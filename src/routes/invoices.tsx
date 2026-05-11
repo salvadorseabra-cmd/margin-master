@@ -128,6 +128,52 @@ function InvoicesPage() {
     }
   };
 
+  const fileToDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result as string);
+      r.onerror = () => reject(r.error);
+      r.readAsDataURL(file);
+    });
+
+  const runExtraction = async (
+    invoiceId: string,
+    dataUrl: string,
+  ): Promise<{ supplier?: string; total?: number; itemsCount: number } | null> => {
+    setExtracting((s) => ({ ...s, [invoiceId]: true }));
+    try {
+      const { data, error } = await supabase.functions.invoke("extract-invoice", {
+        body: { imageDataUrl: dataUrl },
+      });
+      if (error) throw error;
+      const items = Array.isArray(data?.items) ? data.items : [];
+      // wipe prior items then insert fresh
+      await supabase.from("invoice_items").delete().eq("invoice_id", invoiceId);
+      if (items.length && user) {
+        const insertRows = items.map((it: ItemRow) => ({
+          invoice_id: invoiceId,
+          user_id: user.id,
+          name: String(it.name ?? "Unknown").slice(0, 200),
+          quantity: it.quantity ?? null,
+          unit: it.unit ? String(it.unit).slice(0, 20) : null,
+          unit_price: it.unit_price ?? null,
+          total: it.total ?? null,
+        }));
+        await supabase.from("invoice_items").insert(insertRows);
+      }
+      return {
+        supplier: data?.supplier,
+        total: typeof data?.total === "number" ? data.total : undefined,
+        itemsCount: items.length,
+      };
+    } catch (err) {
+      console.error("extract failed", err);
+      return null;
+    } finally {
+      setExtracting((s) => ({ ...s, [invoiceId]: false }));
+    }
+  };
+
   const uploadOne = async (item: Pending) => {
     if (!user) return;
     setPending((p) => p.map((x) => (x.id === item.id ? { ...x, status: "uploading", progress: 10 } : x)));
@@ -140,25 +186,47 @@ function InvoicesPage() {
         .upload(path, item.file, { contentType: item.file.type, upsert: false });
       if (upErr) throw upErr;
 
-      setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 70 } : x)));
+      setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 40 } : x)));
 
-      const supplier = item.file.name.replace(/\.[^.]+$/, "").slice(0, 60) || "Unknown supplier";
-      const total = +(Math.random() * 1500 + 100).toFixed(2);
-      const items = Math.floor(Math.random() * 18) + 4;
+      const fallbackSupplier = item.file.name.replace(/\.[^.]+$/, "").slice(0, 60) || "Unknown supplier";
+      const { data: inserted, error: insErr } = await supabase
+        .from("invoices")
+        .insert({
+          user_id: user.id,
+          supplier: fallbackSupplier,
+          total: 0,
+          items_count: 0,
+          status: "Processing",
+          file_path: path,
+        })
+        .select("id")
+        .single();
+      if (insErr || !inserted) throw insErr ?? new Error("Insert failed");
 
-      const { error: insErr } = await supabase.from("invoices").insert({
-        user_id: user.id,
-        supplier,
-        total,
-        items_count: items,
-        status: "Processed",
-        file_path: path,
-      });
-      if (insErr) throw insErr;
+      setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 65 } : x)));
+
+      const isImage = item.file.type.startsWith("image/");
+      if (isImage) {
+        const dataUrl = await fileToDataUrl(item.file);
+        const ext = await runExtraction(inserted.id, dataUrl);
+        await supabase
+          .from("invoices")
+          .update({
+            supplier: ext?.supplier?.slice(0, 120) ?? fallbackSupplier,
+            total: ext?.total ?? 0,
+            items_count: ext?.itemsCount ?? 0,
+            status: ext ? "Processed" : "Review",
+          })
+          .eq("id", inserted.id);
+      } else {
+        await supabase
+          .from("invoices")
+          .update({ status: "Review" })
+          .eq("id", inserted.id);
+      }
 
       setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 100, status: "done" } : x)));
       load();
-      // Clear from queue after a moment
       setTimeout(() => {
         setPending((p) => {
           const target = p.find((x) => x.id === item.id);
@@ -174,6 +242,45 @@ function InvoicesPage() {
             : x,
         ),
       );
+    }
+  };
+
+  const loadItems = async (invoiceId: string) => {
+    const { data } = await supabase
+      .from("invoice_items")
+      .select("id, name, quantity, unit, unit_price, total")
+      .eq("invoice_id", invoiceId)
+      .order("created_at", { ascending: true });
+    setItemsByInvoice((s) => ({ ...s, [invoiceId]: (data ?? []) as ItemRow[] }));
+  };
+
+  const toggleExpand = (row: InvoiceRow) => {
+    setExpanded((id) => (id === row.id ? null : row.id));
+    if (!itemsByInvoice[row.id]) loadItems(row.id);
+  };
+
+  const reExtract = async (row: InvoiceRow) => {
+    if (!row.file_path) return;
+    const ext = row.file_path.split(".").pop()?.toLowerCase() ?? "";
+    if (!["png", "jpg", "jpeg", "webp"].includes(ext)) return;
+    const { data: signed } = await supabase.storage.from("invoices").createSignedUrl(row.file_path, 120);
+    if (!signed) return;
+    const blob = await fetch(signed.signedUrl).then((r) => r.blob());
+    const dataUrl = await new Promise<string>((res) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result as string);
+      r.readAsDataURL(blob);
+    });
+    const result = await runExtraction(row.id, dataUrl);
+    if (result) {
+      await supabase.from("invoices").update({
+        supplier: result.supplier?.slice(0, 120) ?? row.supplier,
+        total: result.total ?? row.total,
+        items_count: result.itemsCount,
+        status: "Processed",
+      }).eq("id", row.id);
+      await loadItems(row.id);
+      load();
     }
   };
 
