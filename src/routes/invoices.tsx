@@ -52,6 +52,15 @@ type Pending = {
 const MAX_BYTES = 20 * 1024 * 1024;
 const ACCEPT = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
 
+type ItemRow = {
+  id: string;
+  name: string;
+  quantity: number | null;
+  unit: string | null;
+  unit_price: number | null;
+  total: number | null;
+};
+
 function InvoicesPage() {
   const { user } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -61,6 +70,9 @@ function InvoicesPage() {
   const [loading, setLoading] = useState(true);
   const [preview, setPreview] = useState<{ url: string; type: string; name: string } | null>(null);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [itemsByInvoice, setItemsByInvoice] = useState<Record<string, ItemRow[]>>({});
+  const [extracting, setExtracting] = useState<Record<string, boolean>>({});
 
   const load = async () => {
     setLoading(true);
