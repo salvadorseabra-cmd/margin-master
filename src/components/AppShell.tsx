@@ -1,7 +1,9 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Receipt, ChefHat, LineChart, Bell, Sparkles, Menu, X, Search } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
+import { LayoutDashboard, Receipt, ChefHat, LineChart, Bell, Sparkles, Menu, X, Search, LogOut, Loader2 } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
 import { restaurant } from "@/lib/mock-data";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -14,6 +16,22 @@ const nav = [
 export function AppShell({ title, subtitle, action, children }: { title: string; subtitle?: string; action?: ReactNode; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !user) navigate({ to: "/login" });
+  }, [loading, user, navigate]);
+
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen grid place-items-center bg-background">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  const initials = (user.email ?? "?").slice(0, 2).toUpperCase();
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -54,8 +72,16 @@ export function AppShell({ title, subtitle, action, children }: { title: string;
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
             </Link>
+            <button
+              onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/login" }); }}
+              className="p-2 rounded-md hover:bg-muted text-muted-foreground"
+              aria-label="Sign out"
+              title="Sign out"
+            >
+              <LogOut className="h-5 w-5" />
+            </button>
             <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-chart-5 grid place-items-center text-primary-foreground text-sm font-semibold">
-              CL
+              {initials}
             </div>
           </div>
         </header>
