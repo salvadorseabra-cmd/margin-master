@@ -11,8 +11,11 @@ import {
   Eye,
   Trash2,
   X,
+  ChevronDown,
+  ChevronRight,
+  Wand2,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -49,6 +52,15 @@ type Pending = {
 const MAX_BYTES = 20 * 1024 * 1024;
 const ACCEPT = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
 
+type ItemRow = {
+  id: string;
+  name: string;
+  quantity: number | null;
+  unit: string | null;
+  unit_price: number | null;
+  total: number | null;
+};
+
 function InvoicesPage() {
   const { user } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -58,6 +70,9 @@ function InvoicesPage() {
   const [loading, setLoading] = useState(true);
   const [preview, setPreview] = useState<{ url: string; type: string; name: string } | null>(null);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [itemsByInvoice, setItemsByInvoice] = useState<Record<string, ItemRow[]>>({});
+  const [extracting, setExtracting] = useState<Record<string, boolean>>({});
 
   const load = async () => {
     setLoading(true);
@@ -113,6 +128,52 @@ function InvoicesPage() {
     }
   };
 
+  const fileToDataUrl = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result as string);
+      r.onerror = () => reject(r.error);
+      r.readAsDataURL(file);
+    });
+
+  const runExtraction = async (
+    invoiceId: string,
+    dataUrl: string,
+  ): Promise<{ supplier?: string; total?: number; itemsCount: number } | null> => {
+    setExtracting((s) => ({ ...s, [invoiceId]: true }));
+    try {
+      const { data, error } = await supabase.functions.invoke("extract-invoice", {
+        body: { imageDataUrl: dataUrl },
+      });
+      if (error) throw error;
+      const items = Array.isArray(data?.items) ? data.items : [];
+      // wipe prior items then insert fresh
+      await supabase.from("invoice_items").delete().eq("invoice_id", invoiceId);
+      if (items.length && user) {
+        const insertRows = items.map((it: ItemRow) => ({
+          invoice_id: invoiceId,
+          user_id: user.id,
+          name: String(it.name ?? "Unknown").slice(0, 200),
+          quantity: it.quantity ?? null,
+          unit: it.unit ? String(it.unit).slice(0, 20) : null,
+          unit_price: it.unit_price ?? null,
+          total: it.total ?? null,
+        }));
+        await supabase.from("invoice_items").insert(insertRows);
+      }
+      return {
+        supplier: data?.supplier,
+        total: typeof data?.total === "number" ? data.total : undefined,
+        itemsCount: items.length,
+      };
+    } catch (err) {
+      console.error("extract failed", err);
+      return null;
+    } finally {
+      setExtracting((s) => ({ ...s, [invoiceId]: false }));
+    }
+  };
+
   const uploadOne = async (item: Pending) => {
     if (!user) return;
     setPending((p) => p.map((x) => (x.id === item.id ? { ...x, status: "uploading", progress: 10 } : x)));
@@ -125,25 +186,47 @@ function InvoicesPage() {
         .upload(path, item.file, { contentType: item.file.type, upsert: false });
       if (upErr) throw upErr;
 
-      setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 70 } : x)));
+      setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 40 } : x)));
 
-      const supplier = item.file.name.replace(/\.[^.]+$/, "").slice(0, 60) || "Unknown supplier";
-      const total = +(Math.random() * 1500 + 100).toFixed(2);
-      const items = Math.floor(Math.random() * 18) + 4;
+      const fallbackSupplier = item.file.name.replace(/\.[^.]+$/, "").slice(0, 60) || "Unknown supplier";
+      const { data: inserted, error: insErr } = await supabase
+        .from("invoices")
+        .insert({
+          user_id: user.id,
+          supplier: fallbackSupplier,
+          total: 0,
+          items_count: 0,
+          status: "Processing",
+          file_path: path,
+        })
+        .select("id")
+        .single();
+      if (insErr || !inserted) throw insErr ?? new Error("Insert failed");
 
-      const { error: insErr } = await supabase.from("invoices").insert({
-        user_id: user.id,
-        supplier,
-        total,
-        items_count: items,
-        status: "Processed",
-        file_path: path,
-      });
-      if (insErr) throw insErr;
+      setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 65 } : x)));
+
+      const isImage = item.file.type.startsWith("image/");
+      if (isImage) {
+        const dataUrl = await fileToDataUrl(item.file);
+        const ext = await runExtraction(inserted.id, dataUrl);
+        await supabase
+          .from("invoices")
+          .update({
+            supplier: ext?.supplier?.slice(0, 120) ?? fallbackSupplier,
+            total: ext?.total ?? 0,
+            items_count: ext?.itemsCount ?? 0,
+            status: ext ? "Processed" : "Review",
+          })
+          .eq("id", inserted.id);
+      } else {
+        await supabase
+          .from("invoices")
+          .update({ status: "Review" })
+          .eq("id", inserted.id);
+      }
 
       setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 100, status: "done" } : x)));
       load();
-      // Clear from queue after a moment
       setTimeout(() => {
         setPending((p) => {
           const target = p.find((x) => x.id === item.id);
@@ -159,6 +242,45 @@ function InvoicesPage() {
             : x,
         ),
       );
+    }
+  };
+
+  const loadItems = async (invoiceId: string) => {
+    const { data } = await supabase
+      .from("invoice_items")
+      .select("id, name, quantity, unit, unit_price, total")
+      .eq("invoice_id", invoiceId)
+      .order("created_at", { ascending: true });
+    setItemsByInvoice((s) => ({ ...s, [invoiceId]: (data ?? []) as ItemRow[] }));
+  };
+
+  const toggleExpand = (row: InvoiceRow) => {
+    setExpanded((id) => (id === row.id ? null : row.id));
+    if (!itemsByInvoice[row.id]) loadItems(row.id);
+  };
+
+  const reExtract = async (row: InvoiceRow) => {
+    if (!row.file_path) return;
+    const ext = row.file_path.split(".").pop()?.toLowerCase() ?? "";
+    if (!["png", "jpg", "jpeg", "webp"].includes(ext)) return;
+    const { data: signed } = await supabase.storage.from("invoices").createSignedUrl(row.file_path, 120);
+    if (!signed) return;
+    const blob = await fetch(signed.signedUrl).then((r) => r.blob());
+    const dataUrl = await new Promise<string>((res) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result as string);
+      r.readAsDataURL(blob);
+    });
+    const result = await runExtraction(row.id, dataUrl);
+    if (result) {
+      await supabase.from("invoices").update({
+        supplier: result.supplier?.slice(0, 120) ?? row.supplier,
+        total: result.total ?? row.total,
+        items_count: result.itemsCount,
+        status: "Processed",
+      }).eq("id", row.id);
+      await loadItems(row.id);
+      load();
     }
   };
 
@@ -286,22 +408,23 @@ function InvoicesPage() {
           <table className="w-full text-sm">
             <thead className="bg-muted/40">
               <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
+                <th className="py-3 px-5 font-medium w-8"></th>
                 <th className="py-3 px-5 font-medium">File</th>
                 <th className="py-3 px-5 font-medium">Supplier</th>
                 <th className="py-3 px-5 font-medium hidden sm:table-cell">Date</th>
                 <th className="py-3 px-5 font-medium text-right hidden md:table-cell">Items</th>
                 <th className="py-3 px-5 font-medium text-right">Total</th>
                 <th className="py-3 px-5 font-medium hidden sm:table-cell">Status</th>
-                <th className="py-3 px-5 font-medium w-20"></th>
+                <th className="py-3 px-5 font-medium w-28"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {loading && (
-                <tr><td colSpan={7} className="py-12 text-center"><Loader2 className="h-5 w-5 animate-spin inline text-muted-foreground" /></td></tr>
+                <tr><td colSpan={8} className="py-12 text-center"><Loader2 className="h-5 w-5 animate-spin inline text-muted-foreground" /></td></tr>
               )}
               {!loading && rows.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="py-16 text-center">
+                  <td colSpan={8} className="py-16 text-center">
                     <div className="mx-auto h-10 w-10 rounded-full bg-muted grid place-items-center mb-3">
                       <FileText className="h-5 w-5 text-muted-foreground" />
                     </div>
@@ -310,37 +433,67 @@ function InvoicesPage() {
                   </td>
                 </tr>
               )}
-              {rows.map((r) => (
-                <tr key={r.id} className="hover:bg-muted/30">
-                  <td className="py-3 px-5">
-                    <FileBadge path={r.file_path} />
-                  </td>
-                  <td className="py-3 px-5 font-medium">{r.supplier}</td>
-                  <td className="py-3 px-5 text-muted-foreground hidden sm:table-cell">{r.invoice_date}</td>
-                  <td className="py-3 px-5 text-right tabular-nums hidden md:table-cell">{r.items_count}</td>
-                  <td className="py-3 px-5 text-right tabular-nums font-medium">€{Number(r.total).toFixed(2)}</td>
-                  <td className="py-3 px-5 hidden sm:table-cell">
-                    <StatusPill status={r.status as "Processed" | "Processing" | "Review"} />
-                  </td>
-                  <td className="py-3 px-5 text-right whitespace-nowrap">
-                    <button
-                      onClick={() => openPreview(r)}
-                      disabled={!r.file_path}
-                      className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
-                      title="Preview"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => removeRow(r)}
-                      className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-muted"
-                      title="Delete"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {rows.map((r) => {
+                const open = expanded === r.id;
+                const isImage = r.file_path ? ["png", "jpg", "jpeg", "webp"].some((e) => r.file_path!.toLowerCase().endsWith(e)) : false;
+                const items = itemsByInvoice[r.id] ?? [];
+                return (
+                  <Fragment key={r.id}>
+                    <tr className="hover:bg-muted/30 cursor-pointer" onClick={() => toggleExpand(r)}>
+                      <td className="py-3 px-5 text-muted-foreground">
+                        {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                      </td>
+                      <td className="py-3 px-5"><FileBadge path={r.file_path} /></td>
+                      <td className="py-3 px-5 font-medium">{r.supplier}</td>
+                      <td className="py-3 px-5 text-muted-foreground hidden sm:table-cell">{r.invoice_date}</td>
+                      <td className="py-3 px-5 text-right tabular-nums hidden md:table-cell">{r.items_count}</td>
+                      <td className="py-3 px-5 text-right tabular-nums font-medium">€{Number(r.total).toFixed(2)}</td>
+                      <td className="py-3 px-5 hidden sm:table-cell">
+                        <StatusPill status={r.status as "Processed" | "Processing" | "Review"} />
+                      </td>
+                      <td className="py-3 px-5 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                        {isImage && (
+                          <button
+                            onClick={() => reExtract(r)}
+                            disabled={!!extracting[r.id]}
+                            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
+                            title="Re-extract with AI"
+                          >
+                            {extracting[r.id] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => openPreview(r)}
+                          disabled={!r.file_path}
+                          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
+                          title="Preview"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => removeRow(r)}
+                          className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-muted"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </td>
+                    </tr>
+                    {open && (
+                      <tr className="bg-muted/20">
+                        <td colSpan={8} className="px-5 py-4">
+                          <ItemsTable
+                            items={items}
+                            loading={itemsByInvoice[r.id] === undefined}
+                            extracting={!!extracting[r.id]}
+                            onExtract={isImage ? () => reExtract(r) : undefined}
+                          />
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -443,3 +596,76 @@ function PreviewModal({ preview, onClose }: { preview: { url: string; type: stri
     </div>
   );
 }
+
+function ItemsTable({
+  items,
+  loading,
+  extracting,
+  onExtract,
+}: {
+  items: ItemRow[];
+  loading: boolean;
+  extracting: boolean;
+  onExtract?: () => void;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-card overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <div>
+          <div className="text-sm font-semibold inline-flex items-center gap-2">
+            <Sparkles className="h-3.5 w-3.5 text-primary" /> Extracted ingredients
+          </div>
+          <div className="text-xs text-muted-foreground">AI Vision · structured output</div>
+        </div>
+        {onExtract && (
+          <button
+            onClick={onExtract}
+            disabled={extracting}
+            className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-md border border-border hover:bg-muted disabled:opacity-50"
+          >
+            {extracting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
+            {extracting ? "Extracting…" : "Re-extract"}
+          </button>
+        )}
+      </div>
+      {loading || extracting ? (
+        <div className="py-8 text-center text-xs text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin inline mr-2" /> Reading invoice…
+        </div>
+      ) : items.length === 0 ? (
+        <div className="py-8 text-center">
+          <div className="text-sm font-medium">No items extracted yet</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            {onExtract ? "Click Re-extract to analyze with AI Vision." : "Upload an image (PNG/JPG/WEBP) to enable AI extraction."}
+          </div>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/40">
+              <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
+                <th className="py-2.5 px-4 font-medium">Ingredient</th>
+                <th className="py-2.5 px-4 font-medium text-right">Qty</th>
+                <th className="py-2.5 px-4 font-medium">Unit</th>
+                <th className="py-2.5 px-4 font-medium text-right">Unit price</th>
+                <th className="py-2.5 px-4 font-medium text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {items.map((it) => (
+                <tr key={it.id}>
+                  <td className="py-2.5 px-4 font-medium">{it.name}</td>
+                  <td className="py-2.5 px-4 text-right tabular-nums">{it.quantity ?? "—"}</td>
+                  <td className="py-2.5 px-4 text-muted-foreground">{it.unit ?? "—"}</td>
+                  <td className="py-2.5 px-4 text-right tabular-nums">{it.unit_price != null ? `€${Number(it.unit_price).toFixed(2)}` : "—"}</td>
+                  <td className="py-2.5 px-4 text-right tabular-nums font-medium">{it.total != null ? `€${Number(it.total).toFixed(2)}` : "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
