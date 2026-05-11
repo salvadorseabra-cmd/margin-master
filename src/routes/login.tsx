@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Sparkles, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { Sparkles, ArrowRight, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -14,8 +15,42 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("camille@maisonolivier.fr");
-  const [password, setPassword] = useState("••••••••");
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) navigate({ to: "/" });
+    });
+  }, [navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    try {
+      if (mode === "signup") {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: `${window.location.origin}/` },
+        });
+        if (error) throw error;
+        navigate({ to: "/" });
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        navigate({ to: "/" });
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Authentication failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
@@ -28,55 +63,61 @@ function LoginPage() {
         </Link>
 
         <div className="max-w-sm w-full mx-auto py-12 lg:py-0">
-          <h1 className="text-3xl font-semibold tracking-tight">Welcome back</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">
+            {mode === "signin" ? "Welcome back" : "Create your account"}
+          </h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Sign in to track ingredient costs, recipes, and AI-powered margin alerts.
+            {mode === "signin"
+              ? "Sign in to track ingredient costs, recipes, and AI-powered margin alerts."
+              : "Start a 14-day trial. No credit card required."}
           </p>
 
-          <form
-            className="mt-8 space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              navigate({ to: "/" });
-            }}
-          >
+          <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
             <div>
               <label className="text-xs font-medium text-muted-foreground">Email</label>
               <input
                 type="email"
+                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 w-full rounded-lg border border-input bg-card px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                placeholder="you@restaurant.com"
               />
             </div>
             <div>
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-medium text-muted-foreground">Password</label>
-                <a className="text-xs text-primary hover:underline">Forgot?</a>
-              </div>
+              <label className="text-xs font-medium text-muted-foreground">Password</label>
               <input
                 type="password"
+                required
+                minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="mt-1 w-full rounded-lg border border-input bg-card px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                placeholder="••••••••"
               />
             </div>
+
+            {error && (
+              <div className="text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-md px-3 py-2">
+                {error}
+              </div>
+            )}
+
             <button
               type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 bg-foreground text-background rounded-lg px-4 py-2.5 text-sm font-medium hover:opacity-90 transition"
+              disabled={loading}
+              className="w-full inline-flex items-center justify-center gap-2 bg-foreground text-background rounded-lg px-4 py-2.5 text-sm font-medium hover:opacity-90 transition disabled:opacity-60"
             >
-              Continue <ArrowRight className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              className="w-full rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium hover:bg-muted transition"
-            >
-              Continue with Google
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>{mode === "signin" ? "Sign in" : "Create account"} <ArrowRight className="h-4 w-4" /></>}
             </button>
           </form>
 
           <p className="text-xs text-muted-foreground mt-6 text-center">
-            New to Marginly? <a className="text-foreground font-medium hover:underline">Start a 14-day trial</a>
+            {mode === "signin" ? (
+              <>New to Marginly? <button onClick={() => setMode("signup")} className="text-foreground font-medium hover:underline">Create an account</button></>
+            ) : (
+              <>Already have an account? <button onClick={() => setMode("signin")} className="text-foreground font-medium hover:underline">Sign in</button></>
+            )}
           </p>
         </div>
 
@@ -96,11 +137,6 @@ function LoginPage() {
           <Stat label="Avg margin recovered" value="+4.2%" />
           <Stat label="Invoices automated" value="98%" />
           <Stat label="Hours saved / week" value="11h" />
-          <p className="text-sm text-background/70 max-w-sm">
-            “Marginly caught a 15% saffron spike before it ate our Risotto margin. It paid for itself in a week.”
-            <br />
-            <span className="text-background/90 font-medium">— Camille L., Maison Olivier</span>
-          </p>
         </div>
       </div>
     </div>
