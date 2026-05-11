@@ -596,3 +596,76 @@ function PreviewModal({ preview, onClose }: { preview: { url: string; type: stri
     </div>
   );
 }
+
+function ItemsTable({
+  items,
+  loading,
+  extracting,
+  onExtract,
+}: {
+  items: ItemRow[];
+  loading: boolean;
+  extracting: boolean;
+  onExtract?: () => void;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-card overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <div>
+          <div className="text-sm font-semibold inline-flex items-center gap-2">
+            <Sparkles className="h-3.5 w-3.5 text-primary" /> Extracted ingredients
+          </div>
+          <div className="text-xs text-muted-foreground">AI Vision · structured output</div>
+        </div>
+        {onExtract && (
+          <button
+            onClick={onExtract}
+            disabled={extracting}
+            className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-md border border-border hover:bg-muted disabled:opacity-50"
+          >
+            {extracting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
+            {extracting ? "Extracting…" : "Re-extract"}
+          </button>
+        )}
+      </div>
+      {loading || extracting ? (
+        <div className="py-8 text-center text-xs text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin inline mr-2" /> Reading invoice…
+        </div>
+      ) : items.length === 0 ? (
+        <div className="py-8 text-center">
+          <div className="text-sm font-medium">No items extracted yet</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            {onExtract ? "Click Re-extract to analyze with AI Vision." : "Upload an image (PNG/JPG/WEBP) to enable AI extraction."}
+          </div>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/40">
+              <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
+                <th className="py-2.5 px-4 font-medium">Ingredient</th>
+                <th className="py-2.5 px-4 font-medium text-right">Qty</th>
+                <th className="py-2.5 px-4 font-medium">Unit</th>
+                <th className="py-2.5 px-4 font-medium text-right">Unit price</th>
+                <th className="py-2.5 px-4 font-medium text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {items.map((it) => (
+                <tr key={it.id}>
+                  <td className="py-2.5 px-4 font-medium">{it.name}</td>
+                  <td className="py-2.5 px-4 text-right tabular-nums">{it.quantity ?? "—"}</td>
+                  <td className="py-2.5 px-4 text-muted-foreground">{it.unit ?? "—"}</td>
+                  <td className="py-2.5 px-4 text-right tabular-nums">{it.unit_price != null ? `€${Number(it.unit_price).toFixed(2)}` : "—"}</td>
+                  <td className="py-2.5 px-4 text-right tabular-nums font-medium">{it.total != null ? `€${Number(it.total).toFixed(2)}` : "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
