@@ -408,22 +408,23 @@ function InvoicesPage() {
           <table className="w-full text-sm">
             <thead className="bg-muted/40">
               <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
+                <th className="py-3 px-5 font-medium w-8"></th>
                 <th className="py-3 px-5 font-medium">File</th>
                 <th className="py-3 px-5 font-medium">Supplier</th>
                 <th className="py-3 px-5 font-medium hidden sm:table-cell">Date</th>
                 <th className="py-3 px-5 font-medium text-right hidden md:table-cell">Items</th>
                 <th className="py-3 px-5 font-medium text-right">Total</th>
                 <th className="py-3 px-5 font-medium hidden sm:table-cell">Status</th>
-                <th className="py-3 px-5 font-medium w-20"></th>
+                <th className="py-3 px-5 font-medium w-28"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {loading && (
-                <tr><td colSpan={7} className="py-12 text-center"><Loader2 className="h-5 w-5 animate-spin inline text-muted-foreground" /></td></tr>
+                <tr><td colSpan={8} className="py-12 text-center"><Loader2 className="h-5 w-5 animate-spin inline text-muted-foreground" /></td></tr>
               )}
               {!loading && rows.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="py-16 text-center">
+                  <td colSpan={8} className="py-16 text-center">
                     <div className="mx-auto h-10 w-10 rounded-full bg-muted grid place-items-center mb-3">
                       <FileText className="h-5 w-5 text-muted-foreground" />
                     </div>
@@ -432,37 +433,67 @@ function InvoicesPage() {
                   </td>
                 </tr>
               )}
-              {rows.map((r) => (
-                <tr key={r.id} className="hover:bg-muted/30">
-                  <td className="py-3 px-5">
-                    <FileBadge path={r.file_path} />
-                  </td>
-                  <td className="py-3 px-5 font-medium">{r.supplier}</td>
-                  <td className="py-3 px-5 text-muted-foreground hidden sm:table-cell">{r.invoice_date}</td>
-                  <td className="py-3 px-5 text-right tabular-nums hidden md:table-cell">{r.items_count}</td>
-                  <td className="py-3 px-5 text-right tabular-nums font-medium">€{Number(r.total).toFixed(2)}</td>
-                  <td className="py-3 px-5 hidden sm:table-cell">
-                    <StatusPill status={r.status as "Processed" | "Processing" | "Review"} />
-                  </td>
-                  <td className="py-3 px-5 text-right whitespace-nowrap">
-                    <button
-                      onClick={() => openPreview(r)}
-                      disabled={!r.file_path}
-                      className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
-                      title="Preview"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => removeRow(r)}
-                      className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-muted"
-                      title="Delete"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {rows.map((r) => {
+                const open = expanded === r.id;
+                const isImage = r.file_path ? ["png", "jpg", "jpeg", "webp"].some((e) => r.file_path!.toLowerCase().endsWith(e)) : false;
+                const items = itemsByInvoice[r.id] ?? [];
+                return (
+                  <Fragment key={r.id}>
+                    <tr className="hover:bg-muted/30 cursor-pointer" onClick={() => toggleExpand(r)}>
+                      <td className="py-3 px-5 text-muted-foreground">
+                        {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                      </td>
+                      <td className="py-3 px-5"><FileBadge path={r.file_path} /></td>
+                      <td className="py-3 px-5 font-medium">{r.supplier}</td>
+                      <td className="py-3 px-5 text-muted-foreground hidden sm:table-cell">{r.invoice_date}</td>
+                      <td className="py-3 px-5 text-right tabular-nums hidden md:table-cell">{r.items_count}</td>
+                      <td className="py-3 px-5 text-right tabular-nums font-medium">€{Number(r.total).toFixed(2)}</td>
+                      <td className="py-3 px-5 hidden sm:table-cell">
+                        <StatusPill status={r.status as "Processed" | "Processing" | "Review"} />
+                      </td>
+                      <td className="py-3 px-5 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                        {isImage && (
+                          <button
+                            onClick={() => reExtract(r)}
+                            disabled={!!extracting[r.id]}
+                            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
+                            title="Re-extract with AI"
+                          >
+                            {extracting[r.id] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => openPreview(r)}
+                          disabled={!r.file_path}
+                          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
+                          title="Preview"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => removeRow(r)}
+                          className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-muted"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </td>
+                    </tr>
+                    {open && (
+                      <tr className="bg-muted/20">
+                        <td colSpan={8} className="px-5 py-4">
+                          <ItemsTable
+                            items={items}
+                            loading={itemsByInvoice[r.id] === undefined}
+                            extracting={!!extracting[r.id]}
+                            onExtract={isImage ? () => reExtract(r) : undefined}
+                          />
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                );
+              })}
             </tbody>
           </table>
         </div>
