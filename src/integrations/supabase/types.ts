@@ -14,7 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ingredients: {
+        Row: {
+          created_at: string
+          current_price: number
+          id: string
+          name: string
+          supplier: string | null
+          unit: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_price?: number
+          id?: string
+          name: string
+          supplier?: string | null
+          unit?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_price?: number
+          id?: string
+          name?: string
+          supplier?: string | null
+          unit?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      invoices: {
+        Row: {
+          created_at: string
+          file_path: string | null
+          id: string
+          invoice_date: string
+          items_count: number
+          status: string
+          supplier: string
+          total: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_path?: string | null
+          id?: string
+          invoice_date?: string
+          items_count?: number
+          status?: string
+          supplier: string
+          total?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_path?: string | null
+          id?: string
+          invoice_date?: string
+          items_count?: number
+          status?: string
+          supplier?: string
+          total?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      recipes: {
+        Row: {
+          category: string
+          cost: number
+          created_at: string
+          id: string
+          name: string
+          price: number
+          sold: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          cost?: number
+          created_at?: string
+          id?: string
+          name: string
+          price?: number
+          sold?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          cost?: number
+          created_at?: string
+          id?: string
+          name?: string
+          price?: number
+          sold?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
