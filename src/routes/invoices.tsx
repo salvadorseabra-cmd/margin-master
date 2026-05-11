@@ -11,6 +11,9 @@ import {
   Eye,
   Trash2,
   X,
+  ChevronDown,
+  ChevronRight,
+  Wand2,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
