@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
-import { recipes } from "@/lib/mock-data";
 import { Plus, TrendingUp, TrendingDown } from "lucide-react";
+
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/recipes")({
   head: () => ({
@@ -12,8 +15,68 @@ export const Route = createFileRoute("/recipes")({
   }),
   component: RecipesPage,
 });
+type RecipeIngredient = {
+  quantity: number | null;
+  ingredients: {
+    price: number | null;
+  } | null;
+};
 
+type RecipeRow = {
+  id: string;
+  name: string;
+  selling_price: number | null;
+  type: string | null;
+  recipe_ingredients: RecipeIngredient[] | null;
+};
 function RecipesPage() {
+  const { user } = useAuth();
+
+  const [recipes, setRecipes] = useState<RecipeRow[]>([]);
+  const [recipeCosts, setRecipeCosts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+  if (!user) return;
+
+  const load = async () => {
+  const { data: recipesData } = await supabase
+    .from("recipes")
+    .select("*")
+    .order("name", { ascending: true });
+
+  setRecipes(recipesData as any);
+
+  const { data: links } = await supabase
+    .from("recipe_ingredients")
+    .select(`
+      recipe_id,
+      quantity,
+      ingredients (
+        price
+      )
+    `);
+
+  const costs: Record<string, number> = {};
+
+  (links ?? []).forEach((row: any) => {
+    const recipeId = row.recipe_id;
+
+    const qty = Number(row.quantity ?? 0);
+
+    const ingredientPrice =
+      Number(row.ingredients?.price ?? 0);
+
+    const total = qty * ingredientPrice;
+
+    costs[recipeId] =
+      (costs[recipeId] ?? 0) + total;
+  });
+
+  setRecipeCosts(costs);
+};
+
+  load();
+}, [user]);
   return (
     <AppShell
       title="Recipes"
@@ -25,15 +88,26 @@ function RecipesPage() {
       }
     >
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {recipes.map((r) => {
-          const margin = ((r.price - r.cost) / r.price) * 100;
-          const fc = (r.cost / r.price) * 100;
+        {(recipes ?? []).map((r) => {
+          const price = r.selling_price ?? 0;
+
+  const cost = recipeCosts[r.id] ?? 0;
+
+const margin =
+  price > 0
+    ? ((price - cost) / price) * 100
+    : 0;
+
+const fc =
+  price > 0
+    ? (cost / price) * 100
+    : 0;
           const healthy = margin >= 65;
           return (
             <Card key={r.id} className="flex flex-col">
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="text-xs text-muted-foreground">{r.category}</div>
+                  <div className="text-xs text-muted-foreground">{r.type}</div>
                   <div className="text-base font-semibold mt-0.5">{r.name}</div>
                 </div>
                 <div className={`inline-flex items-center gap-1 text-xs font-medium ${healthy ? "text-success" : "text-destructive"}`}>
@@ -43,9 +117,9 @@ function RecipesPage() {
               </div>
 
               <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                <Mini label="Price" value={`€${r.price}`} />
-                <Mini label="Cost" value={`€${r.cost.toFixed(2)}`} />
-                <Mini label="Sold" value={`${r.sold}`} />
+                <Mini label="Price" value={`€${r.selling_price ?? 0}`} />
+                <Mini label="Cost" value={`€${cost.toFixed(2)}`} />
+                <Mini label="Sold" value="-" />
               </div>
 
               <div className="mt-4">

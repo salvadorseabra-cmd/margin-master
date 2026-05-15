@@ -10,6 +10,8 @@ export type RecipeIngredientLine = any;
 
 export type RecipeWithIngredients = any;
 
+export type RecipeIngredientRow = any;
+
 export function buildRecipeLinesByRecipeId(
   merged: RecipeWithIngredients[],
 ): Map<string, RecipeIngredientLine[]> {
