@@ -18,7 +18,8 @@ export const Route = createFileRoute("/recipes")({
 type RecipeIngredient = {
   quantity: number | null;
   ingredients: {
-    price: number | null;
+    current_price: number | null;
+    purchase_quantity: number | null;
   } | null;
 };
 
@@ -39,44 +40,58 @@ function RecipesPage() {
   if (!user) return;
 
   const load = async () => {
-  const { data: recipesData } = await supabase
-    .from("recipes")
-    .select("*")
-    .order("name", { ascending: true });
-
-  setRecipes(recipesData as any);
-
-  const { data: links } = await supabase
-    .from("recipe_ingredients")
-    .select(`
-      recipe_id,
+  
+  const { data: recipesData, error } = await supabase
+  .from("recipes")
+  .select(`
+    id,
+    name,
+    selling_price,
+    type,
+    recipe_ingredients!recipe_ingredients_recipe_id_fkey (
       quantity,
       ingredients (
-        price
+        current_price,
+        purchase_quantity
       )
-    `);
+    )
+  `)
+  .order("name", { ascending: true });
+  
+  console.log(error);
+  
+setRecipes(recipesData as any);
+console.log(recipesData);
 
-  const costs: Record<string, number> = {};
+const costs: Record<string, number> = {};
 
-  (links ?? []).forEach((row: any) => {
-    const recipeId = row.recipe_id;
+(recipesData ?? []).forEach((recipe: any) => {
+  const total =
+    recipe.recipe_ingredients?.reduce((sum: number, ri: any) => {
+      const ingredientPrice =
+        Number(ri.ingredients?.current_price ?? 0);
 
-    const qty = Number(row.quantity ?? 0);
+      const purchaseQty =
+        Number(ri.ingredients?.purchase_quantity ?? 1);
 
-    const ingredientPrice =
-      Number(row.ingredients?.price ?? 0);
+      const qty =
+        Number(ri.quantity ?? 0);
 
-    const total = qty * ingredientPrice;
+      const unitCost =
+        ingredientPrice / purchaseQty;
 
-    costs[recipeId] =
-      (costs[recipeId] ?? 0) + total;
-  });
+      return sum + unitCost * qty;
+        }, 0) ?? 0;
 
-  setRecipeCosts(costs);
-};
+  costs[recipe.id] = total;
+});
+      
+setRecipeCosts(costs);
+  };
 
   load();
 }, [user]);
+
   return (
     <AppShell
       title="Recipes"
@@ -91,7 +106,7 @@ function RecipesPage() {
         {(recipes ?? []).map((r) => {
           const price = r.selling_price ?? 0;
 
-  const cost = recipeCosts[r.id] ?? 0;
+  const cost = Number(recipeCosts?.[r.id] ?? 0);
 
 const margin =
   price > 0
@@ -112,19 +127,19 @@ const fc =
                 </div>
                 <div className={`inline-flex items-center gap-1 text-xs font-medium ${healthy ? "text-success" : "text-destructive"}`}>
                   {healthy ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
-                  {margin.toFixed(0)}%
+                  Gross Margin {margin.toFixed(0)}%
                 </div>
               </div>
 
               <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                 <Mini label="Price" value={`€${r.selling_price ?? 0}`} />
-                <Mini label="Cost" value={`€${cost.toFixed(2)}`} />
+                <Mini label="Food Cost" value={`€${cost.toFixed(2)}`} />
                 <Mini label="Sold" value="-" />
               </div>
 
               <div className="mt-4">
                 <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
-                  <span>Food cost</span>
+                  <span>Food Cost %</span>
                   <span className="tabular-nums">{fc.toFixed(1)}%</span>
                 </div>
                 <div className="h-1.5 rounded-full bg-muted overflow-hidden">
