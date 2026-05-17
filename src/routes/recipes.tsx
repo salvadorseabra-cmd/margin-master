@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
-import { Loader2, Plus, Trash2, TrendingUp, TrendingDown, X } from "lucide-react";
+import { Download, Loader2, Plus, Trash2, TrendingUp, TrendingDown, X } from "lucide-react";
 
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { downloadRecipeTechnicalSheet } from "@/lib/recipe-technical-sheet";
 
 export const Route = createFileRoute("/recipes")({
   head: () => ({
@@ -424,6 +425,24 @@ function RecipesPage() {
     highestCostDriver?.contribution ?? 0,
     activeIngredientCount,
   );
+  const downloadTechnicalSheet = () => {
+    void downloadRecipeTechnicalSheet({
+      recipeName: recipeForm.name,
+      category: recipeForm.type,
+      ingredients: recipeCostLines
+        .filter((line) => line.line.ingredient_id)
+        .map((line) => ({
+          name: line.ingredient?.name ?? "Unnamed ingredient",
+          quantity: line.quantity,
+          unit: line.line.unit || line.ingredient?.unit || "",
+          unitCost: line.unitCost,
+          lineCost: line.lineCost,
+        })),
+      totalFoodCost: recipeTotalCost,
+      sellingPrice,
+      grossMargin,
+    });
+  };
 
   return (
     <AppShell
@@ -440,7 +459,7 @@ function RecipesPage() {
         </button>
       }
     >
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {(recipes ?? []).map((r) => {
           const price = r.selling_price ?? 0;
 
@@ -465,10 +484,10 @@ function RecipesPage() {
                 }
               }}
               aria-label={`Open ${r.name} recipe details`}
-              className="group h-full cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+              className="group h-full min-w-0 cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
             >
-              <Card className="h-full border-border transition-all group-hover:border-foreground/20 group-hover:shadow-md group-focus-visible:border-foreground/20 group-focus-visible:shadow-md">
-                <div className="flex h-full flex-col text-left">
+              <Card className="h-full min-w-0 border-border transition-all group-hover:border-foreground/20 group-hover:shadow-md group-focus-visible:border-foreground/20 group-focus-visible:shadow-md">
+                <div className="flex h-full min-w-0 flex-col text-left">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="text-xs text-muted-foreground">{r.type}</div>
@@ -478,9 +497,9 @@ function RecipesPage() {
                       </div>
                     </div>
 
-                    <div className="flex shrink-0 flex-col items-end gap-2">
+                    <div className="flex min-w-0 flex-col items-end gap-2 text-right">
                       <div
-                        className={`inline-flex items-center gap-1 text-xs font-medium ${
+                        className={`flex max-w-full flex-wrap items-center justify-end gap-1 text-xs font-medium ${
                           healthy ? "text-success" : "text-destructive"
                         }`}
                       >
@@ -494,7 +513,7 @@ function RecipesPage() {
                     </div>
                   </div>
 
-                  <div className="mt-4 grid grid-cols-2 gap-2 text-center">
+                  <div className="mt-4 grid min-w-0 grid-cols-2 gap-2 text-center">
                     <Mini label="Selling Price" value={`€${r.selling_price ?? 0}`} />
 
                     <Mini label="Food Cost" value={`€${cost.toFixed(2)}`} />
@@ -550,6 +569,17 @@ function RecipesPage() {
                 </div>
 
                 <div className="flex shrink-0 items-center gap-2">
+                  {formMode === "edit" && (
+                    <button
+                      type="button"
+                      onClick={downloadTechnicalSheet}
+                      className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-muted-foreground shadow-sm transition-colors hover:border-foreground/20 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">Download technical sheet</span>
+                      <span className="sm:hidden">Download sheet</span>
+                    </button>
+                  )}
                   <div
                     className={`inline-flex w-fit items-center rounded-full border px-3 py-1.5 text-xs font-medium ${
                       recipeHealth.tone === "success"
@@ -574,7 +604,7 @@ function RecipesPage() {
             </div>
 
             <div className="flex-1 space-y-6 overflow-y-auto px-5 py-5 sm:px-6">
-              <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
                 <div className="rounded-2xl border border-border bg-card/40 p-4 sm:p-5">
                   <div className="mb-4">
                     <div className="text-base font-semibold">Recipe setup</div>
@@ -688,7 +718,7 @@ function RecipesPage() {
                 <KpiCard label="Ingredients" value={String(activeIngredientCount)} />
               </div>
 
-              <div className="grid gap-4 lg:grid-cols-[0.9fr_1.6fr]">
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.6fr)]">
                 <div className="rounded-2xl border border-border p-4 sm:p-5">
                   <div className="flex items-center justify-between gap-3">
                     <div>
@@ -1100,10 +1130,12 @@ function getIngredientForLine(
 
 function Mini({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-muted/50 border border-border py-2">
-      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
+    <div className="min-w-0 rounded-lg border border-border bg-muted/50 py-2">
+      <div className="truncate text-[10px] uppercase tracking-wide text-muted-foreground">
+        {label}
+      </div>
 
-      <div className="text-sm font-semibold tabular-nums">{value}</div>
+      <div className="truncate text-sm font-semibold tabular-nums">{value}</div>
     </div>
   );
 }
@@ -1118,12 +1150,12 @@ function KpiCard({
   tone?: RecipeHealth["tone"];
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card/30 px-3 py-3">
-      <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+    <div className="min-w-0 rounded-xl border border-border bg-card/30 px-3 py-3">
+      <div className="truncate text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
         {label}
       </div>
       <div
-        className={`mt-1.5 text-xl font-semibold tabular-nums ${
+        className={`mt-1.5 truncate text-xl font-semibold tabular-nums ${
           tone === "success"
             ? "text-success"
             : tone === "warning"
@@ -1141,11 +1173,11 @@ function KpiCard({
 
 function InsightRow({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
-    <div className="rounded-xl border border-border bg-background/70 p-3">
+    <div className="min-w-0 rounded-xl border border-border bg-background/70 p-3">
       <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
         {label}
       </div>
-      <div className="mt-1 text-sm font-semibold">{value}</div>
+      <div className="mt-1 break-words text-sm font-semibold">{value}</div>
       <div className="mt-1 text-xs text-muted-foreground">{detail}</div>
     </div>
   );
