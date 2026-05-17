@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
-import { Plus, Loader2, Trash2, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Plus, Loader2, Search, Trash2, X } from "lucide-react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -26,7 +26,7 @@ type Row = {
   updated_at?: string | null;
 };
 
-type SortKey = "recent" | "price" | "usage" | "name";
+type SortKey = "recent" | "risk" | "usage" | "price" | "missingSupplier";
 type IngredientSignal = "High risk" | "Attention" | "Stable";
 
 function IngredientsPage() {
@@ -39,7 +39,9 @@ function IngredientsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortKey>("recent");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(null);
+  const deferredSearchQuery = useDeferredValue(searchQuery);
 
   const load = async () => {
     setLoading(true);
@@ -89,14 +91,34 @@ function IngredientsPage() {
     return total / rows.length;
   }, [rows]);
 
+  const filteredRows = useMemo(() => {
+    const query = deferredSearchQuery.trim().toLowerCase();
+    if (!query) return rows;
+
+    return rows.filter((row) => {
+      const name = row.name.toLowerCase();
+      const supplier = row.supplier?.toLowerCase() ?? "";
+      return name.includes(query) || supplier.includes(query);
+    });
+  }, [deferredSearchQuery, rows]);
+
   const sortedRows = useMemo(() => {
-    return [...rows].sort((a, b) => {
+    return [...filteredRows].sort((a, b) => {
+      if (sortBy === "risk") {
+        const aSignal = getIngredientSignal(a, averagePrice, usageCounts[a.id] ?? 0);
+        const bSignal = getIngredientSignal(b, averagePrice, usageCounts[b.id] ?? 0);
+        return getSignalPriority(bSignal) - getSignalPriority(aSignal) || getUpdatedTime(b) - getUpdatedTime(a);
+      }
       if (sortBy === "price") return Number(b.current_price ?? 0) - Number(a.current_price ?? 0);
       if (sortBy === "usage") return (usageCounts[b.id] ?? 0) - (usageCounts[a.id] ?? 0);
-      if (sortBy === "name") return a.name.localeCompare(b.name);
+      if (sortBy === "missingSupplier") {
+        return Number(hasMissingSupplier(b)) - Number(hasMissingSupplier(a)) || getUpdatedTime(b) - getUpdatedTime(a);
+      }
       return getUpdatedTime(b) - getUpdatedTime(a);
     });
-  }, [rows, sortBy, usageCounts]);
+  }, [averagePrice, filteredRows, sortBy, usageCounts]);
+
+  const hasActiveSearch = searchQuery.trim().length > 0;
 
   const highRiskCount = rows.filter((row) => isHighRisk(row, averagePrice, usageCounts[row.id] ?? 0)).length;
 
@@ -176,27 +198,58 @@ function IngredientsPage() {
       </div>
 
       <Card className="p-0 overflow-hidden">
-        <div className="px-5 py-4 border-b border-border flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="font-semibold">Ingredient intelligence</div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              Lightweight price, freshness and recipe usage signals.
+        <div className="px-5 py-4 border-b border-border">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <div className="font-semibold">Ingredient intelligence</div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                Lightweight price, freshness and recipe usage signals.
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                Showing {sortedRows.length} of {rows.length} ingredients
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+              <label className="min-w-0 text-xs font-medium text-muted-foreground sm:w-[300px]">
+                Search ingredients
+                <div className="relative mt-1">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full rounded-lg border border-input bg-card py-2 pl-9 pr-9 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-foreground/30"
+                    placeholder="Search by name or supplier"
+                  />
+                  {hasActiveSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                      aria-label="Clear ingredient search"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              </label>
+
+              <label className="text-xs font-medium text-muted-foreground sm:w-[190px]">
+                Sort by
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as SortKey)}
+                  className="mt-1 w-full rounded-lg border border-input bg-card px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
+                >
+                  <option value="recent">Recently updated</option>
+                  <option value="risk">High risk first</option>
+                  <option value="usage">Most used</option>
+                  <option value="price">Highest price</option>
+                  <option value="missingSupplier">Missing supplier</option>
+                </select>
+              </label>
             </div>
           </div>
-
-          <label className="text-xs font-medium text-muted-foreground">
-            Sort by
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortKey)}
-              className="ml-2 rounded-lg border border-input bg-card px-3 py-2 text-sm text-foreground"
-            >
-              <option value="recent">Recently updated</option>
-              <option value="price">Highest price</option>
-              <option value="usage">Most used</option>
-              <option value="name">Name A-Z</option>
-            </select>
-          </label>
         </div>
 
         <div className="overflow-x-auto">
@@ -218,6 +271,9 @@ function IngredientsPage() {
               )}
               {!loading && rows.length === 0 && (
                 <tr><td colSpan={7} className="py-10 text-center text-sm text-muted-foreground">No ingredients yet. Add your first one above.</td></tr>
+              )}
+              {!loading && rows.length > 0 && sortedRows.length === 0 && (
+                <tr><td colSpan={7} className="py-10 text-center text-sm text-muted-foreground">No ingredients match your search.</td></tr>
               )}
               {sortedRows.map((ing) => {
                 const usageCount = usageCounts[ing.id] ?? 0;
@@ -414,6 +470,12 @@ function getIngredientSignal(row: Row, averagePrice: number, usageCount: number)
   return "Stable";
 }
 
+function getSignalPriority(signal: IngredientSignal) {
+  if (signal === "High risk") return 3;
+  if (signal === "Attention") return 2;
+  return 1;
+}
+
 function getUpdatedTime(row: Row) {
   const value = row.updated_at ?? row.created_at;
   const time = value ? new Date(value).getTime() : 0;
@@ -438,6 +500,10 @@ function isHighRisk(row: Row, averagePrice: number, usageCount: number) {
   const heavyUsage = usageCount >= 2;
 
   return heavyUsage && (highPrice || missingSupplier);
+}
+
+function hasMissingSupplier(row: Row) {
+  return !row.supplier?.trim();
 }
 
 function getPriceContext(row: Row, averagePrice: number, usageCount: number) {

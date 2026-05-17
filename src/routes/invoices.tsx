@@ -78,7 +78,7 @@ function InvoicesPage() {
     setLoading(true);
     const { data, error } = await supabase
       .from("invoices")
-      .select("id, supplier, invoice_date, total, status, items_count, file_path, created_at")
+      .select("id, invoice_date, total, status, items_count, file_path, created_at")
       .order("created_at", { ascending: false });
     if (error) setGlobalError(error.message);
     else setRows(data ?? []);
