@@ -15,7 +15,7 @@ import {
   ChevronRight,
   Wand2,
 } from "lucide-react";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -32,12 +32,20 @@ export const Route = createFileRoute("/invoices")({
 type InvoiceRow = {
   id: string;
   supplier: string;
-  invoice_date: string;
+  displayDate: string;
   total: number;
   status: string;
   items_count: number;
   file_path: string | null;
   created_at: string;
+};
+
+type DbInvoiceRow = {
+  id: string;
+  supplier_name: string | null;
+  total: number | null;
+  file_url: string | null;
+  created_at: string | null;
 };
 
 type Pending = {
@@ -61,6 +69,26 @@ type ItemRow = {
   total: number | null;
 };
 
+const formatInvoiceDate = (createdAt: string | null) => {
+  if (!createdAt) return "—";
+  const date = new Date(createdAt);
+  return Number.isNaN(date.getTime()) ? "—" : date.toLocaleDateString();
+};
+
+const toInvoiceRow = (row: DbInvoiceRow, itemCount = 0): InvoiceRow => {
+  const total = Number(row.total ?? 0);
+  return {
+    id: row.id,
+    supplier: row.supplier_name?.trim() || "Unknown supplier",
+    displayDate: formatInvoiceDate(row.created_at),
+    total,
+    status: itemCount > 0 || total > 0 ? "Processed" : "Review",
+    items_count: itemCount,
+    file_path: row.file_url,
+    created_at: row.created_at ?? "",
+  };
+};
+
 function InvoicesPage() {
   const { user } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -74,23 +102,57 @@ function InvoicesPage() {
   const [itemsByInvoice, setItemsByInvoice] = useState<Record<string, ItemRow[]>>({});
   const [extracting, setExtracting] = useState<Record<string, boolean>>({});
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("invoices")
-      .select("id, invoice_date, total, status, items_count, file_path, created_at")
-      .order("created_at", { ascending: false });
-    if (error) setGlobalError(error.message);
-    else setRows(data ?? []);
-    setLoading(false);
-  };
+    setGlobalError(null);
+    try {
+      const { data, error } = await supabase
+        .from("invoices")
+        .select("id, supplier_name, total, file_url, created_at")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
 
-  useEffect(() => { if (user) load(); }, [user]);
+      const invoiceRows = (data ?? []) as DbInvoiceRow[];
+      const ids = invoiceRows.map((row) => row.id);
+      const itemCounts: Record<string, number> = {};
+
+      if (ids.length > 0) {
+        const { data: itemRows, error: itemError } = await supabase
+          .from("invoice_items")
+          .select("invoice_id")
+          .in("invoice_id", ids);
+        if (!itemError) {
+          for (const item of (itemRows ?? []) as { invoice_id: string | null }[]) {
+            if (item.invoice_id)
+              itemCounts[item.invoice_id] = (itemCounts[item.invoice_id] ?? 0) + 1;
+          }
+        }
+      }
+
+      setRows(invoiceRows.map((row) => toInvoiceRow(row, itemCounts[row.id] ?? 0)));
+    } catch (err) {
+      setRows([]);
+      setGlobalError(err instanceof Error ? err.message : "Could not load invoices");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user) load();
+    else {
+      setRows([]);
+      setLoading(false);
+    }
+  }, [user, load]);
 
   // Cleanup preview URLs on unmount
-  useEffect(() => () => {
-    pending.forEach((p) => URL.revokeObjectURL(p.previewUrl));
-  }, [pending]);
+  useEffect(
+    () => () => {
+      pending.forEach((p) => URL.revokeObjectURL(p.previewUrl));
+    },
+    [pending],
+  );
 
   const stats = useMemo(() => {
     const total = rows.reduce((s, r) => s + Number(r.total ?? 0), 0);
@@ -166,8 +228,7 @@ function InvoicesPage() {
         total: typeof data?.total === "number" ? data.total : undefined,
         itemsCount: items.length,
       };
-    } catch (err) {
-      console.error("extract failed", err);
+    } catch {
       return null;
     } finally {
       setExtracting((s) => ({ ...s, [invoiceId]: false }));
@@ -176,7 +237,9 @@ function InvoicesPage() {
 
   const uploadOne = async (item: Pending) => {
     if (!user) return;
-    setPending((p) => p.map((x) => (x.id === item.id ? { ...x, status: "uploading", progress: 10 } : x)));
+    setPending((p) =>
+      p.map((x) => (x.id === item.id ? { ...x, status: "uploading", progress: 10 } : x)),
+    );
     try {
       const safeName = item.file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
       const path = `${user.id}/${Date.now()}-${safeName}`;
@@ -188,16 +251,15 @@ function InvoicesPage() {
 
       setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 40 } : x)));
 
-      const fallbackSupplier = item.file.name.replace(/\.[^.]+$/, "").slice(0, 60) || "Unknown supplier";
+      const fallbackSupplier =
+        item.file.name.replace(/\.[^.]+$/, "").slice(0, 60) || "Unknown supplier";
       const { data: inserted, error: insErr } = await supabase
         .from("invoices")
         .insert({
           user_id: user.id,
-          supplier: fallbackSupplier,
+          supplier_name: fallbackSupplier,
           total: 0,
-          items_count: 0,
-          status: "Processing",
-          file_path: path,
+          file_url: path,
         })
         .select("id")
         .single();
@@ -212,20 +274,15 @@ function InvoicesPage() {
         await supabase
           .from("invoices")
           .update({
-            supplier: ext?.supplier?.slice(0, 120) ?? fallbackSupplier,
+            supplier_name: ext?.supplier?.slice(0, 120) ?? fallbackSupplier,
             total: ext?.total ?? 0,
-            items_count: ext?.itemsCount ?? 0,
-            status: ext ? "Processed" : "Review",
           })
-          .eq("id", inserted.id);
-      } else {
-        await supabase
-          .from("invoices")
-          .update({ status: "Review" })
           .eq("id", inserted.id);
       }
 
-      setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 100, status: "done" } : x)));
+      setPending((p) =>
+        p.map((x) => (x.id === item.id ? { ...x, progress: 100, status: "done" } : x)),
+      );
       load();
       setTimeout(() => {
         setPending((p) => {
@@ -263,7 +320,9 @@ function InvoicesPage() {
     if (!row.file_path) return;
     const ext = row.file_path.split(".").pop()?.toLowerCase() ?? "";
     if (!["png", "jpg", "jpeg", "webp"].includes(ext)) return;
-    const { data: signed } = await supabase.storage.from("invoices").createSignedUrl(row.file_path, 120);
+    const { data: signed } = await supabase.storage
+      .from("invoices")
+      .createSignedUrl(row.file_path, 120);
     if (!signed) return;
     const blob = await fetch(signed.signedUrl).then((r) => r.blob());
     const dataUrl = await new Promise<string>((res) => {
@@ -273,12 +332,13 @@ function InvoicesPage() {
     });
     const result = await runExtraction(row.id, dataUrl);
     if (result) {
-      await supabase.from("invoices").update({
-        supplier: result.supplier?.slice(0, 120) ?? row.supplier,
-        total: result.total ?? row.total,
-        items_count: result.itemsCount,
-        status: "Processed",
-      }).eq("id", row.id);
+      await supabase
+        .from("invoices")
+        .update({
+          supplier_name: result.supplier?.slice(0, 120) ?? row.supplier,
+          total: result.total ?? row.total,
+        })
+        .eq("id", row.id);
       await loadItems(row.id);
       load();
     }
@@ -318,9 +378,16 @@ function InvoicesPage() {
         {/* Dropzone */}
         <Card className="lg:col-span-2">
           <div
-            onDragOver={(e) => { e.preventDefault(); setDrop(true); }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDrop(true);
+            }}
             onDragLeave={() => setDrop(false)}
-            onDrop={(e) => { e.preventDefault(); setDrop(false); if (e.dataTransfer.files?.length) enqueue(e.dataTransfer.files); }}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDrop(false);
+              if (e.dataTransfer.files?.length) enqueue(e.dataTransfer.files);
+            }}
             onClick={() => inputRef.current?.click()}
             className={`cursor-pointer border-2 border-dashed rounded-2xl p-8 sm:p-12 text-center transition ${
               drop
@@ -334,7 +401,10 @@ function InvoicesPage() {
               multiple
               className="hidden"
               accept=".pdf,.jpg,.jpeg,.png,.webp"
-              onChange={(e) => { if (e.target.files) enqueue(e.target.files); e.target.value = ""; }}
+              onChange={(e) => {
+                if (e.target.files) enqueue(e.target.files);
+                e.target.value = "";
+              }}
             />
             <div className="mx-auto h-14 w-14 rounded-2xl bg-foreground text-background grid place-items-center shadow-sm">
               <UploadCloud className="h-6 w-6" />
@@ -345,7 +415,10 @@ function InvoicesPage() {
             </div>
             <button
               type="button"
-              onClick={(e) => { e.stopPropagation(); inputRef.current?.click(); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                inputRef.current?.click();
+              }}
               className="mt-5 inline-flex items-center gap-2 bg-foreground text-background rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90"
             >
               Choose files
@@ -420,7 +493,11 @@ function InvoicesPage() {
             </thead>
             <tbody className="divide-y divide-border">
               {loading && (
-                <tr><td colSpan={8} className="py-12 text-center"><Loader2 className="h-5 w-5 animate-spin inline text-muted-foreground" /></td></tr>
+                <tr>
+                  <td colSpan={8} className="py-12 text-center">
+                    <Loader2 className="h-5 w-5 animate-spin inline text-muted-foreground" />
+                  </td>
+                </tr>
               )}
               {!loading && rows.length === 0 && (
                 <tr>
@@ -429,29 +506,53 @@ function InvoicesPage() {
                       <FileText className="h-5 w-5 text-muted-foreground" />
                     </div>
                     <div className="text-sm font-medium">No invoices yet</div>
-                    <div className="text-xs text-muted-foreground mt-1">Drop your first invoice above to get started.</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Drop your first invoice above to get started.
+                    </div>
                   </td>
                 </tr>
               )}
               {rows.map((r) => {
                 const open = expanded === r.id;
-                const isImage = r.file_path ? ["png", "jpg", "jpeg", "webp"].some((e) => r.file_path!.toLowerCase().endsWith(e)) : false;
+                const isImage = r.file_path
+                  ? ["png", "jpg", "jpeg", "webp"].some((e) =>
+                      r.file_path!.toLowerCase().endsWith(e),
+                    )
+                  : false;
                 const items = itemsByInvoice[r.id] ?? [];
                 return (
                   <Fragment key={r.id}>
-                    <tr className="hover:bg-muted/30 cursor-pointer" onClick={() => toggleExpand(r)}>
+                    <tr
+                      className="hover:bg-muted/30 cursor-pointer"
+                      onClick={() => toggleExpand(r)}
+                    >
                       <td className="py-3 px-5 text-muted-foreground">
-                        {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                        {open ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
                       </td>
-                      <td className="py-3 px-5"><FileBadge path={r.file_path} /></td>
+                      <td className="py-3 px-5">
+                        <FileBadge path={r.file_path} />
+                      </td>
                       <td className="py-3 px-5 font-medium">{r.supplier}</td>
-                      <td className="py-3 px-5 text-muted-foreground hidden sm:table-cell">{r.invoice_date}</td>
-                      <td className="py-3 px-5 text-right tabular-nums hidden md:table-cell">{r.items_count}</td>
-                      <td className="py-3 px-5 text-right tabular-nums font-medium">€{Number(r.total).toFixed(2)}</td>
+                      <td className="py-3 px-5 text-muted-foreground hidden sm:table-cell">
+                        {r.displayDate}
+                      </td>
+                      <td className="py-3 px-5 text-right tabular-nums hidden md:table-cell">
+                        {r.items_count}
+                      </td>
+                      <td className="py-3 px-5 text-right tabular-nums font-medium">
+                        €{Number(r.total).toFixed(2)}
+                      </td>
                       <td className="py-3 px-5 hidden sm:table-cell">
                         <StatusPill status={r.status as "Processed" | "Processing" | "Review"} />
                       </td>
-                      <td className="py-3 px-5 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                      <td
+                        className="py-3 px-5 text-right whitespace-nowrap"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         {isImage && (
                           <button
                             onClick={() => reExtract(r)}
@@ -459,7 +560,11 @@ function InvoicesPage() {
                             className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
                             title="Re-extract with AI"
                           >
-                            {extracting[r.id] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                            {extracting[r.id] ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Wand2 className="h-4 w-4" />
+                            )}
                           </button>
                         )}
                         <button
@@ -535,7 +640,11 @@ function PendingItem({ item }: { item: Pending }) {
         <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
           <div
             className={`h-full rounded-full transition-all ${
-              item.status === "error" ? "bg-destructive" : item.status === "done" ? "bg-success" : "bg-foreground"
+              item.status === "error"
+                ? "bg-destructive"
+                : item.status === "done"
+                  ? "bg-success"
+                  : "bg-foreground"
             }`}
             style={{ width: `${item.progress}%` }}
           />
@@ -545,8 +654,16 @@ function PendingItem({ item }: { item: Pending }) {
         )}
       </div>
       <div className="text-xs text-muted-foreground shrink-0 inline-flex items-center gap-1.5">
-        {item.status === "uploading" && <><Loader2 className="h-3 w-3 animate-spin" /> Uploading</>}
-        {item.status === "done" && <><Check className="h-3 w-3 text-success" /> Done</>}
+        {item.status === "uploading" && (
+          <>
+            <Loader2 className="h-3 w-3 animate-spin" /> Uploading
+          </>
+        )}
+        {item.status === "done" && (
+          <>
+            <Check className="h-3 w-3 text-success" /> Done
+          </>
+        )}
         {item.status === "error" && <>Failed</>}
         {item.status === "queued" && <>Queued</>}
       </div>
@@ -565,16 +682,27 @@ function FileBadge({ path }: { path: string | null }) {
   const ext = path.split(".").pop()?.toLowerCase() ?? "";
   const isImage = ["png", "jpg", "jpeg", "webp"].includes(ext);
   return (
-    <div className={`h-9 w-9 rounded-lg grid place-items-center ${isImage ? "bg-chart-2/20 text-chart-2" : "bg-foreground/5 text-foreground"}`}>
+    <div
+      className={`h-9 w-9 rounded-lg grid place-items-center ${isImage ? "bg-chart-2/20 text-chart-2" : "bg-foreground/5 text-foreground"}`}
+    >
       {isImage ? <ImageIcon className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
     </div>
   );
 }
 
-function PreviewModal({ preview, onClose }: { preview: { url: string; type: string; name: string }; onClose: () => void }) {
+function PreviewModal({
+  preview,
+  onClose,
+}: {
+  preview: { url: string; type: string; name: string };
+  onClose: () => void;
+}) {
   const isPdf = preview.type === "application/pdf";
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-foreground/40 backdrop-blur-sm" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 grid place-items-center p-4 bg-foreground/40 backdrop-blur-sm"
+      onClick={onClose}
+    >
       <div
         className="bg-card border border-border rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
@@ -589,7 +717,11 @@ function PreviewModal({ preview, onClose }: { preview: { url: string; type: stri
           {isPdf ? (
             <iframe src={preview.url} title={preview.name} className="w-full h-[80vh]" />
           ) : (
-            <img src={preview.url} alt={preview.name} className="max-w-full max-h-[80vh] object-contain" />
+            <img
+              src={preview.url}
+              alt={preview.name}
+              className="max-w-full max-h-[80vh] object-contain"
+            />
           )}
         </div>
       </div>
@@ -623,7 +755,11 @@ function ItemsTable({
             disabled={extracting}
             className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-md border border-border hover:bg-muted disabled:opacity-50"
           >
-            {extracting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
+            {extracting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Wand2 className="h-3.5 w-3.5" />
+            )}
             {extracting ? "Extracting…" : "Re-extract"}
           </button>
         )}
@@ -636,7 +772,9 @@ function ItemsTable({
         <div className="py-8 text-center">
           <div className="text-sm font-medium">No items extracted yet</div>
           <div className="text-xs text-muted-foreground mt-1">
-            {onExtract ? "Click Re-extract to analyze with AI Vision." : "Upload an image (PNG/JPG/WEBP) to enable AI extraction."}
+            {onExtract
+              ? "Click Re-extract to analyze with AI Vision."
+              : "Upload an image (PNG/JPG/WEBP) to enable AI extraction."}
           </div>
         </div>
       ) : (
@@ -657,8 +795,12 @@ function ItemsTable({
                   <td className="py-2.5 px-4 font-medium">{it.name}</td>
                   <td className="py-2.5 px-4 text-right tabular-nums">{it.quantity ?? "—"}</td>
                   <td className="py-2.5 px-4 text-muted-foreground">{it.unit ?? "—"}</td>
-                  <td className="py-2.5 px-4 text-right tabular-nums">{it.unit_price != null ? `€${Number(it.unit_price).toFixed(2)}` : "—"}</td>
-                  <td className="py-2.5 px-4 text-right tabular-nums font-medium">{it.total != null ? `€${Number(it.total).toFixed(2)}` : "—"}</td>
+                  <td className="py-2.5 px-4 text-right tabular-nums">
+                    {it.unit_price != null ? `€${Number(it.unit_price).toFixed(2)}` : "—"}
+                  </td>
+                  <td className="py-2.5 px-4 text-right tabular-nums font-medium">
+                    {it.total != null ? `€${Number(it.total).toFixed(2)}` : "—"}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -668,4 +810,3 @@ function ItemsTable({
     </div>
   );
 }
-
