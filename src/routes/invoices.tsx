@@ -151,6 +151,20 @@ const isUnresolvedInvoiceItem = (item: ItemRow, ingredientNameMatches: Set<strin
   return !normalizedName || !ingredientNameMatches.has(normalizedName);
 };
 
+const isPlaceholderItemName = (name: string) => {
+  const normalizedName = normalizeExtractedItemName(name);
+  return !normalizedName || normalizedName === "unknown";
+};
+
+const needsQuantityUnitConfirmation = (item: ItemRow) => item.quantity == null || !item.unit;
+
+const needsAmountConfirmation = (item: ItemRow) => item.unit_price == null || item.total == null;
+
+const needsExtractionConfirmation = (item: ItemRow) =>
+  isPlaceholderItemName(item.name) ||
+  needsQuantityUnitConfirmation(item) ||
+  needsAmountConfirmation(item);
+
 const getPriceDeltaDetails = (
   currentPrice: number | null,
   previousPrice: number | undefined,
@@ -675,9 +689,10 @@ function InvoicesPage() {
           <ul className="mt-4 space-y-2.5 text-sm">
             {[
               "Files are uploaded to your private vault",
-              "Line items and totals are detected",
+              "Invoice table rows are parsed for review",
+              "Quantities, units, and totals are separated when clear",
               "Prices compared with previous invoices",
-              "Linked to your recipes & ingredients",
+              "Ingredient matches are shown separately",
             ].map((t) => (
               <li key={t} className="flex items-start gap-2">
                 <Check className="h-4 w-4 text-success mt-0.5 shrink-0" />
@@ -992,6 +1007,14 @@ function PriceDeltaIndicator({
   );
 }
 
+function MissingValue({ label }: { label: string }) {
+  return (
+    <span className="text-muted-foreground/60" title={`${label} was not separated confidently`}>
+      Check
+    </span>
+  );
+}
+
 function OperationalBadge({
   label,
   tone = "muted",
@@ -1076,10 +1099,13 @@ function ItemsTable({
   const operationalSummary = items.reduce(
     (summary, item) => {
       if (isUnresolvedInvoiceItem(item, ingredientNameMatches)) {
-        summary.needsReview += 1;
+        summary.unmatchedIngredients += 1;
       } else {
-        summary.matched += 1;
+        summary.matchedIngredients += 1;
       }
+
+      if (needsExtractionConfirmation(item)) summary.extractionReview += 1;
+      if (needsQuantityUnitConfirmation(item)) summary.quantityUnitReview += 1;
 
       const delta = getPriceDeltaDetails(item.unit_price, priceComparisons[item.id]);
       if (delta?.direction === "increased") summary.priceIncreases += 1;
@@ -1087,9 +1113,17 @@ function ItemsTable({
 
       return summary;
     },
-    { matched: 0, needsReview: 0, priceIncreases: 0, priceDecreases: 0 },
+    {
+      matchedIngredients: 0,
+      unmatchedIngredients: 0,
+      extractionReview: 0,
+      quantityUnitReview: 0,
+      priceIncreases: 0,
+      priceDecreases: 0,
+    },
   );
-  const hasUnresolvedItems = operationalSummary.needsReview > 0;
+  const hasExtractionReview = operationalSummary.extractionReview > 0;
+  const hasUnmatchedIngredients = operationalSummary.unmatchedIngredients > 0;
   const priceMovementCount = operationalSummary.priceIncreases + operationalSummary.priceDecreases;
 
   return (
@@ -1097,21 +1131,33 @@ function ItemsTable({
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-border">
         <div>
           <div className="text-sm font-semibold inline-flex items-center gap-2">
-            <Sparkles className="h-3.5 w-3.5 text-primary" /> Extracted ingredients
-            {hasUnresolvedItems && !loading && !extracting && (
-              <OperationalBadge label="Needs review" tone="review" />
+            <Sparkles className="h-3.5 w-3.5 text-primary" /> Extracted invoice rows
+            {hasExtractionReview && !loading && !extracting && (
+              <OperationalBadge label="Confirm extraction" tone="review" />
             )}
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-            <span>AI Vision · structured output</span>
+            <span>Parsed rows are separate from ingredient matching</span>
             {!loading && !extracting && items.length > 0 && (
               <>
                 <span className="text-muted-foreground/40">•</span>
-                <span>{operationalSummary.matched} matched automatically</span>
-                {hasUnresolvedItems && (
+                <span>{operationalSummary.matchedIngredients} ingredient matches</span>
+                {hasExtractionReview && (
                   <>
                     <span className="text-muted-foreground/40">•</span>
-                    <span>{operationalSummary.needsReview} need review</span>
+                    <span>{operationalSummary.extractionReview} rows need confirmation</span>
+                  </>
+                )}
+                {operationalSummary.quantityUnitReview > 0 && (
+                  <>
+                    <span className="text-muted-foreground/40">•</span>
+                    <span>{operationalSummary.quantityUnitReview} check qty/unit</span>
+                  </>
+                )}
+                {hasUnmatchedIngredients && (
+                  <>
+                    <span className="text-muted-foreground/40">•</span>
+                    <span>{operationalSummary.unmatchedIngredients} not in ingredient list</span>
                   </>
                 )}
                 {priceMovementCount > 0 && (
@@ -1148,8 +1194,8 @@ function ItemsTable({
           <div className="text-sm font-medium">No items extracted yet</div>
           <div className="text-xs text-muted-foreground mt-1">
             {onExtract
-              ? "Click Re-extract to analyze with AI Vision."
-              : "Upload an image (PNG/JPG/WEBP) to enable AI extraction."}
+              ? "The invoice table was not parsed into rows. Re-extract after checking the file image."
+              : "This file has no parsed table rows to review."}
           </div>
         </div>
       ) : (
@@ -1166,13 +1212,16 @@ function ItemsTable({
             </thead>
             <tbody className="divide-y divide-border">
               {items.map((it) => {
-                const unresolved = isUnresolvedInvoiceItem(it, ingredientNameMatches);
+                const unmatchedIngredient = isUnresolvedInvoiceItem(it, ingredientNameMatches);
+                const extractionReview = needsExtractionConfirmation(it);
+                const quantityUnitReview = needsQuantityUnitConfirmation(it);
+                const amountReview = needsAmountConfirmation(it);
                 const delta = getPriceDeltaDetails(it.unit_price, priceComparisons[it.id]);
                 return (
                   <tr
                     key={it.id}
                     className={`transition-colors ${
-                      unresolved
+                      extractionReview
                         ? "bg-amber-500/[0.04] hover:bg-amber-500/[0.07]"
                         : "hover:bg-muted/20"
                     }`}
@@ -1181,11 +1230,13 @@ function ItemsTable({
                       <div className="space-y-1">
                         <div className="font-medium leading-tight">{it.name}</div>
                         <div className="flex flex-wrap items-center gap-1.5">
-                          {unresolved ? (
-                            <>
-                              <OperationalBadge label="new ingredient" tone="review" />
-                              <OperationalBadge label="needs review" />
-                            </>
+                          {extractionReview && (
+                            <OperationalBadge label="confirm extracted row" tone="review" />
+                          )}
+                          {quantityUnitReview && <OperationalBadge label="check qty/unit" />}
+                          {amountReview && <OperationalBadge label="check amounts" />}
+                          {unmatchedIngredient ? (
+                            <OperationalBadge label="not in ingredient list" />
                           ) : (
                             <OperationalBadge label="matched automatically" tone="success" />
                           )}
@@ -1198,8 +1249,12 @@ function ItemsTable({
                         </div>
                       </div>
                     </td>
-                    <td className="py-2.5 px-4 text-right tabular-nums">{it.quantity ?? "—"}</td>
-                    <td className="py-2.5 px-4 text-muted-foreground">{it.unit ?? "—"}</td>
+                    <td className="py-2.5 px-4 text-right tabular-nums">
+                      {it.quantity ?? <MissingValue label="Quantity" />}
+                    </td>
+                    <td className="py-2.5 px-4 text-muted-foreground">
+                      {it.unit ?? <MissingValue label="Unit" />}
+                    </td>
                     <td className="py-2.5 px-4 text-right tabular-nums">
                       {it.unit_price != null ? (
                         <span className="inline-flex flex-col items-end gap-0.5">
@@ -1210,11 +1265,15 @@ function ItemsTable({
                           />
                         </span>
                       ) : (
-                        "—"
+                        <MissingValue label="Unit price" />
                       )}
                     </td>
                     <td className="py-2.5 px-4 text-right tabular-nums font-medium">
-                      {it.total != null ? `€${Number(it.total).toFixed(2)}` : "—"}
+                      {it.total != null ? (
+                        `€${Number(it.total).toFixed(2)}`
+                      ) : (
+                        <MissingValue label="Total" />
+                      )}
                     </td>
                   </tr>
                 );
