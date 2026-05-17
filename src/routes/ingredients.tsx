@@ -9,7 +9,7 @@ export const Route = createFileRoute("/ingredients")({
   head: () => ({
     meta: [
       { title: "Ingredient Prices — Marginly" },
-      { name: "description", content: "Track ingredient price changes across suppliers." },
+      { name: "description", content: "Track ingredient price changes across  s." },
     ],
   }),
   component: IngredientsPage,
@@ -34,12 +34,14 @@ function IngredientsPage() {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error }: any = await supabase
       .from("ingredients")
-      .select("id, name, unit, current_price, supplier")
+      .select("*")
       .order("created_at", { ascending: false });
     if (error) setError(error.message);
-    else setRows(data ?? []);
+    else {
+  setRows((data ?? []) as Row[]);
+}
     setLoading(false);
   };
 
