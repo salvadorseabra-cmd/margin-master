@@ -14,8 +14,8 @@ import {
 export const Route = createFileRoute("/ingredients")({
   head: () => ({
     meta: [
-      { title: "Ingredient Prices — Marginly" },
-      { name: "description", content: "Track ingredient price changes across suppliers." },
+      { title: "Ingredient Costs — Marginly" },
+      { name: "description", content: "Manage ingredient pack prices and recipe unit costs." },
     ],
   }),
   component: IngredientsPage,
@@ -171,12 +171,12 @@ function IngredientsPage() {
 
   return (
     <AppShell
-      title="Ingredient prices"
-      subtitle="Track ingredient unit costs for recipes and margin."
+      title="Ingredient costs"
+      subtitle="Manage pack prices and recipe unit costs for margin control."
       action={
         <button
           onClick={() => setOpen((v) => !v)}
-          className="inline-flex items-center gap-2 bg-foreground text-background rounded-lg px-3.5 py-2 text-sm font-medium hover:opacity-90"
+          className="inline-flex cursor-pointer items-center gap-2 bg-foreground text-background rounded-lg px-3.5 py-2 text-sm font-medium hover:opacity-90"
         >
           <Plus className="h-4 w-4" /> Add ingredient
         </button>
@@ -194,7 +194,7 @@ function IngredientsPage() {
                 placeholder="Beef tenderloin"
               />
             </Field>
-            <Field label="Unit (catalog)">
+            <Field label="Stock unit">
               <input
                 value={form.unit}
                 onChange={(e) => setForm({ ...form, unit: e.target.value })}
@@ -202,12 +202,12 @@ function IngredientsPage() {
                 placeholder="kg"
               />
             </Field>
-            <Field label="Base unit (recipes), optional">
+            <Field label="Recipe unit (optional)">
               <input
                 value={form.base_unit}
                 onChange={(e) => setForm({ ...form, base_unit: e.target.value })}
                 className="input"
-                placeholder="Same as unit if empty"
+                placeholder="Defaults to stock unit"
               />
             </Field>
             <Field label="Pack price (€)">
@@ -232,18 +232,18 @@ function IngredientsPage() {
                 placeholder="1"
               />
             </Field>
-            <Field label="Pack label (optional)">
+            <Field label="Pack unit (optional)">
               <input
                 value={form.purchase_unit}
                 onChange={(e) => setForm({ ...form, purchase_unit: e.target.value })}
                 className="input"
-                placeholder="cx"
+                placeholder="case"
               />
             </Field>
             <button
               disabled={saving}
               type="submit"
-              className="bg-foreground text-background rounded-lg px-3.5 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60 inline-flex items-center justify-center gap-2 sm:col-span-2 lg:col-span-1"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 bg-foreground text-background rounded-lg px-3.5 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60 sm:col-span-2 lg:col-span-1"
             >
               {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save
             </button>
@@ -260,7 +260,7 @@ function IngredientsPage() {
               <thead className="bg-muted/40">
                 <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="py-3 px-5 font-medium">Ingredient</th>
-                  <th className="py-3 px-5 font-medium text-right">Current price</th>
+                  <th className="py-3 px-5 font-medium text-right">Pack price</th>
                   <th className="py-3 pl-2 pr-5 font-medium w-16"></th>
                 </tr>
               </thead>
@@ -275,7 +275,7 @@ function IngredientsPage() {
                 {!loading && rows.length === 0 && (
                   <tr>
                     <td colSpan={3} className="py-10 text-center text-sm text-muted-foreground">
-                      No ingredients yet. Add your first one above.
+                      Add ingredients to start tracking pack prices.
                     </td>
                   </tr>
                 )}
@@ -290,13 +290,16 @@ function IngredientsPage() {
                   return (
                     <tr
                       key={ing.id}
+                      aria-selected={selected}
                       onClick={() => setSelectedIngredientId(ing.id)}
-                      className={`cursor-pointer transition-colors hover:bg-muted/30 ${
-                        selected ? "bg-muted/35" : ""
+                      className={`group cursor-pointer transition-[background-color,box-shadow] duration-150 ease-out hover:bg-muted/25 hover:shadow-[inset_2px_0_0_var(--color-border)] focus-within:bg-muted/25 ${
+                        selected ? "bg-muted/35 shadow-[inset_2px_0_0_var(--color-foreground)]" : ""
                       }`}
                     >
                       <td className="py-4 px-5">
-                        <div className="font-medium">{ing.name}</div>
+                        <div className="font-medium transition-colors group-hover:text-foreground">
+                          {ing.name}
+                        </div>
                         <div className="text-xs text-muted-foreground">
                           {denom > 1
                             ? `€${eff.toFixed(3)} per ${base} · pack €${Number(ing.current_price).toFixed(2)} / ${denom}${ing.purchase_unit?.trim() ? ` ${ing.purchase_unit.trim()}` : ""}`
@@ -306,7 +309,7 @@ function IngredientsPage() {
                           <div className="mt-1 text-[11px] text-muted-foreground">
                             Used in {linkActivity.count}{" "}
                             {linkActivity.count === 1 ? "recipe" : "recipes"}
-                            {linkActivity.recentlyLinked ? " · recently linked to recipes" : ""}
+                            {linkActivity.recentlyLinked ? " · added to recipes recently" : ""}
                           </div>
                         )}
                       </td>
@@ -317,11 +320,12 @@ function IngredientsPage() {
                       <td className="py-4 pl-2 pr-5 text-right align-middle whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1">
                           <button
+                            type="button"
                             onClick={(event) => {
                               event.stopPropagation();
                               remove(ing.id);
                             }}
-                            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-muted"
+                            className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/70 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/15"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -364,10 +368,12 @@ function IngredientDetailPanel({
 }) {
   if (!ingredient) {
     return (
-      <Card className="hidden h-fit lg:block">
-        <div className="text-sm font-medium">Ingredient inspection</div>
-        <div className="mt-2 text-sm text-muted-foreground">
-          Select an ingredient to inspect price, pack, and recipe exposure.
+      <Card className="hidden h-fit border-dashed bg-card/70 lg:block">
+        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          Ingredient cost details
+        </div>
+        <div className="mt-2 text-sm leading-6 text-muted-foreground">
+          Select an ingredient to review pack cost, recipe unit, and recipe exposure.
         </div>
       </Card>
     );
@@ -382,46 +388,48 @@ function IngredientDetailPanel({
   const recentlyUpdated = priceActivity && isRecentDate(priceActivity.created_at);
 
   return (
-    <Card className="h-fit lg:sticky lg:top-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Ingredient inspection
+    <Card className="h-fit p-4 lg:sticky lg:top-4">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            Ingredient cost details
           </div>
-          <h2 className="mt-1 text-lg font-semibold leading-tight">{ingredient.name}</h2>
-          <div className="mt-1 text-sm text-muted-foreground">
-            {usageCount > 0 ? `Used in ${formatRecipeCount(usageCount)}` : "No active recipe links"}
+          <h2 className="mt-1.5 text-xl font-semibold leading-tight tracking-tight">
+            {ingredient.name}
+          </h2>
+          <div className="mt-1 text-xs text-muted-foreground">
+            {usageCount > 0 ? `Used in ${formatRecipeCount(usageCount)}` : "Not linked to recipes"}
           </div>
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
-          aria-label="Close ingredient inspection"
+          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+          aria-label="Close ingredient cost details"
         >
           <X className="h-4 w-4" />
         </button>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-3">
+      <div className="mt-5 grid grid-cols-2 gap-2.5">
         <DetailMetric
           label="Pack price"
           value={`€${Number(ingredient.current_price).toFixed(2)}`}
           helper={denom > 1 ? `${denom} ${packLabel}` : `per ${base}`}
         />
         <DetailMetric label="Unit cost" value={`€${eff.toFixed(3)}`} helper={`per ${base}`} />
-        <DetailMetric label="Catalog unit" value={ingredient.unit} helper="Ingredient library" />
-        <DetailMetric label="Recipes" value={String(usageCount)} helper="Current exposure" />
+        <DetailMetric label="Stock unit" value={ingredient.unit} helper="Ingredient record" />
+        <DetailMetric label="Recipes" value={String(usageCount)} helper="Recipe impact" />
       </div>
 
-      <section className="mt-4 rounded-xl border border-border bg-background/35 p-4">
+      <section className="mt-3 rounded-lg border border-border/70 bg-muted/10 p-3.5">
         <div className="flex items-center justify-between gap-3">
-          <div className="font-medium">Operational status</div>
-          <span className="rounded-md border border-border/70 bg-muted/25 px-2 py-0.5 text-xs font-medium text-muted-foreground">
-            {recentlyUpdated ? "Recently updated" : "Tracked"}
+          <div className="text-sm font-semibold">Operational status</div>
+          <span className="rounded-md border border-border/60 bg-background/45 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+            {recentlyUpdated ? "Recently updated" : "In cost library"}
           </span>
         </div>
-        <div className="mt-3 space-y-2 text-sm">
+        <div className="mt-3 space-y-1 text-sm">
           <DetailRow
             label="Pack"
             value={
@@ -430,47 +438,49 @@ function IngredientDetailPanel({
                 : `€${Number(ingredient.current_price).toFixed(2)} per ${base}`
             }
           />
-          <DetailRow label="Recipe base" value={base} />
-          <DetailRow label="Usage" value={formatRecipeCount(usageCount)} />
+          <DetailRow label="Recipe unit" value={base} />
+          <DetailRow label="Linked recipes" value={formatRecipeCount(usageCount)} />
         </div>
       </section>
 
-      <section className="mt-4 rounded-xl border border-border bg-background/35 p-4">
-        <div className="font-medium">Price activity</div>
+      <section className="mt-3 rounded-lg border border-border/70 bg-muted/10 p-3.5">
+        <div className="text-sm font-semibold">Price movement</div>
         {priceActivity ? (
-          <div className="mt-3 space-y-2 text-sm">
+          <div className="mt-3 space-y-1 text-sm">
             <DetailRow
-              label="Last change"
+              label="Latest movement"
               value={formatActivityChange(priceActivity)}
               valueClassName={getActivityTone(priceActivity)}
             />
             <DetailRow
-              label="Freshness"
-              value={recentlyUpdated ? "Updated in the last 14 days" : "No recent price change"}
+              label="Price recency"
+              value={
+                recentlyUpdated ? "Updated in the last 14 days" : "No change in the last 14 days"
+              }
             />
           </div>
         ) : (
-          <div className="mt-3 rounded-lg border border-dashed border-border bg-muted/15 px-3 py-2 text-sm text-muted-foreground">
-            No price activity recorded yet.
+          <div className="mt-3 rounded-md border border-dashed border-border/70 bg-background/35 px-3 py-2 text-sm text-muted-foreground">
+            No price changes logged yet.
           </div>
         )}
       </section>
 
-      <section className="mt-4 rounded-xl border border-border bg-background/35 p-4">
-        <div className="font-medium">Recipe exposure</div>
-        <div className="mt-2 text-sm text-muted-foreground">
+      <section className="mt-3 rounded-lg border border-border/70 bg-muted/10 p-3.5">
+        <div className="text-sm font-semibold">Recipe impact</div>
+        <div className="mt-2 text-sm leading-6 text-muted-foreground">
           {usageCount > 0
-            ? `Changes to this ingredient can affect ${formatRecipeCount(usageCount)}.`
-            : "This ingredient is not currently linked to recipes."}
-          {recipeLinkActivity?.recentlyLinked ? " Recently linked to recipes." : ""}
+            ? `Price changes may affect ${formatRecipeCount(usageCount)}.`
+            : "Not currently linked to recipes."}
+          {recipeLinkActivity?.recentlyLinked ? " Added to recipes recently." : ""}
         </div>
       </section>
 
-      <div className="mt-4 flex justify-end">
+      <div className="mt-3 flex justify-end">
         <button
           type="button"
           onClick={() => onDelete(ingredient.id)}
-          className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-destructive"
+          className="inline-flex items-center gap-2 rounded-lg border border-border/70 px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-destructive"
         >
           <Trash2 className="h-4 w-4" />
           Delete
@@ -482,12 +492,12 @@ function IngredientDetailPanel({
 
 function DetailMetric({ label, value, helper }: { label: string; value: string; helper: string }) {
   return (
-    <div className="rounded-lg border border-border bg-background/35 p-3">
-      <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+    <div className="rounded-lg border border-border/70 bg-background/35 p-3">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
         {label}
       </div>
-      <div className="mt-1.5 font-semibold tabular-nums">{value}</div>
-      <div className="mt-1 text-xs text-muted-foreground">{helper}</div>
+      <div className="mt-1.5 text-lg font-semibold leading-none tabular-nums">{value}</div>
+      <div className="mt-1.5 text-xs text-muted-foreground">{helper}</div>
     </div>
   );
 }
@@ -502,9 +512,9 @@ function DetailRow({
   valueClassName?: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-muted-foreground">{label}</span>
-      <span className={`text-right font-medium ${valueClassName}`}>{value}</span>
+    <div className="flex items-center justify-between gap-3 py-0.5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className={`text-right text-sm font-medium ${valueClassName}`}>{value}</span>
     </div>
   );
 }
@@ -559,7 +569,7 @@ function PriceActivityNote({ activity }: { activity: PriceActivity | undefined }
     >
       {hasDirectionalChange && <Icon className="h-3 w-3" />}
       <span>
-        Price updated recently
+        Price updated in last 14 days
         {hasDirectionalChange ? ` · ${deltaPercent > 0 ? "+" : ""}${deltaPercent.toFixed(1)}%` : ""}
       </span>
     </div>
