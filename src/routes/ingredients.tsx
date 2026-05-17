@@ -27,7 +27,7 @@ type Row = {
 };
 
 type SortKey = "recent" | "price" | "usage" | "name";
-type IngredientSignal = "Stable" | "Stale" | "Frequently used" | "High cost";
+type IngredientSignal = "High risk" | "Attention" | "Stable";
 
 function IngredientsPage() {
   const { user } = useAuth();
@@ -97,15 +97,9 @@ function IngredientsPage() {
     });
   }, [rows, sortBy, usageCounts]);
 
-  const highRiskCount = rows.filter((row) => {
-    const signal = getIngredientSignal(row, averagePrice, usageCounts[row.id] ?? 0);
-    return signal === "High cost" || signal === "Stale";
-  }).length;
+  const highRiskCount = rows.filter((row) => isHighRisk(row, averagePrice, usageCounts[row.id] ?? 0)).length;
 
-  const recentlyUpdatedCount = rows.filter((row) => {
-    const days = daysSinceUpdate(row);
-    return days !== null && days <= 7;
-  }).length;
+  const recentlyUpdatedCount = rows.filter((row) => isRecentlyUpdated(row)).length;
 
   const save = async (e: FormEvent) => {
     e.preventDefault();
@@ -172,7 +166,7 @@ function IngredientsPage() {
         <Kpi label="Total ingredients" value={rows.length.toString()} />
         <Kpi label="High risk ingredients" value={highRiskCount.toString()} />
         <Kpi label="Recently updated" value={recentlyUpdatedCount.toString()} />
-        <Kpi label="Average price" value={`€${averagePrice.toFixed(2)}`} />
+        <Kpi label="Average ingredient price" value={`€${averagePrice.toFixed(2)}`} />
       </div>
 
       <Card className="p-0 overflow-hidden">
@@ -205,10 +199,10 @@ function IngredientsPage() {
               <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <th className="py-3.5 pl-6 pr-5 font-medium min-w-[240px] w-[32%]">Ingredient</th>
                 <th className="py-3.5 px-5 font-medium min-w-[160px]">Supplier</th>
-                <th className="py-3.5 px-4 font-medium w-[110px] whitespace-nowrap">Usage</th>
+                <th className="py-3.5 px-5 font-medium w-[125px] whitespace-nowrap">Usage</th>
                 <th className="py-3.5 px-5 font-medium min-w-[150px] whitespace-nowrap">Last updated</th>
                 <th className="py-3.5 px-5 font-medium text-right min-w-[135px] whitespace-nowrap">Current price</th>
-                <th className="py-3.5 px-4 font-medium w-[120px] whitespace-nowrap">Signal</th>
+                <th className="py-3.5 px-5 font-medium w-[150px] whitespace-nowrap">Signal</th>
                 <th className="py-3.5 pl-3 pr-6 font-medium w-12"></th>
               </tr>
             </thead>
@@ -222,7 +216,7 @@ function IngredientsPage() {
               {sortedRows.map((ing) => {
                 const usageCount = usageCounts[ing.id] ?? 0;
                 const signal = getIngredientSignal(ing, averagePrice, usageCount);
-                const stale = isStale(ing);
+                const priceContext = getPriceContext(ing, averagePrice, usageCount);
 
                 return (
                   <tr key={ing.id} className="hover:bg-muted/30 align-top">
@@ -230,21 +224,19 @@ function IngredientsPage() {
                       <div className="font-medium leading-5 line-clamp-2 break-words">{ing.name}</div>
                       <div className="text-xs text-muted-foreground mt-0.5 whitespace-nowrap">per {ing.unit}</div>
                     </td>
-                    <td className="py-[1.125rem] px-5 text-muted-foreground whitespace-nowrap">{ing.supplier ?? "No supplier"}</td>
-                    <td className="py-[1.125rem] px-4 whitespace-nowrap">
-                      <div className="font-medium">{formatUsageLabel(usageCount)}</div>
+                    <td className="py-[1.125rem] px-5 text-muted-foreground whitespace-nowrap">{ing.supplier?.trim() || "No supplier"}</td>
+                    <td className="py-[1.125rem] px-5 whitespace-nowrap">
+                      <div className="font-medium tabular-nums">{formatUsageLabel(usageCount)}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">{usageCount > 0 ? "In active recipes" : "Not in recipes"}</div>
                     </td>
                     <td className="py-[1.125rem] px-5">
                       <div className="text-sm whitespace-nowrap">{formatUpdatedLabel(ing)}</div>
-                      {stale && (
-                        <div className="text-xs text-warning mt-0.5 whitespace-nowrap">No update in 30+ days</div>
-                      )}
                     </td>
                     <td className="py-[1.125rem] px-5 text-right tabular-nums whitespace-nowrap">
                       <div className="font-semibold">€{Number(ing.current_price ?? 0).toFixed(2)}</div>
-                      <div className="text-xs text-muted-foreground">per {ing.unit}</div>
+                      <div className="text-xs text-muted-foreground">{priceContext}</div>
                     </td>
-                    <td className="py-[1.125rem] px-4 whitespace-nowrap">
+                    <td className="py-[1.125rem] px-5 whitespace-nowrap">
                       <SignalBadge signal={signal} />
                     </td>
                     <td className="py-[1.125rem] pl-3 pr-6 text-right">
@@ -283,13 +275,11 @@ function Kpi({ label, value }: { label: string; value: string }) {
 
 function SignalBadge({ signal }: { signal: IngredientSignal }) {
   const className =
-    signal === "High cost"
+    signal === "High risk"
       ? "text-destructive bg-destructive/10 border-destructive/20"
-      : signal === "Stale"
+      : signal === "Attention"
       ? "text-warning bg-warning/10 border-warning/20"
-      : signal === "Frequently used"
-      ? "text-foreground bg-muted border-border"
-      : "text-success bg-success/10 border-success/20";
+      : "text-muted-foreground bg-muted/30 border-border/60";
 
   return (
     <span className={`inline-flex whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-medium ${className}`}>
@@ -300,10 +290,11 @@ function SignalBadge({ signal }: { signal: IngredientSignal }) {
 
 function getIngredientSignal(row: Row, averagePrice: number, usageCount: number): IngredientSignal {
   const price = Number(row.current_price ?? 0);
+  const missingSupplier = !row.supplier?.trim();
+  const expensive = averagePrice > 0 && price >= averagePrice * 1.15;
 
-  if (isStale(row)) return "Stale";
-  if (averagePrice > 0 && price >= averagePrice * 1.25) return "High cost";
-  if (usageCount >= 2) return "Frequently used";
+  if (isHighRisk(row, averagePrice, usageCount)) return "High risk";
+  if (missingSupplier || expensive) return "Attention";
   return "Stable";
 }
 
@@ -319,9 +310,29 @@ function daysSinceUpdate(row: Row) {
   return Math.floor((Date.now() - time) / (1000 * 60 * 60 * 24));
 }
 
-function isStale(row: Row) {
+function isRecentlyUpdated(row: Row) {
   const days = daysSinceUpdate(row);
-  return days !== null && days >= 30;
+  return days !== null && days <= 7;
+}
+
+function isHighRisk(row: Row, averagePrice: number, usageCount: number) {
+  const price = Number(row.current_price ?? 0);
+  const missingSupplier = !row.supplier?.trim();
+  const highPrice = averagePrice > 0 && price >= averagePrice * 1.5;
+  const heavyUsage = usageCount >= 2;
+
+  return heavyUsage && (highPrice || missingSupplier);
+}
+
+function getPriceContext(row: Row, averagePrice: number, usageCount: number) {
+  const price = Number(row.current_price ?? 0);
+
+  if (averagePrice > 0 && price >= averagePrice * 1.5) return "High cost item";
+  if (usageCount >= 2) return "Frequently used";
+  if (averagePrice > 0 && price >= averagePrice * 1.15) return "Above average";
+  if (averagePrice > 0 && price <= averagePrice * 0.75) return "Low cost item";
+
+  return `per ${row.unit}`;
 }
 
 function formatUpdatedLabel(row: Row) {
