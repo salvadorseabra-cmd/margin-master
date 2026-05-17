@@ -18,6 +18,7 @@ import {
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 
 export const Route = createFileRoute("/invoices")({
   head: () => ({
@@ -57,8 +58,20 @@ type Pending = {
   error?: string;
 };
 
+type SortOption = "newest" | "oldest" | "supplier" | "highest" | "lowest" | "status";
+type SettlementState = "awaiting" | "settled";
+
 const MAX_BYTES = 20 * 1024 * 1024;
 const ACCEPT = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
+
+const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: "newest", label: "Newest" },
+  { value: "oldest", label: "Oldest" },
+  { value: "supplier", label: "Supplier name" },
+  { value: "highest", label: "Highest total" },
+  { value: "lowest", label: "Lowest total" },
+  { value: "status", label: "Status" },
+];
 
 type ItemRow = {
   id: string;
@@ -69,11 +82,43 @@ type ItemRow = {
   total: number | null;
 };
 
+type PreviousInvoiceRow = {
+  id: string;
+};
+
+type PreviousItemRow = {
+  invoice_id: string | null;
+  name: string | null;
+  unit_price: number | null;
+};
+
+type IngredientMatchRow = {
+  name: string | null;
+  normalized_name?: string | null;
+};
+
+type PriceComparisonMap = Record<string, number>;
+type PriceDeltaDetails = {
+  direction: "increased" | "decreased" | "stable";
+  percentLabel: string;
+  previousLabel: string;
+};
+
 const formatInvoiceDate = (createdAt: string | null) => {
   if (!createdAt) return "—";
   const date = new Date(createdAt);
   return Number.isNaN(date.getTime()) ? "—" : date.toLocaleDateString();
 };
+
+const invoiceTime = (createdAt: string) => {
+  const time = new Date(createdAt).getTime();
+  return Number.isNaN(time) ? 0 : time;
+};
+
+const getSettlementState = (
+  invoiceId: string,
+  settlementByInvoice: Record<string, SettlementState>,
+) => settlementByInvoice[invoiceId] ?? "awaiting";
 
 const toInvoiceRow = (row: DbInvoiceRow, itemCount = 0): InvoiceRow => {
   const total = Number(row.total ?? 0);
@@ -89,6 +134,41 @@ const toInvoiceRow = (row: DbInvoiceRow, itemCount = 0): InvoiceRow => {
   };
 };
 
+const normalizeExtractedItemName = (name: string | null | undefined) =>
+  name?.trim().toLowerCase() ?? "";
+
+const buildIngredientNameMatches = (rows: IngredientMatchRow[]) =>
+  rows.reduce((matches, row) => {
+    const normalized = row.normalized_name?.trim() || normalizeIngredientName(row.name ?? "");
+    const normalizedName = normalizeIngredientName(row.name ?? "");
+    if (normalized) matches.add(normalized);
+    if (normalizedName) matches.add(normalizedName);
+    return matches;
+  }, new Set<string>());
+
+const isUnresolvedInvoiceItem = (item: ItemRow, ingredientNameMatches: Set<string>) => {
+  const normalizedName = normalizeIngredientName(item.name);
+  return !normalizedName || !ingredientNameMatches.has(normalizedName);
+};
+
+const getPriceDeltaDetails = (
+  currentPrice: number | null,
+  previousPrice: number | undefined,
+): PriceDeltaDetails | null => {
+  const current = Number(currentPrice);
+  const previous = Number(previousPrice);
+  if (!Number.isFinite(current) || !Number.isFinite(previous) || previous <= 0) return null;
+
+  const percent = Math.round(((current - previous) / previous) * 100);
+  const direction = percent > 0 ? "increased" : percent < 0 ? "decreased" : ("stable" as const);
+
+  return {
+    direction,
+    percentLabel: percent === 0 ? "0%" : `${percent > 0 ? "+" : ""}${percent}%`,
+    previousLabel: `Previous €${previous.toFixed(2)}`,
+  };
+};
+
 function InvoicesPage() {
   const { user } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -100,7 +180,15 @@ function InvoicesPage() {
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [itemsByInvoice, setItemsByInvoice] = useState<Record<string, ItemRow[]>>({});
+  const [priceComparisonsByInvoice, setPriceComparisonsByInvoice] = useState<
+    Record<string, PriceComparisonMap>
+  >({});
+  const [ingredientNameMatches, setIngredientNameMatches] = useState<Set<string>>(new Set());
   const [extracting, setExtracting] = useState<Record<string, boolean>>({});
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
+  const [settlementByInvoice, setSettlementByInvoice] = useState<Record<string, SettlementState>>(
+    {},
+  );
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -115,6 +203,15 @@ function InvoicesPage() {
       const invoiceRows = (data ?? []) as DbInvoiceRow[];
       const ids = invoiceRows.map((row) => row.id);
       const itemCounts: Record<string, number> = {};
+      const { data: ingredientRows, error: ingredientError } = await supabase
+        .from("ingredients")
+        .select("name, normalized_name");
+
+      setIngredientNameMatches(
+        ingredientError
+          ? new Set()
+          : buildIngredientNameMatches((ingredientRows ?? []) as IngredientMatchRow[]),
+      );
 
       if (ids.length > 0) {
         const { data: itemRows, error: itemError } = await supabase
@@ -132,6 +229,7 @@ function InvoicesPage() {
       setRows(invoiceRows.map((row) => toInvoiceRow(row, itemCounts[row.id] ?? 0)));
     } catch (err) {
       setRows([]);
+      setIngredientNameMatches(new Set());
       setGlobalError(err instanceof Error ? err.message : "Could not load invoices");
     } finally {
       setLoading(false);
@@ -142,6 +240,7 @@ function InvoicesPage() {
     if (user) load();
     else {
       setRows([]);
+      setIngredientNameMatches(new Set());
       setLoading(false);
     }
   }, [user, load]);
@@ -162,6 +261,67 @@ function InvoicesPage() {
       processing: rows.filter((r) => r.status === "Processing").length,
     };
   }, [rows]);
+
+  const settlementOverview = useMemo(() => {
+    if (rows.length === 0) return null;
+
+    let settled = 0;
+    let awaiting = 0;
+    let awaitingTotal = 0;
+
+    for (const row of rows) {
+      if (getSettlementState(row.id, settlementByInvoice) === "settled") {
+        settled += 1;
+      } else {
+        awaiting += 1;
+        awaitingTotal += Number(row.total ?? 0);
+      }
+    }
+
+    const settledLabel = `${settled} settled`;
+    const awaitingLabel = awaiting === 1 ? "1 to follow up" : `${awaiting} to follow up`;
+    const awaitingAmount =
+      awaiting > 0 && awaitingTotal > 0 ? ` (€${awaitingTotal.toFixed(2)})` : "";
+
+    return `${settledLabel} • ${awaitingLabel}${awaitingAmount}`;
+  }, [rows, settlementByInvoice]);
+
+  const sortedRows = useMemo(() => {
+    return [...rows].sort((a, b) => {
+      switch (sortBy) {
+        case "oldest":
+          return invoiceTime(a.created_at) - invoiceTime(b.created_at);
+        case "supplier":
+          return a.supplier.localeCompare(b.supplier, undefined, { sensitivity: "base" });
+        case "highest":
+          return Number(b.total) - Number(a.total);
+        case "lowest":
+          return Number(a.total) - Number(b.total);
+        case "status": {
+          const statusOrder =
+            a.status.localeCompare(b.status, undefined, { sensitivity: "base" }) ||
+            getSettlementState(a.id, settlementByInvoice).localeCompare(
+              getSettlementState(b.id, settlementByInvoice),
+              undefined,
+              { sensitivity: "base" },
+            );
+          return (
+            statusOrder || a.supplier.localeCompare(b.supplier, undefined, { sensitivity: "base" })
+          );
+        }
+        case "newest":
+        default:
+          return invoiceTime(b.created_at) - invoiceTime(a.created_at);
+      }
+    });
+  }, [rows, settlementByInvoice, sortBy]);
+
+  const toggleSettlement = (invoiceId: string) => {
+    setSettlementByInvoice((current) => ({
+      ...current,
+      [invoiceId]: getSettlementState(invoiceId, current) === "settled" ? "awaiting" : "settled",
+    }));
+  };
 
   const enqueue = (files: FileList | File[]) => {
     setGlobalError(null);
@@ -302,18 +462,78 @@ function InvoicesPage() {
     }
   };
 
-  const loadItems = async (invoiceId: string) => {
+  const loadPriceComparisons = async (
+    invoiceId: string,
+    invoiceCreatedAt: string,
+    items: ItemRow[],
+  ): Promise<PriceComparisonMap> => {
+    const neededNames = new Set(
+      items.map((item) => normalizeExtractedItemName(item.name)).filter(Boolean),
+    );
+    const invoiceDate = new Date(invoiceCreatedAt);
+    if (neededNames.size === 0 || Number.isNaN(invoiceDate.getTime())) return {};
+
+    const { data: previousInvoices, error: invoiceError } = await supabase
+      .from("invoices")
+      .select("id")
+      .lt("created_at", invoiceCreatedAt)
+      .neq("id", invoiceId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (invoiceError || !previousInvoices?.length) return {};
+
+    const previousInvoiceIds = ((previousInvoices ?? []) as PreviousInvoiceRow[]).map(
+      (row) => row.id,
+    );
+    const invoiceOrder = new Map(previousInvoiceIds.map((id, index) => [id, index]));
+    const { data: previousItems, error: itemError } = await supabase
+      .from("invoice_items")
+      .select("invoice_id, name, unit_price")
+      .in("invoice_id", previousInvoiceIds);
+    if (itemError || !previousItems?.length) return {};
+
+    const latestPriceByName: Record<string, number> = {};
+    const sortedItems = [...((previousItems ?? []) as PreviousItemRow[])].sort(
+      (a, b) =>
+        (invoiceOrder.get(a.invoice_id ?? "") ?? Number.MAX_SAFE_INTEGER) -
+        (invoiceOrder.get(b.invoice_id ?? "") ?? Number.MAX_SAFE_INTEGER),
+    );
+
+    for (const item of sortedItems) {
+      const name = normalizeExtractedItemName(item.name);
+      const price = Number(item.unit_price);
+      if (
+        !neededNames.has(name) ||
+        latestPriceByName[name] !== undefined ||
+        !Number.isFinite(price)
+      ) {
+        continue;
+      }
+      latestPriceByName[name] = price;
+    }
+
+    return items.reduce<PriceComparisonMap>((comparisons, item) => {
+      const previousPrice = latestPriceByName[normalizeExtractedItemName(item.name)];
+      if (previousPrice !== undefined) comparisons[item.id] = previousPrice;
+      return comparisons;
+    }, {});
+  };
+
+  const loadItems = async (invoiceId: string, invoiceCreatedAt: string) => {
     const { data } = await supabase
       .from("invoice_items")
       .select("id, name, quantity, unit, unit_price, total")
       .eq("invoice_id", invoiceId)
       .order("created_at", { ascending: true });
-    setItemsByInvoice((s) => ({ ...s, [invoiceId]: (data ?? []) as ItemRow[] }));
+    const items = (data ?? []) as ItemRow[];
+    const priceComparisons = await loadPriceComparisons(invoiceId, invoiceCreatedAt, items);
+    setItemsByInvoice((s) => ({ ...s, [invoiceId]: items }));
+    setPriceComparisonsByInvoice((s) => ({ ...s, [invoiceId]: priceComparisons }));
   };
 
   const toggleExpand = (row: InvoiceRow) => {
     setExpanded((id) => (id === row.id ? null : row.id));
-    if (!itemsByInvoice[row.id]) loadItems(row.id);
+    if (!itemsByInvoice[row.id]) loadItems(row.id, row.created_at);
   };
 
   const reExtract = async (row: InvoiceRow) => {
@@ -339,7 +559,7 @@ function InvoicesPage() {
           total: result.total ?? row.total,
         })
         .eq("id", row.id);
-      await loadItems(row.id);
+      await loadItems(row.id, row.created_at);
       load();
     }
   };
@@ -470,12 +690,31 @@ function InvoicesPage() {
 
       {/* Table */}
       <Card className="mt-4 p-0 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-border">
           <div>
             <div className="text-sm font-semibold">Your invoices</div>
             <div className="text-xs text-muted-foreground">All files are stored privately</div>
+            {settlementOverview && (
+              <div className="mt-1 text-[11px] text-muted-foreground/75">{settlementOverview}</div>
+            )}
           </div>
-          <span className="text-xs text-muted-foreground tabular-nums">{rows.length} total</span>
+          <div className="flex items-center gap-3">
+            <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+              Sort
+              <select
+                value={sortBy}
+                onChange={(event) => setSortBy(event.target.value as SortOption)}
+                className="h-8 rounded-md border border-border bg-background px-2 text-xs text-foreground shadow-sm outline-none hover:bg-muted/40 focus:border-foreground/30"
+              >
+                {SORT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <span className="text-xs text-muted-foreground tabular-nums">{rows.length} total</span>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -512,7 +751,7 @@ function InvoicesPage() {
                   </td>
                 </tr>
               )}
-              {rows.map((r) => {
+              {sortedRows.map((r) => {
                 const open = expanded === r.id;
                 const isImage = r.file_path
                   ? ["png", "jpg", "jpeg", "webp"].some((e) =>
@@ -520,6 +759,7 @@ function InvoicesPage() {
                     )
                   : false;
                 const items = itemsByInvoice[r.id] ?? [];
+                const settlementState = getSettlementState(r.id, settlementByInvoice);
                 return (
                   <Fragment key={r.id}>
                     <tr
@@ -547,7 +787,13 @@ function InvoicesPage() {
                         €{Number(r.total).toFixed(2)}
                       </td>
                       <td className="py-3 px-5 hidden sm:table-cell">
-                        <StatusPill status={r.status as "Processed" | "Processing" | "Review"} />
+                        <div className="flex flex-col items-start gap-1">
+                          <StatusPill status={r.status as "Processed" | "Processing" | "Review"} />
+                          <SettlementBadge
+                            state={settlementState}
+                            onToggle={() => toggleSettlement(r.id)}
+                          />
+                        </div>
                       </td>
                       <td
                         className="py-3 px-5 text-right whitespace-nowrap"
@@ -589,6 +835,8 @@ function InvoicesPage() {
                         <td colSpan={8} className="px-5 py-4">
                           <ItemsTable
                             items={items}
+                            priceComparisons={priceComparisonsByInvoice[r.id] ?? {}}
+                            ingredientNameMatches={ingredientNameMatches}
                             loading={itemsByInvoice[r.id] === undefined}
                             extracting={!!extracting[r.id]}
                             onExtract={isImage ? () => reExtract(r) : undefined}
@@ -690,6 +938,87 @@ function FileBadge({ path }: { path: string | null }) {
   );
 }
 
+function SettlementBadge({ state, onToggle }: { state: SettlementState; onToggle: () => void }) {
+  const settled = state === "settled";
+  return (
+    <button
+      type="button"
+      onClick={(event) => {
+        event.stopPropagation();
+        onToggle();
+      }}
+      className={`inline-flex items-center gap-1 rounded-md px-0.5 py-0 text-[10px] font-normal leading-tight transition hover:bg-muted/50 hover:text-foreground ${
+        settled ? "text-success/70" : "text-muted-foreground/75"
+      }`}
+      title="Local settlement marker for this session"
+    >
+      <span
+        className={`h-1 w-1 rounded-full ${settled ? "bg-success/60" : "bg-muted-foreground/40"}`}
+      />
+      {settled ? "Settled" : "Settlement pending"}
+    </button>
+  );
+}
+
+function PriceDeltaIndicator({
+  currentPrice,
+  previousPrice,
+}: {
+  currentPrice: number | null;
+  previousPrice: number | undefined;
+}) {
+  const delta = getPriceDeltaDetails(currentPrice, previousPrice);
+  if (!delta) return null;
+
+  if (delta.direction === "stable") {
+    return (
+      <span
+        className="text-[11px] text-muted-foreground/80 font-normal"
+        title={delta.previousLabel}
+      >
+        Stable
+      </span>
+    );
+  }
+
+  const increasing = delta.direction === "increased";
+  return (
+    <span
+      className={`text-[11px] font-medium ${increasing ? "text-destructive/80" : "text-success/80"}`}
+      title={delta.previousLabel}
+    >
+      {increasing ? "↑ price increased" : "↓ price decreased"} {delta.percentLabel}
+    </span>
+  );
+}
+
+function OperationalBadge({
+  label,
+  tone = "muted",
+}: {
+  label: string;
+  tone?: "muted" | "review" | "success" | "increase" | "decrease";
+}) {
+  const toneClass =
+    tone === "review"
+      ? "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+      : tone === "success"
+        ? "border-success/20 bg-success/10 text-success/80"
+        : tone === "increase"
+          ? "border-destructive/20 bg-destructive/10 text-destructive/80"
+          : tone === "decrease"
+            ? "border-success/20 bg-success/10 text-success/80"
+            : "border-border bg-muted/40 text-muted-foreground";
+
+  return (
+    <span
+      className={`rounded-full border px-2 py-0.5 text-[11px] font-medium leading-none ${toneClass}`}
+    >
+      {label}
+    </span>
+  );
+}
+
 function PreviewModal({
   preview,
   onClose,
@@ -731,23 +1060,69 @@ function PreviewModal({
 
 function ItemsTable({
   items,
+  priceComparisons,
+  ingredientNameMatches,
   loading,
   extracting,
   onExtract,
 }: {
   items: ItemRow[];
+  priceComparisons: PriceComparisonMap;
+  ingredientNameMatches: Set<string>;
   loading: boolean;
   extracting: boolean;
   onExtract?: () => void;
 }) {
+  const operationalSummary = items.reduce(
+    (summary, item) => {
+      if (isUnresolvedInvoiceItem(item, ingredientNameMatches)) {
+        summary.needsReview += 1;
+      } else {
+        summary.matched += 1;
+      }
+
+      const delta = getPriceDeltaDetails(item.unit_price, priceComparisons[item.id]);
+      if (delta?.direction === "increased") summary.priceIncreases += 1;
+      if (delta?.direction === "decreased") summary.priceDecreases += 1;
+
+      return summary;
+    },
+    { matched: 0, needsReview: 0, priceIncreases: 0, priceDecreases: 0 },
+  );
+  const hasUnresolvedItems = operationalSummary.needsReview > 0;
+  const priceMovementCount = operationalSummary.priceIncreases + operationalSummary.priceDecreases;
+
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-border">
         <div>
           <div className="text-sm font-semibold inline-flex items-center gap-2">
             <Sparkles className="h-3.5 w-3.5 text-primary" /> Extracted ingredients
+            {hasUnresolvedItems && !loading && !extracting && (
+              <OperationalBadge label="Needs review" tone="review" />
+            )}
           </div>
-          <div className="text-xs text-muted-foreground">AI Vision · structured output</div>
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+            <span>AI Vision · structured output</span>
+            {!loading && !extracting && items.length > 0 && (
+              <>
+                <span className="text-muted-foreground/40">•</span>
+                <span>{operationalSummary.matched} matched automatically</span>
+                {hasUnresolvedItems && (
+                  <>
+                    <span className="text-muted-foreground/40">•</span>
+                    <span>{operationalSummary.needsReview} need review</span>
+                  </>
+                )}
+                {priceMovementCount > 0 && (
+                  <>
+                    <span className="text-muted-foreground/40">•</span>
+                    <span>{priceMovementCount} price movements</span>
+                  </>
+                )}
+              </>
+            )}
+          </div>
         </div>
         {onExtract && (
           <button
@@ -790,19 +1165,60 @@ function ItemsTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {items.map((it) => (
-                <tr key={it.id}>
-                  <td className="py-2.5 px-4 font-medium">{it.name}</td>
-                  <td className="py-2.5 px-4 text-right tabular-nums">{it.quantity ?? "—"}</td>
-                  <td className="py-2.5 px-4 text-muted-foreground">{it.unit ?? "—"}</td>
-                  <td className="py-2.5 px-4 text-right tabular-nums">
-                    {it.unit_price != null ? `€${Number(it.unit_price).toFixed(2)}` : "—"}
-                  </td>
-                  <td className="py-2.5 px-4 text-right tabular-nums font-medium">
-                    {it.total != null ? `€${Number(it.total).toFixed(2)}` : "—"}
-                  </td>
-                </tr>
-              ))}
+              {items.map((it) => {
+                const unresolved = isUnresolvedInvoiceItem(it, ingredientNameMatches);
+                const delta = getPriceDeltaDetails(it.unit_price, priceComparisons[it.id]);
+                return (
+                  <tr
+                    key={it.id}
+                    className={`transition-colors ${
+                      unresolved
+                        ? "bg-amber-500/[0.04] hover:bg-amber-500/[0.07]"
+                        : "hover:bg-muted/20"
+                    }`}
+                  >
+                    <td className="py-2.5 px-4">
+                      <div className="space-y-1">
+                        <div className="font-medium leading-tight">{it.name}</div>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {unresolved ? (
+                            <>
+                              <OperationalBadge label="new ingredient" tone="review" />
+                              <OperationalBadge label="needs review" />
+                            </>
+                          ) : (
+                            <OperationalBadge label="matched automatically" tone="success" />
+                          )}
+                          {delta?.direction === "increased" && (
+                            <OperationalBadge label="price increased" tone="increase" />
+                          )}
+                          {delta?.direction === "decreased" && (
+                            <OperationalBadge label="price decreased" tone="decrease" />
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-2.5 px-4 text-right tabular-nums">{it.quantity ?? "—"}</td>
+                    <td className="py-2.5 px-4 text-muted-foreground">{it.unit ?? "—"}</td>
+                    <td className="py-2.5 px-4 text-right tabular-nums">
+                      {it.unit_price != null ? (
+                        <span className="inline-flex flex-col items-end gap-0.5">
+                          <span className="font-medium">€{Number(it.unit_price).toFixed(2)}</span>
+                          <PriceDeltaIndicator
+                            currentPrice={it.unit_price}
+                            previousPrice={priceComparisons[it.id]}
+                          />
+                        </span>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td className="py-2.5 px-4 text-right tabular-nums font-medium">
+                      {it.total != null ? `€${Number(it.total).toFixed(2)}` : "—"}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
