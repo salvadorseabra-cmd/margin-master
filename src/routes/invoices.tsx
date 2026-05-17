@@ -98,6 +98,8 @@ type IngredientMatchRow = {
 };
 
 type PriceComparisonMap = Record<string, number>;
+type IngredientCreationState = Record<string, boolean>;
+type IngredientCreationErrors = Record<string, string>;
 type PriceDeltaDetails = {
   direction: "increased" | "decreased" | "stable";
   percentLabel: string;
@@ -165,6 +167,12 @@ const needsExtractionConfirmation = (item: ItemRow) =>
   needsQuantityUnitConfirmation(item) ||
   needsAmountConfirmation(item);
 
+const removeKey = <T,>(record: Record<string, T>, key: string) => {
+  const next = { ...record };
+  delete next[key];
+  return next;
+};
+
 const getPriceDeltaDetails = (
   currentPrice: number | null,
   previousPrice: number | undefined,
@@ -198,6 +206,11 @@ function InvoicesPage() {
     Record<string, PriceComparisonMap>
   >({});
   const [ingredientNameMatches, setIngredientNameMatches] = useState<Set<string>>(new Set());
+  const [creatingIngredientByItem, setCreatingIngredientByItem] = useState<IngredientCreationState>(
+    {},
+  );
+  const [ingredientCreationErrors, setIngredientCreationErrors] =
+    useState<IngredientCreationErrors>({});
   const [extracting, setExtracting] = useState<Record<string, boolean>>({});
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [settlementByInvoice, setSettlementByInvoice] = useState<Record<string, SettlementState>>(
@@ -550,6 +563,49 @@ function InvoicesPage() {
     if (!itemsByInvoice[row.id]) loadItems(row.id, row.created_at);
   };
 
+  const createIngredientFromItem = async (item: ItemRow) => {
+    if (!user) return;
+
+    const name = item.name.trim();
+    const normalizedName = normalizeIngredientName(name);
+    if (!normalizedName || isPlaceholderItemName(name)) {
+      setIngredientCreationErrors((current) => ({
+        ...current,
+        [item.id]: "Confirm the extracted name before creating an ingredient.",
+      }));
+      return;
+    }
+
+    const unit = item.unit?.trim() || "kg";
+    const detectedPrice = Number(item.unit_price);
+    const currentPrice = Number.isFinite(detectedPrice) && detectedPrice >= 0 ? detectedPrice : 0;
+
+    setCreatingIngredientByItem((current) => ({ ...current, [item.id]: true }));
+    setIngredientCreationErrors((current) => removeKey(current, item.id));
+    try {
+      const { error } = await supabase.from("ingredients").insert({
+        user_id: user.id,
+        name,
+        normalized_name: normalizedName,
+        unit,
+        current_price: currentPrice,
+        purchase_quantity: 1,
+        purchase_unit: unit,
+        base_unit: unit,
+      });
+      if (error) throw error;
+
+      setIngredientNameMatches((current) => new Set(current).add(normalizedName));
+    } catch (err) {
+      setIngredientCreationErrors((current) => ({
+        ...current,
+        [item.id]: err instanceof Error ? err.message : "Could not create ingredient.",
+      }));
+    } finally {
+      setCreatingIngredientByItem((current) => removeKey(current, item.id));
+    }
+  };
+
   const reExtract = async (row: InvoiceRow) => {
     if (!row.file_path) return;
     const ext = row.file_path.split(".").pop()?.toLowerCase() ?? "";
@@ -855,6 +911,9 @@ function InvoicesPage() {
                             loading={itemsByInvoice[r.id] === undefined}
                             extracting={!!extracting[r.id]}
                             onExtract={isImage ? () => reExtract(r) : undefined}
+                            onCreateIngredient={createIngredientFromItem}
+                            creatingIngredientByItem={creatingIngredientByItem}
+                            ingredientCreationErrors={ingredientCreationErrors}
                           />
                         </td>
                       </tr>
@@ -1085,16 +1144,22 @@ function ItemsTable({
   items,
   priceComparisons,
   ingredientNameMatches,
+  creatingIngredientByItem,
+  ingredientCreationErrors,
   loading,
   extracting,
   onExtract,
+  onCreateIngredient,
 }: {
   items: ItemRow[];
   priceComparisons: PriceComparisonMap;
   ingredientNameMatches: Set<string>;
+  creatingIngredientByItem: IngredientCreationState;
+  ingredientCreationErrors: IngredientCreationErrors;
   loading: boolean;
   extracting: boolean;
   onExtract?: () => void;
+  onCreateIngredient: (item: ItemRow) => void;
 }) {
   const operationalSummary = items.reduce(
     (summary, item) => {
@@ -1217,6 +1282,9 @@ function ItemsTable({
                 const quantityUnitReview = needsQuantityUnitConfirmation(it);
                 const amountReview = needsAmountConfirmation(it);
                 const delta = getPriceDeltaDetails(it.unit_price, priceComparisons[it.id]);
+                const canCreateIngredient = !isPlaceholderItemName(it.name);
+                const creatingIngredient = !!creatingIngredientByItem[it.id];
+                const creationError = ingredientCreationErrors[it.id];
                 return (
                   <tr
                     key={it.id}
@@ -1236,7 +1304,23 @@ function ItemsTable({
                           {quantityUnitReview && <OperationalBadge label="check qty/unit" />}
                           {amountReview && <OperationalBadge label="check amounts" />}
                           {unmatchedIngredient ? (
-                            <OperationalBadge label="not in ingredient list" />
+                            <>
+                              <OperationalBadge label="not in ingredient list" />
+                              <button
+                                type="button"
+                                onClick={() => onCreateIngredient(it)}
+                                disabled={creatingIngredient || !canCreateIngredient}
+                                title={
+                                  canCreateIngredient
+                                    ? "Create ingredient from this extracted row"
+                                    : "Confirm the extracted name before creating an ingredient"
+                                }
+                                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground transition hover:bg-muted/70 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                {creatingIngredient && <Loader2 className="h-3 w-3 animate-spin" />}
+                                + Create ingredient
+                              </button>
+                            </>
                           ) : (
                             <OperationalBadge label="matched automatically" tone="success" />
                           )}
@@ -1247,6 +1331,9 @@ function ItemsTable({
                             <OperationalBadge label="price decreased" tone="decrease" />
                           )}
                         </div>
+                        {creationError && (
+                          <div className="text-[11px] text-destructive">{creationError}</div>
+                        )}
                       </div>
                     </td>
                     <td className="py-2.5 px-4 text-right tabular-nums">
