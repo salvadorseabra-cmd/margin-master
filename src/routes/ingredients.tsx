@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
-import { Plus, Loader2, Trash2 } from "lucide-react";
+import { Plus, Loader2, Trash2, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +39,7 @@ function IngredientsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortKey>("recent");
+  const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -100,6 +101,11 @@ function IngredientsPage() {
   const highRiskCount = rows.filter((row) => isHighRisk(row, averagePrice, usageCounts[row.id] ?? 0)).length;
 
   const recentlyUpdatedCount = rows.filter((row) => isRecentlyUpdated(row)).length;
+
+  const selectedIngredient = useMemo(
+    () => rows.find((row) => row.id === selectedIngredientId) ?? null,
+    [rows, selectedIngredientId]
+  );
 
   const save = async (e: FormEvent) => {
     e.preventDefault();
@@ -219,9 +225,20 @@ function IngredientsPage() {
                 const priceContext = getPriceContext(ing, averagePrice, usageCount);
 
                 return (
-                  <tr key={ing.id} className="hover:bg-muted/30 align-top">
+                  <tr
+                    key={ing.id}
+                    onClick={() => setSelectedIngredientId(ing.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        setSelectedIngredientId(ing.id);
+                      }
+                    }}
+                    tabIndex={0}
+                    className="group cursor-pointer align-top outline-none transition-colors duration-150 hover:bg-muted/25 focus-visible:bg-muted/25 focus-within:bg-muted/25"
+                  >
                     <td className="py-[1.125rem] pl-6 pr-5 min-w-[240px] max-w-[320px]">
-                      <div className="font-medium leading-5 line-clamp-2 break-words">{ing.name}</div>
+                      <div className="font-medium leading-5 line-clamp-2 break-words transition-colors group-hover:text-foreground/90">{ing.name}</div>
                       <div className="text-xs text-muted-foreground mt-0.5 whitespace-nowrap">per {ing.unit}</div>
                     </td>
                     <td className="py-[1.125rem] px-5 text-muted-foreground whitespace-nowrap">{ing.supplier?.trim() || "No supplier"}</td>
@@ -240,7 +257,14 @@ function IngredientsPage() {
                       <SignalBadge signal={signal} />
                     </td>
                     <td className="py-[1.125rem] pl-3 pr-6 text-right">
-                      <button onClick={() => remove(ing.id)} className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-muted">
+                      <button
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          remove(ing.id);
+                        }}
+                        className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-muted"
+                        aria-label={`Delete ${ing.name}`}
+                      >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </td>
@@ -251,7 +275,99 @@ function IngredientsPage() {
           </table>
         </div>
       </Card>
+
+      {selectedIngredient && (
+        <IngredientDetailPanel
+          ingredient={selectedIngredient}
+          usageCount={usageCounts[selectedIngredient.id] ?? 0}
+          signal={getIngredientSignal(selectedIngredient, averagePrice, usageCounts[selectedIngredient.id] ?? 0)}
+          priceContext={getPriceContext(selectedIngredient, averagePrice, usageCounts[selectedIngredient.id] ?? 0)}
+          onClose={() => setSelectedIngredientId(null)}
+        />
+      )}
     </AppShell>
+  );
+}
+
+function IngredientDetailPanel({
+  ingredient,
+  usageCount,
+  signal,
+  priceContext,
+  onClose,
+}: {
+  ingredient: Row;
+  usageCount: number;
+  signal: IngredientSignal;
+  priceContext: string;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-40 flex justify-end bg-background/35 backdrop-blur-[1px]" onClick={onClose}>
+      <aside
+        className="h-full w-full max-w-md border-l border-border bg-card shadow-xl transition-transform duration-200"
+        onClick={(event) => event.stopPropagation()}
+        aria-label={`${ingredient.name} details`}
+      >
+        <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
+          <div>
+            <div className="text-xs uppercase tracking-wide text-muted-foreground">Ingredient detail</div>
+            <h2 className="mt-1 text-xl font-semibold leading-7">{ingredient.name}</h2>
+            <div className="mt-1 text-sm text-muted-foreground">per {ingredient.unit}</div>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label="Close ingredient details"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="space-y-5 px-6 py-5">
+          <div className="grid grid-cols-2 gap-3">
+            <DetailMetric label="Current price" value={`€${Number(ingredient.current_price ?? 0).toFixed(2)}`} helper={priceContext} />
+            <DetailMetric label="Usage" value={formatUsageLabel(usageCount)} helper={usageCount > 0 ? "In active recipes" : "Not in recipes"} />
+          </div>
+
+          <div className="rounded-xl border border-border bg-background/40 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Supplier</div>
+                <div className="mt-1 font-medium">{ingredient.supplier?.trim() || "No supplier"}</div>
+              </div>
+              <SignalBadge signal={signal} />
+            </div>
+          </div>
+
+          <section className="rounded-xl border border-border bg-background/40 p-4">
+            <div className="font-medium">Recipes using this ingredient</div>
+            <div className="mt-1 text-sm text-muted-foreground">
+              {usageCount > 0
+                ? `${formatUsageLabel(usageCount)} currently reference this ingredient. Recipe names are not shown in this view yet.`
+                : "No recipes are currently using this ingredient."}
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-dashed border-border bg-muted/20 p-4">
+            <div className="font-medium">Price history intelligence</div>
+            <div className="mt-1 text-sm text-muted-foreground">
+              Future price movement context will appear here when historical supplier data is available.
+            </div>
+          </section>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+function DetailMetric({ label, value, helper }: { label: string; value: string; helper: string }) {
+  return (
+    <div className="rounded-xl border border-border bg-background/40 p-4">
+      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className="mt-2 text-lg font-semibold tabular-nums">{value}</div>
+      <div className="mt-1 text-xs text-muted-foreground">{helper}</div>
+    </div>
   );
 }
 
