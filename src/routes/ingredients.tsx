@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
-import { Plus, Loader2, Search, Trash2, X } from "lucide-react";
+import { Plus, Loader2, Pencil, Search, Trash2, X } from "lucide-react";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,6 +36,7 @@ function IngredientsPage() {
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: "", unit: "kg", current_price: "", supplier: "" });
+  const [editingIngredientId, setEditingIngredientId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortKey>("recent");
@@ -134,23 +135,46 @@ function IngredientsPage() {
     if (!user) return;
     setSaving(true);
     setError(null);
-    const { error } = await supabase.from("ingredients").insert({
-      user_id: user.id,
+    const payload = {
       name: form.name,
       unit: form.unit,
       current_price: Number(form.current_price) || 0,
       supplier: form.supplier || null,
-    });
+    };
+    const { error } = editingIngredientId
+      ? await supabase.from("ingredients").update(payload).eq("id", editingIngredientId)
+      : await supabase.from("ingredients").insert({
+          user_id: user.id,
+          ...payload,
+        });
     setSaving(false);
     if (error) { setError(error.message); return; }
-    setForm({ name: "", unit: "kg", current_price: "", supplier: "" });
-    setOpen(false);
+    resetForm();
     load();
   };
 
   const remove = async (id: string) => {
     await supabase.from("ingredients").delete().eq("id", id);
+    if (selectedIngredientId === id) setSelectedIngredientId(null);
     load();
+  };
+
+  const resetForm = () => {
+    setForm({ name: "", unit: "kg", current_price: "", supplier: "" });
+    setEditingIngredientId(null);
+    setOpen(false);
+  };
+
+  const beginEdit = (ingredient: Row) => {
+    setSelectedIngredientId(null);
+    setForm({
+      name: ingredient.name,
+      unit: ingredient.unit,
+      current_price: String(Number(ingredient.current_price ?? 0)),
+      supplier: ingredient.supplier ?? "",
+    });
+    setEditingIngredientId(ingredient.id);
+    setOpen(true);
   };
 
   return (
@@ -159,7 +183,15 @@ function IngredientsPage() {
       subtitle="Track ingredient prices across your suppliers."
       action={
         <button
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => {
+            if (open && !editingIngredientId) {
+              setOpen(false);
+              return;
+            }
+            setForm({ name: "", unit: "kg", current_price: "", supplier: "" });
+            setEditingIngredientId(null);
+            setOpen(true);
+          }}
           className="inline-flex items-center gap-2 bg-foreground text-background rounded-lg px-3.5 py-2 text-sm font-medium hover:opacity-90"
         >
           <Plus className="h-4 w-4" /> Add ingredient
@@ -168,6 +200,23 @@ function IngredientsPage() {
     >
       {open && (
         <Card className="mb-4">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <div className="text-sm font-semibold">{editingIngredientId ? "Edit ingredient" : "Add ingredient"}</div>
+              <div className="text-xs text-muted-foreground">
+                {editingIngredientId ? "Update the ingredient details without changing recipe links." : "Add a supplier price to your ingredient library."}
+              </div>
+            </div>
+            {editingIngredientId && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
           <form onSubmit={save} className="grid sm:grid-cols-5 gap-3 items-end">
             <Field label="Name">
               <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="input" placeholder="Beef tenderloin" />
@@ -182,7 +231,7 @@ function IngredientsPage() {
               <input value={form.supplier} onChange={(e) => setForm({ ...form, supplier: e.target.value })} className="input" placeholder="Boucherie Lafayette" />
             </Field>
             <button disabled={saving} type="submit" className="bg-foreground text-background rounded-lg px-3.5 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60 inline-flex items-center justify-center gap-2">
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />} Save
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />} {editingIngredientId ? "Update" : "Save"}
             </button>
           </form>
           {error && <div className="text-xs text-destructive mt-2">{error}</div>}
@@ -203,7 +252,7 @@ function IngredientsPage() {
             <div>
               <div className="font-semibold">Ingredient intelligence</div>
               <div className="text-xs text-muted-foreground mt-0.5">
-                Lightweight price, freshness and recipe usage signals.
+                Lightweight price, freshness, supplier and recipe dependency signals.
               </div>
               <div className="mt-1 text-xs text-muted-foreground">
                 Showing {sortedRows.length} of {rows.length} ingredients
@@ -252,33 +301,56 @@ function IngredientsPage() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[920px] text-sm">
+        <div className="hidden overflow-hidden sm:block">
+          <table className="w-full table-fixed text-sm">
+            <colgroup>
+              <col className="w-[36%] sm:w-[42%]" />
+              <col className="w-[18%] sm:w-[17%]" />
+              <col className="w-[22%] sm:w-[19%]" />
+              <col className="w-[16%] sm:w-[14%]" />
+              <col className="w-[8%]" />
+            </colgroup>
             <thead className="bg-muted/40">
               <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
-                <th className="py-3.5 pl-6 pr-5 font-medium min-w-[240px] w-[32%]">Ingredient</th>
-                <th className="py-3.5 px-5 font-medium min-w-[160px]">Supplier</th>
-                <th className="py-3.5 px-5 font-medium w-[125px] whitespace-nowrap">Usage</th>
-                <th className="py-3.5 px-5 font-medium min-w-[150px] whitespace-nowrap">Last updated</th>
-                <th className="py-3.5 px-5 font-medium text-right min-w-[135px] whitespace-nowrap">Current price</th>
-                <th className="py-3.5 px-5 font-medium w-[150px] whitespace-nowrap">Signal</th>
-                <th className="py-3.5 pl-3 pr-6 font-medium w-12"></th>
+                <th className="py-3.5 pl-4 pr-3 font-medium sm:pl-6 sm:pr-5">Ingredient</th>
+                <th className="py-3.5 px-2 font-medium sm:px-5">Usage</th>
+                <th className="py-3.5 px-2 font-medium text-right sm:px-5">Current price</th>
+                <th className="py-3.5 px-2 font-medium sm:px-5">Signal</th>
+                <th className="py-3.5 pl-1 pr-3 font-medium sm:pl-3 sm:pr-6"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {loading && (
-                <tr><td colSpan={7} className="py-10 text-center"><Loader2 className="h-4 w-4 animate-spin inline text-muted-foreground" /></td></tr>
+                <tr><td colSpan={5} className="py-10 text-center"><Loader2 className="h-4 w-4 animate-spin inline text-muted-foreground" /></td></tr>
               )}
               {!loading && rows.length === 0 && (
-                <tr><td colSpan={7} className="py-10 text-center text-sm text-muted-foreground">No ingredients yet. Add your first one above.</td></tr>
+                <tr>
+                  <td colSpan={5} className="px-6 py-14 text-center">
+                    <div className="mx-auto max-w-sm">
+                      <div className="font-medium">No ingredients yet</div>
+                      <div className="mt-1 text-sm text-muted-foreground">
+                        Add a few core ingredients to start seeing supplier, usage and cost signals.
+                      </div>
+                    </div>
+                  </td>
+                </tr>
               )}
               {!loading && rows.length > 0 && sortedRows.length === 0 && (
-                <tr><td colSpan={7} className="py-10 text-center text-sm text-muted-foreground">No ingredients match your search.</td></tr>
+                <tr>
+                  <td colSpan={5} className="px-6 py-14 text-center">
+                    <div className="mx-auto max-w-sm">
+                      <div className="font-medium">No matching ingredients</div>
+                      <div className="mt-1 text-sm text-muted-foreground">
+                        Try a different ingredient or supplier search.
+                      </div>
+                    </div>
+                  </td>
+                </tr>
               )}
               {sortedRows.map((ing) => {
                 const usageCount = usageCounts[ing.id] ?? 0;
                 const signal = getIngredientSignal(ing, averagePrice, usageCount);
-                const priceContext = getPriceContext(ing, averagePrice, usageCount);
+                const isSelected = selectedIngredientId === ing.id;
 
                 return (
                   <tr
@@ -291,44 +363,122 @@ function IngredientsPage() {
                       }
                     }}
                     tabIndex={0}
-                    className="group cursor-pointer align-top outline-none transition-colors duration-150 hover:bg-muted/25 focus-visible:bg-muted/25 focus-within:bg-muted/25"
+                    aria-selected={isSelected}
+                    className={`group cursor-pointer align-top outline-none transition-colors duration-150 hover:bg-muted/35 focus-visible:bg-muted/35 focus-within:bg-muted/35 ${
+                      isSelected ? "bg-muted/40" : ""
+                    }`}
                   >
-                    <td className="py-[1.125rem] pl-6 pr-5 min-w-[240px] max-w-[320px]">
+                    <td className="py-4 pl-4 pr-3 sm:py-[1.125rem] sm:pl-6 sm:pr-5">
                       <div className="font-medium leading-5 line-clamp-2 break-words transition-colors group-hover:text-foreground/90">{ing.name}</div>
-                      <div className="text-xs text-muted-foreground mt-0.5 whitespace-nowrap">per {ing.unit}</div>
+                      <div className="mt-1 text-xs text-muted-foreground">per {ing.unit}</div>
                     </td>
-                    <td className="py-[1.125rem] px-5 text-muted-foreground whitespace-nowrap">{ing.supplier?.trim() || "No supplier"}</td>
-                    <td className="py-[1.125rem] px-5 whitespace-nowrap">
-                      <div className="font-medium tabular-nums">{formatUsageLabel(usageCount)}</div>
-                      <div className="text-xs text-muted-foreground mt-0.5">{usageCount > 0 ? "In active recipes" : "Not in recipes"}</div>
+                    <td className="py-4 px-2 sm:py-[1.125rem] sm:px-5">
+                      <div className="font-medium tabular-nums leading-5">{formatUsageLabel(usageCount)}</div>
                     </td>
-                    <td className="py-[1.125rem] px-5">
-                      <div className="text-sm whitespace-nowrap">{formatUpdatedLabel(ing)}</div>
-                    </td>
-                    <td className="py-[1.125rem] px-5 text-right tabular-nums whitespace-nowrap">
+                    <td className="py-4 px-2 text-right tabular-nums sm:py-[1.125rem] sm:px-5">
                       <div className="font-semibold">€{Number(ing.current_price ?? 0).toFixed(2)}</div>
-                      <div className="text-xs text-muted-foreground">{priceContext}</div>
                     </td>
-                    <td className="py-[1.125rem] px-5 whitespace-nowrap">
+                    <td className="py-4 px-2 sm:py-[1.125rem] sm:px-5">
                       <SignalBadge signal={signal} />
                     </td>
-                    <td className="py-[1.125rem] pl-3 pr-6 text-right">
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          remove(ing.id);
-                        }}
-                        className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-muted"
-                        aria-label={`Delete ${ing.name}`}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                    <td className="py-4 pl-1 pr-3 text-right sm:py-[1.125rem] sm:pl-3 sm:pr-6">
+                      <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                        <button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            beginEdit(ing);
+                          }}
+                          className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          aria-label={`Edit ${ing.name}`}
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            remove(ing.id);
+                          }}
+                          className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
+                          aria-label={`Delete ${ing.name}`}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
+        </div>
+        <div className="divide-y divide-border sm:hidden">
+          {loading && (
+            <div className="py-10 text-center">
+              <Loader2 className="h-4 w-4 animate-spin inline text-muted-foreground" />
+            </div>
+          )}
+          {!loading && rows.length === 0 && (
+            <div className="px-6 py-14 text-center">
+              <div className="mx-auto max-w-sm">
+                <div className="font-medium">No ingredients yet</div>
+                <div className="mt-1 text-sm text-muted-foreground">
+                  Add a few core ingredients to start seeing supplier, usage and cost signals.
+                </div>
+              </div>
+            </div>
+          )}
+          {!loading && rows.length > 0 && sortedRows.length === 0 && (
+            <div className="px-6 py-14 text-center">
+              <div className="mx-auto max-w-sm">
+                <div className="font-medium">No matching ingredients</div>
+                <div className="mt-1 text-sm text-muted-foreground">
+                  Try a different ingredient or supplier search.
+                </div>
+              </div>
+            </div>
+          )}
+          {sortedRows.map((ing) => {
+            const usageCount = usageCounts[ing.id] ?? 0;
+            const signal = getIngredientSignal(ing, averagePrice, usageCount);
+            const isSelected = selectedIngredientId === ing.id;
+
+            return (
+              <div
+                key={ing.id}
+                role="button"
+                tabIndex={0}
+                aria-selected={isSelected}
+                onClick={() => setSelectedIngredientId(ing.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setSelectedIngredientId(ing.id);
+                  }
+                }}
+                className={`block w-full px-4 py-4 text-left transition-colors hover:bg-muted/35 focus-visible:bg-muted/35 focus-visible:outline-none ${
+                  isSelected ? "bg-muted/40" : ""
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="font-medium leading-5">{ing.name}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">per {ing.unit}</div>
+                  </div>
+                  <SignalBadge signal={signal} />
+                </div>
+                <div className="mt-4 flex items-end justify-between gap-4">
+                  <div>
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Usage</div>
+                    <div className="mt-1 font-medium tabular-nums">{formatUsageLabel(usageCount)}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Current price</div>
+                    <div className="mt-1 font-semibold tabular-nums">€{Number(ing.current_price ?? 0).toFixed(2)}</div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </Card>
 
@@ -338,7 +488,10 @@ function IngredientsPage() {
           usageCount={usageCounts[selectedIngredient.id] ?? 0}
           signal={getIngredientSignal(selectedIngredient, averagePrice, usageCounts[selectedIngredient.id] ?? 0)}
           priceContext={getPriceContext(selectedIngredient, averagePrice, usageCounts[selectedIngredient.id] ?? 0)}
+          averagePrice={averagePrice}
           onClose={() => setSelectedIngredientId(null)}
+          onEdit={() => beginEdit(selectedIngredient)}
+          onDelete={() => remove(selectedIngredient.id)}
         />
       )}
     </AppShell>
@@ -350,18 +503,27 @@ function IngredientDetailPanel({
   usageCount,
   signal,
   priceContext,
+  averagePrice,
   onClose,
+  onEdit,
+  onDelete,
 }: {
   ingredient: Row;
   usageCount: number;
   signal: IngredientSignal;
   priceContext: string;
+  averagePrice: number;
   onClose: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }) {
+  const contextLabels = getOperationalLabels(ingredient, averagePrice, usageCount);
+  const supplierStatus = hasMissingSupplier(ingredient) ? "Supplier missing" : "Supplier linked";
+
   return (
     <div className="fixed inset-0 z-40 flex justify-end bg-background/35 backdrop-blur-[1px]" onClick={onClose}>
       <aside
-        className="h-full w-full max-w-md border-l border-border bg-card shadow-xl transition-transform duration-200"
+        className="h-full w-full max-w-md overflow-y-auto border-l border-border bg-card shadow-xl transition-transform duration-200"
         onClick={(event) => event.stopPropagation()}
         aria-label={`${ingredient.name} details`}
       >
@@ -369,21 +531,41 @@ function IngredientDetailPanel({
           <div>
             <div className="text-xs uppercase tracking-wide text-muted-foreground">Ingredient detail</div>
             <h2 className="mt-1 text-xl font-semibold leading-7">{ingredient.name}</h2>
-            <div className="mt-1 text-sm text-muted-foreground">per {ingredient.unit}</div>
+            <div className="mt-1 text-sm text-muted-foreground">
+              €{Number(ingredient.current_price ?? 0).toFixed(2)} per {ingredient.unit}
+            </div>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            aria-label="Close ingredient details"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={onEdit}
+              className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              aria-label={`Edit ${ingredient.name}`}
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
+            <button
+              onClick={onDelete}
+              className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
+              aria-label={`Delete ${ingredient.name}`}
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+            <button
+              onClick={onClose}
+              className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              aria-label="Close ingredient details"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
         <div className="space-y-5 px-6 py-5">
           <div className="grid grid-cols-2 gap-3">
             <DetailMetric label="Current price" value={`€${Number(ingredient.current_price ?? 0).toFixed(2)}`} helper={priceContext} />
-            <DetailMetric label="Usage" value={formatUsageLabel(usageCount)} helper={usageCount > 0 ? "In active recipes" : "Not in recipes"} />
+            <DetailMetric label="Unit" value={ingredient.unit} helper="Purchase unit" />
+            <DetailMetric label="Usage" value={formatUsageLabel(usageCount)} helper={getRecipeDependencySummary(usageCount)} />
+            <DetailMetric label="Freshness" value={formatUpdatedLabel(ingredient)} helper={getFreshnessContext(ingredient)} />
           </div>
 
           <div className="rounded-xl border border-border bg-background/40 p-4">
@@ -391,25 +573,46 @@ function IngredientDetailPanel({
               <div>
                 <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Supplier</div>
                 <div className="mt-1 font-medium">{ingredient.supplier?.trim() || "No supplier"}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{supplierStatus}</div>
+                <div className="mt-2 text-sm leading-6 text-muted-foreground">{getSupplierExplanation(ingredient, usageCount)}</div>
               </div>
               <SignalBadge signal={signal} />
             </div>
           </div>
 
+          {contextLabels.length > 0 && (
+            <section className="rounded-xl border border-border bg-background/40 p-4">
+              <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Operational context</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {contextLabels.map((label) => (
+                  <ContextPill key={label}>{label}</ContextPill>
+                ))}
+              </div>
+            </section>
+          )}
+
           <section className="rounded-xl border border-border bg-background/40 p-4">
-            <div className="font-medium">Recipes using this ingredient</div>
+            <div className="flex items-center justify-between gap-3">
+              <div className="font-medium">Operational signal</div>
+              <SignalBadge signal={signal} />
+            </div>
+            <div className="mt-2 text-sm leading-6 text-muted-foreground">
+              {getRiskExplanation(ingredient, averagePrice, usageCount)}
+            </div>
+          </section>
+
+          <section className="rounded-xl border border-border bg-background/40 p-4">
+            <div className="font-medium">Recipe dependency</div>
             <div className="mt-1 text-sm text-muted-foreground">
               {usageCount > 0
-                ? `${formatUsageLabel(usageCount)} currently reference this ingredient. Recipe names are not shown in this view yet.`
-                : "No recipes are currently using this ingredient."}
+                ? `${formatUsageLabel(usageCount)} currently reference this ingredient. ${getRecipeDependencySummary(usageCount)}.`
+                : "No recipes are currently using this ingredient, so changes here should have limited menu impact."}
             </div>
           </section>
 
           <section className="rounded-xl border border-dashed border-border bg-muted/20 p-4">
-            <div className="font-medium">Price history intelligence</div>
-            <div className="mt-1 text-sm text-muted-foreground">
-              Future price movement context will appear here when historical supplier data is available.
-            </div>
+            <div className="font-medium">Manager note</div>
+            <div className="mt-1 text-sm leading-6 text-muted-foreground">{getManagerNote(ingredient, averagePrice, usageCount)}</div>
           </section>
         </div>
       </aside>
@@ -460,13 +663,23 @@ function SignalBadge({ signal }: { signal: IngredientSignal }) {
   );
 }
 
+function ContextPill({ children }: { children: ReactNode }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-border/70 bg-muted/25 px-2 py-0.5 text-[11px] font-medium leading-5 text-muted-foreground">
+      {children}
+    </span>
+  );
+}
+
 function getIngredientSignal(row: Row, averagePrice: number, usageCount: number): IngredientSignal {
   const price = Number(row.current_price ?? 0);
   const missingSupplier = !row.supplier?.trim();
-  const expensive = averagePrice > 0 && price >= averagePrice * 1.15;
+  const expensive = averagePrice > 0 && price >= averagePrice * 1.2;
+  const moderateUsage = usageCount >= 1;
+  const stale = isStale(row);
 
   if (isHighRisk(row, averagePrice, usageCount)) return "High risk";
-  if (missingSupplier || expensive) return "Attention";
+  if ((missingSupplier && moderateUsage) || expensive || (stale && usageCount >= 2)) return "Attention";
   return "Stable";
 }
 
@@ -496,10 +709,11 @@ function isRecentlyUpdated(row: Row) {
 function isHighRisk(row: Row, averagePrice: number, usageCount: number) {
   const price = Number(row.current_price ?? 0);
   const missingSupplier = !row.supplier?.trim();
-  const highPrice = averagePrice > 0 && price >= averagePrice * 1.5;
-  const heavyUsage = usageCount >= 2;
+  const mainCostDriver = averagePrice > 0 && price >= averagePrice * 1.35;
+  const heavyUsage = usageCount >= 3;
+  const operationallyImportant = usageCount >= 2 && mainCostDriver;
 
-  return heavyUsage && (highPrice || missingSupplier);
+  return (heavyUsage && (mainCostDriver || missingSupplier)) || operationallyImportant;
 }
 
 function hasMissingSupplier(row: Row) {
@@ -509,12 +723,92 @@ function hasMissingSupplier(row: Row) {
 function getPriceContext(row: Row, averagePrice: number, usageCount: number) {
   const price = Number(row.current_price ?? 0);
 
-  if (averagePrice > 0 && price >= averagePrice * 1.5) return "High cost item";
+  if (averagePrice > 0 && price >= averagePrice * 1.35 && usageCount > 0) return "Main cost driver";
+  if (averagePrice > 0 && price >= averagePrice * 1.35) return "High cost item";
   if (usageCount >= 2) return "Frequently used";
   if (averagePrice > 0 && price >= averagePrice * 1.15) return "Above average";
   if (averagePrice > 0 && price <= averagePrice * 0.75) return "Low cost item";
 
   return `per ${row.unit}`;
+}
+
+function getOperationalLabels(row: Row, averagePrice: number, usageCount: number) {
+  const labels: string[] = [];
+  const price = Number(row.current_price ?? 0);
+  const mainCostDriver = averagePrice > 0 && price >= averagePrice * 1.35 && usageCount > 0;
+
+  if (mainCostDriver) labels.push("Main cost driver");
+  if (usageCount >= 2) labels.push("Frequently used");
+  if (usageCount <= 1) labels.push("Low recipe dependency");
+  if (hasMissingSupplier(row) && usageCount > 0) labels.push("Supplier missing");
+  if (isRecentlyUpdated(row)) labels.push("Recently updated");
+
+  return labels;
+}
+
+function getRiskExplanation(row: Row, averagePrice: number, usageCount: number) {
+  const signal = getIngredientSignal(row, averagePrice, usageCount);
+  const missingSupplier = hasMissingSupplier(row);
+  const price = Number(row.current_price ?? 0);
+  const mainCostDriver = averagePrice > 0 && price >= averagePrice * 1.35 && usageCount > 0;
+
+  if (signal === "High risk") {
+    if (missingSupplier) return "This ingredient is used across several recipes and does not have a supplier attached, so price ownership is unclear.";
+    if (mainCostDriver) return "This ingredient combines meaningful recipe usage with a price well above the current ingredient average.";
+    return "This ingredient is operationally important enough to deserve a quick price and supplier review.";
+  }
+
+  if (signal === "Attention") {
+    if (missingSupplier) return "Supplier details are missing on an ingredient currently used by recipes.";
+    if (isStale(row)) return "This ingredient has not been refreshed recently and appears in multiple recipes.";
+    return "The current price sits above the ingredient average, but recipe exposure is still moderate.";
+  }
+
+  return "No immediate operational concern based on supplier coverage, price position and recipe dependency.";
+}
+
+function getSupplierExplanation(row: Row, usageCount: number) {
+  if (!hasMissingSupplier(row)) return "Supplier context is linked here, keeping the table focused on the active operating signals.";
+  if (usageCount > 0) return "Recipes depend on this ingredient, but supplier ownership is not attached yet.";
+  return "Supplier ownership is not attached yet, and no recipes currently depend on this ingredient.";
+}
+
+function getRecipeDependencySummary(usageCount: number) {
+  if (usageCount >= 3) return "High menu exposure";
+  if (usageCount >= 2) return "Moderate menu exposure";
+  if (usageCount === 1) return "Single recipe dependency";
+  return "Low recipe dependency";
+}
+
+function getFreshnessContext(row: Row) {
+  const days = daysSinceUpdate(row);
+
+  if (days === null || days <= 7) return "Recently updated";
+  if (days < 30) return "Fresh this month";
+  if (days < 90) return "Worth a price check";
+  return "Needs refresh";
+}
+
+function getManagerNote(row: Row, averagePrice: number, usageCount: number) {
+  if (isHighRisk(row, averagePrice, usageCount)) {
+    return "Review supplier coverage and price before this ingredient quietly drifts into menu margins.";
+  }
+  if (hasMissingSupplier(row) && usageCount === 0) {
+    return "Supplier is missing, but no recipes depend on this ingredient yet.";
+  }
+  if (usageCount <= 1) {
+    return "Low recipe dependency means updates here should be simple to validate.";
+  }
+  if (isRecentlyUpdated(row)) {
+    return "Recently updated and ready for day-to-day margin checks.";
+  }
+
+  return "Keep an eye on this ingredient during routine supplier and menu reviews.";
+}
+
+function isStale(row: Row) {
+  const days = daysSinceUpdate(row);
+  return days !== null && days >= 90;
 }
 
 function formatUpdatedLabel(row: Row) {

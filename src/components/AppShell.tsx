@@ -36,7 +36,7 @@ export function AppShell({ title, subtitle, action, children }: { title: string;
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar — desktop */}
-      <aside className="hidden lg:flex w-64 flex-col border-r border-border bg-card/40 sticky top-0 h-screen">
+      <aside className="group hidden lg:flex w-16 hover:w-64 flex-col overflow-hidden border-r border-border bg-card/40 sticky top-0 h-screen transition-[width] duration-200 ease-out">
         <BrandHeader />
         <SidebarNav path={path} />
         <SidebarFooter />
@@ -105,12 +105,12 @@ export function AppShell({ title, subtitle, action, children }: { title: string;
 
 function BrandHeader({ onClose }: { onClose?: () => void }) {
   return (
-    <div className="h-16 flex items-center justify-between px-5 border-b border-border">
-      <Link to="/" className="flex items-center gap-2">
-        <div className="h-8 w-8 rounded-lg bg-foreground text-background grid place-items-center">
+    <div className="h-16 flex items-center justify-between border-b border-border px-4 transition-[padding] duration-200 lg:group-hover:px-5">
+      <Link to="/" className="flex min-w-0 items-center gap-2">
+        <div className="h-8 w-8 shrink-0 rounded-lg bg-foreground text-background grid place-items-center">
           <Sparkles className="h-4 w-4" />
         </div>
-        <div className="leading-tight">
+        <div className="min-w-0 overflow-hidden leading-tight transition-opacity duration-150 lg:w-0 lg:opacity-0 lg:group-hover:w-auto lg:group-hover:opacity-100">
           <div className="text-sm font-semibold">Marginly</div>
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground">AI · F&B</div>
         </div>
@@ -126,7 +126,7 @@ function BrandHeader({ onClose }: { onClose?: () => void }) {
 
 function SidebarNav({ path, onNavigate }: { path: string; onNavigate?: () => void }) {
   return (
-    <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+    <nav className="flex-1 space-y-1 overflow-y-auto p-2 lg:group-hover:p-3">
       {nav.map(({ to, label, icon: Icon }) => {
         const active = to === "/" ? path === "/" : path.startsWith(to);
         return (
@@ -134,14 +134,15 @@ function SidebarNav({ path, onNavigate }: { path: string; onNavigate?: () => voi
             key={to}
             to={to}
             onClick={onNavigate}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+            className={`flex items-center justify-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors lg:group-hover:justify-start ${
               active
                 ? "bg-foreground text-background font-medium"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
+            title={label}
           >
-            <Icon className="h-4 w-4" />
-            {label}
+            <Icon className="h-4 w-4 shrink-0" />
+            <span className="min-w-0 truncate transition-opacity duration-150 lg:w-0 lg:opacity-0 lg:group-hover:w-auto lg:group-hover:opacity-100">{label}</span>
           </Link>
         );
       })}
@@ -151,7 +152,7 @@ function SidebarNav({ path, onNavigate }: { path: string; onNavigate?: () => voi
 
 function SidebarFooter() {
   return (
-    <div className="p-3 border-t border-border">
+    <div className="border-t border-border p-3 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
       <div className="rounded-xl bg-gradient-to-br from-accent to-card p-4">
         <div className="text-xs text-muted-foreground mb-1">Restaurant</div>
         <div className="text-sm font-semibold">{restaurant.name}</div>
