@@ -8,9 +8,9 @@ create table public.invoice_items (
   unit text,
   unit_price numeric,
   total numeric,
-  created_at timestamptz not null default now()
+created_at timestamptz not null default now(),
+updated_at timestamptz not null default now()
 );
-create index idx_invoice_items_invoice on public.invoice_items(invoice_id);
 alter table public.invoice_items enable row level security;
 create policy "items_select_own" on public.invoice_items for select using (auth.uid() = user_id);
 create policy "items_insert_own" on public.invoice_items for insert with check (auth.uid() = user_id);

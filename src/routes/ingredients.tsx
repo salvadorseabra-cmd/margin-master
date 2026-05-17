@@ -10,7 +10,7 @@ export const Route = createFileRoute("/ingredients")({
   head: () => ({
     meta: [
       { title: "Ingredient Prices — Marginly" },
-      { name: "description", content: "Track ingredient price changes across  s." },
+      { name: "description", content: "Track ingredient prices and supplier coverage." },
     ],
   }),
   component: IngredientsPage,
@@ -28,11 +28,19 @@ type Row = {
 
 type SortKey = "recent" | "risk" | "usage" | "price" | "missingSupplier";
 type IngredientSignal = "High risk" | "Attention" | "Stable";
+type RecipeDependency = {
+  recipeId: string;
+  recipeName: string;
+  lineCount: number;
+};
 
 function IngredientsPage() {
   const { user } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
   const [usageCounts, setUsageCounts] = useState<Record<string, number>>({});
+  const [recipeDependencies, setRecipeDependencies] = useState<Record<string, RecipeDependency[]>>(
+    {},
+  );
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: "", unit: "kg", current_price: "", supplier: "" });
@@ -48,7 +56,7 @@ function IngredientsPage() {
     setLoading(true);
     setError(null);
 
-    const { data, error }: any = await supabase
+    const { data, error } = await supabase
       .from("ingredients")
       .select("*")
       .order("created_at", { ascending: false });
@@ -57,34 +65,83 @@ function IngredientsPage() {
       setError(error.message);
       setRows([]);
       setUsageCounts({});
+      setRecipeDependencies({});
       setLoading(false);
       return;
     }
 
     setRows((data ?? []) as Row[]);
 
-    const { data: usageData, error: usageError }: any = await supabase
+    const { data: usageData, error: usageError } = await supabase
       .from("recipe_ingredients")
-      .select("ingredient_id");
+      .select("ingredient_id, recipe_id");
 
     if (!usageError) {
-      const counts = (usageData ?? []).reduce(
-        (acc: Record<string, number>, item: { ingredient_id?: string | null }) => {
-          if (item.ingredient_id) acc[item.ingredient_id] = (acc[item.ingredient_id] ?? 0) + 1;
+      const usageRows = (usageData ?? []) as {
+        ingredient_id?: string | null;
+        recipe_id?: string | null;
+      }[];
+      const recipeIds = Array.from(
+        new Set(usageRows.map((item) => item.recipe_id).filter((id): id is string => Boolean(id))),
+      );
+      let recipeNameById = new Map<string, string>();
+
+      if (recipeIds.length > 0) {
+        const { data: recipeData } = await supabase
+          .from("recipes")
+          .select("id, name")
+          .in("id", recipeIds);
+        recipeNameById = new Map(
+          ((recipeData ?? []) as { id: string; name?: string | null }[]).map((recipe) => [
+            recipe.id,
+            recipe.name?.trim() || "Recipe",
+          ]),
+        );
+      }
+
+      const counts = usageRows.reduce((acc: Record<string, number>, item) => {
+        if (item.ingredient_id) acc[item.ingredient_id] = (acc[item.ingredient_id] ?? 0) + 1;
+        return acc;
+      }, {});
+      const dependencies = usageRows.reduce((acc: Record<string, RecipeDependency[]>, item) => {
+        if (!item.ingredient_id || !item.recipe_id) return acc;
+        const existing = acc[item.ingredient_id]?.find(
+          (recipe) => recipe.recipeId === item.recipe_id,
+        );
+
+        if (existing) {
+          existing.lineCount += 1;
           return acc;
-        },
-        {}
+        }
+
+        acc[item.ingredient_id] = [
+          ...(acc[item.ingredient_id] ?? []),
+          {
+            recipeId: item.recipe_id,
+            recipeName: recipeNameById.get(item.recipe_id) ?? "Recipe",
+            lineCount: 1,
+          },
+        ];
+        return acc;
+      }, {});
+
+      Object.values(dependencies).forEach((recipes) =>
+        recipes.sort((a, b) => a.recipeName.localeCompare(b.recipeName)),
       );
 
       setUsageCounts(counts);
+      setRecipeDependencies(dependencies);
     } else {
       setUsageCounts({});
+      setRecipeDependencies({});
     }
 
     setLoading(false);
   };
 
-  useEffect(() => { if (user) load(); }, [user]);
+  useEffect(() => {
+    if (user) load();
+  }, [user]);
 
   const averagePrice = useMemo(() => {
     if (rows.length === 0) return 0;
@@ -108,12 +165,18 @@ function IngredientsPage() {
       if (sortBy === "risk") {
         const aSignal = getIngredientSignal(a, averagePrice, usageCounts[a.id] ?? 0);
         const bSignal = getIngredientSignal(b, averagePrice, usageCounts[b.id] ?? 0);
-        return getSignalPriority(bSignal) - getSignalPriority(aSignal) || getUpdatedTime(b) - getUpdatedTime(a);
+        return (
+          getSignalPriority(bSignal) - getSignalPriority(aSignal) ||
+          getUpdatedTime(b) - getUpdatedTime(a)
+        );
       }
       if (sortBy === "price") return Number(b.current_price ?? 0) - Number(a.current_price ?? 0);
       if (sortBy === "usage") return (usageCounts[b.id] ?? 0) - (usageCounts[a.id] ?? 0);
       if (sortBy === "missingSupplier") {
-        return Number(hasMissingSupplier(b)) - Number(hasMissingSupplier(a)) || getUpdatedTime(b) - getUpdatedTime(a);
+        return (
+          Number(hasMissingSupplier(b)) - Number(hasMissingSupplier(a)) ||
+          getUpdatedTime(b) - getUpdatedTime(a)
+        );
       }
       return getUpdatedTime(b) - getUpdatedTime(a);
     });
@@ -121,13 +184,19 @@ function IngredientsPage() {
 
   const hasActiveSearch = searchQuery.trim().length > 0;
 
-  const highRiskCount = rows.filter((row) => isHighRisk(row, averagePrice, usageCounts[row.id] ?? 0)).length;
+  const attentionCount = rows.filter(
+    (row) => getIngredientSignal(row, averagePrice, usageCounts[row.id] ?? 0) !== "Stable",
+  ).length;
 
-  const recentlyUpdatedCount = rows.filter((row) => isRecentlyUpdated(row)).length;
+  const usedIngredientCount = rows.filter((row) => (usageCounts[row.id] ?? 0) > 0).length;
+
+  const supplierCoverageCount = rows.filter((row) => !hasMissingSupplier(row)).length;
+  const supplierCoverageValue =
+    rows.length > 0 ? `${Math.round((supplierCoverageCount / rows.length) * 100)}%` : "0";
 
   const selectedIngredient = useMemo(
     () => rows.find((row) => row.id === selectedIngredientId) ?? null,
-    [rows, selectedIngredientId]
+    [rows, selectedIngredientId],
   );
 
   const save = async (e: FormEvent) => {
@@ -148,7 +217,10 @@ function IngredientsPage() {
           ...payload,
         });
     setSaving(false);
-    if (error) { setError(error.message); return; }
+    if (error) {
+      setError(error.message);
+      return;
+    }
     resetForm();
     load();
   };
@@ -180,7 +252,7 @@ function IngredientsPage() {
   return (
     <AppShell
       title="Ingredient prices"
-      subtitle="Track ingredient prices across your suppliers."
+      subtitle="Supplier prices and recipe dependency visibility."
       action={
         <button
           onClick={() => {
@@ -192,46 +264,79 @@ function IngredientsPage() {
             setEditingIngredientId(null);
             setOpen(true);
           }}
-          className="inline-flex items-center gap-2 bg-foreground text-background rounded-lg px-3.5 py-2 text-sm font-medium hover:opacity-90"
+          className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-foreground px-3.5 py-2 text-sm font-medium text-background shadow-sm transition hover:-translate-y-px hover:opacity-90 active:translate-y-0"
         >
           <Plus className="h-4 w-4" /> Add ingredient
         </button>
       }
     >
       {open && (
-        <Card className="mb-4">
+        <Card className="mb-3">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
-              <div className="text-sm font-semibold">{editingIngredientId ? "Edit ingredient" : "Add ingredient"}</div>
+              <div className="text-sm font-semibold">
+                {editingIngredientId ? "Edit ingredient" : "Add ingredient"}
+              </div>
               <div className="text-xs text-muted-foreground">
-                {editingIngredientId ? "Update the ingredient details without changing recipe links." : "Add a supplier price to your ingredient library."}
+                {editingIngredientId
+                  ? "Update price, unit or supplier."
+                  : "Add a supplier price to the ingredient library."}
               </div>
             </div>
             {editingIngredientId && (
               <button
                 type="button"
                 onClick={resetForm}
-                className="rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="cursor-pointer rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 Cancel
               </button>
             )}
           </div>
-          <form onSubmit={save} className="grid sm:grid-cols-5 gap-3 items-end">
+          <form onSubmit={save} className="grid items-end gap-3 sm:grid-cols-5">
             <Field label="Name">
-              <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="input" placeholder="Beef tenderloin" />
+              <input
+                required
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="input"
+                placeholder="Beef tenderloin"
+              />
             </Field>
             <Field label="Unit">
-              <input value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} className="input" placeholder="kg" />
+              <input
+                value={form.unit}
+                onChange={(e) => setForm({ ...form, unit: e.target.value })}
+                className="input"
+                placeholder="kg"
+              />
             </Field>
             <Field label="Price (€)">
-              <input required type="number" step="0.01" value={form.current_price} onChange={(e) => setForm({ ...form, current_price: e.target.value })} className="input" placeholder="0.00" />
+              <input
+                required
+                type="number"
+                step="0.01"
+                value={form.current_price}
+                onChange={(e) => setForm({ ...form, current_price: e.target.value })}
+                className="input"
+                placeholder="0.00"
+              />
             </Field>
             <Field label="Supplier">
-              <input value={form.supplier} onChange={(e) => setForm({ ...form, supplier: e.target.value })} className="input" placeholder="Boucherie Lafayette" />
+              <input
+                value={form.supplier}
+                onChange={(e) => setForm({ ...form, supplier: e.target.value })}
+                className="input"
+                placeholder="Boucherie Lafayette"
+              />
             </Field>
-            <button disabled={saving} type="submit" className="bg-foreground text-background rounded-lg px-3.5 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60 inline-flex items-center justify-center gap-2">
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />} {editingIngredientId ? "Update" : "Save"}
+            <button
+              disabled={saving}
+              type="submit"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-foreground px-3.5 py-2 text-sm font-medium text-background transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />}{" "}
+              {editingIngredientId ? "Update" : "Save"}
             </button>
           </form>
           {error && <div className="text-xs text-destructive mt-2">{error}</div>}
@@ -239,22 +344,30 @@ function IngredientsPage() {
         </Card>
       )}
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-        <Kpi label="Total ingredients" value={rows.length.toString()} />
-        <Kpi label="High risk ingredients" value={highRiskCount.toString()} />
-        <Kpi label="Recently updated" value={recentlyUpdatedCount.toString()} />
-        <Kpi label="Average ingredient price" value={`€${averagePrice.toFixed(2)}`} />
+      <div className="mb-3 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+        <Kpi label="Ingredients" value={rows.length.toString()} helper="Price library" />
+        <Kpi label="Attention" value={attentionCount.toString()} helper="Needs review" />
+        <Kpi
+          label="Used in recipes"
+          value={usedIngredientCount.toString()}
+          helper="Linked ingredients"
+        />
+        <Kpi
+          label="Supplier ownership"
+          value={supplierCoverageValue}
+          helper={`${supplierCoverageCount} assigned`}
+        />
       </div>
 
       <Card className="p-0 overflow-hidden">
-        <div className="px-5 py-4 border-b border-border">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div className="border-b border-border px-4 py-3.5 sm:px-5">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <div className="font-semibold">Ingredient intelligence</div>
-              <div className="text-xs text-muted-foreground mt-0.5">
-                Lightweight price, freshness, supplier and recipe dependency signals.
+              <div className="font-semibold">Ingredient register</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">
+                Price, supplier and recipe links.
               </div>
-              <div className="mt-1 text-xs text-muted-foreground">
+              <div className="mt-1 text-xs text-muted-foreground tabular-nums">
                 Showing {sortedRows.length} of {rows.length} ingredients
               </div>
             </div>
@@ -310,18 +423,22 @@ function IngredientsPage() {
               <col className="w-[16%] sm:w-[14%]" />
               <col className="w-[8%]" />
             </colgroup>
-            <thead className="bg-muted/40">
+            <thead className="bg-muted/35">
               <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
-                <th className="py-3.5 pl-4 pr-3 font-medium sm:pl-6 sm:pr-5">Ingredient</th>
-                <th className="py-3.5 px-2 font-medium sm:px-5">Usage</th>
-                <th className="py-3.5 px-2 font-medium text-right sm:px-5">Current price</th>
-                <th className="py-3.5 px-2 font-medium sm:px-5">Signal</th>
-                <th className="py-3.5 pl-1 pr-3 font-medium sm:pl-3 sm:pr-6"></th>
+                <th className="py-2.5 pl-4 pr-3 font-medium sm:pl-5 sm:pr-4">Ingredient</th>
+                <th className="px-2 py-2.5 font-medium sm:px-4">Usage</th>
+                <th className="px-2 py-2.5 text-right font-medium sm:px-4">Current price</th>
+                <th className="px-2 py-2.5 font-medium sm:px-4">Signal</th>
+                <th className="py-2.5 pl-1 pr-3 font-medium sm:pl-2 sm:pr-5"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {loading && (
-                <tr><td colSpan={5} className="py-10 text-center"><Loader2 className="h-4 w-4 animate-spin inline text-muted-foreground" /></td></tr>
+                <tr>
+                  <td colSpan={5} className="py-10 text-center">
+                    <Loader2 className="h-4 w-4 animate-spin inline text-muted-foreground" />
+                  </td>
+                </tr>
               )}
               {!loading && rows.length === 0 && (
                 <tr>
@@ -329,7 +446,7 @@ function IngredientsPage() {
                     <div className="mx-auto max-w-sm">
                       <div className="font-medium">No ingredients yet</div>
                       <div className="mt-1 text-sm text-muted-foreground">
-                        Add a few core ingredients to start seeing supplier, usage and cost signals.
+                        Add core ingredients to track supplier ownership and recipe exposure.
                       </div>
                     </div>
                   </td>
@@ -364,31 +481,37 @@ function IngredientsPage() {
                     }}
                     tabIndex={0}
                     aria-selected={isSelected}
-                    className={`group cursor-pointer align-top outline-none transition-colors duration-150 hover:bg-muted/35 focus-visible:bg-muted/35 focus-within:bg-muted/35 ${
-                      isSelected ? "bg-muted/40" : ""
+                    className={`group cursor-pointer align-top outline-none transition-colors duration-150 hover:bg-muted/40 focus-visible:bg-muted/45 focus-within:bg-muted/45 ${
+                      isSelected ? "bg-muted/55 shadow-[inset_3px_0_0_var(--color-foreground)]" : ""
                     }`}
                   >
-                    <td className="py-4 pl-4 pr-3 sm:py-[1.125rem] sm:pl-6 sm:pr-5">
-                      <div className="font-medium leading-5 line-clamp-2 break-words transition-colors group-hover:text-foreground/90">{ing.name}</div>
+                    <td className="py-3 pl-4 pr-3 sm:pl-5 sm:pr-4">
+                      <div className="font-medium leading-5 line-clamp-2 break-words transition-colors group-hover:text-foreground/90">
+                        {ing.name}
+                      </div>
                       <div className="mt-1 text-xs text-muted-foreground">per {ing.unit}</div>
                     </td>
-                    <td className="py-4 px-2 sm:py-[1.125rem] sm:px-5">
-                      <div className="font-medium tabular-nums leading-5">{formatUsageLabel(usageCount)}</div>
+                    <td className="px-2 py-3 sm:px-4">
+                      <div className="font-medium tabular-nums leading-5">
+                        {formatUsageLabel(usageCount)}
+                      </div>
                     </td>
-                    <td className="py-4 px-2 text-right tabular-nums sm:py-[1.125rem] sm:px-5">
-                      <div className="font-semibold">€{Number(ing.current_price ?? 0).toFixed(2)}</div>
+                    <td className="px-2 py-3 text-right tabular-nums sm:px-4">
+                      <div className="font-semibold">
+                        €{Number(ing.current_price ?? 0).toFixed(2)}
+                      </div>
                     </td>
-                    <td className="py-4 px-2 sm:py-[1.125rem] sm:px-5">
+                    <td className="px-2 py-3 sm:px-4">
                       <SignalBadge signal={signal} />
                     </td>
-                    <td className="py-4 pl-1 pr-3 text-right sm:py-[1.125rem] sm:pl-3 sm:pr-6">
-                      <div className="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                    <td className="py-3 pl-1 pr-3 text-right sm:pl-2 sm:pr-5">
+                      <div className="flex items-center justify-end gap-1 opacity-65 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                         <button
                           onClick={(event) => {
                             event.stopPropagation();
                             beginEdit(ing);
                           }}
-                          className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                           aria-label={`Edit ${ing.name}`}
                         >
                           <Pencil className="h-3.5 w-3.5" />
@@ -398,7 +521,7 @@ function IngredientsPage() {
                             event.stopPropagation();
                             remove(ing.id);
                           }}
-                          className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
+                          className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
                           aria-label={`Delete ${ing.name}`}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -422,7 +545,7 @@ function IngredientsPage() {
               <div className="mx-auto max-w-sm">
                 <div className="font-medium">No ingredients yet</div>
                 <div className="mt-1 text-sm text-muted-foreground">
-                  Add a few core ingredients to start seeing supplier, usage and cost signals.
+                  Add core ingredients to track supplier ownership and recipe exposure.
                 </div>
               </div>
             </div>
@@ -455,8 +578,8 @@ function IngredientsPage() {
                     setSelectedIngredientId(ing.id);
                   }
                 }}
-                className={`block w-full px-4 py-4 text-left transition-colors hover:bg-muted/35 focus-visible:bg-muted/35 focus-visible:outline-none ${
-                  isSelected ? "bg-muted/40" : ""
+                className={`block w-full cursor-pointer px-4 py-3.5 text-left transition-colors hover:bg-muted/40 focus-visible:bg-muted/45 focus-visible:outline-none ${
+                  isSelected ? "bg-muted/55 shadow-[inset_3px_0_0_var(--color-foreground)]" : ""
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -466,14 +589,22 @@ function IngredientsPage() {
                   </div>
                   <SignalBadge signal={signal} />
                 </div>
-                <div className="mt-4 flex items-end justify-between gap-4">
+                <div className="mt-3 flex items-end justify-between gap-4">
                   <div>
-                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Usage</div>
-                    <div className="mt-1 font-medium tabular-nums">{formatUsageLabel(usageCount)}</div>
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                      Usage
+                    </div>
+                    <div className="mt-1 font-medium tabular-nums">
+                      {formatUsageLabel(usageCount)}
+                    </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs uppercase tracking-wide text-muted-foreground">Current price</div>
-                    <div className="mt-1 font-semibold tabular-nums">€{Number(ing.current_price ?? 0).toFixed(2)}</div>
+                    <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                      Current price
+                    </div>
+                    <div className="mt-1 font-semibold tabular-nums">
+                      €{Number(ing.current_price ?? 0).toFixed(2)}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -486,8 +617,17 @@ function IngredientsPage() {
         <IngredientDetailPanel
           ingredient={selectedIngredient}
           usageCount={usageCounts[selectedIngredient.id] ?? 0}
-          signal={getIngredientSignal(selectedIngredient, averagePrice, usageCounts[selectedIngredient.id] ?? 0)}
-          priceContext={getPriceContext(selectedIngredient, averagePrice, usageCounts[selectedIngredient.id] ?? 0)}
+          recipeDependencies={recipeDependencies[selectedIngredient.id] ?? []}
+          signal={getIngredientSignal(
+            selectedIngredient,
+            averagePrice,
+            usageCounts[selectedIngredient.id] ?? 0,
+          )}
+          priceContext={getPriceContext(
+            selectedIngredient,
+            averagePrice,
+            usageCounts[selectedIngredient.id] ?? 0,
+          )}
           averagePrice={averagePrice}
           onClose={() => setSelectedIngredientId(null)}
           onEdit={() => beginEdit(selectedIngredient)}
@@ -501,6 +641,7 @@ function IngredientsPage() {
 function IngredientDetailPanel({
   ingredient,
   usageCount,
+  recipeDependencies,
   signal,
   priceContext,
   averagePrice,
@@ -510,6 +651,7 @@ function IngredientDetailPanel({
 }: {
   ingredient: Row;
   usageCount: number;
+  recipeDependencies: RecipeDependency[];
   signal: IngredientSignal;
   priceContext: string;
   averagePrice: number;
@@ -517,102 +659,144 @@ function IngredientDetailPanel({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const contextLabels = getOperationalLabels(ingredient, averagePrice, usageCount);
-  const supplierStatus = hasMissingSupplier(ingredient) ? "Supplier missing" : "Supplier linked";
+  const primaryContextLabel = getPrimaryContextLabel(ingredient, averagePrice, usageCount);
+  const supplierName = ingredient.supplier?.trim() || "No supplier assigned";
+  const visibleRecipeDependencies = recipeDependencies.slice(0, 4);
+  const hiddenRecipeCount = Math.max(
+    recipeDependencies.length - visibleRecipeDependencies.length,
+    0,
+  );
 
   return (
-    <div className="fixed inset-0 z-40 flex justify-end bg-background/35 backdrop-blur-[1px]" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-40 flex justify-end bg-background/45 backdrop-blur-[1px]"
+      onClick={onClose}
+    >
       <aside
-        className="h-full w-full max-w-md overflow-y-auto border-l border-border bg-card shadow-xl transition-transform duration-200"
+        className="h-full w-full max-w-lg overflow-y-auto border-l border-border bg-card shadow-2xl transition-transform duration-200"
         onClick={(event) => event.stopPropagation()}
         aria-label={`${ingredient.name} details`}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
-          <div>
-            <div className="text-xs uppercase tracking-wide text-muted-foreground">Ingredient detail</div>
-            <h2 className="mt-1 text-xl font-semibold leading-7">{ingredient.name}</h2>
-            <div className="mt-1 text-sm text-muted-foreground">
-              €{Number(ingredient.current_price ?? 0).toFixed(2)} per {ingredient.unit}
+        <div className="border-b border-border px-5 py-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                Ingredient detail
+              </div>
+              <h2 className="mt-1 text-xl font-semibold leading-7 tracking-tight">
+                {ingredient.name}
+              </h2>
+              <div className="mt-1 text-sm text-muted-foreground tabular-nums">
+                €{Number(ingredient.current_price ?? 0).toFixed(2)} per {ingredient.unit}
+              </div>
+            </div>
+            <div className="flex shrink-0 items-center gap-1 rounded-lg border border-border/70 bg-background/45 p-1">
+              <button
+                onClick={onEdit}
+                className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label={`Edit ${ingredient.name}`}
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+              <button
+                onClick={onDelete}
+                className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
+                aria-label={`Delete ${ingredient.name}`}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+              <button
+                onClick={onClose}
+                className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label="Close ingredient details"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={onEdit}
-              className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              aria-label={`Edit ${ingredient.name}`}
-            >
-              <Pencil className="h-4 w-4" />
-            </button>
-            <button
-              onClick={onDelete}
-              className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
-              aria-label={`Delete ${ingredient.name}`}
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-            <button
-              onClick={onClose}
-              className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              aria-label="Close ingredient details"
-            >
-              <X className="h-4 w-4" />
-            </button>
+          <div className="mt-3 flex flex-wrap items-center gap-1.5">
+            <SignalBadge signal={signal} />
+            {primaryContextLabel && <ContextPill>{primaryContextLabel}</ContextPill>}
           </div>
         </div>
 
-        <div className="space-y-5 px-6 py-5">
-          <div className="grid grid-cols-2 gap-3">
-            <DetailMetric label="Current price" value={`€${Number(ingredient.current_price ?? 0).toFixed(2)}`} helper={priceContext} />
+        <div className="space-y-3.5 px-5 py-4">
+          <div className="grid grid-cols-2 gap-2.5">
+            <DetailMetric
+              label="Current price"
+              value={`€${Number(ingredient.current_price ?? 0).toFixed(2)}`}
+              helper={priceContext}
+            />
             <DetailMetric label="Unit" value={ingredient.unit} helper="Purchase unit" />
-            <DetailMetric label="Usage" value={formatUsageLabel(usageCount)} helper={getRecipeDependencySummary(usageCount)} />
-            <DetailMetric label="Freshness" value={formatUpdatedLabel(ingredient)} helper={getFreshnessContext(ingredient)} />
+            <DetailMetric
+              label="Usage"
+              value={formatUsageLabel(usageCount)}
+              helper="Recipe links"
+            />
+            <DetailMetric
+              label="Freshness"
+              value={formatUpdatedLabel(ingredient)}
+              helper={getFreshnessContext(ingredient)}
+            />
           </div>
 
-          <div className="rounded-xl border border-border bg-background/40 p-4">
+          <section className="rounded-xl border border-border bg-background/35 p-4">
             <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Supplier</div>
-                <div className="mt-1 font-medium">{ingredient.supplier?.trim() || "No supplier"}</div>
-                <div className="mt-1 text-xs text-muted-foreground">{supplierStatus}</div>
-                <div className="mt-2 text-sm leading-6 text-muted-foreground">{getSupplierExplanation(ingredient, usageCount)}</div>
-              </div>
+              <div className="font-medium">Status</div>
               <SignalBadge signal={signal} />
             </div>
-          </div>
+            <div className="mt-3 divide-y divide-border/70 text-sm">
+              <div className="flex items-center justify-between gap-3 py-2 first:pt-0">
+                <span className="text-muted-foreground">Supplier</span>
+                <span className="min-w-0 truncate text-right font-medium">{supplierName}</span>
+              </div>
+              <div className="flex items-start justify-between gap-3 pt-2">
+                <span className="text-muted-foreground">Signal</span>
+                <span className="max-w-[60%] text-right text-muted-foreground">
+                  {getRiskExplanation(ingredient, averagePrice, usageCount)}
+                </span>
+              </div>
+            </div>
+          </section>
 
-          {contextLabels.length > 0 && (
-            <section className="rounded-xl border border-border bg-background/40 p-4">
-              <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Operational context</div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {contextLabels.map((label) => (
-                  <ContextPill key={label}>{label}</ContextPill>
+          <section className="rounded-xl border border-border bg-background/35 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="font-medium">Recipe exposure</div>
+                <div className="mt-1 text-sm text-muted-foreground">
+                  {getRecipeDependencyExplanation(usageCount)}
+                </div>
+              </div>
+              <div className="text-right text-sm font-semibold tabular-nums">
+                {formatUsageLabel(usageCount)}
+              </div>
+            </div>
+            {visibleRecipeDependencies.length > 0 ? (
+              <div className="mt-3 divide-y divide-border/70 rounded-lg border border-border/70 bg-card">
+                {visibleRecipeDependencies.map((recipe) => (
+                  <div
+                    key={recipe.recipeId}
+                    className="flex items-center justify-between gap-3 px-3 py-2 text-sm"
+                  >
+                    <span className="min-w-0 truncate font-medium">{recipe.recipeName}</span>
+                    {recipe.lineCount > 1 && (
+                      <span className="shrink-0 text-xs text-muted-foreground">
+                        {recipe.lineCount} lines
+                      </span>
+                    )}
+                  </div>
                 ))}
               </div>
-            </section>
-          )}
-
-          <section className="rounded-xl border border-border bg-background/40 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="font-medium">Operational signal</div>
-              <SignalBadge signal={signal} />
-            </div>
-            <div className="mt-2 text-sm leading-6 text-muted-foreground">
-              {getRiskExplanation(ingredient, averagePrice, usageCount)}
-            </div>
-          </section>
-
-          <section className="rounded-xl border border-border bg-background/40 p-4">
-            <div className="font-medium">Recipe dependency</div>
-            <div className="mt-1 text-sm text-muted-foreground">
-              {usageCount > 0
-                ? `${formatUsageLabel(usageCount)} currently reference this ingredient. ${getRecipeDependencySummary(usageCount)}.`
-                : "No recipes are currently using this ingredient, so changes here should have limited menu impact."}
-            </div>
-          </section>
-
-          <section className="rounded-xl border border-dashed border-border bg-muted/20 p-4">
-            <div className="font-medium">Manager note</div>
-            <div className="mt-1 text-sm leading-6 text-muted-foreground">{getManagerNote(ingredient, averagePrice, usageCount)}</div>
+            ) : (
+              <div className="mt-3 rounded-lg border border-dashed border-border bg-muted/15 px-3 py-2 text-sm text-muted-foreground">
+                No active recipe dependency.
+              </div>
+            )}
+            {hiddenRecipeCount > 0 && (
+              <div className="mt-2 text-xs text-muted-foreground">
+                +{hiddenRecipeCount} more affected recipes
+              </div>
+            )}
           </section>
         </div>
       </aside>
@@ -622,9 +806,11 @@ function IngredientDetailPanel({
 
 function DetailMetric({ label, value, helper }: { label: string; value: string; helper: string }) {
   return (
-    <div className="rounded-xl border border-border bg-background/40 p-4">
-      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className="mt-2 text-lg font-semibold tabular-nums">{value}</div>
+    <div className="rounded-lg border border-border bg-background/35 p-3">
+      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </div>
+      <div className="mt-1.5 text-base font-semibold tabular-nums">{value}</div>
       <div className="mt-1 text-xs text-muted-foreground">{helper}</div>
     </div>
   );
@@ -639,11 +825,12 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-function Kpi({ label, value }: { label: string; value: string }) {
+function Kpi({ label, value, helper }: { label: string; value: string; helper: string }) {
   return (
-    <Card className="py-4">
-      <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className="text-2xl font-semibold tabular-nums mt-1">{value}</div>
+    <Card className="py-3">
+      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className="mt-1 text-xl font-semibold tabular-nums">{value}</div>
+      <div className="mt-1 text-xs text-muted-foreground">{helper}</div>
     </Card>
   );
 }
@@ -653,11 +840,13 @@ function SignalBadge({ signal }: { signal: IngredientSignal }) {
     signal === "High risk"
       ? "text-destructive bg-destructive/10 border-destructive/20"
       : signal === "Attention"
-      ? "text-warning bg-warning/10 border-warning/20"
-      : "text-muted-foreground bg-muted/30 border-border/60";
+        ? "text-warning bg-warning/10 border-warning/20"
+        : "text-muted-foreground bg-muted/30 border-border/60";
 
   return (
-    <span className={`inline-flex whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-medium ${className}`}>
+    <span
+      className={`inline-flex whitespace-nowrap rounded-md border px-2 py-0.5 text-xs font-medium ${className}`}
+    >
       {signal}
     </span>
   );
@@ -665,7 +854,7 @@ function SignalBadge({ signal }: { signal: IngredientSignal }) {
 
 function ContextPill({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex items-center rounded-full border border-border/70 bg-muted/25 px-2 py-0.5 text-[11px] font-medium leading-5 text-muted-foreground">
+    <span className="inline-flex items-center rounded-md border border-border/70 bg-muted/25 px-2 py-0.5 text-[11px] font-medium leading-5 text-muted-foreground">
       {children}
     </span>
   );
@@ -679,7 +868,8 @@ function getIngredientSignal(row: Row, averagePrice: number, usageCount: number)
   const stale = isStale(row);
 
   if (isHighRisk(row, averagePrice, usageCount)) return "High risk";
-  if ((missingSupplier && moderateUsage) || expensive || (stale && usageCount >= 2)) return "Attention";
+  if ((missingSupplier && moderateUsage) || expensive || (stale && usageCount >= 2))
+    return "Attention";
   return "Stable";
 }
 
@@ -732,52 +922,43 @@ function getPriceContext(row: Row, averagePrice: number, usageCount: number) {
   return `per ${row.unit}`;
 }
 
-function getOperationalLabels(row: Row, averagePrice: number, usageCount: number) {
-  const labels: string[] = [];
+function getPrimaryContextLabel(row: Row, averagePrice: number, usageCount: number) {
   const price = Number(row.current_price ?? 0);
   const mainCostDriver = averagePrice > 0 && price >= averagePrice * 1.35 && usageCount > 0;
 
-  if (mainCostDriver) labels.push("Main cost driver");
-  if (usageCount >= 2) labels.push("Frequently used");
-  if (usageCount <= 1) labels.push("Low recipe dependency");
-  if (hasMissingSupplier(row) && usageCount > 0) labels.push("Supplier missing");
-  if (isRecentlyUpdated(row)) labels.push("Recently updated");
+  if (mainCostDriver) return "Main cost driver";
+  if (usageCount >= 3) return "High recipe exposure";
+  if (isRecentlyUpdated(row)) return "Recently updated";
 
-  return labels;
+  return null;
 }
 
 function getRiskExplanation(row: Row, averagePrice: number, usageCount: number) {
   const signal = getIngredientSignal(row, averagePrice, usageCount);
   const missingSupplier = hasMissingSupplier(row);
-  const price = Number(row.current_price ?? 0);
-  const mainCostDriver = averagePrice > 0 && price >= averagePrice * 1.35 && usageCount > 0;
+  const mainCostDriver =
+    averagePrice > 0 && Number(row.current_price ?? 0) >= averagePrice * 1.35 && usageCount > 0;
 
   if (signal === "High risk") {
-    if (missingSupplier) return "This ingredient is used across several recipes and does not have a supplier attached, so price ownership is unclear.";
-    if (mainCostDriver) return "This ingredient combines meaningful recipe usage with a price well above the current ingredient average.";
-    return "This ingredient is operationally important enough to deserve a quick price and supplier review.";
+    if (missingSupplier) return "High recipe exposure with no supplier assigned.";
+    if (mainCostDriver) return "High recipe exposure and above-average price.";
+    return "Review price and supplier coverage.";
   }
 
   if (signal === "Attention") {
-    if (missingSupplier) return "Supplier details are missing on an ingredient currently used by recipes.";
-    if (isStale(row)) return "This ingredient has not been refreshed recently and appears in multiple recipes.";
-    return "The current price sits above the ingredient average, but recipe exposure is still moderate.";
+    if (missingSupplier) return "No supplier assigned for a recipe-linked ingredient.";
+    if (isStale(row)) return "Price has not been refreshed recently.";
+    return "Above-average price with moderate recipe exposure.";
   }
 
-  return "No immediate operational concern based on supplier coverage, price position and recipe dependency.";
+  return "No supplier risk detected.";
 }
 
-function getSupplierExplanation(row: Row, usageCount: number) {
-  if (!hasMissingSupplier(row)) return "Supplier context is linked here, keeping the table focused on the active operating signals.";
-  if (usageCount > 0) return "Recipes depend on this ingredient, but supplier ownership is not attached yet.";
-  return "Supplier ownership is not attached yet, and no recipes currently depend on this ingredient.";
-}
-
-function getRecipeDependencySummary(usageCount: number) {
-  if (usageCount >= 3) return "High menu exposure";
-  if (usageCount >= 2) return "Moderate menu exposure";
-  if (usageCount === 1) return "Single recipe dependency";
-  return "Low recipe dependency";
+function getRecipeDependencyExplanation(usageCount: number) {
+  if (usageCount >= 3) return "Used in active recipes.";
+  if (usageCount >= 2) return "Used in a small recipe group.";
+  if (usageCount === 1) return "Used in one active recipe.";
+  return "No active recipe dependency.";
 }
 
 function getFreshnessContext(row: Row) {
@@ -787,23 +968,6 @@ function getFreshnessContext(row: Row) {
   if (days < 30) return "Fresh this month";
   if (days < 90) return "Worth a price check";
   return "Needs refresh";
-}
-
-function getManagerNote(row: Row, averagePrice: number, usageCount: number) {
-  if (isHighRisk(row, averagePrice, usageCount)) {
-    return "Review supplier coverage and price before this ingredient quietly drifts into menu margins.";
-  }
-  if (hasMissingSupplier(row) && usageCount === 0) {
-    return "Supplier is missing, but no recipes depend on this ingredient yet.";
-  }
-  if (usageCount <= 1) {
-    return "Low recipe dependency means updates here should be simple to validate.";
-  }
-  if (isRecentlyUpdated(row)) {
-    return "Recently updated and ready for day-to-day margin checks.";
-  }
-
-  return "Keep an eye on this ingredient during routine supplier and menu reviews.";
 }
 
 function isStale(row: Row) {

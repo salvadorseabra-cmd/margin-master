@@ -1,13 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
 import {
+  recipes,
   kpis,
   marginTrend,
   topIngredients,
   alerts,
   invoices,
   ingredients,
-  recipes,
 } from "@/lib/mock-data";
 import {
   ArrowDownRight,

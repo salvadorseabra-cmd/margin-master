@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
-import { Loader2, Plus, Trash2, TrendingUp, TrendingDown } from "lucide-react";
+import { Loader2, Plus, Trash2, TrendingUp, TrendingDown, X } from "lucide-react";
 
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
@@ -65,6 +65,21 @@ type RecipeForm = {
 };
 
 type RecipeFormMode = "create" | "edit";
+
+type RecipeCostLine = {
+  line: RecipeLineForm;
+  ingredient: RecipeIngredient["ingredients"] | IngredientOption | null;
+  quantity: number;
+  unitCost: number;
+  lineCost: number;
+  contribution: number;
+};
+
+type RecipeHealth = {
+  label: "Healthy" | "Attention" | "High risk";
+  tone: "success" | "warning" | "destructive";
+  helper: string;
+};
 
 const emptyRecipeForm: RecipeForm = {
   name: "",
@@ -372,6 +387,26 @@ function RecipesPage() {
     setSaving(false);
   };
 
+  const recipeCostLines = getRecipeCostLines(recipeForm.lines, selectedRecipe, ingredientOptions);
+  const recipeTotalCost = recipeCostLines.reduce((sum, line) => sum + line.lineCost, 0);
+  const sellingPrice = Number(recipeForm.selling_price || 0);
+  const grossProfit = sellingPrice - recipeTotalCost;
+  const grossMargin = sellingPrice > 0 ? (grossProfit / sellingPrice) * 100 : 0;
+  const foodCostPercentage = sellingPrice > 0 ? (recipeTotalCost / sellingPrice) * 100 : 0;
+  const activeIngredientCount = recipeCostLines.filter((line) => line.line.ingredient_id).length;
+  const topCostDrivers = [...recipeCostLines]
+    .filter((line) => line.lineCost > 0)
+    .sort((a, b) => b.lineCost - a.lineCost)
+    .slice(0, 3);
+  const highestCostDriver = topCostDrivers[0] ?? null;
+  const recipeHealth = getRecipeHealth(
+    sellingPrice,
+    recipeTotalCost,
+    foodCostPercentage,
+    highestCostDriver?.contribution ?? 0,
+    activeIngredientCount,
+  );
+
   return (
     <AppShell
       title="Recipes"
@@ -472,227 +507,362 @@ function RecipesPage() {
 
       {detailOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 sm:p-6"
           onClick={closeRecipeForm}
         >
           <form
             onSubmit={saveRecipe}
             onClick={(event) => event.stopPropagation()}
-            className="bg-background border border-border rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6"
+            className="flex max-h-[92vh] w-full max-w-[960px] flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl"
           >
-            <div className="flex items-start justify-between mb-6">
-              <div>
-                <div className="text-3xl font-bold">
-                  {formMode === "create" ? "New recipe" : "Edit recipe"}
+            <div className="border-b border-border px-5 py-5 sm:px-6">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                    Recipe workspace
+                  </div>
+                  <div className="mt-1 text-2xl font-semibold tracking-tight">
+                    {formMode === "create" ? "Build a protected margin recipe" : recipeForm.name}
+                  </div>
+                  <div className="mt-2 max-w-xl text-sm text-muted-foreground">
+                    Review cost, concentration, and margin before service.
+                  </div>
                 </div>
 
-                <div className="mt-2 text-muted-foreground">
-                  {formMode === "create"
-                    ? "Create a recipe and add ingredient quantities."
-                    : "Update recipe details and ingredient quantities."}
+                <div className="flex shrink-0 items-center gap-2">
+                  <div
+                    className={`inline-flex w-fit items-center rounded-full border px-3 py-1.5 text-xs font-medium ${
+                      recipeHealth.tone === "success"
+                        ? "border-success/25 bg-success/10 text-success"
+                        : recipeHealth.tone === "warning"
+                          ? "border-warning/25 bg-warning/10 text-warning"
+                          : "border-destructive/25 bg-destructive/10 text-destructive"
+                    }`}
+                  >
+                    {recipeHealth.label}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={closeRecipeForm}
+                    aria-label="Close recipe workspace"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-muted-foreground shadow-sm transition-colors hover:border-foreground/20 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 space-y-6 overflow-y-auto px-5 py-5 sm:px-6">
+              <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+                <div className="rounded-2xl border border-border bg-card/40 p-4 sm:p-5">
+                  <div className="mb-4">
+                    <div className="text-base font-semibold">Recipe setup</div>
+                    <div className="mt-1 text-sm text-muted-foreground">
+                      Essentials stay editable as margin updates.
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <label className="text-sm font-medium text-muted-foreground sm:col-span-3">
+                      Recipe name
+                      <input
+                        required
+                        value={recipeForm.name}
+                        onChange={(event) =>
+                          setRecipeForm({ ...recipeForm, name: event.target.value })
+                        }
+                        className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
+                      />
+                    </label>
+
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Type
+                      <select
+                        value={recipeForm.type}
+                        onChange={(event) =>
+                          setRecipeForm({ ...recipeForm, type: event.target.value })
+                        }
+                        className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
+                      >
+                        <option value="dish">Dish</option>
+                        <option value="prep">Prep</option>
+                      </select>
+                    </label>
+
+                    <label className="text-sm font-medium text-muted-foreground sm:col-span-2">
+                      Selling price (€)
+                      <input
+                        required
+                        type="number"
+                        step="0.01"
+                        value={recipeForm.selling_price}
+                        onChange={(event) =>
+                          setRecipeForm({
+                            ...recipeForm,
+                            selling_price: event.target.value,
+                          })
+                        }
+                        className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-border bg-muted/20 p-4 sm:p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-base font-semibold">Margin intelligence</div>
+                      <div className="mt-1 text-sm text-muted-foreground">
+                        {recipeHealth.helper}
+                      </div>
+                    </div>
+                    <div
+                      className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                        recipeHealth.tone === "success"
+                          ? "bg-success/10 text-success"
+                          : recipeHealth.tone === "warning"
+                            ? "bg-warning/10 text-warning"
+                            : "bg-destructive/10 text-destructive"
+                      }`}
+                    >
+                      {foodCostPercentage.toFixed(1)}% food cost
+                    </div>
+                  </div>
+
+                  <div className="mt-5 grid gap-3">
+                    <InsightRow
+                      label="Highest cost driver"
+                      value={
+                        highestCostDriver?.ingredient?.name
+                          ? highestCostDriver.ingredient.name
+                          : "Add ingredients"
+                      }
+                      detail={
+                        highestCostDriver
+                          ? `€${highestCostDriver.lineCost.toFixed(2)} · ${highestCostDriver.contribution.toFixed(1)}% of recipe cost`
+                          : "Cost drivers appear once recipe lines are added."
+                      }
+                    />
+                    <InsightRow
+                      label="Cost concentration"
+                      value={
+                        highestCostDriver
+                          ? `${highestCostDriver.contribution.toFixed(1)}% in one ingredient`
+                          : "No concentration yet"
+                      }
+                      detail="Margin exposed to ingredient concentration."
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
+                <KpiCard label="Selling price" value={`€${sellingPrice.toFixed(2)}`} />
+                <KpiCard label="Food cost" value={`€${recipeTotalCost.toFixed(2)}`} />
+                <KpiCard label="Gross profit" value={`€${grossProfit.toFixed(2)}`} />
+                <KpiCard
+                  label="Gross margin"
+                  value={`${grossMargin.toFixed(1)}%`}
+                  tone={
+                    grossMargin >= 65 ? "success" : grossMargin >= 55 ? "warning" : "destructive"
+                  }
+                />
+                <KpiCard label="Ingredients" value={String(activeIngredientCount)} />
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-[0.9fr_1.6fr]">
+                <div className="rounded-2xl border border-border p-4 sm:p-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <div className="font-semibold">Top cost drivers</div>
+                      <div className="mt-1 text-sm text-muted-foreground">
+                        Largest cost contributors.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 space-y-3">
+                    {topCostDrivers.length > 0 ? (
+                      topCostDrivers.map((driver, index) => (
+                        <div
+                          key={`${driver.line.id ?? driver.line.ingredient_id}-${index}`}
+                          className="rounded-xl border border-border bg-card/40 p-3"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="truncate text-sm font-medium">
+                                {driver.ingredient?.name ?? "Unnamed ingredient"}
+                              </div>
+                              <div className="mt-1 text-xs text-muted-foreground">
+                                {driver.quantity.toFixed(3)} {driver.line.unit}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm font-semibold tabular-nums">
+                                €{driver.lineCost.toFixed(2)}
+                              </div>
+                              <div className="text-xs text-muted-foreground tabular-nums">
+                                {driver.contribution.toFixed(1)}%
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+                        Add ingredient quantities to reveal recipe cost drivers.
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="overflow-hidden rounded-2xl border border-border">
+                  <div className="flex items-start justify-between gap-3 border-b border-border px-5 py-4">
+                    <div>
+                      <div className="font-semibold">Ingredient contribution</div>
+                      <div className="mt-1 text-sm text-muted-foreground">
+                        Edit quantities and scan cost share.
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={addRecipeLine}
+                      className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Add line
+                    </button>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[760px] text-sm">
+                      <thead className="bg-muted/30 text-xs uppercase tracking-wide text-muted-foreground">
+                        <tr>
+                          <th className="px-4 py-3 text-left font-medium">Ingredient</th>
+                          <th className="px-4 py-3 text-right font-medium">Quantity</th>
+                          <th className="px-4 py-3 text-right font-medium">Unit cost</th>
+                          <th className="px-4 py-3 text-right font-medium">Cost</th>
+                          <th className="px-4 py-3 text-right font-medium">Contribution</th>
+                          <th className="px-4 py-3"></th>
+                        </tr>
+                      </thead>
+
+                      <tbody className="divide-y divide-border">
+                        {recipeForm.lines.map((line, idx) => {
+                          const costLine = recipeCostLines[idx];
+                          const unitCost = costLine?.unitCost ?? 0;
+                          const lineCost = costLine?.lineCost ?? 0;
+                          const contribution = costLine?.contribution ?? 0;
+
+                          return (
+                            <tr
+                              key={line.id ?? `new-${idx}`}
+                              className="align-middle transition-colors hover:bg-muted/25 focus-within:bg-muted/25"
+                            >
+                              <td className="px-4 py-3.5">
+                                <select
+                                  value={line.ingredient_id}
+                                  onChange={(event) => {
+                                    const ingredientId = event.target.value;
+                                    updateRecipeLine(idx, {
+                                      ingredient_id: ingredientId,
+                                      unit: getIngredientUnit(ingredientId, ingredientOptions),
+                                    });
+                                  }}
+                                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
+                                >
+                                  <option value="">Choose ingredient</option>
+                                  {ingredientOptions.map((ingredient) => (
+                                    <option key={ingredient.id} value={ingredient.id}>
+                                      {ingredient.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </td>
+
+                              <td className="px-4 py-3.5 text-right">
+                                <div className="flex items-center justify-end gap-2">
+                                  <input
+                                    required
+                                    type="number"
+                                    step="0.001"
+                                    min="0"
+                                    value={line.quantity}
+                                    onChange={(event) =>
+                                      updateRecipeLine(idx, { quantity: event.target.value })
+                                    }
+                                    className="w-24 rounded-lg border border-input bg-background px-3 py-2 text-right text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
+                                  />
+                                  <span className="w-10 text-left text-xs text-muted-foreground">
+                                    {line.unit}
+                                  </span>
+                                </div>
+                              </td>
+
+                              <td className="px-4 py-3.5 text-right tabular-nums text-muted-foreground">
+                                €{unitCost.toFixed(4)}
+                              </td>
+
+                              <td className="px-4 py-3.5 text-right font-semibold tabular-nums">
+                                €{lineCost.toFixed(2)}
+                              </td>
+
+                              <td className="px-4 py-3.5 text-right">
+                                <span className="inline-flex min-w-16 justify-center rounded-full border border-border bg-background px-2.5 py-1 text-xs font-semibold tabular-nums text-foreground shadow-sm">
+                                  {contribution.toFixed(1)}%
+                                </span>
+                              </td>
+
+                              <td className="px-4 py-3.5 text-right">
+                                <button
+                                  type="button"
+                                  onClick={() => removeRecipeLine(idx)}
+                                  className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
+                                  aria-label="Remove recipe line"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 border-t border-border bg-background px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <div className="min-h-5 text-sm">
+                {error ? (
+                  <span className="text-destructive">{error}</span>
+                ) : (
+                  <span className="text-muted-foreground">
+                    Changes stay local until you save this recipe.
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={closeRecipeForm}
-                  className="text-sm border border-border rounded-lg px-3 py-2"
+                  className="rounded-lg border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
                 >
-                  Close
+                  Cancel
                 </button>
                 <button
                   disabled={saving}
                   type="submit"
-                  className="inline-flex items-center gap-2 bg-foreground text-background rounded-lg px-3 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-60"
                 >
                   {saving && <Loader2 className="h-4 w-4 animate-spin" />}
                   {formMode === "create" ? "Create recipe" : "Save changes"}
                 </button>
               </div>
             </div>
-
-            <div className="grid gap-3 sm:grid-cols-3 mb-6">
-              <label className="text-sm font-medium text-muted-foreground">
-                Name
-                <input
-                  required
-                  value={recipeForm.name}
-                  onChange={(event) => setRecipeForm({ ...recipeForm, name: event.target.value })}
-                  className="mt-1 w-full rounded-lg border border-input bg-card px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
-                />
-              </label>
-
-              <label className="text-sm font-medium text-muted-foreground">
-                Type
-                <select
-                  value={recipeForm.type}
-                  onChange={(event) => setRecipeForm({ ...recipeForm, type: event.target.value })}
-                  className="mt-1 w-full rounded-lg border border-input bg-card px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
-                >
-                  <option value="dish">Dish</option>
-                  <option value="prep">Prep</option>
-                </select>
-              </label>
-
-              <label className="text-sm font-medium text-muted-foreground">
-                Selling price (€)
-                <input
-                  required
-                  type="number"
-                  step="0.01"
-                  value={recipeForm.selling_price}
-                  onChange={(event) =>
-                    setRecipeForm({
-                      ...recipeForm,
-                      selling_price: event.target.value,
-                    })
-                  }
-                  className="mt-1 w-full rounded-lg border border-input bg-card px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
-                />
-              </label>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4 mb-8">
-              <div className="rounded-xl border border-border p-4">
-                <div className="text-sm text-muted-foreground">Selling price</div>
-
-                <div className="text-3xl font-bold mt-1">
-                  €{Number(recipeForm.selling_price || 0).toFixed(2)}
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-border p-4">
-                <div className="text-sm text-muted-foreground">Total cost</div>
-
-                <div className="text-3xl font-bold mt-1">
-                  €
-                  {Number(
-                    getFormRecipeCost(recipeForm.lines, selectedRecipe, ingredientOptions),
-                  ).toFixed(2)}
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-border p-4">
-                <div className="text-sm text-muted-foreground">Gross Margin %</div>
-
-                <div className="text-3xl font-bold mt-1 text-success">
-                  {(
-                    ((Number(recipeForm.selling_price || 0) -
-                      Number(
-                        getFormRecipeCost(recipeForm.lines, selectedRecipe, ingredientOptions),
-                      )) /
-                      (Number(recipeForm.selling_price || 0) || 1)) *
-                    100
-                  ).toFixed(1)}
-                  %
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-border overflow-hidden">
-              <div className="px-5 py-4 border-b border-border flex items-center justify-between gap-3">
-                <div className="font-semibold">Recipe lines</div>
-                <button
-                  type="button"
-                  onClick={addRecipeLine}
-                  className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  Add line
-                </button>
-              </div>
-
-              <table className="w-full text-sm">
-                <thead className="bg-muted/40">
-                  <tr>
-                    <th className="text-left px-5 py-3">Ingredient</th>
-
-                    <th className="text-right px-5 py-3">Qty</th>
-
-                    <th className="text-right px-5 py-3">Unit cost</th>
-
-                    <th className="text-right px-5 py-3">Line cost</th>
-
-                    <th className="px-5 py-3"></th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {recipeForm.lines.map((line, idx) => {
-                    const ingredient = getIngredientForLine(
-                      line.ingredient_id,
-                      selectedRecipe?.recipe_ingredients ?? null,
-                      ingredientOptions,
-                    );
-                    const ingredientPrice = Number(ingredient?.current_price ?? 0);
-
-                    const purchaseQty = Number(ingredient?.purchase_quantity ?? 1);
-
-                    const qty = Number(line.quantity ?? 0);
-
-                    const unitCost = getUnitCost(ingredientPrice, purchaseQty);
-
-                    const lineCost = unitCost * qty;
-
-                    return (
-                      <tr key={line.id ?? `new-${idx}`} className="border-t border-border">
-                        <td className="px-5 py-3">
-                          <select
-                            value={line.ingredient_id}
-                            onChange={(event) => {
-                              const ingredientId = event.target.value;
-                              updateRecipeLine(idx, {
-                                ingredient_id: ingredientId,
-                                unit: getIngredientUnit(ingredientId, ingredientOptions),
-                              });
-                            }}
-                            className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
-                          >
-                            <option value="">Choose ingredient</option>
-                            {ingredientOptions.map((ingredient) => (
-                              <option key={ingredient.id} value={ingredient.id}>
-                                {ingredient.name}
-                              </option>
-                            ))}
-                          </select>
-                        </td>
-
-                        <td className="px-5 py-3 text-right">
-                          <input
-                            required
-                            type="number"
-                            step="0.001"
-                            min="0"
-                            value={line.quantity}
-                            onChange={(event) =>
-                              updateRecipeLine(idx, { quantity: event.target.value })
-                            }
-                            className="ml-auto w-24 rounded-lg border border-input bg-card px-3 py-2 text-right text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
-                          />
-                        </td>
-
-                        <td className="px-5 py-3 text-right">€{unitCost.toFixed(4)}</td>
-
-                        <td className="px-5 py-3 text-right font-medium">€{lineCost.toFixed(2)}</td>
-
-                        <td className="px-5 py-3 text-right">
-                          <button
-                            type="button"
-                            onClick={() => removeRecipeLine(idx)}
-                            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
-                            aria-label="Remove recipe line"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-            {error && <div className="mt-3 text-sm text-destructive">{error}</div>}
           </form>
         </div>
       )}
@@ -711,12 +881,12 @@ function getUnitCost(price: number, purchaseQuantity: number) {
   return price / denominator;
 }
 
-function getFormRecipeCost(
+function getRecipeCostLines(
   lines: RecipeLineForm[],
   selectedRecipe: RecipeRow | null,
   ingredientOptions: IngredientOption[],
-) {
-  return lines.reduce((sum, line) => {
+): RecipeCostLine[] {
+  const costLines = lines.map((line) => {
     const ingredient = getIngredientForLine(
       line.ingredient_id,
       selectedRecipe?.recipe_ingredients ?? null,
@@ -727,9 +897,82 @@ function getFormRecipeCost(
       Number(ingredient?.current_price ?? 0),
       Number(ingredient?.purchase_quantity ?? 1),
     );
+    const quantity = Number(line.quantity) || 0;
+    const lineCost = unitCost * quantity;
 
-    return sum + unitCost * (Number(line.quantity) || 0);
-  }, 0);
+    return {
+      line,
+      ingredient,
+      quantity,
+      unitCost,
+      lineCost,
+      contribution: 0,
+    };
+  });
+
+  const totalCost = costLines.reduce((sum, line) => sum + line.lineCost, 0);
+
+  return costLines.map((line) => ({
+    ...line,
+    contribution: totalCost > 0 ? (line.lineCost / totalCost) * 100 : 0,
+  }));
+}
+
+function getRecipeHealth(
+  sellingPrice: number,
+  totalCost: number,
+  foodCostPercentage: number,
+  highestContribution: number,
+  ingredientCount: number,
+): RecipeHealth {
+  if (ingredientCount === 0 || totalCost <= 0) {
+    return {
+      label: "Attention",
+      tone: "warning",
+      helper: "Add quantities to assess margin.",
+    };
+  }
+
+  if (sellingPrice <= 0) {
+    return {
+      label: "High risk",
+      tone: "destructive",
+      helper: "Ingredient cost has no price cover.",
+    };
+  }
+
+  const grossMargin = 100 - foodCostPercentage;
+  const concentrationNeedsReview = highestContribution > 65 && ingredientCount > 1;
+
+  if (grossMargin >= 65 && !concentrationNeedsReview) {
+    return {
+      label: "Healthy",
+      tone: "success",
+      helper: "Margin protected; cost mix controlled.",
+    };
+  }
+
+  if (grossMargin >= 65) {
+    return {
+      label: "Attention",
+      tone: "warning",
+      helper: "Margin strong; concentration needs watching.",
+    };
+  }
+
+  if (grossMargin >= 55 || foodCostPercentage <= 45) {
+    return {
+      label: "Attention",
+      tone: "warning",
+      helper: "Margin workable; review cost pressure.",
+    };
+  }
+
+  return {
+    label: "High risk",
+    tone: "destructive",
+    helper: "Food cost is eroding margin.",
+  };
 }
 
 function getIngredientForLine(
@@ -750,6 +993,49 @@ function Mini({ label, value }: { label: string; value: string }) {
       <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
 
       <div className="text-sm font-semibold tabular-nums">{value}</div>
+    </div>
+  );
+}
+
+function KpiCard({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone?: RecipeHealth["tone"];
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-card/30 px-3 py-3">
+      <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </div>
+      <div
+        className={`mt-1.5 text-xl font-semibold tabular-nums ${
+          tone === "success"
+            ? "text-success"
+            : tone === "warning"
+              ? "text-warning"
+              : tone === "destructive"
+                ? "text-destructive"
+                : "text-foreground"
+        }`}
+      >
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function InsightRow({ label, value, detail }: { label: string; value: string; detail: string }) {
+  return (
+    <div className="rounded-xl border border-border bg-background/70 p-3">
+      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </div>
+      <div className="mt-1 text-sm font-semibold">{value}</div>
+      <div className="mt-1 text-xs text-muted-foreground">{detail}</div>
     </div>
   );
 }
