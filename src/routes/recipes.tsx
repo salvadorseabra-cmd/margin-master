@@ -25,6 +25,7 @@ type RecipeIngredient = {
   ingredient_id: string | null;
   quantity: number | null;
   unit: string | null;
+  created_at: string | null;
   ingredients: {
     id: string;
     name: string | null;
@@ -76,7 +77,13 @@ type RecipeCostLine = {
 };
 
 type RecipeHealth = {
-  label: "Healthy" | "Attention" | "High risk";
+  label:
+    | "Add quantities"
+    | "No selling price"
+    | "Margin protected"
+    | "Cost concentration"
+    | "Margin pressure"
+    | "Margin below target";
   tone: "success" | "warning" | "destructive";
   helper: string;
 };
@@ -170,6 +177,7 @@ function RecipesPage() {
             ingredient_id,
             quantity,
             unit,
+            created_at,
             ingredients (
             id,
             name,
@@ -406,6 +414,16 @@ function RecipesPage() {
     highestCostDriver?.contribution ?? 0,
     activeIngredientCount,
   );
+  const recipeActivityNote = getRecipeActivityNote(
+    selectedRecipe,
+    highestCostDriver?.contribution ?? 0,
+    activeIngredientCount,
+  );
+  const highestCostDriverDetail = getHighestCostDriverDetail(highestCostDriver);
+  const concentrationDetail = getConcentrationDetail(
+    highestCostDriver?.contribution ?? 0,
+    activeIngredientCount,
+  );
 
   return (
     <AppShell
@@ -455,7 +473,9 @@ function RecipesPage() {
                     <div className="min-w-0">
                       <div className="text-xs text-muted-foreground">{r.type}</div>
 
-                      <div className="text-base font-semibold mt-0.5 truncate">{r.name}</div>
+                      <div className="mt-0.5 line-clamp-2 break-words text-base font-semibold leading-snug">
+                        {r.name}
+                      </div>
                     </div>
 
                     <div className="flex shrink-0 flex-col items-end gap-2">
@@ -631,27 +651,24 @@ function RecipesPage() {
                   </div>
 
                   <div className="mt-5 grid gap-3">
+                    {recipeActivityNote && <OperationalNote text={recipeActivityNote} />}
                     <InsightRow
-                      label="Highest cost driver"
+                      label="Primary margin exposure"
                       value={
                         highestCostDriver?.ingredient?.name
                           ? highestCostDriver.ingredient.name
                           : "Add ingredients"
                       }
-                      detail={
-                        highestCostDriver
-                          ? `€${highestCostDriver.lineCost.toFixed(2)} · ${highestCostDriver.contribution.toFixed(1)}% of recipe cost`
-                          : "Cost drivers appear once recipe lines are added."
-                      }
+                      detail={highestCostDriverDetail}
                     />
                     <InsightRow
                       label="Cost concentration"
                       value={
                         highestCostDriver
-                          ? `${highestCostDriver.contribution.toFixed(1)}% in one ingredient`
+                          ? `${highestCostDriver.contribution.toFixed(1)}% of recipe cost in one ingredient`
                           : "No concentration yet"
                       }
-                      detail="Margin exposed to ingredient concentration."
+                      detail={concentrationDetail}
                     />
                   </div>
                 </div>
@@ -677,7 +694,7 @@ function RecipesPage() {
                     <div>
                       <div className="font-semibold">Top cost drivers</div>
                       <div className="mt-1 text-sm text-muted-foreground">
-                        Largest cost contributors.
+                        Primary inputs behind recipe margin.
                       </div>
                     </div>
                   </div>
@@ -697,6 +714,23 @@ function RecipesPage() {
                               <div className="mt-1 text-xs text-muted-foreground">
                                 {driver.quantity.toFixed(3)} {driver.line.unit}
                               </div>
+                              {getCostDriverNote(
+                                index,
+                                driver.contribution,
+                                activeIngredientCount,
+                                driver.line.id,
+                                selectedRecipe,
+                              ) && (
+                                <div className="mt-1 text-[11px] text-muted-foreground">
+                                  {getCostDriverNote(
+                                    index,
+                                    driver.contribution,
+                                    activeIngredientCount,
+                                    driver.line.id,
+                                    selectedRecipe,
+                                  )}
+                                </div>
+                              )}
                             </div>
                             <div className="text-right">
                               <div className="text-sm font-semibold tabular-nums">
@@ -927,17 +961,17 @@ function getRecipeHealth(
 ): RecipeHealth {
   if (ingredientCount === 0 || totalCost <= 0) {
     return {
-      label: "Attention",
+      label: "Add quantities",
       tone: "warning",
-      helper: "Add quantities to assess margin.",
+      helper: "Add quantities to see margin exposure.",
     };
   }
 
   if (sellingPrice <= 0) {
     return {
-      label: "High risk",
+      label: "No selling price",
       tone: "destructive",
-      helper: "Ingredient cost has no price cover.",
+      helper: "Ingredient cost needs selling price cover.",
     };
   }
 
@@ -946,33 +980,110 @@ function getRecipeHealth(
 
   if (grossMargin >= 65 && !concentrationNeedsReview) {
     return {
-      label: "Healthy",
+      label: "Margin protected",
       tone: "success",
-      helper: "Margin protected; cost mix controlled.",
+      helper: "Margin protected; cost mix balanced.",
     };
   }
 
   if (grossMargin >= 65) {
     return {
-      label: "Attention",
+      label: "Cost concentration",
       tone: "warning",
-      helper: "Margin strong; concentration needs watching.",
+      helper: "Margin strong; primary ingredient drives exposure.",
     };
   }
 
   if (grossMargin >= 55 || foodCostPercentage <= 45) {
     return {
-      label: "Attention",
+      label: "Margin pressure",
       tone: "warning",
-      helper: "Margin workable; review cost pressure.",
+      helper: "Margin workable; review price cover and top inputs.",
     };
   }
 
   return {
-    label: "High risk",
+    label: "Margin below target",
     tone: "destructive",
-    helper: "Food cost is eroding margin.",
+    helper: "Food cost is eroding margin cover.",
   };
+}
+
+function getRecipeActivityNote(
+  recipe: RecipeRow | null,
+  highestContribution: number,
+  ingredientCount: number,
+) {
+  const lines = recipe?.recipe_ingredients?.filter((line) => line.ingredient_id) ?? [];
+  const recentlyLinked = lines.some((line) => isRecentDate(line.created_at));
+
+  if (recentlyLinked) return "Recently updated ingredient links";
+  if (highestContribution >= 65 && ingredientCount > 1) {
+    return `${highestContribution.toFixed(1)}% of cost concentrated in one ingredient`;
+  }
+
+  return null;
+}
+
+function getHighestCostDriverDetail(driver: RecipeCostLine | null) {
+  if (!driver) return "Cost drivers appear once recipe lines are added.";
+
+  return `€${driver.lineCost.toFixed(2)} · ${driver.contribution.toFixed(1)}% of cost · primary exposure if price or portion changes`;
+}
+
+function getConcentrationDetail(highestContribution: number, ingredientCount: number) {
+  if (ingredientCount === 0) return "Add ingredient quantities to assess concentration.";
+
+  if (ingredientCount === 1) {
+    return "Single-ingredient recipe; margin follows this input.";
+  }
+
+  if (highestContribution >= 65) {
+    return "High concentration; check price cover and portion control.";
+  }
+
+  if (highestContribution >= 45) {
+    return "Meaningful concentration; keep this input visible during costing.";
+  }
+
+  return "Cost is spread across ingredients with no dominant input.";
+}
+
+function getCostDriverNote(
+  index: number,
+  contribution: number,
+  ingredientCount: number,
+  lineId: string | null,
+  recipe: RecipeRow | null,
+) {
+  const activityNote = getRecipeLineActivityNote(lineId, recipe);
+  if (activityNote) return activityNote;
+
+  if (index !== 0 || ingredientCount <= 1) return null;
+  if (contribution >= 65) return "Primary margin exposure";
+  if (contribution >= 45) return "Main contributor to recipe volatility";
+
+  return "Leading cost contributor";
+}
+
+function getRecipeLineActivityNote(lineId: string | null, recipe: RecipeRow | null) {
+  if (!lineId) return null;
+
+  const line = recipe?.recipe_ingredients?.find((recipeLine) => recipeLine.id === lineId);
+
+  if (isRecentDate(line?.created_at)) return "Recently linked";
+
+  return null;
+}
+
+function isRecentDate(value: string | null | undefined, days = 14) {
+  if (!value) return false;
+
+  const timestamp = new Date(value).getTime();
+  if (!Number.isFinite(timestamp)) return false;
+
+  const ageMs = Date.now() - timestamp;
+  return ageMs >= 0 && ageMs <= days * 24 * 60 * 60 * 1000;
 }
 
 function getIngredientForLine(
@@ -1036,6 +1147,14 @@ function InsightRow({ label, value, detail }: { label: string; value: string; de
       </div>
       <div className="mt-1 text-sm font-semibold">{value}</div>
       <div className="mt-1 text-xs text-muted-foreground">{detail}</div>
+    </div>
+  );
+}
+
+function OperationalNote({ text }: { text: string }) {
+  return (
+    <div className="rounded-xl border border-border/70 bg-background/50 px-3 py-2 text-xs text-muted-foreground">
+      {text}
     </div>
   );
 }
