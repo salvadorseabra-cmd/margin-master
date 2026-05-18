@@ -219,13 +219,15 @@ console.log(
       invoiceDate = parsed.invoiceDate;
     }
 
+    const normalizedInvoiceDate = invoiceDate;
+
     const normalized = {
       supplier:
         typeof parsed?.supplier === "string"
           ? parsed.supplier
           : null,
 
-      invoice_date: invoiceDate,
+      invoice_date: normalizedInvoiceDate,
 
       total:
         typeof parsed?.total === "number"

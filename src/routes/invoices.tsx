@@ -235,8 +235,8 @@ const toInvoiceRow = (
   const invoiceDate = normalizeInvoiceDate(identityMeta?.invoiceDate ?? row.invoice_date);
   const timelineDate = invoiceDate ?? row.created_at ?? "";
   const invoiceRow = {
-  id: row.id,
-  supplier_name: supplier,
+    id: row.id,
+    supplier_name: supplier,
     sourceFileName,
     supplierIsFallback,
     invoiceNumber: normalizeInvoiceNumber(identityMeta?.invoiceNumber),
@@ -969,8 +969,8 @@ function InvoicesPage() {
       const rawInvoiceDate = data?.invoice_date ?? data?.invoiceDate;
       const invoiceDate = normalizeInvoiceDate(rawInvoiceDate);
       console.log("RAW INVOICE DATE:", rawInvoiceDate);
-console.log("NORMALIZED INVOICE DATE:", invoiceDate);
-console.log("FULL EXTRACTION DATA:", data);
+      console.log("NORMALIZED INVOICE DATE:", invoiceDate);
+      console.log("FULL EXTRACTION DATA:", data);
 
       traceInvoiceDatePersistence("extracted-date", {
         invoiceId,
@@ -1037,30 +1037,34 @@ console.log("FULL EXTRACTION DATA:", data);
       if (isImage) {
         const dataUrl = await fileToDataUrl(item.file);
         const ext = await runExtraction(inserted.id, dataUrl);
-        const invoiceUpdatePayload = {
+        const invoiceUpdatePayload: {
+          supplier_name: string;
+          invoice_date?: string;
+          total: number;
+        } = {
           supplier_name: ext?.supplier?.slice(0, 120) ?? fallbackSupplier,
           ...(ext?.invoiceDate ? { invoice_date: ext.invoiceDate } : {}),
-          total:
-  typeof ext?.total === "number" && ext.total > 0
-    ? ext.total
-    : 0,
+          total: typeof ext?.total === "number" && ext.total > 0 ? ext.total : 0,
         };
-        const { error: invoiceUpdateError } = await supabase
+        const { data: updatedInvoice, error: invoiceUpdateError } = await supabase
           .from("invoices")
           .update(invoiceUpdatePayload)
-          .eq("id", inserted.id);
+          .eq("id", inserted.id)
+          .select("invoice_date")
+          .single();
         traceInvoiceDatePersistence("upload-persist-date", {
           invoiceId: inserted.id,
           extractedInvoiceDate: ext?.invoiceDate,
-          persistedInvoiceDate: invoiceUpdatePayload.invoice_date,
+          persistedInvoiceDate: updatedInvoice?.invoice_date ?? invoiceUpdatePayload.invoice_date,
           persistenceError: invoiceUpdateError?.message,
         });
+        if (invoiceUpdateError) throw invoiceUpdateError;
         traceInvoiceIdentity("persisted-invoice", {
           invoiceId: inserted.id,
           extractedSupplierName: ext?.supplier,
           extractedInvoiceNumber: ext?.invoiceNumber,
           extractedInvoiceDate: ext?.invoiceDate,
-          persistedInvoiceDate: invoiceUpdatePayload.invoice_date,
+          persistedInvoiceDate: updatedInvoice?.invoice_date ?? invoiceUpdatePayload.invoice_date,
           persistedSupplierName: ext?.supplier?.slice(0, 120) ?? fallbackSupplier,
           persistenceError: invoiceUpdateError?.message,
         });
@@ -1295,31 +1299,35 @@ console.log("FULL EXTRACTION DATA:", data);
     });
     const result = await runExtraction(row.id, dataUrl);
     if (result) {
-      const invoiceUpdatePayload = {
+      const invoiceUpdatePayload: {
+        supplier_name: string;
+        invoice_date?: string;
+        total: number;
+      } = {
         supplier_name: result.supplier?.slice(0, 120) ?? row.supplier,
         ...(result.invoiceDate ? { invoice_date: result.invoiceDate } : {}),
-        total:
-  typeof result?.total === "number" && result.total > 0
-    ? result.total
-    : row.total,
+        total: typeof result?.total === "number" && result.total > 0 ? result.total : row.total,
       };
-      const { error: invoiceUpdateError } = await supabase
+      const { data: updatedInvoice, error: invoiceUpdateError } = await supabase
         .from("invoices")
         .update(invoiceUpdatePayload)
-        .eq("id", row.id);
+        .eq("id", row.id)
+        .select("invoice_date")
+        .single();
       traceInvoiceDatePersistence("reextract-persist-date", {
         invoiceId: row.id,
         previousInvoiceDate: row.invoiceDate,
         extractedInvoiceDate: result.invoiceDate,
-        persistedInvoiceDate: invoiceUpdatePayload.invoice_date,
+        persistedInvoiceDate: updatedInvoice?.invoice_date ?? invoiceUpdatePayload.invoice_date,
         persistenceError: invoiceUpdateError?.message,
       });
+      if (invoiceUpdateError) throw invoiceUpdateError;
       traceInvoiceIdentity("persisted-invoice", {
         invoiceId: row.id,
         extractedSupplierName: result.supplier,
         extractedInvoiceNumber: result.invoiceNumber,
         extractedInvoiceDate: result.invoiceDate,
-        persistedInvoiceDate: invoiceUpdatePayload.invoice_date,
+        persistedInvoiceDate: updatedInvoice?.invoice_date ?? invoiceUpdatePayload.invoice_date,
         persistedSupplierName: result.supplier?.slice(0, 120) ?? row.supplier,
         persistenceError: invoiceUpdateError?.message,
       });
