@@ -157,6 +157,8 @@ type ParsedCollapsedRow = {
   total: number | null;
 };
 
+type ItemFields = Pick<NormalizedItem, "quantity" | "unit" | "unit_price" | "total">;
+
 const NUMBER_TOKEN = String.raw`\d{1,3}(?:[.\s]\d{3})*(?:,\d+)?|\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+[.,]\d+|\d+`;
 const UNIT_TOKEN = String.raw`un|uni|und|unds|unid|unids|unidade|unidades|kg|g|gr|l|lt|ml|cl|cx|caixa|caixas|dz|pack|packs|pc|pcs`;
 const COLLAPSED_ROW_RE = new RegExp(
@@ -171,14 +173,18 @@ const VAT_TOKEN_RE = /\b\d{1,2}(?:[,.]\d+)?\s*%/u;
 const HEADER_FOOTER_RE =
   /\b(?:codigo\s+postal|cod\.?\s+postal|nif|nipc|contribuinte|telefone|telemovel|email|e-mail|www|capital\s+social|matricula|conservatoria|certidao|pagina|page|fatura|factura|invoice|guia|encomenda|cliente|fornecedor|morada|local\s+de\s+descarga|resumo|subtotal|total|iva|vat|troco|mbway|multibanco)\b/iu;
 const ADDRESS_RE =
-  /(^|\s)(?:travessa|trav\.?|rua|r\.|avenida|av\.?|estrada|largo|praceta|praca|rotunda|urbanizacao|zona\s+industrial|parque\s+industrial|edificio|lote|loja|andar|sala|apartado|cod\.?\s+postal|cp)\b/iu;
+  /(^|\s)(?:travessa|trav\.?|rua|r\.|avenida|av\.?|estrada|largo|praceta|praca|rotunda|urbanizacao|zona\s+industrial|parque\s+industrial|edificio|lote|loja|andar|sala|apartado|cod\.?\s+postal|cp)(?=\s|,|\.|:|$)/iu;
 const PAYMENT_METADATA_RE =
   /\b(?:iban|swift|bic|sepa|referencia\s+mb|ref\.?\s+mb|entidade|pagamento|transferencia|multibanco|mb\s*way|cartao|visa|mastercard)\b/iu;
 const TAX_SUMMARY_RE =
   /\b(?:base\s+incidencia|incidencia|valor\s+iva|taxa\s+iva|iva\s+dedutivel|total\s+liquido|total\s+mercadoria|total\s+documento|valor\s+a\s+pagar)\b/iu;
 const BUSINESS_METADATA_RE =
-  /\b(?:lda|l\.?da|unipessoal|sa|s\.?a\.?|sociedade|comercial|distribuicao|armazem|sede|delegacao|gerencia|gerente|eng\.?|engenheiro|dr\.?|dra\.?)\b/iu;
+  /(^|\s)(?:lda|l\.?da|unipessoal|sa|s\.?a\.?|sociedade|comercial|distribuicao|armazem|sede|delegacao|gerencia|gerente|eng\.?|engenheiro|dr\.?|dra\.?)(?=\s|,|\.|:|$)/iu;
 const PRODUCT_CODE_RE = /^(?:[A-Z]{1,4}\d{3,8}|\d{2,8})\s+/iu;
+const RESIDUAL_ROW_TAIL_RE = new RegExp(
+  String.raw`\s+(?<quantity>${NUMBER_TOKEN})\s*(?<unit>${UNIT_TOKEN})\b\s+(?:€|EUR)?\s*${NUMBER_TOKEN}\s*(?:€|EUR)?\s*(?:\d{1,2}(?:[,.]\d+)?\s*%)?\s*$`,
+  "iu",
+);
 
 function normalizeExtractedInvoice(value: ExtractedInvoice): ExtractedInvoice {
   const items = Array.isArray(value?.items) ? value.items : [];
@@ -229,23 +235,26 @@ function normalizeExtractedItem(item: ExtractedItem): NormalizedItem | null {
   const rawName = stringValue(item.name).replace(/\s+/g, " ").trim();
   if (!rawName) return null;
 
-  const collapsed = parseCollapsedInvoiceRow(rawName);
-  if (collapsed) {
-    return {
-      name: collapsed.name,
-      quantity: collapsed.quantity,
-      unit: collapsed.unit,
-      unit_price: collapsed.unit_price,
-      total: numberValue(item.total) ?? collapsed.total,
-    };
-  }
-
-  return {
-    name: cleanIngredientName(rawName),
+  const extractedFields: ItemFields = {
     quantity: numberValue(item.quantity),
     unit: normalizeUnit(stringValue(item.unit)) ?? null,
     unit_price: numberValue(item.unit_price),
     total: numberValue(item.total),
+  };
+  const collapsed = parseCollapsedInvoiceRow(rawName);
+  if (collapsed) {
+    return {
+      name: cleanIngredientLabel(collapsed.name, extractedFields),
+      quantity: extractedFields.quantity ?? collapsed.quantity,
+      unit: extractedFields.unit ?? collapsed.unit,
+      unit_price: extractedFields.unit_price ?? collapsed.unit_price,
+      total: extractedFields.total ?? collapsed.total,
+    };
+  }
+
+  return {
+    name: cleanIngredientLabel(rawName, extractedFields),
+    ...extractedFields,
   };
 }
 
@@ -296,6 +305,80 @@ function extractMoneyValues(tail: string): number[] {
 
 function cleanIngredientName(name: string): string {
   return name.replace(PRODUCT_CODE_RE, "").replace(/\s+/g, " ").trim().slice(0, 200);
+}
+
+function cleanIngredientLabel(name: string, fields: ItemFields): string {
+  let label = cleanIngredientName(name);
+  label = removeResidualRowValueTail(label, fields);
+  label = removeTrailingVat(label);
+  label = removeTrailingPriceFragments(label, fields);
+  label = removeTrailingQuantityUnit(label, fields);
+  label = removeTrailingPriceFragments(label, fields);
+  return cleanIngredientName(label);
+}
+
+function removeResidualRowValueTail(label: string, fields: ItemFields): string {
+  const match = label.match(RESIDUAL_ROW_TAIL_RE);
+  if (!match?.groups?.quantity || !match.groups.unit) return label.trim();
+
+  const quantity = parseEuropeanNumber(match.groups.quantity);
+  const unit = normalizeUnit(match.groups.unit);
+  const quantityMatches =
+    fields.quantity == null || quantity == null || amountsNearlyEqual(fields.quantity, quantity);
+  const unitMatches = !fields.unit || !unit || normalizeUnit(fields.unit) === unit;
+
+  if (!quantityMatches || !unitMatches) return label.trim();
+  return label.slice(0, match.index).trim();
+}
+
+function removeTrailingVat(label: string): string {
+  return label.replace(/\s+\d{1,2}(?:[,.]\d+)?\s*%\s*$/u, "").trim();
+}
+
+function removeTrailingPriceFragments(label: string, fields: ItemFields): string {
+  let next = label;
+  const knownAmounts = [fields.unit_price, fields.total].filter(
+    (amount): amount is number => amount != null && Number.isFinite(amount),
+  );
+
+  for (;;) {
+    const previous = next;
+    next = next
+      .replace(/\s+(?:€|EUR)\s*\d+(?:[,.]\d{1,4})?\s*$/iu, "")
+      .replace(/\s+\d+[,.]\d{1,4}\s*(?:€|EUR)\s*$/iu, "");
+
+    if (next === previous) {
+      const match = next.match(/\s+(?<amount>\d+[,.]\d{1,4})\s*$/u);
+      const amount = match?.groups?.amount ? parseEuropeanNumber(match.groups.amount) : null;
+      if (amount != null && knownAmounts.some((known) => amountsNearlyEqual(known, amount))) {
+        next = next.slice(0, match!.index).trim();
+      }
+    }
+
+    if (next === previous) return next.trim();
+  }
+}
+
+function removeTrailingQuantityUnit(label: string, fields: ItemFields): string {
+  if (fields.quantity == null) return label.trim();
+
+  const match = label.match(
+    new RegExp(String.raw`\s+(?<quantity>${NUMBER_TOKEN})\s*(?<unit>${UNIT_TOKEN})\b\s*$`, "iu"),
+  );
+  if (!match?.groups?.quantity || !match.groups.unit) return label.trim();
+
+  const quantity = parseEuropeanNumber(match.groups.quantity);
+  const unit = normalizeUnit(match.groups.unit);
+  const quantityMatches =
+    fields.quantity == null || quantity == null || amountsNearlyEqual(fields.quantity, quantity);
+  const unitMatches = !fields.unit || !unit || normalizeUnit(fields.unit) === unit;
+
+  if (!quantityMatches || !unitMatches) return label.trim();
+  return label.slice(0, match.index).trim();
+}
+
+function amountsNearlyEqual(a: number, b: number): boolean {
+  return Math.abs(a - b) < 0.005;
 }
 
 function getNonIngredientReason(line: string, item?: NormalizedItem): string | null {

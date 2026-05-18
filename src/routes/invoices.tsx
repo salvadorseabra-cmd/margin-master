@@ -218,6 +218,102 @@ const toInvoiceRow = (
 const normalizeExtractedItemName = (name: string | null | undefined) =>
   name?.trim().toLowerCase() ?? "";
 
+const INVOICE_NUMBER_TOKEN = String.raw`\d{1,3}(?:[.\s]\d{3})*(?:,\d+)?|\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+[.,]\d+|\d+`;
+const INVOICE_UNIT_TOKEN = String.raw`un|uni|und|unds|unid|unids|unidade|unidades|kg|g|gr|l|lt|ml|cl|cx|caixa|caixas|dz|pack|packs|pc|pcs`;
+const INVOICE_ROW_TAIL_RE = new RegExp(
+  String.raw`\s+(?<quantity>${INVOICE_NUMBER_TOKEN})\s*(?<unit>${INVOICE_UNIT_TOKEN})\b\s+(?:€|EUR)?\s*${INVOICE_NUMBER_TOKEN}\s*(?:€|EUR)?\s*(?:\d{1,2}(?:[,.]\d+)?\s*%)?\s*$`,
+  "iu",
+);
+const INVOICE_PRODUCT_CODE_RE = /^(?:[A-Z]{1,4}\d{3,8}|\d{2,8})\s+/iu;
+const INVOICE_ADDRESS_RE =
+  /(^|\s)(?:travessa|trav\.?|rua|r\.|avenida|av\.?|estrada|largo|praceta|praca|rotunda|urbanizacao|zona\s+industrial|parque\s+industrial|edificio|lote|loja|andar|sala|apartado|cod\.?\s+postal|cp)(?=\s|,|\.|:|$)/iu;
+const INVOICE_BUSINESS_METADATA_RE =
+  /(^|\s)(?:lda|l\.?da|unipessoal|sa|s\.?a\.?|sociedade|comercial|distribuicao|armazem|sede|delegacao|gerencia|gerente|eng\.?|engenheiro|dr\.?|dra\.?)(?=\s|,|\.|:|$)/iu;
+const INVOICE_PAYMENT_METADATA_RE =
+  /\b(?:iban|swift|bic|sepa|referencia\s+mb|ref\.?\s+mb|entidade|pagamento|transferencia|multibanco|mb\s*way|cartao|visa|mastercard)\b/iu;
+const INVOICE_TAX_SUMMARY_RE =
+  /\b(?:base\s+incidencia|incidencia|valor\s+iva|taxa\s+iva|iva\s+dedutivel|total\s+liquido|total\s+mercadoria|total\s+documento|valor\s+a\s+pagar)\b/iu;
+
+const parseInvoiceNumberToken = (raw: string): number | null => {
+  let value = raw
+    .replace(/\u20AC/g, " ")
+    .replace(/€/g, " ")
+    .replace(/EUR/gi, " ")
+    .replace(/\s+/g, "")
+    .trim();
+  if (!value) return null;
+  value = value.replace(/[^\d.,-]/g, "");
+  const lastComma = value.lastIndexOf(",");
+  const lastDot = value.lastIndexOf(".");
+  const normalized =
+    lastComma > lastDot
+      ? value.replace(/\./g, "").replace(",", ".")
+      : lastDot > lastComma
+        ? value.replace(/,/g, "")
+        : value.replace(",", ".");
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const normalizeInvoiceUnitToken = (raw: string | null | undefined) => {
+  const unit = raw?.trim().toLowerCase();
+  if (!unit) return null;
+  if (["uni", "und", "unds", "unid", "unids", "unidade", "unidades", "pc", "pcs"].includes(unit)) {
+    return "un";
+  }
+  if (unit === "lt") return "L";
+  if (unit === "gr") return "g";
+  return unit === "l" ? "L" : unit;
+};
+
+const invoiceAmountsNearlyEqual = (a: number, b: number) => Math.abs(a - b) < 0.005;
+
+const cleanInvoiceItemDisplayName = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {
+  let name = String(item.name ?? "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(INVOICE_PRODUCT_CODE_RE, "")
+    .trim();
+
+  const rowTail = name.match(INVOICE_ROW_TAIL_RE);
+  if (rowTail?.groups?.quantity && rowTail.groups.unit) {
+    const quantity = parseInvoiceNumberToken(rowTail.groups.quantity);
+    const rowUnit = normalizeInvoiceUnitToken(rowTail.groups.unit);
+    const itemUnit = normalizeInvoiceUnitToken(item.unit);
+    const quantityMatches =
+      item.quantity == null ||
+      quantity == null ||
+      invoiceAmountsNearlyEqual(item.quantity, quantity);
+    const unitMatches = !itemUnit || !rowUnit || itemUnit === rowUnit;
+    if (quantityMatches && unitMatches) name = name.slice(0, rowTail.index).trim();
+  }
+
+  return name
+    .replace(/\s+\d{1,2}(?:[,.]\d+)?\s*%\s*$/u, "")
+    .replace(/\s+(?:€|EUR)\s*\d+(?:[,.]\d{1,4})?\s*$/iu, "")
+    .replace(/\s+\d+[,.]\d{1,4}\s*(?:€|EUR)\s*$/iu, "")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+const shouldRejectInvoiceItemName = (
+  item: Pick<ItemRow, "name" | "quantity" | "unit" | "unit_price" | "total">,
+) => {
+  const name = cleanInvoiceItemDisplayName(item);
+  if (!name || !/[A-Za-zÀ-ÿ]/u.test(name)) return true;
+
+  const normalized = normalizeDisplayName(name);
+  const hasParsedRowFields =
+    item.quantity != null || item.unit != null || item.unit_price != null || item.total != null;
+  if (INVOICE_PAYMENT_METADATA_RE.test(normalized) || INVOICE_TAX_SUMMARY_RE.test(normalized)) {
+    return true;
+  }
+  if (!hasParsedRowFields) {
+    return INVOICE_ADDRESS_RE.test(normalized) || INVOICE_BUSINESS_METADATA_RE.test(normalized);
+  }
+  return false;
+};
+
 const getItemIngredientMatch = (
   item: ItemRow,
   ingredientCatalog: IngredientMatchRow[],
@@ -736,19 +832,25 @@ function InvoicesPage() {
       // wipe prior items then insert fresh
       await supabase.from("invoice_items").delete().eq("invoice_id", invoiceId);
       if (items.length && user) {
-        const insertRows = items.map((it: ItemRow) => {
-          const name = String(it.name ?? "Unknown");
-          const unit = resolveInvoiceItemUnit({ name, unit: it.unit });
-          return {
-            invoice_id: invoiceId,
-            user_id: user.id,
-            name: name.slice(0, 200),
-            quantity: it.quantity ?? null,
-            unit: unit ? unit.slice(0, 20) : null,
-            unit_price: it.unit_price ?? null,
-            total: it.total ?? null,
-          };
-        });
+        const insertRows = items
+          .map((it: ItemRow) => ({
+            ...it,
+            name: cleanInvoiceItemDisplayName(it),
+          }))
+          .filter((it: ItemRow) => !shouldRejectInvoiceItemName(it))
+          .map((it: ItemRow) => {
+            const name = String(it.name ?? "Unknown");
+            const unit = resolveInvoiceItemUnit({ name, unit: it.unit });
+            return {
+              invoice_id: invoiceId,
+              user_id: user.id,
+              name: name.slice(0, 200),
+              quantity: it.quantity ?? null,
+              unit: unit ? unit.slice(0, 20) : null,
+              unit_price: it.unit_price ?? null,
+              total: it.total ?? null,
+            };
+          });
         await supabase.from("invoice_items").insert(insertRows);
       }
       const supplier = normalizeSupplierDisplayName(data?.supplier);
@@ -921,7 +1023,12 @@ function InvoicesPage() {
       .select("id, name, quantity, unit, unit_price, total")
       .eq("invoice_id", invoiceId)
       .order("created_at", { ascending: true });
-    const items = (data ?? []) as ItemRow[];
+    const items = ((data ?? []) as ItemRow[])
+      .map((item) => ({
+        ...item,
+        name: cleanInvoiceItemDisplayName(item),
+      }))
+      .filter((item) => !shouldRejectInvoiceItemName(item));
     const priceComparisons = await loadPriceComparisons(invoiceId, invoiceCreatedAt, items);
     setItemsByInvoice((s) => ({ ...s, [invoiceId]: items }));
     setPriceComparisonsByInvoice((s) => ({ ...s, [invoiceId]: priceComparisons }));
