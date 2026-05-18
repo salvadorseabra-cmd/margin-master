@@ -51,7 +51,7 @@ export const Route = createFileRoute("/invoices")({
 
 type InvoiceRow = {
   id: string;
-  supplier: string;
+  supplier_name: string;
   sourceFileName: string | null;
   supplierIsFallback: boolean;
   invoiceNumber: string | null;
@@ -61,13 +61,14 @@ type InvoiceRow = {
   total: number;
   status: string;
   items_count: number;
-  file_path: string | null;
+  file_url: string | null;
   created_at: string;
 };
 
 type DbInvoiceRow = {
   id: string;
   supplier_name: string | null;
+  invoice_date: string | null;
   total: number | null;
   file_url: string | null;
   created_at: string | null;
@@ -145,11 +146,15 @@ type InvoiceRowTailFields = {
   quantity: number | null;
   unit: string | null;
 };
-type InvoiceItemFieldSource = Partial<ItemRow> & Record<string, unknown>;
 
 const traceInvoiceIdentity = (stage: string, details: InvoiceIdentityTrace) => {
   if (!import.meta.env.DEV) return;
   console.debug("[invoice-list]", stage, details);
+};
+
+const traceInvoiceDatePersistence = (stage: string, details: InvoiceIdentityTrace) => {
+  if (!import.meta.env.DEV) return;
+  console.debug("[invoice-date]", stage, details);
 };
 
 const traceInvoiceRender = (stage: string, details: unknown) => {
@@ -227,11 +232,11 @@ const toInvoiceRow = (
   const supplier = supplierIsFallback
     ? (sourceFileName ?? normalizedSupplier ?? "Unknown supplier")
     : normalizedSupplier;
-  const invoiceDate = normalizeInvoiceDate(identityMeta?.invoiceDate);
+  const invoiceDate = normalizeInvoiceDate(identityMeta?.invoiceDate ?? row.invoice_date);
   const timelineDate = invoiceDate ?? row.created_at ?? "";
   const invoiceRow = {
-    id: row.id,
-    supplier,
+  id: row.id,
+  supplier_name: supplier,
     sourceFileName,
     supplierIsFallback,
     invoiceNumber: normalizeInvoiceNumber(identityMeta?.invoiceNumber),
@@ -249,12 +254,20 @@ const toInvoiceRow = (
     extractedSupplierName: identityMeta?.supplierName,
     extractedInvoiceNumber: identityMeta?.invoiceNumber,
     extractedInvoiceDate: identityMeta?.invoiceDate,
+    persistedInvoiceDate: row.invoice_date,
     persistedSupplierName: row.supplier_name,
     sourceFileName,
     renderedSupplier: invoiceRow.supplier,
     renderedInvoiceNumber: invoiceRow.invoiceNumber,
     renderedDate: invoiceRow.displayDate,
     usedFallback: invoiceRow.supplierIsFallback,
+  });
+  traceInvoiceDatePersistence("render-resolved-date", {
+    invoiceId: row.id,
+    identityInvoiceDate: identityMeta?.invoiceDate,
+    persistedInvoiceDate: row.invoice_date,
+    normalizedInvoiceDate: invoiceDate,
+    displayedDate: invoiceRow.displayDate,
   });
   return invoiceRow;
 };
@@ -269,29 +282,6 @@ const INVOICE_ROW_TAIL_RE = new RegExp(
   "iu",
 );
 const INVOICE_PRODUCT_CODE_RE = /^(?:[A-Z]{1,4}\d{3,8}|\d{2,8})\s+/iu;
-const INVOICE_QUANTITY_FIELD_KEYS = [
-  "quantity",
-  "quantity_value",
-  "quantityValue",
-  "parsed_quantity",
-  "parsedQuantity",
-  "purchase_quantity",
-  "purchased_quantity",
-  "qty",
-  "qtd",
-] as const;
-const INVOICE_UNIT_FIELD_KEYS = [
-  "unit",
-  "quantity_unit",
-  "quantityUnit",
-  "purchase_unit",
-  "purchased_unit",
-  "unit_name",
-  "unitName",
-  "unidade",
-] as const;
-const INVOICE_UNIT_PRICE_FIELD_KEYS = ["unit_price", "unitPrice"] as const;
-const INVOICE_TOTAL_FIELD_KEYS = ["total", "total_price", "totalPrice"] as const;
 const INVOICE_ADDRESS_RE =
   /(^|\s)(?:travessa|trav\.?|rua|r\.|avenida|av\.?|estrada|largo|praceta|praca|rotunda|urbanizacao|zona\s+industrial|parque\s+industrial|edificio|lote|loja|andar|sala|apartado|cod\.?\s+postal|cp)(?=\s|,|\.|:|$)/iu;
 const INVOICE_BUSINESS_METADATA_RE =
@@ -351,42 +341,12 @@ const normalizeInvoiceNumberField = (value: unknown): number | null => {
   return null;
 };
 
-const normalizeInvoiceNumberFieldFromKeys = (
-  item: InvoiceItemFieldSource,
-  keys: readonly string[],
-): number | null => {
-  for (const key of keys) {
-    const value = normalizeInvoiceNumberField(item[key]);
-    if (value != null) return value;
-  }
-  return null;
-};
-
-const normalizeInvoiceUnitFieldFromKeys = (
-  item: InvoiceItemFieldSource,
-  keys: readonly string[],
-): string | null => {
-  for (const key of keys) {
-    const value = typeof item[key] === "string" ? item[key] : null;
-    const unit = normalizeInvoiceUnitToken(value);
-    if (unit) return unit;
-  }
-  return null;
-};
-
 const normalizeInvoiceItemFields = <T extends Partial<ItemRow>>(item: T): T & ItemRow => {
-  const fieldSource = item as InvoiceItemFieldSource;
   const rowTailFields = extractInvoiceRowTailFields(String(item.name ?? ""));
-  const quantity =
-    normalizeInvoiceNumberFieldFromKeys(fieldSource, INVOICE_QUANTITY_FIELD_KEYS) ??
-    rowTailFields.quantity;
-  const unit =
-    normalizeInvoiceUnitFieldFromKeys(fieldSource, INVOICE_UNIT_FIELD_KEYS) ?? rowTailFields.unit;
-  const unit_price = normalizeInvoiceNumberFieldFromKeys(
-    fieldSource,
-    INVOICE_UNIT_PRICE_FIELD_KEYS,
-  );
-  const total = normalizeInvoiceNumberFieldFromKeys(fieldSource, INVOICE_TOTAL_FIELD_KEYS);
+  const quantity = normalizeInvoiceNumberField(item.quantity) ?? rowTailFields.quantity;
+  const unit = normalizeInvoiceUnitToken(item.unit) ?? rowTailFields.unit;
+  const unit_price = normalizeInvoiceNumberField(item.unit_price);
+  const total = normalizeInvoiceNumberField(item.total);
   const normalized = {
     ...item,
     name: cleanInvoiceItemDisplayName({ name: item.name ?? "", quantity, unit }),
@@ -799,7 +759,7 @@ function InvoicesPage() {
     try {
       const { data, error } = await supabase
         .from("invoices")
-        .select("id, supplier_name, total, file_url, created_at")
+        .select("id, supplier_name, invoice_date, total, file_url, created_at")
         .order("created_at", { ascending: false });
       if (error) throw error;
 
@@ -1006,13 +966,24 @@ function InvoicesPage() {
       }
       const supplier = normalizeSupplierDisplayName(data?.supplier);
       const invoiceNumber = normalizeInvoiceNumber(data?.invoice_number);
-      const invoiceDate = normalizeInvoiceDate(data?.invoice_date);
+      const rawInvoiceDate = data?.invoice_date ?? data?.invoiceDate;
+      const invoiceDate = normalizeInvoiceDate(rawInvoiceDate);
+      console.log("RAW INVOICE DATE:", rawInvoiceDate);
+console.log("NORMALIZED INVOICE DATE:", invoiceDate);
+console.log("FULL EXTRACTION DATA:", data);
+
+      traceInvoiceDatePersistence("extracted-date", {
+        invoiceId,
+        rawInvoiceDateSnake: data?.invoice_date,
+        rawInvoiceDateCamel: data?.invoiceDate,
+        normalizedInvoiceDate: invoiceDate,
+      });
       traceInvoiceIdentity("extracted-metadata", {
         invoiceId,
         extractedSupplierName: supplier || null,
         extractedInvoiceNumber: invoiceNumber,
         extractedInvoiceDate: invoiceDate,
-        rawInvoiceDate: data?.invoice_date,
+        rawInvoiceDate,
         itemsCount: items.length,
       });
       return {
@@ -1066,18 +1037,30 @@ function InvoicesPage() {
       if (isImage) {
         const dataUrl = await fileToDataUrl(item.file);
         const ext = await runExtraction(inserted.id, dataUrl);
+        const invoiceUpdatePayload = {
+          supplier_name: ext?.supplier?.slice(0, 120) ?? fallbackSupplier,
+          ...(ext?.invoiceDate ? { invoice_date: ext.invoiceDate } : {}),
+          total:
+  typeof ext?.total === "number" && ext.total > 0
+    ? ext.total
+    : 0,
+        };
         const { error: invoiceUpdateError } = await supabase
           .from("invoices")
-          .update({
-            supplier_name: ext?.supplier?.slice(0, 120) ?? fallbackSupplier,
-            total: ext?.total ?? 0,
-          })
+          .update(invoiceUpdatePayload)
           .eq("id", inserted.id);
+        traceInvoiceDatePersistence("upload-persist-date", {
+          invoiceId: inserted.id,
+          extractedInvoiceDate: ext?.invoiceDate,
+          persistedInvoiceDate: invoiceUpdatePayload.invoice_date,
+          persistenceError: invoiceUpdateError?.message,
+        });
         traceInvoiceIdentity("persisted-invoice", {
           invoiceId: inserted.id,
           extractedSupplierName: ext?.supplier,
           extractedInvoiceNumber: ext?.invoiceNumber,
           extractedInvoiceDate: ext?.invoiceDate,
+          persistedInvoiceDate: invoiceUpdatePayload.invoice_date,
           persistedSupplierName: ext?.supplier?.slice(0, 120) ?? fallbackSupplier,
           persistenceError: invoiceUpdateError?.message,
         });
@@ -1312,18 +1295,31 @@ function InvoicesPage() {
     });
     const result = await runExtraction(row.id, dataUrl);
     if (result) {
+      const invoiceUpdatePayload = {
+        supplier_name: result.supplier?.slice(0, 120) ?? row.supplier,
+        ...(result.invoiceDate ? { invoice_date: result.invoiceDate } : {}),
+        total:
+  typeof result?.total === "number" && result.total > 0
+    ? result.total
+    : row.total,
+      };
       const { error: invoiceUpdateError } = await supabase
         .from("invoices")
-        .update({
-          supplier_name: result.supplier?.slice(0, 120) ?? row.supplier,
-          total: result.total ?? row.total,
-        })
+        .update(invoiceUpdatePayload)
         .eq("id", row.id);
+      traceInvoiceDatePersistence("reextract-persist-date", {
+        invoiceId: row.id,
+        previousInvoiceDate: row.invoiceDate,
+        extractedInvoiceDate: result.invoiceDate,
+        persistedInvoiceDate: invoiceUpdatePayload.invoice_date,
+        persistenceError: invoiceUpdateError?.message,
+      });
       traceInvoiceIdentity("persisted-invoice", {
         invoiceId: row.id,
         extractedSupplierName: result.supplier,
         extractedInvoiceNumber: result.invoiceNumber,
         extractedInvoiceDate: result.invoiceDate,
+        persistedInvoiceDate: invoiceUpdatePayload.invoice_date,
         persistedSupplierName: result.supplier?.slice(0, 120) ?? row.supplier,
         persistenceError: invoiceUpdateError?.message,
       });
@@ -1550,10 +1546,10 @@ function InvoicesPage() {
                         )}
                       </td>
                       <td className="py-3 px-5">
-                        <FileBadge path={r.file_path} />
+                        <FileBadge path={r.file_url} />
                       </td>
                       <td className="py-3 px-5">
-                        <div className="font-medium leading-tight">{r.supplier}</div>
+                        <div className="font-medium leading-tight">{r.supplier_name}</div>
                         {subtitle && (
                           <div className="mt-0.5 text-xs text-muted-foreground">
                             {r.supplierIsFallback ? subtitle : `Invoice ${subtitle}`}

@@ -65,6 +65,7 @@ Return this exact structure:
 
 {
   "supplier": string | null,
+  "invoice_date": string | null,
   "total": number | null,
   "items": [
     {
@@ -204,6 +205,11 @@ Do not hallucinate.
     }
 
     console.log("RAW MODEL RESPONSE", parsed);
+
+console.log(
+  "RAW MODEL ITEMS",
+  JSON.stringify(parsed?.items, null, 2)
+);
 
     const normalized = {
       supplier:
