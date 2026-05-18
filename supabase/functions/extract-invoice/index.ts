@@ -169,7 +169,15 @@ const MONEY_TOKEN_RE = new RegExp(
 );
 const VAT_TOKEN_RE = /\b\d{1,2}(?:[,.]\d+)?\s*%/u;
 const HEADER_FOOTER_RE =
-  /\b(?:travessa|trav\.?|rua|r\.|avenida|av\.?|estrada|largo|codigo\s+postal|cod\.?\s+postal|nif|nipc|contribuinte|telefone|telemovel|tel\.?|email|e-mail|www|iban|bic|capital\s+social|matricula|conservatoria|certidao|pagina|page|fatura|factura|invoice|guia|encomenda|cliente|fornecedor|morada|local\s+de\s+descarga|resumo|subtotal|total|iva|vat|troco|mbway|multibanco)\b/iu;
+  /\b(?:codigo\s+postal|cod\.?\s+postal|nif|nipc|contribuinte|telefone|telemovel|email|e-mail|www|capital\s+social|matricula|conservatoria|certidao|pagina|page|fatura|factura|invoice|guia|encomenda|cliente|fornecedor|morada|local\s+de\s+descarga|resumo|subtotal|total|iva|vat|troco|mbway|multibanco)\b/iu;
+const ADDRESS_RE =
+  /(^|\s)(?:travessa|trav\.?|rua|r\.|avenida|av\.?|estrada|largo|praceta|praca|rotunda|urbanizacao|zona\s+industrial|parque\s+industrial|edificio|lote|loja|andar|sala|apartado|cod\.?\s+postal|cp)\b/iu;
+const PAYMENT_METADATA_RE =
+  /\b(?:iban|swift|bic|sepa|referencia\s+mb|ref\.?\s+mb|entidade|pagamento|transferencia|multibanco|mb\s*way|cartao|visa|mastercard)\b/iu;
+const TAX_SUMMARY_RE =
+  /\b(?:base\s+incidencia|incidencia|valor\s+iva|taxa\s+iva|iva\s+dedutivel|total\s+liquido|total\s+mercadoria|total\s+documento|valor\s+a\s+pagar)\b/iu;
+const BUSINESS_METADATA_RE =
+  /\b(?:lda|l\.?da|unipessoal|sa|s\.?a\.?|sociedade|comercial|distribuicao|armazem|sede|delegacao|gerencia|gerente|eng\.?|engenheiro|dr\.?|dra\.?)\b/iu;
 const PRODUCT_CODE_RE = /^(?:[A-Z]{1,4}\d{3,8}|\d{2,8})\s+/iu;
 
 function normalizeExtractedInvoice(value: ExtractedInvoice): ExtractedInvoice {
@@ -177,6 +185,7 @@ function normalizeExtractedInvoice(value: ExtractedInvoice): ExtractedInvoice {
   const candidates = items.map(itemToRawLine).filter((line): line is string => Boolean(line));
   const rejectedLines: RejectedLine[] = [];
   const normalizedItems: NormalizedItem[] = [];
+  const fieldExtractions: unknown[] = [];
 
   debugInvoice("ocr_raw_lines", {
     note: "Current ingestion receives structured model output, not a separate OCR text layer.",
@@ -187,7 +196,12 @@ function normalizeExtractedInvoice(value: ExtractedInvoice): ExtractedInvoice {
     const normalized = normalizeExtractedItem(item as ExtractedItem);
     if (!normalized) continue;
 
-    const rejectReason = getNonIngredientReason(normalized.name);
+    fieldExtractions.push({
+      raw: itemToRawLine(item),
+      parsed: normalized,
+    });
+
+    const rejectReason = getNonIngredientReason(normalized.name, normalized);
     if (rejectReason) {
       rejectedLines.push({ line: normalized.name, reason: rejectReason });
       continue;
@@ -201,6 +215,7 @@ function normalizeExtractedInvoice(value: ExtractedInvoice): ExtractedInvoice {
     acceptedRows: normalizedItems.length,
     rejectedRows: rejectedLines.length,
   });
+  debugInvoice("field_extraction_results", fieldExtractions);
   debugInvoice("parsed_ingredient_candidates", normalizedItems);
   debugInvoice("rejected_header_footer_lines", rejectedLines);
 
@@ -283,23 +298,38 @@ function cleanIngredientName(name: string): string {
   return name.replace(PRODUCT_CODE_RE, "").replace(/\s+/g, " ").trim().slice(0, 200);
 }
 
-function getNonIngredientReason(line: string): string | null {
+function getNonIngredientReason(line: string, item?: NormalizedItem): string | null {
   const trimmed = line.trim();
   if (!trimmed) return "empty";
   if (!/[A-Za-zÀ-ÿ]/u.test(trimmed)) return "no_letters";
-  if (HEADER_FOOTER_RE.test(normalizeAccents(trimmed))) return "header_footer_keyword";
 
+  const normalized = normalizeAccents(trimmed);
+  const hasParsedRowFields = itemHasParsedRowFields(item);
   const hasPriceSignal = /\d+[.,]\d{1,4}\s*(?:€|EUR)?/iu.test(trimmed);
   const hasQuantityUnitSignal = new RegExp(
     String.raw`\b${NUMBER_TOKEN}\s*(?:${UNIT_TOKEN})\b`,
     "iu",
   ).test(trimmed);
+
+  if (ADDRESS_RE.test(normalized) && !hasParsedRowFields) return "address_keyword";
+  if (PAYMENT_METADATA_RE.test(normalized)) return "payment_metadata";
+  if (TAX_SUMMARY_RE.test(normalized)) return "tax_summary";
+  if (BUSINESS_METADATA_RE.test(normalized) && !hasParsedRowFields) return "business_metadata";
+  if (HEADER_FOOTER_RE.test(normalized) && !hasParsedRowFields) return "header_footer_keyword";
+
   const mostlyPunctuationAddress = /[,;:]$/u.test(trimmed) && trimmed.split(/\s+/).length <= 8;
   if (mostlyPunctuationAddress && !hasPriceSignal && !hasQuantityUnitSignal) {
     return "address_fragment";
   }
 
   return null;
+}
+
+function itemHasParsedRowFields(item?: NormalizedItem): boolean {
+  if (!item) return false;
+  return (
+    item.quantity != null || item.unit != null || item.unit_price != null || item.total != null
+  );
 }
 
 function parseEuropeanNumber(raw: string): number | null {
