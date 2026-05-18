@@ -31,7 +31,7 @@ serve(async (req) => {
           {
             role: "system",
             content:
-              "You are an expert at extracting line items from restaurant supplier invoices. Read the invoice carefully and call the extract_invoice tool with the supplier name, invoice number/reference if visible, invoice date (ISO YYYY-MM-DD if visible, else null), grand total (numeric), and an array of ingredient line items. Only include product/table rows as items; never include supplier headers, addresses, tax summaries, totals, customer details, or footer lines as items. Split each product row into name, quantity, unit, unit price, and total when those fields are visible. VAT percentages must not be part of the item name. Quantities and prices must be numeric. If a value is not present, use null.",
+              "You are an expert at extracting line items from restaurant supplier invoices. Read the invoice carefully and call the extract_invoice tool with the supplier name, invoice number/reference if visible, invoice date (ISO YYYY-MM-DD if visible, else null), grand total (numeric), and an array of ingredient line items. Only include product/table rows as items; never include supplier headers, addresses, tax summaries, totals, customer details, or footer lines as items. Split each product row into name, quantity, unit, unit price, and total when those fields are visible. VAT percentages must not be part of the item name. Quantities and prices must be numeric; convert European decimal-comma quantities such as 40,000 to 40. Product-size tokens inside names, such as 180g or 1kg, are part of the product identity and are not the purchased quantity. For a row like 'Hambúrguer Bovino 180g 40,000 un 0,85 € 6%', keep 'Hambúrguer Bovino 180g' as the name and set quantity 40 and unit un. If a value is not present, use null.",
           },
           {
             role: "user",
@@ -131,9 +131,28 @@ type ExtractedInvoice = {
 type ExtractedItem = {
   name?: unknown;
   quantity?: unknown;
+  quantity_value?: unknown;
+  quantityValue?: unknown;
+  parsed_quantity?: unknown;
+  parsedQuantity?: unknown;
+  purchase_quantity?: unknown;
+  purchased_quantity?: unknown;
+  qty?: unknown;
+  qtd?: unknown;
   unit?: unknown;
+  quantity_unit?: unknown;
+  quantityUnit?: unknown;
+  purchase_unit?: unknown;
+  purchased_unit?: unknown;
+  unit_name?: unknown;
+  unitName?: unknown;
+  unidade?: unknown;
   unit_price?: unknown;
+  unitPrice?: unknown;
+  total_price?: unknown;
+  totalPrice?: unknown;
   total?: unknown;
+  [key: string]: unknown;
 };
 
 type NormalizedItem = {
@@ -185,6 +204,29 @@ const RESIDUAL_ROW_TAIL_RE = new RegExp(
   String.raw`\s+(?<quantity>${NUMBER_TOKEN})\s*(?<unit>${UNIT_TOKEN})\b\s+(?:€|EUR)?\s*${NUMBER_TOKEN}\s*(?:€|EUR)?\s*(?:\d{1,2}(?:[,.]\d+)?\s*%)?\s*$`,
   "iu",
 );
+const QUANTITY_KEYS = [
+  "quantity",
+  "quantity_value",
+  "quantityValue",
+  "parsed_quantity",
+  "parsedQuantity",
+  "purchase_quantity",
+  "purchased_quantity",
+  "qty",
+  "qtd",
+] as const;
+const UNIT_KEYS = [
+  "unit",
+  "quantity_unit",
+  "quantityUnit",
+  "purchase_unit",
+  "purchased_unit",
+  "unit_name",
+  "unitName",
+  "unidade",
+] as const;
+const UNIT_PRICE_KEYS = ["unit_price", "unitPrice"] as const;
+const TOTAL_KEYS = ["total", "total_price", "totalPrice"] as const;
 
 function normalizeExtractedInvoice(value: ExtractedInvoice): ExtractedInvoice {
   const items = Array.isArray(value?.items) ? value.items : [];
@@ -236,10 +278,10 @@ function normalizeExtractedItem(item: ExtractedItem): NormalizedItem | null {
   if (!rawName) return null;
 
   const extractedFields: ItemFields = {
-    quantity: numberValue(item.quantity),
-    unit: normalizeUnit(stringValue(item.unit)) ?? null,
-    unit_price: numberValue(item.unit_price),
-    total: numberValue(item.total),
+    quantity: numberValueFromKeys(item, QUANTITY_KEYS),
+    unit: unitValueFromKeys(item, UNIT_KEYS),
+    unit_price: numberValueFromKeys(item, UNIT_PRICE_KEYS),
+    total: numberValueFromKeys(item, TOTAL_KEYS),
   };
   const collapsed = parseCollapsedInvoiceRow(rawName);
   if (collapsed) {
@@ -394,7 +436,7 @@ function getNonIngredientReason(line: string, item?: NormalizedItem): string | n
     "iu",
   ).test(trimmed);
 
-  if (ADDRESS_RE.test(normalized) && !hasParsedRowFields) return "address_keyword";
+  if (ADDRESS_RE.test(normalized)) return "address_keyword";
   if (PAYMENT_METADATA_RE.test(normalized)) return "payment_metadata";
   if (TAX_SUMMARY_RE.test(normalized)) return "tax_summary";
   if (BUSINESS_METADATA_RE.test(normalized) && !hasParsedRowFields) return "business_metadata";
@@ -463,8 +505,24 @@ function numberValue(value: unknown): number | null {
   return null;
 }
 
+function numberValueFromKeys(item: ExtractedItem, keys: readonly string[]): number | null {
+  for (const key of keys) {
+    const value = numberValue(item[key]);
+    if (value != null) return value;
+  }
+  return null;
+}
+
 function stringValue(value: unknown): string {
   return typeof value === "string" ? value : "";
+}
+
+function unitValueFromKeys(item: ExtractedItem, keys: readonly string[]): string | null {
+  for (const key of keys) {
+    const unit = normalizeUnit(stringValue(item[key]));
+    if (unit) return unit;
+  }
+  return null;
 }
 
 function itemToRawLine(item: unknown): string | null {
@@ -472,12 +530,20 @@ function itemToRawLine(item: unknown): string | null {
   const candidate = item as ExtractedItem;
   const parts = [
     stringValue(candidate.name),
-    candidate.quantity == null ? "" : String(candidate.quantity),
-    stringValue(candidate.unit),
-    candidate.unit_price == null ? "" : String(candidate.unit_price),
-    candidate.total == null ? "" : String(candidate.total),
+    valueFromKeys(candidate, QUANTITY_KEYS),
+    valueFromKeys(candidate, UNIT_KEYS),
+    valueFromKeys(candidate, UNIT_PRICE_KEYS),
+    valueFromKeys(candidate, TOTAL_KEYS),
   ].filter(Boolean);
   return parts.length ? parts.join(" ") : null;
+}
+
+function valueFromKeys(item: ExtractedItem, keys: readonly string[]): string {
+  for (const key of keys) {
+    const value = item[key];
+    if (value != null && value !== "") return String(value);
+  }
+  return "";
 }
 
 function normalizeAccents(value: string): string {

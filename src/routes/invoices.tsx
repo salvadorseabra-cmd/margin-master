@@ -141,10 +141,54 @@ type PriceDeltaDetails = {
   percentLabel: string;
   previousLabel: string;
 };
+type InvoiceRowTailFields = {
+  quantity: number | null;
+  unit: string | null;
+};
+type InvoiceItemFieldSource = Partial<ItemRow> & Record<string, unknown>;
 
 const traceInvoiceIdentity = (stage: string, details: InvoiceIdentityTrace) => {
   if (!import.meta.env.DEV) return;
   console.debug("[invoice-list]", stage, details);
+};
+
+const traceInvoiceRender = (stage: string, details: unknown) => {
+  if (!import.meta.env.DEV) return;
+  console.debug("[invoice-render]", stage, details);
+};
+
+const QUANTITY_TRACE_KEYS = [
+  "quantity",
+  "quantity_value",
+  "parsed_quantity",
+  "usable_quantity",
+  "unit",
+  "purchase_unit",
+  "unit_name",
+  "pack_quantity",
+  "stock_added",
+  "unit_price",
+  "total",
+];
+
+const traceInvoiceQuantityStage = (
+  stage: string,
+  item: unknown,
+  extra?: Record<string, unknown>,
+) => {
+  if (!import.meta.env.DEV || !item || typeof item !== "object") return;
+
+  const row = item as Record<string, unknown>;
+  const relatedKeys = Object.keys(row).filter((key) =>
+    /quantity|qty|unit|pack|stock|usable/i.test(key),
+  );
+  const keys = [...new Set(["id", "name", ...QUANTITY_TRACE_KEYS, ...relatedKeys])];
+  const fields = keys.reduce<Record<string, unknown>>((acc, key) => {
+    if (key in row) acc[key] = row[key];
+    return acc;
+  }, {});
+
+  console.debug("[invoice-quantity]", stage, { ...extra, fields });
 };
 
 const formatInvoiceDate = (createdAt: string | null) => {
@@ -225,6 +269,29 @@ const INVOICE_ROW_TAIL_RE = new RegExp(
   "iu",
 );
 const INVOICE_PRODUCT_CODE_RE = /^(?:[A-Z]{1,4}\d{3,8}|\d{2,8})\s+/iu;
+const INVOICE_QUANTITY_FIELD_KEYS = [
+  "quantity",
+  "quantity_value",
+  "quantityValue",
+  "parsed_quantity",
+  "parsedQuantity",
+  "purchase_quantity",
+  "purchased_quantity",
+  "qty",
+  "qtd",
+] as const;
+const INVOICE_UNIT_FIELD_KEYS = [
+  "unit",
+  "quantity_unit",
+  "quantityUnit",
+  "purchase_unit",
+  "purchased_unit",
+  "unit_name",
+  "unitName",
+  "unidade",
+] as const;
+const INVOICE_UNIT_PRICE_FIELD_KEYS = ["unit_price", "unitPrice"] as const;
+const INVOICE_TOTAL_FIELD_KEYS = ["total", "total_price", "totalPrice"] as const;
 const INVOICE_ADDRESS_RE =
   /(^|\s)(?:travessa|trav\.?|rua|r\.|avenida|av\.?|estrada|largo|praceta|praca|rotunda|urbanizacao|zona\s+industrial|parque\s+industrial|edificio|lote|loja|andar|sala|apartado|cod\.?\s+postal|cp)(?=\s|,|\.|:|$)/iu;
 const INVOICE_BUSINESS_METADATA_RE =
@@ -268,6 +335,69 @@ const normalizeInvoiceUnitToken = (raw: string | null | undefined) => {
 
 const invoiceAmountsNearlyEqual = (a: number, b: number) => Math.abs(a - b) < 0.005;
 
+const extractInvoiceRowTailFields = (name: string): InvoiceRowTailFields => {
+  const rowTail = name.match(INVOICE_ROW_TAIL_RE);
+  if (!rowTail?.groups?.quantity || !rowTail.groups.unit) return { quantity: null, unit: null };
+
+  return {
+    quantity: parseInvoiceNumberToken(rowTail.groups.quantity),
+    unit: normalizeInvoiceUnitToken(rowTail.groups.unit),
+  };
+};
+
+const normalizeInvoiceNumberField = (value: unknown): number | null => {
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (typeof value === "string") return parseInvoiceNumberToken(value);
+  return null;
+};
+
+const normalizeInvoiceNumberFieldFromKeys = (
+  item: InvoiceItemFieldSource,
+  keys: readonly string[],
+): number | null => {
+  for (const key of keys) {
+    const value = normalizeInvoiceNumberField(item[key]);
+    if (value != null) return value;
+  }
+  return null;
+};
+
+const normalizeInvoiceUnitFieldFromKeys = (
+  item: InvoiceItemFieldSource,
+  keys: readonly string[],
+): string | null => {
+  for (const key of keys) {
+    const value = typeof item[key] === "string" ? item[key] : null;
+    const unit = normalizeInvoiceUnitToken(value);
+    if (unit) return unit;
+  }
+  return null;
+};
+
+const normalizeInvoiceItemFields = <T extends Partial<ItemRow>>(item: T): T & ItemRow => {
+  const fieldSource = item as InvoiceItemFieldSource;
+  const rowTailFields = extractInvoiceRowTailFields(String(item.name ?? ""));
+  const quantity =
+    normalizeInvoiceNumberFieldFromKeys(fieldSource, INVOICE_QUANTITY_FIELD_KEYS) ??
+    rowTailFields.quantity;
+  const unit =
+    normalizeInvoiceUnitFieldFromKeys(fieldSource, INVOICE_UNIT_FIELD_KEYS) ?? rowTailFields.unit;
+  const unit_price = normalizeInvoiceNumberFieldFromKeys(
+    fieldSource,
+    INVOICE_UNIT_PRICE_FIELD_KEYS,
+  );
+  const total = normalizeInvoiceNumberFieldFromKeys(fieldSource, INVOICE_TOTAL_FIELD_KEYS);
+  const normalized = {
+    ...item,
+    name: cleanInvoiceItemDisplayName({ name: item.name ?? "", quantity, unit }),
+    quantity,
+    unit,
+    unit_price,
+    total,
+  };
+  return normalized as T & ItemRow;
+};
+
 const cleanInvoiceItemDisplayName = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {
   let name = String(item.name ?? "")
     .replace(/\s+/g, " ")
@@ -308,8 +438,9 @@ const shouldRejectInvoiceItemName = (
   if (INVOICE_PAYMENT_METADATA_RE.test(normalized) || INVOICE_TAX_SUMMARY_RE.test(normalized)) {
     return true;
   }
-  if (!hasParsedRowFields) {
-    return INVOICE_ADDRESS_RE.test(normalized) || INVOICE_BUSINESS_METADATA_RE.test(normalized);
+  if (INVOICE_ADDRESS_RE.test(normalized)) return true;
+  if (INVOICE_BUSINESS_METADATA_RE.test(normalized) && !hasParsedRowFields) {
+    return true;
   }
   return false;
 };
@@ -352,6 +483,15 @@ const getRecipeCompatibleUnit = (unit: string | null | undefined) => {
   const normalized = unit?.trim().toLowerCase();
   if (normalized === "l") return "L";
   return normalized && RECIPE_COMPATIBLE_DISPLAY_UNITS.has(normalized) ? normalized : null;
+};
+
+const getDisplayPurchaseUnit = (unit: string | null | undefined) => {
+  const normalized = normalizeInvoiceUnitToken(unit);
+  if (!normalized) return null;
+  if (isGenericUnit(normalized)) return "units";
+  if (normalized === "cx") return "cases";
+  if (normalized === "dz") return "dozens";
+  return normalized;
 };
 
 const formatPurchaseCount = (value: number) => {
@@ -513,7 +653,7 @@ const getInvoiceItemPurchaseLabel = (item: Pick<ItemRow, "name" | "quantity" | "
   }
 
   if (item.quantity == null) return null;
-  const unit = item.unit?.trim();
+  const unit = getDisplayPurchaseUnit(item.unit);
   return unit
     ? formatOperationalQuantityWithUnit(item.quantity, unit)
     : formatPurchaseCount(item.quantity);
@@ -557,6 +697,14 @@ const getInvoiceItemStockPresentation = (item: Pick<ItemRow, "name" | "quantity"
   if (compatibleUnit && item.quantity != null) {
     return {
       quantityLabel: `${formatOperationalQuantityWithUnit(item.quantity, compatibleUnit)} usable`,
+      detailLabel: null,
+    };
+  }
+
+  const displayUnit = getDisplayPurchaseUnit(item.unit);
+  if (displayUnit && item.quantity != null) {
+    return {
+      quantityLabel: `${formatOperationalQuantityWithUnit(item.quantity, displayUnit)} usable`,
       detailLabel: null,
     };
   }
@@ -829,29 +977,32 @@ function InvoicesPage() {
       });
       if (error) throw error;
       const items = Array.isArray(data?.items) ? data.items : [];
+      traceInvoiceQuantityStage("extract-response:first-item", items[0], { invoiceId });
       // wipe prior items then insert fresh
       await supabase.from("invoice_items").delete().eq("invoice_id", invoiceId);
       if (items.length && user) {
-        const insertRows = items
-          .map((it: ItemRow) => ({
-            ...it,
-            name: cleanInvoiceItemDisplayName(it),
-          }))
-          .filter((it: ItemRow) => !shouldRejectInvoiceItemName(it))
-          .map((it: ItemRow) => {
-            const name = String(it.name ?? "Unknown");
-            const unit = resolveInvoiceItemUnit({ name, unit: it.unit });
-            return {
-              invoice_id: invoiceId,
-              user_id: user.id,
-              name: name.slice(0, 200),
-              quantity: it.quantity ?? null,
-              unit: unit ? unit.slice(0, 20) : null,
-              unit_price: it.unit_price ?? null,
-              total: it.total ?? null,
-            };
-          });
-        await supabase.from("invoice_items").insert(insertRows);
+        const normalizedItems = items
+          .map((it: ItemRow) => normalizeInvoiceItemFields(it))
+          .filter((it: ItemRow) => !shouldRejectInvoiceItemName(it));
+        traceInvoiceQuantityStage("insert-normalized:first-item", normalizedItems[0], {
+          invoiceId,
+        });
+        const insertRows = normalizedItems.map((it: ItemRow) => {
+          const name = String(it.name ?? "Unknown");
+          const unit = resolveInvoiceItemUnit({ name, unit: it.unit });
+          return {
+            invoice_id: invoiceId,
+            user_id: user.id,
+            name: name.slice(0, 200),
+            quantity: it.quantity ?? null,
+            unit: unit ? unit.slice(0, 20) : null,
+            unit_price: it.unit_price ?? null,
+            total: it.total ?? null,
+          };
+        });
+        traceInvoiceQuantityStage("insert-payload:first-item", insertRows[0], { invoiceId });
+        const { error: insertError } = await supabase.from("invoice_items").insert(insertRows);
+        if (insertError) throw insertError;
       }
       const supplier = normalizeSupplierDisplayName(data?.supplier);
       const invoiceNumber = normalizeInvoiceNumber(data?.invoice_number);
@@ -1023,12 +1174,11 @@ function InvoicesPage() {
       .select("id, name, quantity, unit, unit_price, total")
       .eq("invoice_id", invoiceId)
       .order("created_at", { ascending: true });
+    traceInvoiceQuantityStage("load-raw:first-item", (data ?? [])[0], { invoiceId });
     const items = ((data ?? []) as ItemRow[])
-      .map((item) => ({
-        ...item,
-        name: cleanInvoiceItemDisplayName(item),
-      }))
+      .map((item) => normalizeInvoiceItemFields(item))
       .filter((item) => !shouldRejectInvoiceItemName(item));
+    traceInvoiceQuantityStage("load-normalized:first-item", items[0], { invoiceId });
     const priceComparisons = await loadPriceComparisons(invoiceId, invoiceCreatedAt, items);
     setItemsByInvoice((s) => ({ ...s, [invoiceId]: items }));
     setPriceComparisonsByInvoice((s) => ({ ...s, [invoiceId]: priceComparisons }));
@@ -1864,9 +2014,10 @@ function ItemsTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {items.map((it) => {
+              {items.map((it, index) => {
+                const renderItem = normalizeInvoiceItemFields(it);
                 const ingredientMatch = getItemIngredientMatch(
-                  it,
+                  renderItem,
                   ingredientCatalog,
                   confirmedIngredientAliases,
                 );
@@ -1874,16 +2025,31 @@ function ItemsTable({
                 const possibleIngredientMatch =
                   ingredientMatch?.kind === "semantic" ? ingredientMatch : null;
                 const unmatchedIngredient = !confirmedIngredientMatch && !possibleIngredientMatch;
-                const extractionReview = needsExtractionConfirmation(it);
-                const quantityReview = needsQuantityUnitConfirmation(it);
-                const amountReview = needsAmountConfirmation(it);
-                const delta = getPriceDeltaDetails(it.unit_price, priceComparisons[it.id]);
-                const canCreateIngredient = !isPlaceholderItemName(it.name);
-                const creatingIngredient = !!creatingIngredientByItem[it.id];
-                const creationError = ingredientCreationErrors[it.id];
-                const operationalSummary = getInvoiceItemOperationalSummary(it);
-                const purchaseLabel = getInvoiceItemPurchaseLabel(it);
-                const stockPresentation = getInvoiceItemStockPresentation(it);
+                const extractionReview = needsExtractionConfirmation(renderItem);
+                const quantityReview = needsQuantityUnitConfirmation(renderItem);
+                const amountReview = needsAmountConfirmation(renderItem);
+                const delta = getPriceDeltaDetails(
+                  renderItem.unit_price,
+                  priceComparisons[renderItem.id],
+                );
+                const canCreateIngredient = !isPlaceholderItemName(renderItem.name);
+                const creatingIngredient = !!creatingIngredientByItem[renderItem.id];
+                const creationError = ingredientCreationErrors[renderItem.id];
+                const operationalSummary = getInvoiceItemOperationalSummary(renderItem);
+                const purchaseLabel = getInvoiceItemPurchaseLabel(renderItem);
+                const stockPresentation = getInvoiceItemStockPresentation(renderItem);
+                if (index === 0) {
+                  traceInvoiceQuantityStage("render-row:first-item", renderItem, {
+                    purchaseLabel,
+                    stockLabel: stockPresentation?.quantityLabel ?? null,
+                  });
+                }
+                if (!purchaseLabel || !stockPresentation) {
+                  traceInvoiceQuantityStage("render-fallback:first-missing", renderItem, {
+                    missingPurchaseLabel: !purchaseLabel,
+                    missingStockPresentation: !stockPresentation,
+                  });
+                }
                 const showMatchedBadge =
                   confirmedIngredientMatch &&
                   !extractionReview &&
@@ -1892,7 +2058,7 @@ function ItemsTable({
                   !delta;
                 return (
                   <tr
-                    key={it.id}
+                    key={renderItem.id}
                     className={`transition-colors ${
                       extractionReview
                         ? "bg-amber-500/[0.04] hover:bg-amber-500/[0.07]"
@@ -1901,7 +2067,7 @@ function ItemsTable({
                   >
                     <td className="py-2.5 px-4">
                       <div className="space-y-1">
-                        <div className="font-medium leading-tight">{it.name}</div>
+                        <div className="font-medium leading-tight">{renderItem.name}</div>
                         <div className="flex flex-wrap items-center gap-1.5">
                           {extractionReview && (
                             <OperationalBadge label="needs review" tone="review" />
@@ -1931,7 +2097,7 @@ function ItemsTable({
                               <button
                                 type="button"
                                 onClick={() =>
-                                  onConfirmIngredientMatch(it, possibleIngredientMatch)
+                                  onConfirmIngredientMatch(renderItem, possibleIngredientMatch)
                                 }
                                 className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground transition hover:bg-muted/70 hover:text-foreground"
                               >
@@ -1939,7 +2105,7 @@ function ItemsTable({
                               </button>
                               <button
                                 type="button"
-                                onClick={() => onCreateIngredient(it)}
+                                onClick={() => onCreateIngredient(renderItem)}
                                 disabled={creatingIngredient || !canCreateIngredient}
                                 title={
                                   canCreateIngredient
@@ -1957,7 +2123,7 @@ function ItemsTable({
                               <OperationalBadge label="not in ingredient list" />
                               <button
                                 type="button"
-                                onClick={() => onCreateIngredient(it)}
+                                onClick={() => onCreateIngredient(renderItem)}
                                 disabled={creatingIngredient || !canCreateIngredient}
                                 title={
                                   canCreateIngredient
@@ -2021,12 +2187,14 @@ function ItemsTable({
                       )}
                     </td>
                     <td className="py-2.5 px-4 text-right tabular-nums">
-                      {it.unit_price != null ? (
+                      {renderItem.unit_price != null ? (
                         <span className="inline-flex flex-col items-end gap-0.5">
-                          <span className="font-medium">€{Number(it.unit_price).toFixed(2)}</span>
+                          <span className="font-medium">
+                            €{Number(renderItem.unit_price).toFixed(2)}
+                          </span>
                           <PriceDeltaIndicator
-                            currentPrice={it.unit_price}
-                            previousPrice={priceComparisons[it.id]}
+                            currentPrice={renderItem.unit_price}
+                            previousPrice={priceComparisons[renderItem.id]}
                           />
                         </span>
                       ) : (
@@ -2034,8 +2202,8 @@ function ItemsTable({
                       )}
                     </td>
                     <td className="py-2.5 px-4 text-right tabular-nums font-medium">
-                      {it.total != null ? (
-                        `€${Number(it.total).toFixed(2)}`
+                      {renderItem.total != null ? (
+                        `€${Number(renderItem.total).toFixed(2)}`
                       ) : (
                         <MissingValue label="Total" />
                       )}
