@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
+import { formatCurrency, formatDecimal, formatPercent } from "@/lib/display-format";
 
 export const Route = createFileRoute("/alerts")({
   head: () => ({
@@ -18,7 +19,7 @@ export const Route = createFileRoute("/alerts")({
   component: AlertsPage,
 });
 
-type Severity = "high" | "medium" | "low";
+type Severity = "critical" | "watch" | "stable" | "volatile" | "stale";
 type AlertTarget = "/ingredients" | "/recipes" | "/invoices";
 
 type IngredientRecord = {
@@ -30,7 +31,6 @@ type IngredientRecord = {
   purchase_unit?: string | null;
   base_unit?: string | null;
   created_at?: string | null;
-  updated_at?: string | null;
 };
 
 type RecipeIngredientRecord = {
@@ -112,23 +112,35 @@ type AlertData = {
 type RecipeIngredientRow = Omit<RecipeIngredientRecord, "ingredients">;
 
 const sevStyles: Record<Severity, { dot: string; chip: string; label: string; card: string }> = {
-  high: {
+  critical: {
     dot: "bg-destructive",
     chip: "border-destructive/20 bg-destructive/10 text-destructive",
-    label: "High",
+    label: "Critical",
     card: "border-destructive/20",
   },
-  medium: {
+  watch: {
     dot: "bg-warning/75",
     chip: "border-warning/20 bg-warning/10 text-warning-foreground/80",
     label: "Watch",
     card: "border-border",
   },
-  low: {
+  stable: {
     dot: "bg-success",
     chip: "border-success/20 bg-success/10 text-success",
-    label: "Low",
+    label: "Stable",
     card: "border-success/20",
+  },
+  volatile: {
+    dot: "bg-orange-500",
+    chip: "border-orange-500/20 bg-orange-500/10 text-orange-700",
+    label: "Volatile",
+    card: "border-orange-500/20",
+  },
+  stale: {
+    dot: "bg-muted-foreground",
+    chip: "border-muted-foreground/20 bg-muted text-muted-foreground",
+    label: "Stale price",
+    card: "border-border",
   },
 };
 
@@ -242,7 +254,11 @@ function AlertsPage() {
 
   const alerts = useMemo(() => buildOperationalAlerts(data), [data]);
   const recipeMetrics = useMemo(() => getRecipeMetrics(data.recipes), [data.recipes]);
-  const highCount = alerts.filter((alert) => alert.severity === "high").length;
+  const criticalCount = alerts.filter((alert) => alert.severity === "critical").length;
+  const monitoredIngredients = new Set([
+    ...data.ingredients.map((ingredient) => ingredient.id),
+    ...data.priceHistory.map((row) => row.ingredient_id),
+  ]).size;
   const recipeMarginCount = recipeMetrics.filter(
     (metric) => metric.grossMargin !== null && metric.grossMargin < TARGET_MARGIN,
   ).length;
@@ -253,19 +269,25 @@ function AlertsPage() {
   return (
     <AppShell
       title="Margin alerts"
-      subtitle="Operational checks from invoices, ingredient prices and recipe costings."
+      subtitle="Operational monitoring from invoices, ingredient prices and recipe costings."
     >
       <Card className="p-3">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
           <span className="inline-flex items-center gap-2 font-medium">
             <AlertTriangle className="h-4 w-4 text-destructive" />
-            {highCount} high priority
+            {criticalCount} critical risks
           </span>
           <span className="hidden h-1 w-1 rounded-full bg-muted-foreground/40 sm:block" />
-          <span className="text-muted-foreground">{recipeMarginCount} recipes below target</span>
+          <span className="text-muted-foreground">
+            {recipeMarginCount} recipes below margin target
+          </span>
           <span className="hidden h-1 w-1 rounded-full bg-muted-foreground/40 sm:block" />
           <span className="text-muted-foreground">
-            {recentPriceUpdates} prices updated this week
+            {recentPriceUpdates} invoice price updates this week
+          </span>
+          <span className="hidden h-1 w-1 rounded-full bg-muted-foreground/40 sm:block" />
+          <span className="text-muted-foreground">
+            Monitoring {monitoredIngredients} ingredient costs
           </span>
         </div>
       </Card>
@@ -285,9 +307,11 @@ function AlertsPage() {
         {!loading && !error && alerts.length === 0 && (
           <Card className="p-8 text-center">
             <CheckCircle2 className="mx-auto h-8 w-8 text-success" />
-            <div className="mt-3 text-sm font-medium">No alerts from current data</div>
+            <div className="mt-3 text-sm font-medium">
+              No critical margin risks detected from recent invoices
+            </div>
             <div className="mt-1 text-xs text-muted-foreground">
-              Add invoices, ingredients and recipe links to monitor margin changes.
+              Marginly is monitoring ingredient costs, pricing stability and linked recipe margins.
             </div>
           </Card>
         )}
@@ -373,16 +397,23 @@ function buildOperationalAlerts(data: AlertData): OperationalAlert[] {
 
     alerts.push({
       id,
-      severity: percent >= 15 ? "high" : percent >= 5 ? "medium" : "low",
-      title: `${ingredientName}: cost increased since previous invoice`,
-      context: `Latest invoice price ${formatCurrency(current)}${unit ? ` per ${unit}` : ""}; previous ${formatCurrency(previous)}.`,
+      severity: percent >= 15 ? "critical" : percent >= 5 ? "volatile" : "watch",
+      title: `${ingredientName} cost moved up`,
+      context:
+        "Latest invoice pricing is higher than the previous recorded cost, which can compress linked recipe margins.",
       meta: [
-        { label: "Change", value: formatPercent(percent), tone: "text-destructive" },
-        { label: "Linked recipes", value: String(usage?.count ?? 0) },
+        {
+          label: "Movement",
+          value: `Up ${formatPercent(Math.abs(percent))}`,
+          tone: "text-destructive",
+        },
+        { label: "Latest price", value: `${formatCurrency(current)} / ${unit}` },
+        { label: "Previous", value: formatCurrency(previous) },
+        { label: "Recipes affected", value: String(usage?.count ?? 0) },
         ...(supplier ? [{ label: "Supplier", value: supplier }] : []),
-        { label: "Updated", value: formatDate(row.created_at) },
+        { label: "Last invoice update", value: formatDate(row.created_at) },
       ],
-      actionLabel: row.invoice_id ? "Review invoices" : "Review ingredient",
+      actionLabel: row.invoice_id ? "Compare supplier pricing" : "Monitor next invoice",
       target: row.invoice_id ? "/invoices" : "/ingredients",
       priority: 10_000 + percent * 100 + (usage?.count ?? 0),
     });
@@ -392,25 +423,30 @@ function buildOperationalAlerts(data: AlertData): OperationalAlert[] {
     if (metric.grossMargin === null || metric.grossMargin >= TARGET_MARGIN) continue;
 
     const belowTarget = TARGET_MARGIN - metric.grossMargin;
-    const high = metric.grossMargin < 55;
+    const criticalMargin = metric.grossMargin < 55;
     alerts.push({
       id: `recipe-margin-${metric.recipe.id}`,
-      severity: high ? "high" : "medium",
-      title: high
-        ? `${metric.recipe.name}: recipe margin below target`
-        : `${metric.recipe.name}: recipe close to margin threshold`,
-      context: `Current food cost is ${formatCurrency(metric.foodCost)} against selling price ${formatCurrency(metric.sellingPrice)}.`,
+      severity: criticalMargin ? "critical" : "watch",
+      title: `${metric.recipe.name} below target margin`,
+      context:
+        "Food cost is running too close to the selling price. Review the recipe before the next menu update.",
       meta: [
         {
           label: "Gross margin",
-          value: `${metric.grossMargin.toFixed(1)}%`,
-          tone: high ? "text-destructive" : "text-warning",
+          value: formatPercent(metric.grossMargin),
+          tone: criticalMargin ? "text-destructive" : "text-warning",
         },
-        { label: "Food cost", value: `${metric.foodCostPercent?.toFixed(1) ?? "0.0"}%` },
-        { label: "Below target", value: `${belowTarget.toFixed(1)} pts` },
-        ...(metric.topLine ? [{ label: "Top input", value: metric.topLine.ingredientName }] : []),
+        { label: "Food cost", value: formatPercent(metric.foodCostPercent ?? 0) },
+        { label: "Below target", value: `${formatDecimal(belowTarget)} pts` },
+        { label: "Recipe impacted", value: metric.recipe.name },
+        ...(metric.topLine
+          ? [
+              { label: "Largest driver", value: metric.topLine.ingredientName },
+              { label: "Line cost", value: formatCurrency(metric.topLine.lineCost) },
+            ]
+          : []),
       ],
-      actionLabel: "Review recipe",
+      actionLabel: criticalMargin ? "Review menu pricing" : "Review portion size",
       target: "/recipes",
       priority: 9_000 + belowTarget * 100,
     });
@@ -422,15 +458,16 @@ function buildOperationalAlerts(data: AlertData): OperationalAlert[] {
 
     alerts.push({
       id: `high-contribution-${metric.recipe.id}-${topLine.ingredientId}`,
-      severity: topLine.contribution >= 70 ? "medium" : "low",
-      title: `${topLine.ingredientName}: high cost contribution`,
-      context: `${topLine.ingredientName} is the largest cost in ${metric.recipe.name}.`,
+      severity: "watch",
+      title: `${topLine.ingredientName} dominates ${metric.recipe.name}`,
+      context:
+        "One ingredient is carrying most of the recipe cost, so price or yield movement can quickly affect margin.",
       meta: [
-        { label: "Contribution", value: `${topLine.contribution.toFixed(1)}%` },
+        { label: "Contribution", value: formatPercent(topLine.contribution) },
         { label: "Line cost", value: formatCurrency(topLine.lineCost) },
-        { label: "Recipe", value: metric.recipe.name },
+        { label: "Recipe impacted", value: metric.recipe.name },
       ],
-      actionLabel: "Review recipe",
+      actionLabel: topLine.contribution >= 70 ? "Check recipe yield" : "Review portion size",
       target: "/recipes",
       priority: 5_000 + topLine.contribution,
     });
@@ -447,14 +484,15 @@ function buildOperationalAlerts(data: AlertData): OperationalAlert[] {
 
     alerts.push({
       id: `shared-ingredient-${ingredientId}`,
-      severity: usage.count >= 4 ? "medium" : "low",
-      title: `${ingredient.name}: used across multiple recipes`,
-      context: "Price changes on this ingredient affect more than one recipe costing.",
+      severity: usage.count >= 4 ? "watch" : "stable",
+      title: `${ingredient.name} is used across recipes`,
+      context:
+        "Repeated use makes this ingredient important to monitor because one price move can affect several costings.",
       meta: [
-        { label: "Linked recipes", value: String(usage.count) },
+        { label: "Recipes affected", value: String(usage.count) },
         { label: "Current price", value: formatIngredientPrice(ingredient) },
       ],
-      actionLabel: "Review ingredient",
+      actionLabel: "Review ingredient usage",
       target: "/ingredients",
       priority: 2_000 + usage.count,
     });
@@ -468,8 +506,7 @@ function buildOperationalAlerts(data: AlertData): OperationalAlert[] {
     }))
     .filter(({ ingredient }) => !!ingredient?.name)
     .filter(({ ingredient, history }) => {
-      const latestDate =
-        history?.created_at ?? ingredient?.updated_at ?? ingredient?.created_at ?? null;
+      const latestDate = history?.created_at ?? ingredient?.created_at ?? null;
       return !latestDate || daysSince(latestDate) >= STALE_PRICE_DAYS;
     })
     .sort((a, b) => b.usage.count - a.usage.count)
@@ -478,22 +515,22 @@ function buildOperationalAlerts(data: AlertData): OperationalAlert[] {
   for (const { ingredient, history, usage } of staleIngredients) {
     if (!ingredient?.name) continue;
 
-    const latestDate =
-      history?.created_at ?? ingredient.updated_at ?? ingredient.created_at ?? null;
+    const latestDate = history?.created_at ?? ingredient.created_at ?? null;
     const age = latestDate ? daysSince(latestDate) : null;
     alerts.push({
       id: `stale-price-${ingredient.id}`,
-      severity: usage.count >= 3 || (age !== null && age >= 90) ? "medium" : "low",
-      title: `${ingredient.name}: no recent pricing update`,
+      severity: "stale",
+      title: `${ingredient.name} pricing is stale`,
       context:
         age === null
-          ? "This linked ingredient has no invoice price history yet."
-          : `No invoice price update in ${age} days.`,
+          ? "This linked ingredient has no invoice price history yet, so recipe costs depend on catalog pricing."
+          : `No invoice price update in ${age} days. Recipe costs may be using an old ingredient price.`,
       meta: [
-        { label: "Linked recipes", value: String(usage.count) },
+        { label: "Recipes affected", value: String(usage.count) },
         { label: "Current price", value: formatIngredientPrice(ingredient) },
+        { label: "Last invoice update", value: latestDate ? formatDate(latestDate) : "No history" },
       ],
-      actionLabel: "Review ingredient",
+      actionLabel: "Monitor next invoice",
       target: "/ingredients",
       priority: 1_000 + usage.count * 10 + (age ?? STALE_PRICE_DAYS),
     });
@@ -510,16 +547,27 @@ function buildOperationalAlerts(data: AlertData): OperationalAlert[] {
 
     const ingredient = ingredientById.get(row.ingredient_id);
     const ingredientName = ingredient?.name?.trim() || row.ingredient_name?.trim() || "Ingredient";
+    const current = numberOrNull(row.new_price);
+    const previous = numberOrNull(row.previous_price);
+    const movement =
+      current !== null && previous !== null
+        ? current > previous
+          ? "Up"
+          : current < previous
+            ? "Down"
+            : "Flat"
+        : "Updated";
     alerts.push({
       id,
-      severity: "low",
-      title: `${ingredientName}: price updated this week`,
-      context: "Latest invoice pricing has been recorded for this ingredient.",
+      severity: "stable",
+      title: `${ingredientName} pricing updated recently`,
+      context: "Latest invoice pricing is available for monitoring current recipe cost stability.",
       meta: [
-        { label: "Price", value: formatCurrency(numberOrNull(row.new_price) ?? 0) },
-        { label: "Updated", value: formatDate(row.created_at) },
+        ...(current !== null ? [{ label: "Latest price", value: formatCurrency(current) }] : []),
+        { label: "Movement", value: movement },
+        { label: "Last invoice update", value: formatDate(row.created_at) },
       ],
-      actionLabel: row.invoice_id ? "Review invoices" : "Review ingredient",
+      actionLabel: "Monitor next invoice",
       target: row.invoice_id ? "/invoices" : "/ingredients",
       priority: 500,
     });
@@ -661,18 +709,12 @@ function formatDate(value: string | null | undefined) {
   return date.toLocaleDateString();
 }
 
-function formatCurrency(value: number) {
-  return `€${value.toFixed(2)}`;
-}
-
-function formatPercent(value: number) {
-  return `${value > 0 ? "+" : ""}${value.toFixed(1)}%`;
-}
-
 function severityOrder(severity: Severity) {
-  if (severity === "high") return 0;
-  if (severity === "medium") return 1;
-  return 2;
+  if (severity === "critical") return 0;
+  if (severity === "volatile") return 1;
+  if (severity === "watch") return 2;
+  if (severity === "stale") return 3;
+  return 4;
 }
 
 function MetaPill({

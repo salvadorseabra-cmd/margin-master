@@ -2,8 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
@@ -29,7 +28,7 @@ serve(async (req) => {
           {
             role: "system",
             content:
-              "You are an expert at extracting line items from restaurant supplier invoices. Read the invoice carefully and call the extract_invoice tool with the supplier name, invoice date (ISO YYYY-MM-DD if visible, else null), grand total (numeric), and an array of ingredient line items. Quantities and prices must be numeric. If a value is not present, use null.",
+              "You are an expert at extracting line items from restaurant supplier invoices. Read the invoice carefully and call the extract_invoice tool with the supplier name, invoice number/reference if visible, invoice date (ISO YYYY-MM-DD if visible, else null), grand total (numeric), and an array of ingredient line items. Quantities and prices must be numeric. If a value is not present, use null.",
           },
           {
             role: "user",
@@ -49,6 +48,7 @@ serve(async (req) => {
                 type: "object",
                 properties: {
                   supplier: { type: "string" },
+                  invoice_number: { type: ["string", "null"] },
                   invoice_date: { type: ["string", "null"] },
                   total: { type: ["number", "null"] },
                   items: {
@@ -81,7 +81,10 @@ serve(async (req) => {
       if (response.status === 429)
         return json({ error: "Rate limit reached. Please try again shortly." }, 429);
       if (response.status === 402)
-        return json({ error: "AI credits exhausted. Add funds in Lovable workspace settings." }, 402);
+        return json(
+          { error: "AI credits exhausted. Add funds in Lovable workspace settings." },
+          402,
+        );
       const t = await response.text();
       console.error("AI gateway error:", response.status, t);
       return json({ error: "AI extraction failed" }, 500);

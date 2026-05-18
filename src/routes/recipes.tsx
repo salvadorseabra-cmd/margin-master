@@ -7,6 +7,12 @@ import type { FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { downloadRecipeTechnicalSheet } from "@/lib/recipe-technical-sheet";
+import {
+  formatCurrency,
+  formatPercent,
+  formatQuantityWithUnit,
+  formatUnitCostCurrency,
+} from "@/lib/display-format";
 
 export const Route = createFileRoute("/recipes")({
   head: () => ({
@@ -508,22 +514,25 @@ function RecipesPage() {
                         ) : (
                           <TrendingDown className="h-3.5 w-3.5" />
                         )}
-                        Gross Margin {margin.toFixed(0)}%
+                        Gross Margin {formatPercent(margin)}
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-4 grid min-w-0 grid-cols-2 gap-2 text-center">
-                    <Mini label="Selling Price" value={`€${r.selling_price ?? 0}`} />
+                    <Mini
+                      label="Selling Price"
+                      value={formatCurrency(Number(r.selling_price ?? 0))}
+                    />
 
-                    <Mini label="Food Cost" value={`€${cost.toFixed(2)}`} />
+                    <Mini label="Food Cost" value={formatCurrency(cost)} />
                   </div>
 
                   <div className="mt-4">
                     <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
                       <span>Food Cost %</span>
 
-                      <span className="tabular-nums">{fc.toFixed(1)}%</span>
+                      <span className="tabular-nums">{formatPercent(fc)}</span>
                     </div>
 
                     <div className="h-1.5 rounded-full bg-muted overflow-hidden">
@@ -676,7 +685,7 @@ function RecipesPage() {
                             : "bg-destructive/10 text-destructive"
                       }`}
                     >
-                      {foodCostPercentage.toFixed(1)}% food cost
+                      {formatPercent(foodCostPercentage)} food cost
                     </div>
                   </div>
 
@@ -695,7 +704,7 @@ function RecipesPage() {
                       label="Cost concentration"
                       value={
                         highestCostDriver
-                          ? `${highestCostDriver.contribution.toFixed(1)}% of recipe cost in one ingredient`
+                          ? `${formatPercent(highestCostDriver.contribution)} of recipe cost in one ingredient`
                           : "No concentration yet"
                       }
                       detail={concentrationDetail}
@@ -705,12 +714,12 @@ function RecipesPage() {
               </div>
 
               <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
-                <KpiCard label="Selling price" value={`€${sellingPrice.toFixed(2)}`} />
-                <KpiCard label="Food cost" value={`€${recipeTotalCost.toFixed(2)}`} />
-                <KpiCard label="Gross profit" value={`€${grossProfit.toFixed(2)}`} />
+                <KpiCard label="Selling price" value={formatCurrency(sellingPrice)} />
+                <KpiCard label="Food cost" value={formatCurrency(recipeTotalCost)} />
+                <KpiCard label="Gross profit" value={formatCurrency(grossProfit)} />
                 <KpiCard
                   label="Gross margin"
-                  value={`${grossMargin.toFixed(1)}%`}
+                  value={formatPercent(grossMargin)}
                   tone={
                     grossMargin >= 65 ? "success" : grossMargin >= 55 ? "warning" : "destructive"
                   }
@@ -742,7 +751,7 @@ function RecipesPage() {
                                 {driver.ingredient?.name ?? "Unnamed ingredient"}
                               </div>
                               <div className="mt-1 text-xs text-muted-foreground">
-                                {driver.quantity.toFixed(3)} {driver.line.unit}
+                                {formatQuantityWithUnit(driver.quantity, driver.line.unit)}
                               </div>
                               {getCostDriverNote(
                                 index,
@@ -764,10 +773,10 @@ function RecipesPage() {
                             </div>
                             <div className="text-right">
                               <div className="text-sm font-semibold tabular-nums">
-                                €{driver.lineCost.toFixed(2)}
+                                {formatCurrency(driver.lineCost)}
                               </div>
                               <div className="text-xs text-muted-foreground tabular-nums">
-                                {driver.contribution.toFixed(1)}%
+                                {formatPercent(driver.contribution)}
                               </div>
                             </div>
                           </div>
@@ -865,16 +874,16 @@ function RecipesPage() {
                               </td>
 
                               <td className="px-4 py-3.5 text-right tabular-nums text-muted-foreground">
-                                €{unitCost.toFixed(4)}
+                                {formatUnitCostCurrency(unitCost)}
                               </td>
 
                               <td className="px-4 py-3.5 text-right font-semibold tabular-nums">
-                                €{lineCost.toFixed(2)}
+                                {formatCurrency(lineCost)}
                               </td>
 
                               <td className="px-4 py-3.5 text-right">
                                 <span className="inline-flex min-w-16 justify-center rounded-full border border-border bg-background px-2.5 py-1 text-xs font-semibold tabular-nums text-foreground shadow-sm">
-                                  {contribution.toFixed(1)}%
+                                  {formatPercent(contribution)}
                                 </span>
                               </td>
 
@@ -1049,7 +1058,7 @@ function getRecipeActivityNote(
 
   if (recentlyLinked) return "Recently updated ingredient links";
   if (highestContribution >= 65 && ingredientCount > 1) {
-    return `${highestContribution.toFixed(1)}% of cost concentrated in one ingredient`;
+    return `${formatPercent(highestContribution)} of cost concentrated in one ingredient`;
   }
 
   return null;
@@ -1058,7 +1067,7 @@ function getRecipeActivityNote(
 function getHighestCostDriverDetail(driver: RecipeCostLine | null) {
   if (!driver) return "Cost drivers appear once recipe lines are added.";
 
-  return `€${driver.lineCost.toFixed(2)} · ${driver.contribution.toFixed(1)}% of cost · primary exposure if price or portion changes`;
+  return `${formatCurrency(driver.lineCost)} · ${formatPercent(driver.contribution)} of cost · primary exposure if price or portion changes`;
 }
 
 function getConcentrationDetail(highestContribution: number, ingredientCount: number) {

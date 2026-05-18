@@ -10,6 +10,13 @@ import {
   effectiveIngredientUnitCostEur,
   ingredientDisplayBaseUnit,
 } from "@/lib/ingredient-unit-cost";
+import {
+  formatCurrency,
+  formatPercent,
+  formatQuantityWithUnit,
+  formatUnitCostCurrency,
+} from "@/lib/display-format";
+import { inferPurchaseUnitsFromLineItemName } from "@/lib/ingredient-unit-inference";
 
 export const Route = createFileRoute("/ingredients")({
   head: () => ({
@@ -302,7 +309,7 @@ function IngredientsPage() {
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {denom > 1
-                            ? `€${eff.toFixed(3)} per ${base} · pack €${Number(ing.current_price).toFixed(2)} / ${denom}${ing.purchase_unit?.trim() ? ` ${ing.purchase_unit.trim()}` : ""}`
+                            ? `${formatUnitCostCurrency(eff)} per ${base} · pack ${formatCurrency(Number(ing.current_price))} / ${formatQuantityWithUnit(denom, ing.purchase_unit)}`
                             : `per ${base}`}
                         </div>
                         {linkActivity && (
@@ -314,7 +321,7 @@ function IngredientsPage() {
                         )}
                       </td>
                       <td className="py-4 px-5 text-right tabular-nums font-medium">
-                        <div>€{Number(ing.current_price).toFixed(2)}</div>
+                        <div>{formatCurrency(Number(ing.current_price))}</div>
                         <PriceActivityNote activity={latestPriceActivity} />
                       </td>
                       <td className="py-4 pl-2 pr-5 text-right align-middle whitespace-nowrap">
@@ -385,6 +392,19 @@ function IngredientDetailPanel({
   const eff = effectiveIngredientUnitCostEur(ingredient);
   const usageCount = recipeLinkActivity?.count ?? 0;
   const packLabel = ingredient.purchase_unit?.trim() || ingredient.unit;
+  const inferred = inferPurchaseUnitsFromLineItemName(ingredient.name);
+  const conversionHint = denom > 1 ? null : inferred.conversion_hint;
+  const stockQuantityLabel =
+    denom > 1
+      ? formatQuantityWithUnit(denom, ingredient.purchase_unit || base)
+      : formatQuantityWithUnit(1, ingredient.unit);
+  const purchasePackLabel =
+    denom > 1
+      ? `1 pack -> ${stockQuantityLabel}`
+      : conversionHint
+        ? `1 ${conversionHint.purchase_unit} purchase`
+        : `1 ${ingredient.unit || base}`;
+  const recipeUsageUnit = conversionHint ? `${conversionHint.recipe_usage_unit} (hint)` : base;
   const recentlyUpdated = priceActivity && isRecentDate(priceActivity.created_at);
 
   return (
@@ -414,11 +434,19 @@ function IngredientDetailPanel({
       <div className="mt-5 grid grid-cols-2 gap-2.5">
         <DetailMetric
           label="Pack price"
-          value={`€${Number(ingredient.current_price).toFixed(2)}`}
-          helper={denom > 1 ? `${denom} ${packLabel}` : `per ${base}`}
+          value={formatCurrency(Number(ingredient.current_price))}
+          helper={denom > 1 ? formatQuantityWithUnit(denom, packLabel) : `per ${base}`}
         />
-        <DetailMetric label="Unit cost" value={`€${eff.toFixed(3)}`} helper={`per ${base}`} />
-        <DetailMetric label="Stock unit" value={ingredient.unit} helper="Ingredient record" />
+        <DetailMetric
+          label="Unit cost"
+          value={formatUnitCostCurrency(eff)}
+          helper={`per ${base}`}
+        />
+        <DetailMetric
+          label="Stock qty"
+          value={stockQuantityLabel}
+          helper={denom > 1 ? "Normalized per pack" : "Stored purchase unit"}
+        />
         <DetailMetric label="Recipes" value={String(usageCount)} helper="Recipe impact" />
       </div>
 
@@ -431,14 +459,26 @@ function IngredientDetailPanel({
         </div>
         <div className="mt-3 space-y-1 text-sm">
           <DetailRow
-            label="Pack"
+            label="Purchase pack"
             value={
               denom > 1
-                ? `€${Number(ingredient.current_price).toFixed(2)} / ${denom} ${packLabel}`
-                : `€${Number(ingredient.current_price).toFixed(2)} per ${base}`
+                ? `${formatCurrency(Number(ingredient.current_price))} / ${formatQuantityWithUnit(denom, packLabel)}`
+                : `${formatCurrency(Number(ingredient.current_price))} per ${base}`
             }
           />
-          <DetailRow label="Recipe unit" value={base} />
+          <DetailRow label="Stock quantity" value={stockQuantityLabel} />
+          <DetailRow label="Recipe usage unit" value={recipeUsageUnit} />
+          <DetailRow label="Purchase unit" value={purchasePackLabel} />
+          {conversionHint && (
+            <DetailRow
+              label="Conversion hint"
+              value={`${formatQuantityWithUnit(
+                conversionHint.estimated_quantity,
+                conversionHint.stock_unit,
+              )} usable / ${conversionHint.purchase_unit}`}
+              valueClassName="text-muted-foreground"
+            />
+          )}
           <DetailRow label="Linked recipes" value={formatRecipeCount(usageCount)} />
         </div>
       </section>
@@ -526,12 +566,12 @@ function formatRecipeCount(count: number) {
 function formatActivityChange(activity: PriceActivity) {
   const deltaPercent = activity.delta_percent;
   if (typeof deltaPercent === "number" && deltaPercent !== 0) {
-    return `${deltaPercent > 0 ? "+" : ""}${deltaPercent.toFixed(1)}%`;
+    return formatPercent(deltaPercent, { signDisplay: "always" });
   }
 
   const delta = activity.delta;
   if (typeof delta === "number" && delta !== 0) {
-    return `${delta > 0 ? "+" : ""}€${delta.toFixed(2)}`;
+    return `${delta > 0 ? "+" : ""}${formatCurrency(delta)}`;
   }
 
   return "Updated";
@@ -570,7 +610,7 @@ function PriceActivityNote({ activity }: { activity: PriceActivity | undefined }
       {hasDirectionalChange && <Icon className="h-3 w-3" />}
       <span>
         Price updated in last 14 days
-        {hasDirectionalChange ? ` · ${deltaPercent > 0 ? "+" : ""}${deltaPercent.toFixed(1)}%` : ""}
+        {hasDirectionalChange ? ` · ${formatPercent(deltaPercent, { signDisplay: "always" })}` : ""}
       </span>
     </div>
   );

@@ -19,6 +19,25 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
+import {
+  inferPurchaseUnitsFromLineItemName,
+  type UnitInferenceResult,
+  type PackageType,
+} from "@/lib/ingredient-unit-inference";
+import { formatQuantityWithUnit } from "@/lib/display-format";
+import {
+  findCanonicalIngredientMatch,
+  normalizeInvoiceIngredientName,
+  type IngredientAliasMap,
+  type IngredientCanonicalMatch,
+} from "@/lib/ingredient-canonical";
+import {
+  fileNameFromInvoicePath,
+  looksLikeUploadedFileName,
+  normalizeInvoiceDate,
+  normalizeInvoiceNumber,
+  normalizeSupplierDisplayName,
+} from "@/lib/supplier-identity";
 
 export const Route = createFileRoute("/invoices")({
   head: () => ({
@@ -33,7 +52,12 @@ export const Route = createFileRoute("/invoices")({
 type InvoiceRow = {
   id: string;
   supplier: string;
+  sourceFileName: string | null;
+  supplierIsFallback: boolean;
+  invoiceNumber: string | null;
+  invoiceDate: string | null;
   displayDate: string;
+  timelineDate: string;
   total: number;
   status: string;
   items_count: number;
@@ -73,6 +97,8 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "status", label: "Status" },
 ];
 
+const invoiceIdentityStorageKey = (userId: string) => `marginly:invoice-identities:${userId}`;
+
 type ItemRow = {
   id: string;
   name: string;
@@ -93,17 +119,32 @@ type PreviousItemRow = {
 };
 
 type IngredientMatchRow = {
+  id: string;
   name: string | null;
   normalized_name?: string | null;
+  unit?: string | null;
 };
 
 type PriceComparisonMap = Record<string, number>;
 type IngredientCreationState = Record<string, boolean>;
 type IngredientCreationErrors = Record<string, string>;
+type InvoiceIdentityMeta = {
+  supplierName?: string | null;
+  invoiceNumber?: string | null;
+  invoiceDate?: string | null;
+  sourceFileName?: string | null;
+};
+type InvoiceIdentityState = Record<string, InvoiceIdentityMeta>;
+type InvoiceIdentityTrace = Record<string, string | number | boolean | null | undefined>;
 type PriceDeltaDetails = {
   direction: "increased" | "decreased" | "stable";
   percentLabel: string;
   previousLabel: string;
+};
+
+const traceInvoiceIdentity = (stage: string, details: InvoiceIdentityTrace) => {
+  if (!import.meta.env.DEV) return;
+  console.debug("[invoice-list]", stage, details);
 };
 
 const formatInvoiceDate = (createdAt: string | null) => {
@@ -122,43 +163,79 @@ const getSettlementState = (
   settlementByInvoice: Record<string, SettlementState>,
 ) => settlementByInvoice[invoiceId] ?? "awaiting";
 
-const toInvoiceRow = (row: DbInvoiceRow, itemCount = 0): InvoiceRow => {
+const invoiceSubtitle = (row: InvoiceRow) => {
+  if (row.invoiceNumber) return row.invoiceNumber;
+  if (row.supplierIsFallback && row.sourceFileName) return "Uploaded file";
+  return null;
+};
+
+const toInvoiceRow = (
+  row: DbInvoiceRow,
+  itemCount = 0,
+  identityMeta?: InvoiceIdentityMeta,
+): InvoiceRow => {
   const total = Number(row.total ?? 0);
-  return {
+  const sourceFileName = identityMeta?.sourceFileName ?? fileNameFromInvoicePath(row.file_url);
+  const supplierCandidate = identityMeta?.supplierName ?? row.supplier_name;
+  const normalizedSupplier = normalizeSupplierDisplayName(supplierCandidate);
+  const supplierIsFallback =
+    !normalizedSupplier || looksLikeUploadedFileName(normalizedSupplier, sourceFileName);
+  const supplier = supplierIsFallback
+    ? (sourceFileName ?? normalizedSupplier ?? "Unknown supplier")
+    : normalizedSupplier;
+  const invoiceDate = normalizeInvoiceDate(identityMeta?.invoiceDate);
+  const timelineDate = invoiceDate ?? row.created_at ?? "";
+  const invoiceRow = {
     id: row.id,
-    supplier: row.supplier_name?.trim() || "Unknown supplier",
-    displayDate: formatInvoiceDate(row.created_at),
+    supplier,
+    sourceFileName,
+    supplierIsFallback,
+    invoiceNumber: normalizeInvoiceNumber(identityMeta?.invoiceNumber),
+    invoiceDate,
+    displayDate: formatInvoiceDate(timelineDate),
+    timelineDate,
     total,
     status: itemCount > 0 || total > 0 ? "Processed" : "Review",
     items_count: itemCount,
     file_path: row.file_url,
     created_at: row.created_at ?? "",
   };
+  traceInvoiceIdentity("resolved-row", {
+    invoiceId: row.id,
+    extractedSupplierName: identityMeta?.supplierName,
+    extractedInvoiceNumber: identityMeta?.invoiceNumber,
+    extractedInvoiceDate: identityMeta?.invoiceDate,
+    persistedSupplierName: row.supplier_name,
+    sourceFileName,
+    renderedSupplier: invoiceRow.supplier,
+    renderedInvoiceNumber: invoiceRow.invoiceNumber,
+    renderedDate: invoiceRow.displayDate,
+    usedFallback: invoiceRow.supplierIsFallback,
+  });
+  return invoiceRow;
 };
 
 const normalizeExtractedItemName = (name: string | null | undefined) =>
   name?.trim().toLowerCase() ?? "";
 
-const buildIngredientNameMatches = (rows: IngredientMatchRow[]) =>
-  rows.reduce((matches, row) => {
-    const normalized = row.normalized_name?.trim() || normalizeIngredientName(row.name ?? "");
-    const normalizedName = normalizeIngredientName(row.name ?? "");
-    if (normalized) matches.add(normalized);
-    if (normalizedName) matches.add(normalizedName);
-    return matches;
-  }, new Set<string>());
+const getItemIngredientMatch = (
+  item: ItemRow,
+  ingredientCatalog: IngredientMatchRow[],
+  confirmedAliases: IngredientAliasMap,
+) => findCanonicalIngredientMatch(item.name, ingredientCatalog, confirmedAliases);
 
-const isUnresolvedInvoiceItem = (item: ItemRow, ingredientNameMatches: Set<string>) => {
-  const normalizedName = normalizeIngredientName(item.name);
-  return !normalizedName || !ingredientNameMatches.has(normalizedName);
-};
+const isConfirmedIngredientMatch = (match: IngredientCanonicalMatch | null) =>
+  match?.kind === "exact" || match?.kind === "confirmed-alias";
 
 const isPlaceholderItemName = (name: string) => {
   const normalizedName = normalizeExtractedItemName(name);
   return !normalizedName || normalizedName === "unknown";
 };
 
-const needsQuantityUnitConfirmation = (item: ItemRow) => item.quantity == null || !item.unit;
+const needsQuantityUnitConfirmation = (item: ItemRow) => {
+  if (item.quantity != null && item.unit) return false;
+  return !hasClearInferredQuantityUnit(item);
+};
 
 const needsAmountConfirmation = (item: ItemRow) => item.unit_price == null || item.total == null;
 
@@ -166,6 +243,230 @@ const needsExtractionConfirmation = (item: ItemRow) =>
   isPlaceholderItemName(item.name) ||
   needsQuantityUnitConfirmation(item) ||
   needsAmountConfirmation(item);
+
+const GENERIC_UNIT_TOKENS = new Set(["un", "unit", "units", "und", "unds", "unid", "unids"]);
+const RECIPE_COMPATIBLE_DISPLAY_UNITS = new Set(["kg", "g", "ml", "l"]);
+
+const isGenericUnit = (unit: string | null | undefined) => {
+  const normalized = unit?.trim().toLowerCase();
+  return !normalized || GENERIC_UNIT_TOKENS.has(normalized);
+};
+
+const getRecipeCompatibleUnit = (unit: string | null | undefined) => {
+  const normalized = unit?.trim().toLowerCase();
+  if (normalized === "l") return "L";
+  return normalized && RECIPE_COMPATIBLE_DISPLAY_UNITS.has(normalized) ? normalized : null;
+};
+
+const formatPurchaseCount = (value: number) => {
+  const rounded = Number.isInteger(value) ? String(value) : value.toFixed(2);
+  return rounded;
+};
+
+const hasClearInferredQuantityUnit = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {
+  const inferred = inferPurchaseUnitsFromLineItemName(item.name);
+  const hasUsableInference =
+    inferred.confidence >= 0.86 &&
+    inferred.purchase_quantity > 0 &&
+    inferred.purchase_unit != null &&
+    inferred.base_unit != null;
+  if (!hasUsableInference) return false;
+  if (item.quantity == null) {
+    return inferred.purchase_unit_count > 1 || inferred.size_is_metadata_only;
+  }
+  return isGenericUnit(item.unit) || !item.unit;
+};
+
+const resolveUnitDrivenQuantity = (
+  item: Pick<ItemRow, "quantity">,
+  inferred: UnitInferenceResult,
+) => {
+  const rowQuantity = Number(item.quantity);
+  const inferredUnits = Math.max(
+    1,
+    inferred.normalized_stock_quantity ?? inferred.purchase_quantity,
+  );
+
+  if (!Number.isFinite(rowQuantity) || rowQuantity <= 0) return inferredUnits;
+  if (Math.abs(rowQuantity - inferredUnits) < 0.01) return rowQuantity;
+  if (inferred.package_type) return Math.max(1, rowQuantity * inferredUnits);
+  return inferredUnits;
+};
+
+const formatUnitSizeMetadata = (inferred: UnitInferenceResult) => {
+  if (inferred.pack_size == null || !inferred.pack_size_unit) return null;
+  return `${formatOperationalQuantityWithUnit(inferred.pack_size, inferred.pack_size_unit)} each`;
+};
+
+const PACKAGE_TYPE_LABELS: Record<PackageType, { singular: string; plural: string }> = {
+  pack: { singular: "pack", plural: "packs" },
+  caixa: { singular: "case", plural: "cases" },
+  garrafa: { singular: "bottle", plural: "bottles" },
+  lata: { singular: "can", plural: "cans" },
+  saco: { singular: "bag", plural: "bags" },
+};
+
+const resolvePackageLabel = (
+  packageType: PackageType | null,
+  stockUnit: string | null,
+): { singular: string; plural: string } => {
+  if (packageType) return PACKAGE_TYPE_LABELS[packageType];
+  if (stockUnit === "ml") return PACKAGE_TYPE_LABELS.garrafa;
+  return PACKAGE_TYPE_LABELS.pack;
+};
+
+const formatPackageCount = (
+  value: number,
+  packageType: PackageType | null,
+  stockUnit: string | null,
+) => {
+  const label = resolvePackageLabel(packageType, stockUnit);
+  return `${formatPurchaseCount(value)} ${value === 1 ? label.singular : label.plural}`;
+};
+
+const formatOperationalQuantityWithUnit = (value: number, unit: string | null | undefined) => {
+  const normalizedUnit = unit?.trim().toLowerCase();
+  if (normalizedUnit === "g" && Math.abs(value) >= 1000) {
+    return formatQuantityWithUnit(value / 1000, "kg");
+  }
+  if (normalizedUnit === "ml" && Math.abs(value) >= 1000) {
+    return formatQuantityWithUnit(value / 1000, "L");
+  }
+  return formatQuantityWithUnit(value, unit);
+};
+
+const normalizeDisplayName = (name: string) =>
+  name.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+
+const inferDisplayUnitNoun = (name: string) => {
+  const normalizedName = normalizeDisplayName(name);
+  if (/\b(patty|patties|hamburguer|hamburger)\b/.test(normalizedName)) return "patties";
+  if (/\b(bun|buns|brioche|pao|bread|baguette|croissant|wrap|wraps)\b/.test(normalizedName)) {
+    return "pieces";
+  }
+  if (/\b(can|cans|lata|latas)\b/.test(normalizedName)) return "cans";
+  if (/\b(bottle|bottles|garrafa|garrafas)\b/.test(normalizedName)) return "bottles";
+  return null;
+};
+
+const formatPackSize = (inferred: UnitInferenceResult) => {
+  if (inferred.pack_size == null || !inferred.pack_size_unit) return null;
+  return formatOperationalQuantityWithUnit(inferred.pack_size, inferred.pack_size_unit);
+};
+
+const resolveInvoiceItemUnit = (item: Pick<ItemRow, "name" | "unit">) => {
+  const extractedUnit = item.unit?.trim() || null;
+  const inferred = inferPurchaseUnitsFromLineItemName(item.name);
+  if (inferred.base_unit && isGenericUnit(extractedUnit)) return inferred.base_unit;
+  return extractedUnit ?? inferred.base_unit ?? inferred.conversion_hint?.purchase_unit;
+};
+
+const getInvoiceItemOperationalSummary = (item: Pick<ItemRow, "name" | "quantity">) => {
+  const inferred = inferPurchaseUnitsFromLineItemName(item.name);
+  const hint = inferred.conversion_hint;
+  if (hint) {
+    return {
+      tone: "review" as const,
+      stockUnit: hint.stock_unit,
+      badgeLabel: "estimated yield",
+      badgeTitle: "Estimated kitchen-ready amount from the product type.",
+    };
+  }
+
+  return null;
+};
+
+const getInvoiceItemPurchaseLabel = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {
+  const inferred = inferPurchaseUnitsFromLineItemName(item.name);
+  const rowQuantity = Number(item.quantity);
+  const hasPositiveQuantity = Number.isFinite(rowQuantity) && rowQuantity > 0;
+
+  if (inferred.size_is_metadata_only && inferred.stock_unit === "un") {
+    const sizeLabel = formatPackSize(inferred);
+    const unitQuantity = resolveUnitDrivenQuantity(item, inferred);
+    const unitNoun = inferDisplayUnitNoun(item.name);
+    if (sizeLabel) {
+      return `${formatPurchaseCount(unitQuantity)} × ${sizeLabel}${unitNoun ? ` ${unitNoun}` : ""}`;
+    }
+    return formatQuantityWithUnit(unitQuantity, "units");
+  }
+
+  if (inferred.normalized_stock_quantity != null && inferred.stock_unit) {
+    const purchaseQuantity = hasPositiveQuantity ? rowQuantity : 1;
+    const sizeLabel = formatPackSize(inferred);
+    if (sizeLabel) {
+      if (inferred.purchase_unit_count > 1 && !inferred.package_type) {
+        const unitNoun = inferDisplayUnitNoun(item.name);
+        return `${formatPurchaseCount(inferred.purchase_unit_count)} × ${sizeLabel}${
+          unitNoun ? ` ${unitNoun}` : ""
+        }`;
+      }
+      return `${formatPackageCount(
+        purchaseQuantity,
+        inferred.package_type,
+        inferred.stock_unit,
+      )} × ${sizeLabel}`;
+    }
+    return formatPackageCount(purchaseQuantity, inferred.package_type, inferred.stock_unit);
+  }
+
+  const hint = inferred.conversion_hint;
+  if (hint) {
+    const purchaseQuantity = hasPositiveQuantity ? rowQuantity : 1;
+    return `${formatPurchaseCount(purchaseQuantity)} ${hint.purchase_unit}`;
+  }
+
+  if (item.quantity == null) return null;
+  const unit = item.unit?.trim();
+  return unit
+    ? formatOperationalQuantityWithUnit(item.quantity, unit)
+    : formatPurchaseCount(item.quantity);
+};
+
+const getInvoiceItemStockPresentation = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {
+  const inferred = inferPurchaseUnitsFromLineItemName(item.name);
+  const rowQuantity = Number(item.quantity);
+  const purchaseQuantity = Number.isFinite(rowQuantity) && rowQuantity > 0 ? rowQuantity : 1;
+
+  if (inferred.size_is_metadata_only && inferred.stock_unit === "un") {
+    const unitQuantity = resolveUnitDrivenQuantity(item, inferred);
+    const sizeMetadata = formatUnitSizeMetadata(inferred);
+    return {
+      quantityLabel: `${formatQuantityWithUnit(unitQuantity, "units")} usable`,
+      detailLabel: sizeMetadata,
+    };
+  }
+
+  if (inferred.normalized_stock_quantity != null && inferred.stock_unit) {
+    const stockQuantity = Math.max(1, purchaseQuantity * inferred.normalized_stock_quantity);
+    return {
+      quantityLabel: `${formatOperationalQuantityWithUnit(stockQuantity, inferred.stock_unit)} usable`,
+      detailLabel: null,
+    };
+  }
+
+  const hint = inferred.conversion_hint;
+  if (hint) {
+    const estimatedStockQuantity = Math.max(1, purchaseQuantity * hint.estimated_quantity);
+    return {
+      quantityLabel: `~${formatOperationalQuantityWithUnit(
+        estimatedStockQuantity,
+        hint.stock_unit,
+      )} usable`,
+      detailLabel: "estimated kitchen yield",
+    };
+  }
+
+  const compatibleUnit = getRecipeCompatibleUnit(item.unit);
+  if (compatibleUnit && item.quantity != null) {
+    return {
+      quantityLabel: `${formatOperationalQuantityWithUnit(item.quantity, compatibleUnit)} usable`,
+      detailLabel: null,
+    };
+  }
+
+  return null;
+};
 
 const removeKey = <T,>(record: Record<string, T>, key: string) => {
   const next = { ...record };
@@ -205,7 +506,12 @@ function InvoicesPage() {
   const [priceComparisonsByInvoice, setPriceComparisonsByInvoice] = useState<
     Record<string, PriceComparisonMap>
   >({});
-  const [ingredientNameMatches, setIngredientNameMatches] = useState<Set<string>>(new Set());
+  const [ingredientCatalog, setIngredientCatalog] = useState<IngredientMatchRow[]>([]);
+  const [confirmedIngredientAliases, setConfirmedIngredientAliases] = useState<IngredientAliasMap>(
+    {},
+  );
+  const [, setInvoiceIdentities] = useState<InvoiceIdentityState>({});
+  const invoiceIdentitiesRef = useRef<InvoiceIdentityState>({});
   const [creatingIngredientByItem, setCreatingIngredientByItem] = useState<IngredientCreationState>(
     {},
   );
@@ -216,6 +522,32 @@ function InvoicesPage() {
   const [settlementByInvoice, setSettlementByInvoice] = useState<Record<string, SettlementState>>(
     {},
   );
+
+  useEffect(() => {
+    if (!user) {
+      setConfirmedIngredientAliases({});
+      setInvoiceIdentities({});
+      invoiceIdentitiesRef.current = {};
+      return;
+    }
+
+    try {
+      const raw = window.localStorage.getItem(`marginly:invoice-ingredient-aliases:${user.id}`);
+      setConfirmedIngredientAliases(raw ? (JSON.parse(raw) as IngredientAliasMap) : {});
+    } catch {
+      setConfirmedIngredientAliases({});
+    }
+
+    try {
+      const raw = window.localStorage.getItem(invoiceIdentityStorageKey(user.id));
+      const storedIdentities = raw ? (JSON.parse(raw) as InvoiceIdentityState) : {};
+      invoiceIdentitiesRef.current = storedIdentities;
+      setInvoiceIdentities(storedIdentities);
+    } catch {
+      invoiceIdentitiesRef.current = {};
+      setInvoiceIdentities({});
+    }
+  }, [user]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -232,13 +564,9 @@ function InvoicesPage() {
       const itemCounts: Record<string, number> = {};
       const { data: ingredientRows, error: ingredientError } = await supabase
         .from("ingredients")
-        .select("name, normalized_name");
+        .select("id, name, normalized_name, unit");
 
-      setIngredientNameMatches(
-        ingredientError
-          ? new Set()
-          : buildIngredientNameMatches((ingredientRows ?? []) as IngredientMatchRow[]),
-      );
+      setIngredientCatalog(ingredientError ? [] : ((ingredientRows ?? []) as IngredientMatchRow[]));
 
       if (ids.length > 0) {
         const { data: itemRows, error: itemError } = await supabase
@@ -253,10 +581,13 @@ function InvoicesPage() {
         }
       }
 
-      setRows(invoiceRows.map((row) => toInvoiceRow(row, itemCounts[row.id] ?? 0)));
+      const identityState = invoiceIdentitiesRef.current;
+      setRows(
+        invoiceRows.map((row) => toInvoiceRow(row, itemCounts[row.id] ?? 0, identityState[row.id])),
+      );
     } catch (err) {
       setRows([]);
-      setIngredientNameMatches(new Set());
+      setIngredientCatalog([]);
       setGlobalError(err instanceof Error ? err.message : "Could not load invoices");
     } finally {
       setLoading(false);
@@ -267,7 +598,7 @@ function InvoicesPage() {
     if (user) load();
     else {
       setRows([]);
-      setIngredientNameMatches(new Set());
+      setIngredientCatalog([]);
       setLoading(false);
     }
   }, [user, load]);
@@ -317,7 +648,7 @@ function InvoicesPage() {
     return [...rows].sort((a, b) => {
       switch (sortBy) {
         case "oldest":
-          return invoiceTime(a.created_at) - invoiceTime(b.created_at);
+          return invoiceTime(a.timelineDate) - invoiceTime(b.timelineDate);
         case "supplier":
           return a.supplier.localeCompare(b.supplier, undefined, { sensitivity: "base" });
         case "highest":
@@ -338,7 +669,7 @@ function InvoicesPage() {
         }
         case "newest":
         default:
-          return invoiceTime(b.created_at) - invoiceTime(a.created_at);
+          return invoiceTime(b.timelineDate) - invoiceTime(a.timelineDate);
       }
     });
   }, [rows, settlementByInvoice, sortBy]);
@@ -388,7 +719,13 @@ function InvoicesPage() {
   const runExtraction = async (
     invoiceId: string,
     dataUrl: string,
-  ): Promise<{ supplier?: string; total?: number; itemsCount: number } | null> => {
+  ): Promise<{
+    supplier?: string;
+    invoiceNumber?: string | null;
+    invoiceDate?: string | null;
+    total?: number;
+    itemsCount: number;
+  } | null> => {
     setExtracting((s) => ({ ...s, [invoiceId]: true }));
     try {
       const { data, error } = await supabase.functions.invoke("extract-invoice", {
@@ -399,19 +736,36 @@ function InvoicesPage() {
       // wipe prior items then insert fresh
       await supabase.from("invoice_items").delete().eq("invoice_id", invoiceId);
       if (items.length && user) {
-        const insertRows = items.map((it: ItemRow) => ({
-          invoice_id: invoiceId,
-          user_id: user.id,
-          name: String(it.name ?? "Unknown").slice(0, 200),
-          quantity: it.quantity ?? null,
-          unit: it.unit ? String(it.unit).slice(0, 20) : null,
-          unit_price: it.unit_price ?? null,
-          total: it.total ?? null,
-        }));
+        const insertRows = items.map((it: ItemRow) => {
+          const name = String(it.name ?? "Unknown");
+          const unit = resolveInvoiceItemUnit({ name, unit: it.unit });
+          return {
+            invoice_id: invoiceId,
+            user_id: user.id,
+            name: name.slice(0, 200),
+            quantity: it.quantity ?? null,
+            unit: unit ? unit.slice(0, 20) : null,
+            unit_price: it.unit_price ?? null,
+            total: it.total ?? null,
+          };
+        });
         await supabase.from("invoice_items").insert(insertRows);
       }
+      const supplier = normalizeSupplierDisplayName(data?.supplier);
+      const invoiceNumber = normalizeInvoiceNumber(data?.invoice_number);
+      const invoiceDate = normalizeInvoiceDate(data?.invoice_date);
+      traceInvoiceIdentity("extracted-metadata", {
+        invoiceId,
+        extractedSupplierName: supplier || null,
+        extractedInvoiceNumber: invoiceNumber,
+        extractedInvoiceDate: invoiceDate,
+        rawInvoiceDate: data?.invoice_date,
+        itemsCount: items.length,
+      });
       return {
-        supplier: data?.supplier,
+        supplier: supplier || undefined,
+        invoiceNumber,
+        invoiceDate,
         total: typeof data?.total === "number" ? data.total : undefined,
         itemsCount: items.length,
       };
@@ -438,8 +792,8 @@ function InvoicesPage() {
 
       setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 40 } : x)));
 
-      const fallbackSupplier =
-        item.file.name.replace(/\.[^.]+$/, "").slice(0, 60) || "Unknown supplier";
+      const sourceFileName = item.file.name.replace(/\.[^.]+$/, "").slice(0, 120) || "Invoice";
+      const fallbackSupplier = sourceFileName.slice(0, 60) || "Unknown supplier";
       const { data: inserted, error: insErr } = await supabase
         .from("invoices")
         .insert({
@@ -451,6 +805,7 @@ function InvoicesPage() {
         .select("id")
         .single();
       if (insErr || !inserted) throw insErr ?? new Error("Insert failed");
+      rememberInvoiceIdentity(inserted.id, { sourceFileName });
 
       setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 65 } : x)));
 
@@ -458,13 +813,27 @@ function InvoicesPage() {
       if (isImage) {
         const dataUrl = await fileToDataUrl(item.file);
         const ext = await runExtraction(inserted.id, dataUrl);
-        await supabase
+        const { error: invoiceUpdateError } = await supabase
           .from("invoices")
           .update({
             supplier_name: ext?.supplier?.slice(0, 120) ?? fallbackSupplier,
             total: ext?.total ?? 0,
           })
           .eq("id", inserted.id);
+        traceInvoiceIdentity("persisted-invoice", {
+          invoiceId: inserted.id,
+          extractedSupplierName: ext?.supplier,
+          extractedInvoiceNumber: ext?.invoiceNumber,
+          extractedInvoiceDate: ext?.invoiceDate,
+          persistedSupplierName: ext?.supplier?.slice(0, 120) ?? fallbackSupplier,
+          persistenceError: invoiceUpdateError?.message,
+        });
+        rememberInvoiceIdentity(inserted.id, {
+          sourceFileName,
+          supplierName: ext?.supplier ?? null,
+          invoiceNumber: ext?.invoiceNumber ?? null,
+          invoiceDate: ext?.invoiceDate ?? null,
+        });
       }
 
       setPending((p) =>
@@ -563,6 +932,55 @@ function InvoicesPage() {
     if (!itemsByInvoice[row.id]) loadItems(row.id, row.created_at);
   };
 
+  const rememberInvoiceIdentity = (invoiceId: string, identity: InvoiceIdentityMeta) => {
+    if (!user) return;
+    setInvoiceIdentities((current) => {
+      const previous = current[invoiceId] ?? {};
+      const nextIdentity = {
+        ...previous,
+        ...identity,
+        supplierName: identity.supplierName ?? previous.supplierName ?? null,
+        invoiceNumber: identity.invoiceNumber ?? previous.invoiceNumber ?? null,
+        invoiceDate: identity.invoiceDate ?? previous.invoiceDate ?? null,
+        sourceFileName: identity.sourceFileName ?? previous.sourceFileName ?? null,
+      };
+      const next = { ...current, [invoiceId]: nextIdentity };
+      invoiceIdentitiesRef.current = next;
+      traceInvoiceIdentity("remembered-identity", {
+        invoiceId,
+        extractedSupplierName: nextIdentity.supplierName,
+        extractedInvoiceNumber: nextIdentity.invoiceNumber,
+        extractedInvoiceDate: nextIdentity.invoiceDate,
+        sourceFileName: nextIdentity.sourceFileName,
+      });
+      try {
+        window.localStorage.setItem(invoiceIdentityStorageKey(user.id), JSON.stringify(next));
+      } catch {
+        // Invoice number/date have no current DB columns; local memory keeps the UI useful.
+      }
+      return next;
+    });
+  };
+
+  const confirmIngredientMatch = (item: ItemRow, match: IngredientCanonicalMatch) => {
+    if (!user) return;
+    const normalizedItemName = normalizeInvoiceIngredientName(item.name);
+    if (!normalizedItemName) return;
+
+    setConfirmedIngredientAliases((current) => {
+      const next = { ...current, [normalizedItemName]: match.ingredient.id };
+      try {
+        window.localStorage.setItem(
+          `marginly:invoice-ingredient-aliases:${user.id}`,
+          JSON.stringify(next),
+        );
+      } catch {
+        // Local alias memory is an operational convenience; matching still works without it.
+      }
+      return next;
+    });
+  };
+
   const createIngredientFromItem = async (item: ItemRow) => {
     if (!user) return;
 
@@ -576,26 +994,41 @@ function InvoicesPage() {
       return;
     }
 
-    const unit = item.unit?.trim() || "kg";
+    const extractedUnit = item.unit?.trim() || null;
+    const inferred = inferPurchaseUnitsFromLineItemName(name);
+    const conversionHint = inferred.conversion_hint;
+    const stockUnit =
+      inferred.base_unit && isGenericUnit(extractedUnit)
+        ? inferred.base_unit
+        : (extractedUnit ?? inferred.base_unit ?? conversionHint?.purchase_unit ?? "kg");
+    const purchaseQuantity = inferred.base_unit ? inferred.purchase_quantity : 1;
+    const purchaseUnit = inferred.purchase_unit ?? stockUnit;
+    const baseUnit = inferred.base_unit ?? stockUnit;
     const detectedPrice = Number(item.unit_price);
     const currentPrice = Number.isFinite(detectedPrice) && detectedPrice >= 0 ? detectedPrice : 0;
 
     setCreatingIngredientByItem((current) => ({ ...current, [item.id]: true }));
     setIngredientCreationErrors((current) => removeKey(current, item.id));
     try {
-      const { error } = await supabase.from("ingredients").insert({
-        user_id: user.id,
-        name,
-        normalized_name: normalizedName,
-        unit,
-        current_price: currentPrice,
-        purchase_quantity: 1,
-        purchase_unit: unit,
-        base_unit: unit,
-      });
+      const { data, error } = await supabase
+        .from("ingredients")
+        .insert({
+          user_id: user.id,
+          name,
+          normalized_name: normalizedName,
+          unit: stockUnit,
+          current_price: currentPrice,
+          purchase_quantity: purchaseQuantity,
+          purchase_unit: purchaseUnit,
+          base_unit: baseUnit,
+        })
+        .select("id, name, normalized_name, unit")
+        .single();
       if (error) throw error;
 
-      setIngredientNameMatches((current) => new Set(current).add(normalizedName));
+      if (data) {
+        setIngredientCatalog((current) => [...current, data as IngredientMatchRow]);
+      }
     } catch (err) {
       setIngredientCreationErrors((current) => ({
         ...current,
@@ -622,13 +1055,27 @@ function InvoicesPage() {
     });
     const result = await runExtraction(row.id, dataUrl);
     if (result) {
-      await supabase
+      const { error: invoiceUpdateError } = await supabase
         .from("invoices")
         .update({
           supplier_name: result.supplier?.slice(0, 120) ?? row.supplier,
           total: result.total ?? row.total,
         })
         .eq("id", row.id);
+      traceInvoiceIdentity("persisted-invoice", {
+        invoiceId: row.id,
+        extractedSupplierName: result.supplier,
+        extractedInvoiceNumber: result.invoiceNumber,
+        extractedInvoiceDate: result.invoiceDate,
+        persistedSupplierName: result.supplier?.slice(0, 120) ?? row.supplier,
+        persistenceError: invoiceUpdateError?.message,
+      });
+      rememberInvoiceIdentity(row.id, {
+        sourceFileName: row.sourceFileName,
+        supplierName: result.supplier ?? null,
+        invoiceNumber: result.invoiceNumber ?? null,
+        invoiceDate: result.invoiceDate ?? null,
+      });
       await loadItems(row.id, row.created_at);
       load();
     }
@@ -731,21 +1178,21 @@ function InvoicesPage() {
           )}
         </Card>
 
-        {/* AI side card */}
+        {/* Invoice reading side card */}
         <Card>
           <div className="flex items-start gap-3">
             <div className="h-9 w-9 rounded-lg bg-foreground text-background grid place-items-center shrink-0">
               <Sparkles className="h-4 w-4" />
             </div>
             <div>
-              <div className="text-sm font-medium">AI extraction</div>
+              <div className="text-sm font-medium">Invoice reading</div>
               <div className="text-xs text-muted-foreground">What happens next</div>
             </div>
           </div>
           <ul className="mt-4 space-y-2.5 text-sm">
             {[
               "Files are uploaded to your private vault",
-              "Invoice table rows are parsed for review",
+              "Supplier and invoice rows are prepared for review",
               "Quantities, units, and totals are separated when clear",
               "Prices compared with previous invoices",
               "Ingredient matches are shown separately",
@@ -792,8 +1239,8 @@ function InvoicesPage() {
             <thead className="bg-muted/40">
               <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <th className="py-3 px-5 font-medium w-8"></th>
-                <th className="py-3 px-5 font-medium">File</th>
-                <th className="py-3 px-5 font-medium">Supplier</th>
+                <th className="py-3 px-5 font-medium">Source</th>
+                <th className="py-3 px-5 font-medium">Invoice</th>
                 <th className="py-3 px-5 font-medium hidden sm:table-cell">Date</th>
                 <th className="py-3 px-5 font-medium text-right hidden md:table-cell">Items</th>
                 <th className="py-3 px-5 font-medium text-right">Total</th>
@@ -831,6 +1278,7 @@ function InvoicesPage() {
                   : false;
                 const items = itemsByInvoice[r.id] ?? [];
                 const settlementState = getSettlementState(r.id, settlementByInvoice);
+                const subtitle = invoiceSubtitle(r);
                 return (
                   <Fragment key={r.id}>
                     <tr
@@ -847,7 +1295,14 @@ function InvoicesPage() {
                       <td className="py-3 px-5">
                         <FileBadge path={r.file_path} />
                       </td>
-                      <td className="py-3 px-5 font-medium">{r.supplier}</td>
+                      <td className="py-3 px-5">
+                        <div className="font-medium leading-tight">{r.supplier}</div>
+                        {subtitle && (
+                          <div className="mt-0.5 text-xs text-muted-foreground">
+                            {r.supplierIsFallback ? subtitle : `Invoice ${subtitle}`}
+                          </div>
+                        )}
+                      </td>
                       <td className="py-3 px-5 text-muted-foreground hidden sm:table-cell">
                         {r.displayDate}
                       </td>
@@ -875,7 +1330,7 @@ function InvoicesPage() {
                             onClick={() => reExtract(r)}
                             disabled={!!extracting[r.id]}
                             className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
-                            title="Re-extract with AI"
+                            title="Re-read invoice"
                           >
                             {extracting[r.id] ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -907,11 +1362,13 @@ function InvoicesPage() {
                           <ItemsTable
                             items={items}
                             priceComparisons={priceComparisonsByInvoice[r.id] ?? {}}
-                            ingredientNameMatches={ingredientNameMatches}
+                            ingredientCatalog={ingredientCatalog}
+                            confirmedIngredientAliases={confirmedIngredientAliases}
                             loading={itemsByInvoice[r.id] === undefined}
                             extracting={!!extracting[r.id]}
                             onExtract={isImage ? () => reExtract(r) : undefined}
                             onCreateIngredient={createIngredientFromItem}
+                            onConfirmIngredientMatch={confirmIngredientMatch}
                             creatingIngredientByItem={creatingIngredientByItem}
                             ingredientCreationErrors={ingredientCreationErrors}
                           />
@@ -1077,9 +1534,11 @@ function MissingValue({ label }: { label: string }) {
 function OperationalBadge({
   label,
   tone = "muted",
+  title,
 }: {
   label: string;
   tone?: "muted" | "review" | "success" | "increase" | "decrease";
+  title?: string;
 }) {
   const toneClass =
     tone === "review"
@@ -1095,6 +1554,7 @@ function OperationalBadge({
   return (
     <span
       className={`rounded-full border px-2 py-0.5 text-[11px] font-medium leading-none ${toneClass}`}
+      title={title}
     >
       {label}
     </span>
@@ -1143,34 +1603,45 @@ function PreviewModal({
 function ItemsTable({
   items,
   priceComparisons,
-  ingredientNameMatches,
+  ingredientCatalog,
+  confirmedIngredientAliases,
   creatingIngredientByItem,
   ingredientCreationErrors,
   loading,
   extracting,
   onExtract,
   onCreateIngredient,
+  onConfirmIngredientMatch,
 }: {
   items: ItemRow[];
   priceComparisons: PriceComparisonMap;
-  ingredientNameMatches: Set<string>;
+  ingredientCatalog: IngredientMatchRow[];
+  confirmedIngredientAliases: IngredientAliasMap;
   creatingIngredientByItem: IngredientCreationState;
   ingredientCreationErrors: IngredientCreationErrors;
   loading: boolean;
   extracting: boolean;
   onExtract?: () => void;
   onCreateIngredient: (item: ItemRow) => void;
+  onConfirmIngredientMatch: (item: ItemRow, match: IngredientCanonicalMatch) => void;
 }) {
   const operationalSummary = items.reduce(
     (summary, item) => {
-      if (isUnresolvedInvoiceItem(item, ingredientNameMatches)) {
-        summary.unmatchedIngredients += 1;
-      } else {
+      const ingredientMatch = getItemIngredientMatch(
+        item,
+        ingredientCatalog,
+        confirmedIngredientAliases,
+      );
+      if (isConfirmedIngredientMatch(ingredientMatch)) {
         summary.matchedIngredients += 1;
+      } else if (ingredientMatch) {
+        summary.possibleIngredientMatches += 1;
+      } else {
+        summary.unmatchedIngredients += 1;
       }
 
       if (needsExtractionConfirmation(item)) summary.extractionReview += 1;
-      if (needsQuantityUnitConfirmation(item)) summary.quantityUnitReview += 1;
+      if (needsQuantityUnitConfirmation(item)) summary.quantityReview += 1;
 
       const delta = getPriceDeltaDetails(item.unit_price, priceComparisons[item.id]);
       if (delta?.direction === "increased") summary.priceIncreases += 1;
@@ -1180,15 +1651,17 @@ function ItemsTable({
     },
     {
       matchedIngredients: 0,
+      possibleIngredientMatches: 0,
       unmatchedIngredients: 0,
       extractionReview: 0,
-      quantityUnitReview: 0,
+      quantityReview: 0,
       priceIncreases: 0,
       priceDecreases: 0,
     },
   );
   const hasExtractionReview = operationalSummary.extractionReview > 0;
   const hasUnmatchedIngredients = operationalSummary.unmatchedIngredients > 0;
+  const hasPossibleIngredientMatches = operationalSummary.possibleIngredientMatches > 0;
   const priceMovementCount = operationalSummary.priceIncreases + operationalSummary.priceDecreases;
 
   return (
@@ -1198,11 +1671,11 @@ function ItemsTable({
           <div className="text-sm font-semibold inline-flex items-center gap-2">
             <Sparkles className="h-3.5 w-3.5 text-primary" /> Extracted invoice rows
             {hasExtractionReview && !loading && !extracting && (
-              <OperationalBadge label="Confirm extraction" tone="review" />
+              <OperationalBadge label="Needs review" tone="review" />
             )}
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-            <span>Parsed rows are separate from ingredient matching</span>
+            <span>Invoice lines are ready for costing review</span>
             {!loading && !extracting && items.length > 0 && (
               <>
                 <span className="text-muted-foreground/40">•</span>
@@ -1210,13 +1683,21 @@ function ItemsTable({
                 {hasExtractionReview && (
                   <>
                     <span className="text-muted-foreground/40">•</span>
-                    <span>{operationalSummary.extractionReview} rows need confirmation</span>
+                    <span>{operationalSummary.extractionReview} rows need review</span>
                   </>
                 )}
-                {operationalSummary.quantityUnitReview > 0 && (
+                {operationalSummary.quantityReview > 0 && (
                   <>
                     <span className="text-muted-foreground/40">•</span>
-                    <span>{operationalSummary.quantityUnitReview} check qty/unit</span>
+                    <span>{operationalSummary.quantityReview} need quantity check</span>
+                  </>
+                )}
+                {hasPossibleIngredientMatches && (
+                  <>
+                    <span className="text-muted-foreground/40">•</span>
+                    <span>
+                      {operationalSummary.possibleIngredientMatches} possible ingredient matches
+                    </span>
                   </>
                 )}
                 {hasUnmatchedIngredients && (
@@ -1246,7 +1727,7 @@ function ItemsTable({
             ) : (
               <Wand2 className="h-3.5 w-3.5" />
             )}
-            {extracting ? "Extracting…" : "Re-extract"}
+            {extracting ? "Reading…" : "Re-read"}
           </button>
         )}
       </div>
@@ -1256,10 +1737,10 @@ function ItemsTable({
         </div>
       ) : items.length === 0 ? (
         <div className="py-8 text-center">
-          <div className="text-sm font-medium">No items extracted yet</div>
+          <div className="text-sm font-medium">No invoice rows yet</div>
           <div className="text-xs text-muted-foreground mt-1">
             {onExtract
-              ? "The invoice table was not parsed into rows. Re-extract after checking the file image."
+              ? "The invoice table was not prepared into rows. Re-read after checking the file image."
               : "This file has no parsed table rows to review."}
           </div>
         </div>
@@ -1269,22 +1750,39 @@ function ItemsTable({
             <thead className="bg-muted/40">
               <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <th className="py-2.5 px-4 font-medium">Ingredient</th>
-                <th className="py-2.5 px-4 font-medium text-right">Qty</th>
-                <th className="py-2.5 px-4 font-medium">Unit</th>
+                <th className="py-2.5 px-4 font-medium text-right">Purchased</th>
+                <th className="py-2.5 px-4 font-medium">Stock added</th>
                 <th className="py-2.5 px-4 font-medium text-right">Unit price</th>
                 <th className="py-2.5 px-4 font-medium text-right">Total</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {items.map((it) => {
-                const unmatchedIngredient = isUnresolvedInvoiceItem(it, ingredientNameMatches);
+                const ingredientMatch = getItemIngredientMatch(
+                  it,
+                  ingredientCatalog,
+                  confirmedIngredientAliases,
+                );
+                const confirmedIngredientMatch = isConfirmedIngredientMatch(ingredientMatch);
+                const possibleIngredientMatch =
+                  ingredientMatch?.kind === "semantic" ? ingredientMatch : null;
+                const unmatchedIngredient = !confirmedIngredientMatch && !possibleIngredientMatch;
                 const extractionReview = needsExtractionConfirmation(it);
-                const quantityUnitReview = needsQuantityUnitConfirmation(it);
+                const quantityReview = needsQuantityUnitConfirmation(it);
                 const amountReview = needsAmountConfirmation(it);
                 const delta = getPriceDeltaDetails(it.unit_price, priceComparisons[it.id]);
                 const canCreateIngredient = !isPlaceholderItemName(it.name);
                 const creatingIngredient = !!creatingIngredientByItem[it.id];
                 const creationError = ingredientCreationErrors[it.id];
+                const operationalSummary = getInvoiceItemOperationalSummary(it);
+                const purchaseLabel = getInvoiceItemPurchaseLabel(it);
+                const stockPresentation = getInvoiceItemStockPresentation(it);
+                const showMatchedBadge =
+                  confirmedIngredientMatch &&
+                  !extractionReview &&
+                  !quantityReview &&
+                  !amountReview &&
+                  !delta;
                 return (
                   <tr
                     key={it.id}
@@ -1299,11 +1797,55 @@ function ItemsTable({
                         <div className="font-medium leading-tight">{it.name}</div>
                         <div className="flex flex-wrap items-center gap-1.5">
                           {extractionReview && (
-                            <OperationalBadge label="confirm extracted row" tone="review" />
+                            <OperationalBadge label="needs review" tone="review" />
                           )}
-                          {quantityUnitReview && <OperationalBadge label="check qty/unit" />}
-                          {amountReview && <OperationalBadge label="check amounts" />}
-                          {unmatchedIngredient ? (
+                          {quantityReview && <OperationalBadge label="confirm quantity" />}
+                          {amountReview && <OperationalBadge label="verify amounts" />}
+                          {operationalSummary?.badgeLabel && (
+                            <OperationalBadge
+                              label={operationalSummary.badgeLabel}
+                              tone={operationalSummary.tone}
+                              title={operationalSummary.badgeTitle}
+                            />
+                          )}
+                          {possibleIngredientMatch ? (
+                            <>
+                              <OperationalBadge
+                                label="possible ingredient match"
+                                tone="review"
+                                title={`Possible existing ingredient: ${possibleIngredientMatch.ingredient.name ?? "Unnamed ingredient"}`}
+                              />
+                              <span className="text-[11px] text-muted-foreground">
+                                Already buying this?{" "}
+                                <span className="font-medium text-foreground">
+                                  {possibleIngredientMatch.ingredient.name}
+                                </span>
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  onConfirmIngredientMatch(it, possibleIngredientMatch)
+                                }
+                                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground transition hover:bg-muted/70 hover:text-foreground"
+                              >
+                                Confirm ingredient match
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => onCreateIngredient(it)}
+                                disabled={creatingIngredient || !canCreateIngredient}
+                                title={
+                                  canCreateIngredient
+                                    ? "Create a separate ingredient from this extracted row"
+                                    : "Confirm the extracted name before creating an ingredient"
+                                }
+                                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground transition hover:bg-muted/70 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                {creatingIngredient && <Loader2 className="h-3 w-3 animate-spin" />}
+                                Create new ingredient
+                              </button>
+                            </>
+                          ) : unmatchedIngredient ? (
                             <>
                               <OperationalBadge label="not in ingredient list" />
                               <button
@@ -1318,12 +1860,24 @@ function ItemsTable({
                                 className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground transition hover:bg-muted/70 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 {creatingIngredient && <Loader2 className="h-3 w-3 animate-spin" />}
-                                + Create ingredient
+                                Create new ingredient
                               </button>
                             </>
-                          ) : (
-                            <OperationalBadge label="matched automatically" tone="success" />
-                          )}
+                          ) : showMatchedBadge ? (
+                            <OperationalBadge
+                              label={
+                                ingredientMatch?.kind === "confirmed-alias"
+                                  ? "confirmed match"
+                                  : "matched automatically"
+                              }
+                              tone="success"
+                              title={
+                                ingredientMatch?.ingredient.name
+                                  ? `Suggested existing ingredient: ${ingredientMatch.ingredient.name}`
+                                  : undefined
+                              }
+                            />
+                          ) : null}
                           {delta?.direction === "increased" && (
                             <OperationalBadge label="price increased" tone="increase" />
                           )}
@@ -1337,10 +1891,27 @@ function ItemsTable({
                       </div>
                     </td>
                     <td className="py-2.5 px-4 text-right tabular-nums">
-                      {it.quantity ?? <MissingValue label="Quantity" />}
+                      {purchaseLabel ? (
+                        <span className="inline-flex max-w-44 justify-end whitespace-normal text-right leading-snug">
+                          <span>{purchaseLabel}</span>
+                        </span>
+                      ) : (
+                        <MissingValue label="Quantity" />
+                      )}
                     </td>
                     <td className="py-2.5 px-4 text-muted-foreground">
-                      {it.unit ?? <MissingValue label="Unit" />}
+                      {stockPresentation ? (
+                        <span className="inline-flex flex-col gap-0.5">
+                          <span className="text-foreground tabular-nums">
+                            {stockPresentation.quantityLabel}
+                          </span>
+                          {stockPresentation.detailLabel && (
+                            <span className="text-[11px]">{stockPresentation.detailLabel}</span>
+                          )}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground/60">Same as purchased</span>
+                      )}
                     </td>
                     <td className="py-2.5 px-4 text-right tabular-nums">
                       {it.unit_price != null ? (
