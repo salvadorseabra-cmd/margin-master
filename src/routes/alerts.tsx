@@ -35,6 +35,7 @@ type IngredientRecord = {
 
 type RecipeIngredientRecord = {
   id: string;
+  recipe_id: string | null;
   ingredient_id: string | null;
   quantity: number | null;
   unit: string | null;
@@ -108,6 +109,8 @@ type AlertData = {
   invoices: InvoiceRecord[];
 };
 
+type RecipeIngredientRow = Omit<RecipeIngredientRecord, "ingredients">;
+
 const sevStyles: Record<Severity, { dot: string; chip: string; label: string; card: string }> = {
   high: {
     dot: "bg-destructive",
@@ -150,42 +153,26 @@ function AlertsPage() {
     setError(null);
 
     try {
-      const [ingredientsResult, recipesResult, historyResult, invoicesResult] = await Promise.all([
+      const [
+        ingredientsResult,
+        recipesResult,
+        recipeIngredientsResult,
+        historyResult,
+        invoicesResult,
+      ] = await Promise.all([
         supabase
           .from("ingredients")
           .select(
-            "id, name, unit, current_price, purchase_quantity, purchase_unit, base_unit, created_at, updated_at",
+            "id, name, unit, current_price, purchase_quantity, purchase_unit, base_unit, created_at",
           )
           .order("name", { ascending: true }),
         supabase
           .from("recipes")
-          .select(
-            `
-            id,
-            name,
-            selling_price,
-            type,
-            recipe_ingredients!recipe_ingredients_recipe_id_fkey (
-              id,
-              ingredient_id,
-              quantity,
-              unit,
-              created_at,
-              ingredients (
-                id,
-                name,
-                unit,
-                current_price,
-                purchase_quantity,
-                purchase_unit,
-                base_unit,
-                created_at,
-                updated_at
-              )
-            )
-          `,
-          )
+          .select("id, name, selling_price, type")
           .order("name", { ascending: true }),
+        supabase
+          .from("recipe_ingredients")
+          .select("id, recipe_id, ingredient_id, quantity, unit, created_at"),
         supabase
           .from("ingredient_price_history")
           .select(
@@ -202,10 +189,34 @@ function AlertsPage() {
 
       if (ingredientsResult.error) throw ingredientsResult.error;
       if (recipesResult.error) throw recipesResult.error;
+      if (recipeIngredientsResult.error) throw recipeIngredientsResult.error;
+
+      const ingredients = (ingredientsResult.data ?? []) as IngredientRecord[];
+      const ingredientById = new Map(ingredients.map((ingredient) => [ingredient.id, ingredient]));
+      const recipeIngredients = (recipeIngredientsResult.data ?? []) as RecipeIngredientRow[];
+      const recipeLinesByRecipeId = new Map<string, RecipeIngredientRecord[]>();
+
+      for (const line of recipeIngredients) {
+        if (!line.recipe_id) continue;
+
+        const recipeLines = recipeLinesByRecipeId.get(line.recipe_id) ?? [];
+        recipeLines.push({
+          ...line,
+          ingredients: line.ingredient_id ? (ingredientById.get(line.ingredient_id) ?? null) : null,
+        });
+        recipeLinesByRecipeId.set(line.recipe_id, recipeLines);
+      }
+
+      const recipes = (
+        (recipesResult.data ?? []) as Omit<RecipeRecord, "recipe_ingredients">[]
+      ).map((recipe) => ({
+        ...recipe,
+        recipe_ingredients: recipeLinesByRecipeId.get(recipe.id) ?? [],
+      }));
 
       setData({
-        ingredients: (ingredientsResult.data ?? []) as IngredientRecord[],
-        recipes: (recipesResult.data ?? []) as RecipeRecord[],
+        ingredients,
+        recipes,
         priceHistory: historyResult.error
           ? []
           : ((historyResult.data ?? []) as PriceHistoryRecord[]),
