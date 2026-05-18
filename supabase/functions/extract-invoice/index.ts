@@ -211,11 +211,21 @@ console.log(
   JSON.stringify(parsed?.items, null, 2)
 );
 
+    let invoiceDate: string | null = null;
+
+    if (typeof parsed?.invoice_date === "string") {
+      invoiceDate = parsed.invoice_date;
+    } else if (typeof parsed?.invoiceDate === "string") {
+      invoiceDate = parsed.invoiceDate;
+    }
+
     const normalized = {
       supplier:
         typeof parsed?.supplier === "string"
           ? parsed.supplier
           : null,
+
+      invoice_date: invoiceDate,
 
       total:
         typeof parsed?.total === "number"
