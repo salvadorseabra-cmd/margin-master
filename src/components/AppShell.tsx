@@ -1,5 +1,17 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, Receipt, ChefHat, LineChart, Bell, Sparkles, Menu, X, Search, LogOut, Loader2 } from "lucide-react";
+import {
+  LayoutDashboard,
+  Receipt,
+  ChefHat,
+  LineChart,
+  Bell,
+  Sparkles,
+  Menu,
+  X,
+  Search,
+  LogOut,
+  Loader2,
+} from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { restaurant } from "@/lib/mock-data";
 import { useAuth } from "@/hooks/use-auth";
@@ -13,7 +25,17 @@ const nav = [
   { to: "/alerts", label: "Margin Alerts", icon: Bell },
 ] as const;
 
-export function AppShell({ title, subtitle, action, children }: { title: string; subtitle?: string; action?: ReactNode; children: ReactNode }) {
+export function AppShell({
+  title,
+  subtitle,
+  action,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  action?: ReactNode;
+  children: ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { user, loading } = useAuth();
@@ -34,7 +56,7 @@ export function AppShell({ title, subtitle, action, children }: { title: string;
   const initials = (user.email ?? "?").slice(0, 2).toUpperCase();
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="flex min-h-screen w-full min-w-0 bg-background">
       {/* Sidebar — desktop */}
       <aside className="group hidden lg:flex w-16 hover:w-64 flex-col overflow-hidden border-r border-border bg-card/40 sticky top-0 h-screen transition-[width] duration-200 ease-out">
         <BrandHeader />
@@ -45,7 +67,10 @@ export function AppShell({ title, subtitle, action, children }: { title: string;
       {/* Mobile drawer */}
       {open && (
         <div className="lg:hidden fixed inset-0 z-40">
-          <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" onClick={() => setOpen(false)} />
+          <div
+            className="absolute inset-0 bg-foreground/30 backdrop-blur-sm"
+            onClick={() => setOpen(false)}
+          />
           <aside className="absolute left-0 top-0 h-full w-72 bg-card border-r border-border flex flex-col">
             <BrandHeader onClose={() => setOpen(false)} />
             <SidebarNav path={path} onNavigate={() => setOpen(false)} />
@@ -54,26 +79,39 @@ export function AppShell({ title, subtitle, action, children }: { title: string;
         </div>
       )}
 
-      <div className="flex-1 min-w-0 flex flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 bg-background/80 backdrop-blur border-b border-border">
-          <div className="flex items-center gap-3 px-4 lg:px-8 h-16">
-            <button className="lg:hidden -ml-1 p-2 rounded-md hover:bg-muted" onClick={() => setOpen(true)} aria-label="Open menu">
+        <header className="sticky top-0 z-30 min-w-0 border-b border-border bg-background/80 backdrop-blur">
+          <div className="flex h-16 min-w-0 items-center gap-3 px-4 lg:px-8">
+            <button
+              className="lg:hidden -ml-1 p-2 rounded-md hover:bg-muted"
+              onClick={() => setOpen(true)}
+              aria-label="Open menu"
+            >
               <Menu className="h-5 w-5" />
             </button>
             <div className="flex-1 min-w-0">
               <div className="hidden md:flex items-center gap-2 max-w-md rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-sm text-muted-foreground">
                 <Search className="h-4 w-4" />
                 <span>Search invoices, ingredients, recipes…</span>
-                <kbd className="ml-auto text-[10px] font-medium bg-background border border-border rounded px-1.5 py-0.5">⌘K</kbd>
+                <kbd className="ml-auto text-[10px] font-medium bg-background border border-border rounded px-1.5 py-0.5">
+                  ⌘K
+                </kbd>
               </div>
             </div>
-            <Link to="/alerts" className="relative p-2 rounded-md hover:bg-muted" aria-label="Alerts">
+            <Link
+              to="/alerts"
+              className="relative p-2 rounded-md hover:bg-muted"
+              aria-label="Alerts"
+            >
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-destructive" />
             </Link>
             <button
-              onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/login" }); }}
+              onClick={async () => {
+                await supabase.auth.signOut();
+                navigate({ to: "/login" });
+              }}
               className="p-2 rounded-md hover:bg-muted text-muted-foreground"
               aria-label="Sign out"
               title="Sign out"
@@ -87,17 +125,19 @@ export function AppShell({ title, subtitle, action, children }: { title: string;
         </header>
 
         {/* Page header */}
-        <div className="px-4 lg:px-8 pt-6 lg:pt-10 pb-4">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-semibold tracking-tight text-foreground">{title}</h1>
+        <div className="min-w-0 box-border px-4 pb-4 pt-6 lg:px-8 lg:pt-10">
+          <div className="flex min-w-0 flex-wrap items-end justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="text-2xl lg:text-3xl font-semibold tracking-tight text-foreground">
+                {title}
+              </h1>
               {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
             </div>
             {action}
           </div>
         </div>
 
-        <main className="flex-1 px-4 lg:px-8 pb-16">{children}</main>
+        <main className="min-w-0 flex-1 min-w-0 box-border px-4 pb-16 lg:px-8">{children}</main>
       </div>
     </div>
   );
@@ -142,7 +182,9 @@ function SidebarNav({ path, onNavigate }: { path: string; onNavigate?: () => voi
             title={label}
           >
             <Icon className="h-4 w-4 shrink-0" />
-            <span className="min-w-0 truncate transition-opacity duration-150 lg:w-0 lg:opacity-0 lg:group-hover:w-auto lg:group-hover:opacity-100">{label}</span>
+            <span className="min-w-0 truncate transition-opacity duration-150 lg:w-0 lg:opacity-0 lg:group-hover:w-auto lg:group-hover:opacity-100">
+              {label}
+            </span>
           </Link>
         );
       })}
@@ -163,5 +205,5 @@ function SidebarFooter() {
 }
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`card-surface p-5 ${className}`}>{children}</div>;
+  return <div className={`card-surface min-w-0 p-5 ${className}`}>{children}</div>;
 }

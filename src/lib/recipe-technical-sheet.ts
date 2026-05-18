@@ -59,14 +59,8 @@ export async function downloadRecipeTechnicalSheet(sheet: RecipeTechnicalSheet) 
   y = drawSectionHeader(doc, "Ingredients", y, generatedTimestamp);
   y = drawIngredientsTable(doc, sheet.ingredients, sheet.totalFoodCost, y, generatedTimestamp);
 
-  y += 5;
-  y = drawPreparationSection(doc, sheet, y, generatedTimestamp);
-
-  y += 7;
+  y += 6;
   y = drawOperationalNotes(doc, sheet, y, generatedTimestamp);
-
-  y += 7;
-  drawApprovalArea(doc, y, generatedTimestamp);
 
   drawFooter(doc, generatedTimestamp);
   doc.save(`${slugify(sheet.recipeName || "recipe")}-technical-sheet.pdf`);
@@ -138,21 +132,13 @@ function drawFinancialSummary(
           ? `${sheet.grossMargin.toFixed(1)}%`
           : "-",
     },
+    { label: "Prep time", value: "-" },
   ];
   const columnWidth = CONTENT_WIDTH / columns.length;
   const blockHeight = 15;
 
-  doc.setDrawColor(212, 212, 216);
-  doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y);
-  doc.line(MARGIN, y + blockHeight, PAGE_WIDTH - MARGIN, y + blockHeight);
-
   columns.forEach((column, index) => {
     const x = MARGIN + index * columnWidth;
-    if (index > 0) {
-      doc.setDrawColor(244, 244, 245);
-      doc.line(x, y + 2, x, y + blockHeight - 2);
-    }
-
     const textX = x + (index === 0 ? 0 : 3);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(6.8);
@@ -302,48 +288,6 @@ function drawIngredientsTable(
   return y + 10;
 }
 
-function drawPreparationSection(
-  doc: jsPDF,
-  sheet: RecipeTechnicalSheet,
-  startY: number,
-  generatedTimestamp: string,
-) {
-  const preparationText = sheet.preparationSteps?.trim();
-  let y = ensurePageSpace(doc, startY, preparationText ? 30 : 36, generatedTimestamp);
-
-  y = drawSectionHeader(
-    doc,
-    preparationText ? "Preparation" : "Preparation notes",
-    y,
-    generatedTimestamp,
-  );
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8.8);
-  doc.setTextColor(39, 39, 42);
-
-  if (preparationText) {
-    return writeWrappedText(
-      doc,
-      preparationText,
-      MARGIN,
-      y,
-      CONTENT_WIDTH,
-      4.4,
-      generatedTimestamp,
-    );
-  }
-
-  y = ensurePageSpace(doc, y, 26, generatedTimestamp);
-  doc.setDrawColor(228, 228, 231);
-  [0, 1, 2, 3].forEach((line) => {
-    const lineY = y + line * 7;
-    doc.line(MARGIN, lineY, PAGE_WIDTH - MARGIN, lineY);
-  });
-
-  return y + 26;
-}
-
 function drawOperationalNotes(
   doc: jsPDF,
   sheet: RecipeTechnicalSheet,
@@ -351,59 +295,50 @@ function drawOperationalNotes(
   generatedTimestamp: string,
 ) {
   const notesText = sheet.notes?.trim();
-  let y = ensurePageSpace(doc, startY, notesText ? 56 : 48, generatedTimestamp);
+  let y = ensurePageSpace(doc, startY, notesText ? 58 : 64, generatedTimestamp);
 
-  doc.setDrawColor(212, 212, 216);
-  doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y);
-  y += 7;
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(10);
-  doc.setTextColor(24, 24, 27);
-  doc.text("Operational notes", MARGIN, y);
-  y += 8;
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(39, 39, 42);
-  doc.text("Station: ______________________________", MARGIN, y);
-  doc.text("Prep Time: ______ min", MARGIN + 96, y);
-  y += 9;
-
-  doc.text("Kitchen Notes:", MARGIN, y);
-  y += 7;
+  y = drawLowerSectionTitle(doc, "Kitchen Notes", y, generatedTimestamp);
 
   if (notesText) {
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
     doc.setTextColor(63, 63, 70);
     y = writeWrappedText(doc, notesText, MARGIN, y, CONTENT_WIDTH, 4.2, generatedTimestamp);
-    y += 3;
+    y += 6;
   }
 
-  y = ensurePageSpace(doc, y, 24, generatedTimestamp);
-  doc.setDrawColor(212, 212, 216);
-  [0, 1, 2, 3].forEach((line) => {
-    const lineY = y + line * 7;
-    doc.line(MARGIN, lineY, PAGE_WIDTH - MARGIN, lineY);
-  });
-
-  return y + 24;
+  return reserveOpenWritingSpace(doc, y, notesText ? 32 : 52, generatedTimestamp);
 }
 
-function drawApprovalArea(doc: jsPDF, startY: number, generatedTimestamp: string) {
-  let y = ensurePageSpace(doc, startY, 18, generatedTimestamp);
+function drawLowerSectionTitle(doc: jsPDF, title: string, y: number, generatedTimestamp: string) {
+  y = ensurePageSpace(doc, y, 10, generatedTimestamp);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.setTextColor(24, 24, 27);
+  doc.text(title, MARGIN, y);
+  return y + 7;
+}
+
+function reserveOpenWritingSpace(
+  doc: jsPDF,
+  startY: number,
+  height: number,
+  generatedTimestamp: string,
+) {
+  const y = ensurePageSpace(doc, startY, height, generatedTimestamp);
+  const guideCount = Math.max(3, Math.floor(height / 10));
 
   doc.setDrawColor(228, 228, 231);
-  doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y);
-  y += 8;
+  doc.setLineWidth(0.12);
+  Array.from({ length: guideCount }).forEach((_, index) => {
+    const lineY = y + 8 + index * 10;
+    if (lineY < y + height - 2) {
+      doc.line(MARGIN, lineY, PAGE_WIDTH - MARGIN, lineY);
+    }
+  });
+  doc.setLineWidth(0.2);
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(8.5);
-  doc.setTextColor(63, 63, 70);
-  doc.text("Prepared by: __________________________", MARGIN, y);
-  doc.text("Approved by: __________________________", MARGIN + 96, y);
-
-  return y + 6;
+  return y + height;
 }
 
 function ensurePageSpace(doc: jsPDF, y: number, requiredSpace: number, generatedTimestamp: string) {

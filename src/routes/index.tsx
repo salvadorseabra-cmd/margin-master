@@ -62,7 +62,7 @@ function Dashboard() {
       <section className="hero-surface p-5 sm:p-7 mb-5 relative overflow-hidden">
         <div
           aria-hidden
-          className="absolute -top-24 -right-24 h-64 w-64 rounded-full opacity-25"
+          className="absolute right-0 top-0 h-64 w-64 rounded-full opacity-25"
           style={{ background: "radial-gradient(closest-side, var(--color-chart-1), transparent)" }}
         />
         <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
