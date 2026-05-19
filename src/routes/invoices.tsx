@@ -32,7 +32,6 @@ import {
 } from "@/lib/invoice-purchase-format";
 import { formatQuantityWithUnit } from "@/lib/display-format";
 import {
-  findCanonicalIngredientMatch,
   normalizeInvoiceIngredientName,
   type IngredientAliasMap,
   type IngredientCanonicalMatch,
@@ -41,10 +40,20 @@ import {
   buildMatchExplanation,
   buildMatchTargetLabel,
   formatMatchReasoningTooltip,
-  shouldShowMatchTargetLine,
   type MatchReasoning,
   type MatchTargetLabel,
 } from "@/lib/ingredient-match-explanation";
+import { buildInvoiceMatchCatalog } from "@/lib/ingredient-canonical-synthesis";
+import {
+  invoiceRowMatchSummaryBucket,
+  resolveInvoiceTableRowIngredientMatch,
+} from "@/lib/invoice-ingredient-row-display";
+import { traceInvoiceIngredientMatchPipeline } from "@/lib/invoice-ingredient-match-trace";
+import {
+  cleanInvoiceItemDisplayName,
+  normalizeInvoiceItemFields,
+  normalizeInvoiceUnitToken,
+} from "@/lib/invoice-item-fields";
 import {
   buildKnownSupplierNames,
   deriveInvoiceLineOperationalSignals,
@@ -184,11 +193,6 @@ type OperationalSummaryCard = {
   detail: string;
   tone?: OperationalSummaryTone;
 };
-type InvoiceRowTailFields = {
-  quantity: number | null;
-  unit: string | null;
-};
-
 const traceInvoiceIdentity = (stage: string, details: InvoiceIdentityTrace) => {
   if (!import.meta.env.DEV) return;
   console.debug("[invoice-list]", stage, details);
@@ -457,13 +461,6 @@ const toInvoiceRow = (
 const normalizeExtractedItemName = (name: string | null | undefined) =>
   name?.trim().toLowerCase() ?? "";
 
-const INVOICE_NUMBER_TOKEN = String.raw`\d{1,3}(?:[.\s]\d{3})*(?:,\d+)?|\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+[.,]\d+|\d+`;
-const INVOICE_UNIT_TOKEN = String.raw`un|uni|und|unds|unid|unids|unidade|unidades|kg|g|gr|l|lt|ml|cl|cx|caixa|caixas|dz|pack|packs|pc|pcs`;
-const INVOICE_ROW_TAIL_RE = new RegExp(
-  String.raw`\s+(?<quantity>${INVOICE_NUMBER_TOKEN})\s*(?<unit>${INVOICE_UNIT_TOKEN})\b\s+(?:€|EUR)?\s*${INVOICE_NUMBER_TOKEN}\s*(?:€|EUR)?\s*(?:\d{1,2}(?:[,.]\d+)?\s*%)?\s*$`,
-  "iu",
-);
-const INVOICE_PRODUCT_CODE_RE = /^(?:[A-Z]{1,4}\d{3,8}|\d{2,8})\s+/iu;
 const INVOICE_ADDRESS_RE =
   /(^|\s)(?:travessa|trav\.?|rua|r\.|avenida|av\.?|estrada|largo|praceta|praca|rotunda|urbanizacao|zona\s+industrial|parque\s+industrial|edificio|lote|loja|andar|sala|apartado|cod\.?\s+postal|cp)(?=\s|,|\.|:|$)/iu;
 const INVOICE_BUSINESS_METADATA_RE =
@@ -472,101 +469,6 @@ const INVOICE_PAYMENT_METADATA_RE =
   /\b(?:iban|swift|bic|sepa|referencia\s+mb|ref\.?\s+mb|entidade|pagamento|transferencia|multibanco|mb\s*way|cartao|visa|mastercard)\b/iu;
 const INVOICE_TAX_SUMMARY_RE =
   /\b(?:base\s+incidencia|incidencia|valor\s+iva|taxa\s+iva|iva\s+dedutivel|total\s+liquido|total\s+mercadoria|total\s+documento|valor\s+a\s+pagar)\b/iu;
-
-const parseInvoiceNumberToken = (raw: string): number | null => {
-  let value = raw
-    .replace(/\u20AC/g, " ")
-    .replace(/€/g, " ")
-    .replace(/EUR/gi, " ")
-    .replace(/\s+/g, "")
-    .trim();
-  if (!value) return null;
-  value = value.replace(/[^\d.,-]/g, "");
-  const lastComma = value.lastIndexOf(",");
-  const lastDot = value.lastIndexOf(".");
-  const normalized =
-    lastComma > lastDot
-      ? value.replace(/\./g, "").replace(",", ".")
-      : lastDot > lastComma
-        ? value.replace(/,/g, "")
-        : value.replace(",", ".");
-  const parsed = Number(normalized);
-  return Number.isFinite(parsed) ? parsed : null;
-};
-
-const normalizeInvoiceUnitToken = (raw: string | null | undefined) => {
-  const unit = raw?.trim().toLowerCase();
-  if (!unit) return null;
-  if (["uni", "und", "unds", "unid", "unids", "unidade", "unidades", "pc", "pcs"].includes(unit)) {
-    return "un";
-  }
-  if (unit === "lt") return "L";
-  if (unit === "gr") return "g";
-  return unit === "l" ? "L" : unit;
-};
-
-const invoiceAmountsNearlyEqual = (a: number, b: number) => Math.abs(a - b) < 0.005;
-
-const extractInvoiceRowTailFields = (name: string): InvoiceRowTailFields => {
-  const rowTail = name.match(INVOICE_ROW_TAIL_RE);
-  if (!rowTail?.groups?.quantity || !rowTail.groups.unit) return { quantity: null, unit: null };
-
-  return {
-    quantity: parseInvoiceNumberToken(rowTail.groups.quantity),
-    unit: normalizeInvoiceUnitToken(rowTail.groups.unit),
-  };
-};
-
-const normalizeInvoiceNumberField = (value: unknown): number | null => {
-  if (typeof value === "number") return Number.isFinite(value) ? value : null;
-  if (typeof value === "string") return parseInvoiceNumberToken(value);
-  return null;
-};
-
-const normalizeInvoiceItemFields = <T extends Partial<ItemRow>>(item: T): T & ItemRow => {
-  const rowTailFields = extractInvoiceRowTailFields(String(item.name ?? ""));
-  const quantity = normalizeInvoiceNumberField(item.quantity) ?? rowTailFields.quantity;
-  const unit = normalizeInvoiceUnitToken(item.unit) ?? rowTailFields.unit;
-  const unit_price = normalizeInvoiceNumberField(item.unit_price);
-  const total = normalizeInvoiceNumberField(item.total);
-  const normalized = {
-    ...item,
-    name: cleanInvoiceItemDisplayName({ name: item.name ?? "", quantity, unit }),
-    quantity,
-    unit,
-    unit_price,
-    total,
-  };
-  return normalized as T & ItemRow;
-};
-
-const cleanInvoiceItemDisplayName = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {
-  let name = String(item.name ?? "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(INVOICE_PRODUCT_CODE_RE, "")
-    .trim();
-
-  const rowTail = name.match(INVOICE_ROW_TAIL_RE);
-  if (rowTail?.groups?.quantity && rowTail.groups.unit) {
-    const quantity = parseInvoiceNumberToken(rowTail.groups.quantity);
-    const rowUnit = normalizeInvoiceUnitToken(rowTail.groups.unit);
-    const itemUnit = normalizeInvoiceUnitToken(item.unit);
-    const quantityMatches =
-      item.quantity == null ||
-      quantity == null ||
-      invoiceAmountsNearlyEqual(item.quantity, quantity);
-    const unitMatches = !itemUnit || !rowUnit || itemUnit === rowUnit;
-    if (quantityMatches && unitMatches) name = name.slice(0, rowTail.index).trim();
-  }
-
-  return name
-    .replace(/\s+\d{1,2}(?:[,.]\d+)?\s*%\s*$/u, "")
-    .replace(/\s+(?:€|EUR)\s*\d+(?:[,.]\d{1,4})?\s*$/iu, "")
-    .replace(/\s+\d+[,.]\d{1,4}\s*(?:€|EUR)\s*$/iu, "")
-    .replace(/\s+/g, " ")
-    .trim();
-};
 
 const shouldRejectInvoiceItemName = (
   item: Pick<ItemRow, "name" | "quantity" | "unit" | "unit_price" | "total">,
@@ -586,16 +488,6 @@ const shouldRejectInvoiceItemName = (
   }
   return false;
 };
-
-const getItemIngredientMatch = (
-  item: ItemRow,
-  ingredientCatalog: IngredientMatchRow[],
-  confirmedAliases: IngredientAliasMap,
-  supplierName?: string | null,
-) => findCanonicalIngredientMatch(item.name, ingredientCatalog, confirmedAliases, supplierName);
-
-const isConfirmedIngredientMatch = (match: IngredientCanonicalMatch | null) =>
-  match?.kind === "exact" || match?.kind === "confirmed-alias";
 
 const isPlaceholderItemName = (name: string) => {
   const normalizedName = normalizeExtractedItemName(name);
@@ -2328,18 +2220,38 @@ function ItemsTable({
     () => new Map(ingredientCatalog.map((row) => [row.id, row])),
     [ingredientCatalog],
   );
+  const matchCatalog = useMemo(
+    () =>
+      buildInvoiceMatchCatalog(
+        ingredientCatalog,
+        items.map((item) => ({ name: normalizeInvoiceItemFields(item).name })),
+      ),
+    [ingredientCatalog, items],
+  );
 
   const operationalSummary = items.reduce(
     (summary, item) => {
-      const ingredientMatch = getItemIngredientMatch(
-        item,
-        ingredientCatalog,
+      const rawName = item.name;
+      const rowItem = normalizeInvoiceItemFields(item);
+      traceInvoiceIngredientMatchPipeline({
+        stage: "summary:after-normalize",
+        rowId: rowItem.id,
+        rawName,
+        resolvedName: rowItem.name,
+        nameChanged: rawName !== rowItem.name,
+        ingredientCatalogLength: ingredientCatalog.length,
+      });
+      const { state } = resolveInvoiceTableRowIngredientMatch(
+        rowItem.name,
+        matchCatalog,
         confirmedIngredientAliases,
         supplierName,
+        { stage: "summary:after-canonical", rowId: rowItem.id, rawName },
       );
-      if (isConfirmedIngredientMatch(ingredientMatch)) {
+      const bucket = invoiceRowMatchSummaryBucket(state.displayState);
+      if (bucket === "matched") {
         summary.matchedIngredients += 1;
-      } else if (ingredientMatch) {
+      } else if (bucket === "suggested") {
         summary.possibleIngredientMatches += 1;
       } else {
         summary.unmatchedIngredients += 1;
@@ -2463,17 +2375,53 @@ function ItemsTable({
             </thead>
             <tbody className="divide-y divide-border">
               {items.map((it, index) => {
+                const rawName = it.name;
                 const renderItem = normalizeInvoiceItemFields(it);
-                const ingredientMatch = getItemIngredientMatch(
-                  renderItem,
-                  ingredientCatalog,
-                  confirmedIngredientAliases,
-                  supplierName,
-                );
-                const confirmedIngredientMatch = isConfirmedIngredientMatch(ingredientMatch);
-                const possibleIngredientMatch =
-                  ingredientMatch?.kind === "semantic" ? ingredientMatch : null;
-                const unmatchedIngredient = !confirmedIngredientMatch && !possibleIngredientMatch;
+                traceInvoiceIngredientMatchPipeline({
+                  stage: "render:after-normalize",
+                  rowId: renderItem.id,
+                  rawName,
+                  resolvedName: renderItem.name,
+                  nameChanged: rawName !== renderItem.name,
+                  ingredientCatalogLength: ingredientCatalog.length,
+                });
+                const { match: ingredientMatch, state: ingredientMatchState } =
+                  resolveInvoiceTableRowIngredientMatch(
+                    renderItem.name,
+                    matchCatalog,
+                    confirmedIngredientAliases,
+                    supplierName,
+                    { stage: "render:after-canonical", rowId: renderItem.id, rawName },
+                  );
+                traceInvoiceIngredientMatchPipeline({
+                  stage: "render:final-jsx",
+                  rowId: renderItem.id,
+                  rawName,
+                  resolvedName: renderItem.name,
+                  ingredientCatalogLength: ingredientCatalog.length,
+                  match: ingredientMatch
+                    ? {
+                        kind: ingredientMatch.kind,
+                        ingredientId: ingredientMatch.ingredient.id ?? null,
+                        ingredientName: ingredientMatch.ingredient.name ?? null,
+                        scoreBreakdown: ingredientMatch.scoreBreakdown,
+                      }
+                    : null,
+                  display: {
+                    displayState: ingredientMatchState.displayState,
+                    possibleMatch: ingredientMatchState.possibleMatch,
+                    unmatched: ingredientMatchState.unmatched,
+                    showMatchTargetLine: ingredientMatchState.showMatchTargetLine,
+                    badgeLabel: ingredientMatchState.badgeLabel,
+                  },
+                });
+                const {
+                  confirmedMatch: confirmedIngredientMatch,
+                  possibleMatch: possibleIngredientMatch,
+                  unmatched: unmatchedIngredient,
+                  showMatchTargetLine,
+                  badgeLabel: suggestedMatchBadgeLabel,
+                } = ingredientMatchState;
                 const extractionReview = needsExtractionConfirmation(renderItem);
                 const quantityReview = needsQuantityUnitConfirmation(renderItem);
                 const amountReview = needsAmountConfirmation(renderItem);
@@ -2515,7 +2463,6 @@ function ItemsTable({
                 const matchedIngredient = ingredientMatch
                   ? ingredientById.get(ingredientMatch.ingredient.id)
                   : undefined;
-                const showMatchTargetLine = shouldShowMatchTargetLine(ingredientMatch);
                 const matchTargetLabel = ingredientMatch
                   ? buildMatchTargetLabel(ingredientMatch, matchContext, matchedIngredient)
                   : null;
@@ -2566,12 +2513,16 @@ function ItemsTable({
                               title={operationalSummary.badgeTitle}
                             />
                           )}
-                          {possibleIngredientMatch ? (
+                          {possibleIngredientMatch && suggestedMatchBadgeLabel ? (
                             <>
                               <OperationalBadge
-                                label="possible ingredient match"
+                                label={suggestedMatchBadgeLabel}
                                 tone="review"
-                                title={formatMatchReasoningTooltip(matchExplanation)}
+                                title={
+                                  matchExplanation
+                                    ? formatMatchReasoningTooltip(matchExplanation)
+                                    : undefined
+                                }
                               />
                               <IngredientMatchInsight reasoning={matchExplanation} expandable />
                               <button

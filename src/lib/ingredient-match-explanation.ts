@@ -20,6 +20,71 @@ export type MatchExplanationContext = {
   supplierName?: string | null;
 };
 
+export type InvoiceIngredientDisplayState = "confirmed" | "suggested" | "unmatched";
+
+export function isConfirmedIngredientMatch(
+  match: Pick<IngredientCanonicalMatch, "kind"> | null | undefined,
+): boolean {
+  return match?.kind === "exact" || match?.kind === "confirmed-alias";
+}
+
+export function isSuggestedIngredientMatch(
+  match: Pick<IngredientCanonicalMatch, "kind"> | null | undefined,
+): boolean {
+  return match?.kind === "semantic" || match?.kind === "operational-equivalent";
+}
+
+export function isInvoiceLineMatchedOrSuggested(
+  match: IngredientCanonicalMatch | null | undefined,
+): boolean {
+  return isConfirmedIngredientMatch(match) || isSuggestedIngredientMatch(match);
+}
+
+export function resolveInvoiceIngredientDisplayState(
+  match: IngredientCanonicalMatch | null | undefined,
+): InvoiceIngredientDisplayState {
+  if (!match) return "unmatched";
+  if (isConfirmedIngredientMatch(match)) return "confirmed";
+  if (isSuggestedIngredientMatch(match)) return "suggested";
+  return "unmatched";
+}
+
+export function suggestedIngredientMatchBadgeLabel(kind: IngredientCanonicalMatchKind): string {
+  return kind === "operational-equivalent"
+    ? "possible operational equivalent"
+    : "possible ingredient match";
+}
+
+export type InvoiceRowIngredientMatchState = {
+  match: IngredientCanonicalMatch | null;
+  displayState: InvoiceIngredientDisplayState;
+  possibleMatch: IngredientCanonicalMatch | null;
+  confirmedMatch: boolean;
+  unmatched: boolean;
+  showMatchTargetLine: boolean;
+  badgeLabel: string | null;
+};
+
+/** Maps a canonical match to invoice-row presentation flags (no matching logic). */
+export function getInvoiceRowIngredientMatchState(
+  match: IngredientCanonicalMatch | null | undefined,
+): InvoiceRowIngredientMatchState {
+  const displayState = resolveInvoiceIngredientDisplayState(match);
+  const resolvedMatch = match ?? null;
+  return {
+    match: resolvedMatch,
+    displayState,
+    possibleMatch: displayState === "suggested" ? resolvedMatch : null,
+    confirmedMatch: displayState === "confirmed",
+    unmatched: displayState === "unmatched",
+    showMatchTargetLine: shouldShowMatchTargetLine(resolvedMatch),
+    badgeLabel:
+      displayState === "suggested" && resolvedMatch
+        ? suggestedIngredientMatchBadgeLabel(resolvedMatch.kind)
+        : null,
+  };
+}
+
 const FORM_HINT_TOKENS = new Set([
   "fatiado",
   "fatiada",
@@ -112,6 +177,19 @@ export function buildMatchExplanation(
     };
   }
 
+  if (match.kind === "operational-equivalent") {
+    const caveats = deriveSemanticCaveats(match);
+    caveats.unshift("possible operational equivalent");
+    return {
+      headline: "Possible operational equivalent",
+      detail:
+        "Product family and preparation look aligned operationally, but wording differs enough that you should confirm before treating this as the same ingredient.",
+      confidence: "suggested",
+      confidenceLabel: "Suggested match",
+      caveats,
+    };
+  }
+
   if (match.kind === "exact") {
     if (match.reason === "same core product identity and matching size") {
       return {
@@ -161,7 +239,10 @@ export function shouldShowMatchTargetLine(
 
 export function resolveMatchTargetDisplayName(
   match: Pick<IngredientCanonicalMatch, "ingredient">,
-  catalogIngredient?: Pick<IngredientCanonicalMatch["ingredient"], "name" | "normalized_name"> | null,
+  catalogIngredient?: Pick<
+    IngredientCanonicalMatch["ingredient"],
+    "name" | "normalized_name"
+  > | null,
 ): string | null {
   for (const candidate of [
     catalogIngredient?.name,
@@ -188,7 +269,10 @@ export function matchTargetLabelPrefix(
 export function buildMatchTargetLabel(
   match: Pick<IngredientCanonicalMatch, "kind" | "ingredient" | "normalizedItemName">,
   context: MatchExplanationContext = {},
-  catalogIngredient?: Pick<IngredientCanonicalMatch["ingredient"], "name" | "normalized_name"> | null,
+  catalogIngredient?: Pick<
+    IngredientCanonicalMatch["ingredient"],
+    "name" | "normalized_name"
+  > | null,
 ): MatchTargetLabel | null {
   if (!shouldShowMatchTargetLine(match)) return null;
 

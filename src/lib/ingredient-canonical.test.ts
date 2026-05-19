@@ -6,10 +6,12 @@ import {
   findCanonicalIngredientMatch,
   hasCompatibleIngredientFormFamilies,
   normalizeInvoiceIngredientName,
+  OPERATIONAL_EQUIVALENT_MATCH_REASON,
   SEMANTIC_AUTO_MATCH_MIN_SCORE,
   SEMANTIC_MATCH_MIN_SCORE,
   type IngredientCanonicalInput,
 } from "./ingredient-canonical";
+import { OPERATIONAL_EQUIVALENT_MIN_SCORE } from "./ingredient-identity";
 
 function ingredient(id: string, name: string): IngredientCanonicalInput {
   return { id, name };
@@ -205,12 +207,13 @@ describe("findCanonicalIngredientMatch (weighted semantic)", () => {
     });
   });
 
-  it("auto-matches foodservice palha line without batata in OCR wording", () => {
+  it("suggests foodservice palha line to batata palha without auto-confirm", () => {
     const catalog = [ingredient("bat-palha", "BATATA PALHA 2KG")];
     const match = findCanonicalIngredientMatch("PALHA SNACK FOOD SERVICE 2KG", catalog);
 
     expect(match).not.toBeNull();
-    expect(match?.kind).toBe("exact");
+    expect(match?.kind).toBe("operational-equivalent");
+    expect(match?.reason).toBe(OPERATIONAL_EQUIVALENT_MATCH_REASON);
     expect(match?.ingredient.id).toBe("bat-palha");
   });
 
@@ -275,11 +278,11 @@ describe("findCanonicalIngredientMatch (weighted semantic)", () => {
       ]);
     });
 
-    it("auto-matches rearranged foodservice palha OCR to batata palha catalog line", () => {
+    it("suggests rearranged foodservice palha OCR to batata palha catalog line", () => {
       const catalog = [ingredient("bat-palha", "BATATA PALHA 2KG SERVICE")];
       const match = findCanonicalIngredientMatch("PALHA SNACK FOOD SERVICE 2KG", catalog);
 
-      expect(match?.kind).toBe("exact");
+      expect(match?.kind).toBe("operational-equivalent");
       expect(match?.ingredient.id).toBe("bat-palha");
     });
 

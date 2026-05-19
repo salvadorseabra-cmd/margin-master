@@ -4,10 +4,13 @@ import {
   buildMatchTargetLabel,
   formatMatchReasoningTooltip,
   formatMatchTargetLabel,
+  isInvoiceLineMatchedOrSuggested,
   matchTargetLabelPrefix,
   resolveConfirmedAliasScope,
+  resolveInvoiceIngredientDisplayState,
   resolveMatchTargetDisplayName,
   shouldShowMatchTargetLine,
+  suggestedIngredientMatchBadgeLabel,
 } from "./ingredient-match-explanation";
 import type { IngredientCanonicalMatch } from "./ingredient-canonical";
 import { buildIngredientAliasLookupKey } from "./ingredient-alias-lookup";
@@ -20,6 +23,36 @@ const baseMatch = (
   normalizedIngredientName: "tomate cherry",
   reason: "same normalized ingredient name",
   ...overrides,
+});
+
+describe("resolveInvoiceIngredientDisplayState", () => {
+  it("treats operational-equivalent as suggested, not unmatched", () => {
+    const match = baseMatch({
+      kind: "operational-equivalent",
+      reason: "possible operational equivalent",
+    });
+    expect(resolveInvoiceIngredientDisplayState(match)).toBe("suggested");
+    expect(resolveInvoiceIngredientDisplayState(null)).toBe("unmatched");
+    expect(isInvoiceLineMatchedOrSuggested(match)).toBe(true);
+    expect(isInvoiceLineMatchedOrSuggested(null)).toBe(false);
+  });
+
+  it("classifies confirmed vs semantic suggestions", () => {
+    expect(resolveInvoiceIngredientDisplayState(baseMatch({ kind: "exact" }))).toBe("confirmed");
+    expect(resolveInvoiceIngredientDisplayState(baseMatch({ kind: "confirmed-alias" }))).toBe(
+      "confirmed",
+    );
+    expect(resolveInvoiceIngredientDisplayState(baseMatch({ kind: "semantic" }))).toBe("suggested");
+  });
+});
+
+describe("suggestedIngredientMatchBadgeLabel", () => {
+  it("labels operational-equivalent suggestions distinctly", () => {
+    expect(suggestedIngredientMatchBadgeLabel("operational-equivalent")).toBe(
+      "possible operational equivalent",
+    );
+    expect(suggestedIngredientMatchBadgeLabel("semantic")).toBe("possible ingredient match");
+  });
 });
 
 describe("buildMatchExplanation", () => {
@@ -80,6 +113,20 @@ describe("buildMatchExplanation", () => {
     expect(reasoning.caveats).toContain("requires human confirmation");
     expect(reasoning.caveats).toContain("commercial wording differs");
   });
+
+  it("explains operational-equivalent suggestions", () => {
+    const reasoning = buildMatchExplanation(
+      baseMatch({
+        kind: "operational-equivalent",
+        reason: "possible operational equivalent",
+        normalizedItemName: "palha snack food service 2kg",
+        normalizedIngredientName: "batata palha 2kg",
+      }),
+    );
+    expect(reasoning.headline).toBe("Possible operational equivalent");
+    expect(reasoning.confidence).toBe("suggested");
+    expect(reasoning.caveats).toContain("possible operational equivalent");
+  });
 });
 
 describe("resolveConfirmedAliasScope", () => {
@@ -114,7 +161,11 @@ describe("resolveMatchTargetDisplayName", () => {
     });
     expect(resolveMatchTargetDisplayName(match)).toBe("tomate cherry");
     expect(
-      resolveMatchTargetDisplayName(match, { id: "ing-1", name: "Tomate cherry", normalized_name: null }),
+      resolveMatchTargetDisplayName(match, {
+        id: "ing-1",
+        name: "Tomate cherry",
+        normalized_name: null,
+      }),
     ).toBe("Tomate cherry");
   });
 });
@@ -131,7 +182,7 @@ describe("buildMatchTargetLabel", () => {
     });
   });
 
-  it("uses Matched to for exact and semantic matches", () => {
+  it("uses Matched to for exact, semantic, and operational-equivalent matches", () => {
     const exact = buildMatchTargetLabel(baseMatch({ kind: "exact" }));
     expect(exact?.prefix).toBe("Matched to:");
     expect(formatMatchTargetLabel(exact!)).toBe("Matched to: Tomate cherry");
@@ -139,6 +190,12 @@ describe("buildMatchTargetLabel", () => {
     const semantic = buildMatchTargetLabel(baseMatch({ kind: "semantic" }));
     expect(semantic?.prefix).toBe("Matched to:");
     expect(matchTargetLabelPrefix("semantic", null)).toBe("Matched to:");
+
+    const operational = buildMatchTargetLabel(
+      baseMatch({ kind: "operational-equivalent", reason: "possible operational equivalent" }),
+    );
+    expect(operational?.prefix).toBe("Matched to:");
+    expect(matchTargetLabelPrefix("operational-equivalent", null)).toBe("Matched to:");
   });
 
   it("uses alias prefixes for confirmed matches by scope", () => {

@@ -101,7 +101,13 @@ export function canonicalWeakSubstringMatch(a: string, b: string): boolean {
   return ` ${long} `.includes(` ${short} `);
 }
 
-export type IngredientCanonicalMatchKind = "confirmed-alias" | "exact" | "semantic";
+export type IngredientCanonicalMatchKind =
+  | "confirmed-alias"
+  | "exact"
+  | "semantic"
+  | "operational-equivalent";
+
+export const OPERATIONAL_EQUIVALENT_MATCH_REASON = "possible operational equivalent";
 
 export type IngredientCanonicalInput = {
   id: string;
@@ -116,11 +122,35 @@ export type IngredientCanonicalMatch = {
   normalizedIngredientName: string;
   kind: IngredientCanonicalMatchKind;
   reason: string;
+  /** Weighted semantic similarity from legacy token scoring [0, 1]. */
+  semanticSimilarity?: number;
+  /** Canonical operational-equivalence confidence [0, 1]. */
+  operationalEquivalenceConfidence?: number;
+  /** Deterministic promotion score decomposition (optional for explainability). */
+  scoreBreakdown?: MatchScoreBreakdown;
+  /** Match target is an invoice-inferred synthetic catalog row (not persisted). */
+  syntheticTarget?: boolean;
 };
 
 export type IngredientAliasMap = Record<string, string>;
 
 import { lookupIngredientIdFromAliasMap } from "@/lib/ingredient-alias-lookup";
+import {
+  canonicalizeIngredientIdentity,
+  computeMatchScoreBreakdown,
+  computeOperationalEquivalenceConfidence,
+  hasCompatibleCanonicalForms,
+  needsOperationalHumanConfirm,
+  OPERATIONAL_EQUIVALENT_MIN_SCORE,
+  resolveMatchScoreRejectionReason,
+  scoreCanonicalIngredientSimilarity,
+  shareOperationalAliasCluster,
+  type MatchScoreBreakdown,
+} from "@/lib/ingredient-identity";
+import { resolveParentFormHierarchyMatch } from "@/lib/ingredient-parent-form";
+
+export { OPERATIONAL_EQUIVALENT_MIN_SCORE } from "@/lib/ingredient-identity";
+export type { MatchScoreBreakdown, MatchScoreRejectionReason } from "@/lib/ingredient-identity";
 import { normalizeInvoiceMatchIngredientName } from "@/lib/normalize-ingredient-name";
 
 const WEIGHT_TOKEN_RE = /\b\d+(?:[.,]\d+)?\s*(?:kg|kgs|g|gr|grs)\.?\b/gi;
@@ -220,6 +250,10 @@ export const FORM_INGREDIENT_MATCH_TOKENS = new Set([
   "cherry",
   "cereja",
   "cerejas",
+  "dip",
+  "dips",
+  "slices",
+  "slice",
 ]);
 
 /**
@@ -279,6 +313,8 @@ const FORM_SINGLE_TOKEN_TO_FAMILY: Record<string, string> = {
   fatiada: "sliced",
   molho: "molho",
   molhos: "molho",
+  bloco: "block",
+  block: "block",
   shredded: "shredded",
   triturado: "triturado",
   triturada: "triturado",
@@ -286,6 +322,10 @@ const FORM_SINGLE_TOKEN_TO_FAMILY: Record<string, string> = {
   cherry: "cherry",
   cereja: "cherry",
   cerejas: "cherry",
+  dip: "dip",
+  dips: "dip",
+  slices: "sliced",
+  slice: "sliced",
 };
 
 /** Retailer / brand / marketing tokens — minimal weight in similarity scoring. */
@@ -372,9 +412,21 @@ function traceIngredientSemanticMatch(details: {
   weakTokens: string[];
   matchedIngredient: string | null;
   similarityScore: number;
+  scoreBreakdown?: MatchScoreBreakdown;
 }) {
   if (!import.meta.env.DEV) return;
   console.debug("[invoice-ingredient-match]", details);
+}
+
+function traceIngredientMatchRejected(details: {
+  itemName: string;
+  bestIngredientName: string | null;
+  scoreBreakdown: MatchScoreBreakdown;
+  semanticScore: number;
+  operationalScore: number;
+}) {
+  if (!import.meta.env.DEV) return;
+  console.debug("[ingredient-match-rejected]", details);
 }
 
 function weakTokensFromPhrases(normalizedName: string): Set<string> {
@@ -419,24 +471,6 @@ function classifyIngredientMatchTokens(
   return { core, weak, form, family, neutral };
 }
 
-function deriveIngredientFamilies(
-  classified: ClassifiedMatchTokens,
-  formFamilies: Set<string>,
-): Set<string> {
-  const families = new Set(classified.family);
-  for (const token of [...classified.core, ...classified.form]) {
-    const familyId = TOKEN_TO_INGREDIENT_FAMILY[token];
-    if (familyId) families.add(familyId);
-  }
-  if (
-    [...formFamilies].some((family) => POTATO_FORM_IMPLY_BATATA.has(family)) ||
-    classified.form.some((token) => POTATO_FORM_IMPLY_BATATA.has(token))
-  ) {
-    families.add("potato");
-  }
-  return families;
-}
-
 function applyImplicitBatataCore(
   core: Set<string>,
   formTokens: string[],
@@ -460,16 +494,6 @@ function effectiveCoreSets(
   applyImplicitBatataCore(aCore, aClass.form, extractIngredientFormFamilies(rawA));
   applyImplicitBatataCore(bCore, bClass.form, extractIngredientFormFamilies(rawB));
   return { aCore, bCore };
-}
-
-function mutualWeakOverlapRatio(aWeak: Set<string>, bWeak: Set<string>) {
-  if (aWeak.size === 0 && bWeak.size === 0) return 1;
-  if (aWeak.size === 0 || bWeak.size === 0) return 0;
-  let shared = 0;
-  for (const token of aWeak) {
-    if (bWeak.has(token)) shared += 1;
-  }
-  return shared / Math.max(aWeak.size, bWeak.size);
 }
 
 function lightStripForFormExtraction(raw: string): string {
@@ -518,7 +542,11 @@ export function hasCompatibleIngredientFormFamilies(rawA: string, rawB: string):
   const bForm = extractIngredientFormFamilies(rawB);
 
   if (aForm.size === 0 && bForm.size === 0) return true;
-  if (aForm.size === 0 || bForm.size === 0) return false;
+  if (aForm.size === 0 || bForm.size === 0) {
+    const identityA = canonicalizeIngredientIdentity(rawA);
+    const identityB = canonicalizeIngredientIdentity(rawB);
+    return resolveParentFormHierarchyMatch(identityA, identityB) != null;
+  }
   if (aForm.size !== bForm.size) return false;
   for (const family of aForm) {
     if (!bForm.has(family)) return false;
@@ -632,7 +660,20 @@ function shouldAutoConfirmSemanticMatch(
   if (score < SEMANTIC_AUTO_MATCH_MIN_SCORE) return false;
   if (!hasCompatibleMeasures(a, b)) return false;
   if (!hasCompatibleIngredientFormFamilies(rawA, rawB)) return false;
+  if (needsOperationalHumanConfirm(rawA, rawB, a, b)) return false;
   return equalCoreIngredientIdentity(a, b, rawA, rawB);
+}
+
+function operationalEquivalenceConfidence(
+  rawA: string,
+  rawB: string,
+  normA: string,
+  normB: string,
+  legacyCoreDice: number,
+) {
+  return computeOperationalEquivalenceConfidence(rawA, rawB, {
+    legacyCoreDice,
+  }).confidence;
 }
 
 function semanticSimilarity(a: string, b: string, rawA: string, rawB: string) {
@@ -643,14 +684,20 @@ function semanticSimilarity(a: string, b: string, rawA: string, rawB: string) {
   const bTokens = new Set(productTokens(b));
   if (aTokens.size === 0 || bTokens.size === 0 || !hasCompatibleFormat(aTokens, bTokens)) return 0;
 
+  const identityA = canonicalizeIngredientIdentity(rawA);
+  const identityB = canonicalizeIngredientIdentity(rawB);
+  const parentFormHierarchy = resolveParentFormHierarchyMatch(identityA, identityB);
+  if (!hasCompatibleCanonicalForms(identityA.form, identityB.form) && !parentFormHierarchy) {
+    return 0;
+  }
+
+  const sharedOperationalCluster = shareOperationalAliasCluster(identityA, identityB);
+
   const aClass = classifyIngredientMatchTokens(aTokens, a);
   const bClass = classifyIngredientMatchTokens(bTokens, b);
   const { aCore, bCore } = effectiveCoreSets(aClass, bClass, rawA, rawB);
-  const aForm = new Set(aClass.form);
-  const bForm = new Set(bClass.form);
-  const aFamilies = deriveIngredientFamilies(aClass, extractIngredientFormFamilies(rawA));
-  const bFamilies = deriveIngredientFamilies(bClass, extractIngredientFormFamilies(rawB));
 
+  let legacyCoreDice = 0;
   if (aCore.size > 0 || bCore.size > 0) {
     if (aCore.size === 0 || bCore.size === 0) return 0;
 
@@ -660,7 +707,6 @@ function semanticSimilarity(a: string, b: string, rawA: string, rawB: string) {
     const coresEqual =
       aCore.size === bCore.size && [...aCore].every((token) => bCore.has(token));
 
-    // One-sided extra core tokens (e.g. tomate vs tomate cherry) must not auto-match.
     if (!coresEqual) {
       const maxCoreSize = Math.max(aCore.size, bCore.size);
       const symmetricCoreCoverage =
@@ -668,30 +714,34 @@ function semanticSimilarity(a: string, b: string, rawA: string, rawB: string) {
       if (symmetricCoreCoverage < CORE_COVERAGE_MIN) return 0;
     }
 
-    const coreDice = diceCoefficient([...aCore].sort().join(" "), [...bCore].sort().join(" "));
-    const formCoverage =
-      aForm.size > 0 && bForm.size > 0 ? tokenOverlapRatio(aForm, bForm) : 1;
-    const weakCoverage = mutualWeakOverlapRatio(
-      new Set(aClass.weak),
-      new Set(bClass.weak),
-    );
-    const familyCoverage =
-      aFamilies.size > 0 && bFamilies.size > 0 ? tokenOverlapRatio(aFamilies, bFamilies) : 1;
+    legacyCoreDice = diceCoefficient([...aCore].sort().join(" "), [...bCore].sort().join(" "));
+  }
 
-    // Core identity dominates; form overlap refines; family overlap is a small tie-breaker only.
-    let score =
-      coreCoverage * 0.6 +
-      coreDice * 0.2 +
-      formCoverage * 0.12 +
-      familyCoverage * 0.05 +
-      weakCoverage * 0.03;
-    if (coresEqual) {
-      score = Math.max(score, SEMANTIC_AUTO_MATCH_MIN_SCORE);
+  if (identityA.family && identityB.family) {
+    const canonical = scoreCanonicalIngredientSimilarity(identityA, identityB, {
+      legacyCoreDice,
+    });
+    if (canonical.score === 0) return 0;
+
+    if (!sharedOperationalCluster && aCore.size > 0 && bCore.size > 0) {
+      const coreCoverage = tokenOverlapRatio(aCore, bCore);
+      if (coreCoverage < CORE_COVERAGE_MIN) return 0;
     }
+
+    return Math.min(1, canonical.score);
+  }
+
+  if (aCore.size > 0 || bCore.size > 0) {
+    if (aCore.size === 0 || bCore.size === 0) return 0;
+    const coreCoverage = tokenOverlapRatio(aCore, bCore);
+    if (coreCoverage < CORE_COVERAGE_MIN) return 0;
+    const coresEqual =
+      aCore.size === bCore.size && [...aCore].every((token) => bCore.has(token));
+    let score = coreCoverage * 0.6 + legacyCoreDice * 0.4;
+    if (coresEqual) score = Math.max(score, SEMANTIC_AUTO_MATCH_MIN_SCORE);
     return Math.min(1, score);
   }
 
-  // No core tokens on either side — fall back to neutral-only overlap (conservative).
   const aNeutral = new Set(aClass.neutral);
   const bNeutral = new Set(bClass.neutral);
   if (aNeutral.size === 0 || bNeutral.size === 0) return 0;
@@ -711,6 +761,11 @@ function normalizedIngredientCandidateName(ingredient: IngredientCanonicalInput)
   const fromName = normalizeInvoiceIngredientName(ingredient.name);
   if (fromName) return fromName;
   return normalizeInvoiceIngredientName(ingredient.normalized_name);
+}
+
+function withSyntheticTargetFlag(match: IngredientCanonicalMatch): IngredientCanonicalMatch {
+  if (!match.ingredient.id.startsWith("synthetic:")) return match;
+  return { ...match, syntheticTarget: true };
 }
 
 export function findCanonicalIngredientMatch(
@@ -738,36 +793,40 @@ export function findCanonicalIngredientMatch(
           ingredientName: ingredient.name,
         });
       }
-      return {
+      return withSyntheticTargetFlag({
         ingredient,
         normalizedItemName,
         normalizedIngredientName: normalizedIngredientCandidateName(ingredient),
         kind: "confirmed-alias",
         reason: "confirmed supplier wording",
-      };
+      });
     }
   }
 
   for (const ingredient of ingredients) {
     const normalizedIngredientName = normalizedIngredientCandidateName(ingredient);
+    const ingredientRaw = ingredient.name ?? ingredient.normalized_name ?? "";
     if (normalizedIngredientName && normalizedIngredientName === normalizedItemName) {
-      if (
-        !hasCompatibleIngredientFormFamilies(itemName, ingredient.name ?? ingredient.normalized_name ?? "")
-      ) {
+      if (!hasCompatibleIngredientFormFamilies(itemName, ingredientRaw)) {
         continue;
       }
-      return {
+      if (needsOperationalHumanConfirm(itemName, ingredientRaw, normalizedItemName, normalizedIngredientName)) {
+        continue;
+      }
+      return withSyntheticTargetFlag({
         ingredient,
         normalizedItemName,
         normalizedIngredientName,
         kind: "exact",
         reason: "same normalized ingredient name",
-      };
+      });
     }
   }
 
   let best: IngredientCanonicalMatch | null = null;
   let bestScore = 0;
+  let bestOperationalConfidence = 0;
+  let bestBreakdown: MatchScoreBreakdown | null = null;
   const itemTokenClass = classifyIngredientMatchTokens(
     new Set(productTokens(normalizedItemName)),
     normalizedItemName,
@@ -776,48 +835,215 @@ export function findCanonicalIngredientMatch(
   for (const ingredient of ingredients) {
     const normalizedIngredientName = normalizedIngredientCandidateName(ingredient);
     if (!normalizedIngredientName) continue;
+    const ingredientRaw = ingredient.name ?? ingredient.normalized_name ?? "";
+    const itemIdentity = canonicalizeIngredientIdentity(itemName);
+    const ingredientIdentity = canonicalizeIngredientIdentity(ingredientRaw);
+    const parentFormHierarchy = resolveParentFormHierarchyMatch(
+      itemIdentity,
+      ingredientIdentity,
+    );
+    if (
+      !hasCompatibleCanonicalForms(itemIdentity.form, ingredientIdentity.form) &&
+      !parentFormHierarchy
+    ) {
+      continue;
+    }
+    const aTokens = new Set(productTokens(normalizedItemName));
+    const bTokens = new Set(productTokens(normalizedIngredientName));
+    const aClass = classifyIngredientMatchTokens(aTokens, normalizedItemName);
+    const bClass = classifyIngredientMatchTokens(bTokens, normalizedIngredientName);
+    const { aCore, bCore } = effectiveCoreSets(aClass, bClass, itemName, ingredientRaw);
+    let legacyCoreDice = 0;
+    if (aCore.size > 0 && bCore.size > 0) {
+      legacyCoreDice = diceCoefficient([...aCore].sort().join(" "), [...bCore].sort().join(" "));
+    }
+    if (shareOperationalAliasCluster(itemIdentity, ingredientIdentity)) {
+      const clusterCanonical = scoreCanonicalIngredientSimilarity(itemIdentity, ingredientIdentity, {
+        legacyCoreDice,
+      });
+      legacyCoreDice = Math.max(legacyCoreDice, clusterCanonical.legacyCoreDice, clusterCanonical.score);
+    }
+
     const score = semanticSimilarity(
       normalizedItemName,
       normalizedIngredientName,
       itemName,
-      ingredient.name ?? ingredient.normalized_name ?? "",
+      ingredientRaw,
     );
-    if (score > bestScore) {
+    const operationalConfidence = operationalEquivalenceConfidence(
+      itemName,
+      ingredientRaw,
+      normalizedItemName,
+      normalizedIngredientName,
+      legacyCoreDice,
+    );
+    const breakdown = computeMatchScoreBreakdown({
+      rawItem: itemName,
+      rawIngredient: ingredientRaw,
+      semanticSimilarity: score,
+      legacyCoreDice,
+      hasCompatibleMeasures: hasCompatibleMeasures(normalizedItemName, normalizedIngredientName),
+      hasCompatibleIngredientForms: hasCompatibleIngredientFormFamilies(itemName, ingredientRaw),
+      hasCompatibleFormat: hasCompatibleFormat(aTokens, bTokens),
+      semanticMinScore: SEMANTIC_MATCH_MIN_SCORE,
+      operationalMinScore: OPERATIONAL_EQUIVALENT_MIN_SCORE,
+    });
+    const candidateScore = breakdown.finalPromotionScore;
+    if (candidateScore > Math.max(bestScore, bestOperationalConfidence)) {
       bestScore = score;
+      bestOperationalConfidence = operationalConfidence;
+      bestBreakdown = breakdown;
       best = {
         ingredient,
         normalizedItemName,
         normalizedIngredientName,
         kind: "semantic",
         reason: "similar product wording and matching size",
+        semanticSimilarity: score,
+        operationalEquivalenceConfidence: operationalConfidence,
+        scoreBreakdown: breakdown,
       };
     }
   }
 
-  if (best && bestScore >= SEMANTIC_MATCH_MIN_SCORE) {
-    const autoConfirm = shouldAutoConfirmSemanticMatch(
+  if (!best) {
+    if (import.meta.env.DEV && ingredients.length > 0) {
+      console.debug("[ingredient-match-rejected]", {
+        itemName,
+        reason: "no_viable_candidates",
+      });
+    }
+    return null;
+  }
+
+  const ingredientRaw = best.ingredient.name ?? best.ingredient.normalized_name ?? "";
+  const bestItemIdentity = canonicalizeIngredientIdentity(itemName);
+  const bestIngredientIdentity = canonicalizeIngredientIdentity(ingredientRaw);
+  const parentFormHierarchy = resolveParentFormHierarchyMatch(
+    bestItemIdentity,
+    bestIngredientIdentity,
+  );
+  const requiresOperationalReview = needsOperationalHumanConfirm(
+    itemName,
+    ingredientRaw,
+    normalizedItemName,
+    best.normalizedIngredientName,
+  );
+  const operationalReason =
+    parentFormHierarchy?.reason ?? OPERATIONAL_EQUIVALENT_MATCH_REASON;
+  const meetsSemanticBar = bestScore >= SEMANTIC_MATCH_MIN_SCORE;
+  const meetsOperationalBar = bestOperationalConfidence >= OPERATIONAL_EQUIVALENT_MIN_SCORE;
+
+  if (!meetsSemanticBar && !meetsOperationalBar) {
+    const finalScore = Math.max(bestScore, bestOperationalConfidence);
+    const rejectionBreakdown: MatchScoreBreakdown = {
+      canonicalIdentityScore: bestBreakdown?.canonicalIdentityScore ?? 0,
+      operationalFamilyScore: bestBreakdown?.operationalFamilyScore ?? 0,
+      formCompatibilityScore: bestBreakdown?.formCompatibilityScore ?? 0,
+      commercialNoisePenalty: bestBreakdown?.commercialNoisePenalty ?? 0,
+      blockerPenalty: bestBreakdown?.blockerPenalty ?? 0,
+      aliasConfidence: bestBreakdown?.aliasConfidence ?? 0,
+      finalPromotionScore: finalScore,
+      rejectionReason:
+        bestBreakdown?.rejectionReason ??
+        resolveMatchScoreRejectionReason({
+          canonicalIdentityScore: bestBreakdown?.canonicalIdentityScore ?? 0,
+          operationalFamilyScore: bestBreakdown?.operationalFamilyScore ?? 0,
+          formCompatibilityScore: bestBreakdown?.formCompatibilityScore ?? 0,
+          commercialNoisePenalty: bestBreakdown?.commercialNoisePenalty ?? 0,
+          blockerPenalty: bestBreakdown?.blockerPenalty ?? 0,
+          finalPromotionScore: finalScore,
+          semanticMin: SEMANTIC_MATCH_MIN_SCORE,
+          operationalMin: OPERATIONAL_EQUIVALENT_MIN_SCORE,
+          measuresOk: hasCompatibleMeasures(normalizedItemName, best.normalizedIngredientName),
+          ingredientFormsOk: hasCompatibleIngredientFormFamilies(itemName, ingredientRaw),
+          formatOk: hasCompatibleFormat(
+            new Set(productTokens(normalizedItemName)),
+            new Set(productTokens(best.normalizedIngredientName)),
+          ),
+        }),
+    };
+    traceIngredientMatchRejected({
+      itemName,
+      bestIngredientName: best.ingredient.name ?? null,
+      scoreBreakdown: rejectionBreakdown,
+      semanticScore: bestScore,
+      operationalScore: bestOperationalConfidence,
+    });
+    return null;
+  }
+
+  const autoConfirm =
+    meetsSemanticBar &&
+    shouldAutoConfirmSemanticMatch(
       normalizedItemName,
       best.normalizedIngredientName,
       bestScore,
       itemName,
-      best.ingredient.name ?? best.ingredient.normalized_name ?? "",
+      ingredientRaw,
     );
-    traceIngredientSemanticMatch({
-      originalName: itemName,
-      normalizedName: normalizedItemName,
-      coreTokens: itemTokenClass.core,
-      weakTokens: itemTokenClass.weak,
-      matchedIngredient: best.ingredient.name,
-      similarityScore: bestScore,
+
+  const promotedBreakdown: MatchScoreBreakdown = {
+    ...(bestBreakdown ?? {
+      canonicalIdentityScore: 0,
+      operationalFamilyScore: 0,
+      formCompatibilityScore: 0,
+      commercialNoisePenalty: 0,
+      blockerPenalty: 0,
+      aliasConfidence: 0,
+      finalPromotionScore: Math.max(bestScore, bestOperationalConfidence),
+    }),
+    rejectionReason: null,
+  };
+
+  traceIngredientSemanticMatch({
+    originalName: itemName,
+    normalizedName: normalizedItemName,
+    coreTokens: itemTokenClass.core,
+    weakTokens: itemTokenClass.weak,
+    matchedIngredient: best.ingredient.name,
+    similarityScore: bestScore,
+    scoreBreakdown: promotedBreakdown,
+  });
+
+  if (autoConfirm) {
+    return withSyntheticTargetFlag({
+      ...best,
+      kind: "exact",
+      reason: "same core product identity and matching size",
+      scoreBreakdown: promotedBreakdown,
     });
-    if (autoConfirm) {
-      return {
-        ...best,
-        kind: "exact",
-        reason: "same core product identity and matching size",
-      };
-    }
-    return best;
+  }
+
+  if (parentFormHierarchy && meetsOperationalBar) {
+    return withSyntheticTargetFlag({
+      ...best,
+      kind: "operational-equivalent",
+      reason: operationalReason,
+      scoreBreakdown: promotedBreakdown,
+    });
+  }
+
+  if (requiresOperationalReview && meetsOperationalBar) {
+    return withSyntheticTargetFlag({
+      ...best,
+      kind: "operational-equivalent",
+      reason: operationalReason,
+      scoreBreakdown: promotedBreakdown,
+    });
+  }
+
+  if (meetsSemanticBar) {
+    return withSyntheticTargetFlag({ ...best, scoreBreakdown: promotedBreakdown });
+  }
+
+  if (meetsOperationalBar) {
+    return withSyntheticTargetFlag({
+      ...best,
+      kind: "operational-equivalent",
+      reason: operationalReason,
+      scoreBreakdown: promotedBreakdown,
+    });
   }
 
   return null;
