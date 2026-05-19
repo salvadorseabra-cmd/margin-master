@@ -41,7 +41,7 @@ export async function loadIngredientPriceFieldsById(
   try {
     const { data, error } = await client
       .from("ingredients")
-      .select("id, current_price, updated_at");
+      .select("id, current_price");
     if (error) {
       logQueryFailure("loadIngredientPriceFieldsById", error.message);
       return {};
