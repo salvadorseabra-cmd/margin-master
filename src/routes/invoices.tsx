@@ -72,6 +72,7 @@ type DbInvoiceRow = {
   total: number | null;
   file_url: string | null;
   created_at: string | null;
+  settlement_status: string | null;
 };
 
 type Pending = {
@@ -84,7 +85,7 @@ type Pending = {
 };
 
 type SortOption = "newest" | "oldest" | "supplier" | "highest" | "lowest" | "status";
-type SettlementState = "awaiting" | "settled";
+type SettlementState = "pending" | "settled";
 
 const MAX_BYTES = 20 * 1024 * 1024;
 const ACCEPT = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
@@ -141,6 +142,13 @@ type PriceDeltaDetails = {
   direction: "increased" | "decreased" | "stable";
   percentLabel: string;
   previousLabel: string;
+};
+type OperationalSummaryTone = "muted" | "increase" | "decrease" | "steady";
+type OperationalSummaryCard = {
+  label: string;
+  value: string;
+  detail: string;
+  tone?: OperationalSummaryTone;
 };
 type InvoiceRowTailFields = {
   quantity: number | null;
@@ -207,15 +215,155 @@ const invoiceTime = (createdAt: string) => {
   return Number.isNaN(time) ? 0 : time;
 };
 
+const safeSortString = (value: unknown) => String(value ?? "").trim();
+
+const compareSortStrings = (a: unknown, b: unknown) =>
+  safeSortString(a).localeCompare(safeSortString(b), undefined, { sensitivity: "base" });
+
+const normalizeSettlementStatus = (value: string | null | undefined): SettlementState =>
+  value === "settled" ? "settled" : "pending";
+
 const getSettlementState = (
   invoiceId: string,
   settlementByInvoice: Record<string, SettlementState>,
-) => settlementByInvoice[invoiceId] ?? "awaiting";
+) => settlementByInvoice[invoiceId] ?? "pending";
 
 const invoiceSubtitle = (row: InvoiceRow) => {
   if (row.invoiceNumber) return row.invoiceNumber;
   if (row.supplierIsFallback && row.sourceFileName) return "Uploaded file";
   return null;
+};
+
+const getMonthlyBucketDate = (row: InvoiceRow) => {
+  const value = row.invoiceDate ?? row.created_at;
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const isInMonth = (row: InvoiceRow, monthStart: Date) => {
+  const date = getMonthlyBucketDate(row);
+  if (!date) return false;
+  return (
+    date.getFullYear() === monthStart.getFullYear() && date.getMonth() === monthStart.getMonth()
+  );
+};
+
+const formatMoney = (value: number) => `€${value.toFixed(2)}`;
+
+const formatPercentDelta = (current: number, previous: number) => {
+  if (previous <= 0) return null;
+  const percent = Math.round(((current - previous) / previous) * 100);
+  if (percent === 0) return "0% vs last month";
+  return `${percent > 0 ? "+" : ""}${percent}% vs last month`;
+};
+
+const deltaTone = (current: number, previous: number): OperationalSummaryTone => {
+  if (previous <= 0 || current === previous) return "steady";
+  return current > previous ? "increase" : "decrease";
+};
+
+const summarizeSupplierSpend = (rows: InvoiceRow[]) => {
+  const totals = rows.reduce<Record<string, number>>((acc, row) => {
+    const supplier = row.supplier_name || "Unknown supplier";
+    acc[supplier] = (acc[supplier] ?? 0) + Number(row.total ?? 0);
+    return acc;
+  }, {});
+
+  return Object.entries(totals).sort(([, a], [, b]) => b - a)[0] ?? null;
+};
+
+const buildOperationalSummaryCards = (rows: InvoiceRow[]): OperationalSummaryCard[] => {
+  const now = new Date();
+  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const currentRows = rows.filter((row) => isInMonth(row, currentMonthStart));
+  const previousRows = rows.filter((row) => isInMonth(row, previousMonthStart));
+  const currentSpend = currentRows.reduce((sum, row) => sum + Number(row.total ?? 0), 0);
+  const previousSpend = previousRows.reduce((sum, row) => sum + Number(row.total ?? 0), 0);
+  const activeSuppliers = new Set(currentRows.map((row) => row.supplier_name).filter(Boolean)).size;
+  const topSupplier = summarizeSupplierSpend(currentRows);
+  const missingSupplierCount = currentRows.filter((row) => row.supplierIsFallback).length;
+  const spendDelta = formatPercentDelta(currentSpend, previousSpend);
+
+  let insight: OperationalSummaryCard = {
+    label: "Purchasing movement",
+    value: currentRows.length > 0 ? "Monthly baseline" : "No activity yet",
+    detail:
+      rows.length > 0
+        ? "Upload this month's invoices to compare movement"
+        : "Your purchasing snapshot will appear here",
+    tone: "muted",
+  };
+
+  if (missingSupplierCount > 0) {
+    insight = {
+      label: "Purchasing movement",
+      value: `${missingSupplierCount} supplier ${missingSupplierCount === 1 ? "check" : "checks"}`,
+      detail: "Some invoices need cleaner supplier names",
+      tone: "increase",
+    };
+  } else if (topSupplier && previousRows.length > 0) {
+    const [supplierName, supplierSpend] = topSupplier;
+    const previousSupplierSpend = previousRows
+      .filter((row) => row.supplier_name === supplierName)
+      .reduce((sum, row) => sum + Number(row.total ?? 0), 0);
+    const supplierDelta = formatPercentDelta(supplierSpend, previousSupplierSpend);
+
+    const supplierDeltaPercent = Math.round(
+      ((supplierSpend - previousSupplierSpend) / previousSupplierSpend) * 100,
+    );
+
+    if (supplierDelta && Math.abs(supplierDeltaPercent) >= 10) {
+      insight = {
+        label: "Purchasing movement",
+        value: `${supplierName} ${supplierSpend > previousSupplierSpend ? "up" : "down"}`,
+        detail: supplierDelta,
+        tone: deltaTone(supplierSpend, previousSupplierSpend),
+      };
+    } else {
+      insight = {
+        label: "Purchasing movement",
+        value: "No major volatility",
+        detail:
+          activeSuppliers > 0
+            ? `Across ${activeSuppliers} active ${activeSuppliers === 1 ? "supplier" : "suppliers"}`
+            : "Current month is quiet",
+        tone: "steady",
+      };
+    }
+  } else if (currentRows.length > 0) {
+    insight = {
+      label: "Purchasing movement",
+      value: "Month in progress",
+      detail: "Add another month to show movement",
+      tone: "steady",
+    };
+  }
+
+  return [
+    {
+      label: "Monthly purchasing",
+      value: `${formatMoney(currentSpend)} this month`,
+      detail: spendDelta ?? "No previous month baseline",
+      tone: spendDelta ? deltaTone(currentSpend, previousSpend) : "muted",
+    },
+    {
+      label: "Invoices processed",
+      value: `${currentRows.length} ${currentRows.length === 1 ? "invoice" : "invoices"}`,
+      detail: `${activeSuppliers} active ${activeSuppliers === 1 ? "supplier" : "suppliers"}`,
+      tone: "muted",
+    },
+    {
+      label: "Top supplier this month",
+      value: topSupplier ? topSupplier[0] : "No supplier yet",
+      detail: topSupplier
+        ? `${formatMoney(topSupplier[1])} this month`
+        : "Upload invoices to begin",
+      tone: "muted",
+    },
+    insight,
+  ];
 };
 
 const toInvoiceRow = (
@@ -759,11 +907,15 @@ function InvoicesPage() {
     try {
       const { data, error } = await supabase
         .from("invoices")
-        .select("id, supplier_name, invoice_date, total, file_url, created_at")
+        .select("id, supplier_name, invoice_date, total, file_url, created_at, settlement_status")
         .order("created_at", { ascending: false });
       if (error) throw error;
 
       const invoiceRows = (data ?? []) as DbInvoiceRow[];
+      const settlementMap = Object.fromEntries(
+        invoiceRows.map((row) => [row.id, normalizeSettlementStatus(row.settlement_status)]),
+      ) as Record<string, SettlementState>;
+      setSettlementByInvoice(settlementMap);
       const ids = invoiceRows.map((row) => row.id);
       const itemCounts: Record<string, number> = {};
       const { data: ingredientRows, error: ingredientError } = await supabase
@@ -803,6 +955,7 @@ function InvoicesPage() {
     else {
       setRows([]);
       setIngredientCatalog([]);
+      setSettlementByInvoice({});
       setLoading(false);
     }
   }, [user, load]);
@@ -815,14 +968,7 @@ function InvoicesPage() {
     [pending],
   );
 
-  const stats = useMemo(() => {
-    const total = rows.reduce((s, r) => s + Number(r.total ?? 0), 0);
-    return {
-      count: rows.length,
-      total,
-      processing: rows.filter((r) => r.status === "Processing").length,
-    };
-  }, [rows]);
+  const operationalSummaryCards = useMemo(() => buildOperationalSummaryCards(rows), [rows]);
 
   const settlementOverview = useMemo(() => {
     if (rows.length === 0) return null;
@@ -854,22 +1000,19 @@ function InvoicesPage() {
         case "oldest":
           return invoiceTime(a.timelineDate) - invoiceTime(b.timelineDate);
         case "supplier":
-          return a.supplier.localeCompare(b.supplier, undefined, { sensitivity: "base" });
+          return compareSortStrings(a.supplier_name, b.supplier_name);
         case "highest":
           return Number(b.total) - Number(a.total);
         case "lowest":
           return Number(a.total) - Number(b.total);
         case "status": {
           const statusOrder =
-            a.status.localeCompare(b.status, undefined, { sensitivity: "base" }) ||
-            getSettlementState(a.id, settlementByInvoice).localeCompare(
+            compareSortStrings(a.status, b.status) ||
+            compareSortStrings(
+              getSettlementState(a.id, settlementByInvoice),
               getSettlementState(b.id, settlementByInvoice),
-              undefined,
-              { sensitivity: "base" },
             );
-          return (
-            statusOrder || a.supplier.localeCompare(b.supplier, undefined, { sensitivity: "base" })
-          );
+          return statusOrder || compareSortStrings(a.supplier_name, b.supplier_name);
         }
         case "newest":
         default:
@@ -878,11 +1021,31 @@ function InvoicesPage() {
     });
   }, [rows, settlementByInvoice, sortBy]);
 
-  const toggleSettlement = (invoiceId: string) => {
-    setSettlementByInvoice((current) => ({
-      ...current,
-      [invoiceId]: getSettlementState(invoiceId, current) === "settled" ? "awaiting" : "settled",
-    }));
+  const toggleSettlement = async (invoiceId: string) => {
+    let previous: SettlementState = "pending";
+    let next: SettlementState = "settled";
+
+    setSettlementByInvoice((current) => {
+      previous = getSettlementState(invoiceId, current);
+      next = previous === "settled" ? "pending" : "settled";
+      return {
+        ...current,
+        [invoiceId]: next,
+      };
+    });
+
+    const { error } = await supabase
+      .from("invoices")
+      .update({ settlement_status: next })
+      .eq("id", invoiceId);
+
+    if (error) {
+      setSettlementByInvoice((current) => ({
+        ...current,
+        [invoiceId]: previous,
+      }));
+      setGlobalError(error.message);
+    }
   };
 
   const enqueue = (files: FileList | File[]) => {
@@ -1364,12 +1527,11 @@ function InvoicesPage() {
       title="Invoices"
       subtitle="Upload supplier invoices — your files stay private and are extracted automatically."
     >
-      {/* Stats */}
+      {/* Operational snapshot */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-        <Stat label="Invoices" value={String(stats.count)} />
-        <Stat label="Total spend" value={`€${stats.total.toFixed(2)}`} />
-        <Stat label="In review" value={String(stats.processing)} />
-        <Stat label="Storage" value="Private" hint="Encrypted" />
+        {operationalSummaryCards.map((card) => (
+          <Stat key={card.label} {...card} />
+        ))}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-4">
@@ -1649,12 +1811,21 @@ function InvoicesPage() {
   );
 }
 
-function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
+function Stat({ label, value, detail, tone = "muted" }: OperationalSummaryCard) {
+  const detailClass =
+    tone === "increase"
+      ? "text-destructive/75"
+      : tone === "decrease"
+        ? "text-success/75"
+        : tone === "steady"
+          ? "text-foreground/60"
+          : "text-muted-foreground";
+
   return (
-    <div className="card-surface p-4">
+    <div className="card-surface p-4 min-h-[112px]">
       <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="text-lg font-semibold tabular-nums mt-0.5">{value}</div>
-      {hint && <div className="text-[10px] uppercase tracking-wider text-success mt-1">{hint}</div>}
+      <div className="mt-2 text-lg font-semibold leading-tight tabular-nums">{value}</div>
+      <div className={`mt-2 text-[11px] leading-snug ${detailClass}`}>{detail}</div>
     </div>
   );
 }
@@ -1739,14 +1910,14 @@ function SettlementBadge({ state, onToggle }: { state: SettlementState; onToggle
         event.stopPropagation();
         onToggle();
       }}
-      className={`inline-flex items-center gap-1 rounded-md px-0.5 py-0 text-[10px] font-normal leading-tight transition hover:bg-muted/50 hover:text-foreground ${
-        settled ? "text-success/70" : "text-muted-foreground/75"
+      className={`inline-flex items-center gap-1 rounded-md px-0.5 py-0 text-[10px] font-normal leading-tight transition hover:bg-muted/50 ${
+        settled
+          ? "text-success/70 hover:text-success"
+          : "text-destructive/65 hover:text-destructive/80"
       }`}
-      title="Local settlement marker for this session"
+      title={settled ? "Mark as settlement pending" : "Mark as settled"}
     >
-      <span
-        className={`h-1 w-1 rounded-full ${settled ? "bg-success/60" : "bg-muted-foreground/40"}`}
-      />
+      <span className={`h-1 w-1 rounded-full ${settled ? "bg-success/60" : "bg-destructive/45"}`} />
       {settled ? "Settled" : "Settlement pending"}
     </button>
   );
