@@ -38,6 +38,27 @@ import {
   type IngredientCanonicalMatch,
 } from "@/lib/ingredient-canonical";
 import {
+  buildMatchExplanation,
+  buildMatchTargetLabel,
+  formatMatchReasoningTooltip,
+  shouldShowMatchTargetLine,
+  type MatchReasoning,
+  type MatchTargetLabel,
+} from "@/lib/ingredient-match-explanation";
+import {
+  buildKnownSupplierNames,
+  deriveInvoiceLineOperationalSignals,
+  isNewSupplierForInvoice,
+  type OperationalSignal,
+} from "@/lib/ingredient-operational-signals";
+import {
+  emptyInvoiceOperationalMetadata,
+  loadIngredientPriceFieldsById,
+  loadInvoiceOperationalMetadata,
+  mergeIngredientPriceFields,
+  type InvoiceOperationalMetadata,
+} from "@/lib/invoice-operational-metadata";
+import {
   loadConfirmedIngredientAliasMap,
   rememberAliasInMap,
   upsertConfirmedAlias,
@@ -136,6 +157,8 @@ type IngredientMatchRow = {
   name: string | null;
   normalized_name?: string | null;
   unit?: string | null;
+  current_price?: number | null;
+  updated_at?: string | null;
 };
 
 type PriceComparisonMap = Record<string, number>;
@@ -928,6 +951,8 @@ function InvoicesPage() {
     Record<string, PriceComparisonMap>
   >({});
   const [ingredientCatalog, setIngredientCatalog] = useState<IngredientMatchRow[]>([]);
+  const [invoiceOperationalMetadata, setInvoiceOperationalMetadata] =
+    useState<InvoiceOperationalMetadata>(emptyInvoiceOperationalMetadata());
   const [confirmedIngredientAliases, setConfirmedIngredientAliases] = useState<IngredientAliasMap>(
     {},
   );
@@ -1004,8 +1029,21 @@ function InvoicesPage() {
       const { data: ingredientRows, error: ingredientError } = await supabase
         .from("ingredients")
         .select("id, name, normalized_name, unit");
+      if (ingredientError) {
+        console.error("[invoices] ingredients catalog load failed:", ingredientError.message);
+      }
+      const catalogBase = ingredientError ? [] : ((ingredientRows ?? []) as IngredientMatchRow[]);
+      const ingredientIds = catalogBase.map((row) => row.id);
 
-      setIngredientCatalog(ingredientError ? [] : ((ingredientRows ?? []) as IngredientMatchRow[]));
+      const [operationalMetadata, priceById] = await Promise.all([
+        loadInvoiceOperationalMetadata(supabase, ingredientIds),
+        loadIngredientPriceFieldsById(supabase),
+      ]);
+      const catalog = mergeIngredientPriceFields(catalogBase, priceById);
+
+      if (loadSeq !== invoiceLoadSeqRef.current) return;
+      setIngredientCatalog(catalog);
+      setInvoiceOperationalMetadata(operationalMetadata);
 
       const dbAliases = await loadConfirmedIngredientAliasMap(supabase);
       setConfirmedIngredientAliases((current) => ({ ...current, ...dbAliases }));
@@ -1031,7 +1069,6 @@ function InvoicesPage() {
       );
     } catch (err) {
       setRows([]);
-      setIngredientCatalog([]);
       setGlobalError(err instanceof Error ? err.message : "Could not load invoices");
     } finally {
       setLoading(false);
@@ -1043,6 +1080,7 @@ function InvoicesPage() {
     else {
       setRows([]);
       setIngredientCatalog([]);
+      setInvoiceOperationalMetadata(emptyInvoiceOperationalMetadata());
       setSettlementByInvoice({});
       setLoading(false);
     }
@@ -1209,10 +1247,10 @@ function InvoicesPage() {
       if (error) throw error;
       const items = Array.isArray(data?.items) ? data.items : [];
       traceInvoiceQuantityStage("extract-response:first-item", items[0], { invoiceId });
-  if (import.meta.env.DEV && items[0]) {
-    const sample = normalizeInvoiceItemFields(items[0] as ItemRow);
-    console.debug("[invoice-purchase]", resolveInvoiceLinePurchaseFormat(sample));
-  }
+      if (import.meta.env.DEV && items[0]) {
+        const sample = normalizeInvoiceItemFields(items[0] as ItemRow);
+        console.debug("[invoice-purchase]", resolveInvoiceLinePurchaseFormat(sample));
+      }
       // wipe prior items then insert fresh
       await supabase.from("invoice_items").delete().eq("invoice_id", invoiceId);
       if (items.length && user) {
@@ -1929,6 +1967,8 @@ function InvoicesPage() {
                             items={items}
                             priceComparisons={priceComparisonsByInvoice[r.id] ?? {}}
                             ingredientCatalog={ingredientCatalog}
+                            operationalMetadata={invoiceOperationalMetadata}
+                            allInvoiceSupplierNames={rows.map((row) => row.supplier_name)}
                             confirmedIngredientAliases={confirmedIngredientAliases}
                             supplierName={r.supplier_name}
                             loading={itemsByInvoice[r.id] === undefined}
@@ -2109,6 +2149,72 @@ function MissingValue({ label }: { label: string }) {
   );
 }
 
+function IngredientMatchTargetLine({
+  label,
+  ingredientId,
+}: {
+  label: MatchTargetLabel;
+  ingredientId: string;
+}) {
+  return (
+    <p className="text-sm leading-snug text-muted-foreground">
+      <span>{label.prefix} </span>
+      <a
+        href="/ingredients"
+        title={label.name}
+        className="inline-block max-w-[min(100%,18rem)] truncate align-bottom font-medium text-foreground/85 underline-offset-2 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        data-ingredient-id={ingredientId}
+      >
+        {label.name}
+      </a>
+    </p>
+  );
+}
+
+function IngredientMatchInsight({
+  reasoning,
+  expandable = false,
+}: {
+  reasoning: MatchReasoning;
+  expandable?: boolean;
+}) {
+  const tooltip = formatMatchReasoningTooltip(reasoning);
+
+  if (!expandable) {
+    return (
+      <span
+        className="rounded-full border border-border/80 bg-muted/30 px-1.5 py-0.5 text-[10px] font-medium leading-none text-muted-foreground"
+        title={tooltip}
+      >
+        {reasoning.confidenceLabel}
+      </span>
+    );
+  }
+
+  return (
+    <details className="group w-full basis-full text-[11px] text-muted-foreground">
+      <summary
+        className="inline-flex cursor-pointer list-none items-center gap-1 hover:text-foreground [&::-webkit-details-marker]:hidden"
+        title={tooltip}
+      >
+        <ChevronRight className="h-3 w-3 transition-transform group-open:rotate-90" />
+        <span className="font-medium text-foreground/80">{reasoning.confidenceLabel}</span>
+        <span className="text-muted-foreground">· {reasoning.headline}</span>
+      </summary>
+      <div className="mt-1 space-y-1 border-l border-border/70 pl-3">
+        <p>{reasoning.detail}</p>
+        {reasoning.caveats.length > 0 && (
+          <ul className="list-disc space-y-0.5 pl-4 marker:text-muted-foreground/70">
+            {reasoning.caveats.map((caveat) => (
+              <li key={caveat}>{caveat}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </details>
+  );
+}
+
 function OperationalBadge({
   label,
   tone = "muted",
@@ -2178,10 +2284,16 @@ function PreviewModal({
   );
 }
 
+function OperationalSignalBadge({ signal }: { signal: OperationalSignal }) {
+  return <OperationalBadge label={signal.label} tone={signal.tone} title={signal.title} />;
+}
+
 function ItemsTable({
   items,
   priceComparisons,
   ingredientCatalog,
+  operationalMetadata,
+  allInvoiceSupplierNames,
   confirmedIngredientAliases,
   supplierName,
   creatingIngredientByItem,
@@ -2195,6 +2307,8 @@ function ItemsTable({
   items: ItemRow[];
   priceComparisons: PriceComparisonMap;
   ingredientCatalog: IngredientMatchRow[];
+  operationalMetadata: InvoiceOperationalMetadata;
+  allInvoiceSupplierNames: string[];
   confirmedIngredientAliases: IngredientAliasMap;
   supplierName?: string | null;
   creatingIngredientByItem: IngredientCreationState;
@@ -2205,6 +2319,16 @@ function ItemsTable({
   onCreateIngredient: (item: ItemRow) => void;
   onConfirmIngredientMatch: (item: ItemRow, match: IngredientCanonicalMatch) => void;
 }) {
+  const knownSupplierNames = buildKnownSupplierNames(
+    allInvoiceSupplierNames,
+    normalizeSupplierDisplayName(supplierName).toLocaleLowerCase() || null,
+  );
+  const isNewSupplier = isNewSupplierForInvoice(supplierName, knownSupplierNames);
+  const ingredientById = useMemo(
+    () => new Map(ingredientCatalog.map((row) => [row.id, row])),
+    [ingredientCatalog],
+  );
+
   const operationalSummary = items.reduce(
     (summary, item) => {
       const ingredientMatch = getItemIngredientMatch(
@@ -2381,6 +2505,36 @@ function ItemsTable({
                   !quantityReview &&
                   !amountReview &&
                   !delta;
+                const matchContext = {
+                  confirmedAliases: confirmedIngredientAliases,
+                  supplierName,
+                };
+                const matchExplanation = ingredientMatch
+                  ? buildMatchExplanation(ingredientMatch, matchContext)
+                  : null;
+                const matchedIngredient = ingredientMatch
+                  ? ingredientById.get(ingredientMatch.ingredient.id)
+                  : undefined;
+                const showMatchTargetLine = shouldShowMatchTargetLine(ingredientMatch);
+                const matchTargetLabel = ingredientMatch
+                  ? buildMatchTargetLabel(ingredientMatch, matchContext, matchedIngredient)
+                  : null;
+                const lineSignals = deriveInvoiceLineOperationalSignals(
+                  renderItem,
+                  matchedIngredient ?? ingredientMatch?.ingredient ?? null,
+                  {
+                    previousInvoiceLinePrice: priceComparisons[renderItem.id],
+                    recipeCountByIngredientId: operationalMetadata.recipeCountByIngredientId,
+                    volatileIngredientIds: operationalMetadata.volatileIngredientIds,
+                    priceHistoryLatestAtByIngredientId:
+                      operationalMetadata.priceHistoryLatestAtByIngredientId,
+                    aliasCreatedAtByLookupKey: operationalMetadata.aliasCreatedAtByLookupKey,
+                    isNewSupplier,
+                    currentSupplierName: supplierName,
+                    matchKind: ingredientMatch?.kind ?? null,
+                    normalizedItemName: normalizeInvoiceIngredientName(renderItem.name),
+                  },
+                );
                 return (
                   <tr
                     key={renderItem.id}
@@ -2393,6 +2547,12 @@ function ItemsTable({
                     <td className="py-2.5 px-4">
                       <div className="space-y-1">
                         <div className="font-medium leading-tight">{renderItem.name}</div>
+                        {showMatchTargetLine && matchTargetLabel && ingredientMatch && (
+                          <IngredientMatchTargetLine
+                            label={matchTargetLabel}
+                            ingredientId={ingredientMatch.ingredient.id}
+                          />
+                        )}
                         <div className="flex flex-wrap items-center gap-1.5">
                           {extractionReview && (
                             <OperationalBadge label="needs review" tone="review" />
@@ -2411,14 +2571,9 @@ function ItemsTable({
                               <OperationalBadge
                                 label="possible ingredient match"
                                 tone="review"
-                                title={`Possible existing ingredient: ${possibleIngredientMatch.ingredient.name ?? "Unnamed ingredient"}`}
+                                title={formatMatchReasoningTooltip(matchExplanation)}
                               />
-                              <span className="text-[11px] text-muted-foreground">
-                                Already buying this?{" "}
-                                <span className="font-medium text-foreground">
-                                  {possibleIngredientMatch.ingredient.name}
-                                </span>
-                              </span>
+                              <IngredientMatchInsight reasoning={matchExplanation} expandable />
                               <button
                                 type="button"
                                 onClick={() =>
@@ -2462,26 +2617,30 @@ function ItemsTable({
                               </button>
                             </>
                           ) : showMatchedBadge ? (
-                            <OperationalBadge
-                              label={
-                                ingredientMatch?.kind === "confirmed-alias"
-                                  ? "confirmed match"
-                                  : "matched automatically"
-                              }
-                              tone="success"
-                              title={
-                                ingredientMatch?.ingredient.name
-                                  ? `Suggested existing ingredient: ${ingredientMatch.ingredient.name}`
-                                  : undefined
-                              }
-                            />
+                            <>
+                              <OperationalBadge
+                                label={
+                                  ingredientMatch?.kind === "confirmed-alias"
+                                    ? "confirmed match"
+                                    : "matched automatically"
+                                }
+                                tone="success"
+                                title={[
+                                  matchExplanation.headline,
+                                  ingredientMatch?.ingredient.name
+                                    ? `→ ${ingredientMatch.ingredient.name}`
+                                    : null,
+                                  matchExplanation.detail,
+                                ]
+                                  .filter(Boolean)
+                                  .join(" ")}
+                              />
+                              <IngredientMatchInsight reasoning={matchExplanation} />
+                            </>
                           ) : null}
-                          {delta?.direction === "increased" && (
-                            <OperationalBadge label="price increased" tone="increase" />
-                          )}
-                          {delta?.direction === "decreased" && (
-                            <OperationalBadge label="price decreased" tone="decrease" />
-                          )}
+                          {lineSignals.map((signal) => (
+                            <OperationalSignalBadge key={signal.kind} signal={signal} />
+                          ))}
                         </div>
                         {creationError && (
                           <div className="text-[11px] text-destructive">{creationError}</div>
