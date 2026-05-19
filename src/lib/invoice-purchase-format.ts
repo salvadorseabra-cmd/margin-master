@@ -712,6 +712,65 @@ function formatPackageMeasureSize(quantity: number, unit: PackageMeasureUnit): s
   return formatQuantityWithUnit(quantity, unit);
 }
 
+const BASE_MEASURE_UNITS = new Set(["g", "ml", "kg", "l"]);
+
+function isBaseMeasureContainerUnit(unit: string | null | undefined): boolean {
+  if (!unit) return false;
+  return BASE_MEASURE_UNITS.has(unit.trim().toLowerCase());
+}
+
+/** Structured package size exists (not a bare generic unit row). */
+export function hasRichPackageSemantics(structured: StructuredPurchaseFormat): boolean {
+  return (
+    structured.packageQuantity != null &&
+    structured.packageMeasurementUnit != null &&
+    structured.packageMeasurementUnit !== "un"
+  );
+}
+
+/** Collapsed invoice purchase labels that hide real pack size. */
+export function isCollapsedMeaninglessPurchaseLabel(label: string | null | undefined): boolean {
+  if (!label) return false;
+  const normalized = label.trim().toLowerCase().replace(/\s+/g, " ");
+  return /^(1 g|1 ml|1 un|1 units?)$/.test(normalized);
+}
+
+function isBulkPurchaseMeasure(quantity: number, unit: PackageMeasureUnit): boolean {
+  if (unit === "kg" || unit === "L") return true;
+  if (unit === "g" && quantity >= 1000) return true;
+  if (unit === "ml" && quantity >= 1000) return true;
+  return false;
+}
+
+function enrichStructuredForPurchaseDisplay(
+  structured: StructuredPurchaseFormat,
+): StructuredPurchaseFormat {
+  const inferred = structured.inferred;
+  if (inferred.pack_size == null || !inferred.pack_size_unit) return structured;
+
+  const collapsedRowMeasure =
+    structured.packageQuantity === 1 &&
+    (structured.packageMeasurementUnit === "g" || structured.packageMeasurementUnit === "ml") &&
+    (structured.kind === "weight_or_volume" || structured.kind === "row_only");
+
+  const nameMeasureSmallerThanPack =
+    structured.kind === "weight_or_volume" &&
+    structured.packageQuantity != null &&
+    structured.packageMeasurementUnit === inferred.pack_size_unit &&
+    inferred.pack_size > structured.packageQuantity;
+
+  if (!collapsedRowMeasure && !nameMeasureSmallerThanPack) return structured;
+
+  return {
+    ...structured,
+    packageQuantity: inferred.pack_size,
+    packageMeasurementUnit: inferred.pack_size_unit,
+    purchaseContainerCount:
+      structured.purchaseContainerCount > 0 ? structured.purchaseContainerCount : 1,
+    packageType: structured.packageType ?? inferred.package_type,
+  };
+}
+
 function resolveContainerDisplayLabel(
   structured: StructuredPurchaseFormat,
 ): { singular: string; plural: string } | null {
@@ -719,6 +778,56 @@ function resolveContainerDisplayLabel(
   if (raw && CONTAINER_DISPLAY_LABELS[raw]) return CONTAINER_DISPLAY_LABELS[raw];
   if (structured.packageType) return PACKAGE_TYPE_DISPLAY_LABELS[structured.packageType];
   return null;
+}
+
+/** Display-only container noun when structured unit is a base measure (g/ml) but pack size is known. */
+function resolveInferredDisplayContainerLabel(
+  structured: StructuredPurchaseFormat,
+  enrichedFromCollapsedRow: boolean,
+): { singular: string; plural: string } | null {
+  const explicit = resolveContainerDisplayLabel(structured);
+  if (explicit) return explicit;
+  if (!hasRichPackageSemantics(structured)) return null;
+
+  const measureUnit = structured.packageMeasurementUnit;
+  const measureQty = structured.packageQuantity ?? 0;
+  if (measureUnit && isBulkPurchaseMeasure(measureQty, measureUnit)) {
+    if (!enrichedFromCollapsedRow) {
+      if (measureUnit === "L" && measureQty === 1 && structured.inferred.stock_unit === "ml") {
+        return PACKAGE_TYPE_DISPLAY_LABELS.garrafa;
+      }
+      return null;
+    }
+    if (measureUnit === "ml" || measureUnit === "L" || structured.inferred.stock_unit === "ml") {
+      return PACKAGE_TYPE_DISPLAY_LABELS.garrafa;
+    }
+    return PACKAGE_TYPE_DISPLAY_LABELS.pack;
+  }
+
+  if (measureUnit === "ml" || structured.inferred.stock_unit === "ml") {
+    return PACKAGE_TYPE_DISPLAY_LABELS.garrafa;
+  }
+  if (measureUnit === "g" || measureUnit === "kg") {
+    return PACKAGE_TYPE_DISPLAY_LABELS.pack;
+  }
+  return null;
+}
+
+function shouldShowPurchaseContainer(
+  structured: StructuredPurchaseFormat,
+  enriched: StructuredPurchaseFormat,
+): boolean {
+  if (structured.kind === "inferred" || structured.kind === "multi_unit_pack") return true;
+  if (resolveContainerDisplayLabel(structured)) return true;
+  if (enriched !== structured) return true;
+  if (!hasRichPackageSemantics(enriched)) return false;
+  if (structured.kind !== "weight_or_volume") return false;
+
+  const measureUnit = enriched.packageMeasurementUnit;
+  const measureQty = enriched.packageQuantity ?? 0;
+  if (!measureUnit || isBulkPurchaseMeasure(measureQty, measureUnit)) return false;
+
+  return Boolean(enriched.ingredientIdentityHint.trim());
 }
 
 function formatContainerCountLabel(structured: StructuredPurchaseFormat): string | null {
@@ -734,32 +843,46 @@ function formatContainerCountLabel(structured: StructuredPurchaseFormat): string
  * Does not collapse to normalized usable quantity — use that only for stock math.
  */
 export function formatStructuredPurchaseDisplay(structured: StructuredPurchaseFormat): string | null {
-  const packageQuantity = structured.packageQuantity;
-  const packageUnit = structured.packageMeasurementUnit;
+  const enriched = enrichStructuredForPurchaseDisplay(structured);
+  const packageQuantity = enriched.packageQuantity;
+  const packageUnit = enriched.packageMeasurementUnit;
 
-  if (structured.kind === "unit_count" || (packageUnit === "un" && structured.purchaseContainerUnit === "un")) {
-    return formatQuantityWithUnit(structured.purchaseContainerCount, "un");
+  if (enriched.kind === "unit_count" || (packageUnit === "un" && enriched.purchaseContainerUnit === "un")) {
+    return formatQuantityWithUnit(enriched.purchaseContainerCount, "un");
   }
 
   const hasPackageSize =
     packageQuantity != null && packageUnit != null && packageUnit !== "un";
-  const containerLabel = formatContainerCountLabel(structured);
   const sizeLabel =
     hasPackageSize && packageUnit ? formatPackageMeasureSize(packageQuantity, packageUnit) : null;
+  if (!sizeLabel) return null;
 
-  if (containerLabel && sizeLabel) {
-    return `${containerLabel} x ${sizeLabel}`;
+  const explicitContainerLabel = formatContainerCountLabel(enriched);
+  if (explicitContainerLabel) {
+    return `${explicitContainerLabel} x ${sizeLabel}`;
   }
 
-  if (structured.kind === "multi_unit_pack" && sizeLabel) {
-    return `${formatPurchaseCount(structured.purchaseContainerCount)} x ${sizeLabel}`;
+  if (enriched.kind === "multi_unit_pack") {
+    return `${formatPurchaseCount(enriched.purchaseContainerCount)} x ${sizeLabel}`;
   }
 
-  if (structured.kind === "weight_or_volume" && sizeLabel) {
+  if (shouldShowPurchaseContainer(structured, enriched)) {
+    const containerLabels = resolveInferredDisplayContainerLabel(
+      enriched,
+      enriched !== structured,
+    );
+    if (containerLabels) {
+      const count = enriched.purchaseContainerCount;
+      const noun = count === 1 ? containerLabels.singular : containerLabels.plural;
+      return `${formatPurchaseCount(count)} ${noun} x ${sizeLabel}`;
+    }
+  }
+
+  if (enriched.kind === "weight_or_volume" || enriched.kind === "inferred" || enriched.kind === "row_only") {
     return sizeLabel;
   }
 
-  if (sizeLabel && structured.kind === "container_with_size") {
+  if (enriched.kind === "container_with_size") {
     return sizeLabel;
   }
 
@@ -772,8 +895,12 @@ export function formatStructuredPurchaseDisplay(structured: StructuredPurchaseFo
 export function resolveInvoicePurchaseDisplayLabel(item: InvoiceLinePurchaseInput): string | null {
   const structured = resolveInvoiceLinePurchaseFormat(item);
   const display = formatStructuredPurchaseDisplay(structured);
-  if (display) return display;
-  return formatInvoiceLineRawPurchaseFallback(item);
+  if (display && !isCollapsedMeaninglessPurchaseLabel(display)) return display;
+
+  const raw = formatInvoiceLineRawPurchaseFallback(item);
+  if (raw && !isCollapsedMeaninglessPurchaseLabel(raw)) return raw;
+
+  return display ?? raw;
 }
 
 export type IngredientPurchaseFields = {

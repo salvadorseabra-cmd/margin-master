@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  equalCoreIngredientIdentity,
   extractIngredientFormFamilies,
+  FAMILY_INGREDIENT_MATCH_TOKENS,
   findCanonicalIngredientMatch,
   hasCompatibleIngredientFormFamilies,
   normalizeInvoiceIngredientName,
@@ -260,6 +262,95 @@ describe("findCanonicalIngredientMatch (weighted semantic)", () => {
       "mayo-1",
     );
     expect(findCanonicalIngredientMatch("KETCHUP GULOSO 570G", [catalog[1]])).toBeNull();
+  });
+
+  describe("family-aware semantic identity (regression)", () => {
+    it("exports ingredient family ids for semantic grouping", () => {
+      expect([...FAMILY_INGREDIENT_MATCH_TOKENS].sort()).toEqual([
+        "cheese",
+        "oil",
+        "potato",
+        "sauce",
+        "tomato",
+      ]);
+    });
+
+    it("auto-matches rearranged foodservice palha OCR to batata palha catalog line", () => {
+      const catalog = [ingredient("bat-palha", "BATATA PALHA 2KG SERVICE")];
+      const match = findCanonicalIngredientMatch("PALHA SNACK FOOD SERVICE 2KG", catalog);
+
+      expect(match?.kind).toBe("exact");
+      expect(match?.ingredient.id).toBe("bat-palha");
+    });
+
+    it("auto-matches palha service wording to batata palha when batata is present", () => {
+      const catalog = [ingredient("bat-palha", "BATATA PALHA 2KG")];
+      const match = findCanonicalIngredientMatch("BATATA PALHA 2KG SERVICE", catalog);
+
+      expect(match?.kind).toBe("exact");
+      expect(match?.ingredient.id).toBe("bat-palha");
+    });
+
+    it("does not match batata palha to batata frita corte fino", () => {
+      const catalog = [ingredient("bat-palha", "BATATA PALHA 2KG")];
+      expect(
+        findCanonicalIngredientMatch("BATATA FRITA CORTE FINO 2KG", catalog),
+      ).toBeNull();
+      expect(
+        hasCompatibleIngredientFormFamilies(
+          "BATATA PALHA 2KG",
+          "BATATA FRITA CORTE FINO 2KG",
+        ),
+      ).toBe(false);
+    });
+
+    it("blocks tomato cherry vs crushed tomato at form and format level", () => {
+      expect(
+        hasCompatibleIngredientFormFamilies("TOMATE CHERRY 250G", "TOMATE TRITURADO 250G"),
+      ).toBe(false);
+      expect(
+        findCanonicalIngredientMatch("TOMATE TRITURADO 250G", [
+          ingredient("tom-cherry", "TOMATE CHERRY 250G"),
+        ]),
+      ).toBeNull();
+      expect(
+        equalCoreIngredientIdentity(
+          normalizeInvoiceIngredientName("TOMATE CHERRY 250G"),
+          normalizeInvoiceIngredientName("TOMATE TRITURADO 250G"),
+          "TOMATE CHERRY 250G",
+          "TOMATE TRITURADO 250G",
+        ),
+      ).toBe(false);
+    });
+
+    it("extracts triturado and cherry as distinct raw form families", () => {
+      expect([...extractIngredientFormFamilies("TOMATE TRITURADO 500G")]).toEqual([
+        "triturado",
+      ]);
+      expect([...extractIngredientFormFamilies("TOMATE CHERRY 250G")]).toEqual(["cherry"]);
+    });
+
+    it("blocks cheddar molho vs cheddar fatiado in raw form families", () => {
+      expect(
+        hasCompatibleIngredientFormFamilies("CHEDDAR MOLHO 1KG", "CHEDDAR FATIADO 1KG"),
+      ).toBe(false);
+    });
+
+    it("auto-matches ketchup brand variants", () => {
+      const catalog = [ingredient("ketchup-1", "KETCHUP HEINZ 570G")];
+      const match = findCanonicalIngredientMatch("KETCHUP GULOSO TOP DOWN 570G", catalog);
+
+      expect(match?.kind).toBe("exact");
+      expect(match?.ingredient.id).toBe("ketchup-1");
+    });
+
+    it("auto-matches sunflower oil brand variants", () => {
+      const catalog = [ingredient("oil-1", "ÓLEO GIRASSOL FULA 1L")];
+      const match = findCanonicalIngredientMatch("Óleo Girassol Vaqueiro 1L", catalog);
+
+      expect(match?.kind).toBe("exact");
+      expect(match?.ingredient.id).toBe("oil-1");
+    });
   });
 
   it("skips semantic suggestion when alias memory resolves the line", () => {

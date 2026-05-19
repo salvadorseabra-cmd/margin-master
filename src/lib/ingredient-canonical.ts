@@ -148,6 +148,8 @@ const FORMAT_GROUPS: string[][] = [
   ["congelado", "congelada", "frozen"],
   ["fresco", "fresca", "fresh"],
   ["ralado", "ralada", "grated"],
+  ["cherry", "cereja", "cerejas"],
+  ["triturado", "triturada", "triturados", "polpa", "passata"],
 ];
 
 /** Multi-word retailer / marketing phrases — tokens here are weak even if normalization missed a phrase. */
@@ -157,6 +159,11 @@ const WEAK_INGREDIENT_PHRASES: readonly string[] = [
   "oliveira da serra",
   "pingo doce",
   "private label",
+  "para restauracao",
+  "para restauração",
+  "catering",
+  "horeca",
+  "foodservice",
 ];
 
 /** Potato cut families that imply batata when the base core token is absent from OCR text. */
@@ -204,8 +211,51 @@ export const FORM_INGREDIENT_MATCH_TOKENS = new Set([
   "sliced",
   "fatiado",
   "fatiada",
+  "molho",
+  "molhos",
   "shredded",
+  "triturado",
+  "triturada",
+  "triturados",
+  "cherry",
+  "cereja",
+  "cerejas",
 ]);
+
+/**
+ * Ingredient family ids used for semantic grouping only — never override core or form.
+ * Derived from product tokens + conservative inference (e.g. palha → potato family).
+ */
+export const FAMILY_INGREDIENT_MATCH_TOKENS = new Set([
+  "potato",
+  "cheese",
+  "tomato",
+  "sauce",
+  "oil",
+]);
+
+/** Maps product tokens to a family id (semantic boost / inference only). */
+const TOKEN_TO_INGREDIENT_FAMILY: Record<string, string> = {
+  batata: "potato",
+  palha: "potato",
+  frita: "potato",
+  fritas: "potato",
+  wedges: "potato",
+  wedge: "potato",
+  hashbrown: "potato",
+  hashbrowns: "potato",
+  corte_fino: "potato",
+  cheddar: "cheese",
+  tomate: "tomato",
+  cherry: "tomato",
+  triturado: "tomato",
+  triturada: "tomato",
+  triturados: "tomato",
+  ketchup: "sauce",
+  maionese: "sauce",
+  oleo: "oil",
+  girassol: "oil",
+};
 
 const FORM_PHRASE_TO_FAMILY: { pattern: RegExp; family: string }[] = [
   { pattern: /\bcorte\s+fino\b/, family: "corte_fino" },
@@ -227,7 +277,15 @@ const FORM_SINGLE_TOKEN_TO_FAMILY: Record<string, string> = {
   sliced: "sliced",
   fatiado: "sliced",
   fatiada: "sliced",
+  molho: "molho",
+  molhos: "molho",
   shredded: "shredded",
+  triturado: "triturado",
+  triturada: "triturado",
+  triturados: "triturado",
+  cherry: "cherry",
+  cereja: "cherry",
+  cerejas: "cherry",
 };
 
 /** Retailer / brand / marketing tokens — minimal weight in similarity scoring. */
@@ -271,6 +329,15 @@ export const WEAK_INGREDIENT_MATCH_TOKENS = new Set([
   "marca",
   "brand",
   "s",
+  "catering",
+  "horeca",
+  "restauracao",
+  "restauração",
+  "profissional",
+  "professional",
+  "fs",
+  "kg",
+  "un",
 ]);
 
 const CORE_COVERAGE_MIN = 0.67;
@@ -285,6 +352,7 @@ type ClassifiedMatchTokens = {
   core: string[];
   weak: string[];
   form: string[];
+  family: string[];
   neutral: string[];
 };
 
@@ -334,16 +402,39 @@ function classifyIngredientMatchTokens(
   const core: string[] = [];
   const weak: string[] = [];
   const form: string[] = [];
+  const family: string[] = [];
   const neutral: string[] = [];
 
   for (const token of tokens) {
     if (CORE_INGREDIENT_MATCH_TOKENS.has(token)) core.push(token);
     else if (WEAK_INGREDIENT_MATCH_TOKENS.has(token) || phraseWeak.has(token)) weak.push(token);
     else if (FORM_INGREDIENT_MATCH_TOKENS.has(token)) form.push(token);
-    else neutral.push(token);
+    else {
+      const familyId = TOKEN_TO_INGREDIENT_FAMILY[token];
+      if (familyId && FAMILY_INGREDIENT_MATCH_TOKENS.has(familyId)) family.push(familyId);
+      else neutral.push(token);
+    }
   }
 
-  return { core, weak, form, neutral };
+  return { core, weak, form, family, neutral };
+}
+
+function deriveIngredientFamilies(
+  classified: ClassifiedMatchTokens,
+  formFamilies: Set<string>,
+): Set<string> {
+  const families = new Set(classified.family);
+  for (const token of [...classified.core, ...classified.form]) {
+    const familyId = TOKEN_TO_INGREDIENT_FAMILY[token];
+    if (familyId) families.add(familyId);
+  }
+  if (
+    [...formFamilies].some((family) => POTATO_FORM_IMPLY_BATATA.has(family)) ||
+    classified.form.some((token) => POTATO_FORM_IMPLY_BATATA.has(token))
+  ) {
+    families.add("potato");
+  }
+  return families;
 }
 
 function applyImplicitBatataCore(
@@ -557,6 +648,8 @@ function semanticSimilarity(a: string, b: string, rawA: string, rawB: string) {
   const { aCore, bCore } = effectiveCoreSets(aClass, bClass, rawA, rawB);
   const aForm = new Set(aClass.form);
   const bForm = new Set(bClass.form);
+  const aFamilies = deriveIngredientFamilies(aClass, extractIngredientFormFamilies(rawA));
+  const bFamilies = deriveIngredientFamilies(bClass, extractIngredientFormFamilies(rawB));
 
   if (aCore.size > 0 || bCore.size > 0) {
     if (aCore.size === 0 || bCore.size === 0) return 0;
@@ -582,10 +675,16 @@ function semanticSimilarity(a: string, b: string, rawA: string, rawB: string) {
       new Set(aClass.weak),
       new Set(bClass.weak),
     );
+    const familyCoverage =
+      aFamilies.size > 0 && bFamilies.size > 0 ? tokenOverlapRatio(aFamilies, bFamilies) : 1;
 
-    // Core identity dominates; form overlap refines; unmatched brand tokens barely move the score.
+    // Core identity dominates; form overlap refines; family overlap is a small tie-breaker only.
     let score =
-      coreCoverage * 0.65 + coreDice * 0.22 + formCoverage * 0.1 + weakCoverage * 0.03;
+      coreCoverage * 0.6 +
+      coreDice * 0.2 +
+      formCoverage * 0.12 +
+      familyCoverage * 0.05 +
+      weakCoverage * 0.03;
     if (coresEqual) {
       score = Math.max(score, SEMANTIC_AUTO_MATCH_MIN_SCORE);
     }

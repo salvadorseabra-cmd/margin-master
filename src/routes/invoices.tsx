@@ -23,6 +23,8 @@ import { type UnitInferenceResult, type PackageType } from "@/lib/ingredient-uni
 import {
   formatStructuredPurchaseDisplay,
   formatUsableStockQuantityLabel,
+  hasRichPackageSemantics,
+  isCollapsedMeaninglessPurchaseLabel,
   isMeaninglessUsableStockLabel,
   resolveInvoiceLinePurchaseFormat,
   resolveInvoicePurchaseDisplayLabel,
@@ -738,14 +740,18 @@ const getInvoiceItemOperationalSummary = (item: Pick<ItemRow, "name" | "quantity
 };
 
 const getInvoiceItemPurchaseLabel = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {
+  const structured = resolveItemPurchaseFormat(item);
   const structuredLabel = resolveInvoicePurchaseDisplayLabel({
     name: item.name,
     quantity: item.quantity,
     unit: item.unit,
   });
-  if (structuredLabel) return structuredLabel;
+  if (structuredLabel && !isCollapsedMeaninglessPurchaseLabel(structuredLabel)) {
+    return structuredLabel;
+  }
 
-  const structured = resolveItemPurchaseFormat(item);
+  const structuredDisplay = formatStructuredPurchaseDisplay(structured);
+  if (structuredDisplay) return structuredDisplay;
   const inferred = structured.inferred;
   const rowQuantity = Number(item.quantity);
   const hasPositiveQuantity = Number.isFinite(rowQuantity) && rowQuantity > 0;
@@ -787,9 +793,13 @@ const getInvoiceItemPurchaseLabel = (item: Pick<ItemRow, "name" | "quantity" | "
 
   if (item.quantity == null) return null;
   const unit = getDisplayPurchaseUnit(item.unit);
-  return unit
+  const rowFallback = unit
     ? formatOperationalQuantityWithUnit(item.quantity, unit)
     : formatPurchaseCount(item.quantity);
+  if (isCollapsedMeaninglessPurchaseLabel(rowFallback) && hasRichPackageSemantics(structured)) {
+    return structuredDisplay ?? rowFallback;
+  }
+  return rowFallback;
 };
 
 const getInvoiceItemStockPresentation = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {

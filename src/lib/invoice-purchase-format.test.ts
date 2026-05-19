@@ -3,6 +3,8 @@ import {
   formatInvoiceLineRawPurchaseFallback,
   formatStructuredPurchaseDisplay,
   formatUsableStockQuantityLabel,
+  hasRichPackageSemantics,
+  isCollapsedMeaninglessPurchaseLabel,
   isCollapsedMeaninglessUsable,
   isMeaninglessUsableStockLabel,
   parsePurchaseFormatPhrase,
@@ -222,6 +224,61 @@ describe("formatStructuredPurchaseDisplay", () => {
     expect(structured.normalizedUsableQuantity).toBeGreaterThanOrEqual(12000);
     expect(formatStructuredPurchaseDisplay(structured)).toBe("2 packs x 1 L");
   });
+
+  it.each([
+    {
+      name: "MAIONESE CALVE TOP DOWN 450ML",
+      quantity: 1,
+      unit: "ml",
+      display: "1 bottle x 450 ml",
+      usable: 450,
+      usableUnit: "ml",
+    },
+    {
+      name: "KETCHUP GULOSO TOP DOWN 570G",
+      quantity: 1,
+      unit: "g",
+      display: "1 pack x 570 g",
+      usable: 570,
+      usableUnit: "g",
+    },
+    {
+      name: "OLEO GIRASSOL VAQUEIRO 1L",
+      quantity: 1,
+      unit: "ml",
+      display: "1 bottle x 1 L",
+      usable: 1000,
+      usableUnit: "ml",
+    },
+    {
+      name: "BATATA PALHA 2KG",
+      quantity: 1,
+      unit: "g",
+      display: "1 pack x 2 kg",
+      usable: 2000,
+      usableUnit: "g",
+    },
+  ] as const)(
+    "reconstructs purchase display for $name (not collapsed row unit)",
+    ({ name, quantity, unit, display, usable, usableUnit }) => {
+      const structured = resolveInvoiceLinePurchaseFormat({ name, quantity, unit });
+      const stockQty =
+        structured.normalizedUsableQuantity ??
+        structured.inferred.normalized_stock_quantity;
+      const stockUnit =
+        structured.usableQuantityUnit ??
+        (structured.inferred.stock_unit === "kg"
+          ? "g"
+          : structured.inferred.stock_unit === "L"
+            ? "ml"
+            : structured.inferred.stock_unit);
+      expect(stockQty).toBe(usable);
+      expect(stockUnit).toBe(usableUnit);
+      expect(isCollapsedMeaninglessPurchaseLabel(`${quantity} ${unit}`)).toBe(true);
+      expect(formatStructuredPurchaseDisplay(structured)).toBe(display);
+      expect(resolveInvoicePurchaseDisplayLabel({ name, quantity, unit })).toBe(display);
+    },
+  );
 });
 
 describe("supermarket and OCR purchase phrases", () => {
@@ -334,6 +391,21 @@ describe("fallback and meaningless usable guards", () => {
     expect(
       formatInvoiceLineRawPurchaseFallback({ name: "AZEITE 1 GARRAFA X 750ML" }),
     ).toBe("1 GARRAFA X 750ML");
+  });
+
+  it("detects collapsed purchase row labels", () => {
+    expect(isCollapsedMeaninglessPurchaseLabel("1 g")).toBe(true);
+    expect(isCollapsedMeaninglessPurchaseLabel("1 ml")).toBe(true);
+    expect(isCollapsedMeaninglessPurchaseLabel("1 pack x 570 g")).toBe(false);
+  });
+
+  it("never shows collapsed row unit when name has pack x size", () => {
+    const item = { name: "CEREAL FLOCOS 1 pack x 250 g", quantity: 1, unit: "g" };
+    const structured = resolveInvoiceLinePurchaseFormat(item);
+    expect(structured.kind).toBe("container_with_size");
+    expect(hasRichPackageSemantics(structured)).toBe(true);
+    expect(resolveInvoicePurchaseDisplayLabel(item)).toBe("1 pack x 250 g");
+    expect(resolveInvoicePurchaseDisplayLabel(item)).not.toBe("1 g");
   });
 
   it("does not emit 1 units usable for generic single-unit rows", () => {
