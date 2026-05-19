@@ -1,63 +1,102 @@
 /**
- * Uppercase ingredient name normalization for stable invoice-line matching candidates.
+ * Invoice ingredient name normalization for matching (lowercase, accent-stripped).
  *
- * Strips accents, pack sizes, unit tokens, and common retailer/commercial wording while
- * keeping product identity tokens (e.g. variety names like ICEBERG).
- *
- * Not wired into invoice matching yet — see {@link normalizeInvoiceIngredientName} for the
- * conservative path used in production matching today.
+ * Used by {@link normalizeInvoiceIngredientName} before fuzzy / semantic matching.
+ * Strips pack sizes, retailer noise, and applies conservative abbreviations and synonyms
+ * while keeping product identity tokens (e.g. iceberg, girassol).
  */
 
 const DIACRITIC_RE = /\p{M}/gu;
 
-/** Multi-word phrases removed as retailer / marketing noise (matched after uppercasing). */
+const PACKAGING_WORD_RE =
+  /\b(caixa|caixas|cx|pack|packs|un|und|unds|unid|unids|unit|units|pc|pcs)\b/i;
+
+/** Multi-word phrases removed after accent strip (longest first). */
 const COMMERCIAL_PHRASES = [
-  "FOOD SERVICE",
-  "PINGO DOCE",
-  "TOP DOWN",
-  "CONTINENTE",
-  "PREMIUM",
-  "AUCHAN",
-  "RAMA",
+  "food service",
+  "pingo doce",
+  "top down",
+  "oliveira da serra",
+  "continente",
+  "premium",
+  "auchan",
+  "rama",
 ] as const;
 
-/** Standalone pack / count unit tokens (not attached to a number). */
-const STANDALONE_PACKAGING_UNITS = new Set([
-  "KG",
-  "KGS",
-  "G",
-  "GR",
-  "GRS",
-  "MG",
-  "ML",
-  "CL",
-  "L",
-  "LT",
-  "UN",
-  "UNI",
-  "UNID",
+/** Standalone marketing / pack / brand tokens (not product identity). */
+const COMMERCIAL_TOKENS = new Set([
+  "premium",
+  "mix",
+  "rama",
+  "inteira",
+  "inteiro",
+  "inteiras",
+  "inteiros",
+  "service",
+  "top",
+  "down",
+  "corte",
+  "fino",
+  "snack",
+  "food",
+  "continente",
+  "auchan",
+  "calve",
+  "guloso",
+  "heinz",
 ]);
 
-/** Product-form descriptors that are not variety/brand identity on invoice lines. */
-const PRODUCT_FORM_TOKENS = new Set(["INTEIRA", "INTEIRO", "INTEIRAS", "INTEIROS"]);
+const PRODUCT_FORM_TOKENS = new Set(["inteira", "inteiro", "inteiras", "inteiros"]);
 
-/** `570G`, `2 KG`, `1,5L`, etc. */
+const STANDALONE_PACKAGING_UNITS = new Set([
+  "kg",
+  "kgs",
+  "g",
+  "gr",
+  "grs",
+  "mg",
+  "ml",
+  "cl",
+  "l",
+  "lt",
+  "lts",
+  "ltr",
+  "ltrs",
+  "un",
+  "uni",
+  "unid",
+  "unids",
+  "und",
+  "unds",
+  "pc",
+  "pcs",
+]);
+
 const QUANTITY_WITH_UNIT_RE =
-  /\b\d+(?:[.,]\d+)?\s*(?:KG|KGS|G|GR|GRS|MG|ML|CL|L|LT|UN|UNI|UNID)\b/gi;
+  /\b\d+(?:[.,]\d+)?\s*(?:kg|kgs|g|gr|grs|mg|ml|cl|l|lt|lts|ltr|ltrs|un|uni|unid)\b/gi;
 
-/** `570G` without a space between digits and unit. */
-const ATTACHED_QUANTITY_UNIT_RE = /\b\d+(?:KG|KGS|G|GR|GRS|MG|ML|CL|L|LT)\b/gi;
+const ATTACHED_QUANTITY_UNIT_RE = /\b\d+(?:kg|kgs|g|gr|grs|mg|ml|cl|l|lt|lts|ltr|ltrs)\b/gi;
+
+const OUTER_PACK_RE =
+  /\b(?:caixa|caixas|cx|pack|packs)\s*\d+\s*(?:un|und|unds|unid|unids|unit|units)?\b/gi;
+
+const COUNT_PACK_RE = /\b\d+\s*(?:un|und|unds|unid|unids|unit|units|pc|pcs)\b/gi;
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function stripAccents(value: string): string {
-  return value.normalize("NFD").replace(DIACRITIC_RE, "");
+function stripAccentsLower(value: string): string {
+  return value.normalize("NFD").replace(DIACRITIC_RE, "").toLowerCase();
 }
 
 function collapseWhitespace(value: string): string {
   return value.replace(/\s+/g, " ").trim();
+}
+
+/** Word-boundary abbreviations applied before punctuation is stripped. */
+function expandAbbreviations(value: string): string {
+  return value.replace(/\btom\.\b/g, "tomate ").replace(/\btom\b/g, "tomate");
 }
 
 function removeCommercialPhrases(value: string): string {
@@ -73,38 +112,105 @@ function removeCommercialPhrases(value: string): string {
   return out;
 }
 
-function removePackagingTokens(value: string): string {
-  const stripped = value
+function removePackagingQuantities(value: string): string {
+  return value
     .replace(QUANTITY_WITH_UNIT_RE, " ")
-    .replace(ATTACHED_QUANTITY_UNIT_RE, " ");
-  const tokens = stripped.split(/\s+/).filter(Boolean);
-  return tokens.filter((token) => !STANDALONE_PACKAGING_UNITS.has(token)).join(" ");
+    .replace(ATTACHED_QUANTITY_UNIT_RE, " ")
+    .replace(/\b\d+\b/g, " ");
 }
 
-function removeProductFormTokens(value: string): string {
-  const tokens = value.split(/\s+/).filter(Boolean);
-  return tokens.filter((token) => !PRODUCT_FORM_TOKENS.has(token)).join(" ");
+function filterTokens(tokens: string[], exclude: Set<string>): string[] {
+  return tokens.filter((token) => token.length > 0 && !exclude.has(token));
+}
+
+function applyConservativeSynonyms(tokens: string[]): string[] {
+  const hasBatata = tokens.includes("batata");
+  const out: string[] = [];
+
+  for (const token of tokens) {
+    if (token === "cereja") {
+      out.push("cherry");
+      continue;
+    }
+    if (token === "palha") {
+      if (hasBatata || out.includes("batata")) {
+        out.push("frita");
+      } else {
+        out.push("batata", "frita");
+      }
+      continue;
+    }
+    out.push(token);
+  }
+
+  return out;
+}
+
+function stripOuterPackWording(value: string): string {
+  let s = value;
+  s = s.replace(OUTER_PACK_RE, " ");
+  s = s.replace(COUNT_PACK_RE, " ");
+  s = s.replace(
+    /\b(?:caixa|caixas|cx|pack|packs|un|und|unds|unid|unids|unit|units|pc|pcs)\b/g,
+    " ",
+  );
+  return s;
+}
+
+function stripPackagingParentheticals(value: string): string {
+  return value.replace(/\(([^)]*)\)/g, (match, inner) => {
+    const normalizedInner = stripAccentsLower(String(inner));
+    return PACKAGING_WORD_RE.test(normalizedInner) ? " " : ` ${match.replace(/[()]/g, " ")} `;
+  });
 }
 
 /**
- * Normalize a noisy supplier invoice ingredient name into a stable matching candidate.
+ * Normalize a noisy supplier invoice line name for ingredient matching.
  *
  * @example
- * normalizeIngredientName("Ketchup Heinz Top Down 570g") // "KETCHUP HEINZ"
+ * normalizeInvoiceMatchIngredientName("TOM. CHERRY RAMA 250GR") // "tomate cherry"
  */
-export function normalizeIngredientName(input: string): string {
-  let value = stripAccents(input).toUpperCase();
+export function normalizeInvoiceMatchIngredientName(raw: string): string {
+  let value = stripAccentsLower(raw);
+  value = expandAbbreviations(value);
+  value = stripPackagingParentheticals(value);
+  value = stripOuterPackWording(value);
+  value = value.replace(/[^a-z0-9\s]+/g, " ");
   value = collapseWhitespace(value);
   value = removeCommercialPhrases(value);
-  value = removePackagingTokens(value);
-  value = removeProductFormTokens(value);
-  return collapseWhitespace(value);
+  value = removePackagingQuantities(value);
+
+  let tokens = filterTokens(value.split(/\s+/), STANDALONE_PACKAGING_UNITS);
+  tokens = filterTokens(tokens, COMMERCIAL_TOKENS);
+  tokens = filterTokens(tokens, PRODUCT_FORM_TOKENS);
+  tokens = applyConservativeSynonyms(tokens);
+
+  return collapseWhitespace(tokens.join(" "));
+}
+
+/** @deprecated Use {@link normalizeInvoiceMatchIngredientName}; kept for tests that expect uppercase. */
+export function normalizeIngredientName(input: string): string {
+  return normalizeInvoiceMatchIngredientName(input).toUpperCase();
 }
 
 /** Documented input/output pairs for manual checks and tests. */
 export const NORMALIZE_INGREDIENT_NAME_EXAMPLES = [
-  { input: "KETCHUP HEINZ TOP DOWN 570G", output: "KETCHUP HEINZ" },
-  { input: "BATATA PALHA CONTINENTE 2KG", output: "BATATA PALHA" },
-  { input: "ALFACE ICEBERG INTEIRA", output: "ALFACE ICEBERG" },
-  { input: "Queijo São Jorge Premium 1 KG", output: "QUEIJO SAO JORGE" },
+  { input: "KETCHUP GULOSO TOP DOWN 570G", output: "ketchup" },
+  { input: "BATATA PALHA 2KG SERVICE", output: "batata frita" },
+  { input: "ALFACE ICEBERG INTEIRA", output: "alface iceberg" },
+  { input: "MAIONESE CALVE TOP DOWN 450ML", output: "maionese" },
+] as const;
+
+/** User-requested supermarket wording cases (invoice match path). */
+export const INVOICE_MATCH_NORMALIZATION_EXAMPLES = [
+  { input: "TOM CHERRY MIX 250GR", output: "tomate cherry" },
+  { input: "TOMATE CEREJA PREMIUM", output: "tomate cherry" },
+  { input: "TOM. CHERRY RAMA", output: "tomate cherry" },
+  { input: "ALFACE ICEBERG INTEIRA", output: "alface iceberg" },
+  { input: "MAIONESE CALVE TOP DOWN 450ML", output: "maionese" },
+  { input: "KETCHUP GULOSO TOP DOWN 570G", output: "ketchup" },
+  { input: "ÓLEO GIRASSOL OLIVEIRA DA SERRA 1L", output: "oleo girassol" },
+  { input: "BATATA PALHA 2KG SERVICE", output: "batata frita" },
+  { input: "BATATA FRITA CORTE FINO 2KG", output: "batata frita" },
+  { input: "PALHA SNACK FOOD SERVICE 2KG", output: "batata frita" },
 ] as const;

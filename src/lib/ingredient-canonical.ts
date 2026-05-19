@@ -120,8 +120,8 @@ export type IngredientCanonicalMatch = {
 
 export type IngredientAliasMap = Record<string, string>;
 
-const PACKAGING_WORD_RE =
-  /\b(caixa|caixas|cx|pack|packs|un|und|unds|unid|unids|unit|units|pc|pcs)\b/i;
+import { normalizeInvoiceMatchIngredientName } from "@/lib/normalize-ingredient-name";
+
 const WEIGHT_TOKEN_RE = /\b\d+(?:[.,]\d+)?\s*(?:kg|kgs|g|gr|grs)\.?\b/gi;
 const VOLUME_TOKEN_RE = /\b\d+(?:[.,]\d+)?\s*(?:ml|cl|l|lt|lts|ltr|ltrs)\.?\b/gi;
 const NUMBER_WITH_UNIT_RE = /\b(\d+(?:[.,]\d+)?)(kg|g|ml|cl|l)\b/g;
@@ -146,63 +146,105 @@ const FORMAT_GROUPS: string[][] = [
   ["ralado", "ralada", "grated"],
 ];
 
-function normalizeQuantity(raw: string) {
-  return raw.replace(",", ".").replace(/\.0+$/, "");
+/** Product-identity tokens — overlap here drives semantic suggestions. */
+export const CORE_INGREDIENT_MATCH_TOKENS = new Set([
+  "tomate",
+  "cherry",
+  "oleo",
+  "girassol",
+  "ketchup",
+  "maionese",
+  "alface",
+  "iceberg",
+  "cebola",
+  "cheddar",
+  "batata",
+  "frita",
+]);
+
+/** Retailer / brand / marketing tokens — minimal weight in similarity scoring. */
+export const WEAK_INGREDIENT_MATCH_TOKENS = new Set([
+  "premium",
+  "rama",
+  "vaqueiro",
+  "service",
+  "mix",
+  "top",
+  "down",
+  "inteira",
+  "corte",
+  "fino",
+  "snack",
+  "food",
+  "continente",
+  "auchan",
+  "pingo",
+  "doce",
+]);
+
+const CORE_COVERAGE_MIN = 0.67;
+const FALLBACK_COVERAGE_MIN = 0.67;
+const FALLBACK_DICE_MIN = 0.58;
+/** Minimum weighted score to surface a "possible ingredient match" (semantic kind). */
+export const SEMANTIC_MATCH_MIN_SCORE = 0.72;
+
+type ClassifiedMatchTokens = {
+  core: string[];
+  weak: string[];
+  neutral: string[];
+};
+
+function traceInvoiceIngredientNormalize(original: string, normalized: string) {
+  if (!import.meta.env.DEV || !original) return;
+  console.debug("[invoice-ingredient-normalize]", { original, normalized });
 }
 
-function stripAccentsLowerForInvoiceName(s: string): string {
-  return s
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+function traceIngredientSemanticMatch(details: {
+  originalName: string;
+  normalizedName: string;
+  coreTokens: string[];
+  weakTokens: string[];
+  matchedIngredient: string | null;
+  similarityScore: number;
+}) {
+  if (!import.meta.env.DEV) return;
+  console.debug("[invoice-ingredient-match]", details);
 }
 
-function normalizeUnitTokens(s: string) {
-  return s
-    .replace(/\b(\d+(?:[.,]\d+)?)\s*(kgs?|kg)\.?\b/gi, (_match, qty) => {
-      return `${normalizeQuantity(String(qty))}kg`;
-    })
-    .replace(/\b(\d+(?:[.,]\d+)?)\s*(grs?|g)\.?\b/gi, (_match, qty) => {
-      return `${normalizeQuantity(String(qty))}g`;
-    })
-    .replace(/\b(\d+(?:[.,]\d+)?)\s*(ml)\.?\b/gi, (_match, qty) => {
-      return `${normalizeQuantity(String(qty))}ml`;
-    })
-    .replace(/\b(\d+(?:[.,]\d+)?)\s*(cl)\.?\b/gi, (_match, qty) => {
-      return `${normalizeQuantity(String(qty))}cl`;
-    })
-    .replace(/\b(\d+(?:[.,]\d+)?)\s*(lt|lts|ltr|ltrs|l)\.?\b/gi, (_match, qty) => {
-      return `${normalizeQuantity(String(qty))}l`;
-    });
+function classifyIngredientMatchTokens(tokens: Set<string>): ClassifiedMatchTokens {
+  const core: string[] = [];
+  const weak: string[] = [];
+  const neutral: string[] = [];
+
+  for (const token of tokens) {
+    if (CORE_INGREDIENT_MATCH_TOKENS.has(token)) core.push(token);
+    else if (WEAK_INGREDIENT_MATCH_TOKENS.has(token)) weak.push(token);
+    else neutral.push(token);
+  }
+
+  return { core, weak, neutral };
+}
+
+function tokenOverlapRatio(a: Set<string>, b: Set<string>) {
+  if (a.size === 0 || b.size === 0) return 0;
+  let overlap = 0;
+  for (const token of a) {
+    if (b.has(token)) overlap += 1;
+  }
+  return overlap / Math.min(a.size, b.size);
 }
 
 /**
- * Conservative invoice-name normalization for matching only.
+ * Invoice-name normalization used before exact, alias, and semantic ingredient matching.
  *
- * This preserves product semantics and size tokens such as `180g` because those
- * are operationally meaningful for stock and pack understanding. It only removes
- * obvious outer-pack wording when it is separated from the product name.
+ * Strips pack sizes and retailer noise, expands conservative abbreviations, and applies
+ * lightweight synonyms so supermarket-specific wording converges on the same key.
  */
 export function normalizeInvoiceIngredientName(raw: string | null | undefined): string {
   if (!raw) return "";
-  let s = stripAccentsLowerForInvoiceName(raw);
-  s = normalizeUnitTokens(s);
-  s = s.replace(/\(([^)]*)\)/g, (match, inner) => {
-    const normalizedInner = normalizeUnitTokens(stripAccentsLowerForInvoiceName(String(inner)));
-    return PACKAGING_WORD_RE.test(normalizedInner) ? " " : ` ${match.replace(/[()]/g, " ")} `;
-  });
-  s = s.replace(
-    /\b(?:caixa|caixas|cx|pack|packs)\s*\d+\s*(?:un|und|unds|unid|unids|unit|units)?\b/gi,
-    " ",
-  );
-  s = s.replace(/\b\d+\s*(?:un|und|unds|unid|unids|unit|units|pc|pcs)\b/gi, " ");
-  s = s.replace(
-    /\b(?:caixa|caixas|cx|pack|packs|un|und|unds|unid|unids|unit|units|pc|pcs)\b/gi,
-    " ",
-  );
-  s = s.replace(/[^a-z0-9\s]+/g, " ");
-  s = normalizeUnitTokens(s);
-  return s.replace(/\s+/g, " ").trim();
+  const normalized = normalizeInvoiceMatchIngredientName(raw);
+  traceInvoiceIngredientNormalize(raw, normalized);
+  return normalized;
 }
 
 function extractMeasureSignature(normalizedName: string) {
@@ -259,17 +301,39 @@ function semanticSimilarity(a: string, b: string) {
   const bTokens = new Set(productTokens(b));
   if (aTokens.size === 0 || bTokens.size === 0 || !hasCompatibleFormat(aTokens, bTokens)) return 0;
 
-  let overlap = 0;
-  for (const token of aTokens) {
-    if (bTokens.has(token)) overlap += 1;
+  const aClass = classifyIngredientMatchTokens(aTokens);
+  const bClass = classifyIngredientMatchTokens(bTokens);
+  const aCore = new Set(aClass.core);
+  const bCore = new Set(bClass.core);
+
+  if (aCore.size > 0 || bCore.size > 0) {
+    if (aCore.size === 0 || bCore.size === 0) return 0;
+
+    const coreCoverage = tokenOverlapRatio(aCore, bCore);
+    if (coreCoverage < CORE_COVERAGE_MIN) return 0;
+
+    const coreDice = diceCoefficient([...aCore].sort().join(" "), [...bCore].sort().join(" "));
+    const weakCoverage = tokenOverlapRatio(new Set(aClass.weak), new Set(bClass.weak));
+
+    // Core identity drives the score; weak/brand tokens contribute at most ~3%.
+    const score = coreCoverage * 0.72 + coreDice * 0.23 + weakCoverage * 0.05;
+    return Math.min(1, score);
   }
 
-  const coverage = overlap / Math.min(aTokens.size, bTokens.size);
-  const stringSimilarity = diceCoefficient([...aTokens].join(" "), [...bTokens].join(" "));
+  // No core tokens on either side — fall back to neutral-only overlap (conservative).
+  const aNeutral = new Set(aClass.neutral);
+  const bNeutral = new Set(bClass.neutral);
+  if (aNeutral.size === 0 || bNeutral.size === 0) return 0;
 
-  // Keep the threshold intentionally high: this is a suggestion layer, not an
-  // auto-merge path, and false ingredient links are operationally expensive.
-  return coverage >= 0.67 && stringSimilarity >= 0.58 ? (coverage + stringSimilarity) / 2 : 0;
+  const coverage = tokenOverlapRatio(aNeutral, bNeutral);
+  const stringSimilarity = diceCoefficient(
+    [...aNeutral].sort().join(" "),
+    [...bNeutral].sort().join(" "),
+  );
+
+  return coverage >= FALLBACK_COVERAGE_MIN && stringSimilarity >= FALLBACK_DICE_MIN
+    ? (coverage + stringSimilarity) / 2
+    : 0;
 }
 
 function normalizedIngredientCandidateName(ingredient: IngredientCanonicalInput) {
@@ -315,6 +379,8 @@ export function findCanonicalIngredientMatch(
 
   let best: IngredientCanonicalMatch | null = null;
   let bestScore = 0;
+  const itemTokenClass = classifyIngredientMatchTokens(new Set(productTokens(normalizedItemName)));
+
   for (const ingredient of ingredients) {
     const normalizedIngredientName = normalizedIngredientCandidateName(ingredient);
     if (!normalizedIngredientName) continue;
@@ -331,5 +397,17 @@ export function findCanonicalIngredientMatch(
     }
   }
 
-  return bestScore >= 0.72 ? best : null;
+  if (best && bestScore >= SEMANTIC_MATCH_MIN_SCORE) {
+    traceIngredientSemanticMatch({
+      originalName: itemName,
+      normalizedName: normalizedItemName,
+      coreTokens: itemTokenClass.core,
+      weakTokens: itemTokenClass.weak,
+      matchedIngredient: best.ingredient.name,
+      similarityScore: bestScore,
+    });
+    return best;
+  }
+
+  return null;
 }
