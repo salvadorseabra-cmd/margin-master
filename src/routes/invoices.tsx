@@ -32,6 +32,10 @@ import {
   type IngredientCanonicalMatch,
 } from "@/lib/ingredient-canonical";
 import {
+  loadConfirmedIngredientAliasMap,
+  upsertConfirmedAlias,
+} from "@/lib/ingredient-alias-memory";
+import {
   fileNameFromInvoicePath,
   looksLikeUploadedFileName,
   normalizeInvoiceDate,
@@ -924,6 +928,9 @@ function InvoicesPage() {
 
       setIngredientCatalog(ingredientError ? [] : ((ingredientRows ?? []) as IngredientMatchRow[]));
 
+      const dbAliases = await loadConfirmedIngredientAliasMap(supabase);
+      setConfirmedIngredientAliases((current) => ({ ...current, ...dbAliases }));
+
       if (ids.length > 0) {
         const { data: itemRows, error: itemError } = await supabase
           .from("invoice_items")
@@ -1369,7 +1376,11 @@ function InvoicesPage() {
     });
   };
 
-  const confirmIngredientMatch = (item: ItemRow, match: IngredientCanonicalMatch) => {
+  const confirmIngredientMatch = (
+    item: ItemRow,
+    match: IngredientCanonicalMatch,
+    supplierName?: string | null,
+  ) => {
     if (!user) return;
     const normalizedItemName = normalizeInvoiceIngredientName(item.name);
     if (!normalizedItemName) return;
@@ -1385,6 +1396,17 @@ function InvoicesPage() {
         // Local alias memory is an operational convenience; matching still works without it.
       }
       return next;
+    });
+
+    void upsertConfirmedAlias({
+      ingredientId: match.ingredient.id,
+      aliasName: item.name,
+      supplierName,
+      supabase,
+    }).then(({ error }) => {
+      if (error) {
+        setGlobalError(error.message || "Could not save ingredient alias");
+      }
     });
   };
 
@@ -1791,7 +1813,9 @@ function InvoicesPage() {
                             extracting={!!extracting[r.id]}
                             onExtract={isImage ? () => reExtract(r) : undefined}
                             onCreateIngredient={createIngredientFromItem}
-                            onConfirmIngredientMatch={confirmIngredientMatch}
+                            onConfirmIngredientMatch={(item, match) =>
+                              confirmIngredientMatch(item, match, r.supplier_name)
+                            }
                             creatingIngredientByItem={creatingIngredientByItem}
                             ingredientCreationErrors={ingredientCreationErrors}
                           />
