@@ -1,0 +1,66 @@
+import type { IngredientAliasMap } from "@/lib/ingredient-canonical";
+import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
+
+const LOG_PREFIX = "[ingredient_aliases]";
+
+function normalizeSupplierScope(raw: string | null | undefined): string | null {
+  if (!raw?.trim()) return null;
+  const normalized = normalizeSupplierDisplayName(raw);
+  return normalized || null;
+}
+
+function debugAliasLog(message: string, details?: Record<string, unknown>): void {
+  if (details) {
+    console.debug(`${LOG_PREFIX} ${message}`, details);
+    return;
+  }
+  console.debug(`${LOG_PREFIX} ${message}`);
+}
+
+/** In-memory lookup key: supplier-scoped when supplier is known, else global normalized alias. */
+export function buildIngredientAliasLookupKey(
+  normalizedAlias: string,
+  supplierName?: string | null,
+): string {
+  const supplier = normalizeSupplierScope(supplierName);
+  return supplier ? `${supplier}::${normalizedAlias}` : normalizedAlias;
+}
+
+export function lookupIngredientIdFromAliasMap(
+  aliases: IngredientAliasMap,
+  normalizedItemName: string,
+  supplierName?: string | null,
+): string | undefined {
+  const supplierKey = buildIngredientAliasLookupKey(normalizedItemName, supplierName);
+  const supplierHit = aliases[supplierKey];
+  if (supplierHit) {
+    debugAliasLog("alias lookup hit (supplier-scoped)", {
+      normalizedItemName,
+      supplierKey,
+      ingredientId: supplierHit,
+    });
+    return supplierHit;
+  }
+
+  const globalHit = aliases[normalizedItemName];
+  if (globalHit) {
+    debugAliasLog("alias lookup hit (global)", {
+      normalizedItemName,
+      ingredientId: globalHit,
+    });
+    return globalHit;
+  }
+
+  debugAliasLog("alias lookup miss", { normalizedItemName, supplierKey });
+  return undefined;
+}
+
+export function rememberAliasInMap(
+  aliases: IngredientAliasMap,
+  normalizedItemName: string,
+  ingredientId: string,
+  supplierName?: string | null,
+): IngredientAliasMap {
+  const key = buildIngredientAliasLookupKey(normalizedItemName, supplierName);
+  return { ...aliases, [key]: ingredientId };
+}

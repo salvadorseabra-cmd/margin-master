@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  extractIngredientFormFamilies,
   findCanonicalIngredientMatch,
+  hasCompatibleIngredientFormFamilies,
   normalizeInvoiceIngredientName,
+  SEMANTIC_AUTO_MATCH_MIN_SCORE,
   SEMANTIC_MATCH_MIN_SCORE,
   type IngredientCanonicalInput,
 } from "./ingredient-canonical";
@@ -11,15 +14,31 @@ function ingredient(id: string, name: string): IngredientCanonicalInput {
 }
 
 describe("findCanonicalIngredientMatch (weighted semantic)", () => {
-  it("suggests semantic match for sunflower oil despite different brand tokens", () => {
+  it("auto-matches sunflower oil despite different brand tokens", () => {
     const catalog = [ingredient("oil-1", "ÓLEO GIRASSOL FULA 1L")];
     const match = findCanonicalIngredientMatch("Óleo Girassol Vaqueiro 1L", catalog);
 
     expect(match).not.toBeNull();
-    expect(match?.kind).toBe("semantic");
+    expect(match?.kind).toBe("exact");
     expect(match?.ingredient.id).toBe("oil-1");
     expect(normalizeInvoiceIngredientName("Óleo Girassol Vaqueiro 1L")).toContain("oleo");
     expect(normalizeInvoiceIngredientName("Óleo Girassol Vaqueiro 1L")).toContain("girassol");
+  });
+
+  it("auto-matches private-label mayo to a different brand at the same size", () => {
+    const catalog = [ingredient("mayo-hellmann", "MAIONESE HELLMANN'S 450ML")];
+    const match = findCanonicalIngredientMatch("MAIONESE CALVE TOP DOWN 450ML", catalog);
+
+    expect(match?.kind).toBe("exact");
+    expect(match?.ingredient.id).toBe("mayo-hellmann");
+  });
+
+  it("auto-matches oliveira da serra sunflower oil to another brand", () => {
+    const catalog = [ingredient("oil-fula", "ÓLEO GIRASSOL FULA 1L")];
+    const match = findCanonicalIngredientMatch("ÓLEO GIRASSOL OLIVEIRA DA SERRA 1L", catalog);
+
+    expect(match?.kind).toBe("exact");
+    expect(match?.ingredient.id).toBe("oil-fula");
   });
 
   it("exact-matches cherry tomato when normalization aligns wording", () => {
@@ -67,7 +86,194 @@ describe("findCanonicalIngredientMatch (weighted semantic)", () => {
     expect(findCanonicalIngredientMatch("ALFACE ICEBERG INTEIRA", [catalog[0]])).toBeNull();
   });
 
-  it("uses conservative semantic threshold for possible matches", () => {
+  it("uses conservative semantic thresholds for suggest vs auto", () => {
     expect(SEMANTIC_MATCH_MIN_SCORE).toBe(0.72);
+    expect(SEMANTIC_AUTO_MATCH_MIN_SCORE).toBe(0.88);
+  });
+
+  it("does not auto-match partial core overlap (tomate vs tomate cherry)", () => {
+    const catalog = [ingredient("tom-cherry", "TOMATE CHERRY 250G")];
+    const match = findCanonicalIngredientMatch("TOMATE 250G", catalog);
+
+    expect(match).toBeNull();
+  });
+
+  it("auto-matches from confirmed alias memory before fuzzy matching", () => {
+    const catalog = [
+      ingredient("oil-1", "ÓLEO GIRASSOL FULA 1L"),
+      ingredient("mayo-1", "MAIONESE CALVE 450ML"),
+    ];
+    const normalizedLine = normalizeInvoiceIngredientName("Óleo Girassol Vaqueiro 1L");
+    const aliases = { [normalizedLine]: "oil-1" };
+
+    const match = findCanonicalIngredientMatch(
+      "Óleo Girassol Vaqueiro 1L",
+      catalog,
+      aliases,
+    );
+
+    expect(match?.kind).toBe("confirmed-alias");
+    expect(match?.ingredient.id).toBe("oil-1");
+  });
+
+  describe("potato form-family discrimination", () => {
+    const potatoCatalog = [
+      ingredient("bat-palha", "BATATA PALHA 2KG"),
+      ingredient("bat-frita", "BATATA FRITA 2KG"),
+      ingredient("bat-corte-fino", "BATATA FRITA CORTE FINO 2KG"),
+      ingredient("bat-wedges", "BATATA WEDGES 2KG"),
+      ingredient("bat-hash", "HASHBROWN 2KG"),
+      ingredient("bat-plain", "BATATA 2KG"),
+    ];
+
+    it("extracts distinct form families from raw wording", () => {
+      expect([...extractIngredientFormFamilies("BATATA PALHA 2KG")]).toEqual(["palha"]);
+      expect([...extractIngredientFormFamilies("BATATA FRITA 2KG")]).toEqual(["frita"]);
+      expect([...extractIngredientFormFamilies("BATATA FRITA CORTE FINO 2KG")]).toEqual([
+        "corte_fino",
+      ]);
+      expect([...extractIngredientFormFamilies("BATATA WEDGES 2KG")]).toEqual(["wedges"]);
+      expect([...extractIngredientFormFamilies("HASHBROWN 2KG")]).toEqual(["hashbrown"]);
+      expect([...extractIngredientFormFamilies("BATATA 2KG")]).toEqual([]);
+    });
+
+    it("blocks incompatible form-family pairs", () => {
+      expect(
+        hasCompatibleIngredientFormFamilies("BATATA PALHA 2KG", "BATATA FRITA 2KG"),
+      ).toBe(false);
+      expect(
+        hasCompatibleIngredientFormFamilies("BATATA 2KG", "BATATA WEDGES 2KG"),
+      ).toBe(false);
+      expect(
+        hasCompatibleIngredientFormFamilies(
+          "BATATA FRITA CORTE FINO 2KG",
+          "HASHBROWN 2KG",
+        ),
+      ).toBe(false);
+      expect(
+        hasCompatibleIngredientFormFamilies("BATATA PALHA 2KG", "BATATA PALHA SERVICE 2KG"),
+      ).toBe(true);
+    });
+
+    it("does not match batata palha to batata frita", () => {
+      expect(
+        findCanonicalIngredientMatch("BATATA PALHA 2KG", [potatoCatalog[1]])?.ingredient.id,
+      ).toBeUndefined();
+      expect(
+        findCanonicalIngredientMatch("BATATA FRITA 2KG", [potatoCatalog[0]])?.ingredient.id,
+      ).toBeUndefined();
+    });
+
+    it("does not match batata corte fino to hashbrown or palha", () => {
+      expect(
+        findCanonicalIngredientMatch("BATATA FRITA CORTE FINO 2KG", [potatoCatalog[4]])
+          ?.ingredient.id,
+      ).toBeUndefined();
+      expect(
+        findCanonicalIngredientMatch("HASHBROWN 2KG", [potatoCatalog[2]])?.ingredient.id,
+      ).toBeUndefined();
+      expect(
+        findCanonicalIngredientMatch("BATATA FRITA CORTE FINO 2KG", [potatoCatalog[0]])
+          ?.ingredient.id,
+      ).toBeUndefined();
+    });
+
+    it("does not match generic batata to wedges or palha", () => {
+      expect(
+        findCanonicalIngredientMatch("BATATA 2KG", [potatoCatalog[0]])?.ingredient.id,
+      ).toBeUndefined();
+      expect(
+        findCanonicalIngredientMatch("BATATA 2KG", [potatoCatalog[3]])?.ingredient.id,
+      ).toBeUndefined();
+    });
+
+    it("exact-matches same potato form family despite retailer noise", () => {
+      const match = findCanonicalIngredientMatch("BATATA PALHA 2KG SERVICE", [potatoCatalog[0]]);
+      expect(match?.kind).toBe("exact");
+      expect(match?.ingredient.id).toBe("bat-palha");
+    });
+
+    it("does not exact-match when normalization collapses different families", () => {
+      expect(normalizeInvoiceIngredientName("BATATA PALHA 2KG")).toBe(
+        normalizeInvoiceIngredientName("BATATA FRITA 2KG"),
+      );
+      expect(
+        findCanonicalIngredientMatch("BATATA PALHA 2KG", [potatoCatalog[1]]),
+      ).toBeNull();
+    });
+  });
+
+  it("auto-matches foodservice palha line without batata in OCR wording", () => {
+    const catalog = [ingredient("bat-palha", "BATATA PALHA 2KG")];
+    const match = findCanonicalIngredientMatch("PALHA SNACK FOOD SERVICE 2KG", catalog);
+
+    expect(match).not.toBeNull();
+    expect(match?.kind).toBe("exact");
+    expect(match?.ingredient.id).toBe("bat-palha");
+  });
+
+  it("auto-matches premium cereja tomato to cherry catalog line", () => {
+    const catalog = [ingredient("tom-cherry", "TOMATE CHERRY 250G")];
+    const match = findCanonicalIngredientMatch("Tomate Cereja Premium 250g", catalog);
+
+    expect(match).not.toBeNull();
+    expect(match?.kind).toBe("exact");
+    expect(match?.ingredient.id).toBe("tom-cherry");
+  });
+
+  it("auto-matches private-label Continente wording to catalog ingredient", () => {
+    const catalog = [ingredient("ketchup-1", "KETCHUP HEINZ 570G")];
+    const match = findCanonicalIngredientMatch(
+      "KETCHUP CONTINENTE TOP DOWN 570G",
+      catalog,
+    );
+
+    expect(match?.kind).toBe("exact");
+    expect(match?.ingredient.id).toBe("ketchup-1");
+  });
+
+  it("does not auto-match cheddar sauce to sliced cheddar", () => {
+    const catalog = [ingredient("ched-sliced", "CHEDDAR FATIADO 1KG")];
+    const match = findCanonicalIngredientMatch("CHEDDAR MOLHO 1KG", catalog);
+
+    expect(match).toBeNull();
+  });
+
+  it("auto-matches when catalog line still carries brand tokens in normalization", () => {
+    const catalog = [ingredient("mayo-hellmann", "MAIONESE HELLMANN'S 450ML")];
+    const match = findCanonicalIngredientMatch("MAIONESE CALVE TOP DOWN 450ML", catalog);
+
+    expect(match?.kind).toBe("exact");
+    expect(match?.ingredient.id).toBe("mayo-hellmann");
+  });
+
+  it("does not suggest semantic match across ketchup and mayo cores", () => {
+    const catalog = [
+      ingredient("ketchup-1", "KETCHUP HEINZ 570G"),
+      ingredient("mayo-1", "MAIONESE CALVE 450ML"),
+    ];
+
+    expect(findCanonicalIngredientMatch("KETCHUP GULOSO 570G", catalog)?.ingredient.id).toBe(
+      "ketchup-1",
+    );
+    expect(findCanonicalIngredientMatch("MAIONESE GULOSO 450ML", catalog)?.ingredient.id).toBe(
+      "mayo-1",
+    );
+    expect(findCanonicalIngredientMatch("KETCHUP GULOSO 570G", [catalog[1]])).toBeNull();
+  });
+
+  it("skips semantic suggestion when alias memory resolves the line", () => {
+    const catalog = [ingredient("mayo-1", "MAIONESE CALVE 450ML")];
+    const normalizedLine = normalizeInvoiceIngredientName("MAIONESE CALVE TOP DOWN 450ML");
+    const aliases = { [normalizedLine]: "mayo-1" };
+
+    const match = findCanonicalIngredientMatch(
+      "MAIONESE CALVE TOP DOWN 450ML",
+      catalog,
+      aliases,
+    );
+
+    expect(match?.kind).toBe("confirmed-alias");
+    expect(match?.ingredient.id).toBe("mayo-1");
   });
 });

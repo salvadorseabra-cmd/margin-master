@@ -1,14 +1,28 @@
 import type { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
+import { buildIngredientAliasLookupKey, rememberAliasInMap } from "@/lib/ingredient-alias-lookup";
 import type { IngredientAliasMap } from "@/lib/ingredient-canonical";
 import { normalizeInvoiceIngredientName } from "@/lib/ingredient-canonical";
-import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
 import type { Database } from "@/integrations/supabase/types";
 
 export type AppSupabaseClient = SupabaseClient<Database>;
 
+export {
+  buildIngredientAliasLookupKey,
+  lookupIngredientIdFromAliasMap,
+  rememberAliasInMap,
+} from "@/lib/ingredient-alias-lookup";
+
 const CONFIDENCE_CAP = 10;
 const LOG_PREFIX = "[ingredient_aliases]";
+
+function debugAliasLog(message: string, details?: Record<string, unknown>): void {
+  if (details) {
+    console.debug(`${LOG_PREFIX} ${message}`, details);
+    return;
+  }
+  console.debug(`${LOG_PREFIX} ${message}`);
+}
 
 export type UpsertConfirmedAliasParams = {
   ingredientId: string;
@@ -67,7 +81,7 @@ export async function upsertConfirmedAlias({
     };
   }
 
-  const normalizedAlias = normalizeIngredientName(alias);
+  const normalizedAlias = normalizeInvoiceIngredientName(alias);
   if (!normalizedAlias) {
     return {
       error: {
@@ -108,6 +122,13 @@ export async function upsertConfirmedAlias({
 
     if (updateError) {
       logSupabaseError("upsertConfirmedAlias update", updateError);
+    } else {
+      debugAliasLog("saved alias (updated)", {
+        ingredientId,
+        aliasName: alias,
+        normalizedAlias,
+        supplierName: supplier,
+      });
     }
     return { error: updateError };
   }
@@ -123,6 +144,13 @@ export async function upsertConfirmedAlias({
 
   if (insertError) {
     logSupabaseError("upsertConfirmedAlias insert", insertError);
+  } else {
+    debugAliasLog("saved alias (inserted)", {
+      ingredientId,
+      aliasName: alias,
+      normalizedAlias,
+      supplierName: supplier,
+    });
   }
   return { error: insertError };
 }
@@ -136,7 +164,7 @@ export async function loadConfirmedIngredientAliasMap(
   try {
     const { data, error } = await client
       .from("ingredient_aliases")
-      .select("ingredient_id, alias_name")
+      .select("ingredient_id, normalized_alias, supplier_name")
       .eq("confirmed_by_user", true);
 
     if (error) {
@@ -145,10 +173,17 @@ export async function loadConfirmedIngredientAliasMap(
     }
 
     const map: IngredientAliasMap = {};
-    for (const row of (data ?? []) as { ingredient_id: string; alias_name: string }[]) {
-      const key = normalizeInvoiceIngredientName(row.alias_name);
-      if (key) map[key] = row.ingredient_id;
+    for (const row of (data ?? []) as {
+      ingredient_id: string;
+      normalized_alias: string;
+      supplier_name: string | null;
+    }[]) {
+      const normalizedAlias = row.normalized_alias?.trim().toLowerCase();
+      if (!normalizedAlias) continue;
+      const key = buildIngredientAliasLookupKey(normalizedAlias, row.supplier_name);
+      map[key] = row.ingredient_id;
     }
+    debugAliasLog("loaded confirmed aliases", { count: Object.keys(map).length });
     return map;
   } catch (err) {
     console.error(

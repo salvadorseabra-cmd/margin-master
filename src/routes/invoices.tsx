@@ -19,11 +19,15 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
+import { type UnitInferenceResult, type PackageType } from "@/lib/ingredient-unit-inference";
 import {
-  inferPurchaseUnitsFromLineItemName,
-  type UnitInferenceResult,
-  type PackageType,
-} from "@/lib/ingredient-unit-inference";
+  formatStructuredPurchaseDisplay,
+  formatUsableStockQuantityLabel,
+  isMeaninglessUsableStockLabel,
+  resolveInvoiceLinePurchaseFormat,
+  resolveInvoicePurchaseDisplayLabel,
+  structuredPurchaseToIngredientFields,
+} from "@/lib/invoice-purchase-format";
 import { formatQuantityWithUnit } from "@/lib/display-format";
 import {
   findCanonicalIngredientMatch,
@@ -33,6 +37,7 @@ import {
 } from "@/lib/ingredient-canonical";
 import {
   loadConfirmedIngredientAliasMap,
+  rememberAliasInMap,
   upsertConfirmedAlias,
 } from "@/lib/ingredient-alias-memory";
 import {
@@ -561,7 +566,8 @@ const getItemIngredientMatch = (
   item: ItemRow,
   ingredientCatalog: IngredientMatchRow[],
   confirmedAliases: IngredientAliasMap,
-) => findCanonicalIngredientMatch(item.name, ingredientCatalog, confirmedAliases);
+  supplierName?: string | null,
+) => findCanonicalIngredientMatch(item.name, ingredientCatalog, confirmedAliases, supplierName);
 
 const isConfirmedIngredientMatch = (match: IngredientCanonicalMatch | null) =>
   match?.kind === "exact" || match?.kind === "confirmed-alias";
@@ -611,8 +617,15 @@ const formatPurchaseCount = (value: number) => {
   return rounded;
 };
 
+const resolveItemPurchaseFormat = (item: Pick<ItemRow, "name" | "quantity" | "unit">) =>
+  resolveInvoiceLinePurchaseFormat({
+    name: item.name,
+    quantity: item.quantity,
+    unit: item.unit,
+  });
+
 const hasClearInferredQuantityUnit = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {
-  const inferred = inferPurchaseUnitsFromLineItemName(item.name);
+  const inferred = resolveItemPurchaseFormat(item).inferred;
   const hasUsableInference =
     inferred.confidence >= 0.86 &&
     inferred.purchase_quantity > 0 &&
@@ -704,13 +717,13 @@ const formatPackSize = (inferred: UnitInferenceResult) => {
 
 const resolveInvoiceItemUnit = (item: Pick<ItemRow, "name" | "unit">) => {
   const extractedUnit = item.unit?.trim() || null;
-  const inferred = inferPurchaseUnitsFromLineItemName(item.name);
+  const inferred = resolveItemPurchaseFormat(item).inferred;
   if (inferred.base_unit && isGenericUnit(extractedUnit)) return inferred.base_unit;
   return extractedUnit ?? inferred.base_unit ?? inferred.conversion_hint?.purchase_unit;
 };
 
 const getInvoiceItemOperationalSummary = (item: Pick<ItemRow, "name" | "quantity">) => {
-  const inferred = inferPurchaseUnitsFromLineItemName(item.name);
+  const inferred = resolveItemPurchaseFormat(item).inferred;
   const hint = inferred.conversion_hint;
   if (hint) {
     return {
@@ -725,7 +738,15 @@ const getInvoiceItemOperationalSummary = (item: Pick<ItemRow, "name" | "quantity
 };
 
 const getInvoiceItemPurchaseLabel = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {
-  const inferred = inferPurchaseUnitsFromLineItemName(item.name);
+  const structuredLabel = resolveInvoicePurchaseDisplayLabel({
+    name: item.name,
+    quantity: item.quantity,
+    unit: item.unit,
+  });
+  if (structuredLabel) return structuredLabel;
+
+  const structured = resolveItemPurchaseFormat(item);
+  const inferred = structured.inferred;
   const rowQuantity = Number(item.quantity);
   const hasPositiveQuantity = Number.isFinite(rowQuantity) && rowQuantity > 0;
 
@@ -772,53 +793,87 @@ const getInvoiceItemPurchaseLabel = (item: Pick<ItemRow, "name" | "quantity" | "
 };
 
 const getInvoiceItemStockPresentation = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {
-  const inferred = inferPurchaseUnitsFromLineItemName(item.name);
+  const structured = resolveItemPurchaseFormat(item);
+  const inferred = structured.inferred;
   const rowQuantity = Number(item.quantity);
   const purchaseQuantity = Number.isFinite(rowQuantity) && rowQuantity > 0 ? rowQuantity : 1;
+
+  if (
+    structured.normalizedUsableQuantity != null &&
+    structured.usableQuantityUnit &&
+    structured.kind !== "unit_count"
+  ) {
+    const quantityLabel = formatUsableStockQuantityLabel(
+      structured.normalizedUsableQuantity,
+      structured.usableQuantityUnit,
+      structured,
+    );
+    if (quantityLabel) {
+      return { quantityLabel, detailLabel: null };
+    }
+  }
+
+  if (structured.kind === "unit_count") {
+    const quantityLabel = formatUsableStockQuantityLabel(
+      structured.normalizedUsableQuantity ?? structured.purchaseContainerCount,
+      "units",
+      structured,
+    );
+    if (quantityLabel) {
+      return { quantityLabel, detailLabel: null };
+    }
+  }
 
   if (inferred.size_is_metadata_only && inferred.stock_unit === "un") {
     const unitQuantity = resolveUnitDrivenQuantity(item, inferred);
     const sizeMetadata = formatUnitSizeMetadata(inferred);
-    return {
-      quantityLabel: `${formatQuantityWithUnit(unitQuantity, "units")} usable`,
-      detailLabel: sizeMetadata,
-    };
+    const quantityLabel = formatUsableStockQuantityLabel(unitQuantity, "units", structured);
+    if (quantityLabel) {
+      return { quantityLabel, detailLabel: sizeMetadata };
+    }
   }
 
   if (inferred.normalized_stock_quantity != null && inferred.stock_unit) {
     const stockQuantity = Math.max(1, purchaseQuantity * inferred.normalized_stock_quantity);
-    return {
-      quantityLabel: `${formatOperationalQuantityWithUnit(stockQuantity, inferred.stock_unit)} usable`,
-      detailLabel: null,
-    };
+    const quantityLabel = formatUsableStockQuantityLabel(
+      stockQuantity,
+      inferred.stock_unit,
+      structured,
+    );
+    if (quantityLabel) {
+      return { quantityLabel, detailLabel: null };
+    }
   }
 
   const hint = inferred.conversion_hint;
   if (hint) {
     const estimatedStockQuantity = Math.max(1, purchaseQuantity * hint.estimated_quantity);
-    return {
-      quantityLabel: `~${formatOperationalQuantityWithUnit(
-        estimatedStockQuantity,
-        hint.stock_unit,
-      )} usable`,
-      detailLabel: "estimated kitchen yield",
-    };
+    const quantityLabel = `~${formatOperationalQuantityWithUnit(
+      estimatedStockQuantity,
+      hint.stock_unit,
+    )} usable`;
+    if (!isMeaninglessUsableStockLabel(quantityLabel)) {
+      return {
+        quantityLabel,
+        detailLabel: "estimated kitchen yield",
+      };
+    }
   }
 
   const compatibleUnit = getRecipeCompatibleUnit(item.unit);
   if (compatibleUnit && item.quantity != null) {
-    return {
-      quantityLabel: `${formatOperationalQuantityWithUnit(item.quantity, compatibleUnit)} usable`,
-      detailLabel: null,
-    };
+    const quantityLabel = formatUsableStockQuantityLabel(item.quantity, compatibleUnit, structured);
+    if (quantityLabel) {
+      return { quantityLabel, detailLabel: null };
+    }
   }
 
   const displayUnit = getDisplayPurchaseUnit(item.unit);
   if (displayUnit && item.quantity != null) {
-    return {
-      quantityLabel: `${formatOperationalQuantityWithUnit(item.quantity, displayUnit)} usable`,
-      detailLabel: null,
-    };
+    const quantityLabel = formatUsableStockQuantityLabel(item.quantity, displayUnit, structured);
+    if (quantityLabel) {
+      return { quantityLabel, detailLabel: null };
+    }
   }
 
   return null;
@@ -878,6 +933,12 @@ function InvoicesPage() {
   const [settlementByInvoice, setSettlementByInvoice] = useState<Record<string, SettlementState>>(
     {},
   );
+  const settlementByInvoiceRef = useRef<Record<string, SettlementState>>({});
+  const invoiceLoadSeqRef = useRef(0);
+
+  useEffect(() => {
+    settlementByInvoiceRef.current = settlementByInvoice;
+  }, [settlementByInvoice]);
 
   useEffect(() => {
     if (!user) {
@@ -906,6 +967,7 @@ function InvoicesPage() {
   }, [user]);
 
   const load = useCallback(async () => {
+    const loadSeq = ++invoiceLoadSeqRef.current;
     setLoading(true);
     setGlobalError(null);
     try {
@@ -919,7 +981,14 @@ function InvoicesPage() {
       const settlementMap = Object.fromEntries(
         invoiceRows.map((row) => [row.id, normalizeSettlementStatus(row.settlement_status)]),
       ) as Record<string, SettlementState>;
+      console.log("[settlement] reload", {
+        loadSeq,
+        invoiceCount: invoiceRows.length,
+        settlementMap,
+      });
+      if (loadSeq !== invoiceLoadSeqRef.current) return;
       setSettlementByInvoice(settlementMap);
+      settlementByInvoiceRef.current = settlementMap;
       const ids = invoiceRows.map((row) => row.id);
       const itemCounts: Record<string, number> = {};
       const { data: ingredientRows, error: ingredientError } = await supabase
@@ -943,6 +1012,8 @@ function InvoicesPage() {
           }
         }
       }
+
+      if (loadSeq !== invoiceLoadSeqRef.current) return;
 
       const identityState = invoiceIdentitiesRef.current;
       setRows(
@@ -1029,30 +1100,50 @@ function InvoicesPage() {
   }, [rows, settlementByInvoice, sortBy]);
 
   const toggleSettlement = async (invoiceId: string) => {
-    let previous: SettlementState = "pending";
-    let next: SettlementState = "settled";
+    invoiceLoadSeqRef.current += 1;
 
-    setSettlementByInvoice((current) => {
-      previous = getSettlementState(invoiceId, current);
-      next = previous === "settled" ? "pending" : "settled";
-      return {
-        ...current,
-        [invoiceId]: next,
-      };
-    });
+    const previous = getSettlementState(invoiceId, settlementByInvoiceRef.current);
+    const next: SettlementState = previous === "settled" ? "pending" : "settled";
 
-    const { error } = await supabase
+    console.log("[settlement] toggle", { invoiceId, previous, next });
+
+    setSettlementByInvoice((current) => ({
+      ...current,
+      [invoiceId]: next,
+    }));
+
+    const { data, error } = await supabase
       .from("invoices")
       .update({ settlement_status: next })
-      .eq("id", invoiceId);
+      .eq("id", invoiceId)
+      .select("id, settlement_status")
+      .maybeSingle();
 
-    if (error) {
+    console.log("[settlement] update response", {
+      invoiceId,
+      next,
+      data,
+      error: error?.message ?? null,
+    });
+
+    if (error || !data) {
       setSettlementByInvoice((current) => ({
         ...current,
         [invoiceId]: previous,
       }));
-      setGlobalError(error.message);
+      setGlobalError(error?.message ?? "Could not update settlement status");
+      return;
     }
+
+    const persisted = normalizeSettlementStatus(data.settlement_status);
+    setSettlementByInvoice((current) => ({
+      ...current,
+      [invoiceId]: persisted,
+    }));
+    settlementByInvoiceRef.current = {
+      ...settlementByInvoiceRef.current,
+      [invoiceId]: persisted,
+    };
   };
 
   const enqueue = (files: FileList | File[]) => {
@@ -1108,6 +1199,10 @@ function InvoicesPage() {
       if (error) throw error;
       const items = Array.isArray(data?.items) ? data.items : [];
       traceInvoiceQuantityStage("extract-response:first-item", items[0], { invoiceId });
+  if (import.meta.env.DEV && items[0]) {
+    const sample = normalizeInvoiceItemFields(items[0] as ItemRow);
+    console.debug("[invoice-purchase]", resolveInvoiceLinePurchaseFormat(sample));
+  }
       // wipe prior items then insert fresh
       await supabase.from("invoice_items").delete().eq("invoice_id", invoiceId);
       if (items.length && user) {
@@ -1386,7 +1481,12 @@ function InvoicesPage() {
     if (!normalizedItemName) return;
 
     setConfirmedIngredientAliases((current) => {
-      const next = { ...current, [normalizedItemName]: match.ingredient.id };
+      const next = rememberAliasInMap(
+        current,
+        normalizedItemName,
+        match.ingredient.id,
+        supplierName,
+      );
       try {
         window.localStorage.setItem(
           `marginly:invoice-ingredient-aliases:${user.id}`,
@@ -1424,15 +1524,26 @@ function InvoicesPage() {
     }
 
     const extractedUnit = item.unit?.trim() || null;
-    const inferred = inferPurchaseUnitsFromLineItemName(name);
-    const conversionHint = inferred.conversion_hint;
+    const structured = resolveInvoiceLinePurchaseFormat({
+      name,
+      quantity: item.quantity,
+      unit: item.unit,
+    });
+    const purchaseFields = structuredPurchaseToIngredientFields(
+      structured,
+      extractedUnit,
+      isGenericUnit,
+    );
     const stockUnit =
-      inferred.base_unit && isGenericUnit(extractedUnit)
-        ? inferred.base_unit
-        : (extractedUnit ?? inferred.base_unit ?? conversionHint?.purchase_unit ?? "kg");
-    const purchaseQuantity = inferred.base_unit ? inferred.purchase_quantity : 1;
-    const purchaseUnit = inferred.purchase_unit ?? stockUnit;
-    const baseUnit = inferred.base_unit ?? stockUnit;
+      structured.inferred.base_unit && isGenericUnit(extractedUnit)
+        ? structured.inferred.base_unit
+        : (extractedUnit ??
+          structured.inferred.base_unit ??
+          structured.inferred.conversion_hint?.purchase_unit ??
+          purchaseFields.base_unit);
+    const purchaseQuantity = purchaseFields.purchase_quantity;
+    const purchaseUnit = purchaseFields.purchase_unit;
+    const baseUnit = purchaseFields.base_unit;
     const detectedPrice = Number(item.unit_price);
     const currentPrice = Number.isFinite(detectedPrice) && detectedPrice >= 0 ? detectedPrice : 0;
 
@@ -1809,6 +1920,7 @@ function InvoicesPage() {
                             priceComparisons={priceComparisonsByInvoice[r.id] ?? {}}
                             ingredientCatalog={ingredientCatalog}
                             confirmedIngredientAliases={confirmedIngredientAliases}
+                            supplierName={r.supplier_name}
                             loading={itemsByInvoice[r.id] === undefined}
                             extracting={!!extracting[r.id]}
                             onExtract={isImage ? () => reExtract(r) : undefined}
@@ -2061,6 +2173,7 @@ function ItemsTable({
   priceComparisons,
   ingredientCatalog,
   confirmedIngredientAliases,
+  supplierName,
   creatingIngredientByItem,
   ingredientCreationErrors,
   loading,
@@ -2073,6 +2186,7 @@ function ItemsTable({
   priceComparisons: PriceComparisonMap;
   ingredientCatalog: IngredientMatchRow[];
   confirmedIngredientAliases: IngredientAliasMap;
+  supplierName?: string | null;
   creatingIngredientByItem: IngredientCreationState;
   ingredientCreationErrors: IngredientCreationErrors;
   loading: boolean;
@@ -2087,6 +2201,7 @@ function ItemsTable({
         item,
         ingredientCatalog,
         confirmedIngredientAliases,
+        supplierName,
       );
       if (isConfirmedIngredientMatch(ingredientMatch)) {
         summary.matchedIngredients += 1;
@@ -2219,6 +2334,7 @@ function ItemsTable({
                   renderItem,
                   ingredientCatalog,
                   confirmedIngredientAliases,
+                  supplierName,
                 );
                 const confirmedIngredientMatch = isConfirmedIngredientMatch(ingredientMatch);
                 const possibleIngredientMatch =

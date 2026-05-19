@@ -1,0 +1,377 @@
+import { describe, expect, it } from "vitest";
+import {
+  formatInvoiceLineRawPurchaseFallback,
+  formatStructuredPurchaseDisplay,
+  formatUsableStockQuantityLabel,
+  isCollapsedMeaninglessUsable,
+  isMeaninglessUsableStockLabel,
+  parsePurchaseFormatPhrase,
+  resolveInvoiceLinePurchaseFormat,
+  resolveInvoicePurchaseDisplayLabel,
+  structuredPurchaseToIngredientFields,
+  USABLE_STOCK_MIN_CONFIDENCE,
+} from "./invoice-purchase-format";
+
+describe("parsePurchaseFormatPhrase", () => {
+  it.each([
+    {
+      input: "1 bottle x 450ml",
+      kind: "container_with_size",
+      containerCount: 1,
+      containerUnit: "bottle",
+      packageQuantity: 450,
+      packageUnit: "ml",
+      usable: 450,
+      usableUnit: "ml",
+    },
+    {
+      input: "1 pack x 2kg",
+      kind: "container_with_size",
+      containerCount: 1,
+      containerUnit: "pack",
+      packageQuantity: 2,
+      packageUnit: "kg",
+      usable: 2000,
+      usableUnit: "g",
+    },
+    {
+      input: "1 un",
+      kind: "unit_count",
+      containerCount: 1,
+      containerUnit: "un",
+      usable: null,
+      usableUnit: null,
+    },
+    {
+      input: "250 g",
+      kind: "weight_or_volume",
+      containerCount: 1,
+      packageQuantity: 250,
+      packageUnit: "g",
+      usable: 250,
+      usableUnit: "g",
+    },
+  ] as const)(
+    "parses $input",
+    ({
+      input,
+      kind,
+      containerCount,
+      containerUnit,
+      packageQuantity,
+      packageUnit,
+      usable,
+      usableUnit,
+    }) => {
+      const parsed = parsePurchaseFormatPhrase(input);
+      expect(parsed?.kind).toBe(kind);
+      expect(parsed?.containerCount).toBe(containerCount);
+      if (containerUnit) expect(parsed?.containerUnit).toBe(containerUnit);
+      if (packageQuantity != null) expect(parsed?.packageQuantity).toBe(packageQuantity);
+      if (packageUnit) expect(parsed?.packageUnit).toBe(packageUnit);
+
+      const resolved = resolveInvoiceLinePurchaseFormat({ name: input });
+      expect(resolved.kind).toBe(kind);
+      expect(resolved.normalizedUsableQuantity).toBe(usable);
+      expect(resolved.usableQuantityUnit).toBe(usableUnit);
+    },
+  );
+
+  it("parses container×size embedded in a product name", () => {
+    const resolved = resolveInvoiceLinePurchaseFormat({
+      name: "AZEITE VIRGEM 1 GARRAFA X 750ML",
+    });
+    expect(resolved.kind).toBe("container_with_size");
+    expect(resolved.purchaseContainerCount).toBe(1);
+    expect(resolved.packageQuantity).toBe(750);
+    expect(resolved.packageMeasurementUnit).toBe("ml");
+    expect(resolved.ingredientIdentityHint.toLowerCase()).toContain("azeite");
+    expect(resolved.ingredientIdentityHint.toLowerCase()).not.toContain("750");
+  });
+
+  it("prefers row quantity+unit when present", () => {
+    const resolved = resolveInvoiceLinePurchaseFormat({
+      name: "TOMATE CHERRY",
+      quantity: 1,
+      unit: "un",
+    });
+    expect(resolved.kind).toBe("unit_count");
+    expect(resolved.purchaseContainerCount).toBe(1);
+    expect(resolved.usableQuantityUnit).toBeNull();
+  });
+
+  it("handles European decimal separators", () => {
+    const resolved = resolveInvoiceLinePurchaseFormat({ name: "1,5 kg" });
+    expect(resolved.kind).toBe("weight_or_volume");
+    expect(resolved.normalizedUsableQuantity).toBe(1500);
+    expect(resolved.usableQuantityUnit).toBe("g");
+  });
+
+  it("returns null for ambiguous bare numbers", () => {
+    expect(parsePurchaseFormatPhrase("24")).toBeNull();
+  });
+});
+
+describe("resolveInvoiceLinePurchaseFormat + inference", () => {
+  it("uses inference for PACK24 style names without explicit phrase", () => {
+    const resolved = resolveInvoiceLinePurchaseFormat({ name: "COCA COLA 33CL PACK24" });
+    expect(resolved.inferred.purchase_unit).toBe("un");
+    expect(resolved.inferred.purchase_quantity).toBe(24);
+  });
+
+  it("combines invoice row count with per-unit size from name", () => {
+    const resolved = resolveInvoiceLinePurchaseFormat({
+      name: "LEITE UHT 1L PACK6",
+      quantity: 2,
+      unit: "un",
+    });
+    expect(resolved.kind).toBe("inferred");
+    expect(resolved.inferred.purchase_quantity).toBe(6);
+    expect(resolved.normalizedUsableQuantity).toBeGreaterThanOrEqual(12000);
+    expect(resolved.usableQuantityUnit).toBe("ml");
+  });
+});
+
+describe("example parse outputs", () => {
+  it("documents structured fields for common purchase phrases", () => {
+    const examples = ["1 bottle x 450ml", "1 pack x 2kg", "1 un", "250 g"].map((name) => {
+      const structured = resolveInvoiceLinePurchaseFormat({ name });
+      return {
+        input: name,
+        kind: structured.kind,
+        ingredientIdentityHint: structured.ingredientIdentityHint,
+        purchaseContainerCount: structured.purchaseContainerCount,
+        purchaseContainerUnit: structured.purchaseContainerUnit,
+        packageQuantity: structured.packageQuantity,
+        packageMeasurementUnit: structured.packageMeasurementUnit,
+        normalizedUsableQuantity: structured.normalizedUsableQuantity,
+        usableQuantityUnit: structured.usableQuantityUnit,
+      };
+    });
+    expect(examples).toMatchInlineSnapshot(`
+      [
+        {
+          "ingredientIdentityHint": "",
+          "input": "1 bottle x 450ml",
+          "kind": "container_with_size",
+          "normalizedUsableQuantity": 450,
+          "packageMeasurementUnit": "ml",
+          "packageQuantity": 450,
+          "purchaseContainerCount": 1,
+          "purchaseContainerUnit": "bottle",
+          "usableQuantityUnit": "ml",
+        },
+        {
+          "ingredientIdentityHint": "",
+          "input": "1 pack x 2kg",
+          "kind": "container_with_size",
+          "normalizedUsableQuantity": 2000,
+          "packageMeasurementUnit": "kg",
+          "packageQuantity": 2,
+          "purchaseContainerCount": 1,
+          "purchaseContainerUnit": "pack",
+          "usableQuantityUnit": "g",
+        },
+        {
+          "ingredientIdentityHint": "",
+          "input": "1 un",
+          "kind": "unit_count",
+          "normalizedUsableQuantity": null,
+          "packageMeasurementUnit": "un",
+          "packageQuantity": 1,
+          "purchaseContainerCount": 1,
+          "purchaseContainerUnit": "un",
+          "usableQuantityUnit": null,
+        },
+        {
+          "ingredientIdentityHint": "",
+          "input": "250 g",
+          "kind": "weight_or_volume",
+          "normalizedUsableQuantity": 250,
+          "packageMeasurementUnit": "g",
+          "packageQuantity": 250,
+          "purchaseContainerCount": 1,
+          "purchaseContainerUnit": "g",
+          "usableQuantityUnit": "g",
+        },
+      ]
+    `);
+  });
+});
+
+describe("formatStructuredPurchaseDisplay", () => {
+  it.each([
+    { name: "1 pack x 250 g", expected: "1 pack x 250 g" },
+    { name: "1 bottle x 450 ml", expected: "1 bottle x 450 ml" },
+    { name: "1 pack x 2 kg", expected: "1 pack x 2 kg" },
+    { name: "1 un", expected: "1 un" },
+    { name: "250 g", expected: "250 g" },
+  ] as const)("formats $name for invoice display", ({ name, expected }) => {
+    const structured = resolveInvoiceLinePurchaseFormat({ name });
+    expect(formatStructuredPurchaseDisplay(structured)).toBe(expected);
+  });
+
+  it("formats inferred pack lines from structured fields, not row qty/unit", () => {
+    const structured = resolveInvoiceLinePurchaseFormat({
+      name: "LEITE UHT 1L PACK6",
+      quantity: 2,
+      unit: "un",
+    });
+    expect(structured.kind).toBe("inferred");
+    expect(structured.packageType).toBe("pack");
+    expect(structured.normalizedUsableQuantity).toBeGreaterThanOrEqual(12000);
+    expect(formatStructuredPurchaseDisplay(structured)).toBe("2 packs x 1 L");
+  });
+});
+
+describe("supermarket and OCR purchase phrases", () => {
+  it.each([
+    {
+      input: "6 x 1.5L",
+      kind: "multi_unit_pack",
+      display: "6 x 1.5 L",
+      usable: 9000,
+      usableUnit: "ml",
+    },
+    {
+      input: "24x33cl",
+      kind: "multi_unit_pack",
+      display: "24 x 330 ml",
+      usable: 7920,
+      usableUnit: "ml",
+    },
+    {
+      input: "3 packs x 500g",
+      kind: "container_with_size",
+      display: "3 packs x 500 g",
+      usable: 1500,
+      usableUnit: "g",
+    },
+    {
+      input: "2 caixas x 5kg",
+      kind: "container_with_size",
+      display: "2 cases x 5 kg",
+      usable: 10000,
+      usableUnit: "g",
+    },
+    {
+      input: "2 kg",
+      kind: "weight_or_volume",
+      display: "2 kg",
+      usable: 2000,
+      usableUnit: "g",
+    },
+    {
+      input: "1 pack x 250 g",
+      kind: "container_with_size",
+      display: "1 pack x 250 g",
+      usable: 250,
+      usableUnit: "g",
+    },
+    {
+      input: "AGUA 6X1.5L",
+      kind: "multi_unit_pack",
+      display: "6 x 1.5 L",
+      usable: 9000,
+      usableUnit: "ml",
+    },
+    {
+      input: "CERVEJA 24 X 33CL",
+      kind: "multi_unit_pack",
+      display: "24 x 330 ml",
+      usable: 7920,
+      usableUnit: "ml",
+    },
+  ] as const)(
+    "parses $input",
+    ({ input, kind, display, usable, usableUnit }) => {
+      const resolved = resolveInvoiceLinePurchaseFormat({ name: input });
+      expect(resolved.kind).toBe(kind);
+      expect(resolved.normalizedUsableQuantity).toBe(usable);
+      expect(resolved.usableQuantityUnit).toBe(usableUnit);
+      expect(formatStructuredPurchaseDisplay(resolved)).toBe(display);
+    },
+  );
+
+  it("parses embedded weight in a product name", () => {
+    const resolved = resolveInvoiceLinePurchaseFormat({ name: "ARROZ CAROLINO 2 KG" });
+    expect(resolved.kind).toBe("weight_or_volume");
+    expect(resolved.normalizedUsableQuantity).toBe(2000);
+    expect(formatStructuredPurchaseDisplay(resolved)).toBe("2 kg");
+  });
+});
+
+describe("fallback and meaningless usable guards", () => {
+  it("detects meaningless usable stock labels", () => {
+    expect(isMeaninglessUsableStockLabel("1 g usable")).toBe(true);
+    expect(isMeaninglessUsableStockLabel("1 ml usable")).toBe(true);
+    expect(isMeaninglessUsableStockLabel("1 units usable")).toBe(true);
+    expect(isMeaninglessUsableStockLabel("2 kg usable")).toBe(false);
+  });
+
+  it("suppresses collapsed 1 g/ml/un usable quantities", () => {
+    const weak = resolveInvoiceLinePurchaseFormat({
+      name: "PRODUTO SEM MEDIDA",
+      quantity: 1,
+      unit: "un",
+    });
+    expect(isCollapsedMeaninglessUsable(1, "un", weak)).toBe(true);
+    expect(
+      formatUsableStockQuantityLabel(1, "units", weak),
+    ).toBeNull();
+  });
+
+  it("preserves raw row text when structured parsing is weak", () => {
+    const label = resolveInvoicePurchaseDisplayLabel({
+      name: "ITEM DESCRITIVO",
+      quantity: 3,
+      unit: "cx",
+    });
+    expect(label).toBe("3 cx");
+  });
+
+  it("falls back to matched phrase in product name", () => {
+    expect(
+      formatInvoiceLineRawPurchaseFallback({ name: "AZEITE 1 GARRAFA X 750ML" }),
+    ).toBe("1 GARRAFA X 750ML");
+  });
+
+  it("does not emit 1 units usable for generic single-unit rows", () => {
+    const structured = resolveInvoiceLinePurchaseFormat({
+      name: "TOMATE CHERRY",
+      quantity: 1,
+      unit: "un",
+    });
+    const stockLabel = formatUsableStockQuantityLabel(1, "units", structured);
+    expect(stockLabel).toBeNull();
+    expect(resolveInvoicePurchaseDisplayLabel({
+      name: "TOMATE CHERRY",
+      quantity: 1,
+      unit: "un",
+    })).toBe("1 un");
+  });
+
+  it("documents usable stock confidence threshold", () => {
+    expect(USABLE_STOCK_MIN_CONFIDENCE).toBeGreaterThanOrEqual(0.9);
+  });
+});
+
+describe("structuredPurchaseToIngredientFields", () => {
+  const isGeneric = (unit: string | null | undefined) =>
+    !unit?.trim() || ["un", "unit", "units"].includes(unit.trim().toLowerCase());
+
+  it("keeps inference-backed fields when available", () => {
+    const structured = resolveInvoiceLinePurchaseFormat({ name: "CHEDDAR FATIADO 1KG" });
+    const fields = structuredPurchaseToIngredientFields(structured, null, isGeneric);
+    expect(fields.purchase_quantity).toBe(1000);
+    expect(fields.purchase_unit).toBe("g");
+    expect(fields.base_unit).toBe("g");
+  });
+
+  it("uses structured usable quantity for explicit weight lines", () => {
+    const structured = resolveInvoiceLinePurchaseFormat({ name: "250 g" });
+    const fields = structuredPurchaseToIngredientFields(structured, "g", isGeneric);
+    expect(fields.purchase_quantity).toBe(250);
+    expect(fields.purchase_unit).toBe("g");
+  });
+});

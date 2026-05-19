@@ -120,6 +120,7 @@ export type IngredientCanonicalMatch = {
 
 export type IngredientAliasMap = Record<string, string>;
 
+import { lookupIngredientIdFromAliasMap } from "@/lib/ingredient-alias-lookup";
 import { normalizeInvoiceMatchIngredientName } from "@/lib/normalize-ingredient-name";
 
 const WEIGHT_TOKEN_RE = /\b\d+(?:[.,]\d+)?\s*(?:kg|kgs|g|gr|grs)\.?\b/gi;
@@ -137,14 +138,37 @@ const SEMANTIC_TOKEN_ALIASES: Record<string, string> = {
   bovino: "beef",
   vaca: "beef",
   beef: "beef",
+  cereja: "cherry",
+  cerejas: "cherry",
 };
 
 const FORMAT_GROUPS: string[][] = [
   ["fatiado", "fatiada", "fatiadas", "fatias", "sliced"],
+  ["molho", "molhos", "sauce", "salsa"],
   ["congelado", "congelada", "frozen"],
   ["fresco", "fresca", "fresh"],
   ["ralado", "ralada", "grated"],
 ];
+
+/** Multi-word retailer / marketing phrases — tokens here are weak even if normalization missed a phrase. */
+const WEAK_INGREDIENT_PHRASES: readonly string[] = [
+  "food service",
+  "top down",
+  "oliveira da serra",
+  "pingo doce",
+  "private label",
+];
+
+/** Potato cut families that imply batata when the base core token is absent from OCR text. */
+const POTATO_FORM_IMPLY_BATATA = new Set([
+  "palha",
+  "frita",
+  "fritas",
+  "wedges",
+  "wedge",
+  "hashbrown",
+  "hashbrowns",
+]);
 
 /** Product-identity tokens — overlap here drives semantic suggestions. */
 export const CORE_INGREDIENT_MATCH_TOKENS = new Set([
@@ -159,27 +183,94 @@ export const CORE_INGREDIENT_MATCH_TOKENS = new Set([
   "cebola",
   "cheddar",
   "batata",
-  "frita",
 ]);
+
+/**
+ * Preparation / cut-family tokens — distinguish adjacent product lines (e.g. palha vs wedges).
+ * Compared from raw supplier wording so invoice normalization synonyms cannot collapse families.
+ */
+export const FORM_INGREDIENT_MATCH_TOKENS = new Set([
+  "palha",
+  "frita",
+  "fritas",
+  "wedges",
+  "wedge",
+  "hashbrown",
+  "hashbrowns",
+  "corte_fino",
+  "grated",
+  "ralado",
+  "ralada",
+  "sliced",
+  "fatiado",
+  "fatiada",
+  "shredded",
+]);
+
+const FORM_PHRASE_TO_FAMILY: { pattern: RegExp; family: string }[] = [
+  { pattern: /\bcorte\s+fino\b/, family: "corte_fino" },
+  { pattern: /\bcorte\s+fina\b/, family: "corte_fino" },
+  { pattern: /\bhash\s*brown\b/, family: "hashbrown" },
+];
+
+const FORM_SINGLE_TOKEN_TO_FAMILY: Record<string, string> = {
+  palha: "palha",
+  frita: "frita",
+  fritas: "frita",
+  wedges: "wedges",
+  wedge: "wedges",
+  hashbrown: "hashbrown",
+  hashbrowns: "hashbrown",
+  grated: "grated",
+  ralado: "grated",
+  ralada: "grated",
+  sliced: "sliced",
+  fatiado: "sliced",
+  fatiada: "sliced",
+  shredded: "shredded",
+};
 
 /** Retailer / brand / marketing tokens — minimal weight in similarity scoring. */
 export const WEAK_INGREDIENT_MATCH_TOKENS = new Set([
   "premium",
   "rama",
   "vaqueiro",
+  "fula",
+  "calve",
+  "guloso",
+  "heinz",
+  "hellmann",
+  "hellmanns",
+  "oliveira",
+  "serra",
   "service",
   "mix",
   "top",
   "down",
   "inteira",
-  "corte",
-  "fino",
   "snack",
   "food",
   "continente",
   "auchan",
   "pingo",
   "doce",
+  "lidl",
+  "eroski",
+  "minipreco",
+  "gourmet",
+  "especial",
+  "classico",
+  "tradicional",
+  "extra",
+  "super",
+  "knorr",
+  "nestle",
+  "unilever",
+  "private",
+  "label",
+  "marca",
+  "brand",
+  "s",
 ]);
 
 const CORE_COVERAGE_MIN = 0.67;
@@ -187,12 +278,19 @@ const FALLBACK_COVERAGE_MIN = 0.67;
 const FALLBACK_DICE_MIN = 0.58;
 /** Minimum weighted score to surface a "possible ingredient match" (semantic kind). */
 export const SEMANTIC_MATCH_MIN_SCORE = 0.72;
+/** Minimum score to promote a semantic match to exact (auto-confirm) when core identity matches. */
+export const SEMANTIC_AUTO_MATCH_MIN_SCORE = 0.88;
 
 type ClassifiedMatchTokens = {
   core: string[];
   weak: string[];
+  form: string[];
   neutral: string[];
 };
+
+const FORM_EXTRACT_QUANTITY_RE =
+  /\b\d+(?:[.,]\d+)?\s*(?:kg|kgs|g|gr|grs|mg|ml|cl|l|lt|lts|ltr|ltrs|un|uni|unid)\b/gi;
+const FORM_EXTRACT_ATTACHED_QTY_RE = /\b\d+(?:kg|kgs|g|gr|grs|mg|ml|cl|l|lt|lts|ltr|ltrs)\b/gi;
 
 function traceInvoiceIngredientNormalize(original: string, normalized: string) {
   if (!import.meta.env.DEV || !original) return;
@@ -211,18 +309,130 @@ function traceIngredientSemanticMatch(details: {
   console.debug("[invoice-ingredient-match]", details);
 }
 
-function classifyIngredientMatchTokens(tokens: Set<string>): ClassifiedMatchTokens {
+function weakTokensFromPhrases(normalizedName: string): Set<string> {
+  const weak = new Set<string>();
+  const padded = ` ${normalizedName} `;
+  const sortedPhrases = [...WEAK_INGREDIENT_PHRASES].sort((a, b) => b.length - a.length);
+  for (const phrase of sortedPhrases) {
+    const pattern = phrase
+      .split(/\s+/)
+      .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("\\s+");
+    if (!new RegExp(`\\s${pattern}\\s`).test(padded)) continue;
+    for (const token of phrase.split(/\s+/)) {
+      weak.add(token);
+    }
+  }
+  return weak;
+}
+
+function classifyIngredientMatchTokens(
+  tokens: Set<string>,
+  normalizedName = "",
+): ClassifiedMatchTokens {
+  const phraseWeak = weakTokensFromPhrases(normalizedName);
   const core: string[] = [];
   const weak: string[] = [];
+  const form: string[] = [];
   const neutral: string[] = [];
 
   for (const token of tokens) {
     if (CORE_INGREDIENT_MATCH_TOKENS.has(token)) core.push(token);
-    else if (WEAK_INGREDIENT_MATCH_TOKENS.has(token)) weak.push(token);
+    else if (WEAK_INGREDIENT_MATCH_TOKENS.has(token) || phraseWeak.has(token)) weak.push(token);
+    else if (FORM_INGREDIENT_MATCH_TOKENS.has(token)) form.push(token);
     else neutral.push(token);
   }
 
-  return { core, weak, neutral };
+  return { core, weak, form, neutral };
+}
+
+function applyImplicitBatataCore(
+  core: Set<string>,
+  formTokens: string[],
+  formFamilies: Set<string>,
+) {
+  if (core.has("batata")) return;
+  const hasPotatoForm =
+    formTokens.some((token) => POTATO_FORM_IMPLY_BATATA.has(token)) ||
+    [...formFamilies].some((family) => POTATO_FORM_IMPLY_BATATA.has(family));
+  if (hasPotatoForm) core.add("batata");
+}
+
+function effectiveCoreSets(
+  aClass: ClassifiedMatchTokens,
+  bClass: ClassifiedMatchTokens,
+  rawA: string,
+  rawB: string,
+) {
+  const aCore = new Set(aClass.core);
+  const bCore = new Set(bClass.core);
+  applyImplicitBatataCore(aCore, aClass.form, extractIngredientFormFamilies(rawA));
+  applyImplicitBatataCore(bCore, bClass.form, extractIngredientFormFamilies(rawB));
+  return { aCore, bCore };
+}
+
+function mutualWeakOverlapRatio(aWeak: Set<string>, bWeak: Set<string>) {
+  if (aWeak.size === 0 && bWeak.size === 0) return 1;
+  if (aWeak.size === 0 || bWeak.size === 0) return 0;
+  let shared = 0;
+  for (const token of aWeak) {
+    if (bWeak.has(token)) shared += 1;
+  }
+  return shared / Math.max(aWeak.size, bWeak.size);
+}
+
+function lightStripForFormExtraction(raw: string): string {
+  let s = stripAccentsLower(raw);
+  s = s.replace(/[^a-z0-9\s]+/g, " ");
+  s = s.replace(FORM_EXTRACT_QUANTITY_RE, " ");
+  s = s.replace(FORM_EXTRACT_ATTACHED_QTY_RE, " ");
+  s = s.replace(/\b\d+\b/g, " ");
+  return s.replace(/\s+/g, " ").trim();
+}
+
+/**
+ * Product cut / preparation families from raw wording (before palha→frita invoice synonyms).
+ */
+export function extractIngredientFormFamilies(raw: string): Set<string> {
+  let s = lightStripForFormExtraction(raw);
+  if (!s) return new Set();
+
+  const families = new Set<string>();
+
+  for (const { pattern, family } of FORM_PHRASE_TO_FAMILY) {
+    if (pattern.test(s)) {
+      families.add(family);
+      s = s.replace(pattern, " ");
+    }
+  }
+
+  const tokens = s.split(/\s+/).filter((token) => token.length > 1);
+  const hasBatata = tokens.includes("batata");
+
+  for (const token of tokens) {
+    const mapped = FORM_SINGLE_TOKEN_TO_FAMILY[token];
+    if (!mapped) continue;
+    if (mapped === "frita" && !hasBatata) continue;
+    if (mapped === "corte_fino") continue;
+    if (families.has("corte_fino") && mapped === "frita") continue;
+    families.add(mapped);
+  }
+
+  return families;
+}
+
+/** Both sides must share the same form-family set, or both must lack form tokens. */
+export function hasCompatibleIngredientFormFamilies(rawA: string, rawB: string): boolean {
+  const aForm = extractIngredientFormFamilies(rawA);
+  const bForm = extractIngredientFormFamilies(rawB);
+
+  if (aForm.size === 0 && bForm.size === 0) return true;
+  if (aForm.size === 0 || bForm.size === 0) return false;
+  if (aForm.size !== bForm.size) return false;
+  for (const family of aForm) {
+    if (!bForm.has(family)) return false;
+  }
+  return true;
 }
 
 function tokenOverlapRatio(a: Set<string>, b: Set<string>) {
@@ -294,17 +504,59 @@ function hasCompatibleMeasures(a: string, b: string) {
   return !aMeasure.weight && !aMeasure.volume && !bMeasure.weight && !bMeasure.volume;
 }
 
-function semanticSimilarity(a: string, b: string) {
+function coreTokenSet(normalizedName: string, rawName = normalizedName) {
+  const tokens = new Set(productTokens(normalizedName));
+  const classified = classifyIngredientMatchTokens(tokens, normalizedName);
+  const { aCore } = effectiveCoreSets(classified, classified, rawName, rawName);
+  return aCore;
+}
+
+/** Same product-identity cores on both sides (brand/neutral tokens may differ). */
+export function equalCoreIngredientIdentity(
+  a: string,
+  b: string,
+  rawA = a,
+  rawB = b,
+): boolean {
+  const aTokens = new Set(productTokens(a));
+  const bTokens = new Set(productTokens(b));
+  const aClass = classifyIngredientMatchTokens(aTokens, a);
+  const bClass = classifyIngredientMatchTokens(bTokens, b);
+  const { aCore, bCore } = effectiveCoreSets(aClass, bClass, rawA, rawB);
+  if (aCore.size === 0 || bCore.size === 0) return false;
+  if (aCore.size !== bCore.size) return false;
+  for (const token of aCore) {
+    if (!bCore.has(token)) return false;
+  }
+  return true;
+}
+
+function shouldAutoConfirmSemanticMatch(
+  a: string,
+  b: string,
+  score: number,
+  rawA: string,
+  rawB: string,
+) {
+  if (score < SEMANTIC_AUTO_MATCH_MIN_SCORE) return false;
+  if (!hasCompatibleMeasures(a, b)) return false;
+  if (!hasCompatibleIngredientFormFamilies(rawA, rawB)) return false;
+  return equalCoreIngredientIdentity(a, b, rawA, rawB);
+}
+
+function semanticSimilarity(a: string, b: string, rawA: string, rawB: string) {
   if (!hasCompatibleMeasures(a, b)) return 0;
+  if (!hasCompatibleIngredientFormFamilies(rawA, rawB)) return 0;
 
   const aTokens = new Set(productTokens(a));
   const bTokens = new Set(productTokens(b));
   if (aTokens.size === 0 || bTokens.size === 0 || !hasCompatibleFormat(aTokens, bTokens)) return 0;
 
-  const aClass = classifyIngredientMatchTokens(aTokens);
-  const bClass = classifyIngredientMatchTokens(bTokens);
-  const aCore = new Set(aClass.core);
-  const bCore = new Set(bClass.core);
+  const aClass = classifyIngredientMatchTokens(aTokens, a);
+  const bClass = classifyIngredientMatchTokens(bTokens, b);
+  const { aCore, bCore } = effectiveCoreSets(aClass, bClass, rawA, rawB);
+  const aForm = new Set(aClass.form);
+  const bForm = new Set(bClass.form);
 
   if (aCore.size > 0 || bCore.size > 0) {
     if (aCore.size === 0 || bCore.size === 0) return 0;
@@ -312,11 +564,31 @@ function semanticSimilarity(a: string, b: string) {
     const coreCoverage = tokenOverlapRatio(aCore, bCore);
     if (coreCoverage < CORE_COVERAGE_MIN) return 0;
 
-    const coreDice = diceCoefficient([...aCore].sort().join(" "), [...bCore].sort().join(" "));
-    const weakCoverage = tokenOverlapRatio(new Set(aClass.weak), new Set(bClass.weak));
+    const coresEqual =
+      aCore.size === bCore.size && [...aCore].every((token) => bCore.has(token));
 
-    // Core identity drives the score; weak/brand tokens contribute at most ~3%.
-    const score = coreCoverage * 0.72 + coreDice * 0.23 + weakCoverage * 0.05;
+    // One-sided extra core tokens (e.g. tomate vs tomate cherry) must not auto-match.
+    if (!coresEqual) {
+      const maxCoreSize = Math.max(aCore.size, bCore.size);
+      const symmetricCoreCoverage =
+        [...aCore].filter((token) => bCore.has(token)).length / maxCoreSize;
+      if (symmetricCoreCoverage < CORE_COVERAGE_MIN) return 0;
+    }
+
+    const coreDice = diceCoefficient([...aCore].sort().join(" "), [...bCore].sort().join(" "));
+    const formCoverage =
+      aForm.size > 0 && bForm.size > 0 ? tokenOverlapRatio(aForm, bForm) : 1;
+    const weakCoverage = mutualWeakOverlapRatio(
+      new Set(aClass.weak),
+      new Set(bClass.weak),
+    );
+
+    // Core identity dominates; form overlap refines; unmatched brand tokens barely move the score.
+    let score =
+      coreCoverage * 0.65 + coreDice * 0.22 + formCoverage * 0.1 + weakCoverage * 0.03;
+    if (coresEqual) {
+      score = Math.max(score, SEMANTIC_AUTO_MATCH_MIN_SCORE);
+    }
     return Math.min(1, score);
   }
 
@@ -346,14 +618,27 @@ export function findCanonicalIngredientMatch(
   itemName: string,
   ingredients: IngredientCanonicalInput[],
   confirmedAliases: IngredientAliasMap = {},
+  supplierName?: string | null,
 ): IngredientCanonicalMatch | null {
   const normalizedItemName = normalizeInvoiceIngredientName(itemName);
   if (!normalizedItemName) return null;
 
-  const aliasIngredientId = confirmedAliases[normalizedItemName];
+  const aliasIngredientId = lookupIngredientIdFromAliasMap(
+    confirmedAliases,
+    normalizedItemName,
+    supplierName,
+  );
   if (aliasIngredientId) {
     const ingredient = ingredients.find((candidate) => candidate.id === aliasIngredientId);
     if (ingredient) {
+      if (import.meta.env.DEV) {
+        console.debug("[ingredient_aliases] auto-matched from alias memory", {
+          itemName,
+          normalizedItemName,
+          ingredientId: aliasIngredientId,
+          ingredientName: ingredient.name,
+        });
+      }
       return {
         ingredient,
         normalizedItemName,
@@ -367,6 +652,11 @@ export function findCanonicalIngredientMatch(
   for (const ingredient of ingredients) {
     const normalizedIngredientName = normalizedIngredientCandidateName(ingredient);
     if (normalizedIngredientName && normalizedIngredientName === normalizedItemName) {
+      if (
+        !hasCompatibleIngredientFormFamilies(itemName, ingredient.name ?? ingredient.normalized_name ?? "")
+      ) {
+        continue;
+      }
       return {
         ingredient,
         normalizedItemName,
@@ -379,12 +669,20 @@ export function findCanonicalIngredientMatch(
 
   let best: IngredientCanonicalMatch | null = null;
   let bestScore = 0;
-  const itemTokenClass = classifyIngredientMatchTokens(new Set(productTokens(normalizedItemName)));
+  const itemTokenClass = classifyIngredientMatchTokens(
+    new Set(productTokens(normalizedItemName)),
+    normalizedItemName,
+  );
 
   for (const ingredient of ingredients) {
     const normalizedIngredientName = normalizedIngredientCandidateName(ingredient);
     if (!normalizedIngredientName) continue;
-    const score = semanticSimilarity(normalizedItemName, normalizedIngredientName);
+    const score = semanticSimilarity(
+      normalizedItemName,
+      normalizedIngredientName,
+      itemName,
+      ingredient.name ?? ingredient.normalized_name ?? "",
+    );
     if (score > bestScore) {
       bestScore = score;
       best = {
@@ -398,6 +696,13 @@ export function findCanonicalIngredientMatch(
   }
 
   if (best && bestScore >= SEMANTIC_MATCH_MIN_SCORE) {
+    const autoConfirm = shouldAutoConfirmSemanticMatch(
+      normalizedItemName,
+      best.normalizedIngredientName,
+      bestScore,
+      itemName,
+      best.ingredient.name ?? best.ingredient.normalized_name ?? "",
+    );
     traceIngredientSemanticMatch({
       originalName: itemName,
       normalizedName: normalizedItemName,
@@ -406,6 +711,13 @@ export function findCanonicalIngredientMatch(
       matchedIngredient: best.ingredient.name,
       similarityScore: bestScore,
     });
+    if (autoConfirm) {
+      return {
+        ...best,
+        kind: "exact",
+        reason: "same core product identity and matching size",
+      };
+    }
     return best;
   }
 
