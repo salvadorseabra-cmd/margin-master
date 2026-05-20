@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { findCanonicalIngredientMatch, type IngredientCanonicalInput } from "./ingredient-canonical";
+import {
+  findCanonicalIngredientMatch,
+  type IngredientCanonicalInput,
+} from "./ingredient-canonical";
 import { findInvoiceItemIngredientMatch } from "./invoice-ingredient-match-propagation";
 import {
   normalizeSupplierShorthand,
@@ -45,7 +48,7 @@ describe("normalizeSupplierShorthand", () => {
   });
 
   it("does not transform unrelated tokens", () => {
-    expect(normalizeSupplierShorthand("MOLHO BBQ CONTINENTE")).toBe("MOLHO BBQ CONTINENTE");
+    expect(normalizeSupplierShorthand("MOLHO BBQ CONTINENTE")).toBe("MOLHO bbq CONTINENTE");
     expect(normalizeSupplierShorthand("ARROZ CAROLINO 5 KG")).toBe("ARROZ CAROLINO 5 KG");
     expect(OPERATIONAL_ALIASES.molho).toBeUndefined();
   });
@@ -83,7 +86,82 @@ describe("supplier shorthand → canonical match", () => {
 describe("operational alias registry", () => {
   it("keeps a conservative alias count", () => {
     expect(operationalAliasCount()).toBe(Object.keys(OPERATIONAL_ALIASES).length);
-    expect(operationalAliasCount()).toBe(32);
+    expect(operationalAliasCount()).toBe(50);
+  });
+});
+
+describe("final horeca hardening", () => {
+  it("expands new meat, sauce, and packaging shorthand tokens", () => {
+    expect(normalizeSupplierShorthand("ANG PTY 180")).toBe("angus patty 180");
+    expect(normalizeSupplierShorthand("ON RNG")).toBe("onion rings");
+    expect(normalizeSupplierShorthand("PKL SLC")).toBe("pickles fatiados");
+    expect(normalizeSupplierShorthand("CHED TOP")).toBe("cheddar top");
+    expect(normalizeSupplierShorthand("BAC FUM FAT")).toBe("bacon fumado fatiado");
+    expect(normalizeSupplierShorthand("BRD CHK")).toBe("breaded chicken");
+  });
+
+  it("ANG PTY 180 exact to Hambúrguer Bovino 180g not brioche", () => {
+    const catalog = [
+      ingredient("bread", "Pao Brioche Artesanal 180g"),
+      ingredient("beef-180", "Hamburguer Bovino 180g"),
+    ];
+    const match = findInvoiceItemIngredientMatch("ANG PTY 180", catalog);
+    expect(match?.ingredient.id).toBe("beef-180");
+    expect(match?.kind).toBe("exact");
+  });
+
+  it("SMASH PTY 90 prefers smash patty over kraft box and brioche", () => {
+    const catalog = [
+      ingredient("pack", "CAIXA HAMBURGUER KRAFT PEQ 250UN"),
+      ingredient("bread", "Pao Brioche Artesanal 90g"),
+      ingredient("meat", "Smash Burger Patty 90g"),
+    ];
+    const match = findInvoiceItemIngredientMatch("SMASH PTY 90", catalog);
+    expect(match?.ingredient.id).toBe("meat");
+    expect(match?.kind).toBe("exact");
+  });
+
+  it("BAC FUM FAT matches Bacon Fatiado catalog", () => {
+    const catalog = [
+      ingredient("streaky", "Bacon Streaky 1KG"),
+      ingredient("sliced", "Bacon Fatiado"),
+    ];
+    const match = findInvoiceItemIngredientMatch("BAC FUM FAT", catalog);
+    expect(match?.ingredient.id).toBe("sliced");
+  });
+
+  it("CHED TOP matches Molho Cheddar Dispensador not sliced cheddar", () => {
+    const catalog = [
+      ingredient("sliced", "Cheddar Fatiado 1KG"),
+      ingredient("sauce", "Molho Cheddar Dispensador"),
+    ];
+    const match = findInvoiceItemIngredientMatch("CHED TOP", catalog);
+    expect(match?.ingredient.id).toBe("sauce");
+  });
+
+  it("PKL SLC and PICKL SLC match Pickles Fatiados", () => {
+    const catalog = [ingredient("pickles", "Pickles Fatiados")];
+    expect(findInvoiceItemIngredientMatch("PKL SLC", catalog)?.ingredient.id).toBe("pickles");
+    expect(findInvoiceItemIngredientMatch("PICKL SLC 1KG", catalog)?.ingredient.id).toBe("pickles");
+  });
+
+  it("ON RNG matches Onion Rings catalog line", () => {
+    const catalog = [
+      ingredient("raw-onion", "Cebola Crua 1KG"),
+      ingredient("rings", "Onion Rings"),
+    ];
+    const match = findInvoiceItemIngredientMatch("ON RNG", catalog);
+    expect(match?.ingredient.id).toBe("rings");
+  });
+
+  it("BAT SHOE matches shoestring not pão de batata", () => {
+    const catalog = [
+      ingredient("bread", "Pão de Batata 80g"),
+      ingredient("shoestr", "Batata Shoestring 2.5kg"),
+    ];
+    const match = findInvoiceItemIngredientMatch("BAT SHOE 2.5", catalog);
+    expect(match?.ingredient.id).toBe("shoestr");
+    expect(match?.ingredient.id).not.toBe("bread");
   });
 });
 
@@ -163,9 +241,7 @@ describe("horeca weight and family matching", () => {
       ingredient("shoestr", "Batata Shoestring 2.5kg"),
       ingredient("wedges", "Batata Wedges 2.5kg"),
     ];
-    expect(findInvoiceItemIngredientMatch("BAT SHOE 2.5", catalog)?.ingredient.id).toBe(
-      "shoestr",
-    );
+    expect(findInvoiceItemIngredientMatch("BAT SHOE 2.5", catalog)?.ingredient.id).toBe("shoestr");
     expect(findInvoiceItemIngredientMatch("BAT WDG 2.5", catalog)?.ingredient.id).toBe("wedges");
     expect(findInvoiceItemIngredientMatch("BAT SHOE 2.5", catalog)?.ingredient.id).not.toBe(
       "bread",

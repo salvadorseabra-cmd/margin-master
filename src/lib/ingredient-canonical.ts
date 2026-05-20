@@ -154,10 +154,20 @@ import {
   shareOperationalAliasCluster,
   type MatchScoreBreakdown,
 } from "@/lib/ingredient-identity";
-import { operationalFamiliesIncompatibleFromRaw } from "@/lib/ingredient-operational-families";
+import { shouldSkipByOperationalProductFamilyGate } from "@/lib/ingredient-operational-family-gate";
 import { resolveParentFormHierarchyMatch } from "@/lib/ingredient-parent-form";
 import { inferCoarseIngredientFamily } from "@/lib/ingredient-token-families";
+import {
+  meetsOperationalWeightAutoExact,
+  scoreWeightedOperationalFamilyCompatibility,
+  weightedOperationalFamiliesShouldSkip,
+} from "@/lib/ingredient-operational-scoring";
 import { scoreWeightCompatibility } from "@/lib/ingredient-weight-match";
+
+export {
+  OPERATIONAL_WEIGHT_AUTO_THRESHOLD,
+  WEIGHTED_FAMILY_SCORE_DELTAS,
+} from "@/lib/ingredient-operational-scoring";
 
 export { OPERATIONAL_EQUIVALENT_MIN_SCORE } from "@/lib/ingredient-identity";
 export type { MatchScoreBreakdown, MatchScoreRejectionReason } from "@/lib/ingredient-identity";
@@ -729,7 +739,7 @@ function operationalEquivalenceConfidence(
 }
 
 function semanticSimilarity(a: string, b: string, rawA: string, rawB: string) {
-  if (operationalFamiliesIncompatibleFromRaw(rawA, rawB)) return 0;
+  if (shouldSkipByOperationalProductFamilyGate(rawA, rawB)) return 0;
   if (!hasCompatibleMeasures(a, b)) return 0;
   if (!hasCompatibleIngredientFormFamilies(rawA, rawB)) return 0;
 
@@ -1019,6 +1029,9 @@ export function findCanonicalIngredientMatch(
     const normalizedIngredientName = normalizedIngredientCandidateName(ingredient);
     if (!normalizedIngredientName) continue;
     const ingredientRaw = ingredient.name ?? ingredient.normalized_name ?? "";
+    if (shouldSkipByOperationalProductFamilyGate(itemName, ingredientRaw)) {
+      continue;
+    }
     const itemIdentity = canonicalizeIngredientIdentity(itemName);
     const ingredientIdentity = canonicalizeIngredientIdentity(ingredientRaw);
     const parentFormHierarchy = resolveParentFormHierarchyMatch(
@@ -1048,7 +1061,7 @@ export function findCanonicalIngredientMatch(
       });
       legacyCoreDice = Math.max(legacyCoreDice, clusterCanonical.legacyCoreDice, clusterCanonical.score);
     }
-    if (operationalFamiliesIncompatibleFromRaw(itemName, ingredientRaw)) {
+    if (weightedOperationalFamiliesShouldSkip(itemName, ingredientRaw)) {
       continue;
     }
 
@@ -1077,7 +1090,11 @@ export function findCanonicalIngredientMatch(
       operationalMinScore: OPERATIONAL_EQUIVALENT_MIN_SCORE,
     });
     const weightDelta = scoreWeightCompatibility(itemName, ingredientRaw);
-    const candidateScore = breakdown.finalPromotionScore + weightDelta;
+    const weightedFamilyDelta = scoreWeightedOperationalFamilyCompatibility(
+      itemName,
+      ingredientRaw,
+    );
+    const candidateScore = breakdown.finalPromotionScore + weightDelta + weightedFamilyDelta;
     if (candidateScore > bestCandidateScore) {
       bestCandidateScore = candidateScore;
       bestScore = score;
@@ -1163,15 +1180,25 @@ export function findCanonicalIngredientMatch(
     return null;
   }
 
+  const weightDeltaForBest = scoreWeightCompatibility(itemName, ingredientRaw);
+  const weightCompatible = weightDeltaForBest >= 0;
+  const formsCompatible = hasCompatibleIngredientFormFamilies(itemName, ingredientRaw);
+  const operationalWeightExact = meetsOperationalWeightAutoExact(itemName, ingredientRaw, {
+    hasOperationalAlias: operationalAliasHit != null,
+    weightCompatible,
+    formsCompatible,
+  });
+
   const autoConfirm =
-    meetsSemanticBar &&
-    shouldAutoConfirmSemanticMatch(
-      normalizedItemName,
-      best.normalizedIngredientName,
-      bestScore,
-      itemName,
-      ingredientRaw,
-    );
+    operationalWeightExact ||
+    (meetsSemanticBar &&
+      shouldAutoConfirmSemanticMatch(
+        normalizedItemName,
+        best.normalizedIngredientName,
+        bestScore,
+        itemName,
+        ingredientRaw,
+      ));
 
   const promotedBreakdown: MatchScoreBreakdown = {
     ...(bestBreakdown ?? {
@@ -1200,7 +1227,9 @@ export function findCanonicalIngredientMatch(
     return withSyntheticTargetFlag({
       ...best,
       kind: "exact",
-      reason: "same core product identity and matching size",
+      reason: operationalWeightExact
+        ? "same operational product family and matching size"
+        : "same core product identity and matching size",
       scoreBreakdown: promotedBreakdown,
     });
   }

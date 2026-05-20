@@ -8,7 +8,7 @@
 import type { IngredientAliasMap, IngredientCanonicalInput } from "@/lib/ingredient-canonical";
 import { normalizeSupplierShorthand } from "@/lib/ingredient-operational-aliases";
 import { normalizeInvoiceMatchIngredientName } from "@/lib/normalize-ingredient-name";
-import { operationalFamiliesIncompatibleFromRaw } from "@/lib/ingredient-operational-families";
+import { shouldSkipByOperationalProductFamilyGate } from "@/lib/ingredient-operational-family-gate";
 
 const DIACRITIC_RE = /\p{M}/gu;
 const GRID_CUT_PLACEHOLDER = "__grid9x9__";
@@ -123,6 +123,35 @@ export function buildOperationalAliasLookupKeys(
   return [...new Set(names.map((name) => normalizeOperationalAliasKey(name)).filter(Boolean))];
 }
 
+/** Deterministic reorder/substitution keys for partial lookup boost (no fuzzy). */
+const RELATED_ALIAS_TOKEN_SWAPS: Record<string, string[]> = {
+  bac: ["bacon"],
+  bacon: ["bac"],
+  strk: ["streaky", "strips"],
+  streaky: ["strk", "strips"],
+  strips: ["strk", "streaky"],
+};
+
+const RELATED_ALIAS_PARTIAL_CONFIDENCE = 0.92;
+
+function deriveOperationalAliasRelatedKeys(primaryKey: string): string[] {
+  const tokens = primaryKey.split(/\s+/).filter(Boolean);
+  if (tokens.length < 2) return [];
+
+  const related = new Set<string>();
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i]!;
+    const swaps = RELATED_ALIAS_TOKEN_SWAPS[token];
+    if (!swaps) continue;
+    for (const swap of swaps) {
+      const variant = [...tokens.slice(0, i), swap, ...tokens.slice(i + 1)].join(" ");
+      const normalized = normalizeOperationalAliasKey(variant);
+      if (normalized && normalized !== primaryKey) related.add(normalized);
+    }
+  }
+  return [...related];
+}
+
 export function rememberOperationalAlias(
   key: string,
   ingredientId: string,
@@ -132,13 +161,23 @@ export function rememberOperationalAlias(
 ): void {
   const normalizedKey = normalizeOperationalAliasKey(key);
   if (!normalizedKey || !ingredientId) return;
-  operationalAliasMemory.set(normalizedKey, {
+  const entry: OperationalAliasEntry = {
     ingredientId,
     ingredientName,
     source,
     confidence,
     createdAt: Date.now(),
-  });
+  };
+  operationalAliasMemory.set(normalizedKey, entry);
+
+  for (const relatedKey of deriveOperationalAliasRelatedKeys(normalizedKey)) {
+    const existing = operationalAliasMemory.get(relatedKey);
+    if (existing && existing.confidence >= RELATED_ALIAS_PARTIAL_CONFIDENCE) continue;
+    operationalAliasMemory.set(relatedKey, {
+      ...entry,
+      confidence: Math.min(confidence, RELATED_ALIAS_PARTIAL_CONFIDENCE),
+    });
+  }
 }
 
 export function lookupOperationalAlias(key: string): OperationalAliasEntry | null {
@@ -212,7 +251,7 @@ export function resolveOperationalAliasCatalogMatch(
   if (!ingredient) return null;
 
   const ingredientRaw = ingredient.name ?? ingredient.normalized_name ?? "";
-  if (operationalFamiliesIncompatibleFromRaw(itemName, ingredientRaw)) return null;
+  if (shouldSkipByOperationalProductFamilyGate(itemName, ingredientRaw)) return null;
   if (!hasCompatibleForms(itemName, ingredientRaw)) return null;
 
   return hit;

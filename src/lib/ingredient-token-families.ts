@@ -3,15 +3,14 @@
  */
 
 import { normalizeSupplierShorthand } from "@/lib/ingredient-operational-aliases";
+import {
+  scoreWeightedOperationalFamilyCompatibility,
+  weightedOperationalFamiliesShouldSkip,
+} from "@/lib/ingredient-operational-scoring";
 
 const DIACRITIC_RE = /\p{M}/gu;
 
-export type CoarseIngredientFamily =
-  | "bread"
-  | "meat"
-  | "sauces"
-  | "fried_potato"
-  | "cheese";
+export type CoarseIngredientFamily = "bread" | "meat" | "sauces" | "fried_potato" | "cheese";
 
 /** Score deltas applied in {@link scoreCanonicalIngredientSimilarity}. */
 export const INGREDIENT_TOKEN_FAMILY_SCORE_DELTAS = {
@@ -59,8 +58,16 @@ const COARSE_FAMILY_PHRASES: { phrase: string; family: CoarseIngredientFamily }[
   { phrase: "angus burger", family: "meat" },
   { phrase: "smash patty", family: "meat" },
   { phrase: "smash pty", family: "meat" },
+  { phrase: "bac fum fat", family: "meat" },
+  { phrase: "bacon fumado fatiado", family: "meat" },
   { phrase: "bac strk", family: "meat" },
   { phrase: "chk breaded", family: "meat" },
+  { phrase: "ched top", family: "sauces" },
+  { phrase: "cheddar top", family: "sauces" },
+  { phrase: "molho cheddar dispenser", family: "sauces" },
+  { phrase: "pickles fatiados", family: "sauces" },
+  { phrase: "onion rings", family: "sauces" },
+  { phrase: "on rng", family: "sauces" },
   { phrase: "bat shoe", family: "fried_potato" },
   { phrase: "bat shoestr", family: "fried_potato" },
 ].sort((a, b) => b.phrase.length - a.phrase.length);
@@ -100,6 +107,21 @@ const TOKEN_TO_COARSE_FAMILY: Record<string, CoarseIngredientFamily> = {
   mayo: "sauces",
   maionese: "sauces",
   ketchup: "sauces",
+  ketch: "sauces",
+  maio: "sauces",
+  mol: "sauces",
+  molho: "sauces",
+  bbq: "sauces",
+  top: "sauces",
+  disp: "sauces",
+  dispenser: "sauces",
+  pickles: "sauces",
+  pickl: "sauces",
+  pkl: "sauces",
+  onion: "sauces",
+  oni: "sauces",
+  rings: "sauces",
+  rng: "sauces",
   batata: "fried_potato",
   bat: "fried_potato",
   palha: "fried_potato",
@@ -192,9 +214,16 @@ function criticalIncompatibleDelta(
 }
 
 /**
- * Additive compatibility in [-0.35, 0.1] for canonical scoring.
+ * Additive compatibility in [-0.4, 0.1] for canonical scoring.
+ * Prefers weighted operational families when both sides have signal.
  */
 export function scoreTokenFamilyCompatibility(rawA: string, rawB: string): number {
+  const weightedDelta = scoreWeightedOperationalFamilyCompatibility(rawA, rawB);
+  if (weightedDelta !== 0) return weightedDelta;
+  if (weightedOperationalFamiliesShouldSkip(rawA, rawB)) {
+    return INGREDIENT_TOKEN_FAMILY_SCORE_DELTAS.crossCriticalFriedPotatoBread;
+  }
+
   const familyA = inferCoarseIngredientFamily(rawA);
   const familyB = inferCoarseIngredientFamily(rawB);
   if (!familyA && !familyB) return 0;
