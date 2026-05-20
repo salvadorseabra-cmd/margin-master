@@ -17,6 +17,7 @@ import {
   formatUnitCostCurrency,
 } from "@/lib/display-format";
 import { inferPurchaseUnitsFromLineItemName } from "@/lib/ingredient-unit-inference";
+import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 
 export const Route = createFileRoute("/ingredients")({
   head: () => ({
@@ -50,6 +51,7 @@ function IngredientsPage() {
   const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     unit: "kg",
@@ -170,6 +172,15 @@ function IngredientsPage() {
     await supabase.from("ingredients").delete().eq("id", id);
     if (selectedIngredientId === id) setSelectedIngredientId(null);
     load();
+  };
+
+  const requestDelete = (id: string) => setPendingDeleteId(id);
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
+    const id = pendingDeleteId;
+    setPendingDeleteId(null);
+    await remove(id);
   };
 
   const selectedIngredient = selectedIngredientId
@@ -330,7 +341,7 @@ function IngredientsPage() {
                             type="button"
                             onClick={(event) => {
                               event.stopPropagation();
-                              remove(ing.id);
+                              requestDelete(ing.id);
                             }}
                             className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/70 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/15"
                           >
@@ -353,9 +364,16 @@ function IngredientsPage() {
             selectedIngredient ? recipeLinkActivity[selectedIngredient.id] : undefined
           }
           onClose={() => setSelectedIngredientId(null)}
-          onDelete={(id) => remove(id)}
+          onDelete={(id) => requestDelete(id)}
         />
       </div>
+      <ConfirmDeleteDialog
+        open={pendingDeleteId !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteId(null);
+        }}
+        onConfirm={() => void confirmDelete()}
+      />
     </AppShell>
   );
 }

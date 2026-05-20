@@ -8,6 +8,7 @@ import {
   PARENT_FORM_PARTIAL_COMPATIBILITY,
   resolveParentFormHierarchyMatch,
 } from "@/lib/ingredient-parent-form";
+import { operationalFamiliesIncompatibleFromRaw } from "@/lib/ingredient-operational-families";
 
 const DIACRITIC_RE = /\p{M}/gu;
 
@@ -260,6 +261,7 @@ export const COMMERCIAL_DILUTION_BLOCK_PENALTY = 0.14;
 export type MatchScoreRejectionReason =
   | "insufficient_operational_confidence"
   | "blocked_incompatible_form"
+  | "incompatible_operational_family"
   | "weak_canonical_overlap"
   | "commercial_dilution_too_high"
   | "no_safe_family_convergence"
@@ -905,9 +907,19 @@ export function computeMatchScoreBreakdown(
   const measuresOk = input.hasCompatibleMeasures !== false;
   const ingredientFormsOk = input.hasCompatibleIngredientForms !== false;
   const formatOk = input.hasCompatibleFormat !== false;
+  const operationalCatalogFamiliesOk = !operationalFamiliesIncompatibleFromRaw(
+    input.rawItem,
+    input.rawIngredient,
+  );
 
   let finalPromotionScore = 0;
-  if (blockerPenalty === 0 && measuresOk && ingredientFormsOk && formatOk) {
+  if (
+    blockerPenalty === 0 &&
+    measuresOk &&
+    ingredientFormsOk &&
+    formatOk &&
+    operationalCatalogFamiliesOk
+  ) {
     finalPromotionScore = Math.max(input.semanticSimilarity, operational.confidence);
   }
 
@@ -921,14 +933,16 @@ export function computeMatchScoreBreakdown(
     finalPromotionScore,
   };
 
-  const rejectionReason = resolveMatchScoreRejectionReason({
-    ...base,
-    semanticMin,
-    operationalMin,
-    measuresOk,
-    ingredientFormsOk,
-    formatOk,
-  });
+  const rejectionReason = operationalCatalogFamiliesOk
+    ? resolveMatchScoreRejectionReason({
+        ...base,
+        semanticMin,
+        operationalMin,
+        measuresOk,
+        ingredientFormsOk,
+        formatOk,
+      })
+    : "incompatible_operational_family";
 
   const breakdown: MatchScoreBreakdown = { ...base, rejectionReason };
   if (rejectionReason) {

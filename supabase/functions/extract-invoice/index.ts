@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { resolveIssueDateFromExtraction } from "./invoice-date-resolver.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -211,13 +212,16 @@ console.log(
   JSON.stringify(parsed?.items, null, 2)
 );
 
-    let invoiceDate: string | null = null;
-
-    if (typeof parsed?.invoice_date === "string") {
-      invoiceDate = parsed.invoice_date;
-    } else if (typeof parsed?.invoiceDate === "string") {
-      invoiceDate = parsed.invoiceDate;
-    }
+    const fallbackInvoiceDate =
+      typeof parsed?.invoice_date === "string"
+        ? parsed.invoice_date
+        : typeof parsed?.invoiceDate === "string"
+          ? parsed.invoiceDate
+          : null;
+    const invoiceDate =
+      parsed && typeof parsed === "object"
+        ? resolveIssueDateFromExtraction(parsed as Record<string, unknown>, fallbackInvoiceDate)
+        : fallbackInvoiceDate;
 
     const normalizedInvoiceDate = invoiceDate;
 

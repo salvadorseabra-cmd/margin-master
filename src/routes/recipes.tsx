@@ -13,6 +13,7 @@ import {
   formatQuantityWithUnit,
   formatUnitCostCurrency,
 } from "@/lib/display-format";
+import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 
 export const Route = createFileRoute("/recipes")({
   head: () => ({
@@ -133,6 +134,7 @@ function RecipesPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [detailOpen, setDetailOpen] = useState(false);
+  const [pendingDeleteLineIndex, setPendingDeleteLineIndex] = useState<number | null>(null);
 
   const openRecipe = (recipe: RecipeRow) => {
     setFormMode("edit");
@@ -289,6 +291,13 @@ function RecipesPage() {
         lines: current.lines.filter((_, lineIndex) => lineIndex !== index),
       };
     });
+  };
+
+  const confirmDeleteRecipeLine = () => {
+    if (pendingDeleteLineIndex === null) return;
+    const lineIndex = pendingDeleteLineIndex;
+    setPendingDeleteLineIndex(null);
+    removeRecipeLine(lineIndex);
   };
 
   const saveRecipe = async (event: FormEvent) => {
@@ -890,7 +899,7 @@ function RecipesPage() {
                               <td className="px-4 py-3.5 text-right">
                                 <button
                                   type="button"
-                                  onClick={() => removeRecipeLine(idx)}
+                                  onClick={() => setPendingDeleteLineIndex(idx)}
                                   className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
                                   aria-label="Remove recipe line"
                                 >
@@ -939,6 +948,13 @@ function RecipesPage() {
           </form>
         </div>
       )}
+      <ConfirmDeleteDialog
+        open={pendingDeleteLineIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteLineIndex(null);
+        }}
+        onConfirm={confirmDeleteRecipeLine}
+      />
     </AppShell>
   );
 }

@@ -28,7 +28,6 @@ import {
   isMeaninglessUsableStockLabel,
   resolveInvoiceLinePurchaseFormat,
   resolveInvoicePurchaseDisplayLabel,
-  structuredPurchaseToIngredientFields,
 } from "@/lib/invoice-purchase-format";
 import { formatQuantityWithUnit } from "@/lib/display-format";
 import {
@@ -73,12 +72,17 @@ import {
   upsertConfirmedAlias,
 } from "@/lib/ingredient-alias-memory";
 import {
+  autoPersistUnmatchedInvoiceItems,
+  buildIngredientInsertPayload,
+} from "@/lib/ingredient-auto-persist";
+import {
   fileNameFromInvoicePath,
   looksLikeUploadedFileName,
   normalizeInvoiceDate,
   normalizeInvoiceNumber,
   normalizeSupplierDisplayName,
 } from "@/lib/supplier-identity";
+import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 
 export const Route = createFileRoute("/invoices")({
   head: () => ({
@@ -134,9 +138,8 @@ const ACCEPT = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "newest", label: "Newest" },
   { value: "oldest", label: "Oldest" },
-  { value: "supplier", label: "Supplier name" },
-  { value: "highest", label: "Highest total" },
-  { value: "lowest", label: "Lowest total" },
+  { value: "supplier", label: "Supplier" },
+  { value: "highest", label: "Highest value" },
   { value: "status", label: "Status" },
 ];
 
@@ -836,6 +839,7 @@ function InvoicesPage() {
   const [rows, setRows] = useState<InvoiceRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [preview, setPreview] = useState<{ url: string; type: string; name: string } | null>(null);
+  const [pendingDeleteRow, setPendingDeleteRow] = useState<InvoiceRow | null>(null);
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [itemsByInvoice, setItemsByInvoice] = useState<Record<string, ItemRow[]>>({});
@@ -862,6 +866,7 @@ function InvoicesPage() {
   );
   const settlementByInvoiceRef = useRef<Record<string, SettlementState>>({});
   const invoiceLoadSeqRef = useRef(0);
+  const autoPersistAttemptedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     settlementByInvoiceRef.current = settlementByInvoice;
@@ -975,8 +980,34 @@ function InvoicesPage() {
       setInvoiceOperationalMetadata(emptyInvoiceOperationalMetadata());
       setSettlementByInvoice({});
       setLoading(false);
+      autoPersistAttemptedRef.current.clear();
     }
   }, [user, load]);
+
+  useEffect(() => {
+    if (!user || !expanded || ingredientCatalog.length === 0) return;
+    const items = itemsByInvoice[expanded];
+    if (!items?.length) return;
+
+    const supplierName = rows.find((row) => row.id === expanded)?.supplier_name ?? null;
+    void autoPersistUnmatchedInvoiceItems({
+      client: supabase,
+      userId: user.id,
+      invoiceId: expanded,
+      items,
+      catalog: ingredientCatalog,
+      confirmedAliases: confirmedIngredientAliases,
+      supplierName,
+      attemptedKeys: autoPersistAttemptedRef.current,
+      isGenericUnit,
+      onIngredientCreated: (row) => {
+        setIngredientCatalog((current) => {
+          if (current.some((entry) => entry.id === row.id)) return current;
+          return [...current, row as IngredientMatchRow];
+        });
+      },
+    });
+  }, [user, expanded, itemsByInvoice, ingredientCatalog, confirmedIngredientAliases, rows]);
 
   // Cleanup preview URLs on unmount
   useEffect(
@@ -1463,45 +1494,21 @@ function InvoicesPage() {
       return;
     }
 
-    const extractedUnit = item.unit?.trim() || null;
-    const structured = resolveInvoiceLinePurchaseFormat({
-      name,
-      quantity: item.quantity,
-      unit: item.unit,
-    });
-    const purchaseFields = structuredPurchaseToIngredientFields(
-      structured,
-      extractedUnit,
-      isGenericUnit,
-    );
-    const stockUnit =
-      structured.inferred.base_unit && isGenericUnit(extractedUnit)
-        ? structured.inferred.base_unit
-        : (extractedUnit ??
-          structured.inferred.base_unit ??
-          structured.inferred.conversion_hint?.purchase_unit ??
-          purchaseFields.base_unit);
-    const purchaseQuantity = purchaseFields.purchase_quantity;
-    const purchaseUnit = purchaseFields.purchase_unit;
-    const baseUnit = purchaseFields.base_unit;
-    const detectedPrice = Number(item.unit_price);
-    const currentPrice = Number.isFinite(detectedPrice) && detectedPrice >= 0 ? detectedPrice : 0;
+    const payload = buildIngredientInsertPayload(item, user.id, { isGenericUnit });
+    if (!payload) {
+      setIngredientCreationErrors((current) => ({
+        ...current,
+        [item.id]: "Confirm the extracted name before creating an ingredient.",
+      }));
+      return;
+    }
 
     setCreatingIngredientByItem((current) => ({ ...current, [item.id]: true }));
     setIngredientCreationErrors((current) => removeKey(current, item.id));
     try {
       const { data, error } = await supabase
         .from("ingredients")
-        .insert({
-          user_id: user.id,
-          name,
-          normalized_name: normalizedName,
-          unit: stockUnit,
-          current_price: currentPrice,
-          purchase_quantity: purchaseQuantity,
-          purchase_unit: purchaseUnit,
-          base_unit: baseUnit,
-        })
+        .insert(payload)
         .select("id, name, normalized_name, unit")
         .single();
       if (error) throw error;
@@ -1593,6 +1600,13 @@ function InvoicesPage() {
     if (row.file_path) await supabase.storage.from("invoices").remove([row.file_path]);
     await supabase.from("invoices").delete().eq("id", row.id);
     load();
+  };
+
+  const confirmDeleteRow = async () => {
+    if (!pendingDeleteRow) return;
+    const row = pendingDeleteRow;
+    setPendingDeleteRow(null);
+    await removeRow(row);
   };
 
   return (
@@ -1844,7 +1858,7 @@ function InvoicesPage() {
                           <Eye className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => removeRow(r)}
+                          onClick={() => setPendingDeleteRow(r)}
                           className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-muted"
                           title="Delete"
                         >
@@ -1885,6 +1899,13 @@ function InvoicesPage() {
       </Card>
 
       {preview && <PreviewModal preview={preview} onClose={() => setPreview(null)} />}
+      <ConfirmDeleteDialog
+        open={pendingDeleteRow !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteRow(null);
+        }}
+        onConfirm={() => void confirmDeleteRow()}
+      />
     </AppShell>
   );
 }

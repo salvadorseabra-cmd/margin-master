@@ -147,6 +147,7 @@ import {
   shareOperationalAliasCluster,
   type MatchScoreBreakdown,
 } from "@/lib/ingredient-identity";
+import { operationalFamiliesIncompatibleFromRaw } from "@/lib/ingredient-operational-families";
 import { resolveParentFormHierarchyMatch } from "@/lib/ingredient-parent-form";
 
 export { OPERATIONAL_EQUIVALENT_MIN_SCORE } from "@/lib/ingredient-identity";
@@ -677,6 +678,7 @@ function operationalEquivalenceConfidence(
 }
 
 function semanticSimilarity(a: string, b: string, rawA: string, rawB: string) {
+  if (operationalFamiliesIncompatibleFromRaw(rawA, rawB)) return 0;
   if (!hasCompatibleMeasures(a, b)) return 0;
   if (!hasCompatibleIngredientFormFamilies(rawA, rawB)) return 0;
 
@@ -862,6 +864,9 @@ export function findCanonicalIngredientMatch(
         legacyCoreDice,
       });
       legacyCoreDice = Math.max(legacyCoreDice, clusterCanonical.legacyCoreDice, clusterCanonical.score);
+    }
+    if (operationalFamiliesIncompatibleFromRaw(itemName, ingredientRaw)) {
+      continue;
     }
 
     const score = semanticSimilarity(
