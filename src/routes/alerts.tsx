@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
 import { formatCurrency, formatDecimal, formatPercent } from "@/lib/display-format";
+import { loadActiveIngredientCatalog } from "@/lib/ingredient-catalog-load";
 
 export const Route = createFileRoute("/alerts")({
   head: () => ({
@@ -172,12 +173,10 @@ function AlertsPage() {
         historyResult,
         invoicesResult,
       ] = await Promise.all([
-        supabase
-          .from("ingredients")
-          .select(
-            "id, name, unit, current_price, purchase_quantity, purchase_unit, base_unit, created_at",
-          )
-          .order("name", { ascending: true }),
+        loadActiveIngredientCatalog(
+          supabase,
+          "current_price, purchase_quantity, purchase_unit, base_unit, created_at",
+        ),
         supabase
           .from("recipes")
           .select("id, name, selling_price, type")
@@ -199,11 +198,13 @@ function AlertsPage() {
           .limit(25),
       ]);
 
-      if (ingredientsResult.error) throw ingredientsResult.error;
+      if (ingredientsResult.error) throw new Error(ingredientsResult.error);
       if (recipesResult.error) throw recipesResult.error;
       if (recipeIngredientsResult.error) throw recipeIngredientsResult.error;
 
-      const ingredients = (ingredientsResult.data ?? []) as IngredientRecord[];
+      const ingredients = [...ingredientsResult.rows].sort((a, b) =>
+        (a.name ?? "").localeCompare(b.name ?? "", undefined, { sensitivity: "base" }),
+      ) as IngredientRecord[];
       const ingredientById = new Map(ingredients.map((ingredient) => [ingredient.id, ingredient]));
       const recipeIngredients = (recipeIngredientsResult.data ?? []) as RecipeIngredientRow[];
       const recipeLinesByRecipeId = new Map<string, RecipeIngredientRecord[]>();

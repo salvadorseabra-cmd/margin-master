@@ -189,6 +189,33 @@ export function persistRejectedIngredientMatchesToStorage(userId: string): void 
   }
 }
 
+/** Rewire wrong-match memory when a duplicate ingredient id is merged away. */
+export function remapRejectedIngredientId(
+  sourceIngredientId: string,
+  canonicalIngredientId: string,
+): number {
+  if (sourceIngredientId === canonicalIngredientId) return 0;
+  const toRekey: { oldKey: string; entry: RejectedIngredientMatch }[] = [];
+
+  for (const [key, entry] of rejectedIngredientMatches.entries()) {
+    if (entry.rejectedIngredientId !== sourceIngredientId) continue;
+    const newEntry: RejectedIngredientMatch = {
+      ...entry,
+      rejectedIngredientId: canonicalIngredientId,
+    };
+    const newKey = buildRejectedIngredientMatchKey(
+      entry.normalizedInvoiceText,
+      canonicalIngredientId,
+      entry.supplierId,
+    );
+    toRekey.push({ oldKey: key, entry: newEntry });
+    if (newKey !== key) rejectedIngredientMatches.delete(key);
+    rejectedIngredientMatches.set(newKey, newEntry);
+  }
+
+  return toRekey.length;
+}
+
 export function clearRejectedIngredientMatchesForTests(): void {
   rejectedIngredientMatches.clear();
   hydratedRejectedMatchesForUserId = null;

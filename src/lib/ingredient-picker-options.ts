@@ -1,4 +1,8 @@
-import type { IngredientAliasMap, IngredientCanonicalInput } from "@/lib/ingredient-canonical";
+import {
+  isArchivedIngredientEntry,
+  type IngredientAliasMap,
+  type IngredientCanonicalInput,
+} from "@/lib/ingredient-canonical";
 import { isSyntheticCatalogIngredientId } from "@/lib/ingredient-canonical-synthesis";
 import { normalizeInvoiceIngredientName } from "@/lib/ingredient-canonical";
 import {
@@ -38,6 +42,7 @@ function debugPickerCandidate(
 function isCanonicalCatalogRow(row: IngredientCanonicalInput): boolean {
   const id = row.id?.trim();
   if (!id) return false;
+  if (isArchivedIngredientEntry(row)) return false;
   if (isSyntheticCatalogIngredientId(id)) return false;
   if (id.startsWith("invoice:") || id.startsWith("temp:") || id.startsWith("temporary:")) {
     return false;

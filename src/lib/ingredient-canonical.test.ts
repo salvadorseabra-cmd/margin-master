@@ -415,3 +415,21 @@ describe("horeca shorthand canonical ranking", () => {
     expect(findInvoiceItemIngredientMatch("BAT WDG 2.5", catalog)?.ingredient.id).toBe("wedges");
   });
 });
+
+describe("archived catalog filtering", () => {
+  it("matches only the active ANGUS PTY when archived duplicates remain in the array", () => {
+    const catalog: IngredientCanonicalInput[] = [
+      { id: "canonical", name: "ANGUS PTY", normalized_name: "angus pty" },
+      {
+        id: "dup",
+        name: "ANGUS PTY",
+        normalized_name: "angus pty",
+        is_archived: true,
+        merged_into_ingredient_id: "canonical",
+      },
+    ];
+    const match = findCanonicalIngredientMatch("ANGUS PTY", catalog);
+    expect(match?.ingredient.id).toBe("canonical");
+    expect(findInvoiceItemIngredientMatch("ANG PTY", catalog)?.ingredient.id).toBe("canonical");
+  });
+});

@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import type { Tables } from "@/integrations/supabase/types";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
+import { guardIngredientCreation } from "@/lib/ingredient-operational-identity";
 import {
   effectiveIngredientUnitCostEur,
   ingredientDisplayBaseUnit,
@@ -18,6 +19,7 @@ import {
 } from "@/lib/display-format";
 import { inferPurchaseUnitsFromLineItemName } from "@/lib/ingredient-unit-inference";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
+import { loadActiveIngredientCatalog } from "@/lib/ingredient-catalog-load";
 
 export const Route = createFileRoute("/ingredients")({
   head: () => ({
@@ -65,15 +67,15 @@ function IngredientsPage() {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("ingredients")
-      .select(
-        "id, name, unit, current_price, normalized_name, user_id, purchase_quantity, purchase_unit, base_unit",
-      )
-      .order("name", { ascending: true });
-    if (error) setError(error.message);
+    const { rows: catalogRows, error: catalogError } = await loadActiveIngredientCatalog(
+      supabase,
+      "current_price, user_id, purchase_quantity, purchase_unit, base_unit",
+    );
+    if (catalogError) setError(catalogError);
     else {
-      const ingredientRows = data ?? [];
+      const ingredientRows = [...catalogRows].sort((a, b) =>
+        (a.name ?? "").localeCompare(b.name ?? "", undefined, { sensitivity: "base" }),
+      ) as Row[];
       setRows(ingredientRows);
 
       const ingredientIds = ingredientRows.map((ingredient) => ingredient.id);
@@ -141,6 +143,21 @@ function IngredientsPage() {
     const purchase_quantity = Number.isFinite(pq) && pq > 0 ? pq : 1;
     const purchase_unit = form.purchase_unit.trim() || null;
     const base_unit = form.base_unit.trim() || unit;
+
+    const catalog = rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      normalized_name: row.normalized_name,
+    }));
+    const guard = guardIngredientCreation(name, catalog);
+    if (guard.action === "reuse") {
+      setSaving(false);
+      setError(
+        `Ingredient already exists: ${guard.existing.name ?? guard.existing.normalized_name ?? guard.existing.id}`,
+      );
+      return;
+    }
+
     const { error } = await supabase.from("ingredients").insert({
       user_id: user.id,
       name,

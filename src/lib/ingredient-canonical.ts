@@ -122,7 +122,24 @@ export type IngredientCanonicalInput = {
   name: string | null;
   normalized_name?: string | null;
   unit?: string | null;
+  is_archived?: boolean | null;
+  merged_into_ingredient_id?: string | null;
 };
+
+/** True when a catalog row was soft-archived after merge (or flagged archived). */
+export function isArchivedIngredientEntry(entry: {
+  is_archived?: boolean | null;
+  merged_into_ingredient_id?: string | null;
+}): boolean {
+  return entry.is_archived === true || Boolean(entry.merged_into_ingredient_id?.trim());
+}
+
+/** Active catalog rows for matching, pickers, and merge targets. */
+export function filterActiveCatalogIngredients<T extends IngredientCanonicalInput>(
+  catalog: T[],
+): T[] {
+  return catalog.filter((entry) => !isArchivedIngredientEntry(entry));
+}
 
 export type IngredientCanonicalMatch = {
   ingredient: IngredientCanonicalInput;
@@ -874,6 +891,7 @@ function findOperationalMemoryMatch(
   if (itemKey) rawKeys.add(itemKey);
 
   for (const ingredient of ingredients) {
+    if (isArchivedIngredientEntry(ingredient)) continue;
     const ingredientRaw = ingredient.name ?? ingredient.normalized_name ?? "";
     const catalogKey = operationalRawCompareKey(ingredientRaw);
     if (!catalogKey || !rawKeys.has(catalogKey)) continue;
@@ -970,6 +988,7 @@ export function findCanonicalIngredientMatch(
   supplierName?: string | null,
   options?: FindCanonicalIngredientMatchOptions,
 ): IngredientCanonicalMatch | null {
+  const activeIngredients = filterActiveCatalogIngredients(ingredients);
   const normalizedItemName = normalizeInvoiceIngredientName(itemName);
   if (!normalizedItemName) return null;
 
@@ -979,7 +998,7 @@ export function findCanonicalIngredientMatch(
 
   const overrideHit = lookupIngredientMatchOverride(itemName, supplierName, rawLookupNames);
   if (overrideHit) {
-    const ingredient = ingredients.find(
+    const ingredient = activeIngredients.find(
       (candidate) => candidate.id === overrideHit.canonicalIngredientId,
     );
     if (
@@ -1003,12 +1022,12 @@ export function findCanonicalIngredientMatch(
 
   const operationalAliasHit = resolveOperationalAliasCatalogMatch(
     itemName,
-    ingredients,
+    activeIngredients,
     rawLookupNames,
     hasCompatibleIngredientFormFamilies,
   );
   if (operationalAliasHit) {
-    const ingredient = ingredients.find(
+    const ingredient = activeIngredients.find(
       (candidate) => candidate.id === operationalAliasHit.entry.ingredientId,
     );
     if (
@@ -1032,7 +1051,7 @@ export function findCanonicalIngredientMatch(
     options?.rawItemName ?? itemName,
   );
   if (aliasIngredientId) {
-    const ingredient = ingredients.find((candidate) => candidate.id === aliasIngredientId);
+    const ingredient = activeIngredients.find((candidate) => candidate.id === aliasIngredientId);
     if (
       ingredient &&
       !isRejectedIngredientCandidate(itemName, ingredient.id, supplierName, rawLookupNames)
@@ -1058,7 +1077,7 @@ export function findCanonicalIngredientMatch(
   const operationalMemory = findOperationalMemoryMatch(
     itemName,
     normalizedItemName,
-    ingredients,
+    activeIngredients,
     rawLookupNames,
     supplierName,
   );
@@ -1082,7 +1101,7 @@ export function findCanonicalIngredientMatch(
     normalizedItemName,
   );
 
-  for (const ingredient of ingredients) {
+  for (const ingredient of activeIngredients) {
     const normalizedIngredientName = normalizedIngredientCandidateName(ingredient);
     if (!normalizedIngredientName) continue;
     if (isRejectedIngredientCandidate(itemName, ingredient.id, supplierName, rawLookupNames)) {

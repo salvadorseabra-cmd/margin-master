@@ -43,6 +43,16 @@ describe("buildCanonicalIngredientPickerOptions", () => {
     );
   });
 
+  it("excludes archived merged duplicates", () => {
+    const catalog = [
+      ingredient("angus-1", "ANGUS PTY"),
+      ingredient("angus-2", "ANGUS PTY", "angus pty"),
+    ];
+    const archived = { ...catalog[1]!, is_archived: true, merged_into_ingredient_id: "angus-1" };
+    const options = buildCanonicalIngredientPickerOptions([catalog[0]!, archived]);
+    expect(options.map((row) => row.id)).toEqual(["angus-1"]);
+  });
+
   it("excludes synthetics, invoice rows, and temporary ids", () => {
     const catalog = [
       ingredient("synthetic:angus", "ANGUS PTY"),

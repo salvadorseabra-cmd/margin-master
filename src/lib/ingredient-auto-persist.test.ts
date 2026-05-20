@@ -79,6 +79,12 @@ describe("evaluateAutoPersistEligibility", () => {
     expect(result.reason).toBe("duplicate_normalized_name");
   });
 
+  it("blocks duplicate operational identity (ANGUS PTY variants)", () => {
+    const catalog = [ingredient("angus-1", "ANGUS PTY", "angus pty")];
+    const result = evaluateAutoPersistEligibility(item("Angus Patty"), null, catalog);
+    expect(result.reason).toBe("duplicate_operational_identity");
+  });
+
   it("blocks operational-family conflict with overlapping tokens", () => {
     const catalog = [ingredient("bread", "Pão de Batata 80g")];
     expect(catalogHasOperationalFamilyConflict("BATATA SHOESTRING PREMIUM 2KG", catalog)).toBe(

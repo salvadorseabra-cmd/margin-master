@@ -35,6 +35,7 @@ import {
   type IngredientAliasMap,
   type IngredientCanonicalMatch,
 } from "@/lib/ingredient-canonical";
+import { loadActiveIngredientCatalog } from "@/lib/ingredient-catalog-load";
 import {
   buildMatchExplanation,
   buildMatchTargetLabel,
@@ -90,7 +91,9 @@ import {
 import {
   autoPersistUnmatchedInvoiceItems,
   buildIngredientInsertPayload,
+  persistIngredientFromInvoiceItem,
 } from "@/lib/ingredient-auto-persist";
+import { guardIngredientCreation } from "@/lib/ingredient-operational-identity";
 import {
   fileNameFromInvoicePath,
   looksLikeUploadedFileName,
@@ -948,13 +951,11 @@ function InvoicesPage() {
       settlementByInvoiceRef.current = settlementMap;
       const ids = invoiceRows.map((row) => row.id);
       const itemCounts: Record<string, number> = {};
-      const { data: ingredientRows, error: ingredientError } = await supabase
-        .from("ingredients")
-        .select("id, name, normalized_name, unit");
-      if (ingredientError) {
-        console.error("[invoices] ingredients catalog load failed:", ingredientError.message);
+      const { rows: catalogBase, error: ingredientCatalogError } =
+        await loadActiveIngredientCatalog(supabase);
+      if (ingredientCatalogError) {
+        console.error("[invoices] ingredients catalog load failed:", ingredientCatalogError);
       }
-      const catalogBase = ingredientError ? [] : ((ingredientRows ?? []) as IngredientMatchRow[]);
       const ingredientIds = catalogBase.map((row) => row.id);
 
       const [operationalMetadata, priceById] = await Promise.all([
@@ -1594,15 +1595,26 @@ function InvoicesPage() {
     setCreatingIngredientByItem((current) => ({ ...current, [item.id]: true }));
     setIngredientCreationErrors((current) => removeKey(current, item.id));
     try {
-      const { data, error } = await supabase
-        .from("ingredients")
-        .insert(payload)
-        .select("id, name, normalized_name, unit")
-        .single();
+      const guard = guardIngredientCreation(name, ingredientCatalog);
+      if (guard.action === "reuse") {
+        const existing = guard.existing as IngredientMatchRow;
+        setIngredientCatalog((current) =>
+          current.some((row) => row.id === existing.id) ? current : [...current, existing],
+        );
+        return;
+      }
+
+      const { data, error, reused } = await persistIngredientFromInvoiceItem(supabase, payload, {
+        catalog: ingredientCatalog,
+      });
       if (error) throw error;
 
       if (data) {
-        setIngredientCatalog((current) => [...current, data as IngredientMatchRow]);
+        const row = data as IngredientMatchRow;
+        setIngredientCatalog((current) =>
+          current.some((r) => r.id === row.id) ? current : [...current, row],
+        );
+        if (reused) return;
       }
     } catch (err) {
       setIngredientCreationErrors((current) => ({

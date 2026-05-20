@@ -5,7 +5,11 @@
  * No vector DB, embeddings, or UI persistence — session/static/confirmed-bridge only.
  */
 
-import type { IngredientAliasMap, IngredientCanonicalInput } from "@/lib/ingredient-canonical";
+import {
+  isArchivedIngredientEntry,
+  type IngredientAliasMap,
+  type IngredientCanonicalInput,
+} from "@/lib/ingredient-canonical";
 import { normalizeSupplierShorthand } from "@/lib/ingredient-operational-aliases";
 import { normalizeInvoiceMatchIngredientName } from "@/lib/normalize-ingredient-name";
 import { shouldSkipByOperationalProductFamilyGate } from "@/lib/ingredient-operational-family-gate";
@@ -205,7 +209,8 @@ export function hydrateOperationalAliasMemoryFromConfirmedMap(
     if (!operationalKey) continue;
 
     const ingredient = ingredients.find((row) => row.id === ingredientId);
-    const ingredientName = ingredient?.name ?? ingredient?.normalized_name ?? "";
+    if (!ingredient || isArchivedIngredientEntry(ingredient)) continue;
+    const ingredientName = ingredient.name ?? ingredient.normalized_name ?? "";
     const existing = operationalAliasMemory.get(operationalKey);
     if (existing?.source === "session" && existing.confidence >= 1) continue;
 
@@ -247,7 +252,7 @@ export function resolveOperationalAliasCatalogMatch(
   if (!hit) return null;
 
   const ingredient = ingredients.find((row) => row.id === hit.entry.ingredientId);
-  if (!ingredient) return null;
+  if (!ingredient || isArchivedIngredientEntry(ingredient)) return null;
 
   const ingredientRaw = ingredient.name ?? ingredient.normalized_name ?? "";
   if (shouldSkipByOperationalProductFamilyGate(itemName, ingredientRaw)) return null;

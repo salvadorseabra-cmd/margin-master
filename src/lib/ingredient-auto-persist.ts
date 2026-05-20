@@ -7,6 +7,11 @@ import {
   type IngredientCanonicalMatch,
 } from "@/lib/ingredient-canonical";
 import {
+  catalogHasNormalizedNameDuplicate,
+  catalogHasOperationalIdentityDuplicate,
+  guardIngredientCreation,
+} from "@/lib/ingredient-operational-identity";
+import {
   isConfirmedIngredientMatch,
   isSuggestedIngredientMatch,
 } from "@/lib/ingredient-match-explanation";
@@ -44,6 +49,7 @@ export type AutoPersistIneligibilityReason =
   | "weak_purchase_format"
   | "operational_family_conflict"
   | "duplicate_normalized_name"
+  | "duplicate_operational_identity"
   | "same_operational_family";
 
 export type AutoPersistEligibilityResult = {
@@ -96,18 +102,7 @@ function hasMeaningfulCanonicalTokenOverlap(a: Set<string>, b: Set<string>): boo
   return false;
 }
 
-export function catalogHasNormalizedNameDuplicate(
-  normalizedName: string,
-  catalog: AutoPersistCatalogEntry[],
-): boolean {
-  const target = normalizedName.trim().toLowerCase();
-  if (!target) return true;
-  return catalog.some((entry) => {
-    const stored = entry.normalized_name?.trim().toLowerCase();
-    if (stored && stored === target) return true;
-    return normalizeIngredientName(entry.name ?? "") === target;
-  });
-}
+export { catalogHasNormalizedNameDuplicate } from "@/lib/ingredient-operational-identity";
 
 /** Blocks batata shoestring auto-create when pão de batata is already in catalog. */
 export function catalogHasOperationalFamilyConflict(
@@ -200,6 +195,10 @@ export function evaluateAutoPersistEligibility(
     return { eligible: false, reason: "duplicate_normalized_name" };
   }
 
+  if (catalogHasOperationalIdentityDuplicate(name, catalog)) {
+    return { eligible: false, reason: "duplicate_operational_identity" };
+  }
+
   if (catalogHasOperationalFamilyConflict(name, catalog)) {
     return { eligible: false, reason: "operational_family_conflict" };
   }
@@ -272,7 +271,24 @@ export function buildIngredientInsertPayload(
 export async function persistIngredientFromInvoiceItem(
   client: AppSupabaseClient,
   payload: IngredientInsertPayload,
-): Promise<{ data: AutoPersistCatalogEntry | null; error: PostgrestError | null }> {
+  options?: { catalog?: AutoPersistCatalogEntry[] },
+): Promise<{
+  data: AutoPersistCatalogEntry | null;
+  error: PostgrestError | null;
+  reused?: boolean;
+}> {
+  const catalog = options?.catalog ?? [];
+  const guard = guardIngredientCreation(payload.name, catalog);
+  if (guard.action === "reuse") {
+    traceAutoPersist("duplicate-prevention-reuse", {
+      proposedName: payload.name,
+      operationalKey: guard.operationalKey,
+      existingId: guard.existing.id,
+      reason: guard.reason,
+    });
+    return { data: guard.existing, error: null, reused: true };
+  }
+
   const { data, error } = await client
     .from("ingredients")
     .insert(payload)
@@ -288,8 +304,9 @@ export async function persistIngredientFromInvoiceItem(
     ingredientId: data?.id,
     normalizedName: payload.normalized_name,
     name: payload.name,
+    operationalKey: guard.operationalKey,
   });
-  return { data: (data as AutoPersistCatalogEntry | null) ?? null, error: null };
+  return { data: (data as AutoPersistCatalogEntry | null) ?? null, error: null, reused: false };
 }
 
 export type AutoPersistInvoiceItemsParams = {
@@ -360,9 +377,23 @@ export async function autoPersistUnmatchedInvoiceItems(
       continue;
     }
 
-    const { data, error } = await persistIngredientFromInvoiceItem(client, payload);
+    const { data, error, reused } = await persistIngredientFromInvoiceItem(client, payload, {
+      catalog,
+    });
     if (error || !data) {
       attemptedKeys.delete(sessionKey);
+      skipped += 1;
+      continue;
+    }
+
+    if (reused) {
+      traceAutoPersist("skip", {
+        invoiceId,
+        itemId: item.id,
+        itemName: item.name,
+        reason: "duplicate_operational_identity",
+        existingId: data.id,
+      });
       skipped += 1;
       continue;
     }
