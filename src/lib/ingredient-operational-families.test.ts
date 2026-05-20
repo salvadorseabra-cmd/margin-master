@@ -17,6 +17,8 @@ describe("detectOperationalFamily", () => {
     );
     expect(detectOperationalFamily("Pão de Batata 80g")).toBe("burger_bread");
     expect(detectOperationalFamily("BATATA PALHA 2KG")).toBe("fried_potato_products");
+    expect(detectOperationalFamily("BAT SHOE 2.5")).toBe("fried_potato_products");
+    expect(detectOperationalFamily("BAT WDG 2.5")).toBe("fried_potato_products");
     expect(detectOperationalFamily("PAO BRIOCHE ARTESANAL 80G")).toBe("burger_bread");
   });
 

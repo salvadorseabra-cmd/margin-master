@@ -9,6 +9,8 @@ import {
   resolveParentFormHierarchyMatch,
 } from "@/lib/ingredient-parent-form";
 import { operationalFamiliesIncompatibleFromRaw } from "@/lib/ingredient-operational-families";
+import { scoreTokenFamilyCompatibility } from "@/lib/ingredient-token-families";
+import { scoreWeightCompatibility } from "@/lib/ingredient-weight-match";
 
 const DIACRITIC_RE = /\p{M}/gu;
 
@@ -68,7 +70,23 @@ const COMMERCIAL_NOISE_TOKENS = new Set([
 const FAMILY_TOKEN_TO_ID: Record<string, string> = {
   batata: "batata",
   potato: "batata",
+  bacon: "bacon",
+  pickles: "pickles",
+  chicken: "chicken",
+  brioche: "bread",
+  bun: "bread",
+  burger: "meat",
+  hamburguer: "meat",
+  hamburger: "meat",
+  patty: "meat",
+  angus: "meat",
+  beef: "meat",
+  bovino: "meat",
+  vaca: "meat",
+  breaded: "meat",
+  streaky: "bacon",
   cheddar: "cheddar",
+  mozzarella: "cheese",
   tomate: "tomate",
   tom: "tomate",
   ketchup: "ketchup",
@@ -600,7 +618,7 @@ function commercialNoiseSuppressionFactor(noiseA: string[], noiseB: string[], co
 export function scoreCanonicalIngredientSimilarity(
   identityA: CanonicalIngredientIdentity,
   identityB: CanonicalIngredientIdentity,
-  options?: { legacyCoreDice?: number },
+  options?: { legacyCoreDice?: number; rawA?: string; rawB?: string },
 ): CanonicalIdentityScoreBreakdown {
   const w = CANONICAL_IDENTITY_SCORE_WEIGHTS;
   const parentFormHierarchy = resolveParentFormHierarchyMatch(identityA, identityB);
@@ -677,8 +695,13 @@ export function scoreCanonicalIngredientSimilarity(
     score = Math.min(score, PARENT_FORM_MAX_PROMOTION_SCORE);
   }
 
+  if (options?.rawA && options?.rawB) {
+    score += scoreWeightCompatibility(options.rawA, options.rawB);
+    score += scoreTokenFamilyCompatibility(options.rawA, options.rawB);
+  }
+
   return {
-    score: Math.min(1, score),
+    score: Math.min(1, Math.max(0, score)),
     familyOverlap,
     formCompatibility,
     operationalAlias,
@@ -790,6 +813,8 @@ export function computeOperationalEquivalenceConfidence(
   const parentFormHierarchy = resolveParentFormHierarchyMatch(identityA, identityB);
   const canonical = scoreCanonicalIngredientSimilarity(identityA, identityB, {
     legacyCoreDice: options?.legacyCoreDice,
+    rawA,
+    rawB,
   });
 
   const operationalFamilyConfidence = canonical.familyOverlap;
@@ -884,6 +909,8 @@ export function computeMatchScoreBreakdown(
     hasCompatibleCanonicalForms(identityA.form, identityB.form) || parentFormHierarchy != null;
   const canonical = scoreCanonicalIngredientSimilarity(identityA, identityB, {
     legacyCoreDice: input.legacyCoreDice,
+    rawA: input.rawItem,
+    rawB: input.rawIngredient,
   });
   const operational = computeOperationalEquivalenceConfidence(
     input.rawItem,

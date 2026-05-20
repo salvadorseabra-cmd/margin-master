@@ -28,6 +28,20 @@ describe("normalizeSupplierShorthand", () => {
   it("expands BRCH BUN and BAT SHOESTR", () => {
     expect(normalizeSupplierShorthand("BRCH BUN")).toBe("brioche bun");
     expect(normalizeSupplierShorthand("BAT SHOESTR")).toBe("batata shoestring");
+    expect(normalizeSupplierShorthand("BAT SHOE 2.5")).toBe("batata shoestring 2.5");
+    expect(normalizeSupplierShorthand("BAT WDG 2.5")).toBe("batata wedges 2.5");
+    expect(normalizeSupplierShorthand("BAT PAL FIN")).toBe("batata palha fino");
+  });
+
+  it("keeps BAT 9x9 grid-cut token intact", () => {
+    expect(normalizeSupplierShorthand("BAT 9x9")).toBe("batata 9x9");
+  });
+
+  it("expands BAC STRK, CHK BREADED, BAT PALHA FIN, and DN", () => {
+    expect(normalizeSupplierShorthand("BAC STRK")).toBe("bacon streaky");
+    expect(normalizeSupplierShorthand("CHK BREADED")).toBe("chicken breaded");
+    expect(normalizeSupplierShorthand("BAT PALHA FIN")).toBe("batata palha fino");
+    expect(normalizeSupplierShorthand("KETCH DN")).toBe("ketchup top down");
   });
 
   it("does not transform unrelated tokens", () => {
@@ -69,6 +83,111 @@ describe("supplier shorthand → canonical match", () => {
 describe("operational alias registry", () => {
   it("keeps a conservative alias count", () => {
     expect(operationalAliasCount()).toBe(Object.keys(OPERATIONAL_ALIASES).length);
-    expect(operationalAliasCount()).toBe(19);
+    expect(operationalAliasCount()).toBe(32);
+  });
+});
+
+describe("operational memory match order", () => {
+  it("matches PICKL SLC 1KG to persisted catalog wording without semantic", () => {
+    const catalog = [ingredient("pickles-memory", "PICKL SLC 1KG")];
+    const first = findInvoiceItemIngredientMatch("PICKL SLC 1KG", catalog);
+    const second = findInvoiceItemIngredientMatch("PICKL SLC 1KG", catalog);
+
+    expect(first?.kind).toBe("operational-memory");
+    expect(first?.semanticSimilarity).toBeUndefined();
+    expect(first?.ingredient.id).toBe("pickles-memory");
+    expect(second?.ingredient.id).toBe("pickles-memory");
+  });
+
+  it("operational memory wins before semantic when wording was persisted", () => {
+    const catalog = [
+      ingredient("semantic-decoy", "Pickles Relish Sweet 1KG"),
+      ingredient("memory", "PICKL SLC 1KG"),
+    ];
+    const match = findInvoiceItemIngredientMatch("PICKL SLC 1KG", catalog);
+    expect(match?.ingredient.id).toBe("memory");
+    expect(match?.kind).toBe("operational-memory");
+    expect(match?.semanticSimilarity).toBeUndefined();
+  });
+
+  it("BAT 9x9 matches frozen potato not burger bread", () => {
+    const catalog = [
+      ingredient("bread", "Pao Brioche Burger 9 un"),
+      ingredient("fries-9", "Batata Frita Congelada 9x9 2.5KG"),
+    ];
+    const match = findInvoiceItemIngredientMatch("BAT 9x9", catalog);
+    expect(match?.ingredient.id).toBe("fries-9");
+  });
+});
+
+describe("horeca weight and family matching", () => {
+  it("HMB 180G prefers Hamburguer Bovino 180g over brioche 40g", () => {
+    const catalog = [
+      ingredient("brioche-40", "Mini Brioche 40g"),
+      ingredient("beef-180", "Hamburguer Bovino 180g"),
+    ];
+    const match = findInvoiceItemIngredientMatch("HMB 180G", catalog);
+    expect(match?.ingredient.id).toBe("beef-180");
+  });
+
+  it("BRCH BUN 80 prefers 80g bun over 40g brioche", () => {
+    const catalog = [
+      ingredient("brioche-40", "Mini Brioche 40g"),
+      ingredient("bun-80", "Brioche Bun 80g"),
+    ];
+    const match = findInvoiceItemIngredientMatch("BRCH BUN 80", catalog);
+    expect(match?.ingredient.id).toBe("bun-80");
+  });
+
+  it("matches BAC STRK and CHK BREADED catalog lines", () => {
+    const baconCatalog = [ingredient("bac-strk", "Bacon Streaky 1KG")];
+    expect(findInvoiceItemIngredientMatch("BAC STRK", baconCatalog)?.ingredient.id).toBe(
+      "bac-strk",
+    );
+
+    const chickenCatalog = [ingredient("chk-brd", "Chicken Breast Breaded 2KG")];
+    expect(findInvoiceItemIngredientMatch("CHK BREADED", chickenCatalog)?.ingredient.id).toBe(
+      "chk-brd",
+    );
+  });
+
+  it("matches BAT SHOESTR to batata shoestring catalog", () => {
+    const catalog = [ingredient("shoestr", "Batata Shoestring Premium 2KG")];
+    const match = findInvoiceItemIngredientMatch("BAT SHOESTR", catalog);
+    expect(match?.ingredient.id).toBe("shoestr");
+  });
+
+  it("matches BAT SHOE and BAT WDG to shoestring/wedges not pao de batata", () => {
+    const catalog = [
+      ingredient("bread", "Pão de Batata 80g"),
+      ingredient("shoestr", "Batata Shoestring 2.5kg"),
+      ingredient("wedges", "Batata Wedges 2.5kg"),
+    ];
+    expect(findInvoiceItemIngredientMatch("BAT SHOE 2.5", catalog)?.ingredient.id).toBe(
+      "shoestr",
+    );
+    expect(findInvoiceItemIngredientMatch("BAT WDG 2.5", catalog)?.ingredient.id).toBe("wedges");
+    expect(findInvoiceItemIngredientMatch("BAT SHOE 2.5", catalog)?.ingredient.id).not.toBe(
+      "bread",
+    );
+  });
+
+  it("matches BAT 9X9 and BAT PAL FIN to fried potato catalog", () => {
+    const gridCatalog = [
+      ingredient("bread", "Pão de Batata 80g"),
+      ingredient("fries-9", "Batata Frita Congelada 9x9 2.5KG"),
+    ];
+    expect(findInvoiceItemIngredientMatch("BAT 9X9", gridCatalog)?.ingredient.id).toBe("fries-9");
+
+    const palCatalog = [
+      ingredient("bread", "Pão de Batata 80g"),
+      ingredient("pal", "Batata Palha 2KG"),
+    ];
+    expect(findInvoiceItemIngredientMatch("BAT PAL FIN", palCatalog)?.ingredient.id).toBe("pal");
+  });
+
+  it("does not match HMB 180G to bread-family catalog", () => {
+    const catalog = [ingredient("bread", "Pao Brioche Artesanal 180g")];
+    expect(findInvoiceItemIngredientMatch("HMB 180G", catalog)).toBeNull();
   });
 });

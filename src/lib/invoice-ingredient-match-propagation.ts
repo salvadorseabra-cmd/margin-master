@@ -18,7 +18,10 @@ import {
   type InvoiceItemRow,
 } from "@/lib/invoice-item-fields";
 
-/** Mirrors `getItemIngredientMatch` in invoices.tsx (canonical lookup only). */
+/**
+ * Mirrors `getItemIngredientMatch` in invoices.tsx (canonical lookup only).
+ * Applies supplier shorthand (step 2) then {@link findCanonicalIngredientMatch} pipeline.
+ */
 export function findInvoiceItemIngredientMatch(
   itemName: string,
   ingredientCatalog: IngredientCanonicalInput[],
@@ -31,6 +34,7 @@ export function findInvoiceItemIngredientMatch(
     ingredientCatalog,
     confirmedAliases,
     supplierName,
+    { rawItemName: itemName },
   );
 }
 

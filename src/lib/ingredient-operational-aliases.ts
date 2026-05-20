@@ -4,26 +4,39 @@
  */
 
 export const OPERATIONAL_ALIASES: Record<string, string> = {
+  angus: "angus",
   bac: "bacon",
   bat: "batata",
   brch: "brioche",
+  breaded: "breaded",
   bun: "bun",
   chk: "chicken",
   ched: "cheddar",
+  disp: "dispenser",
+  dn: "top down",
   fat: "fatiado",
+  fin: "fino",
   fum: "fumado",
   hmb: "hamburguer",
   ketch: "ketchup",
   maio: "maionese",
+  mol: "molho",
+  oni: "onion",
+  pal: "palha",
+  palha: "palha",
   pickl: "pickles",
   pty: "patty",
+  ring: "rings",
   ses: "sesamo",
   /** PT catalog lines use fatiados; aligns with {@link normalizeInvoiceIngredientName} keys. */
   slc: "fatiados",
   slcd: "fatiados",
-  smk: "smoke",
+  smk: "smoked",
+  smash: "smash",
+  shoe: "shoestring",
   shoestr: "shoestring",
   strk: "streaky",
+  wdg: "wedges",
 };
 
 const SUPPLIER_TOKEN_RE =
@@ -36,8 +49,30 @@ function isPreservedNumericToken(token: string): boolean {
   return PRESERVED_NUMERIC_TOKEN_RE.test(token);
 }
 
+/** Merge `9 x 9` / `9X9` OCR splits into a single grid-cut token. */
+function mergeGridCutTokens(tokens: string[]): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < tokens.length; i++) {
+    const current = tokens[i]!;
+    const separator = tokens[i + 1];
+    const trailing = tokens[i + 2];
+    if (
+      /^\d+$/i.test(current) &&
+      separator?.toLowerCase() === "x" &&
+      trailing &&
+      /^\d+$/i.test(trailing)
+    ) {
+      out.push(`${current}x${trailing}`);
+      i += 2;
+      continue;
+    }
+    out.push(current);
+  }
+  return out;
+}
+
 function tokenizeSupplierLine(text: string): string[] {
-  return text.match(SUPPLIER_TOKEN_RE) ?? [];
+  return mergeGridCutTokens(text.match(SUPPLIER_TOKEN_RE) ?? []);
 }
 
 function replaceOperationalToken(token: string): string {
@@ -55,7 +90,9 @@ export function normalizeSupplierShorthand(text: string | null | undefined): str
   if (!text) return "";
   const trimmed = text.trim();
   if (!trimmed) return "";
-  return tokenizeSupplierLine(trimmed).map(replaceOperationalToken).join(" ");
+  return tokenizeSupplierLine(trimmed)
+    .flatMap((token) => replaceOperationalToken(token).split(/\s+/).filter(Boolean))
+    .join(" ");
 }
 
 export function operationalAliasCount(): number {

@@ -112,11 +112,25 @@ function removeCommercialPhrases(value: string): string {
   return out;
 }
 
-function removePackagingQuantities(value: string): string {
+const GRID_CUT_PLACEHOLDER = "__grid9x9__";
+
+function preserveGridCutToken(value: string): string {
   return value
+    .replace(/\b9\s*x\s*9\b/gi, ` ${GRID_CUT_PLACEHOLDER} `)
+    .replace(/\b9x9\b/gi, ` ${GRID_CUT_PLACEHOLDER} `);
+}
+
+function restoreGridCutToken(value: string): string {
+  return value.replace(new RegExp(GRID_CUT_PLACEHOLDER, "g"), "9x9");
+}
+
+function removePackagingQuantities(value: string): string {
+  let s = value
     .replace(QUANTITY_WITH_UNIT_RE, " ")
-    .replace(ATTACHED_QUANTITY_UNIT_RE, " ")
-    .replace(/\b\d+\b/g, " ");
+    .replace(ATTACHED_QUANTITY_UNIT_RE, " ");
+  s = preserveGridCutToken(s);
+  s = s.replace(/\b\d+\b/g, " ");
+  return restoreGridCutToken(s);
 }
 
 function filterTokens(tokens: string[], exclude: Set<string>): string[] {

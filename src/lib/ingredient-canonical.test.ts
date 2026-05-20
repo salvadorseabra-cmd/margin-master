@@ -12,6 +12,8 @@ import {
   type IngredientCanonicalInput,
 } from "./ingredient-canonical";
 import { OPERATIONAL_EQUIVALENT_MIN_SCORE } from "./ingredient-identity";
+import { findInvoiceItemIngredientMatch } from "./invoice-ingredient-match-propagation";
+import { normalizeSupplierShorthand } from "./ingredient-operational-aliases";
 
 function ingredient(id: string, name: string): IngredientCanonicalInput {
   return { id, name };
@@ -76,7 +78,9 @@ describe("findCanonicalIngredientMatch (weighted semantic)", () => {
     ];
 
     expect(findCanonicalIngredientMatch("ARROZ CAROLINO 5 KG UN", catalog)?.kind).toBe("exact");
-    expect(findCanonicalIngredientMatch("ARROZ BASMATI 5 KG", catalog)?.kind).toBe("exact");
+    expect(findCanonicalIngredientMatch("ARROZ BASMATI 5 KG", catalog)?.kind).toBe(
+      "operational-memory",
+    );
     expect(findCanonicalIngredientMatch("ARROZ CAROLINO 5 KG UN", [catalog[1]])).toBeNull();
   });
 
@@ -367,7 +371,47 @@ describe("findCanonicalIngredientMatch (weighted semantic)", () => {
       aliases,
     );
 
-    expect(match?.kind).toBe("confirmed-alias");
+    expect(match?.kind).toBe("exact");
     expect(match?.ingredient.id).toBe("mayo-1");
+  });
+});
+
+describe("horeca shorthand canonical ranking", () => {
+  it("HMB 180G beats brioche 40g via weight and meat family", () => {
+    const catalog = [
+      ingredient("brioche-40", "Mini Brioche 40g"),
+      ingredient("beef-180", "Hamburguer Bovino 180g"),
+    ];
+    const match = findCanonicalIngredientMatch(
+      normalizeSupplierShorthand("HMB 180G"),
+      catalog,
+    );
+    expect(match?.ingredient.id).toBe("beef-180");
+  });
+
+  it("BRCH BUN 80 beats 40g brioche", () => {
+    const catalog = [
+      ingredient("brioche-40", "Mini Brioche 40g"),
+      ingredient("bun-80", "Brioche Bun 80g"),
+    ];
+    expect(findInvoiceItemIngredientMatch("BRCH BUN 80", catalog)?.ingredient.id).toBe("bun-80");
+  });
+
+  it("BAT SHOE 2.5 picks shoestring over pao de batata", () => {
+    const catalog = [
+      ingredient("bread", "Pão de Batata 80g"),
+      ingredient("shoestr", "Batata Shoestring 2.5kg"),
+    ];
+    const match = findInvoiceItemIngredientMatch("BAT SHOE 2.5", catalog);
+    expect(match?.ingredient.id).toBe("shoestr");
+    expect(match?.ingredient.id).not.toBe("bread");
+  });
+
+  it("BAT WDG 2.5 picks wedges over pao de batata", () => {
+    const catalog = [
+      ingredient("bread", "Pão de Batata 80g"),
+      ingredient("wedges", "Batata Wedges 2.5kg"),
+    ];
+    expect(findInvoiceItemIngredientMatch("BAT WDG 2.5", catalog)?.ingredient.id).toBe("wedges");
   });
 });

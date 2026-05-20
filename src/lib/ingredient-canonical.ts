@@ -104,8 +104,15 @@ export function canonicalWeakSubstringMatch(a: string, b: string): boolean {
 export type IngredientCanonicalMatchKind =
   | "confirmed-alias"
   | "exact"
+  | "operational-memory"
+  | "operational-alias"
   | "semantic"
   | "operational-equivalent";
+
+export type FindCanonicalIngredientMatchOptions = {
+  /** Original invoice line before supplier shorthand (operational memory lookup). */
+  rawItemName?: string | null;
+};
 
 export const OPERATIONAL_EQUIVALENT_MATCH_REASON = "possible operational equivalent";
 
@@ -149,9 +156,12 @@ import {
 } from "@/lib/ingredient-identity";
 import { operationalFamiliesIncompatibleFromRaw } from "@/lib/ingredient-operational-families";
 import { resolveParentFormHierarchyMatch } from "@/lib/ingredient-parent-form";
+import { inferCoarseIngredientFamily } from "@/lib/ingredient-token-families";
+import { scoreWeightCompatibility } from "@/lib/ingredient-weight-match";
 
 export { OPERATIONAL_EQUIVALENT_MIN_SCORE } from "@/lib/ingredient-identity";
 export type { MatchScoreBreakdown, MatchScoreRejectionReason } from "@/lib/ingredient-identity";
+import { resolveOperationalAliasCatalogMatch } from "@/lib/ingredient-operational-alias-memory";
 import { normalizeInvoiceMatchIngredientName } from "@/lib/normalize-ingredient-name";
 
 const WEIGHT_TOKEN_RE = /\b\d+(?:[.,]\d+)?\s*(?:kg|kgs|g|gr|grs)\.?\b/gi;
@@ -221,6 +231,19 @@ export const CORE_INGREDIENT_MATCH_TOKENS = new Set([
   "cebola",
   "cheddar",
   "batata",
+  "burger",
+  "bacon",
+  "pickles",
+  "chicken",
+  "brioche",
+  "bun",
+  "beef",
+  "bovino",
+  "angus",
+  "patty",
+  "breaded",
+  "shoestring",
+  "palha",
 ]);
 
 /**
@@ -273,6 +296,7 @@ export const FAMILY_INGREDIENT_MATCH_TOKENS = new Set([
 const TOKEN_TO_INGREDIENT_FAMILY: Record<string, string> = {
   batata: "potato",
   palha: "potato",
+  shoestring: "potato",
   frita: "potato",
   fritas: "potato",
   wedges: "potato",
@@ -281,6 +305,18 @@ const TOKEN_TO_INGREDIENT_FAMILY: Record<string, string> = {
   hashbrowns: "potato",
   corte_fino: "potato",
   cheddar: "cheese",
+  mozzarella: "cheese",
+  burger: "meat",
+  bacon: "meat",
+  pickles: "condiment",
+  chicken: "meat",
+  brioche: "bread",
+  bun: "bread",
+  beef: "meat",
+  bovino: "meat",
+  angus: "meat",
+  patty: "meat",
+  breaded: "meat",
   tomate: "tomato",
   cherry: "tomato",
   triturado: "tomato",
@@ -293,6 +329,8 @@ const TOKEN_TO_INGREDIENT_FAMILY: Record<string, string> = {
 };
 
 const FORM_PHRASE_TO_FAMILY: { pattern: RegExp; family: string }[] = [
+  { pattern: /\b9\s*x\s*9\b/i, family: "frita" },
+  { pattern: /\b9x9\b/i, family: "frita" },
   { pattern: /\bcorte\s+fino\b/, family: "corte_fino" },
   { pattern: /\bcorte\s+fina\b/, family: "corte_fino" },
   { pattern: /\bhash\s*brown\b/, family: "hashbrown" },
@@ -497,12 +535,26 @@ function effectiveCoreSets(
   return { aCore, bCore };
 }
 
+const GRID_CUT_PLACEHOLDER = "__grid9x9__";
+
+function preserveGridCutToken(s: string): string {
+  return s
+    .replace(/\b9\s*x\s*9\b/gi, ` ${GRID_CUT_PLACEHOLDER} `)
+    .replace(/\b9x9\b/gi, ` ${GRID_CUT_PLACEHOLDER} `);
+}
+
+function restoreGridCutToken(s: string): string {
+  return s.replace(new RegExp(GRID_CUT_PLACEHOLDER, "g"), "9x9");
+}
+
 function lightStripForFormExtraction(raw: string): string {
   let s = stripAccentsLower(raw);
   s = s.replace(/[^a-z0-9\s]+/g, " ");
   s = s.replace(FORM_EXTRACT_QUANTITY_RE, " ");
   s = s.replace(FORM_EXTRACT_ATTACHED_QTY_RE, " ");
+  s = preserveGridCutToken(s);
   s = s.replace(/\b\d+\b/g, " ");
+  s = restoreGridCutToken(s);
   return s.replace(/\s+/g, " ").trim();
 }
 
@@ -615,13 +667,12 @@ function hasCompatibleMeasures(a: string, b: string) {
   const aMeasure = extractMeasureSignature(a);
   const bMeasure = extractMeasureSignature(b);
 
-  if (aMeasure.weight && bMeasure.weight) return aMeasure.weight === bMeasure.weight;
-  if (aMeasure.volume && bMeasure.volume) return aMeasure.volume === bMeasure.volume;
-  if ((aMeasure.weight && bMeasure.volume) || (aMeasure.volume && bMeasure.weight)) return false;
+  if ((aMeasure.weight && bMeasure.volume) || (aMeasure.volume && bMeasure.weight)) {
+    return false;
+  }
 
-  // If only one side declares a size, do not make a semantic suggestion. Missing
-  // a match is safer than linking two different product formats.
-  return !aMeasure.weight && !aMeasure.volume && !bMeasure.weight && !bMeasure.volume;
+  // Weight/volume mismatches are ranked via scoreWeightCompatibility, not blocked here.
+  return true;
 }
 
 function coreTokenSet(normalizedName: string, rawName = normalizedName) {
@@ -722,6 +773,8 @@ function semanticSimilarity(a: string, b: string, rawA: string, rawB: string) {
   if (identityA.family && identityB.family) {
     const canonical = scoreCanonicalIngredientSimilarity(identityA, identityB, {
       legacyCoreDice,
+      rawA,
+      rawB,
     });
     if (canonical.score === 0) return 0;
 
@@ -770,14 +823,161 @@ function withSyntheticTargetFlag(match: IngredientCanonicalMatch): IngredientCan
   return { ...match, syntheticTarget: true };
 }
 
+function operationalRawCompareKey(value: string): string {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+type OperationalMemoryHit = {
+  ingredient: IngredientCanonicalInput;
+  normalizedIngredientName: string;
+  kind: Extract<IngredientCanonicalMatchKind, "operational-memory" | "exact">;
+  reason: string;
+};
+
+/**
+ * Deterministic operational memory: exact raw catalog wording, then exact normalized key.
+ * Runs before alias memory and semantic scoring.
+ */
+function findOperationalMemoryMatch(
+  itemName: string,
+  normalizedItemName: string,
+  ingredients: IngredientCanonicalInput[],
+  rawItemNames: string[],
+): OperationalMemoryHit | null {
+  const rawKeys = new Set(
+    rawItemNames.map(operationalRawCompareKey).filter((key) => key.length > 0),
+  );
+  const itemKey = operationalRawCompareKey(itemName);
+  if (itemKey) rawKeys.add(itemKey);
+
+  for (const ingredient of ingredients) {
+    const ingredientRaw = ingredient.name ?? ingredient.normalized_name ?? "";
+    const catalogKey = operationalRawCompareKey(ingredientRaw);
+    if (!catalogKey || !rawKeys.has(catalogKey)) continue;
+
+    const normalizedIngredientName = normalizedIngredientCandidateName(ingredient);
+    if (!hasCompatibleIngredientFormFamilies(itemName, ingredientRaw)) continue;
+    if (
+      needsOperationalHumanConfirm(
+        itemName,
+        ingredientRaw,
+        normalizedItemName,
+        normalizedIngredientName,
+      )
+    ) {
+      continue;
+    }
+
+    return {
+      ingredient,
+      normalizedIngredientName,
+      kind: "operational-memory",
+      reason: "same persisted invoice wording",
+    };
+  }
+
+  for (const ingredient of ingredients) {
+    const normalizedIngredientName = normalizedIngredientCandidateName(ingredient);
+    const ingredientRaw = ingredient.name ?? ingredient.normalized_name ?? "";
+    const sharesGridCut =
+      normalizedItemName.includes("9x9") &&
+      normalizedIngredientName.includes("9x9") &&
+      normalizedItemName.includes("batata") &&
+      normalizedIngredientName.includes("batata") &&
+      inferCoarseIngredientFamily(itemName) === "fried_potato" &&
+      inferCoarseIngredientFamily(ingredientRaw) === "fried_potato";
+    if (sharesGridCut) {
+      if (!hasCompatibleIngredientFormFamilies(itemName, ingredientRaw)) continue;
+      return {
+        ingredient,
+        normalizedIngredientName,
+        kind: "operational-memory",
+        reason: "same batata grid-cut identity",
+      };
+    }
+
+    if (!normalizedIngredientName || normalizedIngredientName !== normalizedItemName) continue;
+    if (!hasCompatibleIngredientFormFamilies(itemName, ingredientRaw)) continue;
+    if (
+      needsOperationalHumanConfirm(
+        itemName,
+        ingredientRaw,
+        normalizedItemName,
+        normalizedIngredientName,
+      )
+    ) {
+      continue;
+    }
+
+    return {
+      ingredient,
+      normalizedIngredientName,
+      kind: "exact",
+      reason: "same normalized ingredient name",
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Canonical ingredient match pipeline (deterministic order):
+ * 1. Exact operational memory — catalog raw/normalized wording
+ * 2. Supplier shorthand normalization — {@link normalizeSupplierShorthand} in invoice propagation
+ * 3. Operational alias memory — recurring Horeca shorthand (in-memory / confirmed bridge)
+ * 4. Confirmed DB aliases — {@link IngredientAliasMap}
+ * 5. Family-aware deterministic scoring — families, weight, token families in candidate loop
+ * 6. Semantic similarity fallback
+ */
 export function findCanonicalIngredientMatch(
   itemName: string,
   ingredients: IngredientCanonicalInput[],
   confirmedAliases: IngredientAliasMap = {},
   supplierName?: string | null,
+  options?: FindCanonicalIngredientMatchOptions,
 ): IngredientCanonicalMatch | null {
   const normalizedItemName = normalizeInvoiceIngredientName(itemName);
   if (!normalizedItemName) return null;
+
+  const rawLookupNames = [options?.rawItemName, itemName].filter(
+    (name): name is string => Boolean(name?.trim()),
+  );
+  const operationalMemory = findOperationalMemoryMatch(
+    itemName,
+    normalizedItemName,
+    ingredients,
+    rawLookupNames,
+  );
+  if (operationalMemory) {
+    return withSyntheticTargetFlag({
+      ingredient: operationalMemory.ingredient,
+      normalizedItemName,
+      normalizedIngredientName: operationalMemory.normalizedIngredientName,
+      kind: operationalMemory.kind,
+      reason: operationalMemory.reason,
+    });
+  }
+
+  const operationalAliasHit = resolveOperationalAliasCatalogMatch(
+    itemName,
+    ingredients,
+    rawLookupNames,
+    hasCompatibleIngredientFormFamilies,
+  );
+  if (operationalAliasHit) {
+    const ingredient = ingredients.find(
+      (candidate) => candidate.id === operationalAliasHit.entry.ingredientId,
+    );
+    if (ingredient) {
+      return withSyntheticTargetFlag({
+        ingredient,
+        normalizedItemName,
+        normalizedIngredientName: normalizedIngredientCandidateName(ingredient),
+        kind: "operational-alias",
+        reason: "recurring operational wording",
+      });
+    }
+  }
 
   const aliasIngredientId = lookupIngredientIdFromAliasMap(
     confirmedAliases,
@@ -805,28 +1005,9 @@ export function findCanonicalIngredientMatch(
     }
   }
 
-  for (const ingredient of ingredients) {
-    const normalizedIngredientName = normalizedIngredientCandidateName(ingredient);
-    const ingredientRaw = ingredient.name ?? ingredient.normalized_name ?? "";
-    if (normalizedIngredientName && normalizedIngredientName === normalizedItemName) {
-      if (!hasCompatibleIngredientFormFamilies(itemName, ingredientRaw)) {
-        continue;
-      }
-      if (needsOperationalHumanConfirm(itemName, ingredientRaw, normalizedItemName, normalizedIngredientName)) {
-        continue;
-      }
-      return withSyntheticTargetFlag({
-        ingredient,
-        normalizedItemName,
-        normalizedIngredientName,
-        kind: "exact",
-        reason: "same normalized ingredient name",
-      });
-    }
-  }
-
   let best: IngredientCanonicalMatch | null = null;
   let bestScore = 0;
+  let bestCandidateScore = 0;
   let bestOperationalConfidence = 0;
   let bestBreakdown: MatchScoreBreakdown | null = null;
   const itemTokenClass = classifyIngredientMatchTokens(
@@ -862,6 +1043,8 @@ export function findCanonicalIngredientMatch(
     if (shareOperationalAliasCluster(itemIdentity, ingredientIdentity)) {
       const clusterCanonical = scoreCanonicalIngredientSimilarity(itemIdentity, ingredientIdentity, {
         legacyCoreDice,
+        rawA: itemName,
+        rawB: ingredientRaw,
       });
       legacyCoreDice = Math.max(legacyCoreDice, clusterCanonical.legacyCoreDice, clusterCanonical.score);
     }
@@ -893,8 +1076,10 @@ export function findCanonicalIngredientMatch(
       semanticMinScore: SEMANTIC_MATCH_MIN_SCORE,
       operationalMinScore: OPERATIONAL_EQUIVALENT_MIN_SCORE,
     });
-    const candidateScore = breakdown.finalPromotionScore;
-    if (candidateScore > Math.max(bestScore, bestOperationalConfidence)) {
+    const weightDelta = scoreWeightCompatibility(itemName, ingredientRaw);
+    const candidateScore = breakdown.finalPromotionScore + weightDelta;
+    if (candidateScore > bestCandidateScore) {
+      bestCandidateScore = candidateScore;
       bestScore = score;
       bestOperationalConfidence = operationalConfidence;
       bestBreakdown = breakdown;

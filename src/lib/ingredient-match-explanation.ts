@@ -25,7 +25,12 @@ export type InvoiceIngredientDisplayState = "confirmed" | "suggested" | "unmatch
 export function isConfirmedIngredientMatch(
   match: Pick<IngredientCanonicalMatch, "kind"> | null | undefined,
 ): boolean {
-  return match?.kind === "exact" || match?.kind === "confirmed-alias";
+  return (
+    match?.kind === "exact" ||
+    match?.kind === "confirmed-alias" ||
+    match?.kind === "operational-memory" ||
+    match?.kind === "operational-alias"
+  );
 }
 
 export function isSuggestedIngredientMatch(
@@ -187,6 +192,28 @@ export function buildMatchExplanation(
       confidence: "suggested",
       confidenceLabel: "Suggested match",
       caveats,
+    };
+  }
+
+  if (match.kind === "operational-memory") {
+    return {
+      headline: "Matched from catalog invoice wording",
+      detail:
+        "This line matches an ingredient saved with the same supplier wording on a previous purchase.",
+      confidence: "high",
+      confidenceLabel: "High confidence",
+      caveats: [],
+    };
+  }
+
+  if (match.kind === "operational-alias") {
+    return {
+      headline: "Matched from operational shorthand memory",
+      detail:
+        "This recurring supplier shorthand was linked to the same catalog ingredient on a previous match.",
+      confidence: "high",
+      confidenceLabel: "High confidence",
+      caveats: [],
     };
   }
 
