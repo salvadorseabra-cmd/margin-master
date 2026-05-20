@@ -9,6 +9,7 @@ import {
   catalogHasOperationalFamilyConflict,
   catalogHasSameOperationalFamilyDuplicate,
   evaluateAutoPersistEligibility,
+  persistIngredientFromInvoiceItem,
 } from "./ingredient-auto-persist";
 import { recordInvoiceLineAliasMemory } from "./ingredient-match-alias-memory";
 
@@ -30,8 +31,8 @@ const item = (
 describe("evaluateAutoPersistEligibility", () => {
   const emptyCatalog: IngredientCanonicalInput[] = [];
 
-  it("allows unmatched lines with sufficient purchase parsing", () => {
-    const line = item("MOLHO BBQ 1KG", { unit: null });
+  it("allows unmatched lines with sufficient purchase parsing (non-shorthand names)", () => {
+    const line = item("QUEIJO MOZARELLA FATIADO 1KG", { unit: null });
     const result = evaluateAutoPersistEligibility(line, null, emptyCatalog);
     expect(result).toEqual({ eligible: true, reason: "eligible" });
   });
@@ -118,9 +119,16 @@ describe("evaluateAutoPersistEligibility", () => {
     expect(result.reason).toBe("invoice_shorthand");
   });
 
+  it("blocks ANGUS PTY and HMB 180 from auto-create eligibility", () => {
+    for (const name of ["ANGUS PTY", "HMB 180", "BAC STRK", "ON RNG", "JALP SLC"]) {
+      const result = evaluateAutoPersistEligibility(item(name), null, []);
+      expect(result).toEqual({ eligible: false, reason: "invoice_shorthand" });
+    }
+  });
+
   it("blocks weak purchase format rows", () => {
     const result = evaluateAutoPersistEligibility(
-      item("PRODUTO SEM MEDIDA", { quantity: 1, unit: "un" }),
+      item("produto sem medida", { quantity: 1, unit: "un" }),
       null,
       emptyCatalog,
     );
@@ -155,11 +163,8 @@ describe("buildIngredientInsertPayload", () => {
 });
 
 describe("autoPersistUnmatchedInvoiceItems", () => {
-  it("persists once per session key and skips duplicates", async () => {
-    const insert = vi.fn().mockResolvedValue({
-      data: { id: "new-1", name: "MOLHO BBQ 1KG", normalized_name: "molho bbq 1kg", unit: "g" },
-      error: null,
-    });
+  it("never inserts ingredients — only alias memory and skips", async () => {
+    const insert = vi.fn();
     const client = {
       from: () => ({
         insert: () => ({
@@ -183,9 +188,50 @@ describe("autoPersistUnmatchedInvoiceItems", () => {
       attemptedKeys,
     });
 
-    expect(first.created).toBe(1);
-    expect(first.skipped).toBe(1);
-    expect(insert).toHaveBeenCalledTimes(1);
+    expect(first.created).toBe(0);
+    expect(first.skipped).toBe(2);
+    expect(insert).not.toHaveBeenCalled();
     expect(attemptedKeys.has(autoPersistSessionKey(invoiceId, "molho bbq 1kg"))).toBe(true);
+  });
+});
+
+describe("persistIngredientFromInvoiceItem", () => {
+  it("blocks insert without explicit_user source", async () => {
+    const insert = vi.fn();
+    const client = {
+      from: () => ({
+        insert: () => ({
+          select: () => ({ single: insert }),
+        }),
+        select: () => ({ data: [], error: null }),
+      }),
+    } as never;
+
+    const payload = buildIngredientInsertPayload(item("MOLHO BBQ 1KG"), "user-1");
+    const result = await persistIngredientFromInvoiceItem(client, payload!, { catalog: [] });
+    expect(result.blocked).toBe(true);
+    expect(result.blockReason).toBe("canonical_ingredients_require_explicit_user_create");
+    expect(insert).not.toHaveBeenCalled();
+  });
+
+  it("blocks ANGUS PTY even with explicit_user source", async () => {
+    const insert = vi.fn();
+    const client = {
+      from: () => ({
+        insert: () => ({
+          select: () => ({ single: insert }),
+        }),
+        select: () => ({ data: [], error: null }),
+      }),
+    } as never;
+
+    const payload = buildIngredientInsertPayload(item("ANGUS PTY"), "user-1");
+    const result = await persistIngredientFromInvoiceItem(client, payload!, {
+      catalog: [],
+      source: "explicit_user",
+    });
+    expect(result.blocked).toBe(true);
+    expect(result.blockReason).toBe("invoice_shorthand_not_canonical");
+    expect(insert).not.toHaveBeenCalled();
   });
 });

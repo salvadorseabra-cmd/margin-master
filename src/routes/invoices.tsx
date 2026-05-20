@@ -93,6 +93,7 @@ import {
   buildIngredientInsertPayload,
   persistIngredientFromInvoiceItem,
 } from "@/lib/ingredient-auto-persist";
+import { looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
 import { guardIngredientCreation } from "@/lib/ingredient-operational-identity";
 import {
   fileNameFromInvoicePath,
@@ -1583,6 +1584,15 @@ function InvoicesPage() {
       return;
     }
 
+    if (looksLikeInvoiceShorthandName(name)) {
+      setIngredientCreationErrors((current) => ({
+        ...current,
+        [item.id]:
+          "Invoice shorthand belongs in alias memory. Create a full catalog name instead.",
+      }));
+      return;
+    }
+
     const payload = buildIngredientInsertPayload(item, user.id, { isGenericUnit });
     if (!payload) {
       setIngredientCreationErrors((current) => ({
@@ -1604,10 +1614,22 @@ function InvoicesPage() {
         return;
       }
 
-      const { data, error, reused } = await persistIngredientFromInvoiceItem(supabase, payload, {
-        catalog: ingredientCatalog,
-      });
+      const { data, error, reused, blocked, blockReason } =
+        await persistIngredientFromInvoiceItem(supabase, payload, {
+          catalog: ingredientCatalog,
+          source: "explicit_user",
+        });
       if (error) throw error;
+      if (blocked) {
+        setIngredientCreationErrors((current) => ({
+          ...current,
+          [item.id]:
+            blockReason === "archived_ingredient_resurrection"
+              ? "This name was merged/archived. Use the canonical ingredient instead."
+              : "Could not create ingredient from this invoice line.",
+        }));
+        return;
+      }
 
       if (data) {
         const row = data as IngredientMatchRow;

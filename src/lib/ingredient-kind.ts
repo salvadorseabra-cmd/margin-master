@@ -48,17 +48,20 @@ export function looksLikeInvoiceShorthandName(raw: string | null | undefined): b
     /[àáâãéêíóôõúç]/i.test(trimmed) && /[a-zà-ÿ]/.test(trimmed) && upperRatio < 0.95;
   if (hasAccentLower) return false;
 
-  const wordTokens = tokens.filter((token) => /[A-Za-zÀ-ÿ]/.test(token));
-  if (wordTokens.some((token) => token.replace(/[^A-Za-zÀ-ÿ]/g, "").length >= 6)) {
-    return false;
-  }
-  if (wordTokens.some((token) => token.replace(/[^A-Za-zÀ-ÿ]/g, "").length >= 5)) {
+  const wordTokens = tokens.filter((token) => {
+    const letters = token.replace(/[^A-Za-zÀ-ÿ]/g, "");
+    if (letters.length < 2) return false;
+    if (/\d/.test(token)) return false;
+    return true;
+  });
+  if (wordTokens.some((token) => token.replace(/[^A-Za-zÀ-ÿ]/g, "").length >= 8)) {
     return false;
   }
 
-  const shorthandTokens = wordTokens.filter((token) => {
-    const core = token.replace(/[^A-Za-z0-9]/g, "");
-    return core.length > 0 && core.length <= 4;
+  const tokenCoreLengths = wordTokens.map((token) => token.replace(/[^A-Za-z0-9]/g, "").length);
+  const shorthandTokens = wordTokens.filter((_, index) => {
+    const coreLen = tokenCoreLengths[index] ?? 0;
+    return coreLen > 0 && coreLen <= 4;
   });
 
   if (
@@ -68,9 +71,37 @@ export function looksLikeInvoiceShorthandName(raw: string | null | undefined): b
     return true;
   }
 
+  const hasShortAbbrevToken = tokenCoreLengths.some((len) => len > 0 && len <= 4);
+  const maxWordCoreLength = tokenCoreLengths.reduce((max, len) => Math.max(max, len), 0);
+  if (
+    wordTokens.length >= 2 &&
+    hasShortAbbrevToken &&
+    maxWordCoreLength > 0 &&
+    maxWordCoreLength <= 5 &&
+    upperRatio >= 0.82
+  ) {
+    return true;
+  }
+
+  const hasNumericSizeToken = tokens.some((token) => /\d/.test(token));
+  if (
+    wordTokens.length === 1 &&
+    hasShortAbbrevToken &&
+    hasNumericSizeToken &&
+    upperRatio >= 0.82
+  ) {
+    return true;
+  }
+
   const aliasKey = normalizeOperationalAliasKey(trimmed);
   const identityKey = normalizeOperationalIdentityKey(trimmed);
-  if (aliasKey && identityKey && aliasKey !== identityKey && upperRatio >= 0.9) {
+  if (
+    aliasKey &&
+    identityKey &&
+    aliasKey !== identityKey &&
+    upperRatio >= 0.9 &&
+    hasShortAbbrevToken
+  ) {
     return true;
   }
 

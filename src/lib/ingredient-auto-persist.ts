@@ -10,6 +10,7 @@ import {
   catalogHasNormalizedNameDuplicate,
   catalogHasOperationalIdentityDuplicate,
   guardIngredientCreation,
+  normalizeOperationalIdentityKey,
 } from "@/lib/ingredient-operational-identity";
 import {
   isConfirmedIngredientMatch,
@@ -31,6 +32,8 @@ import { recordInvoiceLineAliasMemory } from "@/lib/ingredient-match-alias-memor
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 
 const LOG_PREFIX = "[ingredient-auto-persist]";
+/** Grep-friendly prefix for every insert into public.ingredients (explicit user action only). */
+export const INGREDIENT_CREATE_LOG_PREFIX = "[ingredient-create]";
 const PURCHASE_INFERENCE_MIN_CONFIDENCE = 0.86;
 const OPERATIONAL_CONFLICT_MIN_SHARED_TOKEN_LENGTH = 3;
 
@@ -77,6 +80,13 @@ function traceAutoPersist(stage: string, details?: Record<string, unknown>): voi
   if (details) console.debug(`${LOG_PREFIX} ${stage}`, details);
   else console.debug(`${LOG_PREFIX} ${stage}`);
 }
+
+function traceIngredientCreate(stage: string, details?: Record<string, unknown>): void {
+  if (details) console.info(`${INGREDIENT_CREATE_LOG_PREFIX} ${stage}`, details);
+  else console.info(`${INGREDIENT_CREATE_LOG_PREFIX} ${stage}`);
+}
+
+export type IngredientCreateSource = "explicit_user";
 
 export function autoPersistSessionKey(invoiceId: string, normalizedName: string): string {
   return `${invoiceId}:${normalizedName}`;
@@ -290,16 +300,50 @@ export function buildIngredientInsertPayload(
 export async function persistIngredientFromInvoiceItem(
   client: AppSupabaseClient,
   payload: IngredientInsertPayload,
-  options?: { catalog?: AutoPersistCatalogEntry[] },
+  options?: {
+    catalog?: AutoPersistCatalogEntry[];
+    /** Only explicit user "Create ingredient" may insert canonical rows. */
+    source?: IngredientCreateSource;
+  },
 ): Promise<{
   data: AutoPersistCatalogEntry | null;
   error: PostgrestError | null;
   reused?: boolean;
+  blocked?: boolean;
+  blockReason?: string;
 }> {
+  const source = options?.source;
+  if (source !== "explicit_user") {
+    traceIngredientCreate("blocked-non-explicit", {
+      name: payload.name,
+      normalizedName: payload.normalized_name,
+      source: source ?? "auto_persist",
+    });
+    return {
+      data: null,
+      error: null,
+      blocked: true,
+      blockReason: "canonical_ingredients_require_explicit_user_create",
+    };
+  }
+
+  if (looksLikeInvoiceShorthandName(payload.name)) {
+    traceIngredientCreate("blocked-invoice-shorthand", {
+      name: payload.name,
+      normalizedName: payload.normalized_name,
+    });
+    return {
+      data: null,
+      error: null,
+      blocked: true,
+      blockReason: "invoice_shorthand_not_canonical",
+    };
+  }
+
   const catalog = options?.catalog ?? [];
   const guard = guardIngredientCreation(payload.name, catalog);
   if (guard.action === "reuse") {
-    traceAutoPersist("duplicate-prevention-reuse", {
+    traceIngredientCreate("duplicate-prevention-reuse", {
       proposedName: payload.name,
       operationalKey: guard.operationalKey,
       existingId: guard.existing.id,
@@ -308,6 +352,28 @@ export async function persistIngredientFromInvoiceItem(
     return { data: guard.existing, error: null, reused: true };
   }
 
+  const archivedConflict = await findArchivedIngredientResurrectionConflict(client, payload);
+  if (archivedConflict) {
+    traceIngredientCreate("blocked-archived-resurrection", {
+      name: payload.name,
+      normalizedName: payload.normalized_name,
+      archivedId: archivedConflict.id,
+      mergedInto: archivedConflict.merged_into_ingredient_id,
+    });
+    return {
+      data: null,
+      error: null,
+      blocked: true,
+      blockReason: "archived_ingredient_resurrection",
+    };
+  }
+
+  traceIngredientCreate("insert-attempt", {
+    name: payload.name,
+    normalizedName: payload.normalized_name,
+    operationalKey: guard.operationalKey,
+  });
+
   const { data, error } = await client
     .from("ingredients")
     .insert(payload)
@@ -315,20 +381,54 @@ export async function persistIngredientFromInvoiceItem(
     .single();
 
   if (error) {
-    traceAutoPersist("insert-failed", {
+    traceIngredientCreate("insert-failed", {
       normalizedName: payload.normalized_name,
       message: error.message,
     });
     return { data: null, error };
   }
 
-  traceAutoPersist("insert-ok", {
+  traceIngredientCreate("insert-ok", {
     ingredientId: data?.id,
     normalizedName: payload.normalized_name,
     name: payload.name,
     operationalKey: guard.operationalKey,
   });
   return { data: (data as AutoPersistCatalogEntry | null) ?? null, error: null, reused: false };
+}
+
+type ArchivedResurrectionRow = {
+  id: string;
+  merged_into_ingredient_id?: string | null;
+};
+
+async function findArchivedIngredientResurrectionConflict(
+  client: AppSupabaseClient,
+  payload: IngredientInsertPayload,
+): Promise<ArchivedResurrectionRow | null> {
+  const operationalKey = normalizeOperationalIdentityKey(payload.name);
+  const selectWithArchive =
+    "id, normalized_name, name, is_archived, merged_into_ingredient_id";
+
+  const { data, error } = await client.from("ingredients").select(selectWithArchive);
+  if (error) return null;
+
+  for (const row of data ?? []) {
+    const archived =
+      row.is_archived === true || Boolean(row.merged_into_ingredient_id?.trim());
+    if (!archived) continue;
+
+    const storedNorm = row.normalized_name?.trim().toLowerCase();
+    if (storedNorm && storedNorm === payload.normalized_name) {
+      return row as ArchivedResurrectionRow;
+    }
+
+    const display = row.name?.trim() || row.normalized_name?.trim() || "";
+    if (operationalKey && normalizeOperationalIdentityKey(display) === operationalKey) {
+      return row as ArchivedResurrectionRow;
+    }
+  }
+  return null;
 }
 
 export type AutoPersistInvoiceItemsParams = {
@@ -348,19 +448,15 @@ export async function autoPersistUnmatchedInvoiceItems(
   params: AutoPersistInvoiceItemsParams,
 ): Promise<{ created: number; skipped: number }> {
   const {
-    client,
-    userId,
     invoiceId,
     items,
+    catalog,
     confirmedAliases = {},
     supplierName,
     attemptedKeys,
-    onIngredientCreated,
   } = params;
   const isGenericUnit = params.isGenericUnit ?? defaultIsGenericUnit;
 
-  let catalog = [...params.catalog];
-  let created = 0;
   let skipped = 0;
 
   for (const item of items) {
@@ -379,6 +475,23 @@ export async function autoPersistUnmatchedInvoiceItems(
       supplierName,
     );
     const eligibility = evaluateAutoPersistEligibility(item, match, catalog, { isGenericUnit });
+
+    if (!eligibility.eligible && eligibility.reason === "invoice_shorthand" && match) {
+      const aliasApplied = recordInvoiceLineAliasMemory({
+        itemName: item.name,
+        match,
+        confirmedAliases,
+        supplierName,
+      });
+      if (aliasApplied.recorded) {
+        traceAutoPersist("alias-memory-shorthand", {
+          invoiceId,
+          itemId: item.id,
+          itemName: item.name,
+          canonicalId: match.ingredient.id,
+        });
+      }
+    }
 
     if (!eligibility.eligible && eligibility.reason === "has_match" && match) {
       const aliasApplied = recordInvoiceLineAliasMemory({
@@ -409,39 +522,22 @@ export async function autoPersistUnmatchedInvoiceItems(
       continue;
     }
 
-    const payload = buildIngredientInsertPayload(item, userId, { isGenericUnit });
-    if (!payload) {
-      traceAutoPersist("skip", { invoiceId, itemId: item.id, reason: "invalid_payload" });
-      skipped += 1;
-      continue;
-    }
-
-    const { data, error, reused } = await persistIngredientFromInvoiceItem(client, payload, {
-      catalog,
+    traceAutoPersist("skip-auto-create-disabled", {
+      invoiceId,
+      itemId: item.id,
+      itemName: item.name,
+      reason: "explicit_user_create_only",
+      note: "Invoice lines never auto-insert into public.ingredients",
     });
-    if (error || !data) {
-      attemptedKeys.delete(sessionKey);
-      skipped += 1;
-      continue;
-    }
-
-    if (reused) {
-      traceAutoPersist("skip", {
-        invoiceId,
-        itemId: item.id,
-        itemName: item.name,
-        reason: "duplicate_operational_identity",
-        existingId: data.id,
-      });
-      skipped += 1;
-      continue;
-    }
-
-    catalog = [...catalog, data];
-    onIngredientCreated?.(data);
-    created += 1;
+    skipped += 1;
   }
 
-  traceAutoPersist("batch-complete", { invoiceId, created, skipped, itemCount: items.length });
-  return { created, skipped };
+  traceAutoPersist("batch-complete", {
+    invoiceId,
+    created: 0,
+    skipped,
+    itemCount: items.length,
+    autoInsertDisabled: true,
+  });
+  return { created: 0, skipped };
 }

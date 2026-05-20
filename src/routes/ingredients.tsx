@@ -8,6 +8,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 import { guardIngredientCreation } from "@/lib/ingredient-operational-identity";
 import { INGREDIENT_KIND_CANONICAL, looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
+import { INGREDIENT_CREATE_LOG_PREFIX } from "@/lib/ingredient-auto-persist";
 import {
   effectiveIngredientUnitCostEur,
   ingredientDisplayBaseUnit,
@@ -167,6 +168,11 @@ function IngredientsPage() {
       return;
     }
 
+    console.info(`${INGREDIENT_CREATE_LOG_PREFIX} insert-attempt`, {
+      name,
+      normalizedName: normalizeIngredientName(name),
+      source: "explicit_user_ingredients_page",
+    });
     const { error } = await supabase.from("ingredients").insert({
       user_id: user.id,
       name,
@@ -178,6 +184,13 @@ function IngredientsPage() {
       base_unit,
       ingredient_kind: INGREDIENT_KIND_CANONICAL,
     });
+    if (!error) {
+      console.info(`${INGREDIENT_CREATE_LOG_PREFIX} insert-ok`, {
+        name,
+        normalizedName: normalizeIngredientName(name),
+        source: "explicit_user_ingredients_page",
+      });
+    }
     setSaving(false);
     if (error) {
       setError(error.message);

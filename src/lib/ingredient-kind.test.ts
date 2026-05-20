@@ -21,9 +21,12 @@ function ingredient(
 describe("looksLikeInvoiceShorthandName", () => {
   it("flags invoice shorthand examples", () => {
     const shorthand = [
+      "ANGUS PTY",
       "BAC FUM FAT",
+      "BAC STRK",
       "HMB 180",
       "ON RNG",
+      "JALP SLC",
       "PKL SLC",
       "CHED DISP",
       "BAT SHOE",

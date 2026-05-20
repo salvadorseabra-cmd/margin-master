@@ -14,7 +14,7 @@ import {
   formatUnitCostCurrency,
 } from "@/lib/display-format";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
-import { loadActiveIngredientCatalog } from "@/lib/ingredient-catalog-load";
+import { loadCanonicalIngredientCatalog } from "@/lib/ingredient-catalog-load";
 
 export const Route = createFileRoute("/recipes")({
   head: () => ({
@@ -200,7 +200,7 @@ function RecipesPage() {
         `,
           )
           .order("name", { ascending: true }),
-        loadActiveIngredientCatalog(supabase, "current_price, purchase_quantity"),
+        loadCanonicalIngredientCatalog(supabase, "current_price, purchase_quantity"),
       ]);
 
       console.log(error);

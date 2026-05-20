@@ -165,6 +165,7 @@ export function catalogHasNormalizedNameDuplicate(
   const target = normalizedName.trim().toLowerCase();
   if (!target) return true;
   return catalog.some((entry) => {
+    if (isArchivedIngredientEntry(entry)) return false;
     const stored = entry.normalized_name?.trim().toLowerCase();
     if (stored && stored === target) return true;
     return normalizeIngredientName(entry.name ?? "") === target;
