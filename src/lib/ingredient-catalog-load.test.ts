@@ -3,7 +3,8 @@ import {
   filterActiveCatalogIngredients,
   type IngredientCanonicalInput,
 } from "./ingredient-canonical";
-import { loadActiveIngredientCatalog } from "./ingredient-catalog-load";
+import { loadActiveIngredientCatalog, loadCanonicalIngredientCatalog } from "./ingredient-catalog-load";
+import { INGREDIENT_KIND_ALIAS } from "./ingredient-kind";
 
 function ingredient(
   id: string,
@@ -81,5 +82,38 @@ describe("loadActiveIngredientCatalog", () => {
     expect(error).toBeNull();
     expect(active).toHaveLength(1);
     expect(active[0]?.id).toBe("only");
+  });
+});
+
+describe("loadCanonicalIngredientCatalog", () => {
+  it("excludes alias-kind rows from human-facing catalog load", async () => {
+    const rows = [
+      ingredient("canonical", "BACON FATIADO FUMADO 1KG", { ingredient_kind: "canonical" }),
+      ingredient("alias", "BAC FUM FAT", { ingredient_kind: INGREDIENT_KIND_ALIAS }),
+    ];
+    const client = {
+      from: () => ({
+        select: () => Promise.resolve({ data: rows, error: null }),
+      }),
+    } as never;
+
+    const { rows: canonical, error } = await loadCanonicalIngredientCatalog(client);
+    expect(error).toBeNull();
+    expect(canonical.map((row) => row.id)).toEqual(["canonical"]);
+  });
+
+  it("filters shorthand leakage when ingredient_kind column is absent", async () => {
+    const rows = [
+      ingredient("canonical", "ONION RINGS 1KG"),
+      ingredient("leak", "ON RNG"),
+    ];
+    const client = {
+      from: () => ({
+        select: () => Promise.resolve({ data: rows, error: null }),
+      }),
+    } as never;
+
+    const { rows: canonical } = await loadCanonicalIngredientCatalog(client);
+    expect(canonical.map((row) => row.id)).toEqual(["canonical"]);
   });
 });

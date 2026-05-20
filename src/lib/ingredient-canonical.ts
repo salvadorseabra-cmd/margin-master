@@ -122,6 +122,7 @@ export type IngredientCanonicalInput = {
   name: string | null;
   normalized_name?: string | null;
   unit?: string | null;
+  ingredient_kind?: string | null;
   is_archived?: boolean | null;
   merged_into_ingredient_id?: string | null;
 };
@@ -192,6 +193,7 @@ export type { MatchScoreBreakdown, MatchScoreRejectionReason } from "@/lib/ingre
 import { lookupIngredientMatchOverride } from "@/lib/ingredient-match-override";
 import { resolveOperationalAliasCatalogMatch } from "@/lib/ingredient-operational-alias-memory";
 import { isIngredientMatchPairRejected } from "@/lib/ingredient-rejected-match-memory";
+import { filterMatchingCatalogIngredients } from "@/lib/ingredient-kind";
 import { normalizeInvoiceMatchIngredientName } from "@/lib/normalize-ingredient-name";
 
 const WEIGHT_TOKEN_RE = /\b\d+(?:[.,]\d+)?\s*(?:kg|kgs|g|gr|grs)\.?\b/gi;
@@ -988,7 +990,7 @@ export function findCanonicalIngredientMatch(
   supplierName?: string | null,
   options?: FindCanonicalIngredientMatchOptions,
 ): IngredientCanonicalMatch | null {
-  const activeIngredients = filterActiveCatalogIngredients(ingredients);
+  const activeIngredients = filterMatchingCatalogIngredients(ingredients);
   const normalizedItemName = normalizeInvoiceIngredientName(itemName);
   if (!normalizedItemName) return null;
 

@@ -1,8 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import {
-  findCanonicalIngredientMatch,
-  type IngredientCanonicalInput,
-} from "./ingredient-canonical";
+import type { IngredientCanonicalInput } from "./ingredient-canonical";
+import { findInvoiceItemIngredientMatch } from "./invoice-ingredient-match-propagation";
 import {
   autoPersistSessionKey,
   autoPersistUnmatchedInvoiceItems,
@@ -12,6 +10,7 @@ import {
   catalogHasSameOperationalFamilyDuplicate,
   evaluateAutoPersistEligibility,
 } from "./ingredient-auto-persist";
+import { recordInvoiceLineAliasMemory } from "./ingredient-match-alias-memory";
 
 function ingredient(id: string, name: string, normalized_name?: string): IngredientCanonicalInput {
   return { id, name, normalized_name: normalized_name ?? name.toLowerCase() };
@@ -39,7 +38,7 @@ describe("evaluateAutoPersistEligibility", () => {
 
   it("blocks confirmed exact matches", () => {
     const catalog = [ingredient("k1", "KETCHUP HEINZ 570G")];
-    const match = findCanonicalIngredientMatch("KETCHUP HEINZ SQUEEZE 570G", catalog);
+    const match = findInvoiceItemIngredientMatch("KETCHUP HEINZ SQUEEZE 570G", catalog);
     expect(match?.kind).toBe("exact");
     const result = evaluateAutoPersistEligibility(
       item("KETCHUP HEINZ SQUEEZE 570G"),
@@ -51,7 +50,7 @@ describe("evaluateAutoPersistEligibility", () => {
 
   it("blocks operational-equivalent suggestions", () => {
     const catalog = [ingredient("palha", "BATATA PALHA 2KG")];
-    const match = findCanonicalIngredientMatch("PALHA SNACK FOOD SERVICE 2KG", catalog);
+    const match = findInvoiceItemIngredientMatch("PALHA SNACK FOOD SERVICE 2KG", catalog);
     expect(match?.kind).toBe("operational-equivalent");
     const result = evaluateAutoPersistEligibility(
       item("PALHA SNACK FOOD SERVICE 2KG"),
@@ -63,7 +62,7 @@ describe("evaluateAutoPersistEligibility", () => {
 
   it("blocks strong semantic-style matches promoted to exact", () => {
     const catalog = [ingredient("oil-a", "OLEO GIRASSOL VAQUEIRO 1L")];
-    const match = findCanonicalIngredientMatch("OLEO GIRASSOL OLIVEIRA DA SERRA 1L", catalog);
+    const match = findInvoiceItemIngredientMatch("OLEO GIRASSOL OLIVEIRA DA SERRA 1L", catalog);
     expect(match?.kind).toBe("exact");
     const result = evaluateAutoPersistEligibility(
       item("OLEO GIRASSOL OLIVEIRA DA SERRA 1L"),
@@ -96,6 +95,27 @@ describe("evaluateAutoPersistEligibility", () => {
       catalog,
     );
     expect(result.reason).toBe("operational_family_conflict");
+  });
+
+  it("records alias memory instead of creating when canonical match exists", () => {
+    const catalog = [ingredient("bacon", "BACON FATIADO FUMADO 1KG")];
+    const match = findInvoiceItemIngredientMatch("BAC FUM FAT", catalog);
+    expect(match).not.toBeNull();
+    expect(match?.ingredient.id).toBe("bacon");
+    const eligibility = evaluateAutoPersistEligibility(item("BAC FUM FAT"), match, catalog);
+    expect(eligibility.reason).toBe("has_match");
+    const aliasApplied = recordInvoiceLineAliasMemory({
+      itemName: "BAC FUM FAT",
+      match: match!,
+      confirmedAliases: {},
+    });
+    expect(aliasApplied.recorded).toBe(true);
+  });
+
+  it("blocks auto-create for invoice shorthand without a canonical match", () => {
+    const result = evaluateAutoPersistEligibility(item("BAC FUM FAT"), null, []);
+    expect(result.eligible).toBe(false);
+    expect(result.reason).toBe("invoice_shorthand");
   });
 
   it("blocks weak purchase format rows", () => {

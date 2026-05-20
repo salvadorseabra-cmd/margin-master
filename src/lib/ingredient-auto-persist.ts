@@ -26,6 +26,8 @@ import {
   type StructuredPurchaseFormat,
 } from "@/lib/invoice-purchase-format";
 import { findInvoiceItemIngredientMatch } from "@/lib/invoice-ingredient-match-propagation";
+import { looksLikeInvoiceShorthandName, INGREDIENT_KIND_CANONICAL } from "@/lib/ingredient-kind";
+import { recordInvoiceLineAliasMemory } from "@/lib/ingredient-match-alias-memory";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 
 const LOG_PREFIX = "[ingredient-auto-persist]";
@@ -46,6 +48,7 @@ export type AutoPersistIneligibilityReason =
   | "has_match"
   | "suggested_match"
   | "invalid_name"
+  | "invoice_shorthand"
   | "weak_purchase_format"
   | "operational_family_conflict"
   | "duplicate_normalized_name"
@@ -66,6 +69,7 @@ export type IngredientInsertPayload = {
   purchase_quantity: number;
   purchase_unit: string;
   base_unit: string;
+  ingredient_kind?: string;
 };
 
 function traceAutoPersist(stage: string, details?: Record<string, unknown>): void {
@@ -179,15 +183,25 @@ export function evaluateAutoPersistEligibility(
   },
 ): AutoPersistEligibilityResult {
   const isGenericUnit = options?.isGenericUnit ?? defaultIsGenericUnit;
+  const name = item.name.trim();
 
   if (match) {
     if (isConfirmedIngredientMatch(match)) return { eligible: false, reason: "has_match" };
     if (isSuggestedIngredientMatch(match)) return { eligible: false, reason: "suggested_match" };
   }
 
-  const name = item.name.trim();
+  if (!match && looksLikeInvoiceShorthandName(name)) {
+    const shorthandMatch = findInvoiceItemIngredientMatch(name, catalog, {}, undefined);
+    if (shorthandMatch && isConfirmedIngredientMatch(shorthandMatch)) {
+      return { eligible: false, reason: "has_match" };
+    }
+  }
   if (isInvalidAutoPersistName(name)) {
     return { eligible: false, reason: "invalid_name" };
+  }
+
+  if (looksLikeInvoiceShorthandName(name)) {
+    return { eligible: false, reason: "invoice_shorthand" };
   }
 
   const normalizedName = normalizeIngredientName(name);
@@ -245,7 +259,11 @@ export function buildIngredientInsertPayload(
     quantity: item.quantity,
     unit: item.unit,
   });
-  const purchaseFields = structuredPurchaseToIngredientFields(structured, extractedUnit, isGenericUnit);
+  const purchaseFields = structuredPurchaseToIngredientFields(
+    structured,
+    extractedUnit,
+    isGenericUnit,
+  );
   const stockUnit =
     structured.inferred.base_unit && isGenericUnit(extractedUnit)
       ? structured.inferred.base_unit
@@ -265,6 +283,7 @@ export function buildIngredientInsertPayload(
     purchase_quantity: purchaseFields.purchase_quantity,
     purchase_unit: purchaseFields.purchase_unit,
     base_unit: purchaseFields.base_unit,
+    ingredient_kind: INGREDIENT_KIND_CANONICAL,
   };
 }
 
@@ -296,7 +315,10 @@ export async function persistIngredientFromInvoiceItem(
     .single();
 
   if (error) {
-    traceAutoPersist("insert-failed", { normalizedName: payload.normalized_name, message: error.message });
+    traceAutoPersist("insert-failed", {
+      normalizedName: payload.normalized_name,
+      message: error.message,
+    });
     return { data: null, error };
   }
 
@@ -357,6 +379,23 @@ export async function autoPersistUnmatchedInvoiceItems(
       supplierName,
     );
     const eligibility = evaluateAutoPersistEligibility(item, match, catalog, { isGenericUnit });
+
+    if (!eligibility.eligible && eligibility.reason === "has_match" && match) {
+      const aliasApplied = recordInvoiceLineAliasMemory({
+        itemName: item.name,
+        match,
+        confirmedAliases,
+        supplierName,
+      });
+      if (aliasApplied.recorded) {
+        traceAutoPersist("alias-memory", {
+          invoiceId,
+          itemId: item.id,
+          itemName: item.name,
+          canonicalId: match.ingredient.id,
+        });
+      }
+    }
 
     if (!eligibility.eligible) {
       traceAutoPersist("skip", {

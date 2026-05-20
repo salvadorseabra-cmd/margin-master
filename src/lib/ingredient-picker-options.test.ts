@@ -12,17 +12,17 @@ import type { IngredientCanonicalInput } from "./ingredient-canonical";
 function ingredient(
   id: string,
   name: string,
-  normalized_name?: string,
+  extra?: Partial<IngredientCanonicalInput>,
 ): IngredientCanonicalInput {
-  return { id, name, normalized_name };
+  return { id, name, normalized_name: name.toLowerCase(), ...extra };
 }
 
 describe("buildCanonicalIngredientPickerOptions", () => {
   it("dedupes duplicate catalog hydration by ingredient id", () => {
     const catalog = [
-      ingredient("angus-1", "ANGUS PTY", "angus pty"),
-      ingredient("angus-1", "ANGUS PTY", "angus pty"),
-      ingredient("angus-1", "ANGUS PTY DUPLICATE LABEL", "angus pty"),
+      ingredient("angus-1", "ANGUS PTY", { ingredient_kind: "canonical" }),
+      ingredient("angus-1", "ANGUS PTY", { ingredient_kind: "canonical" }),
+      ingredient("angus-1", "ANGUS PTY DUPLICATE LABEL", { ingredient_kind: "canonical" }),
     ];
     const options = buildCanonicalIngredientPickerOptions(catalog);
     expect(options).toHaveLength(1);
@@ -32,8 +32,8 @@ describe("buildCanonicalIngredientPickerOptions", () => {
 
   it("keeps same display name with different ids as separate canonical rows", () => {
     const catalog = [
-      ingredient("angus-1", "ANGUS PTY"),
-      ingredient("angus-2", "ANGUS PTY"),
+      ingredient("angus-1", "ANGUS PTY", { ingredient_kind: "canonical" }),
+      ingredient("angus-2", "ANGUS PTY", { ingredient_kind: "canonical" }),
     ];
     const options = buildCanonicalIngredientPickerOptions(catalog);
     expect(options.map((row) => row.id).sort()).toEqual(["angus-1", "angus-2"]);
@@ -45,8 +45,8 @@ describe("buildCanonicalIngredientPickerOptions", () => {
 
   it("excludes archived merged duplicates", () => {
     const catalog = [
-      ingredient("angus-1", "ANGUS PTY"),
-      ingredient("angus-2", "ANGUS PTY", "angus pty"),
+      ingredient("angus-1", "ANGUS PTY", { ingredient_kind: "canonical" }),
+      ingredient("angus-2", "ANGUS PTY", { ingredient_kind: "canonical" }),
     ];
     const archived = { ...catalog[1]!, is_archived: true, merged_into_ingredient_id: "angus-1" };
     const options = buildCanonicalIngredientPickerOptions([catalog[0]!, archived]);
@@ -58,7 +58,7 @@ describe("buildCanonicalIngredientPickerOptions", () => {
       ingredient("synthetic:angus", "ANGUS PTY"),
       ingredient("invoice:line-1", "ANGUS PTY"),
       ingredient("temp:draft", "ANGUS PTY"),
-      ingredient("angus-1", "ANGUS PTY"),
+      ingredient("angus-1", "ANGUS PTY", { ingredient_kind: "canonical" }),
     ];
     const options = buildCanonicalIngredientPickerOptions(catalog);
     expect(options.map((row) => row.id)).toEqual(["angus-1"]);
@@ -67,7 +67,9 @@ describe("buildCanonicalIngredientPickerOptions", () => {
 
 describe("attachAliasSearchKeywordsToPickerOptions", () => {
   it("does not add alias strings as separate dropdown rows", () => {
-    const options = buildCanonicalIngredientPickerOptions([ingredient("angus-1", "ANGUS PTY")]);
+    const options = buildCanonicalIngredientPickerOptions([
+      ingredient("angus-1", "ANGUS PTY", { ingredient_kind: "canonical" }),
+    ]);
     const withAliases = attachAliasSearchKeywordsToPickerOptions(options, {
       "metro::angus burger": "angus-1",
       "angus burger": "angus-1",
@@ -80,8 +82,8 @@ describe("attachAliasSearchKeywordsToPickerOptions", () => {
 
   it("leaves unrelated alias keys off other ingredients", () => {
     const options = buildCanonicalIngredientPickerOptions([
-      ingredient("angus-1", "ANGUS PTY"),
-      ingredient("smash-1", "SMASH PTY 90"),
+      ingredient("angus-1", "ANGUS PTY", { ingredient_kind: "canonical" }),
+      ingredient("smash-1", "SMASH PTY 90", { ingredient_kind: "canonical" }),
     ]);
     const withAliases = attachAliasSearchKeywordsToPickerOptions(options, {
       "angus burger": "angus-1",

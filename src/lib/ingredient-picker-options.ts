@@ -3,6 +3,7 @@ import {
   type IngredientAliasMap,
   type IngredientCanonicalInput,
 } from "@/lib/ingredient-canonical";
+import { isCanonicalIngredientEntry } from "@/lib/ingredient-kind";
 import { isSyntheticCatalogIngredientId } from "@/lib/ingredient-canonical-synthesis";
 import { normalizeInvoiceIngredientName } from "@/lib/ingredient-canonical";
 import {
@@ -43,6 +44,7 @@ function isCanonicalCatalogRow(row: IngredientCanonicalInput): boolean {
   const id = row.id?.trim();
   if (!id) return false;
   if (isArchivedIngredientEntry(row)) return false;
+  if (!isCanonicalIngredientEntry(row)) return false;
   if (isSyntheticCatalogIngredientId(id)) return false;
   if (id.startsWith("invoice:") || id.startsWith("temp:") || id.startsWith("temporary:")) {
     return false;

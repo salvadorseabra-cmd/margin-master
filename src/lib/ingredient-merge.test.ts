@@ -126,8 +126,12 @@ describe("alias and memory preservation", () => {
 describe("picker filtering archived", () => {
   it("excludes archived and merged-into duplicates from picker options", () => {
     const catalog = [
-      row("canonical", "ANGUS PTY"),
-      row("dup", "ANGUS PTY", { is_archived: true, merged_into_ingredient_id: "canonical" }),
+      row("canonical", "Angus Patty 180g", { ingredient_kind: "canonical" }),
+      row("dup", "ANGUS PTY", {
+        ingredient_kind: "alias",
+        is_archived: true,
+        merged_into_ingredient_id: "canonical",
+      }),
     ];
     const options = buildCanonicalIngredientPickerOptions(catalog);
     expect(options.map((o) => o.id)).toEqual(["canonical"]);

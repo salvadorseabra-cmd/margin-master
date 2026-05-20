@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import type { Tables } from "@/integrations/supabase/types";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 import { guardIngredientCreation } from "@/lib/ingredient-operational-identity";
+import { INGREDIENT_KIND_CANONICAL, looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
 import {
   effectiveIngredientUnitCostEur,
   ingredientDisplayBaseUnit,
@@ -19,7 +20,7 @@ import {
 } from "@/lib/display-format";
 import { inferPurchaseUnitsFromLineItemName } from "@/lib/ingredient-unit-inference";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
-import { loadActiveIngredientCatalog } from "@/lib/ingredient-catalog-load";
+import { loadCanonicalIngredientCatalog } from "@/lib/ingredient-catalog-load";
 
 export const Route = createFileRoute("/ingredients")({
   head: () => ({
@@ -67,7 +68,7 @@ function IngredientsPage() {
 
   const load = async () => {
     setLoading(true);
-    const { rows: catalogRows, error: catalogError } = await loadActiveIngredientCatalog(
+    const { rows: catalogRows, error: catalogError } = await loadCanonicalIngredientCatalog(
       supabase,
       "current_price, user_id, purchase_quantity, purchase_unit, base_unit",
     );
@@ -149,6 +150,14 @@ function IngredientsPage() {
       name: row.name,
       normalized_name: row.normalized_name,
     }));
+    if (looksLikeInvoiceShorthandName(name)) {
+      setSaving(false);
+      setError(
+        "Use a full product name for the catalog. Invoice shorthand belongs in alias memory.",
+      );
+      return;
+    }
+
     const guard = guardIngredientCreation(name, catalog);
     if (guard.action === "reuse") {
       setSaving(false);
@@ -167,6 +176,7 @@ function IngredientsPage() {
       purchase_quantity,
       purchase_unit,
       base_unit,
+      ingredient_kind: INGREDIENT_KIND_CANONICAL,
     });
     setSaving(false);
     if (error) {
