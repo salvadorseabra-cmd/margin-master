@@ -832,12 +832,16 @@ const getPriceDeltaDetails = (
 };
 
 function InvoicesPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
   const [drop, setDrop] = useState(false);
   const [pending, setPending] = useState<Pending[]>([]);
   const [rows, setRows] = useState<InvoiceRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [invoicesLoading, setInvoicesLoading] = useState(true);
+  const [hasLoadedInvoicesOnce, setHasLoadedInvoicesOnce] = useState(false);
+  const isLoadingInvoices = authLoading || invoicesLoading || (!!user && !hasLoadedInvoicesOnce);
+  const showInvoiceTableLoading = isLoadingInvoices && rows.length === 0;
+  const showInvoiceTableEmpty = !isLoadingInvoices && rows.length === 0 && hasLoadedInvoicesOnce;
   const [preview, setPreview] = useState<{ url: string; type: string; name: string } | null>(null);
   const [pendingDeleteRow, setPendingDeleteRow] = useState<InvoiceRow | null>(null);
   const [globalError, setGlobalError] = useState<string | null>(null);
@@ -866,6 +870,7 @@ function InvoicesPage() {
   );
   const settlementByInvoiceRef = useRef<Record<string, SettlementState>>({});
   const invoiceLoadSeqRef = useRef(0);
+  const hasLoadedInvoicesOnceRef = useRef(false);
   const autoPersistAttemptedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
@@ -900,7 +905,7 @@ function InvoicesPage() {
 
   const load = useCallback(async () => {
     const loadSeq = ++invoiceLoadSeqRef.current;
-    setLoading(true);
+    setInvoicesLoading(true);
     setGlobalError(null);
     try {
       const { data, error } = await supabase
@@ -964,11 +969,18 @@ function InvoicesPage() {
       setRows(
         invoiceRows.map((row) => toInvoiceRow(row, itemCounts[row.id] ?? 0, identityState[row.id])),
       );
+      hasLoadedInvoicesOnceRef.current = true;
+      setHasLoadedInvoicesOnce(true);
     } catch (err) {
-      setRows([]);
+      if (loadSeq !== invoiceLoadSeqRef.current) return;
       setGlobalError(err instanceof Error ? err.message : "Could not load invoices");
+      if (!hasLoadedInvoicesOnceRef.current) {
+        setRows([]);
+      }
     } finally {
-      setLoading(false);
+      if (loadSeq === invoiceLoadSeqRef.current) {
+        setInvoicesLoading(false);
+      }
     }
   }, []);
 
@@ -979,10 +991,12 @@ function InvoicesPage() {
       setIngredientCatalog([]);
       setInvoiceOperationalMetadata(emptyInvoiceOperationalMetadata());
       setSettlementByInvoice({});
-      setLoading(false);
+      hasLoadedInvoicesOnceRef.current = false;
+      setHasLoadedInvoicesOnce(false);
+      setInvoicesLoading(authLoading);
       autoPersistAttemptedRef.current.clear();
     }
-  }, [user, load]);
+  }, [user, load, authLoading]);
 
   useEffect(() => {
     if (!user || !expanded || ingredientCatalog.length === 0) return;
@@ -1758,15 +1772,18 @@ function InvoicesPage() {
                 <th className="py-3 px-5 font-medium w-28"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
-              {loading && (
+            <tbody
+              className={`divide-y divide-border${invoicesLoading && rows.length > 0 ? " opacity-60" : ""}`}
+            >
+              {showInvoiceTableLoading && (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center">
-                    <Loader2 className="h-5 w-5 animate-spin inline text-muted-foreground" />
+                  <td colSpan={8} className="py-12 text-center text-sm text-muted-foreground">
+                    <Loader2 className="mr-2 inline h-4 w-4 animate-spin" />
+                    Loading invoices…
                   </td>
                 </tr>
               )}
-              {!loading && rows.length === 0 && (
+              {showInvoiceTableEmpty && (
                 <tr>
                   <td colSpan={8} className="py-16 text-center">
                     <div className="mx-auto h-10 w-10 rounded-full bg-muted grid place-items-center mb-3">

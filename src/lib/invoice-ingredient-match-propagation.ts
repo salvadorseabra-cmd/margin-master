@@ -4,6 +4,7 @@ import {
   type IngredientCanonicalInput,
   type IngredientCanonicalMatch,
 } from "@/lib/ingredient-canonical";
+import { normalizeSupplierShorthand } from "@/lib/ingredient-operational-aliases";
 import {
   getInvoiceRowIngredientMatchState,
   type InvoiceRowIngredientMatchState,
@@ -24,7 +25,13 @@ export function findInvoiceItemIngredientMatch(
   confirmedAliases: IngredientAliasMap = {},
   supplierName?: string | null,
 ): IngredientCanonicalMatch | null {
-  return findCanonicalIngredientMatch(itemName, ingredientCatalog, confirmedAliases, supplierName);
+  const operationalName = normalizeSupplierShorthand(itemName);
+  return findCanonicalIngredientMatch(
+    operationalName,
+    ingredientCatalog,
+    confirmedAliases,
+    supplierName,
+  );
 }
 
 /**
