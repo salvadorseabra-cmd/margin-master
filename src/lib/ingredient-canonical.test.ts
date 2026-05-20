@@ -371,7 +371,7 @@ describe("findCanonicalIngredientMatch (weighted semantic)", () => {
       aliases,
     );
 
-    expect(match?.kind).toBe("exact");
+    expect(match?.kind).toBe("confirmed-alias");
     expect(match?.ingredient.id).toBe("mayo-1");
   });
 });

@@ -66,11 +66,27 @@ import {
   mergeIngredientPriceFields,
   type InvoiceOperationalMetadata,
 } from "@/lib/invoice-operational-metadata";
+import { loadConfirmedIngredientAliasMap } from "@/lib/ingredient-alias-memory";
 import {
-  loadConfirmedIngredientAliasMap,
-  rememberAliasInMap,
-  upsertConfirmedAlias,
-} from "@/lib/ingredient-alias-memory";
+  applyManualIngredientCorrection,
+  persistManualIngredientCorrection,
+  rejectIngredientMatchPair,
+  rejectIngredientMatchSuggestion,
+  resolveIngredientCorrectionUiState,
+} from "@/lib/ingredient-correction-memory";
+import {
+  ensureRejectedIngredientMatchesHydrated,
+  hydrateRejectedIngredientMatchesFromStorage,
+} from "@/lib/ingredient-rejected-match-memory";
+import { hydrateIngredientMatchOverridesFromAliasRows } from "@/lib/ingredient-match-override";
+import { hydrateOperationalAliasMemoryFromConfirmedMap } from "@/lib/ingredient-operational-alias-memory";
+import { IngredientCorrectionActions } from "@/components/invoice-ingredient-correction";
+import { buildIngredientPickerOptionsForInvoice } from "@/lib/ingredient-picker-options";
+import {
+  isIngredientPickerTraceEnabled,
+  traceIngredientPickerCatalogStage,
+  traceIngredientPickerOptionsStage,
+} from "@/lib/ingredient-picker-trace";
 import {
   autoPersistUnmatchedInvoiceItems,
   buildIngredientInsertPayload,
@@ -833,6 +849,9 @@ const getPriceDeltaDetails = (
 
 function InvoicesPage() {
   const { user, loading: authLoading } = useAuth();
+  if (user?.id) {
+    ensureRejectedIngredientMatchesHydrated(user.id);
+  }
   const inputRef = useRef<HTMLInputElement>(null);
   const [drop, setDrop] = useState(false);
   const [pending, setPending] = useState<Pending[]>([]);
@@ -901,6 +920,7 @@ function InvoicesPage() {
       invoiceIdentitiesRef.current = {};
       setInvoiceIdentities({});
     }
+    ensureRejectedIngredientMatchesHydrated(user.id);
   }, [user]);
 
   const load = useCallback(async () => {
@@ -945,10 +965,35 @@ function InvoicesPage() {
 
       if (loadSeq !== invoiceLoadSeqRef.current) return;
       setIngredientCatalog(catalog);
+      if (isIngredientPickerTraceEnabled()) {
+        traceIngredientPickerCatalogStage("01_catalog_fetch_merged", catalog, {
+          source: "supabase.ingredients + mergeIngredientPriceFields",
+          rowCountFromDb: catalogBase.length,
+        });
+      }
       setInvoiceOperationalMetadata(operationalMetadata);
 
+      const { data: aliasRows } = await supabase
+        .from("ingredient_aliases")
+        .select("ingredient_id, alias_name, normalized_alias, supplier_name")
+        .eq("confirmed_by_user", true);
+      if (aliasRows?.length) {
+        hydrateIngredientMatchOverridesFromAliasRows(
+          aliasRows as {
+            ingredient_id: string;
+            alias_name: string;
+            normalized_alias: string;
+            supplier_name: string | null;
+          }[],
+          catalog,
+        );
+      }
       const dbAliases = await loadConfirmedIngredientAliasMap(supabase);
-      setConfirmedIngredientAliases((current) => ({ ...current, ...dbAliases }));
+      setConfirmedIngredientAliases((current) => {
+        const merged = { ...current, ...dbAliases };
+        hydrateOperationalAliasMemoryFromConfirmedMap(merged, catalog);
+        return merged;
+      });
 
       if (ids.length > 0) {
         const { data: itemRows, error: itemError } = await supabase
@@ -1456,43 +1501,72 @@ function InvoicesPage() {
     });
   };
 
+  const persistIngredientCorrectionForItem = async (
+    item: ItemRow,
+    ingredientId: string,
+    ingredientName: string,
+    supplierName?: string | null,
+  ) => {
+    if (!user) return;
+
+    const applied = applyManualIngredientCorrection(
+      { itemName: item.name, ingredientId, ingredientName, supplierName },
+      confirmedIngredientAliases,
+    );
+    if (!applied) return;
+
+    setConfirmedIngredientAliases(applied.nextConfirmedAliases);
+
+    const { error } = await persistManualIngredientCorrection({
+      itemName: item.name,
+      ingredientId,
+      ingredientName,
+      supplierName,
+      confirmedAliases: applied.nextConfirmedAliases,
+      supabase,
+    });
+
+    if (error) {
+      setGlobalError(error.message || "Could not save ingredient alias");
+      return;
+    }
+    hydrateOperationalAliasMemoryFromConfirmedMap(applied.nextConfirmedAliases, ingredientCatalog);
+    try {
+      window.localStorage.setItem(
+        `marginly:invoice-ingredient-aliases:${user.id}`,
+        JSON.stringify(applied.nextConfirmedAliases),
+      );
+    } catch {
+      // Local alias memory is an operational convenience; matching still works without it.
+    }
+  };
+
   const confirmIngredientMatch = (
     item: ItemRow,
     match: IngredientCanonicalMatch,
     supplierName?: string | null,
   ) => {
-    if (!user) return;
-    const normalizedItemName = normalizeInvoiceIngredientName(item.name);
-    if (!normalizedItemName) return;
-
-    setConfirmedIngredientAliases((current) => {
-      const next = rememberAliasInMap(
-        current,
-        normalizedItemName,
-        match.ingredient.id,
-        supplierName,
-      );
-      try {
-        window.localStorage.setItem(
-          `marginly:invoice-ingredient-aliases:${user.id}`,
-          JSON.stringify(next),
-        );
-      } catch {
-        // Local alias memory is an operational convenience; matching still works without it.
-      }
-      return next;
-    });
-
-    void upsertConfirmedAlias({
-      ingredientId: match.ingredient.id,
-      aliasName: item.name,
+    persistIngredientCorrectionForItem(
+      item,
+      match.ingredient.id,
+      match.ingredient.name ?? match.ingredient.normalized_name ?? "",
       supplierName,
-      supabase,
-    }).then(({ error }) => {
-      if (error) {
-        setGlobalError(error.message || "Could not save ingredient alias");
-      }
-    });
+    );
+  };
+
+  const selectIngredientForItem = (
+    item: ItemRow,
+    ingredientId: string,
+    supplierName?: string | null,
+  ) => {
+    const ingredient = ingredientCatalog.find((row) => row.id === ingredientId);
+    if (!ingredient) return;
+    persistIngredientCorrectionForItem(
+      item,
+      ingredientId,
+      ingredient.name ?? ingredient.normalized_name ?? "",
+      supplierName,
+    );
   };
 
   const createIngredientFromItem = async (item: ItemRow) => {
@@ -1894,12 +1968,16 @@ function InvoicesPage() {
                             allInvoiceSupplierNames={rows.map((row) => row.supplier_name)}
                             confirmedIngredientAliases={confirmedIngredientAliases}
                             supplierName={r.supplier_name}
+                            userId={user?.id}
                             loading={itemsByInvoice[r.id] === undefined}
                             extracting={!!extracting[r.id]}
                             onExtract={isImage ? () => reExtract(r) : undefined}
                             onCreateIngredient={createIngredientFromItem}
                             onConfirmIngredientMatch={(item, match) =>
                               confirmIngredientMatch(item, match, r.supplier_name)
+                            }
+                            onSelectIngredientForItem={(item, ingredientId) =>
+                              selectIngredientForItem(item, ingredientId, r.supplier_name)
                             }
                             creatingIngredientByItem={creatingIngredientByItem}
                             ingredientCreationErrors={ingredientCreationErrors}
@@ -2226,6 +2304,7 @@ function ItemsTable({
   allInvoiceSupplierNames,
   confirmedIngredientAliases,
   supplierName,
+  userId,
   creatingIngredientByItem,
   ingredientCreationErrors,
   loading,
@@ -2233,6 +2312,7 @@ function ItemsTable({
   onExtract,
   onCreateIngredient,
   onConfirmIngredientMatch,
+  onSelectIngredientForItem,
 }: {
   items: ItemRow[];
   priceComparisons: PriceComparisonMap;
@@ -2241,6 +2321,7 @@ function ItemsTable({
   allInvoiceSupplierNames: string[];
   confirmedIngredientAliases: IngredientAliasMap;
   supplierName?: string | null;
+  userId?: string;
   creatingIngredientByItem: IngredientCreationState;
   ingredientCreationErrors: IngredientCreationErrors;
   loading: boolean;
@@ -2248,7 +2329,21 @@ function ItemsTable({
   onExtract?: () => void;
   onCreateIngredient: (item: ItemRow) => void;
   onConfirmIngredientMatch: (item: ItemRow, match: IngredientCanonicalMatch) => void;
+  onSelectIngredientForItem: (item: ItemRow, ingredientId: string) => void;
 }) {
+  const [rejectedMatchItemIds, setRejectedMatchItemIds] = useState<Set<string>>(() => new Set());
+  const ingredientPickerOptions = useMemo(() => {
+    const built = buildIngredientPickerOptionsForInvoice(
+      ingredientCatalog,
+      confirmedIngredientAliases,
+    );
+    traceIngredientPickerOptionsStage("05b_invoice_table_picker_options", built, {
+      component: "ItemsTable",
+      catalogLength: ingredientCatalog.length,
+      confirmedAliasCount: Object.keys(confirmedIngredientAliases).length,
+    });
+    return built;
+  }, [ingredientCatalog, confirmedIngredientAliases]);
   const knownSupplierNames = buildKnownSupplierNames(
     allInvoiceSupplierNames,
     normalizeSupplierDisplayName(supplierName).toLocaleLowerCase() || null,
@@ -2485,12 +2580,22 @@ function ItemsTable({
                     missingStockPresentation: !stockPresentation,
                   });
                 }
+                const correctionUi = resolveIngredientCorrectionUiState(
+                  renderItem.id,
+                  ingredientMatchState,
+                  rejectedMatchItemIds,
+                );
                 const showMatchedBadge =
                   confirmedIngredientMatch &&
+                  !correctionUi.suppressMatchPresentation &&
                   !extractionReview &&
                   !quantityReview &&
                   !amountReview &&
                   !delta;
+                const showSuggestedMatch =
+                  possibleIngredientMatch &&
+                  suggestedMatchBadgeLabel &&
+                  !correctionUi.suppressMatchPresentation;
                 const matchContext = {
                   confirmedAliases: confirmedIngredientAliases,
                   supplierName,
@@ -2532,7 +2637,10 @@ function ItemsTable({
                     <td className="py-2.5 px-4">
                       <div className="space-y-1">
                         <div className="font-medium leading-tight">{renderItem.name}</div>
-                        {showMatchTargetLine && matchTargetLabel && ingredientMatch && (
+                        {showMatchTargetLine &&
+                          !correctionUi.suppressMatchPresentation &&
+                          matchTargetLabel &&
+                          ingredientMatch && (
                           <IngredientMatchTargetLine
                             label={matchTargetLabel}
                             ingredientId={ingredientMatch.ingredient.id}
@@ -2551,10 +2659,10 @@ function ItemsTable({
                               title={operationalSummary.badgeTitle}
                             />
                           )}
-                          {possibleIngredientMatch && suggestedMatchBadgeLabel ? (
+                          {showSuggestedMatch ? (
                             <>
                               <OperationalBadge
-                                label={suggestedMatchBadgeLabel}
+                                label={suggestedMatchBadgeLabel!}
                                 tone="review"
                                 title={
                                   matchExplanation
@@ -2563,47 +2671,12 @@ function ItemsTable({
                                 }
                               />
                               <IngredientMatchInsight reasoning={matchExplanation} expandable />
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  onConfirmIngredientMatch(renderItem, possibleIngredientMatch)
-                                }
-                                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground transition hover:bg-muted/70 hover:text-foreground"
-                              >
-                                Confirm ingredient match
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => onCreateIngredient(renderItem)}
-                                disabled={creatingIngredient || !canCreateIngredient}
-                                title={
-                                  canCreateIngredient
-                                    ? "Create a separate ingredient from this extracted row"
-                                    : "Confirm the extracted name before creating an ingredient"
-                                }
-                                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground transition hover:bg-muted/70 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                              >
-                                {creatingIngredient && <Loader2 className="h-3 w-3 animate-spin" />}
-                                Create new ingredient
-                              </button>
                             </>
-                          ) : unmatchedIngredient ? (
+                          ) : unmatchedIngredient || correctionUi.suppressMatchPresentation ? (
                             <>
-                              <OperationalBadge label="not in ingredient list" />
-                              <button
-                                type="button"
-                                onClick={() => onCreateIngredient(renderItem)}
-                                disabled={creatingIngredient || !canCreateIngredient}
-                                title={
-                                  canCreateIngredient
-                                    ? "Create ingredient from this extracted row"
-                                    : "Confirm the extracted name before creating an ingredient"
-                                }
-                                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground transition hover:bg-muted/70 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                              >
-                                {creatingIngredient && <Loader2 className="h-3 w-3 animate-spin" />}
-                                Create new ingredient
-                              </button>
+                              {!correctionUi.suppressMatchPresentation && (
+                                <OperationalBadge label="not in ingredient list" />
+                              )}
                             </>
                           ) : showMatchedBadge ? (
                             <>
@@ -2631,6 +2704,72 @@ function ItemsTable({
                             <OperationalSignalBadge key={signal.kind} signal={signal} />
                           ))}
                         </div>
+                        {(correctionUi.showConfirm ||
+                          correctionUi.showWrongMatch ||
+                          correctionUi.showPicker ||
+                          unmatchedIngredient ||
+                          showSuggestedMatch) && (
+                          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                            <IngredientCorrectionActions
+                              showConfirm={correctionUi.showConfirm}
+                              showWrongMatch={correctionUi.showWrongMatch}
+                              showPicker={correctionUi.showPicker}
+                              pickerLabel={
+                                correctionUi.suppressMatchPresentation
+                                  ? "Choose ingredient"
+                                  : "Find ingredient"
+                              }
+                              ingredients={ingredientPickerOptions}
+                              onConfirm={
+                                correctionUi.showConfirm && possibleIngredientMatch
+                                  ? () =>
+                                      onConfirmIngredientMatch(renderItem, possibleIngredientMatch)
+                                  : undefined
+                              }
+                              onWrongMatch={() => {
+                                const rejectedIngredientId =
+                                  ingredientMatch?.ingredient.id ??
+                                  possibleIngredientMatch?.ingredient.id;
+                                if (rejectedIngredientId) {
+                                  rejectIngredientMatchPair({
+                                    itemName: renderItem.name,
+                                    rawItemName: rawName,
+                                    rejectedIngredientId,
+                                    supplierName,
+                                    userId,
+                                  });
+                                }
+                                setRejectedMatchItemIds((current) =>
+                                  rejectIngredientMatchSuggestion(current, renderItem.id),
+                                );
+                              }}
+                              onSelectIngredient={(ingredientId) => {
+                                setRejectedMatchItemIds((current) => {
+                                  const next = new Set(current);
+                                  next.delete(renderItem.id);
+                                  return next;
+                                });
+                                onSelectIngredientForItem(renderItem, ingredientId);
+                              }}
+                            />
+                            {(unmatchedIngredient || correctionUi.suppressMatchPresentation) && (
+                              <button
+                                type="button"
+                                onClick={() => onCreateIngredient(renderItem)}
+                                disabled={creatingIngredient || !canCreateIngredient}
+                                title={
+                                  canCreateIngredient
+                                    ? "Create ingredient from this extracted row"
+                                    : "Confirm the extracted name before creating an ingredient"
+                                }
+                                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground transition hover:bg-muted/70 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                {creatingIngredient && <Loader2 className="h-3 w-3 animate-spin" />}
+                                Create new ingredient
+                              </button>
+                            )}
+                          </div>
+                        )}
                         {creationError && (
                           <div className="text-[11px] text-destructive">{creationError}</div>
                         )}

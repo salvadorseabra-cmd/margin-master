@@ -13,11 +13,10 @@ import { shouldSkipByOperationalProductFamilyGate } from "@/lib/ingredient-opera
 const DIACRITIC_RE = /\p{M}/gu;
 const GRID_CUT_PLACEHOLDER = "__grid9x9__";
 
-const ATTACHED_WEIGHT_RE =
-  /\b\d+(?:[.,]\d+)?(?:kg|kgs|g|gr|grs|mg|ml|cl|l|lt|lts|ltr|ltrs)\b/gi;
+const ATTACHED_WEIGHT_RE = /\b\d+(?:[.,]\d+)?(?:kg|kgs|g|gr|grs|mg|ml|cl|l|lt|lts|ltr|ltrs)\b/gi;
 const STANDALONE_WEIGHT_RE = /\b(\d{2,3})\b/g;
 
-export type OperationalAliasSource = "static" | "session" | "confirmed";
+export type OperationalAliasSource = "static" | "session" | "confirmed" | "manual_confirmation";
 
 export type OperationalAliasEntry = {
   ingredientId: string;

@@ -1,4 +1,5 @@
 import type { IngredientAliasMap } from "@/lib/ingredient-canonical";
+import { buildOverrideKeysFromInvoiceLine } from "@/lib/ingredient-match-override";
 import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
 
 const LOG_PREFIX = "[ingredient_aliases]";
@@ -30,7 +31,34 @@ export function lookupIngredientIdFromAliasMap(
   aliases: IngredientAliasMap,
   normalizedItemName: string,
   supplierName?: string | null,
+  rawItemName?: string | null,
 ): string | undefined {
+  const operationalCandidates = new Set<string>();
+  for (const name of [rawItemName, normalizedItemName]) {
+    if (!name?.trim()) continue;
+    const keys = buildOverrideKeysFromInvoiceLine(name, supplierName);
+    if (!keys) continue;
+    operationalCandidates.add(keys.lookupKey);
+    operationalCandidates.add(keys.rawNormalized);
+    const globalKeys = buildOverrideKeysFromInvoiceLine(name, null);
+    if (globalKeys) {
+      operationalCandidates.add(globalKeys.lookupKey);
+      operationalCandidates.add(globalKeys.rawNormalized);
+    }
+  }
+
+  for (const key of operationalCandidates) {
+    const hit = aliases[key];
+    if (hit) {
+      debugAliasLog("alias lookup hit (operational key)", {
+        normalizedItemName,
+        key,
+        ingredientId: hit,
+      });
+      return hit;
+    }
+  }
+
   const supplierKey = buildIngredientAliasLookupKey(normalizedItemName, supplierName);
   const supplierHit = aliases[supplierKey];
   if (supplierHit) {

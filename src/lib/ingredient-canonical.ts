@@ -102,6 +102,7 @@ export function canonicalWeakSubstringMatch(a: string, b: string): boolean {
 }
 
 export type IngredientCanonicalMatchKind =
+  | "confirmed-override"
   | "confirmed-alias"
   | "exact"
   | "operational-memory"
@@ -171,7 +172,9 @@ export {
 
 export { OPERATIONAL_EQUIVALENT_MIN_SCORE } from "@/lib/ingredient-identity";
 export type { MatchScoreBreakdown, MatchScoreRejectionReason } from "@/lib/ingredient-identity";
+import { lookupIngredientMatchOverride } from "@/lib/ingredient-match-override";
 import { resolveOperationalAliasCatalogMatch } from "@/lib/ingredient-operational-alias-memory";
+import { isIngredientMatchPairRejected } from "@/lib/ingredient-rejected-match-memory";
 import { normalizeInvoiceMatchIngredientName } from "@/lib/normalize-ingredient-name";
 
 const WEIGHT_TOKEN_RE = /\b\d+(?:[.,]\d+)?\s*(?:kg|kgs|g|gr|grs)\.?\b/gi;
@@ -848,11 +851,21 @@ type OperationalMemoryHit = {
  * Deterministic operational memory: exact raw catalog wording, then exact normalized key.
  * Runs before alias memory and semantic scoring.
  */
+function isRejectedIngredientCandidate(
+  itemName: string,
+  ingredientId: string,
+  supplierName: string | null | undefined,
+  rawItemNames: string[],
+): boolean {
+  return isIngredientMatchPairRejected(itemName, ingredientId, supplierName, rawItemNames);
+}
+
 function findOperationalMemoryMatch(
   itemName: string,
   normalizedItemName: string,
   ingredients: IngredientCanonicalInput[],
   rawItemNames: string[],
+  supplierName?: string | null,
 ): OperationalMemoryHit | null {
   const rawKeys = new Set(
     rawItemNames.map(operationalRawCompareKey).filter((key) => key.length > 0),
@@ -877,6 +890,9 @@ function findOperationalMemoryMatch(
     ) {
       continue;
     }
+    if (isRejectedIngredientCandidate(itemName, ingredient.id, supplierName, rawItemNames)) {
+      continue;
+    }
 
     return {
       ingredient,
@@ -898,6 +914,9 @@ function findOperationalMemoryMatch(
       inferCoarseIngredientFamily(ingredientRaw) === "fried_potato";
     if (sharesGridCut) {
       if (!hasCompatibleIngredientFormFamilies(itemName, ingredientRaw)) continue;
+      if (isRejectedIngredientCandidate(itemName, ingredient.id, supplierName, rawItemNames)) {
+        continue;
+      }
       return {
         ingredient,
         normalizedIngredientName,
@@ -918,6 +937,9 @@ function findOperationalMemoryMatch(
     ) {
       continue;
     }
+    if (isRejectedIngredientCandidate(itemName, ingredient.id, supplierName, rawItemNames)) {
+      continue;
+    }
 
     return {
       ingredient,
@@ -932,12 +954,14 @@ function findOperationalMemoryMatch(
 
 /**
  * Canonical ingredient match pipeline (deterministic order):
- * 1. Exact operational memory — catalog raw/normalized wording
- * 2. Supplier shorthand normalization — {@link normalizeSupplierShorthand} in invoice propagation
- * 3. Operational alias memory — recurring Horeca shorthand (in-memory / confirmed bridge)
- * 4. Confirmed DB aliases — {@link IngredientAliasMap}
+ * 1. User-confirmed override — {@link lookupIngredientMatchOverride}
+ * 2. Operational alias memory — recurring Horeca shorthand (in-memory / confirmed bridge)
+ * 3. Confirmed DB aliases — {@link IngredientAliasMap}
+ * 4. Exact operational memory — catalog raw/normalized wording
  * 5. Family-aware deterministic scoring — families, weight, token families in candidate loop
  * 6. Semantic similarity fallback
+ *
+ * Supplier shorthand runs in {@link findInvoiceItemIngredientMatch} before this function.
  */
 export function findCanonicalIngredientMatch(
   itemName: string,
@@ -952,20 +976,29 @@ export function findCanonicalIngredientMatch(
   const rawLookupNames = [options?.rawItemName, itemName].filter(
     (name): name is string => Boolean(name?.trim()),
   );
-  const operationalMemory = findOperationalMemoryMatch(
-    itemName,
-    normalizedItemName,
-    ingredients,
-    rawLookupNames,
-  );
-  if (operationalMemory) {
-    return withSyntheticTargetFlag({
-      ingredient: operationalMemory.ingredient,
-      normalizedItemName,
-      normalizedIngredientName: operationalMemory.normalizedIngredientName,
-      kind: operationalMemory.kind,
-      reason: operationalMemory.reason,
-    });
+
+  const overrideHit = lookupIngredientMatchOverride(itemName, supplierName, rawLookupNames);
+  if (overrideHit) {
+    const ingredient = ingredients.find(
+      (candidate) => candidate.id === overrideHit.canonicalIngredientId,
+    );
+    if (
+      ingredient &&
+      !isRejectedIngredientCandidate(
+        itemName,
+        ingredient.id,
+        supplierName,
+        rawLookupNames,
+      )
+    ) {
+      return withSyntheticTargetFlag({
+        ingredient,
+        normalizedItemName,
+        normalizedIngredientName: normalizedIngredientCandidateName(ingredient),
+        kind: "confirmed-override",
+        reason: "user-confirmed invoice wording",
+      });
+    }
   }
 
   const operationalAliasHit = resolveOperationalAliasCatalogMatch(
@@ -978,7 +1011,10 @@ export function findCanonicalIngredientMatch(
     const ingredient = ingredients.find(
       (candidate) => candidate.id === operationalAliasHit.entry.ingredientId,
     );
-    if (ingredient) {
+    if (
+      ingredient &&
+      !isRejectedIngredientCandidate(itemName, ingredient.id, supplierName, rawLookupNames)
+    ) {
       return withSyntheticTargetFlag({
         ingredient,
         normalizedItemName,
@@ -993,10 +1029,14 @@ export function findCanonicalIngredientMatch(
     confirmedAliases,
     normalizedItemName,
     supplierName,
+    options?.rawItemName ?? itemName,
   );
   if (aliasIngredientId) {
     const ingredient = ingredients.find((candidate) => candidate.id === aliasIngredientId);
-    if (ingredient) {
+    if (
+      ingredient &&
+      !isRejectedIngredientCandidate(itemName, ingredient.id, supplierName, rawLookupNames)
+    ) {
       if (import.meta.env.DEV) {
         console.debug("[ingredient_aliases] auto-matched from alias memory", {
           itemName,
@@ -1015,6 +1055,23 @@ export function findCanonicalIngredientMatch(
     }
   }
 
+  const operationalMemory = findOperationalMemoryMatch(
+    itemName,
+    normalizedItemName,
+    ingredients,
+    rawLookupNames,
+    supplierName,
+  );
+  if (operationalMemory) {
+    return withSyntheticTargetFlag({
+      ingredient: operationalMemory.ingredient,
+      normalizedItemName,
+      normalizedIngredientName: operationalMemory.normalizedIngredientName,
+      kind: operationalMemory.kind,
+      reason: operationalMemory.reason,
+    });
+  }
+
   let best: IngredientCanonicalMatch | null = null;
   let bestScore = 0;
   let bestCandidateScore = 0;
@@ -1028,6 +1085,9 @@ export function findCanonicalIngredientMatch(
   for (const ingredient of ingredients) {
     const normalizedIngredientName = normalizedIngredientCandidateName(ingredient);
     if (!normalizedIngredientName) continue;
+    if (isRejectedIngredientCandidate(itemName, ingredient.id, supplierName, rawLookupNames)) {
+      continue;
+    }
     const ingredientRaw = ingredient.name ?? ingredient.normalized_name ?? "";
     if (shouldSkipByOperationalProductFamilyGate(itemName, ingredientRaw)) {
       continue;

@@ -2,6 +2,7 @@ import type { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
 import { buildIngredientAliasLookupKey, rememberAliasInMap } from "@/lib/ingredient-alias-lookup";
 import type { IngredientAliasMap } from "@/lib/ingredient-canonical";
 import { normalizeInvoiceIngredientName } from "@/lib/ingredient-canonical";
+import { buildOverrideKeysFromInvoiceLine } from "@/lib/ingredient-match-override";
 import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -27,8 +28,12 @@ function debugAliasLog(message: string, details?: Record<string, unknown>): void
 export type UpsertConfirmedAliasParams = {
   ingredientId: string;
   aliasName: string;
+  /** When set (e.g. manual correction), persisted normalized_alias uses this operational key. */
+  normalizedAlias?: string;
   supplierName?: string | null;
   supabase: AppSupabaseClient;
+  /** User explicitly confirmed or manually selected — store max confidence in DB. */
+  manualConfirmation?: boolean;
 };
 
 function logSupabaseError(label: string, error: PostgrestError | null | undefined): void {
@@ -71,8 +76,10 @@ function existingAliasQuery(
 export async function upsertConfirmedAlias({
   ingredientId,
   aliasName,
+  normalizedAlias: normalizedAliasOverride,
   supplierName,
   supabase,
+  manualConfirmation = false,
 }: UpsertConfirmedAliasParams): Promise<{ error: PostgrestError | null }> {
   const alias = aliasName.trim();
   if (!alias) {
@@ -81,7 +88,7 @@ export async function upsertConfirmedAlias({
     };
   }
 
-  const normalizedAlias = normalizeInvoiceIngredientName(alias);
+  const normalizedAlias = (normalizedAliasOverride?.trim() || normalizeInvoiceIngredientName(alias));
   if (!normalizedAlias) {
     return {
       error: {
@@ -107,10 +114,9 @@ export async function upsertConfirmedAlias({
 
   if (existing) {
     const currentConfidence = Number(existing.confidence);
-    const nextConfidence = Math.min(
-      CONFIDENCE_CAP,
-      (Number.isFinite(currentConfidence) ? currentConfidence : 0) + 1,
-    );
+    const nextConfidence = manualConfirmation
+      ? CONFIDENCE_CAP
+      : Math.min(CONFIDENCE_CAP, (Number.isFinite(currentConfidence) ? currentConfidence : 0) + 1);
     const { error: updateError } = await supabase
       .from("ingredient_aliases")
       .update({
@@ -138,7 +144,7 @@ export async function upsertConfirmedAlias({
     alias_name: alias,
     normalized_alias: normalizedAlias,
     supplier_name: supplier,
-    confidence: 1,
+    confidence: manualConfirmation ? CONFIDENCE_CAP : 1,
     confirmed_by_user: true,
   });
 
@@ -164,7 +170,7 @@ export async function loadConfirmedIngredientAliasMap(
   try {
     const { data, error } = await client
       .from("ingredient_aliases")
-      .select("ingredient_id, normalized_alias, supplier_name")
+      .select("ingredient_id, alias_name, normalized_alias, supplier_name")
       .eq("confirmed_by_user", true);
 
     if (error) {
@@ -175,13 +181,24 @@ export async function loadConfirmedIngredientAliasMap(
     const map: IngredientAliasMap = {};
     for (const row of (data ?? []) as {
       ingredient_id: string;
+      alias_name: string;
       normalized_alias: string;
       supplier_name: string | null;
     }[]) {
-      const normalizedAlias = row.normalized_alias?.trim().toLowerCase();
+      const fromLine = row.alias_name?.trim()
+        ? buildOverrideKeysFromInvoiceLine(row.alias_name, row.supplier_name)
+        : null;
+      const normalizedAlias = (
+        fromLine?.rawNormalized ?? row.normalized_alias?.trim().toLowerCase()
+      );
       if (!normalizedAlias) continue;
-      const key = buildIngredientAliasLookupKey(normalizedAlias, row.supplier_name);
-      map[key] = row.ingredient_id;
+      map[buildIngredientAliasLookupKey(normalizedAlias, row.supplier_name)] = row.ingredient_id;
+      const legacyInvoiceNorm = row.alias_name?.trim()
+        ? normalizeInvoiceIngredientName(row.alias_name)
+        : "";
+      if (legacyInvoiceNorm && legacyInvoiceNorm !== normalizedAlias) {
+        map[buildIngredientAliasLookupKey(legacyInvoiceNorm, row.supplier_name)] = row.ingredient_id;
+      }
     }
     debugAliasLog("loaded confirmed aliases", { count: Object.keys(map).length });
     return map;

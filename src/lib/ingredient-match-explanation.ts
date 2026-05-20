@@ -27,6 +27,7 @@ export function isConfirmedIngredientMatch(
 ): boolean {
   return (
     match?.kind === "exact" ||
+    match?.kind === "confirmed-override" ||
     match?.kind === "confirmed-alias" ||
     match?.kind === "operational-memory" ||
     match?.kind === "operational-alias"
@@ -161,8 +162,11 @@ export function buildMatchExplanation(
   match: IngredientCanonicalMatch,
   context: MatchExplanationContext = {},
 ): MatchReasoning {
-  if (match.kind === "confirmed-alias") {
-    const scope = resolveConfirmedAliasScope(match, context.confirmedAliases, context.supplierName);
+  if (match.kind === "confirmed-override" || match.kind === "confirmed-alias") {
+    const scope =
+      match.kind === "confirmed-alias"
+        ? resolveConfirmedAliasScope(match, context.confirmedAliases, context.supplierName)
+        : null;
     if (scope === "supplier") {
       return {
         headline: "Matched by supplier history",
@@ -175,7 +179,10 @@ export function buildMatchExplanation(
     }
     return {
       headline: "Matched from previous confirmed purchase",
-      detail: "Matched automatically from alias memory for this product wording.",
+      detail:
+        match.kind === "confirmed-override"
+          ? "Matched automatically from your confirmed correction for this invoice wording."
+          : "Matched automatically from alias memory for this product wording.",
       confidence: "high",
       confidenceLabel: "High confidence",
       caveats: [],
@@ -287,7 +294,7 @@ export function matchTargetLabelPrefix(
   kind: IngredientCanonicalMatchKind,
   aliasScope: "supplier" | "global" | null,
 ): string {
-  if (kind === "confirmed-alias") {
+  if (kind === "confirmed-override" || kind === "confirmed-alias") {
     return aliasScope === "supplier" ? "Using existing ingredient:" : "Alias of:";
   }
   return "Matched to:";
