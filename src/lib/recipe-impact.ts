@@ -4,6 +4,7 @@ import { effectiveIngredientUnitCostEur, purchaseQuantityDenom } from "@/lib/ing
 import { loadRecipeLinesByRecipeMapForClosure } from "./recipe-impact-engine";
 import { recipeTotalCostEurForRecipe, recipeTotalCostWithIngredientUnitOverrides } from "./recipe-merge";
 import { traceFoodCostRecalculationSource } from "./recipe-canonical-graph-trace";
+import { traceRecipeLineFoodCostSource } from "./recipe-canonical-integrity";
 
 type AppSupabaseClient = SupabaseClient<Database>;
 
@@ -237,6 +238,14 @@ export async function computeRecipeCost(
   const outLines: RecipeCostLine[] = [];
   for (const line of topLines) {
     if (!line.ingredient_id) continue;
+    traceRecipeLineFoodCostSource({
+      surface: "recipe-impact.computeRecipeCost",
+      recipeId,
+      lineId: line.id,
+      ingredientId: line.ingredient_id,
+      source: "ingredients_join",
+      inCanonicalCatalog: undefined,
+    });
     const qty = Number(line.quantity);
     const safeQty = Number.isFinite(qty) ? qty : 0;
     const unit = priceById.get(line.ingredient_id) ?? 0;
@@ -413,6 +422,13 @@ export async function computeMarginDelta(
   const lines: RecipeMarginDeltaLine[] = [];
   for (const line of topLines) {
     if (!line.ingredient_id) continue;
+    traceRecipeLineFoodCostSource({
+      surface: "recipe-impact.computeMarginDelta",
+      recipeId: recipe.id,
+      lineId: line.id,
+      ingredientId: line.ingredient_id,
+      source: "ingredients_join",
+    });
     const meta = metaById.get(line.ingredient_id);
     if (!meta) continue;
     const qty = Number(line.quantity);
@@ -731,6 +747,13 @@ export async function computeRecipeMarginImpactsForRecipeIds(
 
     for (const line of linesForRecipe) {
       if (!line.ingredient_id) continue;
+      traceRecipeLineFoodCostSource({
+        surface: "recipe-impact.computeRecipeMarginImpactsForRecipeIds",
+        recipeId: recipe.id,
+        lineId: line.id,
+        ingredientId: line.ingredient_id,
+        source: "ingredients_join",
+      });
       const meta = priceById.get(line.ingredient_id);
       if (!meta) continue;
       const qty = Number(line.quantity);

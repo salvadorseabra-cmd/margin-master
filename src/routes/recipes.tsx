@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
-import { Download, Loader2, Plus, Trash2, TrendingUp, TrendingDown, X } from "lucide-react";
+import { ClipboardList, Download, Loader2, Plus, Trash2, TrendingUp, TrendingDown, X } from "lucide-react";
 
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
@@ -17,9 +17,13 @@ import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
 import { loadCanonicalIngredientCatalog } from "@/lib/ingredient-catalog-load";
 import {
+  canonicalCatalogIdSet,
   logPickerAliasLeaksIfAny,
   logRecipeCanonicalIntegrityOnLoad,
   logRecipeCanonicalIntegrityOnSave,
+  recipeLineFoodCostSourceKind,
+  resolveRecipeLineIngredientSource,
+  traceRecipeLineFoodCostSource,
 } from "@/lib/recipe-canonical-integrity";
 import { traceFoodCostRecalculationSource } from "@/lib/recipe-canonical-graph-trace";
 
@@ -129,6 +133,11 @@ function recipeToForm(recipe: RecipeRow): RecipeForm {
 }
 
 function RecipesPage() {
+  const isChildRoute = useRouterState({
+    select: (s) => s.location.pathname !== "/recipes",
+  });
+  if (isChildRoute) return <Outlet />;
+
   const { user } = useAuth();
 
   const [recipes, setRecipes] = useState<RecipeRow[]>([]);
@@ -255,6 +264,7 @@ function RecipesPage() {
 
       setRecipeCosts(costs);
 
+      const canonicalIds = canonicalCatalogIdSet(catalogRows);
       const recipeLines = loadedRecipes.flatMap((recipe) =>
         (recipe.recipe_ingredients ?? [])
           .filter((line) => line.ingredient_id)
@@ -263,8 +273,35 @@ function RecipesPage() {
             lineId: line.id,
             ingredientId: line.ingredient_id as string,
             ingredientName: line.ingredients?.name ?? null,
+            embed: line.ingredients
+              ? {
+                  name: line.ingredients.name,
+                  current_price: line.ingredients.current_price,
+                  purchase_quantity: line.ingredients.purchase_quantity,
+                }
+              : null,
           })),
       );
+
+      loadedRecipes.forEach((recipe) => {
+        (recipe.recipe_ingredients ?? []).forEach((line) => {
+          if (!line.ingredient_id) return;
+          const resolution = resolveRecipeLineIngredientSource(
+            line.ingredient_id,
+            recipe.recipe_ingredients,
+            pickerRows,
+          );
+          traceRecipeLineFoodCostSource({
+            surface: "recipes.load.listCost",
+            recipeId: recipe.id,
+            lineId: line.id,
+            ingredientId: line.ingredient_id,
+            source: recipeLineFoodCostSourceKind(line.ingredient_id, canonicalIds, resolution),
+            inCanonicalCatalog: canonicalIds.has(line.ingredient_id),
+          });
+        });
+      });
+
       logRecipeCanonicalIntegrityOnLoad({
         recipes: loadedRecipes.map((r) => ({ id: r.id, name: r.name })),
         recipeLines,
@@ -460,7 +497,12 @@ function RecipesPage() {
     });
   };
 
-  const recipeCostLines = getRecipeCostLines(recipeForm.lines, selectedRecipe, ingredientOptions);
+  const recipeCostLines = getRecipeCostLines(
+    recipeForm.lines,
+    selectedRecipe,
+    ingredientOptions,
+    canonicalCatalogIdSet(ingredientOptions),
+  );
   const recipeTotalCost = recipeCostLines.reduce((sum, line) => sum + line.lineCost, 0);
   const sellingPrice = Number(recipeForm.selling_price || 0);
   const grossProfit = sellingPrice - recipeTotalCost;
@@ -513,14 +555,24 @@ function RecipesPage() {
       title="Recipes"
       subtitle="Per-dish food cost, margin and contribution."
       action={
-        <button
-          type="button"
-          onClick={openNewRecipe}
-          className="inline-flex items-center gap-2 cursor-pointer bg-foreground text-background rounded-lg px-3.5 py-2 text-sm font-medium hover:opacity-90"
-        >
-          <Plus className="h-4 w-4" />
-          New recipe
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to="/recipes/migration-preview"
+            className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded-lg border border-border hover:bg-muted"
+            title="Preview only — sem migração automática"
+          >
+            <ClipboardList className="h-4 w-4" />
+            Pré-visualização migração
+          </Link>
+          <button
+            type="button"
+            onClick={openNewRecipe}
+            className="inline-flex items-center gap-2 cursor-pointer bg-foreground text-background rounded-lg px-3.5 py-2 text-sm font-medium hover:opacity-90"
+          >
+            <Plus className="h-4 w-4" />
+            New recipe
+          </button>
+        </div>
       }
     >
       <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -1024,6 +1076,7 @@ function getRecipeCostLines(
   lines: RecipeLineForm[],
   selectedRecipe: RecipeRow | null,
   ingredientOptions: IngredientOption[],
+  canonicalCatalogIds: Set<string>,
 ): RecipeCostLine[] {
   const costLines = lines.map((line) => {
     const ingredient = getIngredientForLine(
@@ -1031,6 +1084,18 @@ function getRecipeCostLines(
       selectedRecipe?.recipe_ingredients ?? null,
       ingredientOptions,
     );
+    const resolution = resolveRecipeLineIngredientSource(
+      line.ingredient_id,
+      selectedRecipe?.recipe_ingredients ?? null,
+      ingredientOptions,
+    );
+    traceRecipeLineFoodCostSource({
+      surface: "recipes.getRecipeCostLines",
+      recipeId: selectedRecipe?.id,
+      ingredientId: line.ingredient_id,
+      source: recipeLineFoodCostSourceKind(line.ingredient_id, canonicalCatalogIds, resolution),
+      inCanonicalCatalog: canonicalCatalogIds.has(line.ingredient_id),
+    });
 
     const unitCost = getUnitCost(
       Number(ingredient?.current_price ?? 0),

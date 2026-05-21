@@ -15,6 +15,7 @@ import { Route as InvoicesRouteImport } from './routes/invoices'
 import { Route as IngredientsRouteImport } from './routes/ingredients'
 import { Route as AlertsRouteImport } from './routes/alerts'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RecipesMigrationPreviewRouteImport } from './routes/recipes.migration-preview'
 import { Route as IngredientsReviewRouteImport } from './routes/ingredients.review'
 
 const RecipesRoute = RecipesRouteImport.update({
@@ -47,6 +48,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecipesMigrationPreviewRoute = RecipesMigrationPreviewRouteImport.update({
+  id: '/migration-preview',
+  path: '/migration-preview',
+  getParentRoute: () => RecipesRoute,
+} as any)
 const IngredientsReviewRoute = IngredientsReviewRouteImport.update({
   id: '/review',
   path: '/review',
@@ -59,8 +65,9 @@ export interface FileRoutesByFullPath {
   '/ingredients': typeof IngredientsRouteWithChildren
   '/invoices': typeof InvoicesRoute
   '/login': typeof LoginRoute
-  '/recipes': typeof RecipesRoute
+  '/recipes': typeof RecipesRouteWithChildren
   '/ingredients/review': typeof IngredientsReviewRoute
+  '/recipes/migration-preview': typeof RecipesMigrationPreviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -68,8 +75,9 @@ export interface FileRoutesByTo {
   '/ingredients': typeof IngredientsRouteWithChildren
   '/invoices': typeof InvoicesRoute
   '/login': typeof LoginRoute
-  '/recipes': typeof RecipesRoute
+  '/recipes': typeof RecipesRouteWithChildren
   '/ingredients/review': typeof IngredientsReviewRoute
+  '/recipes/migration-preview': typeof RecipesMigrationPreviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,8 +86,9 @@ export interface FileRoutesById {
   '/ingredients': typeof IngredientsRouteWithChildren
   '/invoices': typeof InvoicesRoute
   '/login': typeof LoginRoute
-  '/recipes': typeof RecipesRoute
+  '/recipes': typeof RecipesRouteWithChildren
   '/ingredients/review': typeof IngredientsReviewRoute
+  '/recipes/migration-preview': typeof RecipesMigrationPreviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/recipes'
     | '/ingredients/review'
+    | '/recipes/migration-preview'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/recipes'
     | '/ingredients/review'
+    | '/recipes/migration-preview'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/recipes'
     | '/ingredients/review'
+    | '/recipes/migration-preview'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,7 +129,7 @@ export interface RootRouteChildren {
   IngredientsRoute: typeof IngredientsRouteWithChildren
   InvoicesRoute: typeof InvoicesRoute
   LoginRoute: typeof LoginRoute
-  RecipesRoute: typeof RecipesRoute
+  RecipesRoute: typeof RecipesRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -164,6 +176,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recipes/migration-preview': {
+      id: '/recipes/migration-preview'
+      path: '/migration-preview'
+      fullPath: '/recipes/migration-preview'
+      preLoaderRoute: typeof RecipesMigrationPreviewRouteImport
+      parentRoute: typeof RecipesRoute
+    }
     '/ingredients/review': {
       id: '/ingredients/review'
       path: '/review'
@@ -186,13 +205,24 @@ const IngredientsRouteWithChildren = IngredientsRoute._addFileChildren(
   IngredientsRouteChildren,
 )
 
+interface RecipesRouteChildren {
+  RecipesMigrationPreviewRoute: typeof RecipesMigrationPreviewRoute
+}
+
+const RecipesRouteChildren: RecipesRouteChildren = {
+  RecipesMigrationPreviewRoute: RecipesMigrationPreviewRoute,
+}
+
+const RecipesRouteWithChildren =
+  RecipesRoute._addFileChildren(RecipesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AlertsRoute: AlertsRoute,
   IngredientsRoute: IngredientsRouteWithChildren,
   InvoicesRoute: InvoicesRoute,
   LoginRoute: LoginRoute,
-  RecipesRoute: RecipesRoute,
+  RecipesRoute: RecipesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

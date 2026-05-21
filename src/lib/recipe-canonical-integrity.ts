@@ -7,9 +7,13 @@ import {
 import { isSyntheticCatalogIngredientId } from "@/lib/ingredient-canonical-synthesis";
 import {
   traceFoodCostRecalculationSource,
+  traceLegacyRecipeEmbedDetected,
   traceRecipeAliasLeakDetected,
   traceRecipeCanonicalIntegrity,
+  traceRecipeFoodCostLegacySource,
+  traceRecipeMissingCanonicalFk,
   type FoodCostRecalculationTrigger,
+  type RecipeFoodCostSourceKind,
 } from "@/lib/recipe-canonical-graph-trace";
 
 export type RecipeIngredientRef = {
@@ -17,6 +21,39 @@ export type RecipeIngredientRef = {
   lineId?: string | null;
   ingredientId: string;
   ingredientName?: string | null;
+};
+
+export type RecipeEmbedSnapshot = {
+  name?: string | null;
+  current_price?: number | null;
+  purchase_quantity?: number | null;
+};
+
+export type RecipeLineWithEmbed = RecipeIngredientRef & {
+  embed?: RecipeEmbedSnapshot | null;
+};
+
+export type LegacyEmbedFoodCostFinding = RecipeLineWithEmbed & {
+  foodCostSource: "embed_snapshot";
+  inCanonicalCatalog: boolean;
+  staleEmbedName: boolean;
+};
+
+export type RecipeCanonicalDependencyReport = {
+  recipeCount: number;
+  lineCount: number;
+  canonicalCatalogSize: number;
+  lines: RecipeCanonicalLineAudit[];
+  missingCanonicalFk: RecipeCanonicalLineAudit[];
+  orphanIngredientIds: string[];
+  legacyEmbedFoodCost: LegacyEmbedFoodCostFinding[];
+  staleEmbedNames: Array<{
+    recipeId: string;
+    lineId?: string | null;
+    ingredientId: string;
+    embedName: string;
+    catalogName: string;
+  }>;
 };
 
 export type RecipeCanonicalLineAudit = RecipeIngredientRef & {
@@ -84,6 +121,182 @@ export function collectNonCanonicalRecipeLineAudits(
   return audits.filter((row) => !row.inCanonicalCatalog);
 }
 
+function normalizeLabel(value: string | null | undefined): string {
+  return (value ?? "").trim().toLowerCase();
+}
+
+/** Whether a recipe line resolves ingredient price/name from the Supabase embed vs catalog options. */
+export function resolveRecipeLineIngredientSource(
+  ingredientId: string,
+  recipeLines: Array<{ ingredient_id: string | null; ingredients: RecipeEmbedSnapshot | null }> | null,
+  catalogOptions: Array<{ id: string }>,
+): "embed" | "catalog" | "missing" {
+  const id = ingredientId.trim();
+  if (!id) return "missing";
+  const embed = recipeLines?.find((line) => line.ingredient_id === id)?.ingredients;
+  if (embed) return "embed";
+  if (catalogOptions.some((row) => row.id === id)) return "catalog";
+  return "missing";
+}
+
+export function recipeLineFoodCostSourceKind(
+  ingredientId: string,
+  canonicalCatalogIds: Set<string>,
+  ingredientResolution: "embed" | "catalog" | "missing",
+): RecipeFoodCostSourceKind {
+  const inCatalog = canonicalCatalogIds.has(ingredientId.trim());
+  if (inCatalog && ingredientResolution === "catalog") return "canonical_catalog";
+  if (ingredientResolution === "embed") return "embed_snapshot";
+  return "ingredients_join";
+}
+
+/**
+ * Audit recipe lines vs the canonical catalog: FK validity, embed-based costing, stale embed names.
+ * Investigation-only — does not mutate data or change costing behavior.
+ */
+export function auditRecipeCanonicalDependencies(
+  recipes: Array<{ id: string; name: string }>,
+  lines: RecipeLineWithEmbed[],
+  catalog: IngredientCanonicalInput[],
+): RecipeCanonicalDependencyReport {
+  const audits = auditRecipeLinesAgainstCanonicalCatalog(lines, catalog);
+  const missingCanonicalFk = collectNonCanonicalRecipeLineAudits(audits);
+  const canonicalIds = canonicalCatalogIdSet(catalog);
+  const catalogById = new Map(catalog.map((row) => [row.id, row]));
+
+  const legacyEmbedFoodCost: LegacyEmbedFoodCostFinding[] = [];
+  const staleEmbedNames: RecipeCanonicalDependencyReport["staleEmbedNames"] = [];
+  const orphanIngredientIds = new Set<string>();
+
+  for (const line of lines) {
+    const id = line.ingredientId.trim();
+    if (!id) continue;
+
+    const audit = audits.find(
+      (row) => row.recipeId === line.recipeId && row.lineId === line.lineId && row.ingredientId === line.ingredientId,
+    );
+    const inCanonicalCatalog = audit?.inCanonicalCatalog ?? false;
+
+    if (!inCanonicalCatalog) orphanIngredientIds.add(id);
+
+    const embed = line.embed;
+    const usesEmbedForCost = Boolean(embed && (embed.current_price != null || embed.purchase_quantity != null));
+    if (usesEmbedForCost || embed?.name) {
+      legacyEmbedFoodCost.push({
+        ...line,
+        foodCostSource: "embed_snapshot",
+        inCanonicalCatalog,
+        staleEmbedName: false,
+      });
+    }
+
+    const catalogRow = catalogById.get(id);
+    const embedName = embed?.name;
+    if (
+      catalogRow &&
+      embedName &&
+      normalizeLabel(embedName) !== normalizeLabel(catalogRow.name ?? catalogRow.normalized_name)
+    ) {
+      staleEmbedNames.push({
+        recipeId: line.recipeId,
+        lineId: line.lineId,
+        ingredientId: id,
+        embedName,
+        catalogName: catalogRow.name ?? catalogRow.normalized_name ?? "",
+      });
+      const last = legacyEmbedFoodCost[legacyEmbedFoodCost.length - 1];
+      if (last && last.ingredientId === id && last.recipeId === line.recipeId) {
+        last.staleEmbedName = true;
+      }
+    }
+  }
+
+  return {
+    recipeCount: recipes.length,
+    lineCount: lines.length,
+    canonicalCatalogSize: catalog.length,
+    lines: audits,
+    missingCanonicalFk,
+    orphanIngredientIds: [...orphanIngredientIds],
+    legacyEmbedFoodCost,
+    staleEmbedNames,
+  };
+}
+
+export function logRecipeCanonicalDependencyAudit(args: {
+  surface: string;
+  report: RecipeCanonicalDependencyReport;
+}): void {
+  const { report, surface } = args;
+
+  for (const row of report.missingCanonicalFk) {
+    traceRecipeMissingCanonicalFk({
+      surface,
+      recipeId: row.recipeId,
+      lineId: row.lineId,
+      ingredientId: row.ingredientId,
+      ingredientName: row.ingredientName,
+      reason: row.reason,
+    });
+  }
+
+  for (const row of report.legacyEmbedFoodCost) {
+    traceLegacyRecipeEmbedDetected({
+      surface,
+      recipeId: row.recipeId,
+      lineId: row.lineId,
+      ingredientId: row.ingredientId,
+      inCanonicalCatalog: row.inCanonicalCatalog,
+      staleEmbedName: row.staleEmbedName,
+      embedName: row.embed?.name ?? null,
+      embedPrice: row.embed?.current_price ?? null,
+    });
+  }
+
+  for (const row of report.staleEmbedNames) {
+    traceLegacyRecipeEmbedDetected({
+      surface,
+      kind: "stale_embed_name",
+      recipeId: row.recipeId,
+      lineId: row.lineId,
+      ingredientId: row.ingredientId,
+      embedName: row.embedName,
+      catalogName: row.catalogName,
+    });
+  }
+
+  traceRecipeCanonicalIntegrity("load", {
+    surface,
+    audit: "recipe_canonical_dependencies",
+    recipeCount: report.recipeCount,
+    lineCount: report.lineCount,
+    canonicalCatalogSize: report.canonicalCatalogSize,
+    missingCanonicalFkCount: report.missingCanonicalFk.length,
+    legacyEmbedLineCount: report.legacyEmbedFoodCost.length,
+    staleEmbedNameCount: report.staleEmbedNames.length,
+    orphanIngredientIdCount: report.orphanIngredientIds.length,
+    orphanIngredientIds: report.orphanIngredientIds,
+  });
+}
+
+export function traceRecipeLineFoodCostSource(args: {
+  surface: string;
+  recipeId?: string;
+  lineId?: string | null;
+  ingredientId: string;
+  source: RecipeFoodCostSourceKind;
+  inCanonicalCatalog?: boolean;
+}): void {
+  traceRecipeFoodCostLegacySource({
+    surface: args.surface,
+    recipeId: args.recipeId,
+    lineId: args.lineId,
+    ingredientId: args.ingredientId,
+    source: args.source,
+    inCanonicalCatalog: args.inCanonicalCatalog,
+  });
+}
+
 /** Detect shorthand / alias-kind rows that leaked into picker options. */
 export function detectPickerAliasLeaks(
   options: Array<{ id: string; name: string }>,
@@ -127,7 +340,7 @@ export function detectPickerAliasLeaks(
 
 export function logRecipeCanonicalIntegrityOnLoad(args: {
   recipes: Array<{ id: string; name: string }>;
-  recipeLines: RecipeIngredientRef[];
+  recipeLines: RecipeLineWithEmbed[];
   catalog: IngredientCanonicalInput[];
   recalcTrigger?: FoodCostRecalculationTrigger;
 }): void {
@@ -158,6 +371,9 @@ export function logRecipeCanonicalIntegrityOnLoad(args: {
       reason: violation.reason,
     });
   }
+
+  const dependencyReport = auditRecipeCanonicalDependencies(args.recipes, args.recipeLines, args.catalog);
+  logRecipeCanonicalDependencyAudit({ surface: "recipes.load", report: dependencyReport });
 
   if (args.recalcTrigger) {
     traceFoodCostRecalculationSource(args.recalcTrigger, {

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
 import { Plus, Loader2, Pencil, Trash2, TrendingDown, TrendingUp, X, ClipboardList } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -57,6 +57,11 @@ type RecipeLinkActivity = {
 };
 
 function IngredientsPage() {
+  const isChildRoute = useRouterState({
+    select: (s) => s.location.pathname !== "/ingredients",
+  });
+  if (isChildRoute) return <Outlet />;
+
   const { user } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
   const [priceActivity, setPriceActivity] = useState<Record<string, PriceActivity>>({});

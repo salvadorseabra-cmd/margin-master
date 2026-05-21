@@ -98,6 +98,24 @@ export async function loadMatchingIngredientCatalog(
  * Human-facing ingredients catalog: active canonical rows only (no alias/OCR leakage).
  * Falls back when `ingredient_kind` column is not migrated yet (name heuristics apply).
  */
+/**
+ * All ingredient rows (including archived) for read-only migration preview / merge deps.
+ */
+export async function loadIngredientCatalogIncludingArchived(
+  client: CatalogClient,
+  extraColumns = "",
+): Promise<{ rows: IngredientCanonicalInput[]; error: string | null }> {
+  const selectWithArchive = extraColumns
+    ? `${CATALOG_SELECT_WITH_ARCHIVE}, ${extraColumns}`
+    : CATALOG_SELECT_WITH_ARCHIVE;
+
+  const result = await client.from("ingredients").select(selectWithArchive);
+  if (result.error) {
+    return { rows: [], error: result.error.message };
+  }
+  return { rows: (result.data ?? []) as IngredientCanonicalInput[], error: null };
+}
+
 export async function loadCanonicalIngredientCatalog(
   client: CatalogClient,
   extraColumns = "",

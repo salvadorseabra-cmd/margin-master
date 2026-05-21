@@ -5,10 +5,13 @@ import {
   buildCanonicalIngredientPickerOptions,
 } from "./ingredient-picker-options";
 import {
+  auditRecipeCanonicalDependencies,
   auditRecipeLinesAgainstCanonicalCatalog,
   canonicalCatalogIdSet,
   detectPickerAliasLeaks,
   recipeLineFoodCostEur,
+  recipeLineFoodCostSourceKind,
+  resolveRecipeLineIngredientSource,
   resolveRecipeLineUnitCostEur,
 } from "./recipe-canonical-integrity";
 
@@ -112,5 +115,89 @@ describe("auditRecipeLinesAgainstCanonicalCatalog", () => {
     expect(audits[0]?.inCanonicalCatalog).toBe(true);
     expect(audits[1]?.inCanonicalCatalog).toBe(false);
     expect(audits[1]?.reason).toBe("synthetic_or_temp_id");
+  });
+});
+
+describe("auditRecipeCanonicalDependencies", () => {
+  const catalog = [
+    ingredient("canonical-1", ANGUS_CATALOG_NAME, { ingredient_kind: "canonical" }),
+  ];
+
+  it("flags orphan ingredient_id not in canonical active set", () => {
+    const report = auditRecipeCanonicalDependencies(
+      [{ id: "recipe-1", name: "Burger" }],
+      [
+        {
+          recipeId: "recipe-1",
+          lineId: "line-orphan",
+          ingredientId: "missing-archived",
+        },
+      ],
+      catalog,
+    );
+    expect(report.missingCanonicalFk).toHaveLength(1);
+    expect(report.missingCanonicalFk[0]?.reason).toBe("missing_from_catalog");
+    expect(report.orphanIngredientIds).toContain("missing-archived");
+  });
+
+  it("passes canonical ingredient_id in active catalog", () => {
+    const report = auditRecipeCanonicalDependencies(
+      [{ id: "recipe-1", name: "Burger" }],
+      [
+        {
+          recipeId: "recipe-1",
+          lineId: "line-ok",
+          ingredientId: "canonical-1",
+          embed: { name: ANGUS_CATALOG_NAME, current_price: 10, purchase_quantity: 1 },
+        },
+      ],
+      catalog,
+    );
+    expect(report.missingCanonicalFk).toHaveLength(0);
+    expect(report.lines[0]?.inCanonicalCatalog).toBe(true);
+    expect(report.orphanIngredientIds).toHaveLength(0);
+  });
+
+  it("detects stale embed name vs catalog", () => {
+    const report = auditRecipeCanonicalDependencies(
+      [{ id: "recipe-1", name: "Burger" }],
+      [
+        {
+          recipeId: "recipe-1",
+          lineId: "line-stale",
+          ingredientId: "canonical-1",
+          embed: { name: "OLD OCR LABEL", current_price: 10, purchase_quantity: 1 },
+        },
+      ],
+      catalog,
+    );
+    expect(report.staleEmbedNames).toHaveLength(1);
+    expect(report.staleEmbedNames[0]?.catalogName).toBe(ANGUS_CATALOG_NAME);
+  });
+});
+
+describe("recipe line food cost source resolution", () => {
+  it("prefers embed when recipe line carries ingredients embed", () => {
+    const resolution = resolveRecipeLineIngredientSource(
+      "canonical-1",
+      [{ ingredient_id: "canonical-1", ingredients: { name: "X" } }],
+      [{ id: "canonical-1" }],
+    );
+    expect(resolution).toBe("embed");
+    expect(
+      recipeLineFoodCostSourceKind("canonical-1", new Set(["canonical-1"]), resolution),
+    ).toBe("embed_snapshot");
+  });
+
+  it("uses canonical catalog when embed is absent", () => {
+    const resolution = resolveRecipeLineIngredientSource(
+      "canonical-1",
+      [{ ingredient_id: "canonical-1", ingredients: null }],
+      [{ id: "canonical-1" }],
+    );
+    expect(resolution).toBe("catalog");
+    expect(
+      recipeLineFoodCostSourceKind("canonical-1", new Set(["canonical-1"]), resolution),
+    ).toBe("canonical_catalog");
   });
 });

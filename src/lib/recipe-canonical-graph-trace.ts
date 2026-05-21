@@ -8,6 +8,12 @@
 export const RECIPE_CANONICAL_INTEGRITY_PREFIX = "[recipe_canonical_integrity]";
 export const RECIPE_ALIAS_LEAK_PREFIX = "[recipe_alias_leak_detected]";
 export const FOOD_COST_RECALCULATION_PREFIX = "[food_cost_recalculation_source]";
+export const LEGACY_RECIPE_EMBED_PREFIX = "[legacy_recipe_embed_detected]";
+export const RECIPE_MISSING_CANONICAL_FK_PREFIX = "[recipe_missing_canonical_fk]";
+export const RECIPE_FOOD_COST_LEGACY_SOURCE_PREFIX = "[recipe_food_cost_legacy_source]";
+export const RECIPE_MIGRATION_CANDIDATE_PREFIX = "[recipe_migration_candidate]";
+export const RECIPE_ORPHAN_EMBED_PREFIX = "[recipe_orphan_embed]";
+export const RECIPE_AMBIGUOUS_CANONICAL_PREFIX = "[recipe_ambiguous_canonical]";
 
 declare global {
   interface Window {
@@ -50,4 +56,38 @@ export function traceFoodCostRecalculationSource(
   if (!isRecipeCanonicalGraphTraceEnabled()) return;
   const payload = { trigger, ...details };
   console.info(`${FOOD_COST_RECALCULATION_PREFIX}`, payload);
+}
+
+export type RecipeFoodCostSourceKind = "canonical_catalog" | "embed_snapshot" | "ingredients_join";
+
+export function traceLegacyRecipeEmbedDetected(details: Record<string, unknown>): void {
+  if (!isRecipeCanonicalGraphTraceEnabled()) return;
+  console.warn(`${LEGACY_RECIPE_EMBED_PREFIX}`, details);
+}
+
+export function traceRecipeMissingCanonicalFk(details: Record<string, unknown>): void {
+  if (!isRecipeCanonicalGraphTraceEnabled()) return;
+  console.warn(`${RECIPE_MISSING_CANONICAL_FK_PREFIX}`, details);
+}
+
+export function traceRecipeFoodCostLegacySource(details: Record<string, unknown> & {
+  source: RecipeFoodCostSourceKind;
+}): void {
+  if (!isRecipeCanonicalGraphTraceEnabled()) return;
+  console.info(`${RECIPE_FOOD_COST_LEGACY_SOURCE_PREFIX}`, details);
+}
+
+export function traceRecipeMigrationCandidate(details: Record<string, unknown>): void {
+  if (!isRecipeCanonicalGraphTraceEnabled()) return;
+  console.info(`${RECIPE_MIGRATION_CANDIDATE_PREFIX}`, details);
+}
+
+export function traceRecipeOrphanEmbed(details: Record<string, unknown>): void {
+  if (!isRecipeCanonicalGraphTraceEnabled()) return;
+  console.warn(`${RECIPE_ORPHAN_EMBED_PREFIX}`, details);
+}
+
+export function traceRecipeAmbiguousCanonical(details: Record<string, unknown>): void {
+  if (!isRecipeCanonicalGraphTraceEnabled()) return;
+  console.warn(`${RECIPE_AMBIGUOUS_CANONICAL_PREFIX}`, details);
 }
