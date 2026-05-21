@@ -137,7 +137,10 @@ function RecipesPage() {
     select: (s) => s.location.pathname !== "/recipes",
   });
   if (isChildRoute) return <Outlet />;
+  return <RecipesIndexPage />;
+}
 
+function RecipesIndexPage() {
   const { user } = useAuth();
 
   const [recipes, setRecipes] = useState<RecipeRow[]>([]);

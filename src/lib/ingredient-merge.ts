@@ -487,16 +487,38 @@ async function archiveMergedIngredients(
   if (plan.sourceIngredientIds.length === 0) return null;
 
   const mergedAt = new Date().toISOString();
-  const { error } = await client
+  const { data, error } = await client
     .from("ingredients")
     .update({
       is_archived: true,
       merged_into_ingredient_id: plan.canonicalIngredientId,
       merged_at: mergedAt,
     })
-    .in("id", plan.sourceIngredientIds);
+    .in("id", plan.sourceIngredientIds)
+    .select("id, is_archived, merged_into_ingredient_id");
 
   if (error) return error;
+
+  const archivedIds = new Set((data ?? []).map((row) => row.id));
+  const missingArchive = plan.sourceIngredientIds.filter((id) => !archivedIds.has(id));
+  if (missingArchive.length > 0) {
+    console.info("[canonical_merge_archive_visibility]", "archive_update_incomplete", {
+      sourceIds: plan.sourceIngredientIds,
+      archivedIds: [...archivedIds],
+      missingArchive,
+      canonicalId: plan.canonicalIngredientId,
+    });
+    return {
+      message: `Archive update incomplete for source ingredient(s): ${missingArchive.join(", ")}`,
+      code: "archive_update_incomplete",
+      details: JSON.stringify({
+        missingArchive,
+        archivedIds: [...archivedIds],
+        canonicalId: plan.canonicalIngredientId,
+      }),
+      hint: "Update returned no row (wrong id or RLS); merge aborted after FK reassignment",
+    } as PostgrestError;
+  }
 
   for (const sourceId of plan.sourceIngredientIds) {
     steps.push({

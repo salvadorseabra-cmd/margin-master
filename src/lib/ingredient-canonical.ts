@@ -138,8 +138,16 @@ export function isArchivedIngredientEntry(entry: {
 /** Active catalog rows for matching, pickers, and merge targets. */
 export function filterActiveCatalogIngredients<T extends IngredientCanonicalInput>(
   catalog: T[],
+  options?: { archiveFieldsLoaded?: boolean },
 ): T[] {
-  return catalog.filter((entry) => !isArchivedIngredientEntry(entry));
+  return catalog.filter((entry) => {
+    if (options?.archiveFieldsLoaded) {
+      if (entry.is_archived === true) return false;
+      if (entry.merged_into_ingredient_id?.trim()) return false;
+      return true;
+    }
+    return !isArchivedIngredientEntry(entry);
+  });
 }
 
 export type IngredientCanonicalMatch = {

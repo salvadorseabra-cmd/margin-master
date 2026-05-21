@@ -61,7 +61,10 @@ function IngredientsPage() {
     select: (s) => s.location.pathname !== "/ingredients",
   });
   if (isChildRoute) return <Outlet />;
+  return <IngredientsIndexPage />;
+}
 
+function IngredientsIndexPage() {
   const { user } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
   const [priceActivity, setPriceActivity] = useState<Record<string, PriceActivity>>({});

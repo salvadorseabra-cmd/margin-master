@@ -48,6 +48,7 @@ const client = createClient<Database>(url, key);
 
 const selectAttempts = [
   "id, name, normalized_name, unit, ingredient_kind, is_archived, merged_into_ingredient_id",
+  "id, name, normalized_name, unit, is_archived, merged_into_ingredient_id",
   "id, name, normalized_name, unit, ingredient_kind",
   "id, name, normalized_name, unit",
 ] as const;

@@ -230,14 +230,26 @@ describe("executeManualCanonicalMerge", () => {
             }),
           }),
           update(payload: Record<string, unknown>) {
+            const finishUpdate = (filter: Record<string, unknown>) => {
+              updates.push({ table, payload, filter });
+              const archivedRows =
+                table === "ingredients" && payload.is_archived === true
+                  ? ((filter.id as string[] | undefined) ?? []).map((id) => ({
+                      id,
+                      is_archived: true,
+                      merged_into_ingredient_id: payload.merged_into_ingredient_id,
+                    }))
+                  : [];
+              return Promise.resolve({ data: archivedRows, error: null });
+            };
             return {
               eq(column: string, value: string) {
-                updates.push({ table, payload, filter: { [column]: value } });
-                return Promise.resolve({ error: null });
+                return finishUpdate({ [column]: value });
               },
               in(column: string, values: string[]) {
-                updates.push({ table, payload, filter: { [column]: values } });
-                return Promise.resolve({ error: null });
+                return {
+                  select: () => finishUpdate({ [column]: values }),
+                };
               },
             };
           },
@@ -303,14 +315,26 @@ describe("executeIngredientMerge", () => {
             }),
           }),
           update(payload: Record<string, unknown>) {
+            const finishUpdate = (filter: Record<string, unknown>) => {
+              updates.push({ table, payload, filter });
+              const archivedRows =
+                table === "ingredients" && payload.is_archived === true
+                  ? ((filter.id as string[] | undefined) ?? []).map((id) => ({
+                      id,
+                      is_archived: true,
+                      merged_into_ingredient_id: payload.merged_into_ingredient_id,
+                    }))
+                  : [];
+              return Promise.resolve({ data: archivedRows, error: null });
+            };
             return {
               eq(column: string, value: string) {
-                updates.push({ table, payload, filter: { [column]: value } });
-                return Promise.resolve({ error: null });
+                return finishUpdate({ [column]: value });
               },
               in(column: string, values: string[]) {
-                updates.push({ table, payload, filter: { [column]: values } });
-                return Promise.resolve({ error: null });
+                return {
+                  select: () => finishUpdate({ [column]: values }),
+                };
               },
             };
           },
@@ -354,9 +378,22 @@ describe("executeIngredientMerge", () => {
                 in: () => Promise.resolve({ data: [], error: null }),
               }),
             }),
-            update: () => ({
-              eq: () => Promise.resolve({ error: null }),
-              in: () => Promise.resolve({ error: null }),
+            update: (payload: Record<string, unknown>) => ({
+              eq: () => Promise.resolve({ data: [], error: null }),
+              in: (_column: string, values: string[]) => ({
+                select: () =>
+                  Promise.resolve({
+                    data:
+                      table === "ingredients" && payload.is_archived === true
+                        ? values.map((id) => ({
+                            id,
+                            is_archived: true,
+                            merged_into_ingredient_id: payload.merged_into_ingredient_id,
+                          }))
+                        : [],
+                    error: null,
+                  }),
+              }),
             }),
           };
         }
