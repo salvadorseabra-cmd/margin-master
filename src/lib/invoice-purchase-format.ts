@@ -12,6 +12,15 @@ import {
   type PackageType,
   type UnitInferenceResult,
 } from "@/lib/ingredient-unit-inference";
+import {
+  isWeakInvoiceRowContentMeasure,
+  logStockNormalize,
+  logStockNormalizationSource,
+  normalizePurchasedToUsableStock,
+  type NormalizedPackPhrase,
+  type StockNormalizationPipelineId,
+  type StockNormalizeResult,
+} from "@/lib/stock-normalization";
 export type PackageMeasureUnit = "g" | "ml" | "kg" | "L" | "un";
 
 export type PurchaseFormatKind =
@@ -42,6 +51,8 @@ export type StructuredPurchaseFormat = {
   inferred: UnitInferenceResult;
   confidence: number;
   reason: string;
+  /** Which pipeline produced `normalizedUsableQuantity` (always `unified` before sanitization). */
+  stockNormalizationPipeline: StockNormalizationPipelineId;
 };
 
 export type InvoiceLinePurchaseInput = {
@@ -196,12 +207,14 @@ function normalizeMeasureUnit(raw: string): PackageMeasureUnit | null {
   return null;
 }
 
-function measureToBase(quantity: number, unit: PackageMeasureUnit): { amount: number; base: "g" | "ml" | "un" } {
-  if (unit === "kg") return { amount: quantity * 1000, base: "g" };
-  if (unit === "g") return { amount: quantity, base: "g" };
-  if (unit === "L") return { amount: quantity * 1000, base: "ml" };
-  if (unit === "ml") return { amount: quantity, base: "ml" };
-  return { amount: quantity, base: "un" };
+function toNormalizedPackPhrase(phrase: ParsedPhrase): NormalizedPackPhrase {
+  return {
+    kind: phrase.kind,
+    containerCount: phrase.containerCount,
+    packageQuantity: phrase.packageQuantity,
+    packageUnit: phrase.packageUnit,
+    confidence: phrase.confidence,
+  };
 }
 
 function normalizeContainerToken(raw: string): string {
@@ -354,86 +367,76 @@ function phraseFromRowFields(quantity: number | null, unit: string | null): Pars
   return parsePurchaseFormatPhrase(`${quantity} ${unit}`.trim());
 }
 
-function usableFromPhrase(phrase: ParsedPhrase): {
-  normalizedUsableQuantity: number | null;
-  usableQuantityUnit: "g" | "ml" | "un" | null;
-} {
-  if (phrase.kind === "unit_count") {
-    return {
-      normalizedUsableQuantity: Math.max(1, Math.round(phrase.containerCount)),
-      usableQuantityUnit: "un",
-    };
-  }
-
-  if (phrase.packageQuantity == null || !phrase.packageUnit) {
-    return { normalizedUsableQuantity: null, usableQuantityUnit: null };
-  }
-
-  if (phrase.kind === "container_with_size" || phrase.kind === "multi_unit_pack") {
-    const perItem = measureToBase(phrase.packageQuantity, phrase.packageUnit);
-    const total =
-      phrase.packageUnit === "un"
-        ? phrase.containerCount * phrase.packageQuantity
-        : phrase.containerCount * perItem.amount;
-    return {
-      normalizedUsableQuantity: Math.max(1, Math.round(total)),
-      usableQuantityUnit: perItem.base,
-    };
-  }
-
-  const direct = measureToBase(phrase.packageQuantity, phrase.packageUnit);
-  return {
-    normalizedUsableQuantity: Math.max(1, Math.round(direct.amount)),
-    usableQuantityUnit: direct.base,
-  };
+function parsedPhraseMatchesNormalized(
+  parsed: ParsedPhrase,
+  normalized: NormalizedPackPhrase,
+): boolean {
+  const n = toNormalizedPackPhrase(parsed);
+  return (
+    n.kind === normalized.kind &&
+    n.containerCount === normalized.containerCount &&
+    n.packageQuantity === normalized.packageQuantity &&
+    n.packageUnit === normalized.packageUnit
+  );
 }
 
-function usableFromInference(
-  inferred: UnitInferenceResult,
-  rowQuantity: number | null,
-): {
-  normalizedUsableQuantity: number | null;
-  usableQuantityUnit: "g" | "ml" | "un" | null;
-} {
-  const purchaseQuantity =
-    Number.isFinite(rowQuantity) && rowQuantity != null && rowQuantity > 0 ? rowQuantity : 1;
-
-  if (inferred.normalized_stock_quantity != null && inferred.stock_unit) {
-    const stockUnit = inferred.stock_unit === "L" ? "ml" : inferred.stock_unit;
-    const baseUnit = stockUnit === "kg" ? "g" : (stockUnit as "g" | "ml" | "un");
-    const stockQuantity = Math.max(1, purchaseQuantity * inferred.normalized_stock_quantity);
-    return {
-      normalizedUsableQuantity: stockQuantity,
-      usableQuantityUnit: baseUnit,
-    };
-  }
-
-  if (inferred.conversion_hint) {
-    const estimated = Math.max(1, purchaseQuantity * inferred.conversion_hint.estimated_quantity);
-    return {
-      normalizedUsableQuantity: estimated,
-      usableQuantityUnit: inferred.conversion_hint.stock_unit,
-    };
-  }
-
-  if (inferred.base_unit === "g" || inferred.base_unit === "ml" || inferred.base_unit === "un") {
-    return {
-      normalizedUsableQuantity: inferred.purchase_quantity,
-      usableQuantityUnit: inferred.base_unit,
-    };
-  }
-
-  return { normalizedUsableQuantity: null, usableQuantityUnit: null };
-}
-
-function pickBestPhrase(
+function pickExplicitPhrase(
   namePhrase: ParsedPhrase | null,
   rowPhrase: ParsedPhrase | null,
+  rowQuantity: number | null,
 ): ParsedPhrase | null {
   if (namePhrase && rowPhrase) {
+    if (
+      isWeakInvoiceRowContentMeasure(
+        toNormalizedPackPhrase(rowPhrase),
+        rowQuantity,
+        toNormalizedPackPhrase(namePhrase),
+      )
+    ) {
+      return namePhrase;
+    }
     return namePhrase.confidence >= rowPhrase.confidence ? namePhrase : rowPhrase;
   }
   return namePhrase ?? rowPhrase;
+}
+
+function inferenceHintsFromResult(
+  inferred: UnitInferenceResult,
+): NonNullable<Parameters<typeof normalizePurchasedToUsableStock>[0]["inferred"]> {
+  return {
+    normalized_stock_quantity: inferred.normalized_stock_quantity,
+    stock_unit: inferred.stock_unit,
+    purchase_quantity: inferred.purchase_quantity,
+    base_unit: inferred.base_unit,
+    conversion_hint: inferred.conversion_hint,
+  };
+}
+
+function pipelineIdFromStock(stock: StockNormalizeResult): StockNormalizationPipelineId {
+  return stock.pipelineId;
+}
+
+function structuredFromExplicitPhrase(
+  explicit: ParsedPhrase,
+  stock: StockNormalizeResult,
+  name: string,
+  inferred: UnitInferenceResult,
+): StructuredPurchaseFormat {
+  return {
+    kind: explicit.kind,
+    ingredientIdentityHint: stripMatchedPurchaseText(name, explicit.matchedText),
+    purchaseContainerCount: stock.purchaseContainerCount,
+    purchaseContainerUnit: explicit.containerUnit,
+    packageQuantity: explicit.packageQuantity,
+    packageMeasurementUnit: explicit.packageUnit,
+    normalizedUsableQuantity: stock.usableQuantity,
+    usableQuantityUnit: stock.usableUnit,
+    packageType: resolvePackageType(explicit.containerUnit) ?? inferred.package_type,
+    inferred,
+    confidence: explicit.confidence,
+    reason: explicit.reason,
+    stockNormalizationPipeline: pipelineIdFromStock(stock),
+  };
 }
 
 function inferenceHasPackSignals(inferred: UnitInferenceResult): boolean {
@@ -452,11 +455,41 @@ function shouldPreferInferenceOverRowPhrase(
   namePhrase: ParsedPhrase | null,
   inferred: UnitInferenceResult,
 ): boolean {
+  if (inferred.conversion_hint && rowPhrase?.kind === "unit_count") return true;
+  if (inferred.conversion_hint && namePhrase?.kind === "unit_count") return true;
   if (!rowPhrase || rowPhrase.kind !== "unit_count") return false;
   if (inferred.confidence < 0.86 || !inferenceHasPackSignals(inferred)) return false;
   if (!namePhrase) return true;
   if (namePhrase.kind === "weight_or_volume" && namePhrase.confidence < 0.95) return true;
   return false;
+}
+
+/** Per-item weight in the name (80G) is metadata when inference found an outer unit count (120 UN). */
+function shouldPreferInferenceOverNameWeightPhrase(
+  namePhrase: ParsedPhrase | null,
+  inferred: UnitInferenceResult,
+): boolean {
+  if (!namePhrase || namePhrase.kind !== "weight_or_volume") return false;
+  if (inferred.size_is_metadata_only && inferred.stock_unit === "un") return true;
+  if (
+    inferred.purchase_unit_count > 1 &&
+    inferred.normalized_stock_quantity != null &&
+    inferred.stock_unit === "un"
+  ) {
+    return true;
+  }
+  return false;
+}
+
+function shouldPreferInferenceOverExplicitPhrase(
+  rowPhrase: ParsedPhrase | null,
+  namePhrase: ParsedPhrase | null,
+  inferred: UnitInferenceResult,
+): boolean {
+  return (
+    shouldPreferInferenceOverRowPhrase(rowPhrase, namePhrase, inferred) ||
+    shouldPreferInferenceOverNameWeightPhrase(namePhrase, inferred)
+  );
 }
 
 /**
@@ -476,54 +509,77 @@ export function resolveInvoiceLinePurchaseFormat(
     Number.isFinite(rowQuantity) && rowQuantity != null && rowQuantity > 0 ? rowQuantity : null,
     rowUnit,
   );
-  let explicit = pickBestPhrase(namePhrase, rowPhrase);
-  if (shouldPreferInferenceOverRowPhrase(rowPhrase, namePhrase, inferred)) {
-    explicit = null;
-  }
+  const preferInference = shouldPreferInferenceOverExplicitPhrase(rowPhrase, namePhrase, inferred);
+  const explicit = preferInference ? null : pickExplicitPhrase(namePhrase, rowPhrase, rowQuantity);
 
-  if (explicit) {
-    const usable = usableFromPhrase(explicit);
-    return sanitizeStructuredUsable({
-      kind: explicit.kind,
-      ingredientIdentityHint: stripMatchedPurchaseText(name, explicit.matchedText),
-      purchaseContainerCount: explicit.containerCount,
-      purchaseContainerUnit: explicit.containerUnit,
-      packageQuantity: explicit.packageQuantity,
-      packageMeasurementUnit: explicit.packageUnit,
-      normalizedUsableQuantity: usable.normalizedUsableQuantity,
-      usableQuantityUnit: usable.usableQuantityUnit,
-      packageType: resolvePackageType(explicit.containerUnit) ?? inferred.package_type,
-      inferred,
-      confidence: explicit.confidence,
-      reason: explicit.reason,
-    });
+  const stock = normalizePurchasedToUsableStock({
+    name,
+    namePhrase:
+      preferInference || !namePhrase ? null : toNormalizedPackPhrase(namePhrase),
+    rowPhrase: preferInference ? null : rowPhrase ? toNormalizedPackPhrase(rowPhrase) : null,
+    rowQuantity,
+    rowUnit,
+    inferred: inferenceHintsFromResult(inferred),
+  });
+
+  logStockNormalize("resolve_line", {
+    name,
+    rowQuantity,
+    rowUnit,
+    namePhrase: namePhrase ? toNormalizedPackPhrase(namePhrase) : null,
+    rowPhrase: rowPhrase ? toNormalizedPackPhrase(rowPhrase) : null,
+    explicitKind: explicit?.kind ?? null,
+    stockSource: stock.source,
+    pipelineId: stock.pipelineId,
+  });
+
+  if (stock.source === "explicit_phrase") {
+    const phraseForStructured =
+      explicit ??
+      (namePhrase && stock.explicitPhrase && parsedPhraseMatchesNormalized(namePhrase, stock.explicitPhrase)
+        ? namePhrase
+        : null) ??
+      (rowPhrase && stock.explicitPhrase && parsedPhraseMatchesNormalized(rowPhrase, stock.explicitPhrase)
+        ? rowPhrase
+        : null);
+    if (phraseForStructured) {
+      return sanitizeStructuredUsable(
+        structuredFromExplicitPhrase(phraseForStructured, stock, name, inferred),
+      );
+    }
   }
 
   const rowOnly =
     Number.isFinite(rowQuantity) && rowQuantity != null && rowQuantity > 0 && Boolean(rowUnit);
-  const usable = usableFromInference(inferred, rowQuantity);
   const purchaseContainerCount =
     Number.isFinite(rowQuantity) && rowQuantity != null && rowQuantity > 0 ? rowQuantity : 1;
 
   if (inferred.base_unit || inferred.normalized_stock_quantity != null || inferred.conversion_hint) {
-    return sanitizeStructuredUsable({
-      kind: "inferred",
-      ingredientIdentityHint: name,
-      purchaseContainerCount: inferred.package_type
-        ? purchaseContainerCount
-        : inferred.purchase_unit_count > 1
-          ? inferred.purchase_unit_count
-          : purchaseContainerCount,
-      purchaseContainerUnit: inferred.purchase_unit ?? inferred.base_unit,
-      packageQuantity: inferred.pack_size,
-      packageMeasurementUnit: inferred.pack_size_unit,
-      normalizedUsableQuantity: usable.normalizedUsableQuantity,
-      usableQuantityUnit: usable.usableQuantityUnit,
-      packageType: inferred.package_type,
-      inferred,
-      confidence: inferred.confidence,
-      reason: inferred.reason,
-    });
+    return sanitizeStructuredUsable(
+      backfillUsableFromPackageFields(
+        {
+          kind: "inferred",
+          ingredientIdentityHint: name,
+          purchaseContainerCount: inferred.package_type
+            ? purchaseContainerCount
+            : inferred.purchase_unit_count > 1
+              ? inferred.purchase_unit_count
+              : purchaseContainerCount,
+          purchaseContainerUnit: inferred.purchase_unit ?? inferred.base_unit,
+          packageQuantity: inferred.pack_size,
+          packageMeasurementUnit: inferred.pack_size_unit,
+          normalizedUsableQuantity: stock.usableQuantity,
+          usableQuantityUnit: stock.usableUnit,
+          packageType: inferred.package_type,
+          inferred,
+          confidence: inferred.confidence,
+          reason: inferred.reason,
+          stockNormalizationPipeline: pipelineIdFromStock(stock),
+        },
+        rowQuantity,
+        rowUnit,
+      ),
+    );
   }
 
   return sanitizeStructuredUsable({
@@ -533,12 +589,13 @@ export function resolveInvoiceLinePurchaseFormat(
     purchaseContainerUnit: rowUnit,
     packageQuantity: null,
     packageMeasurementUnit: normalizeMeasureUnit(rowUnit ?? ""),
-    normalizedUsableQuantity: null,
-    usableQuantityUnit: null,
+    normalizedUsableQuantity: stock.usableQuantity,
+    usableQuantityUnit: stock.usableUnit,
     packageType: inferred.package_type,
     inferred,
     confidence: rowOnly ? 0.7 : 0,
     reason: rowOnly ? "invoice row quantity and unit only" : "no purchase format resolved",
+    stockNormalizationPipeline: pipelineIdFromStock(stock),
   });
 }
 
@@ -613,17 +670,66 @@ export function formatInvoiceLineRawPurchaseFallback(item: InvoiceLinePurchaseIn
   return name || null;
 }
 
+/** When display enrichment adds pack size but usable was missing, derive from package fields. */
+function backfillUsableFromPackageFields(
+  structured: StructuredPurchaseFormat,
+  rowQuantity: number | null,
+  rowUnit: string | null,
+): StructuredPurchaseFormat {
+  if (structured.normalizedUsableQuantity != null && structured.usableQuantityUnit) {
+    return structured;
+  }
+
+  const packQty = structured.packageQuantity ?? structured.inferred.pack_size;
+  const packUnit = structured.packageMeasurementUnit ?? structured.inferred.pack_size_unit;
+  if (packQty == null || !packUnit || packUnit === "un") return structured;
+
+  const stock = normalizePurchasedToUsableStock({
+    name: structured.ingredientIdentityHint,
+    namePhrase: {
+      kind: "container_with_size",
+      containerCount: structured.purchaseContainerCount,
+      packageQuantity: packQty,
+      packageUnit: packUnit,
+      confidence: structured.confidence,
+    },
+    rowPhrase: null,
+    rowQuantity,
+    rowUnit,
+    inferred: inferenceHintsFromResult(structured.inferred),
+  });
+
+  if (stock.usableQuantity == null || !stock.usableUnit) return structured;
+
+  return {
+    ...structured,
+    packageQuantity: packQty,
+    packageMeasurementUnit: packUnit,
+    purchaseContainerCount: stock.purchaseContainerCount,
+    normalizedUsableQuantity: stock.usableQuantity,
+    usableQuantityUnit: stock.usableUnit,
+    stockNormalizationPipeline: pipelineIdFromStock(stock),
+    reason: `${structured.reason}; backfilled usable from pack size`,
+  };
+}
+
 function sanitizeStructuredUsable(structured: StructuredPurchaseFormat): StructuredPurchaseFormat {
   const { normalizedUsableQuantity, usableQuantityUnit } = structured;
   if (
     isImpossibleUsableQuantity(normalizedUsableQuantity, usableQuantityUnit) ||
     isCollapsedMeaninglessUsable(normalizedUsableQuantity, usableQuantityUnit, structured)
   ) {
+    logStockNormalize("impossible_usable", {
+      quantity: normalizedUsableQuantity,
+      unit: usableQuantityUnit,
+      kind: structured.kind,
+    });
     return {
       ...structured,
       normalizedUsableQuantity: null,
       usableQuantityUnit: null,
       confidence: Math.min(structured.confidence, 0.55),
+      stockNormalizationPipeline: "suppressed",
       reason: `${structured.reason}; suppressed weak usable collapse`,
     };
   }
@@ -903,6 +1009,113 @@ export function resolveInvoicePurchaseDisplayLabel(item: InvoiceLinePurchaseInpu
   return display ?? raw;
 }
 
+export type InvoiceLineStockPresentation = {
+  quantityLabel: string | null;
+  detailLabel: string | null;
+  pipelineId: StockNormalizationPipelineId;
+  usableQuantity: number | null;
+  usableUnit: "g" | "ml" | "un" | null;
+};
+
+/**
+ * Stock-added column for invoice rows — single entry via {@link resolveInvoiceLinePurchaseFormat}.
+ * Does not fall back to raw row g/ml or duplicate inference math.
+ */
+export function resolveInvoiceLineStockPresentation(
+  item: InvoiceLinePurchaseInput,
+  rowKey?: string,
+): InvoiceLineStockPresentation {
+  const structured = resolveInvoiceLinePurchaseFormat(item);
+  const inferred = structured.inferred;
+  const rowQuantity = item.quantity == null ? null : Number(item.quantity);
+  const purchaseQuantity =
+    Number.isFinite(rowQuantity) && rowQuantity != null && rowQuantity > 0 ? rowQuantity : 1;
+
+  const empty: InvoiceLineStockPresentation = {
+    quantityLabel: null,
+    detailLabel: null,
+    pipelineId: structured.stockNormalizationPipeline,
+    usableQuantity: structured.normalizedUsableQuantity,
+    usableUnit: structured.usableQuantityUnit,
+  };
+
+  if (rowKey) {
+    logStockNormalizationSource(rowKey, structured.stockNormalizationPipeline, {
+      name: item.name,
+      quantity: item.quantity,
+      unit: item.unit,
+      kind: structured.kind,
+      usableQuantity: structured.normalizedUsableQuantity,
+      usableUnit: structured.usableQuantityUnit,
+      reason: structured.reason,
+    });
+  }
+
+  if (
+    structured.normalizedUsableQuantity != null &&
+    structured.usableQuantityUnit &&
+    structured.kind !== "unit_count"
+  ) {
+    const quantityLabel = formatUsableStockQuantityLabel(
+      structured.normalizedUsableQuantity,
+      structured.usableQuantityUnit,
+      structured,
+    );
+    if (quantityLabel) {
+      return { ...empty, quantityLabel, detailLabel: null };
+    }
+  }
+
+  if (structured.kind === "unit_count") {
+    const quantityLabel = formatUsableStockQuantityLabel(
+      structured.normalizedUsableQuantity ?? structured.purchaseContainerCount,
+      "units",
+      structured,
+    );
+    if (quantityLabel) {
+      return { ...empty, quantityLabel, detailLabel: null };
+    }
+  }
+
+  const hint = inferred.conversion_hint;
+  if (
+    hint &&
+    structured.normalizedUsableQuantity != null &&
+    structured.usableQuantityUnit === hint.stock_unit
+  ) {
+    const quantityLabel = `~${formatOperationalQuantity(
+      structured.normalizedUsableQuantity,
+      hint.stock_unit,
+    )} usable`;
+    if (!isMeaninglessUsableStockLabel(quantityLabel)) {
+      return {
+        ...empty,
+        quantityLabel,
+        detailLabel: "estimated kitchen yield",
+      };
+    }
+  }
+
+  if (hint) {
+    const estimatedStockQuantity = Math.max(1, purchaseQuantity * hint.estimated_quantity);
+    const quantityLabel = `~${formatOperationalQuantity(
+      estimatedStockQuantity,
+      hint.stock_unit,
+    )} usable`;
+    if (!isMeaninglessUsableStockLabel(quantityLabel)) {
+      return {
+        ...empty,
+        quantityLabel,
+        detailLabel: "estimated kitchen yield",
+        usableQuantity: estimatedStockQuantity,
+        usableUnit: hint.stock_unit,
+      };
+    }
+  }
+
+  return empty;
+}
+
 export type IngredientPurchaseFields = {
   purchase_quantity: number;
   purchase_unit: string;
@@ -923,19 +1136,19 @@ export function structuredPurchaseToIngredientFields(
       ? inferred.base_unit
       : (extractedUnit ?? inferred.base_unit ?? conversionHint?.purchase_unit ?? "kg");
 
-  if (inferred.base_unit) {
-    return {
-      purchase_quantity: inferred.purchase_quantity,
-      purchase_unit: inferred.purchase_unit ?? stockUnit,
-      base_unit: inferred.base_unit ?? stockUnit,
-    };
-  }
-
   if (structured.normalizedUsableQuantity != null && structured.usableQuantityUnit) {
     return {
       purchase_quantity: structured.normalizedUsableQuantity,
       purchase_unit: structured.usableQuantityUnit,
       base_unit: structured.usableQuantityUnit,
+    };
+  }
+
+  if (inferred.base_unit) {
+    return {
+      purchase_quantity: inferred.purchase_quantity,
+      purchase_unit: inferred.purchase_unit ?? stockUnit,
+      base_unit: inferred.base_unit ?? stockUnit,
     };
   }
 

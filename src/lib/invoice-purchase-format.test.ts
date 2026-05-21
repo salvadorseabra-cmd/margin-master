@@ -9,6 +9,7 @@ import {
   isMeaninglessUsableStockLabel,
   parsePurchaseFormatPhrase,
   resolveInvoiceLinePurchaseFormat,
+  resolveInvoiceLineStockPresentation,
   resolveInvoicePurchaseDisplayLabel,
   structuredPurchaseToIngredientFields,
   USABLE_STOCK_MIN_CONFIDENCE,
@@ -425,6 +426,58 @@ describe("fallback and meaningless usable guards", () => {
 
   it("documents usable stock confidence threshold", () => {
     expect(USABLE_STOCK_MIN_CONFIDENCE).toBeGreaterThanOrEqual(0.9);
+  });
+});
+
+describe("resolveInvoiceLineStockPresentation", () => {
+  it.each([
+    {
+      name: "1 pack x 2.5 kg",
+      quantity: 6,
+      unit: "g",
+      usable: 2500,
+      usableUnit: "g",
+      pipelineId: "unified" as const,
+    },
+    {
+      name: "1 bottle x 450 ml",
+      quantity: 4,
+      unit: "ml",
+      usable: 450,
+      usableUnit: "ml",
+      pipelineId: "unified" as const,
+    },
+    {
+      name: "250 g",
+      quantity: 1,
+      unit: "g",
+      usable: 250,
+      usableUnit: "g",
+      pipelineId: "unified" as const,
+    },
+  ])(
+    "unified pipeline: $name",
+    ({ name, quantity, unit, usable, usableUnit, pipelineId }) => {
+      const presentation = resolveInvoiceLineStockPresentation({ name, quantity, unit });
+      expect(presentation.pipelineId).toBe(pipelineId);
+      expect(presentation.usableQuantity).toBe(usable);
+      expect(presentation.usableUnit).toBe(usableUnit);
+      expect(presentation.quantityLabel).toContain(String(usable >= 1000 ? usable / 1000 : usable));
+    },
+  );
+
+  it("shows estimated yield for leafy produce without explicit pack size", () => {
+    const presentation = resolveInvoiceLineStockPresentation({
+      name: "ALFACE ICEBERG",
+      quantity: 1,
+      unit: "un",
+    });
+    expect(presentation.quantityLabel).toMatch(/usable/i);
+    expect(presentation.usableQuantity).toBeGreaterThanOrEqual(400);
+    expect(presentation.pipelineId).toBe("unified");
+    if (presentation.detailLabel) {
+      expect(presentation.detailLabel).toBe("estimated kitchen yield");
+    }
   });
 });
 

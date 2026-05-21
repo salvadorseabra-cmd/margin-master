@@ -22,11 +22,10 @@ import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 import { type UnitInferenceResult, type PackageType } from "@/lib/ingredient-unit-inference";
 import {
   formatStructuredPurchaseDisplay,
-  formatUsableStockQuantityLabel,
   hasRichPackageSemantics,
   isCollapsedMeaninglessPurchaseLabel,
-  isMeaninglessUsableStockLabel,
   resolveInvoiceLinePurchaseFormat,
+  resolveInvoiceLineStockPresentation,
   resolveInvoicePurchaseDisplayLabel,
 } from "@/lib/invoice-purchase-format";
 import { formatQuantityWithUnit } from "@/lib/display-format";
@@ -746,91 +745,16 @@ const getInvoiceItemPurchaseLabel = (item: Pick<ItemRow, "name" | "quantity" | "
   return rowFallback;
 };
 
-const getInvoiceItemStockPresentation = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {
-  const structured = resolveItemPurchaseFormat(item);
-  const inferred = structured.inferred;
-  const rowQuantity = Number(item.quantity);
-  const purchaseQuantity = Number.isFinite(rowQuantity) && rowQuantity > 0 ? rowQuantity : 1;
-
-  if (
-    structured.normalizedUsableQuantity != null &&
-    structured.usableQuantityUnit &&
-    structured.kind !== "unit_count"
-  ) {
-    const quantityLabel = formatUsableStockQuantityLabel(
-      structured.normalizedUsableQuantity,
-      structured.usableQuantityUnit,
-      structured,
-    );
-    if (quantityLabel) {
-      return { quantityLabel, detailLabel: null };
-    }
-  }
-
-  if (structured.kind === "unit_count") {
-    const quantityLabel = formatUsableStockQuantityLabel(
-      structured.normalizedUsableQuantity ?? structured.purchaseContainerCount,
-      "units",
-      structured,
-    );
-    if (quantityLabel) {
-      return { quantityLabel, detailLabel: null };
-    }
-  }
-
-  if (inferred.size_is_metadata_only && inferred.stock_unit === "un") {
-    const unitQuantity = resolveUnitDrivenQuantity(item, inferred);
-    const sizeMetadata = formatUnitSizeMetadata(inferred);
-    const quantityLabel = formatUsableStockQuantityLabel(unitQuantity, "units", structured);
-    if (quantityLabel) {
-      return { quantityLabel, detailLabel: sizeMetadata };
-    }
-  }
-
-  if (inferred.normalized_stock_quantity != null && inferred.stock_unit) {
-    const stockQuantity = Math.max(1, purchaseQuantity * inferred.normalized_stock_quantity);
-    const quantityLabel = formatUsableStockQuantityLabel(
-      stockQuantity,
-      inferred.stock_unit,
-      structured,
-    );
-    if (quantityLabel) {
-      return { quantityLabel, detailLabel: null };
-    }
-  }
-
-  const hint = inferred.conversion_hint;
-  if (hint) {
-    const estimatedStockQuantity = Math.max(1, purchaseQuantity * hint.estimated_quantity);
-    const quantityLabel = `~${formatOperationalQuantityWithUnit(
-      estimatedStockQuantity,
-      hint.stock_unit,
-    )} usable`;
-    if (!isMeaninglessUsableStockLabel(quantityLabel)) {
-      return {
-        quantityLabel,
-        detailLabel: "estimated kitchen yield",
-      };
-    }
-  }
-
-  const compatibleUnit = getRecipeCompatibleUnit(item.unit);
-  if (compatibleUnit && item.quantity != null) {
-    const quantityLabel = formatUsableStockQuantityLabel(item.quantity, compatibleUnit, structured);
-    if (quantityLabel) {
-      return { quantityLabel, detailLabel: null };
-    }
-  }
-
-  const displayUnit = getDisplayPurchaseUnit(item.unit);
-  if (displayUnit && item.quantity != null) {
-    const quantityLabel = formatUsableStockQuantityLabel(item.quantity, displayUnit, structured);
-    if (quantityLabel) {
-      return { quantityLabel, detailLabel: null };
-    }
-  }
-
-  return null;
+const getInvoiceItemStockPresentation = (item: Pick<ItemRow, "id" | "name" | "quantity" | "unit">) => {
+  const presentation = resolveInvoiceLineStockPresentation(
+    { name: item.name, quantity: item.quantity, unit: item.unit },
+    item.id,
+  );
+  if (!presentation.quantityLabel) return null;
+  return {
+    quantityLabel: presentation.quantityLabel,
+    detailLabel: presentation.detailLabel,
+  };
 };
 
 const removeKey = <T,>(record: Record<string, T>, key: string) => {
@@ -3051,9 +2975,18 @@ function ItemsTable({
                 const purchaseLabel = getInvoiceItemPurchaseLabel(renderItem);
                 const stockPresentation = getInvoiceItemStockPresentation(renderItem);
                 if (index === 0) {
+                  const stockMeta = resolveInvoiceLineStockPresentation(
+                    {
+                      name: renderItem.name,
+                      quantity: renderItem.quantity,
+                      unit: renderItem.unit,
+                    },
+                    renderItem.id,
+                  );
                   traceInvoiceQuantityStage("render-row:first-item", renderItem, {
                     purchaseLabel,
                     stockLabel: stockPresentation?.quantityLabel ?? null,
+                    stockNormalizationPipeline: stockMeta.pipelineId,
                   });
                 }
                 if (!purchaseLabel || !stockPresentation) {
