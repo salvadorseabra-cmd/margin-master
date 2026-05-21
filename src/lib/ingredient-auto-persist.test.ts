@@ -120,7 +120,7 @@ describe("evaluateAutoPersistEligibility", () => {
   });
 
   it("blocks ANGUS PTY and HMB 180 from auto-create eligibility", () => {
-    for (const name of ["ANGUS PTY", "HMB 180", "BAC STRK", "ON RNG", "JALP SLC"]) {
+    for (const name of ["ANGUS PTY", "HMB 180", "BAC STRK", "ON RNG", "JALP SLC", "CHK BREADED"]) {
       const result = evaluateAutoPersistEligibility(item(name), null, []);
       expect(result).toEqual({ eligible: false, reason: "invoice_shorthand" });
     }
@@ -163,6 +163,30 @@ describe("buildIngredientInsertPayload", () => {
 });
 
 describe("autoPersistUnmatchedInvoiceItems", () => {
+  it("never inserts CHK BREADED unmatched lines", async () => {
+    const insert = vi.fn();
+    const client = {
+      from: () => ({
+        insert: () => ({
+          select: () => ({ single: insert }),
+        }),
+      }),
+    } as never;
+
+    const result = await autoPersistUnmatchedInvoiceItems({
+      client,
+      userId: "user-1",
+      invoiceId: "inv-chk",
+      items: [item("CHK BREADED")],
+      catalog: [],
+      attemptedKeys: new Set(),
+    });
+
+    expect(result.created).toBe(0);
+    expect(result.skipped).toBe(1);
+    expect(insert).not.toHaveBeenCalled();
+  });
+
   it("never inserts ingredients — only alias memory and skips", async () => {
     const insert = vi.fn();
     const client = {

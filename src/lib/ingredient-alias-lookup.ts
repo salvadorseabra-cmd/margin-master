@@ -92,3 +92,18 @@ export function rememberAliasInMap(
   const key = buildIngredientAliasLookupKey(normalizedItemName, supplierName);
   return { ...aliases, [key]: ingredientId };
 }
+
+/**
+ * Store all lookup keys used by invoice matching (supplier-scoped, global, legacy invoice norm).
+ */
+export function rememberConfirmedAliasInMap(
+  aliases: IngredientAliasMap,
+  _aliasName: string,
+  normalizedAlias: string,
+  ingredientId: string,
+  supplierName?: string | null,
+): IngredientAliasMap {
+  let next = rememberAliasInMap(aliases, normalizedAlias, ingredientId, supplierName);
+  next = rememberAliasInMap(next, normalizedAlias, ingredientId, null);
+  return next;
+}

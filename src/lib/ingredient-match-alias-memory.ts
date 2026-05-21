@@ -4,13 +4,20 @@
 
 import type { PostgrestError } from "@supabase/supabase-js";
 import {
-  rememberAliasInMap,
+  rememberConfirmedAliasInMap,
   type AppSupabaseClient,
   upsertConfirmedAlias,
 } from "@/lib/ingredient-alias-memory";
 import type { IngredientAliasMap, IngredientCanonicalMatch } from "@/lib/ingredient-canonical";
 import { isConfirmedIngredientMatch } from "@/lib/ingredient-match-explanation";
+import { buildOverrideKeysFromInvoiceLine } from "@/lib/ingredient-match-override";
 import { rememberOperationalAlias } from "@/lib/ingredient-operational-alias-memory";
+import {
+  getAliasTraceCompareBucket,
+  traceIngredientAliases,
+  traceIngredientAliasesInsertError,
+  traceIngredientAliasesNormalizationRejection,
+} from "@/lib/ingredient-aliases-trace";
 
 export type RecordInvoiceAliasMemoryParams = {
   itemName: string;
@@ -35,28 +42,62 @@ export function recordInvoiceLineAliasMemory(
   params: RecordInvoiceAliasMemoryParams,
 ): RecordInvoiceAliasMemoryResult {
   const { itemName, match, confirmedAliases, supplierName } = params;
+  traceIngredientAliases("recordInvoiceLineAliasMemory:enter", {
+    function: "recordInvoiceLineAliasMemory",
+    itemName,
+    compareBucket: getAliasTraceCompareBucket(itemName),
+    matchKind: match.kind,
+    ingredientId: match.ingredient.id,
+  });
   const ingredientId = match.ingredient.id;
   const ingredientName = match.ingredient.name ?? match.ingredient.normalized_name ?? "";
 
   const itemKey = normalizeCompareKey(itemName);
   const catalogKey = normalizeCompareKey(ingredientName);
   if (!itemKey || !catalogKey || itemKey === catalogKey) {
+    traceIngredientAliases("recordInvoiceLineAliasMemory:early-return", {
+      branch: "item_equals_catalog",
+      itemName,
+      itemKey,
+      catalogKey,
+    });
     return { nextConfirmedAliases: confirmedAliases, recorded: false };
   }
 
   if (!isConfirmedIngredientMatch(match)) {
+    traceIngredientAliases("recordInvoiceLineAliasMemory:early-return", {
+      branch: "not_confirmed_match",
+      itemName,
+      matchKind: match.kind,
+    });
     return { nextConfirmedAliases: confirmedAliases, recorded: false };
   }
 
-  const nextConfirmedAliases = rememberAliasInMap(
+  const keys = buildOverrideKeysFromInvoiceLine(itemName, supplierName);
+  if (!keys) {
+    traceIngredientAliasesNormalizationRejection(
+      "recordInvoiceLineAliasMemory",
+      "buildOverrideKeysFromInvoiceLine_null",
+      { itemName, supplierName: supplierName ?? null },
+    );
+    return { nextConfirmedAliases: confirmedAliases, recorded: false };
+  }
+
+  const nextConfirmedAliases = rememberConfirmedAliasInMap(
     confirmedAliases,
-    itemName,
+    itemName.trim(),
+    keys.rawNormalized,
     ingredientId,
     supplierName,
   );
 
   rememberOperationalAlias(itemName, ingredientId, ingredientName, "confirmed", 8);
 
+  traceIngredientAliases("recordInvoiceLineAliasMemory:ok", {
+    itemName,
+    recorded: true,
+    normalizedAlias: keys.rawNormalized,
+  });
   return { nextConfirmedAliases, recorded: true };
 }
 
@@ -67,18 +108,43 @@ export type PersistInvoiceAliasMemoryParams = RecordInvoiceAliasMemoryParams & {
 export async function persistInvoiceLineAliasMemory(
   params: PersistInvoiceAliasMemoryParams,
 ): Promise<{ nextConfirmedAliases: IngredientAliasMap; error: PostgrestError | null }> {
+  traceIngredientAliases("persistInvoiceLineAliasMemory:enter", {
+    function: "persistInvoiceLineAliasMemory",
+    itemName: params.itemName,
+  });
   const applied = recordInvoiceLineAliasMemory(params);
   if (!applied.recorded) {
+    traceIngredientAliases("persistInvoiceLineAliasMemory:early-return", {
+      branch: "not_recorded_in_memory",
+      itemName: params.itemName,
+      insertAttempted: false,
+    });
     return { nextConfirmedAliases: applied.nextConfirmedAliases, error: null };
   }
 
+  traceIngredientAliases("persistInvoiceLineAliasMemory:upsert-call", {
+    itemName: params.itemName,
+    ingredientId: params.match.ingredient.id,
+    insertAttempted: true,
+  });
+
+  const keys = buildOverrideKeysFromInvoiceLine(params.itemName, params.supplierName);
   const { error } = await upsertConfirmedAlias({
     ingredientId: params.match.ingredient.id,
     aliasName: params.itemName.trim(),
+    normalizedAlias: keys?.rawNormalized,
     supplierName: params.supplierName,
     supabase: params.supabase,
     manualConfirmation: false,
   });
+
+  if (error) {
+    traceIngredientAliasesInsertError({
+      function: "persistInvoiceLineAliasMemory",
+      itemName: params.itemName,
+      error: { message: error.message, code: error.code },
+    });
+  }
 
   return { nextConfirmedAliases: applied.nextConfirmedAliases, error };
 }

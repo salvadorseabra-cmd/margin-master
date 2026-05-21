@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
-import { Plus, Loader2, Trash2, TrendingDown, TrendingUp, X } from "lucide-react";
+import { Plus, Loader2, Pencil, Trash2, TrendingDown, TrendingUp, X, ClipboardList } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import type { Tables } from "@/integrations/supabase/types";
+import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 import { guardIngredientCreation } from "@/lib/ingredient-operational-identity";
 import { INGREDIENT_KIND_CANONICAL, looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
@@ -21,7 +22,17 @@ import {
 } from "@/lib/display-format";
 import { inferPurchaseUnitsFromLineItemName } from "@/lib/ingredient-unit-inference";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
+import { CanonicalIngredientRenameDialog } from "@/components/canonical-ingredient-rename-dialog";
+import {
+  buildCanonicalIngredientRenamePayload,
+  traceCanonicalRename,
+} from "@/lib/canonical-ingredient-rename";
+import { traceFoodCostRecalculationSource } from "@/lib/recipe-canonical-graph-trace";
 import { loadCanonicalIngredientCatalog } from "@/lib/ingredient-catalog-load";
+import {
+  traceCanonicalCreateAttempt,
+  traceCanonicalCreateNameSource,
+} from "@/lib/ingredient-catalog-diagnostics";
 
 export const Route = createFileRoute("/ingredients")({
   head: () => ({
@@ -66,6 +77,10 @@ function IngredientsPage() {
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [renameTargetId, setRenameTargetId] = useState<string | null>(null);
+  const [renameSaving, setRenameSaving] = useState(false);
+  const [renameError, setRenameError] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -139,7 +154,7 @@ function IngredientsPage() {
     if (!user) return;
     setSaving(true);
     setError(null);
-    const name = form.name.trim();
+    const name = formatCanonicalIngredientDisplayName(form.name.trim());
     const unit = form.unit.trim() || "kg";
     const pq = Number(form.purchase_quantity);
     const purchase_quantity = Number.isFinite(pq) && pq > 0 ? pq : 1;
@@ -159,7 +174,11 @@ function IngredientsPage() {
       return;
     }
 
-    const guard = guardIngredientCreation(name, catalog);
+    const guard = guardIngredientCreation(name, catalog, {
+      flowFunction: "IngredientsPage.saveNewIngredient",
+      flowOrigin: "manual_form",
+      rawInvoiceText: null,
+    });
     if (guard.action === "reuse") {
       setSaving(false);
       setError(
@@ -168,15 +187,37 @@ function IngredientsPage() {
       return;
     }
 
+    const normalizedName = normalizeIngredientName(name);
+    traceCanonicalCreateNameSource({
+      flowFunction: "IngredientsPage.saveNewIngredient",
+      flowOrigin: "manual_form",
+      stage: "form-resolved",
+      rawInvoiceText: null,
+      normalized: normalizedName,
+      finalCanonicalName: name,
+      nameSource: "form_input",
+      insertAttempted: false,
+    });
+    traceCanonicalCreateAttempt({
+      flowFunction: "IngredientsPage.saveNewIngredient",
+      flowOrigin: "manual_form",
+      stage: "insert-attempt",
+      rawInvoiceText: null,
+      normalized: normalizedName,
+      finalCanonicalName: name,
+      nameSource: "form_input",
+      insertAttempted: true,
+      blocked: false,
+    });
     console.info(`${INGREDIENT_CREATE_LOG_PREFIX} insert-attempt`, {
       name,
-      normalizedName: normalizeIngredientName(name),
+      normalizedName,
       source: "explicit_user_ingredients_page",
     });
     const { error } = await supabase.from("ingredients").insert({
       user_id: user.id,
       name,
-      normalized_name: normalizeIngredientName(name),
+      normalized_name: normalizedName,
       unit,
       current_price: Number(form.current_price) || 0,
       purchase_quantity,
@@ -223,6 +264,74 @@ function IngredientsPage() {
     await remove(id);
   };
 
+  const openRename = (ingredientId: string) => {
+    setSelectedIngredientId(ingredientId);
+    setRenameTargetId(ingredientId);
+    setRenameError(null);
+    setRenameOpen(true);
+  };
+
+  const saveRename = async (rawName: string) => {
+    const renameTarget = renameTargetId
+      ? (rows.find((ingredient) => ingredient.id === renameTargetId) ?? null)
+      : null;
+    if (!renameTarget) return;
+    setRenameSaving(true);
+    setRenameError(null);
+
+    const catalog = rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      normalized_name: row.normalized_name,
+    }));
+    const payload = buildCanonicalIngredientRenamePayload(
+      renameTarget.id,
+      rawName,
+      catalog,
+    );
+    if (!payload.ok) {
+      setRenameSaving(false);
+      setRenameError(payload.message);
+      return;
+    }
+
+    traceCanonicalRename("update-attempt", {
+      ingredientId: payload.update.ingredientId,
+      name: payload.update.name,
+      normalizedName: payload.update.normalized_name,
+    });
+    const { error: updateError } = await supabase
+      .from("ingredients")
+      .update({
+        name: payload.update.name,
+        normalized_name: payload.update.normalized_name,
+      })
+      .eq("id", payload.update.ingredientId);
+
+    setRenameSaving(false);
+    if (updateError) {
+      setRenameError(updateError.message);
+      return;
+    }
+
+    traceCanonicalRename("update-ok", {
+      ingredientId: payload.update.ingredientId,
+      name: payload.update.name,
+    });
+    traceFoodCostRecalculationSource("canonical_rename", {
+      ingredientId: payload.update.ingredientId,
+      surface: "ingredients",
+      note: "Recipes page recalculates on next catalog_reload when visited",
+    });
+    setRenameOpen(false);
+    setRenameTargetId(null);
+    await load();
+  };
+
+  const renameTarget = renameTargetId
+    ? (rows.find((ingredient) => ingredient.id === renameTargetId) ?? null)
+    : null;
+
   const selectedIngredient = selectedIngredientId
     ? (rows.find((ingredient) => ingredient.id === selectedIngredientId) ?? null)
     : null;
@@ -232,12 +341,21 @@ function IngredientsPage() {
       title="Ingredient costs"
       subtitle="Manage pack prices and recipe unit costs for margin control."
       action={
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className="inline-flex cursor-pointer items-center gap-2 bg-foreground text-background rounded-lg px-3.5 py-2 text-sm font-medium hover:opacity-90"
-        >
-          <Plus className="h-4 w-4" /> Add ingredient
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to="/ingredients/review"
+            className="inline-flex items-center gap-2 rounded-lg border border-border px-3.5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          >
+            <ClipboardList className="h-4 w-4" />
+            Revisão catálogo
+          </Link>
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="inline-flex cursor-pointer items-center gap-2 bg-foreground text-background rounded-lg px-3.5 py-2 text-sm font-medium hover:opacity-90"
+          >
+            <Plus className="h-4 w-4" /> Add ingredient
+          </button>
+        </div>
       }
     >
       {open && (
@@ -319,7 +437,7 @@ function IngredientsPage() {
                 <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="py-3 px-5 font-medium">Ingredient</th>
                   <th className="py-3 px-5 font-medium text-right">Pack price</th>
-                  <th className="py-3 pl-2 pr-5 font-medium w-16"></th>
+                  <th className="py-3 pl-2 pr-5 font-medium text-right w-28">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -356,7 +474,7 @@ function IngredientsPage() {
                     >
                       <td className="py-4 px-5">
                         <div className="font-medium transition-colors group-hover:text-foreground">
-                          {ing.name}
+                          {formatCanonicalIngredientDisplayName(ing.name)}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {denom > 1
@@ -381,9 +499,24 @@ function IngredientsPage() {
                             type="button"
                             onClick={(event) => {
                               event.stopPropagation();
+                              openRename(ing.id);
+                            }}
+                            className="inline-flex h-8 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/15 md:min-w-8 md:px-2"
+                            aria-label={`Rename ${formatCanonicalIngredientDisplayName(ing.name)}`}
+                          >
+                            <Pencil className="h-4 w-4" />
+                            <span className="sr-only md:not-sr-only md:inline text-xs font-medium">
+                              Edit
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
                               requestDelete(ing.id);
                             }}
                             className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/70 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/15"
+                            aria-label={`Delete ${formatCanonicalIngredientDisplayName(ing.name)}`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -404,9 +537,24 @@ function IngredientsPage() {
             selectedIngredient ? recipeLinkActivity[selectedIngredient.id] : undefined
           }
           onClose={() => setSelectedIngredientId(null)}
+          onRename={(id) => openRename(id)}
           onDelete={(id) => requestDelete(id)}
         />
       </div>
+      <CanonicalIngredientRenameDialog
+        open={renameOpen && renameTarget !== null}
+        onOpenChange={(open) => {
+          setRenameOpen(open);
+          if (!open) {
+            setRenameError(null);
+            setRenameTargetId(null);
+          }
+        }}
+        currentName={renameTarget?.name ?? ""}
+        saving={renameSaving}
+        error={renameError}
+        onSubmit={(canonicalName) => void saveRename(canonicalName)}
+      />
       <ConfirmDeleteDialog
         open={pendingDeleteId !== null}
         onOpenChange={(open) => {
@@ -423,22 +571,25 @@ function IngredientDetailPanel({
   priceActivity,
   recipeLinkActivity,
   onClose,
+  onRename,
   onDelete,
 }: {
   ingredient: Row | null;
   priceActivity: PriceActivity | undefined;
   recipeLinkActivity: RecipeLinkActivity | undefined;
   onClose: () => void;
+  onRename: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
   if (!ingredient) {
     return (
-      <Card className="hidden h-fit border-dashed bg-card/70 lg:block">
+      <Card className="h-fit border-dashed bg-card/70">
         <div className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           Ingredient cost details
         </div>
         <div className="mt-2 text-sm leading-6 text-muted-foreground">
-          Select an ingredient to review pack cost, recipe unit, and recipe exposure.
+          Select a row for pack cost and recipe exposure, or use Edit on any row to rename the
+          catalog name.
         </div>
       </Card>
     );
@@ -473,20 +624,30 @@ function IngredientDetailPanel({
             Ingredient cost details
           </div>
           <h2 className="mt-1.5 text-xl font-semibold leading-tight tracking-tight">
-            {ingredient.name}
+            {formatCanonicalIngredientDisplayName(ingredient.name)}
           </h2>
           <div className="mt-1 text-xs text-muted-foreground">
             {usageCount > 0 ? `Used in ${formatRecipeCount(usageCount)}` : "Not linked to recipes"}
           </div>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
-          aria-label="Close ingredient cost details"
-        >
-          <X className="h-4 w-4" />
-        </button>
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            onClick={() => onRename(ingredient.id)}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+            aria-label="Rename catalog ingredient"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+            aria-label="Close ingredient cost details"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       <div className="mt-5 grid grid-cols-2 gap-2.5">
@@ -574,7 +735,15 @@ function IngredientDetailPanel({
         </div>
       </section>
 
-      <div className="mt-3 flex justify-end">
+      <div className="mt-3 flex flex-wrap justify-end gap-2">
+        <button
+          type="button"
+          onClick={() => onRename(ingredient.id)}
+          className="inline-flex items-center gap-2 rounded-lg border border-foreground/20 bg-foreground/5 px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-foreground/10"
+        >
+          <Pencil className="h-4 w-4" />
+          Rename catalog name
+        </button>
         <button
           type="button"
           onClick={() => onDelete(ingredient.id)}

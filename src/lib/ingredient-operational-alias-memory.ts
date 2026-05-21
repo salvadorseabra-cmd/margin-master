@@ -11,7 +11,7 @@ import {
   type IngredientCanonicalInput,
 } from "@/lib/ingredient-canonical";
 import { normalizeSupplierShorthand } from "@/lib/ingredient-operational-aliases";
-import { normalizeInvoiceMatchIngredientName } from "@/lib/normalize-ingredient-name";
+import { normalizeInvoiceAliasMemoryKey } from "@/lib/normalize-ingredient-name";
 import { shouldSkipByOperationalProductFamilyGate } from "@/lib/ingredient-operational-family-gate";
 
 const DIACRITIC_RE = /\p{M}/gu;
@@ -93,7 +93,7 @@ function extractPreservedWeightTokens(expanded: string): string[] {
 }
 
 /**
- * Compact operational lookup key: shorthand → {@link normalizeInvoiceIngredientName} →
+ * Compact alias/operational lookup key: shorthand → {@link normalizeInvoiceAliasMemoryKey} →
  * lowercase collapsed text with product weights / grid cuts preserved.
  */
 export function normalizeOperationalAliasKey(raw: string): string {
@@ -102,7 +102,7 @@ export function normalizeOperationalAliasKey(raw: string): string {
 
   const expanded = normalizeSupplierShorthand(trimmed);
   const weightTokens = extractPreservedWeightTokens(expanded || trimmed);
-  const normalized = normalizeInvoiceMatchIngredientName(expanded || trimmed);
+  const normalized = normalizeInvoiceAliasMemoryKey(expanded || trimmed);
 
   let compact = (normalized || expanded || trimmed)
     .normalize("NFD")

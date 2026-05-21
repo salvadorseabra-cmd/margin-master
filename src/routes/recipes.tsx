@@ -14,7 +14,14 @@ import {
   formatUnitCostCurrency,
 } from "@/lib/display-format";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
+import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
 import { loadCanonicalIngredientCatalog } from "@/lib/ingredient-catalog-load";
+import {
+  logPickerAliasLeaksIfAny,
+  logRecipeCanonicalIntegrityOnLoad,
+  logRecipeCanonicalIntegrityOnSave,
+} from "@/lib/recipe-canonical-integrity";
+import { traceFoodCostRecalculationSource } from "@/lib/recipe-canonical-graph-trace";
 
 export const Route = createFileRoute("/recipes")({
   head: () => ({
@@ -210,7 +217,14 @@ function RecipesPage() {
       if (ingredientCatalog.error) {
         console.error("[recipes] ingredients catalog load failed:", ingredientCatalog.error);
       }
-      setIngredientOptions((ingredientCatalog.rows ?? []) as IngredientOption[]);
+      const catalogRows = ingredientCatalog.rows ?? [];
+      const pickerRows = catalogRows as IngredientOption[];
+      setIngredientOptions(pickerRows);
+      logPickerAliasLeaksIfAny(
+        pickerRows.map((row) => ({ id: row.id, name: row.name })),
+        catalogRows,
+        "recipes.ingredientOptions",
+      );
 
       if (activeRecipeId) {
         const activeRecipe =
@@ -240,6 +254,23 @@ function RecipesPage() {
       });
 
       setRecipeCosts(costs);
+
+      const recipeLines = loadedRecipes.flatMap((recipe) =>
+        (recipe.recipe_ingredients ?? [])
+          .filter((line) => line.ingredient_id)
+          .map((line) => ({
+            recipeId: recipe.id,
+            lineId: line.id,
+            ingredientId: line.ingredient_id as string,
+            ingredientName: line.ingredients?.name ?? null,
+          })),
+      );
+      logRecipeCanonicalIntegrityOnLoad({
+        recipes: loadedRecipes.map((r) => ({ id: r.id, name: r.name })),
+        recipeLines,
+        catalog: catalogRows,
+        recalcTrigger: "catalog_reload",
+      });
     },
     [user],
   );
@@ -364,6 +395,19 @@ function RecipesPage() {
 
     const editableLines = recipeForm.lines.filter((line) => line.ingredient_id);
 
+    logRecipeCanonicalIntegrityOnSave({
+      recipeId,
+      lines: editableLines.map((line) => ({
+        lineId: line.id,
+        ingredientId: line.ingredient_id,
+      })),
+      catalog: ingredientOptions.map((row) => ({
+        id: row.id,
+        name: row.name,
+        normalized_name: row.name.toLowerCase(),
+      })),
+    });
+
     const updateRequests = editableLines
       .filter((line) => line.id)
       .map((line) =>
@@ -410,6 +454,10 @@ function RecipesPage() {
     await load(recipeId);
     setFormMode("edit");
     setSaving(false);
+    traceFoodCostRecalculationSource("recipe_save_reload", {
+      recipeId,
+      surface: "recipes",
+    });
   };
 
   const recipeCostLines = getRecipeCostLines(recipeForm.lines, selectedRecipe, ingredientOptions);
@@ -448,7 +496,7 @@ function RecipesPage() {
       ingredients: recipeCostLines
         .filter((line) => line.line.ingredient_id)
         .map((line) => ({
-          name: line.ingredient?.name ?? "Unnamed ingredient",
+          name: formatCanonicalIngredientDisplayName(line.ingredient?.name) || "Unnamed ingredient",
           quantity: line.quantity,
           unit: line.line.unit || line.ingredient?.unit || "",
           unitCost: line.unitCost,
@@ -705,7 +753,7 @@ function RecipesPage() {
                       label="Primary margin exposure"
                       value={
                         highestCostDriver?.ingredient?.name
-                          ? highestCostDriver.ingredient.name
+                          ? formatCanonicalIngredientDisplayName(highestCostDriver.ingredient.name)
                           : "Add ingredients"
                       }
                       detail={highestCostDriverDetail}
@@ -758,7 +806,8 @@ function RecipesPage() {
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                               <div className="truncate text-sm font-medium">
-                                {driver.ingredient?.name ?? "Unnamed ingredient"}
+                                {formatCanonicalIngredientDisplayName(driver.ingredient?.name) ||
+                                  "Unnamed ingredient"}
                               </div>
                               <div className="mt-1 text-xs text-muted-foreground">
                                 {formatQuantityWithUnit(driver.quantity, driver.line.unit)}
@@ -858,7 +907,7 @@ function RecipesPage() {
                                   <option value="">Choose ingredient</option>
                                   {ingredientOptions.map((ingredient) => (
                                     <option key={ingredient.id} value={ingredient.id}>
-                                      {ingredient.name}
+                                      {formatCanonicalIngredientDisplayName(ingredient.name)}
                                     </option>
                                   ))}
                                 </select>

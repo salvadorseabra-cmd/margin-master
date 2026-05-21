@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
 import { formatCurrency, formatDecimal, formatPercent } from "@/lib/display-format";
-import { loadActiveIngredientCatalog } from "@/lib/ingredient-catalog-load";
+import { loadCanonicalIngredientCatalog } from "@/lib/ingredient-catalog-load";
 
 export const Route = createFileRoute("/alerts")({
   head: () => ({
@@ -173,7 +173,7 @@ function AlertsPage() {
         historyResult,
         invoicesResult,
       ] = await Promise.all([
-        loadActiveIngredientCatalog(
+        loadCanonicalIngredientCatalog(
           supabase,
           "current_price, purchase_quantity, purchase_unit, base_unit, created_at",
         ),

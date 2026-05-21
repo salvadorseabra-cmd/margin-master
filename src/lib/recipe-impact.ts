@@ -3,6 +3,7 @@ import type { Database, Tables } from "@/integrations/supabase/types";
 import { effectiveIngredientUnitCostEur, purchaseQuantityDenom } from "@/lib/ingredient-unit-cost";
 import { loadRecipeLinesByRecipeMapForClosure } from "./recipe-impact-engine";
 import { recipeTotalCostEurForRecipe, recipeTotalCostWithIngredientUnitOverrides } from "./recipe-merge";
+import { traceFoodCostRecalculationSource } from "./recipe-canonical-graph-trace";
 
 type AppSupabaseClient = SupabaseClient<Database>;
 
@@ -219,6 +220,8 @@ export async function computeRecipeCost(
   client: AppSupabaseClient,
   recipeId: string,
 ): Promise<RecipeCostResult> {
+  traceFoodCostRecalculationSource("compute_recipe_cost", { recipeId, surface: "recipe-impact" });
+
   const linesByRecipe = await loadRecipeLinesByRecipeMapForClosure(client, [recipeId]);
   const topLines = linesByRecipe.get(recipeId) ?? [];
   if (!topLines.length) return { costEur: 0, lines: [] };

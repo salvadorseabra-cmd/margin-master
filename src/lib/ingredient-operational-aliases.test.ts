@@ -166,10 +166,10 @@ describe("final horeca hardening", () => {
 });
 
 describe("operational memory match order", () => {
-  it("matches PICKL SLC 1KG to persisted catalog wording without semantic", () => {
-    const catalog = [ingredient("pickles-memory", "PICKL SLC 1KG")];
-    const first = findInvoiceItemIngredientMatch("PICKL SLC 1KG", catalog);
-    const second = findInvoiceItemIngredientMatch("PICKL SLC 1KG", catalog);
+  it("matches invoice line to persisted canonical catalog wording without semantic", () => {
+    const catalog = [ingredient("pickles-memory", "Pickles Sliced 1KG")];
+    const first = findInvoiceItemIngredientMatch("Pickles Sliced 1KG", catalog);
+    const second = findInvoiceItemIngredientMatch("Pickles Sliced 1KG", catalog);
 
     expect(first?.kind).toBe("operational-memory");
     expect(first?.semanticSimilarity).toBeUndefined();
@@ -180,9 +180,9 @@ describe("operational memory match order", () => {
   it("operational memory wins before semantic when wording was persisted", () => {
     const catalog = [
       ingredient("semantic-decoy", "Pickles Relish Sweet 1KG"),
-      ingredient("memory", "PICKL SLC 1KG"),
+      ingredient("memory", "Pickles Sliced 1KG"),
     ];
-    const match = findInvoiceItemIngredientMatch("PICKL SLC 1KG", catalog);
+    const match = findInvoiceItemIngredientMatch("Pickles Sliced 1KG", catalog);
     expect(match?.ingredient.id).toBe("memory");
     expect(match?.kind).toBe("operational-memory");
     expect(match?.semanticSimilarity).toBeUndefined();

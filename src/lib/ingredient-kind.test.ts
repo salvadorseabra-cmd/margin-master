@@ -6,6 +6,7 @@ import {
   findCanonicalNeighborForAlias,
   inferIngredientKindFromName,
   isAliasIngredientEntry,
+  isCanonicalIngredientEntry,
   looksLikeInvoiceShorthandName,
   resolveIngredientKind,
 } from "./ingredient-kind";
@@ -89,6 +90,17 @@ describe("filterCanonicalCatalogIngredients", () => {
     ];
     expect(filterCanonicalCatalogIngredients(catalog).map((row) => row.id)).toEqual(["canonical"]);
     expect(isAliasIngredientEntry(catalog[1]!)).toBe(true);
+  });
+
+  it("filters legacy CHK BREADED pollution marked canonical in DB", () => {
+    const catalog = [
+      ingredient("chicken", "Chicken Breaded / Frango Panado", { ingredient_kind: "canonical" }),
+      ingredient("leak", "CHK BREADED", { ingredient_kind: "canonical" }),
+      ingredient("angus-leak", "ANGUS PTY", { ingredient_kind: "canonical" }),
+    ];
+    expect(filterCanonicalCatalogIngredients(catalog).map((row) => row.id)).toEqual(["chicken"]);
+    expect(isCanonicalIngredientEntry(catalog[1]!)).toBe(false);
+    expect(filterMatchingCatalogIngredients(catalog).map((row) => row.id)).toEqual(["chicken"]);
   });
 });
 

@@ -3,9 +3,11 @@ import {
   applyManualIngredientCorrection,
   buildManualIngredientCorrectionKeys,
   MANUAL_CONFIRMATION_CONFIDENCE,
+  persistManualIngredientCorrection,
   rejectIngredientMatchSuggestion,
   resolveIngredientCorrectionUiState,
 } from "./ingredient-correction-memory";
+import type { AppSupabaseClient } from "./ingredient-alias-memory";
 import {
   clearOperationalAliasMemoryForTests,
   lookupOperationalAlias,
@@ -25,6 +27,13 @@ describe("buildManualIngredientCorrectionKeys", () => {
 
   it("returns null for empty names", () => {
     expect(buildManualIngredientCorrectionKeys("   ")).toBeNull();
+  });
+
+  it("expands CHK BREADED to chicken breaded operational alias", () => {
+    const keys = buildManualIngredientCorrectionKeys("CHK BREADED");
+    expect(keys).not.toBeNull();
+    expect(keys!.aliasName).toBe("CHK BREADED");
+    expect(keys!.normalizedAlias).toBe("chicken breaded");
   });
 });
 
@@ -50,6 +59,80 @@ describe("applyManualIngredientCorrection", () => {
     expect(entry?.ingredientId).toBe("bac-1");
     expect(entry?.source).toBe("manual_confirmation");
     expect(entry?.confidence).toBe(MANUAL_CONFIRMATION_CONFIDENCE);
+  });
+
+  it("stores supplier-scoped and global keys for CHK BREADED", () => {
+    const result = applyManualIngredientCorrection(
+      {
+        itemName: "CHK BREADED",
+        ingredientId: "chk-1",
+        ingredientName: "Chicken Breaded / Frango Panado",
+        supplierName: "Metro",
+      },
+      {},
+    );
+    expect(result).not.toBeNull();
+    expect(result!.nextConfirmedAliases["Metro::chicken breaded"]).toBe("chk-1");
+    expect(result!.nextConfirmedAliases["chicken breaded"]).toBe("chk-1");
+  });
+});
+
+describe("persistManualIngredientCorrection", () => {
+  it("upserts CHK BREADED alias after canonical create", async () => {
+    const insertCalls: Record<string, unknown>[] = [];
+    const supabase = {
+      from(table: string) {
+        if (table !== "ingredient_aliases") throw new Error(`unexpected table ${table}`);
+        return {
+          select() {
+            return {
+              eq() {
+                return {
+                  eq() {
+                    return {
+                      is() {
+                        return { maybeSingle: async () => ({ data: null, error: null }) };
+                      },
+                      eq() {
+                        return { maybeSingle: async () => ({ data: null, error: null }) };
+                      },
+                    };
+                  },
+                };
+              },
+            };
+          },
+          insert(payload: Record<string, unknown>) {
+            insertCalls.push(payload);
+            return Promise.resolve({ error: null });
+          },
+          update() {
+            return { eq: () => Promise.resolve({ error: null }) };
+          },
+        };
+      },
+    } as unknown as AppSupabaseClient;
+
+    const { applied, error } = await persistManualIngredientCorrection({
+      itemName: "CHK BREADED",
+      ingredientId: "chk-new",
+      ingredientName: "Chicken Breaded / Frango Panado",
+      supplierName: "Metro",
+      confirmedAliases: {},
+      supabase,
+    });
+
+    expect(error).toBeNull();
+    expect(applied).not.toBeNull();
+    expect(insertCalls).toHaveLength(1);
+    expect(insertCalls[0]).toMatchObject({
+      ingredient_id: "chk-new",
+      alias_name: "CHK BREADED",
+      normalized_alias: "chicken breaded",
+      confirmed_by_user: true,
+    });
+    expect(applied!.nextConfirmedAliases["Metro::chicken breaded"]).toBe("chk-new");
+    expect(applied!.nextConfirmedAliases["chicken breaded"]).toBe("chk-new");
   });
 });
 

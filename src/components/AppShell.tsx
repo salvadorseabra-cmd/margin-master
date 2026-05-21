@@ -11,6 +11,7 @@ import {
   Search,
   LogOut,
   Loader2,
+  ClipboardList,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { restaurant } from "@/lib/mock-data";
@@ -22,6 +23,7 @@ const nav = [
   { to: "/invoices", label: "Invoices", icon: Receipt },
   { to: "/recipes", label: "Recipes", icon: ChefHat },
   { to: "/ingredients", label: "Ingredients", icon: LineChart },
+  { to: "/ingredients/review", label: "Catalog review", icon: ClipboardList },
   { to: "/alerts", label: "Margin Alerts", icon: Bell },
 ] as const;
 

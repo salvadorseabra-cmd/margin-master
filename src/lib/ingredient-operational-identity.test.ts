@@ -45,6 +45,12 @@ describe("guardIngredientCreation", () => {
     expect(guard.action).toBe("create");
   });
 
+  it('does not treat "Batata palha" as duplicate of catalog row "Palha"', () => {
+    const catalog = [ingredient("palha-1", "Palha", "palha")];
+    const guard = guardIngredientCreation("Batata palha", catalog);
+    expect(guard.action).toBe("create");
+  });
+
   it("reuses on duplicate display name", () => {
     const catalog = [ingredient("b1", "BACON FATIAS")];
     const guard = guardIngredientCreation("bacon fatias", catalog);

@@ -6,6 +6,7 @@ import {
 import { isCanonicalIngredientEntry } from "@/lib/ingredient-kind";
 import { isSyntheticCatalogIngredientId } from "@/lib/ingredient-canonical-synthesis";
 import { normalizeInvoiceIngredientName } from "@/lib/ingredient-canonical";
+import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
 import {
   traceIngredientPickerCatalogStage,
   traceIngredientPickerOptionsStage,
@@ -13,6 +14,7 @@ import {
   traceIngredientPickerStageNote,
   traceRowsFromPickerOptions,
 } from "@/lib/ingredient-picker-trace";
+import { logPickerAliasLeaksIfAny } from "@/lib/recipe-canonical-integrity";
 
 const LOG_PREFIX = "[ingredient_picker]";
 
@@ -52,8 +54,13 @@ function isCanonicalCatalogRow(row: IngredientCanonicalInput): boolean {
   return true;
 }
 
-function displayNameForRow(row: IngredientCanonicalInput): string {
+function rawNameForRow(row: IngredientCanonicalInput): string {
   return row.name?.trim() || row.normalized_name?.trim() || row.id;
+}
+
+function displayNameForRow(row: IngredientCanonicalInput): string {
+  const raw = rawNameForRow(row);
+  return formatCanonicalIngredientDisplayName(raw) || raw;
 }
 
 /**
@@ -95,7 +102,7 @@ export function buildCanonicalIngredientPickerOptions(
       name,
       normalizedName,
       source,
-      searchKeywords: [name, normalizedName].filter(Boolean),
+      searchKeywords: [...new Set([rawNameForRow(row), name, normalizedName].filter(Boolean))],
     };
     rowsBeforeIdDedupe.push({
       ingredientId: row.id,
@@ -119,6 +126,7 @@ export function buildCanonicalIngredientPickerOptions(
 
   const canonicalOptions = [...byId.values()];
   traceIngredientPickerOptionsStage("03_canonical_after_id_dedupe", canonicalOptions);
+  logPickerAliasLeaksIfAny(canonicalOptions, catalog, "buildCanonicalIngredientPickerOptions");
   return canonicalOptions;
 }
 

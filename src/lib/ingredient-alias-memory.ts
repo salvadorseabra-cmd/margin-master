@@ -1,10 +1,19 @@
 import type { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
 import { buildIngredientAliasLookupKey, rememberAliasInMap } from "@/lib/ingredient-alias-lookup";
 import type { IngredientAliasMap } from "@/lib/ingredient-canonical";
-import { normalizeInvoiceIngredientName } from "@/lib/ingredient-canonical";
+import { normalizeInvoiceAliasMemoryKey } from "@/lib/normalize-ingredient-name";
 import { buildOverrideKeysFromInvoiceLine } from "@/lib/ingredient-match-override";
 import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
 import type { Database } from "@/integrations/supabase/types";
+import {
+  traceIngredientAliases,
+  traceIngredientAliasesCatch,
+  traceIngredientAliasesInsertAfter,
+  traceIngredientAliasesInsertBefore,
+  traceIngredientAliasesInsertError,
+  traceIngredientAliasesNormalizationRejection,
+  traceIngredientAliasesValidationRejection,
+} from "@/lib/ingredient-aliases-trace";
 
 export type AppSupabaseClient = SupabaseClient<Database>;
 
@@ -12,6 +21,7 @@ export {
   buildIngredientAliasLookupKey,
   lookupIngredientIdFromAliasMap,
   rememberAliasInMap,
+  rememberConfirmedAliasInMap,
 } from "@/lib/ingredient-alias-lookup";
 
 const CONFIDENCE_CAP = 10;
@@ -81,15 +91,33 @@ export async function upsertConfirmedAlias({
   supabase,
   manualConfirmation = false,
 }: UpsertConfirmedAliasParams): Promise<{ error: PostgrestError | null }> {
+  traceIngredientAliases("upsertConfirmedAlias:enter", {
+    function: "upsertConfirmedAlias",
+    aliasName,
+    ingredientId,
+    normalizedAliasOverride: normalizedAliasOverride ?? null,
+    supplierName: supplierName ?? null,
+    manualConfirmation,
+  });
+
   const alias = aliasName.trim();
   if (!alias) {
+    traceIngredientAliasesValidationRejection("upsertConfirmedAlias", "empty_alias_trim", {
+      aliasName,
+    });
     return {
       error: { message: "Alias name is required", code: "invalid_alias" } as PostgrestError,
     };
   }
 
-  const normalizedAlias = (normalizedAliasOverride?.trim() || normalizeInvoiceIngredientName(alias));
+  const normalizedAlias = (
+    normalizedAliasOverride?.trim() || normalizeInvoiceAliasMemoryKey(alias)
+  );
   if (!normalizedAlias) {
+    traceIngredientAliasesNormalizationRejection("upsertConfirmedAlias", "empty_after_normalize", {
+      aliasName: alias,
+      normalizedAliasOverride: normalizedAliasOverride ?? null,
+    });
     return {
       error: {
         message: "Alias name is empty after normalization",
@@ -100,34 +128,95 @@ export async function upsertConfirmedAlias({
 
   const supplier = normalizeSupplierScope(supplierName);
 
-  const { data: existing, error: selectError } = await existingAliasQuery(
+  const { data: existing, error: selectError, status: selectStatus } = await existingAliasQuery(
     supabase,
     ingredientId,
     normalizedAlias,
     supplier,
   );
 
+  traceIngredientAliases("upsertConfirmedAlias:select-after", {
+    aliasName: alias,
+    ingredientId,
+    normalizedAlias,
+    supplierName: supplier,
+    existingId: existing?.id ?? null,
+    selectStatus: selectStatus ?? null,
+    selectError: selectError
+      ? { message: selectError.message, code: selectError.code, details: selectError.details }
+      : null,
+  });
+
   if (selectError) {
     logSupabaseError("upsertConfirmedAlias select", selectError);
+    traceIngredientAliasesInsertError({
+      function: "upsertConfirmedAlias",
+      phase: "select",
+      aliasName: alias,
+      selectError: {
+        message: selectError.message,
+        code: selectError.code,
+        details: selectError.details,
+      },
+    });
     return { error: selectError };
   }
 
   if (existing) {
+    traceIngredientAliases("upsertConfirmedAlias:update-branch", {
+      aliasName: alias,
+      existingId: existing.id,
+      manualConfirmation,
+    });
     const currentConfidence = Number(existing.confidence);
     const nextConfidence = manualConfirmation
       ? CONFIDENCE_CAP
       : Math.min(CONFIDENCE_CAP, (Number.isFinite(currentConfidence) ? currentConfidence : 0) + 1);
-    const { error: updateError } = await supabase
+    const updatePayload = {
+      alias_name: alias,
+      confidence: nextConfidence,
+      confirmed_by_user: true,
+    };
+    traceIngredientAliasesInsertBefore({
+      function: "upsertConfirmedAlias",
+      phase: "update",
+      aliasName: alias,
+      payload: updatePayload,
+      existingId: existing.id,
+    });
+    const updateResponse = await supabase
       .from("ingredient_aliases")
-      .update({
-        alias_name: alias,
-        confidence: nextConfidence,
-        confirmed_by_user: true,
-      })
+      .update(updatePayload)
       .eq("id", existing.id);
+    traceIngredientAliasesInsertAfter({
+      function: "upsertConfirmedAlias",
+      phase: "update",
+      aliasName: alias,
+      data: updateResponse.data,
+      status: updateResponse.status,
+      statusText: updateResponse.statusText,
+      error: updateResponse.error
+        ? {
+            message: updateResponse.error.message,
+            code: updateResponse.error.code,
+            details: updateResponse.error.details,
+          }
+        : null,
+    });
 
+    const updateError = updateResponse.error;
     if (updateError) {
       logSupabaseError("upsertConfirmedAlias update", updateError);
+      traceIngredientAliasesInsertError({
+        function: "upsertConfirmedAlias",
+        phase: "update",
+        aliasName: alias,
+        error: {
+          message: updateError.message,
+          code: updateError.code,
+          details: updateError.details,
+        },
+      });
     } else {
       debugAliasLog("saved alias (updated)", {
         ingredientId,
@@ -139,17 +228,55 @@ export async function upsertConfirmedAlias({
     return { error: updateError };
   }
 
-  const { error: insertError } = await supabase.from("ingredient_aliases").insert({
+  const insertPayload = {
     ingredient_id: ingredientId,
     alias_name: alias,
     normalized_alias: normalizedAlias,
     supplier_name: supplier,
     confidence: manualConfirmation ? CONFIDENCE_CAP : 1,
     confirmed_by_user: true,
+  };
+  traceIngredientAliasesInsertBefore({
+    function: "upsertConfirmedAlias",
+    phase: "insert",
+    aliasName: alias,
+    payload: insertPayload,
   });
 
+  const insertResponse = await supabase.from("ingredient_aliases").insert(insertPayload);
+
+  traceIngredientAliasesInsertAfter({
+    function: "upsertConfirmedAlias",
+    phase: "insert",
+    aliasName: alias,
+    data: insertResponse.data,
+    status: insertResponse.status,
+    statusText: insertResponse.statusText,
+    error: insertResponse.error
+      ? {
+          message: insertResponse.error.message,
+          code: insertResponse.error.code,
+          details: insertResponse.error.details,
+          hint: insertResponse.error.hint,
+        }
+      : null,
+  });
+
+  const insertError = insertResponse.error;
   if (insertError) {
     logSupabaseError("upsertConfirmedAlias insert", insertError);
+    traceIngredientAliasesInsertError({
+      function: "upsertConfirmedAlias",
+      phase: "insert",
+      aliasName: alias,
+      payload: insertPayload,
+      error: {
+        message: insertError.message,
+        code: insertError.code,
+        details: insertError.details,
+        hint: insertError.hint,
+      },
+    });
   } else {
     debugAliasLog("saved alias (inserted)", {
       ingredientId,
@@ -158,6 +285,11 @@ export async function upsertConfirmedAlias({
       supplierName: supplier,
     });
   }
+  traceIngredientAliases("upsertConfirmedAlias:exit", {
+    aliasName: alias,
+    insertAttempted: true,
+    ok: !insertError,
+  });
   return { error: insertError };
 }
 
@@ -193,16 +325,11 @@ export async function loadConfirmedIngredientAliasMap(
       );
       if (!normalizedAlias) continue;
       map[buildIngredientAliasLookupKey(normalizedAlias, row.supplier_name)] = row.ingredient_id;
-      const legacyInvoiceNorm = row.alias_name?.trim()
-        ? normalizeInvoiceIngredientName(row.alias_name)
-        : "";
-      if (legacyInvoiceNorm && legacyInvoiceNorm !== normalizedAlias) {
-        map[buildIngredientAliasLookupKey(legacyInvoiceNorm, row.supplier_name)] = row.ingredient_id;
-      }
     }
     debugAliasLog("loaded confirmed aliases", { count: Object.keys(map).length });
     return map;
   } catch (err) {
+    traceIngredientAliasesCatch("loadConfirmedIngredientAliasMap", err);
     console.error(
       `${LOG_PREFIX} loadConfirmedIngredientAliasMap threw: ${err instanceof Error ? err.message : String(err)}`,
     );

@@ -49,3 +49,19 @@ export function toMergeCandidate(cluster: IngredientMergeCluster): IngredientMer
     confidence: cluster.confidence,
   };
 }
+
+/** Read-only merge hint for catalog review UI — does not execute merges. */
+export type IngredientMergeReadOnlyHint = IngredientMergeWorkflowHint & {
+  /** Informational canonical suggestion (e.g. oldest row policy); not an executed merge. */
+  suggestedCanonicalIngredientId: string | null;
+};
+
+export function buildReadOnlyMergeHint(
+  cluster: IngredientMergeCluster,
+  suggestedCanonicalIngredientId: string | null,
+): IngredientMergeReadOnlyHint {
+  return {
+    ...toMergeWorkflowHint(cluster),
+    suggestedCanonicalIngredientId,
+  };
+}

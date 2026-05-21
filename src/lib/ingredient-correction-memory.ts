@@ -1,6 +1,6 @@
 import type { PostgrestError } from "@supabase/supabase-js";
 import {
-  rememberAliasInMap,
+  rememberConfirmedAliasInMap,
   type AppSupabaseClient,
   upsertConfirmedAlias,
 } from "@/lib/ingredient-alias-memory";
@@ -19,6 +19,14 @@ import {
   rememberRejectedIngredientMatch,
   persistRejectedIngredientMatchesToStorage,
 } from "@/lib/ingredient-rejected-match-memory";
+import {
+  getAliasTraceCompareBucket,
+  traceIngredientAliases,
+  traceIngredientAliasesInsertError,
+  traceIngredientAliasesNormalizationRejection,
+  traceIngredientAliasesValidationRejection,
+} from "@/lib/ingredient-aliases-trace";
+import { traceAliasOnly } from "@/lib/ingredient-catalog-diagnostics";
 
 export const MANUAL_CONFIRMATION_CONFIDENCE = 10;
 
@@ -45,13 +53,49 @@ export function buildManualIngredientCorrectionKeys(
   supplierName?: string | null,
 ): ManualIngredientCorrectionKeys | null {
   const aliasName = itemName.trim();
-  if (!aliasName) return null;
+  if (!aliasName) {
+    traceIngredientAliasesValidationRejection(
+      "buildManualIngredientCorrectionKeys",
+      "empty_item_name_trim",
+      { itemName },
+    );
+    return null;
+  }
 
   const overrideKeys = buildOverrideKeysFromInvoiceLine(aliasName, supplierName);
-  if (!overrideKeys) return null;
+  if (!overrideKeys) {
+    traceIngredientAliasesNormalizationRejection(
+      "buildManualIngredientCorrectionKeys",
+      "buildOverrideKeysFromInvoiceLine_null",
+      { itemName: aliasName, supplierName: supplierName ?? null },
+    );
+    return null;
+  }
 
   const expandedName = normalizeSupplierShorthand(aliasName);
   const operationalAliasKey = normalizeOperationalAliasKey(expandedName || aliasName);
+  if (!operationalAliasKey) {
+    traceIngredientAliasesNormalizationRejection(
+      "buildManualIngredientCorrectionKeys",
+      "operational_alias_key_empty",
+      {
+        itemName: aliasName,
+        expandedName,
+        supplierName: supplierName ?? null,
+      },
+    );
+    return null;
+  }
+
+  traceIngredientAliases("buildManualIngredientCorrectionKeys:ok", {
+    itemName: aliasName,
+    compareBucket: getAliasTraceCompareBucket(aliasName),
+    normalizedAlias: overrideKeys.rawNormalized,
+    aliasLookupKey: overrideKeys.lookupKey,
+    operationalAliasKey,
+    expandedName,
+    supplierName: supplierName ?? null,
+  });
 
   return {
     aliasName,
@@ -68,11 +112,24 @@ export function applyManualIngredientCorrection(
   payload: ManualIngredientCorrectionPayload,
   confirmedAliases: IngredientAliasMap,
 ): ApplyManualIngredientCorrectionResult | null {
+  traceIngredientAliases("applyManualIngredientCorrection:enter", {
+    function: "applyManualIngredientCorrection",
+    itemName: payload.itemName,
+    ingredientId: payload.ingredientId,
+    supplierName: payload.supplierName ?? null,
+  });
   const keys = buildManualIngredientCorrectionKeys(payload.itemName, payload.supplierName);
-  if (!keys) return null;
+  if (!keys) {
+    traceIngredientAliases("applyManualIngredientCorrection:early-return", {
+      branch: "keys_null",
+      itemName: payload.itemName,
+    });
+    return null;
+  }
 
-  const nextConfirmedAliases = rememberAliasInMap(
+  const nextConfirmedAliases = rememberConfirmedAliasInMap(
     confirmedAliases,
+    keys.aliasName,
     keys.normalizedAlias,
     payload.ingredientId,
     payload.supplierName,
@@ -93,6 +150,11 @@ export function applyManualIngredientCorrection(
     payload.supplierName,
   );
 
+  traceIngredientAliases("applyManualIngredientCorrection:ok", {
+    itemName: payload.itemName,
+    aliasLookupKey: keys.aliasLookupKey,
+    ingredientId: payload.ingredientId,
+  });
   return { ...keys, nextConfirmedAliases };
 }
 
@@ -110,6 +172,13 @@ export type PersistManualIngredientCorrectionResult = {
  * Persist invoice wording → ingredient for manual confirm or catalog pick.
  * Updates alias map keys used by canonical matching before semantic lookup.
  */
+const MANUAL_ALIAS_LOG_PREFIX = "[canonical-create]";
+
+function traceManualAliasPersist(stage: string, details?: Record<string, unknown>): void {
+  if (details) console.info(`${MANUAL_ALIAS_LOG_PREFIX} ${stage}`, details);
+  else console.info(`${MANUAL_ALIAS_LOG_PREFIX} ${stage}`);
+}
+
 export async function persistManualIngredientCorrection({
   itemName,
   ingredientId,
@@ -118,16 +187,57 @@ export async function persistManualIngredientCorrection({
   confirmedAliases,
   supabase,
 }: PersistManualIngredientCorrectionParams): Promise<PersistManualIngredientCorrectionResult> {
+  traceAliasOnly("persist-manual-correction", {
+    itemName,
+    ingredientId,
+    ingredientName,
+    supplierName: supplierName ?? null,
+    note: "ingredient_aliases only — no ingredients.insert",
+  });
+  traceManualAliasPersist("alias-persist-start", {
+    itemName,
+    ingredientId,
+    ingredientName,
+    supplierName: supplierName ?? null,
+  });
+
   const applied = applyManualIngredientCorrection(
     { itemName, ingredientId, ingredientName, supplierName },
     confirmedAliases,
   );
   if (!applied) {
+    traceManualAliasPersist("alias-persist-skipped", {
+      itemName,
+      reason: "invalid_invoice_line_name",
+    });
+    traceIngredientAliases("persistManualIngredientCorrection:early-return", {
+      function: "persistManualIngredientCorrection",
+      branch: "applyManualIngredientCorrection_null",
+      itemName,
+      compareBucket: getAliasTraceCompareBucket(itemName),
+    });
     return {
       applied: null,
       error: { message: "Invalid invoice line name", code: "invalid_alias" } as PostgrestError,
     };
   }
+
+  traceManualAliasPersist("alias-upsert-attempt", {
+    aliasName: applied.aliasName,
+    normalizedAlias: applied.normalizedAlias,
+    aliasLookupKey: applied.aliasLookupKey,
+    ingredientId,
+  });
+
+  traceIngredientAliases("persistManualIngredientCorrection:upsert-call", {
+    function: "persistManualIngredientCorrection",
+    itemName,
+    aliasName: applied.aliasName,
+    normalizedAlias: applied.normalizedAlias,
+    ingredientId,
+    supplierName: supplierName ?? null,
+    compareBucket: getAliasTraceCompareBucket(itemName),
+  });
 
   const { error } = await upsertConfirmedAlias({
     ingredientId,
@@ -137,6 +247,27 @@ export async function persistManualIngredientCorrection({
     supabase,
     manualConfirmation: true,
   });
+
+  if (error) {
+    traceIngredientAliasesInsertError({
+      function: "persistManualIngredientCorrection",
+      itemName,
+      aliasName: applied.aliasName,
+      error: { message: error.message, code: error.code },
+    });
+    traceManualAliasPersist("alias-upsert-failed", {
+      aliasName: applied.aliasName,
+      normalizedAlias: applied.normalizedAlias,
+      message: error.message,
+      code: error.code,
+    });
+  } else {
+    traceManualAliasPersist("alias-upsert-ok", {
+      aliasName: applied.aliasName,
+      normalizedAlias: applied.normalizedAlias,
+      ingredientId,
+    });
+  }
 
   return { applied, error };
 }

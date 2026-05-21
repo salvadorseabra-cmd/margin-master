@@ -1,3 +1,4 @@
+import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
 import type {
   IngredientAliasMap,
   IngredientCanonicalMatch,
@@ -285,18 +286,15 @@ export function resolveMatchTargetDisplayName(
     match.ingredient.normalized_name,
   ]) {
     const trimmed = candidate?.trim();
-    if (trimmed) return trimmed;
+    if (trimmed) return formatCanonicalIngredientDisplayName(trimmed);
   }
   return null;
 }
 
 export function matchTargetLabelPrefix(
-  kind: IngredientCanonicalMatchKind,
-  aliasScope: "supplier" | "global" | null,
+  _kind: IngredientCanonicalMatchKind,
+  _aliasScope: "supplier" | "global" | null,
 ): string {
-  if (kind === "confirmed-override" || kind === "confirmed-alias") {
-    return aliasScope === "supplier" ? "Using existing ingredient:" : "Alias of:";
-  }
   return "Matched to:";
 }
 

@@ -40,7 +40,7 @@ describe("ingredient rejected match memory", () => {
   });
 
   it("persists rejected pair and blocks matcher on reload", () => {
-    const catalog = [ingredient("angus-1", "ANGUS PTY")];
+    const catalog = [ingredient("angus-1", "Angus Burger Patty 180g")];
     const before = findInvoiceItemIngredientMatch("ANGUS PTY", catalog);
     expect(before?.ingredient.id).toBe("angus-1");
 
@@ -65,14 +65,16 @@ describe("ingredient rejected match memory", () => {
 
   it("keeps ingredient catalog intact and only blocks the rejected pair", () => {
     const catalog = [
-      ingredient("angus-1", "ANGUS PTY"),
-      ingredient("smash-1", "SMASH PTY 90"),
+      ingredient("angus-1", "Angus Burger Patty 180g"),
+      ingredient("pickles-1", "Pickles Sliced 1KG"),
     ];
     rememberRejectedIngredientMatch("ANGUS PTY", "angus-1");
 
     expect(findInvoiceItemIngredientMatch("ANGUS PTY", catalog)).toBeNull();
-    expect(findInvoiceItemIngredientMatch("SMASH PTY 90", catalog)?.ingredient.id).toBe("smash-1");
-    expect(catalog.map((row) => row.id)).toEqual(["angus-1", "smash-1"]);
+    expect(findInvoiceItemIngredientMatch("Pickles Sliced 1KG", catalog)?.ingredient.id).toBe(
+      "pickles-1",
+    );
+    expect(catalog.map((row) => row.id)).toEqual(["angus-1", "pickles-1"]);
   });
 
   it("skips rejected pair in semantic candidate loop", () => {
@@ -95,7 +97,7 @@ describe("ingredient rejected match memory", () => {
   });
 
   it("blocks confirmed-alias rematch after wrong-match rejection", () => {
-    const catalog = [ingredient("angus-1", "ANGUS PTY")];
+    const catalog = [ingredient("angus-1", "Angus Burger Patty 180g")];
     const aliases = { "angus pty": "angus-1" };
     expect(findCanonicalIngredientMatch("ANGUS PTY", catalog, aliases)?.kind).toBe(
       "confirmed-alias",
@@ -106,7 +108,7 @@ describe("ingredient rejected match memory", () => {
   });
 
   it("blocks exact self-match when rejection was stored from raw invoice wording", () => {
-    const catalog = [ingredient("angus-1", "ANGUS PTY")];
+    const catalog = [ingredient("angus-1", "Angus Burger Patty 180g")];
     rememberRejectedIngredientMatch("ANG PTY 180", "angus-1", null, Date.now(), ["ANG PTY 180"]);
     expect(
       findInvoiceItemIngredientMatch("ANG PTY 180", catalog, {}, null),
@@ -129,8 +131,8 @@ describe("ingredient rejected match memory", () => {
 describe("rejection side effects", () => {
   it("does not mutate ingredient catalog or duplicate picker ids", () => {
     const catalog = [
-      ingredient("angus-1", "ANGUS PTY"),
-      ingredient("smash-1", "SMASH PTY 90"),
+      ingredient("angus-1", "Angus Burger Patty 180g"),
+      ingredient("pickles-1", "Pickles Sliced 1KG"),
     ];
     const catalogBefore = catalog.map((row) => row.id);
     rememberRejectedIngredientMatch("ANGUS PTY", "angus-1");

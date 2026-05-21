@@ -160,6 +160,40 @@ function applyConservativeSynonyms(tokens: string[]): string[] {
   return out;
 }
 
+/** Alias persistence keys: keep product-form tokens (palha vs frita), still expand cereja→cherry. */
+function applyAliasMemorySynonyms(tokens: string[]): string[] {
+  const out: string[] = [];
+  for (const token of tokens) {
+    if (token === "cereja") {
+      out.push("cherry");
+      continue;
+    }
+    out.push(token);
+  }
+  return out;
+}
+
+type InvoiceNameNormalizeMode = "match" | "alias_memory";
+
+function normalizeInvoiceNameCore(raw: string, mode: InvoiceNameNormalizeMode): string {
+  let value = stripAccentsLower(raw);
+  value = expandAbbreviations(value);
+  value = stripPackagingParentheticals(value);
+  value = stripOuterPackWording(value);
+  value = value.replace(/[^a-z0-9\s]+/g, " ");
+  value = collapseWhitespace(value);
+  value = removeCommercialPhrases(value);
+  value = removePackagingQuantities(value);
+
+  let tokens = filterTokens(value.split(/\s+/), STANDALONE_PACKAGING_UNITS);
+  tokens = filterTokens(tokens, COMMERCIAL_TOKENS);
+  tokens = filterTokens(tokens, PRODUCT_FORM_TOKENS);
+  tokens =
+    mode === "alias_memory" ? applyAliasMemorySynonyms(tokens) : applyConservativeSynonyms(tokens);
+
+  return collapseWhitespace(tokens.join(" "));
+}
+
 function stripOuterPackWording(value: string): string {
   let s = value;
   s = s.replace(OUTER_PACK_RE, " ");
@@ -185,21 +219,16 @@ function stripPackagingParentheticals(value: string): string {
  * normalizeInvoiceMatchIngredientName("TOM. CHERRY RAMA 250GR") // "tomate cherry"
  */
 export function normalizeInvoiceMatchIngredientName(raw: string): string {
-  let value = stripAccentsLower(raw);
-  value = expandAbbreviations(value);
-  value = stripPackagingParentheticals(value);
-  value = stripOuterPackWording(value);
-  value = value.replace(/[^a-z0-9\s]+/g, " ");
-  value = collapseWhitespace(value);
-  value = removeCommercialPhrases(value);
-  value = removePackagingQuantities(value);
+  return normalizeInvoiceNameCore(raw, "match");
+}
 
-  let tokens = filterTokens(value.split(/\s+/), STANDALONE_PACKAGING_UNITS);
-  tokens = filterTokens(tokens, COMMERCIAL_TOKENS);
-  tokens = filterTokens(tokens, PRODUCT_FORM_TOKENS);
-  tokens = applyConservativeSynonyms(tokens);
-
-  return collapseWhitespace(tokens.join(" "));
+/**
+ * Line-specific key for ingredient_aliases / confirmed alias map.
+ * Strips pack and retailer noise like match normalization but does not collapse
+ * distinct potato forms (palha vs frita) into one shared bucket.
+ */
+export function normalizeInvoiceAliasMemoryKey(raw: string): string {
+  return normalizeInvoiceNameCore(raw, "alias_memory");
 }
 
 /** @deprecated Use {@link normalizeInvoiceMatchIngredientName}; kept for tests that expect uppercase. */

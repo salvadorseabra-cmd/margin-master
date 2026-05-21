@@ -8,6 +8,10 @@ import type { IngredientAliasMap, IngredientCanonicalInput } from "@/lib/ingredi
 import { normalizeSupplierShorthand } from "@/lib/ingredient-operational-aliases";
 import { normalizeOperationalAliasKey } from "@/lib/ingredient-operational-alias-memory";
 import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
+import {
+  traceIngredientAliasesNormalizationRejection,
+  traceIngredientAliasesValidationRejection,
+} from "@/lib/ingredient-aliases-trace";
 
 export type IngredientMatchOverride = {
   invoiceSupplierNormalized?: string;
@@ -47,11 +51,23 @@ export function buildOverrideKeysFromInvoiceLine(
   invoiceSupplierNormalized?: string;
 } | null {
   const trimmed = itemName?.trim();
-  if (!trimmed) return null;
+  if (!trimmed) {
+    traceIngredientAliasesValidationRejection("buildOverrideKeysFromInvoiceLine", "empty_trim", {
+      itemName,
+    });
+    return null;
+  }
 
   const expanded = normalizeSupplierShorthand(trimmed);
   const rawNormalized = normalizeOperationalAliasKey(expanded || trimmed);
-  if (!rawNormalized) return null;
+  if (!rawNormalized) {
+    traceIngredientAliasesNormalizationRejection(
+      "buildOverrideKeysFromInvoiceLine",
+      "normalizeOperationalAliasKey_empty",
+      { itemName: trimmed, expanded, supplierName: supplierName ?? null },
+    );
+    return null;
+  }
 
   const invoiceSupplierNormalized = normalizeSupplierScope(supplierName);
   return {

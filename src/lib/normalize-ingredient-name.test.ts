@@ -3,6 +3,7 @@ import {
   INVOICE_MATCH_NORMALIZATION_EXAMPLES,
   NORMALIZE_INGREDIENT_NAME_EXAMPLES,
   normalizeIngredientName,
+  normalizeInvoiceAliasMemoryKey,
   normalizeInvoiceMatchIngredientName,
 } from "./normalize-ingredient-name";
 import { normalizeInvoiceIngredientName } from "./ingredient-canonical";
@@ -38,6 +39,23 @@ describe("normalizeInvoiceMatchIngredientName", () => {
 
   it("removes commercial phrases case-insensitively", () => {
     expect(normalizeInvoiceMatchIngredientName("azeite rama food service 500ml")).toBe("azeite");
+  });
+});
+
+describe("normalizeInvoiceAliasMemoryKey", () => {
+  it("keeps distinct potato form tokens for alias persistence", () => {
+    const palha = normalizeInvoiceAliasMemoryKey("BATATA PALHA 2KG SERVICE");
+    const frita = normalizeInvoiceAliasMemoryKey("BATATA FRITA CORTE FINO 2KG");
+    const snack = normalizeInvoiceAliasMemoryKey("PALHA SNACK FOOD SERVICE 2KG");
+
+    expect(palha).toBe("batata palha");
+    expect(frita).toBe("batata frita");
+    expect(snack).toBe("palha");
+    expect(new Set([palha, frita, snack]).size).toBe(3);
+  });
+
+  it("still collapses cereja for alias keys", () => {
+    expect(normalizeInvoiceAliasMemoryKey("TOMATE CEREJA PREMIUM")).toBe("tomate cherry");
   });
 });
 

@@ -417,13 +417,18 @@ describe("horeca shorthand canonical ranking", () => {
 });
 
 describe("archived catalog filtering", () => {
-  it("matches only the active ANGUS PTY when archived duplicates remain in the array", () => {
+  it("matches invoice shorthand only to active canonical when archived duplicates remain", () => {
     const catalog: IngredientCanonicalInput[] = [
-      { id: "canonical", name: "ANGUS PTY", normalized_name: "angus pty" },
+      {
+        id: "canonical",
+        name: "Angus Burger Patty 180g",
+        normalized_name: "angus burger patty 180g",
+        ingredient_kind: "canonical",
+      },
       {
         id: "dup",
-        name: "ANGUS PTY",
-        normalized_name: "angus pty",
+        name: "Angus Burger Patty 180g",
+        normalized_name: "angus burger patty 180g",
         is_archived: true,
         merged_into_ingredient_id: "canonical",
       },

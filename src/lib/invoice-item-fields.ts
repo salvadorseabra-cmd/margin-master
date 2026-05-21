@@ -102,6 +102,41 @@ export const cleanInvoiceItemDisplayName = (
     .trim();
 };
 
+const INVOICE_ADDRESS_RE =
+  /(^|\s)(?:travessa|trav\.?|rua|r\.|avenida|av\.?|estrada|largo|praceta|praca|rotunda|urbanizacao|zona\s+industrial|parque\s+industrial|edificio|lote|loja|andar|sala|apartado|cod\.?\s+postal|cp)(?=\s|,|\.|:|$)/iu;
+const INVOICE_BUSINESS_METADATA_RE =
+  /(^|\s)(?:lda|l\.?da|unipessoal|sa|s\.?a\.?|sociedade|comercial|distribuicao|armazem|sede|delegacao|gerencia|gerente|eng\.?|engenheiro|dr\.?|dra\.?)(?=\s|,|\.|:|$)/iu;
+const INVOICE_PAYMENT_METADATA_RE =
+  /\b(?:iban|swift|bic|sepa|referencia\s+mb|ref\.?\s+mb|entidade|pagamento|transferencia|multibanco|mb\s*way|cartao|visa|mastercard)\b/iu;
+const INVOICE_TAX_SUMMARY_RE =
+  /\b(?:base\s+incidencia|incidencia|valor\s+iva|taxa\s+iva|iva\s+dedutivel|total\s+liquido|total\s+mercadoria|total\s+documento|valor\s+a\s+pagar)\b/iu;
+
+const normalizeInvoiceRowNameForFilter = (name: string) =>
+  name
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase();
+
+/** Non-ingredient OCR rows (addresses, tax lines, payment metadata) excluded from normalization counts. */
+export function shouldRejectInvoiceIngredientRow(
+  item: Pick<InvoiceItemRow, "name" | "quantity" | "unit" | "unit_price" | "total">,
+): boolean {
+  const name = cleanInvoiceItemDisplayName(item);
+  if (!name || !/[A-Za-zÀ-ÿ]/u.test(name)) return true;
+
+  const normalized = normalizeInvoiceRowNameForFilter(name);
+  const hasParsedRowFields =
+    item.quantity != null || item.unit != null || item.unit_price != null || item.total != null;
+  if (INVOICE_PAYMENT_METADATA_RE.test(normalized) || INVOICE_TAX_SUMMARY_RE.test(normalized)) {
+    return true;
+  }
+  if (INVOICE_ADDRESS_RE.test(normalized)) return true;
+  if (INVOICE_BUSINESS_METADATA_RE.test(normalized) && !hasParsedRowFields) {
+    return true;
+  }
+  return false;
+}
+
 export const normalizeInvoiceItemFields = <T extends Partial<InvoiceItemRow>>(
   item: T,
 ): T & InvoiceItemRow => {

@@ -142,6 +142,9 @@ export function isAliasIngredientEntry(entry: IngredientKindInput): boolean {
 }
 
 export function isCanonicalIngredientEntry(entry: IngredientKindInput): boolean {
+  const displayName = entry.name ?? entry.normalized_name ?? "";
+  // Legacy pollution: auto-created rows stored as canonical with invoice shorthand names.
+  if (looksLikeInvoiceShorthandName(displayName)) return false;
   return !isAliasIngredientEntry(entry);
 }
 
@@ -154,10 +157,12 @@ export function filterCanonicalCatalogIngredients<T extends IngredientKindInput>
   );
 }
 
-/** Active rows for invoice matching — excludes only explicit DB alias kind (not all-caps heuristic). */
+/** Active rows for invoice matching — excludes alias kind and shorthand catalog pollution. */
 export function filterMatchingCatalogIngredients<T extends IngredientKindInput>(catalog: T[]): T[] {
   return filterActiveCatalogIngredients(catalog).filter(
-    (entry) => !isExplicitAliasIngredientEntry(entry),
+    (entry) =>
+      !isExplicitAliasIngredientEntry(entry) &&
+      !looksLikeInvoiceShorthandName(entry.name ?? entry.normalized_name ?? ""),
   );
 }
 

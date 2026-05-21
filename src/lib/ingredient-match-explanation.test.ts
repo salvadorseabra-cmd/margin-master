@@ -159,7 +159,7 @@ describe("resolveMatchTargetDisplayName", () => {
       kind: "exact",
       ingredient: { id: "ing-1", name: null, normalized_name: "tomate cherry" },
     });
-    expect(resolveMatchTargetDisplayName(match)).toBe("tomate cherry");
+    expect(resolveMatchTargetDisplayName(match)).toBe("Tomate cherry");
     expect(
       resolveMatchTargetDisplayName(match, {
         id: "ing-1",
@@ -177,8 +177,8 @@ describe("buildMatchTargetLabel", () => {
       ingredient: { id: "ing-1", name: null, normalized_name: "tomate cherry" },
     });
     expect(buildMatchTargetLabel(match)).toEqual({
-      prefix: "Alias of:",
-      name: "tomate cherry",
+      prefix: "Matched to:",
+      name: "Tomate cherry",
     });
   });
 
@@ -198,7 +198,7 @@ describe("buildMatchTargetLabel", () => {
     expect(matchTargetLabelPrefix("operational-equivalent", null)).toBe("Matched to:");
   });
 
-  it("uses alias prefixes for confirmed matches by scope", () => {
+  it("uses Matched to for confirmed alias matches regardless of scope", () => {
     const match = baseMatch({ kind: "confirmed-alias" });
     const supplierKey = buildIngredientAliasLookupKey(match.normalizedItemName, "Metro");
 
@@ -206,14 +206,14 @@ describe("buildMatchTargetLabel", () => {
       supplierName: "Metro",
       confirmedAliases: { [supplierKey]: "ing-1" },
     });
-    expect(supplier?.prefix).toBe("Using existing ingredient:");
-    expect(formatMatchTargetLabel(supplier!)).toBe("Using existing ingredient: Tomate cherry");
+    expect(supplier?.prefix).toBe("Matched to:");
+    expect(formatMatchTargetLabel(supplier!)).toBe("Matched to: Tomate cherry");
 
     const global = buildMatchTargetLabel(match, {
       confirmedAliases: { [match.normalizedItemName]: "ing-1" },
     });
-    expect(global?.prefix).toBe("Alias of:");
-    expect(formatMatchTargetLabel(global!)).toBe("Alias of: Tomate cherry");
+    expect(global?.prefix).toBe("Matched to:");
+    expect(formatMatchTargetLabel(global!)).toBe("Matched to: Tomate cherry");
   });
 });
 

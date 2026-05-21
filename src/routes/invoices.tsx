@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
-import { StatusPill } from "./index";
 import {
   UploadCloud,
   FileText,
@@ -18,6 +17,7 @@ import {
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 import { type UnitInferenceResult, type PackageType } from "@/lib/ingredient-unit-inference";
 import {
@@ -35,7 +35,7 @@ import {
   type IngredientAliasMap,
   type IngredientCanonicalMatch,
 } from "@/lib/ingredient-canonical";
-import { loadActiveIngredientCatalog } from "@/lib/ingredient-catalog-load";
+import { loadMatchingIngredientCatalog } from "@/lib/ingredient-catalog-load";
 import {
   buildMatchExplanation,
   buildMatchTargetLabel,
@@ -50,10 +50,21 @@ import {
 } from "@/lib/invoice-ingredient-row-display";
 import { traceInvoiceIngredientMatchPipeline } from "@/lib/invoice-ingredient-match-trace";
 import {
+  getAliasTraceCompareBucket,
+  traceIngredientAliases,
+  traceIngredientAliasesCatch,
+} from "@/lib/ingredient-aliases-trace";
+import {
   cleanInvoiceItemDisplayName,
   normalizeInvoiceItemFields,
   normalizeInvoiceUnitToken,
+  shouldRejectInvoiceIngredientRow,
 } from "@/lib/invoice-item-fields";
+import {
+  countUnresolvedInvoiceIngredients,
+  countUnresolvedInvoiceIngredientsByInvoice,
+  deriveInvoiceListIngredientStatus,
+} from "@/lib/invoice-unresolved-ingredient-count";
 import {
   buildKnownSupplierNames,
   deriveInvoiceLineOperationalSignals,
@@ -69,7 +80,6 @@ import {
 } from "@/lib/invoice-operational-metadata";
 import { loadConfirmedIngredientAliasMap } from "@/lib/ingredient-alias-memory";
 import {
-  applyManualIngredientCorrection,
   persistManualIngredientCorrection,
   rejectIngredientMatchPair,
   rejectIngredientMatchSuggestion,
@@ -82,6 +92,18 @@ import {
 import { hydrateIngredientMatchOverridesFromAliasRows } from "@/lib/ingredient-match-override";
 import { hydrateOperationalAliasMemoryFromConfirmedMap } from "@/lib/ingredient-operational-alias-memory";
 import { IngredientCorrectionActions } from "@/components/invoice-ingredient-correction";
+import {
+  CanonicalIngredientCreateDialog,
+  type CanonicalIngredientCreateSubmitValues,
+} from "@/components/canonical-ingredient-create-dialog";
+import {
+  buildCanonicalIngredientCreateDefaults,
+  buildExplicitCanonicalInsertPayload,
+  traceCanonicalConfirmedName,
+  traceCanonicalCreate,
+  traceCanonicalCreateFailure,
+  validateCanonicalIngredientName,
+} from "@/lib/canonical-ingredient-create";
 import { buildIngredientPickerOptionsForInvoice } from "@/lib/ingredient-picker-options";
 import {
   isIngredientPickerTraceEnabled,
@@ -90,10 +112,10 @@ import {
 } from "@/lib/ingredient-picker-trace";
 import {
   autoPersistUnmatchedInvoiceItems,
-  buildIngredientInsertPayload,
   persistIngredientFromInvoiceItem,
 } from "@/lib/ingredient-auto-persist";
-import { looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
+import { traceCanonicalCreateAttempt } from "@/lib/ingredient-catalog-diagnostics";
+import { traceFoodCostRecalculationSource } from "@/lib/recipe-canonical-graph-trace";
 import { guardIngredientCreation } from "@/lib/ingredient-operational-identity";
 import {
   fileNameFromInvoicePath,
@@ -484,34 +506,6 @@ const toInvoiceRow = (
 const normalizeExtractedItemName = (name: string | null | undefined) =>
   name?.trim().toLowerCase() ?? "";
 
-const INVOICE_ADDRESS_RE =
-  /(^|\s)(?:travessa|trav\.?|rua|r\.|avenida|av\.?|estrada|largo|praceta|praca|rotunda|urbanizacao|zona\s+industrial|parque\s+industrial|edificio|lote|loja|andar|sala|apartado|cod\.?\s+postal|cp)(?=\s|,|\.|:|$)/iu;
-const INVOICE_BUSINESS_METADATA_RE =
-  /(^|\s)(?:lda|l\.?da|unipessoal|sa|s\.?a\.?|sociedade|comercial|distribuicao|armazem|sede|delegacao|gerencia|gerente|eng\.?|engenheiro|dr\.?|dra\.?)(?=\s|,|\.|:|$)/iu;
-const INVOICE_PAYMENT_METADATA_RE =
-  /\b(?:iban|swift|bic|sepa|referencia\s+mb|ref\.?\s+mb|entidade|pagamento|transferencia|multibanco|mb\s*way|cartao|visa|mastercard)\b/iu;
-const INVOICE_TAX_SUMMARY_RE =
-  /\b(?:base\s+incidencia|incidencia|valor\s+iva|taxa\s+iva|iva\s+dedutivel|total\s+liquido|total\s+mercadoria|total\s+documento|valor\s+a\s+pagar)\b/iu;
-
-const shouldRejectInvoiceItemName = (
-  item: Pick<ItemRow, "name" | "quantity" | "unit" | "unit_price" | "total">,
-) => {
-  const name = cleanInvoiceItemDisplayName(item);
-  if (!name || !/[A-Za-zÀ-ÿ]/u.test(name)) return true;
-
-  const normalized = normalizeDisplayName(name);
-  const hasParsedRowFields =
-    item.quantity != null || item.unit != null || item.unit_price != null || item.total != null;
-  if (INVOICE_PAYMENT_METADATA_RE.test(normalized) || INVOICE_TAX_SUMMARY_RE.test(normalized)) {
-    return true;
-  }
-  if (INVOICE_ADDRESS_RE.test(normalized)) return true;
-  if (INVOICE_BUSINESS_METADATA_RE.test(normalized) && !hasParsedRowFields) {
-    return true;
-  }
-  return false;
-};
-
 const isPlaceholderItemName = (name: string) => {
   const normalizedName = normalizeExtractedItemName(name);
   return !normalizedName || normalizedName === "unknown";
@@ -886,6 +880,13 @@ function InvoicesPage() {
   );
   const [ingredientCreationErrors, setIngredientCreationErrors] =
     useState<IngredientCreationErrors>({});
+  const [canonicalCreateContext, setCanonicalCreateContext] = useState<{
+    item: ItemRow;
+    supplierName: string | null;
+  } | null>(null);
+  const [canonicalCreateError, setCanonicalCreateError] = useState<string | null>(null);
+  const [canonicalCreateSaving, setCanonicalCreateSaving] = useState(false);
+  const [rejectedMatchItemIds, setRejectedMatchItemIds] = useState<Set<string>>(() => new Set());
   const [extracting, setExtracting] = useState<Record<string, boolean>>({});
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [settlementByInvoice, setSettlementByInvoice] = useState<Record<string, SettlementState>>(
@@ -895,10 +896,38 @@ function InvoicesPage() {
   const invoiceLoadSeqRef = useRef(0);
   const hasLoadedInvoicesOnceRef = useRef(false);
   const autoPersistAttemptedRef = useRef<Set<string>>(new Set());
+  const allInvoiceItemsRef = useRef<Record<string, ItemRow[]>>({});
+  const [unresolvedIngredientCountByInvoice, setUnresolvedIngredientCountByInvoice] = useState<
+    Record<string, number>
+  >({});
 
   useEffect(() => {
     settlementByInvoiceRef.current = settlementByInvoice;
   }, [settlementByInvoice]);
+
+  const supplierNameByInvoiceId = useMemo(
+    () => Object.fromEntries(rows.map((row) => [row.id, row.supplier_name])),
+    [rows],
+  );
+
+  const refreshUnresolvedIngredientCounts = useCallback(
+    (itemsMap: Record<string, ItemRow[]>) => {
+      if (ingredientCatalog.length === 0) return;
+      setUnresolvedIngredientCountByInvoice(
+        countUnresolvedInvoiceIngredientsByInvoice(
+          itemsMap,
+          ingredientCatalog,
+          confirmedIngredientAliases,
+          supplierNameByInvoiceId,
+        ),
+      );
+    },
+    [ingredientCatalog, confirmedIngredientAliases, supplierNameByInvoiceId],
+  );
+
+  useEffect(() => {
+    refreshUnresolvedIngredientCounts(allInvoiceItemsRef.current);
+  }, [refreshUnresolvedIngredientCounts]);
 
   useEffect(() => {
     if (!user) {
@@ -953,7 +982,7 @@ function InvoicesPage() {
       const ids = invoiceRows.map((row) => row.id);
       const itemCounts: Record<string, number> = {};
       const { rows: catalogBase, error: ingredientCatalogError } =
-        await loadActiveIngredientCatalog(supabase);
+        await loadMatchingIngredientCatalog(supabase);
       if (ingredientCatalogError) {
         console.error("[invoices] ingredients catalog load failed:", ingredientCatalogError);
       }
@@ -991,28 +1020,53 @@ function InvoicesPage() {
         );
       }
       const dbAliases = await loadConfirmedIngredientAliasMap(supabase);
+      let mergedConfirmedAliases: IngredientAliasMap = {};
       setConfirmedIngredientAliases((current) => {
-        const merged = { ...current, ...dbAliases };
-        hydrateOperationalAliasMemoryFromConfirmedMap(merged, catalog);
-        return merged;
+        mergedConfirmedAliases = { ...current, ...dbAliases };
+        hydrateOperationalAliasMemoryFromConfirmedMap(mergedConfirmedAliases, catalog);
+        return mergedConfirmedAliases;
       });
 
+      const itemsByInvoiceId: Record<string, ItemRow[]> = {};
       if (ids.length > 0) {
         const { data: itemRows, error: itemError } = await supabase
           .from("invoice_items")
-          .select("invoice_id")
+          .select("id, invoice_id, name, quantity, unit, unit_price, total")
           .in("invoice_id", ids);
         if (!itemError) {
-          for (const item of (itemRows ?? []) as { invoice_id: string | null }[]) {
-            if (item.invoice_id)
-              itemCounts[item.invoice_id] = (itemCounts[item.invoice_id] ?? 0) + 1;
+          for (const raw of (itemRows ?? []) as (ItemRow & { invoice_id: string | null })[]) {
+            if (!raw.invoice_id) continue;
+            const normalized = normalizeInvoiceItemFields(raw);
+            if (shouldRejectInvoiceIngredientRow(normalized)) continue;
+            itemCounts[raw.invoice_id] = (itemCounts[raw.invoice_id] ?? 0) + 1;
+            const bucket = itemsByInvoiceId[raw.invoice_id] ?? [];
+            bucket.push(normalized);
+            itemsByInvoiceId[raw.invoice_id] = bucket;
           }
         }
       }
+      allInvoiceItemsRef.current = itemsByInvoiceId;
 
       if (loadSeq !== invoiceLoadSeqRef.current) return;
 
       const identityState = invoiceIdentitiesRef.current;
+      if (catalog.length > 0) {
+        setUnresolvedIngredientCountByInvoice(
+          countUnresolvedInvoiceIngredientsByInvoice(
+            itemsByInvoiceId,
+            catalog,
+            mergedConfirmedAliases,
+            Object.fromEntries(
+              invoiceRows.map((row) => [
+                row.id,
+                normalizeSupplierDisplayName(
+                  identityState[row.id]?.supplierName ?? row.supplier_name,
+                ) || null,
+              ]),
+            ),
+          ),
+        );
+      }
       setRows(
         invoiceRows.map((row) => toInvoiceRow(row, itemCounts[row.id] ?? 0, identityState[row.id])),
       );
@@ -1240,7 +1294,7 @@ function InvoicesPage() {
       if (items.length && user) {
         const normalizedItems = items
           .map((it: ItemRow) => normalizeInvoiceItemFields(it))
-          .filter((it: ItemRow) => !shouldRejectInvoiceItemName(it));
+          .filter((it: ItemRow) => !shouldRejectInvoiceIngredientRow(it));
         traceInvoiceQuantityStage("insert-normalized:first-item", normalizedItems[0], {
           invoiceId,
         });
@@ -1461,11 +1515,24 @@ function InvoicesPage() {
     traceInvoiceQuantityStage("load-raw:first-item", (data ?? [])[0], { invoiceId });
     const items = ((data ?? []) as ItemRow[])
       .map((item) => normalizeInvoiceItemFields(item))
-      .filter((item) => !shouldRejectInvoiceItemName(item));
+      .filter((item) => !shouldRejectInvoiceIngredientRow(item));
     traceInvoiceQuantityStage("load-normalized:first-item", items[0], { invoiceId });
     const priceComparisons = await loadPriceComparisons(invoiceId, invoiceCreatedAt, items);
+    allInvoiceItemsRef.current = { ...allInvoiceItemsRef.current, [invoiceId]: items };
     setItemsByInvoice((s) => ({ ...s, [invoiceId]: items }));
     setPriceComparisonsByInvoice((s) => ({ ...s, [invoiceId]: priceComparisons }));
+    const supplierName = rows.find((row) => row.id === invoiceId)?.supplier_name ?? null;
+    if (ingredientCatalog.length > 0) {
+      setUnresolvedIngredientCountByInvoice((current) => ({
+        ...current,
+        [invoiceId]: countUnresolvedInvoiceIngredients({
+          items,
+          ingredientCatalog,
+          confirmedAliases: confirmedIngredientAliases,
+          supplierName,
+        }).unmatchedCount,
+      }));
+    }
   };
 
   const toggleExpand = (row: InvoiceRow) => {
@@ -1508,39 +1575,82 @@ function InvoicesPage() {
     ingredientId: string,
     ingredientName: string,
     supplierName?: string | null,
-  ) => {
-    if (!user) return;
+  ): Promise<{ ok: boolean; error?: string }> => {
+    traceIngredientAliases("persistIngredientCorrectionForItem:enter", {
+      function: "persistIngredientCorrectionForItem",
+      itemId: item.id,
+      itemName: item.name,
+      compareBucket: getAliasTraceCompareBucket(item.name),
+      ingredientId,
+      ingredientName,
+      supplierName: supplierName ?? null,
+    });
+    if (!user) {
+      traceIngredientAliases("persistIngredientCorrectionForItem:early-return", {
+        branch: "not_signed_in",
+        itemName: item.name,
+      });
+      return { ok: false, error: "Not signed in" };
+    }
 
-    const applied = applyManualIngredientCorrection(
-      { itemName: item.name, ingredientId, ingredientName, supplierName },
-      confirmedIngredientAliases,
-    );
-    if (!applied) return;
-
-    setConfirmedIngredientAliases(applied.nextConfirmedAliases);
-
-    const { error } = await persistManualIngredientCorrection({
+    const { applied, error } = await persistManualIngredientCorrection({
       itemName: item.name,
       ingredientId,
       ingredientName,
       supplierName,
-      confirmedAliases: applied.nextConfirmedAliases,
+      confirmedAliases: confirmedIngredientAliases,
       supabase,
     });
 
-    if (error) {
-      setGlobalError(error.message || "Could not save ingredient alias");
-      return;
+    if (!applied) {
+      traceCanonicalCreateFailure("alias-persist-invalid-line", {
+        itemId: item.id,
+        itemName: item.name,
+      });
+      traceIngredientAliases("persistIngredientCorrectionForItem:early-return", {
+        branch: "applied_null",
+        itemName: item.name,
+        insertAttempted: false,
+      });
+      return { ok: false, error: "Invalid invoice line name" };
     }
+
+    if (error) {
+      const message = error.message || "Could not save ingredient alias";
+      traceIngredientAliases("persistIngredientCorrectionForItem:alias-error", {
+        itemName: item.name,
+        message,
+        code: error.code,
+      });
+      setGlobalError(message);
+      return { ok: false, error: message };
+    }
+
+    traceIngredientAliases("persistIngredientCorrectionForItem:ok", {
+      itemName: item.name,
+      aliasLookupKey: applied.aliasLookupKey,
+      ingredientId,
+    });
+    setConfirmedIngredientAliases(applied.nextConfirmedAliases);
     hydrateOperationalAliasMemoryFromConfirmedMap(applied.nextConfirmedAliases, ingredientCatalog);
+    setRejectedMatchItemIds((current) => {
+      if (!current.has(item.id)) return current;
+      const next = new Set(current);
+      next.delete(item.id);
+      return next;
+    });
     try {
       window.localStorage.setItem(
         `marginly:invoice-ingredient-aliases:${user.id}`,
         JSON.stringify(applied.nextConfirmedAliases),
       );
-    } catch {
+    } catch (localStorageErr) {
+      traceIngredientAliasesCatch("persistIngredientCorrectionForItem:localStorage", localStorageErr, {
+        itemName: item.name,
+      });
       // Local alias memory is an operational convenience; matching still works without it.
     }
+    return { ok: true };
   };
 
   const confirmIngredientMatch = (
@@ -1548,12 +1658,30 @@ function InvoicesPage() {
     match: IngredientCanonicalMatch,
     supplierName?: string | null,
   ) => {
+    traceCanonicalCreateAttempt({
+      flowFunction: "confirmIngredientMatch",
+      flowOrigin: "rematch",
+      stage: "alias-only",
+      rawInvoiceText: item.name,
+      normalized: match.ingredient.normalized_name ?? null,
+      finalCanonicalName: match.ingredient.name ?? null,
+      nameSource: "invoice_line",
+      insertAttempted: false,
+      blocked: true,
+      blockReason: "ingredient_aliases_only",
+    });
     persistIngredientCorrectionForItem(
       item,
       match.ingredient.id,
       match.ingredient.name ?? match.ingredient.normalized_name ?? "",
       supplierName,
     );
+    traceFoodCostRecalculationSource("match_confirm", {
+      canonicalIngredientId: match.ingredient.id,
+      invoiceItemId: item.id,
+      surface: "invoices",
+      note: "Alias link only; recipe food cost updates when ingredient price/catalog reloads",
+    });
   };
 
   const selectIngredientForItem = (
@@ -1563,6 +1691,18 @@ function InvoicesPage() {
   ) => {
     const ingredient = ingredientCatalog.find((row) => row.id === ingredientId);
     if (!ingredient) return;
+    traceCanonicalCreateAttempt({
+      flowFunction: "selectIngredientForItem",
+      flowOrigin: "rematch",
+      stage: "manual-link-alias-only",
+      rawInvoiceText: item.name,
+      normalized: ingredient.normalized_name ?? null,
+      finalCanonicalName: ingredient.name ?? null,
+      nameSource: "invoice_line",
+      insertAttempted: false,
+      blocked: true,
+      blockReason: "ingredient_aliases_only",
+    });
     persistIngredientCorrectionForItem(
       item,
       ingredientId,
@@ -1571,79 +1711,227 @@ function InvoicesPage() {
     );
   };
 
-  const createIngredientFromItem = async (item: ItemRow) => {
-    if (!user) return;
+  const canonicalCreateDefaults = useMemo(() => {
+    if (!canonicalCreateContext) return null;
+    return buildCanonicalIngredientCreateDefaults(canonicalCreateContext.item, {
+      supplierName: canonicalCreateContext.supplierName,
+      isGenericUnit,
+    });
+  }, [canonicalCreateContext]);
 
+  const openCanonicalIngredientCreate = (item: ItemRow, supplierName?: string | null) => {
     const name = item.name.trim();
-    const normalizedName = normalizeIngredientName(name);
-    if (!normalizedName || isPlaceholderItemName(name)) {
+    if (!name || isPlaceholderItemName(name)) {
       setIngredientCreationErrors((current) => ({
         ...current,
         [item.id]: "Confirm the extracted name before creating an ingredient.",
       }));
       return;
     }
-
-    if (looksLikeInvoiceShorthandName(name)) {
-      setIngredientCreationErrors((current) => ({
-        ...current,
-        [item.id]:
-          "Invoice shorthand belongs in alias memory. Create a full catalog name instead.",
-      }));
-      return;
-    }
-
-    const payload = buildIngredientInsertPayload(item, user.id, { isGenericUnit });
-    if (!payload) {
-      setIngredientCreationErrors((current) => ({
-        ...current,
-        [item.id]: "Confirm the extracted name before creating an ingredient.",
-      }));
-      return;
-    }
-
-    setCreatingIngredientByItem((current) => ({ ...current, [item.id]: true }));
     setIngredientCreationErrors((current) => removeKey(current, item.id));
+    setCanonicalCreateError(null);
+    setCanonicalCreateContext({ item, supplierName: supplierName?.trim() || null });
+  };
+
+  const saveCanonicalIngredientFromInvoice = async (
+    values: CanonicalIngredientCreateSubmitValues,
+  ) => {
+    if (!user || !canonicalCreateContext) {
+      traceIngredientAliases("saveCanonicalIngredientFromInvoice:early-return", {
+        branch: !user ? "no_user" : "no_context",
+      });
+      return;
+    }
+    const { item, supplierName } = canonicalCreateContext;
+
+    traceIngredientAliases("saveCanonicalIngredientFromInvoice:enter", {
+      function: "saveCanonicalIngredientFromInvoice",
+      itemId: item.id,
+      invoiceAlias: item.name,
+      compareBucket: getAliasTraceCompareBucket(item.name),
+      canonicalName: values.canonicalName,
+      supplierName,
+    });
+    traceCanonicalCreateAttempt({
+      flowFunction: "saveCanonicalIngredientFromInvoice",
+      flowOrigin: "explicit_user",
+      stage: "submit",
+      rawInvoiceText: item.name,
+      normalized: values.canonicalName,
+      finalCanonicalName: values.canonicalName,
+      nameSource: "user_canonical",
+      insertAttempted: false,
+    });
+
+    const nameValidation = validateCanonicalIngredientName(values.canonicalName, {
+      invoiceAlias: item.name,
+    });
+    if (!nameValidation.ok) {
+      traceIngredientAliases("saveCanonicalIngredientFromInvoice:early-return", {
+        branch: "canonical_name_validation_failed",
+        invoiceAlias: item.name,
+        message: nameValidation.message,
+      });
+      setCanonicalCreateError(nameValidation.message);
+      return;
+    }
+
+    traceCanonicalConfirmedName({ confirmedName: values.canonicalName.trim() });
+
+    const payload = buildExplicitCanonicalInsertPayload({
+      canonicalName: values.canonicalName,
+      item,
+      userId: user.id,
+      unit: values.unit,
+      current_price: values.current_price,
+      purchase_quantity: values.purchase_quantity,
+      purchase_unit: values.purchase_unit,
+      base_unit: values.base_unit,
+      isGenericUnit,
+    });
+    if (!payload) {
+      traceIngredientAliases("saveCanonicalIngredientFromInvoice:early-return", {
+        branch: "buildExplicitCanonicalInsertPayload_null",
+        invoiceAlias: item.name,
+      });
+      setCanonicalCreateError("Could not build ingredient from this invoice line.");
+      return;
+    }
+
+    setCanonicalCreateSaving(true);
+    setCanonicalCreateError(null);
+    setCreatingIngredientByItem((current) => ({ ...current, [item.id]: true }));
+    traceCanonicalCreate("submit-start", {
+      itemId: item.id,
+      invoiceAlias: item.name,
+      canonicalName: values.canonicalName,
+      supplierName,
+    });
     try {
-      const guard = guardIngredientCreation(name, ingredientCatalog);
+      const guard = guardIngredientCreation(values.canonicalName, ingredientCatalog, {
+        flowFunction: "saveCanonicalIngredientFromInvoice",
+        flowOrigin: "explicit_user",
+        rawInvoiceText: item.name,
+      });
+      let ingredientId: string;
+      let ingredientName: string;
+      let ingredientReused = false;
+
+      traceCanonicalCreate("guard-resolved", {
+        action: guard.action,
+        operationalKey: guard.operationalKey,
+        existingId: guard.action === "reuse" ? guard.existing.id : null,
+        reason: guard.action === "reuse" ? guard.reason : null,
+      });
+
       if (guard.action === "reuse") {
+        ingredientReused = true;
+        ingredientId = guard.existing.id;
+        ingredientName =
+          guard.existing.name ?? guard.existing.normalized_name ?? values.canonicalName;
+        traceCanonicalCreate("ingredient-reuse", {
+          ingredientId,
+          ingredientName,
+          reason: guard.reason,
+          proposedCanonicalName: values.canonicalName,
+        });
         const existing = guard.existing as IngredientMatchRow;
         setIngredientCatalog((current) =>
           current.some((row) => row.id === existing.id) ? current : [...current, existing],
         );
-        return;
-      }
-
-      const { data, error, reused, blocked, blockReason } =
-        await persistIngredientFromInvoiceItem(supabase, payload, {
-          catalog: ingredientCatalog,
-          source: "explicit_user",
-        });
-      if (error) throw error;
-      if (blocked) {
-        setIngredientCreationErrors((current) => ({
-          ...current,
-          [item.id]:
+      } else {
+        const { data, error, blocked, blockReason } = await persistIngredientFromInvoiceItem(
+          supabase,
+          payload,
+          {
+            catalog: ingredientCatalog,
+            source: "explicit_user",
+          },
+        );
+        if (error) throw error;
+        if (blocked) {
+          traceCanonicalCreateFailure("ingredient-blocked", {
+            blockReason,
+            canonicalName: values.canonicalName,
+          });
+          setCanonicalCreateError(
             blockReason === "archived_ingredient_resurrection"
               ? "This name was merged/archived. Use the canonical ingredient instead."
-              : "Could not create ingredient from this invoice line.",
-        }));
-        return;
-      }
-
-      if (data) {
+              : blockReason === "invoice_shorthand_not_canonical"
+                ? "Use a full product name for the catalog. Invoice shorthand belongs in alias memory."
+                : "Could not create ingredient from this invoice line.",
+          );
+          return;
+        }
+        if (!data?.id) {
+          traceCanonicalCreateFailure("ingredient-missing-id", {
+            canonicalName: values.canonicalName,
+          });
+          setCanonicalCreateError("Could not create ingredient.");
+          return;
+        }
+        ingredientId = data.id;
+        ingredientName = data.name ?? values.canonicalName;
+        traceCanonicalCreate("ingredient-create-ok", {
+          ingredientId,
+          ingredientName,
+          normalizedName: data.normalized_name,
+        });
         const row = data as IngredientMatchRow;
         setIngredientCatalog((current) =>
           current.some((r) => r.id === row.id) ? current : [...current, row],
         );
-        if (reused) return;
       }
+
+      traceIngredientAliases("saveCanonicalIngredientFromInvoice:alias-persist-call", {
+        invoiceAlias: item.name,
+        ingredientId,
+        ingredientReused,
+      });
+      const aliasResult = await persistIngredientCorrectionForItem(
+        item,
+        ingredientId,
+        ingredientName,
+        supplierName,
+      );
+      if (!aliasResult.ok) {
+        traceIngredientAliases("saveCanonicalIngredientFromInvoice:alias-failed", {
+          invoiceAlias: item.name,
+          error: aliasResult.error,
+          insertAttempted: true,
+        });
+        traceCanonicalCreateFailure("alias-link-failed", {
+          itemId: item.id,
+          invoiceAlias: item.name,
+          ingredientId,
+          ingredientReused,
+          error: aliasResult.error,
+        });
+        setCanonicalCreateError(
+          aliasResult.error ??
+            "Ingredient saved but invoice alias could not be linked. Try choosing the ingredient manually.",
+        );
+        return;
+      }
+
+      traceCanonicalCreate("complete", {
+        itemId: item.id,
+        invoiceAlias: item.name,
+        ingredientId,
+        ingredientReused,
+      });
+      setCanonicalCreateContext(null);
+      setCanonicalCreateError(null);
+      setIngredientCreationErrors((current) => removeKey(current, item.id));
     } catch (err) {
-      setIngredientCreationErrors((current) => ({
-        ...current,
-        [item.id]: err instanceof Error ? err.message : "Could not create ingredient.",
-      }));
+      traceIngredientAliasesCatch("saveCanonicalIngredientFromInvoice", err, {
+        invoiceAlias: canonicalCreateContext?.item.name,
+      });
+      setCanonicalCreateError(
+        err instanceof Error ? err.message : "Could not create ingredient.",
+      );
     } finally {
+      setCanonicalCreateSaving(false);
       setCreatingIngredientByItem((current) => removeKey(current, item.id));
     }
   };
@@ -1914,6 +2202,8 @@ function InvoicesPage() {
                 const items = itemsByInvoice[r.id] ?? [];
                 const settlementState = getSettlementState(r.id, settlementByInvoice);
                 const subtitle = invoiceSubtitle(r);
+                const unmatchedIngredientCount =
+                  unresolvedIngredientCountByInvoice[r.id] ?? 0;
                 return (
                   <Fragment key={r.id}>
                     <tr
@@ -1949,7 +2239,10 @@ function InvoicesPage() {
                       </td>
                       <td className="py-3 px-5 hidden sm:table-cell">
                         <div className="flex flex-col items-start gap-1">
-                          <StatusPill status={r.status as "Processed" | "Processing" | "Review"} />
+                          <InvoiceListIngredientStatusBadge
+                            baseStatus={r.status}
+                            unmatchedCount={unmatchedIngredientCount}
+                          />
                           <SettlementBadge
                             state={settlementState}
                             onToggle={() => toggleSettlement(r.id)}
@@ -2006,7 +2299,9 @@ function InvoicesPage() {
                             loading={itemsByInvoice[r.id] === undefined}
                             extracting={!!extracting[r.id]}
                             onExtract={isImage ? () => reExtract(r) : undefined}
-                            onCreateIngredient={createIngredientFromItem}
+                            onCreateIngredient={(item) =>
+                              openCanonicalIngredientCreate(item, r.supplier_name)
+                            }
                             onConfirmIngredientMatch={(item, match) =>
                               confirmIngredientMatch(item, match, r.supplier_name)
                             }
@@ -2015,6 +2310,8 @@ function InvoicesPage() {
                             }
                             creatingIngredientByItem={creatingIngredientByItem}
                             ingredientCreationErrors={ingredientCreationErrors}
+                            rejectedMatchItemIds={rejectedMatchItemIds}
+                            onRejectedMatchItemIdsChange={setRejectedMatchItemIds}
                           />
                         </td>
                       </tr>
@@ -2028,6 +2325,19 @@ function InvoicesPage() {
       </Card>
 
       {preview && <PreviewModal preview={preview} onClose={() => setPreview(null)} />}
+      <CanonicalIngredientCreateDialog
+        open={canonicalCreateContext !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCanonicalCreateContext(null);
+            setCanonicalCreateError(null);
+          }
+        }}
+        defaults={canonicalCreateDefaults}
+        saving={canonicalCreateSaving}
+        error={canonicalCreateError}
+        onSubmit={(values) => void saveCanonicalIngredientFromInvoice(values)}
+      />
       <ConfirmDeleteDialog
         open={pendingDeleteRow !== null}
         onOpenChange={(open) => {
@@ -2257,6 +2567,37 @@ function IngredientMatchInsight({
   );
 }
 
+function InvoiceListIngredientStatusBadge({
+  baseStatus,
+  unmatchedCount,
+}: {
+  baseStatus: string;
+  unmatchedCount: number;
+}) {
+  const { tone, label } = deriveInvoiceListIngredientStatus({ baseStatus, unmatchedCount });
+  const toneClass =
+    tone === "success"
+      ? "bg-success/10 text-success"
+      : tone === "warning"
+        ? "bg-amber-500/10 text-amber-700 dark:text-amber-300"
+        : tone === "review"
+          ? "bg-destructive/10 text-destructive"
+          : "bg-warning/15 text-warning-foreground";
+
+  return (
+    <span
+      className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium leading-snug ${toneClass}`}
+      title={
+        tone === "warning"
+          ? "Invoice lines extracted but some ingredients are not linked to your catalog yet."
+          : undefined
+      }
+    >
+      {label}
+    </span>
+  );
+}
+
 function OperationalBadge({
   label,
   tone = "muted",
@@ -2347,6 +2688,8 @@ function ItemsTable({
   onCreateIngredient,
   onConfirmIngredientMatch,
   onSelectIngredientForItem,
+  rejectedMatchItemIds,
+  onRejectedMatchItemIdsChange,
 }: {
   items: ItemRow[];
   priceComparisons: PriceComparisonMap;
@@ -2358,6 +2701,8 @@ function ItemsTable({
   userId?: string;
   creatingIngredientByItem: IngredientCreationState;
   ingredientCreationErrors: IngredientCreationErrors;
+  rejectedMatchItemIds: Set<string>;
+  onRejectedMatchItemIdsChange: React.Dispatch<React.SetStateAction<Set<string>>>;
   loading: boolean;
   extracting: boolean;
   onExtract?: () => void;
@@ -2365,7 +2710,6 @@ function ItemsTable({
   onConfirmIngredientMatch: (item: ItemRow, match: IngredientCanonicalMatch) => void;
   onSelectIngredientForItem: (item: ItemRow, ingredientId: string) => void;
 }) {
-  const [rejectedMatchItemIds, setRejectedMatchItemIds] = useState<Set<string>>(() => new Set());
   const ingredientPickerOptions = useMemo(() => {
     const built = buildIngredientPickerOptionsForInvoice(
       ingredientCatalog,
@@ -2724,7 +3068,7 @@ function ItemsTable({
                                 title={[
                                   matchExplanation.headline,
                                   ingredientMatch?.ingredient.name
-                                    ? `→ ${ingredientMatch.ingredient.name}`
+                                    ? `→ ${formatCanonicalIngredientDisplayName(ingredientMatch.ingredient.name)}`
                                     : null,
                                   matchExplanation.detail,
                                 ]
@@ -2773,12 +3117,12 @@ function ItemsTable({
                                     userId,
                                   });
                                 }
-                                setRejectedMatchItemIds((current) =>
+                                onRejectedMatchItemIdsChange((current) =>
                                   rejectIngredientMatchSuggestion(current, renderItem.id),
                                 );
                               }}
                               onSelectIngredient={(ingredientId) => {
-                                setRejectedMatchItemIds((current) => {
+                                onRejectedMatchItemIdsChange((current) => {
                                   const next = new Set(current);
                                   next.delete(renderItem.id);
                                   return next;

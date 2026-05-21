@@ -320,6 +320,14 @@ type RecipeIngredientLine = {
   quantity: number | null;
 };
 
+/**
+ * Reassign `recipe_ingredients.ingredient_id` from merge sources → canonical.
+ *
+ * **Duplicate lines:** If the target recipe already has a line for the canonical ingredient,
+ * quantities are summed on the existing row and the source line is deleted (`merge_recipe_line`).
+ * Otherwise the source line’s `ingredient_id` is updated in place. This prevents duplicate
+ * `recipe_ingredients` rows for the same `(recipe_id, ingredient_id)` after merge.
+ */
 async function reassignRecipeIngredients(
   client: AppSupabaseClient,
   plan: IngredientMergePlan,

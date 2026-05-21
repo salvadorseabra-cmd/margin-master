@@ -7,6 +7,11 @@ import {
   isArchivedIngredientEntry,
   type IngredientCanonicalInput,
 } from "@/lib/ingredient-canonical";
+import {
+  type CanonicalCreateFlowOrigin,
+  traceCanonicalDuplicateDetected,
+  traceCanonicalNameSource,
+} from "@/lib/ingredient-catalog-diagnostics";
 import { normalizeOperationalAliasKey } from "@/lib/ingredient-operational-alias-memory";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 
@@ -48,6 +53,16 @@ export function normalizeOperationalIdentityKey(raw: string | null | undefined):
   return canonicalizeIdentityTokens(aliasKey);
 }
 
+/**
+ * Catalog create/rename dedupe key — preserves product identity (e.g. batata palha).
+ * Does not apply invoice-matcher palha→frita synonym expansion.
+ */
+export function normalizeCatalogOperationalIdentityKey(raw: string | null | undefined): string {
+  const simple = normalizeIngredientName(raw ?? "");
+  if (!simple) return "";
+  return canonicalizeIdentityTokens(simple);
+}
+
 export function operationalIdentityKeyForCatalogEntry(entry: IngredientCanonicalInput): string {
   const display = entry.name?.trim() || entry.normalized_name?.trim() || "";
   if (!display) return "";
@@ -57,16 +72,26 @@ export function operationalIdentityKeyForCatalogEntry(entry: IngredientCanonical
   return normalized ? normalizeOperationalIdentityKey(normalized) : "";
 }
 
+export function catalogOperationalIdentityKeyForEntry(entry: IngredientCanonicalInput): string {
+  const normalized = entry.normalized_name?.trim();
+  if (normalized) {
+    const fromStored = normalizeCatalogOperationalIdentityKey(normalized);
+    if (fromStored) return fromStored;
+  }
+  const display = entry.name?.trim() || "";
+  return normalizeCatalogOperationalIdentityKey(display);
+}
+
 export function findCatalogIngredientByOperationalKey(
   catalog: IngredientCanonicalInput[],
   proposedName: string,
 ): IngredientCanonicalInput | null {
-  const key = normalizeOperationalIdentityKey(proposedName);
+  const key = normalizeCatalogOperationalIdentityKey(proposedName);
   if (!key) return null;
 
   for (const entry of catalog) {
     if (isArchivedIngredientEntry(entry)) continue;
-    if (operationalIdentityKeyForCatalogEntry(entry) === key) return entry;
+    if (catalogOperationalIdentityKeyForEntry(entry) === key) return entry;
   }
   return null;
 }
@@ -113,19 +138,45 @@ export type IngredientCreationGuardResult =
       reason: IngredientDuplicatePreventionReason;
     };
 
+export type IngredientCreationGuardTraceContext = {
+  flowOrigin: CanonicalCreateFlowOrigin;
+  flowFunction: string;
+  rawInvoiceText?: string | null;
+};
+
 /**
  * Resolve whether a proposed ingredient name should create a new row or reuse catalog.
  */
 export function guardIngredientCreation(
   proposedName: string,
   catalog: IngredientCanonicalInput[],
+  traceContext?: IngredientCreationGuardTraceContext,
 ): IngredientCreationGuardResult {
-  const operationalKey = normalizeOperationalIdentityKey(proposedName);
+  const operationalKey = normalizeCatalogOperationalIdentityKey(proposedName);
   const trimmed = proposedName.trim();
+  const normalized = normalizeIngredientName(trimmed);
+
+  if (traceContext) {
+    traceCanonicalNameSource({
+      flowFunction: traceContext.flowFunction,
+      flowOrigin: traceContext.flowOrigin,
+      stage: "guard-enter",
+      rawInvoiceText: traceContext.rawInvoiceText ?? null,
+      normalized,
+      finalCanonicalName: trimmed,
+      nameSource:
+        traceContext.flowOrigin === "manual_form"
+          ? "form_input"
+          : traceContext.flowOrigin === "explicit_user"
+            ? "user_canonical"
+            : "unknown",
+      insertAttempted: false,
+    });
+  }
 
   const byDisplay = catalogHasDuplicateDisplayName(trimmed, catalog);
   if (byDisplay) {
-    const key = operationalIdentityKeyForCatalogEntry(byDisplay) || operationalKey;
+    const key = catalogOperationalIdentityKeyForEntry(byDisplay) || operationalKey;
     logIngredientDuplicatePrevention({
       reason: "duplicate_display_name",
       proposedName: trimmed,
@@ -133,12 +184,25 @@ export function guardIngredientCreation(
       existingIngredientId: byDisplay.id,
       existingIngredientName: byDisplay.name,
     });
+    if (traceContext) {
+      traceCanonicalDuplicateDetected({
+        ...traceContext,
+        stage: "guard-reuse",
+        normalized,
+        finalCanonicalName: trimmed,
+        reason: "duplicate_display_name",
+        operationalKey: key,
+        existingIngredientId: byDisplay.id,
+        existingIngredientName: byDisplay.name,
+        insertAttempted: false,
+      });
+    }
     return { action: "reuse", operationalKey: key, existing: byDisplay, reason: "duplicate_display_name" };
   }
 
   const byOperational = findCatalogIngredientByOperationalKey(catalog, trimmed);
   if (byOperational) {
-    const key = operationalIdentityKeyForCatalogEntry(byOperational) || operationalKey;
+    const key = catalogOperationalIdentityKeyForEntry(byOperational) || operationalKey;
     logIngredientDuplicatePrevention({
       reason: "operational_identity_key",
       proposedName: trimmed,
@@ -146,6 +210,19 @@ export function guardIngredientCreation(
       existingIngredientId: byOperational.id,
       existingIngredientName: byOperational.name,
     });
+    if (traceContext) {
+      traceCanonicalDuplicateDetected({
+        ...traceContext,
+        stage: "guard-reuse",
+        normalized,
+        finalCanonicalName: trimmed,
+        reason: "operational_identity_key",
+        operationalKey: key,
+        existingIngredientId: byOperational.id,
+        existingIngredientName: byOperational.name,
+        insertAttempted: false,
+      });
+    }
     return {
       action: "reuse",
       operationalKey: key,

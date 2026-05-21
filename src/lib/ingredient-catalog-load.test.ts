@@ -3,7 +3,12 @@ import {
   filterActiveCatalogIngredients,
   type IngredientCanonicalInput,
 } from "./ingredient-canonical";
-import { loadActiveIngredientCatalog, loadCanonicalIngredientCatalog } from "./ingredient-catalog-load";
+import {
+  loadActiveIngredientCatalog,
+  loadCanonicalIngredientCatalog,
+  loadMatchingIngredientCatalog,
+} from "./ingredient-catalog-load";
+import { buildCanonicalIngredientPickerOptions } from "./ingredient-picker-options";
 import { INGREDIENT_KIND_ALIAS } from "./ingredient-kind";
 
 function ingredient(
@@ -85,6 +90,25 @@ describe("loadActiveIngredientCatalog", () => {
   });
 });
 
+describe("loadMatchingIngredientCatalog", () => {
+  it("excludes alias-kind and shorthand rows from invoice match targets", async () => {
+    const rows = [
+      ingredient("canonical", "Chicken Breaded 2KG", { ingredient_kind: "canonical" }),
+      ingredient("alias-kind", "BAC FUM FAT", { ingredient_kind: INGREDIENT_KIND_ALIAS }),
+      ingredient("shorthand-leak", "CHK BREADED", { ingredient_kind: "canonical" }),
+    ];
+    const client = {
+      from: () => ({
+        select: () => Promise.resolve({ data: rows, error: null }),
+      }),
+    } as never;
+
+    const { rows: matching, error } = await loadMatchingIngredientCatalog(client);
+    expect(error).toBeNull();
+    expect(matching.map((row) => row.id)).toEqual(["canonical"]);
+  });
+});
+
 describe("loadCanonicalIngredientCatalog", () => {
   it("excludes alias-kind rows from human-facing catalog load", async () => {
     const rows = [
@@ -115,5 +139,37 @@ describe("loadCanonicalIngredientCatalog", () => {
 
     const { rows: canonical } = await loadCanonicalIngredientCatalog(client);
     expect(canonical.map((row) => row.id)).toEqual(["canonical"]);
+  });
+
+  it("excludes CHK BREADED legacy canonical pollution from catalog load", async () => {
+    const rows = [
+      ingredient("chk-canonical", "Chicken Breaded / Frango Panado", { ingredient_kind: "canonical" }),
+      ingredient("chk-leak", "CHK BREADED", { ingredient_kind: "canonical" }),
+    ];
+    const client = {
+      from: () => ({
+        select: () => Promise.resolve({ data: rows, error: null }),
+      }),
+    } as never;
+
+    const { rows: canonical, error } = await loadCanonicalIngredientCatalog(client);
+    expect(error).toBeNull();
+    expect(canonical.map((row) => row.id)).toEqual(["chk-canonical"]);
+  });
+
+  it("feeds recipe/invoice picker with canonical rows only (no CHK BREADED)", async () => {
+    const rows = [
+      ingredient("chk-canonical", "Chicken Breaded / Frango Panado", { ingredient_kind: "canonical" }),
+      ingredient("chk-leak", "CHK BREADED", { ingredient_kind: "canonical" }),
+    ];
+    const client = {
+      from: () => ({
+        select: () => Promise.resolve({ data: rows, error: null }),
+      }),
+    } as never;
+
+    const { rows: canonical } = await loadCanonicalIngredientCatalog(client);
+    const pickerIds = buildCanonicalIngredientPickerOptions(canonical).map((row) => row.id);
+    expect(pickerIds).toEqual(["chk-canonical"]);
   });
 });

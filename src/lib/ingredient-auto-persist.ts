@@ -30,10 +30,17 @@ import { findInvoiceItemIngredientMatch } from "@/lib/invoice-ingredient-match-p
 import { looksLikeInvoiceShorthandName, INGREDIENT_KIND_CANONICAL } from "@/lib/ingredient-kind";
 import { recordInvoiceLineAliasMemory } from "@/lib/ingredient-match-alias-memory";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
+import {
+  traceAliasOnly,
+  traceCanonicalCreateAttempt,
+  traceCanonicalCreateNameSource,
+  traceCanonicalInsert,
+  traceUnmatchedPersist,
+} from "@/lib/ingredient-catalog-diagnostics";
 
 const LOG_PREFIX = "[ingredient-auto-persist]";
 /** Grep-friendly prefix for every insert into public.ingredients (explicit user action only). */
-export const INGREDIENT_CREATE_LOG_PREFIX = "[ingredient-create]";
+export const INGREDIENT_CREATE_LOG_PREFIX = "[ingredient_create]";
 const PURCHASE_INFERENCE_MIN_CONFIDENCE = 0.86;
 const OPERATIONAL_CONFLICT_MIN_SHARED_TOKEN_LENGTH = 3;
 
@@ -261,6 +268,16 @@ export function buildIngredientInsertPayload(
   const isGenericUnit = options.isGenericUnit ?? defaultIsGenericUnit;
   const name = item.name.trim();
   const normalizedName = normalizeIngredientName(name);
+  traceCanonicalCreateNameSource({
+    flowFunction: "buildIngredientInsertPayload",
+    flowOrigin: "auto_persist",
+    stage: "invoice-line-as-name",
+    rawInvoiceText: name,
+    normalized: normalizedName,
+    finalCanonicalName: name,
+    nameSource: "invoice_line",
+    insertAttempted: false,
+  });
   if (!normalizedName || isInvalidAutoPersistName(name)) return null;
 
   const extractedUnit = item.unit?.trim() || null;
@@ -313,7 +330,24 @@ export async function persistIngredientFromInvoiceItem(
   blockReason?: string;
 }> {
   const source = options?.source;
+  traceCanonicalCreateAttempt({
+    flowFunction: "persistIngredientFromInvoiceItem",
+    flowOrigin: source === "explicit_user" ? "explicit_user" : "auto_persist",
+    stage: "enter",
+    rawInvoiceText: null,
+    normalized: payload.normalized_name,
+    finalCanonicalName: payload.name,
+    nameSource: "user_canonical",
+    insertAttempted: source === "explicit_user",
+    blocked: source !== "explicit_user",
+    blockReason: source !== "explicit_user" ? "canonical_ingredients_require_explicit_user_create" : null,
+  });
   if (source !== "explicit_user") {
+    traceUnmatchedPersist("blocked-ingredient-insert", {
+      name: payload.name,
+      normalizedName: payload.normalized_name,
+      source: source ?? "auto_persist",
+    });
     traceIngredientCreate("blocked-non-explicit", {
       name: payload.name,
       normalizedName: payload.normalized_name,
@@ -328,6 +362,17 @@ export async function persistIngredientFromInvoiceItem(
   }
 
   if (looksLikeInvoiceShorthandName(payload.name)) {
+    traceCanonicalCreateAttempt({
+      flowFunction: "persistIngredientFromInvoiceItem",
+      flowOrigin: "explicit_user",
+      stage: "blocked-invoice-shorthand",
+      normalized: payload.normalized_name,
+      finalCanonicalName: payload.name,
+      nameSource: "user_canonical",
+      insertAttempted: false,
+      blocked: true,
+      blockReason: "invoice_shorthand_not_canonical",
+    });
     traceIngredientCreate("blocked-invoice-shorthand", {
       name: payload.name,
       normalizedName: payload.normalized_name,
@@ -341,7 +386,11 @@ export async function persistIngredientFromInvoiceItem(
   }
 
   const catalog = options?.catalog ?? [];
-  const guard = guardIngredientCreation(payload.name, catalog);
+  const guard = guardIngredientCreation(payload.name, catalog, {
+    flowFunction: "persistIngredientFromInvoiceItem",
+    flowOrigin: "explicit_user",
+    rawInvoiceText: null,
+  });
   if (guard.action === "reuse") {
     traceIngredientCreate("duplicate-prevention-reuse", {
       proposedName: payload.name,
@@ -368,6 +417,22 @@ export async function persistIngredientFromInvoiceItem(
     };
   }
 
+  traceCanonicalCreateAttempt({
+    flowFunction: "persistIngredientFromInvoiceItem",
+    flowOrigin: "explicit_user",
+    stage: "insert-attempt",
+    normalized: payload.normalized_name,
+    finalCanonicalName: payload.name,
+    nameSource: "user_canonical",
+    insertAttempted: true,
+    blocked: false,
+  });
+  traceCanonicalInsert("insert-attempt", {
+    name: payload.name,
+    normalizedName: payload.normalized_name,
+    operationalKey: guard.operationalKey,
+    source: "explicit_user",
+  });
   traceIngredientCreate("insert-attempt", {
     name: payload.name,
     normalizedName: payload.normalized_name,
@@ -388,6 +453,12 @@ export async function persistIngredientFromInvoiceItem(
     return { data: null, error };
   }
 
+  traceCanonicalInsert("insert-ok", {
+    ingredientId: data?.id,
+    normalizedName: payload.normalized_name,
+    name: payload.name,
+    operationalKey: guard.operationalKey,
+  });
   traceIngredientCreate("insert-ok", {
     ingredientId: data?.id,
     normalizedName: payload.normalized_name,
@@ -484,6 +555,12 @@ export async function autoPersistUnmatchedInvoiceItems(
         supplierName,
       });
       if (aliasApplied.recorded) {
+        traceAliasOnly("shorthand-match-alias-memory", {
+          invoiceId,
+          itemId: item.id,
+          itemName: item.name,
+          canonicalId: match.ingredient.id,
+        });
         traceAutoPersist("alias-memory-shorthand", {
           invoiceId,
           itemId: item.id,
@@ -501,6 +578,12 @@ export async function autoPersistUnmatchedInvoiceItems(
         supplierName,
       });
       if (aliasApplied.recorded) {
+        traceAliasOnly("confirmed-match-alias-memory", {
+          invoiceId,
+          itemId: item.id,
+          itemName: item.name,
+          canonicalId: match.ingredient.id,
+        });
         traceAutoPersist("alias-memory", {
           invoiceId,
           itemId: item.id,
@@ -511,6 +594,26 @@ export async function autoPersistUnmatchedInvoiceItems(
     }
 
     if (!eligibility.eligible) {
+      traceCanonicalCreateAttempt({
+        flowFunction: "autoPersistUnmatchedInvoiceItems",
+        flowOrigin: "auto_persist",
+        stage: "skip-ineligible",
+        rawInvoiceText: item.name,
+        normalized: normalizedName,
+        finalCanonicalName: item.name.trim(),
+        nameSource: "invoice_line",
+        insertAttempted: false,
+        blocked: true,
+        blockReason: eligibility.reason,
+      });
+      traceUnmatchedPersist("invoice-line-skipped", {
+        invoiceId,
+        itemId: item.id,
+        itemName: item.name,
+        matchKind: match?.kind ?? null,
+        reason: eligibility.reason,
+        note: "Unmatched state stays on invoice; no ingredients.insert",
+      });
       traceAutoPersist("skip", {
         invoiceId,
         itemId: item.id,
@@ -522,6 +625,24 @@ export async function autoPersistUnmatchedInvoiceItems(
       continue;
     }
 
+    traceCanonicalCreateAttempt({
+      flowFunction: "autoPersistUnmatchedInvoiceItems",
+      flowOrigin: "auto_persist",
+      stage: "auto-create-blocked",
+      rawInvoiceText: item.name,
+      normalized: normalizedName,
+      finalCanonicalName: item.name.trim(),
+      nameSource: "invoice_line",
+      insertAttempted: false,
+      blocked: true,
+      blockReason: "explicit_user_create_only",
+    });
+    traceUnmatchedPersist("auto-create-blocked", {
+      invoiceId,
+      itemId: item.id,
+      itemName: item.name,
+      reason: "explicit_user_create_only",
+    });
     traceAutoPersist("skip-auto-create-disabled", {
       invoiceId,
       itemId: item.id,
