@@ -13,7 +13,8 @@ import {
   type CatalogReviewClassification,
   type CatalogReviewRow,
 } from "@/lib/catalog-pollution-review";
-import { ArrowLeft, ClipboardList, Loader2 } from "lucide-react";
+import { ManualCanonicalMergeDialog } from "@/components/manual-canonical-merge-dialog";
+import { ArrowLeft, ClipboardList, GitMerge, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/ingredients/review")({
@@ -48,6 +49,14 @@ function CatalogReviewPage() {
   const [classifications, setClassifications] = useState<
     Record<string, CatalogReviewClassification>
   >({});
+  const [catalogRows, setCatalogRows] = useState<
+    Awaited<ReturnType<typeof loadActiveIngredientCatalog>>["rows"]
+  >([]);
+  const [mergeDialogOpen, setMergeDialogOpen] = useState(false);
+  const [mergePrefill, setMergePrefill] = useState<{
+    sourceId?: string;
+    targetId?: string;
+  }>({});
 
   const load = useCallback(async () => {
     if (!user?.id) return;
@@ -92,6 +101,7 @@ function CatalogReviewPage() {
       return;
     }
 
+    setCatalogRows(catalog);
     const stored = loadCatalogReviewClassifications(user.id);
     setClassifications(stored);
     setRows(
@@ -143,13 +153,26 @@ function CatalogReviewPage() {
       title="Revisão do catálogo"
       subtitle="Poluição legada e duplicados operacionais — classificação manual, sem fusão automática."
       action={
-        <Link
-          to="/ingredients"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Ingredientes
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 text-sm px-3 py-1.5 rounded-md border border-border hover:bg-muted"
+            onClick={() => {
+              setMergePrefill({});
+              setMergeDialogOpen(true);
+            }}
+          >
+            <GitMerge className="h-4 w-4" />
+            Fusão manual
+          </button>
+          <Link
+            to="/ingredients"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Ingredientes
+          </Link>
+        </div>
       }
     >
       <div className="space-y-4">
@@ -215,8 +238,21 @@ function CatalogReviewPage() {
               key={row.ingredientId}
               row={row}
               onClassify={handleClassification}
+              onOpenMerge={(sourceId, targetId) => {
+                setMergePrefill({ sourceId, targetId });
+                setMergeDialogOpen(true);
+              }}
             />
           ))}
+
+        <ManualCanonicalMergeDialog
+          open={mergeDialogOpen}
+          onOpenChange={setMergeDialogOpen}
+          catalog={catalogRows}
+          initialSourceId={mergePrefill.sourceId}
+          initialTargetId={mergePrefill.targetId}
+          onSuccess={() => void load()}
+        />
       </div>
     </AppShell>
   );
@@ -225,9 +261,11 @@ function CatalogReviewPage() {
 function ReviewRowCard({
   row,
   onClassify,
+  onOpenMerge,
 }: {
   row: CatalogReviewRow;
   onClassify: (id: string, c: CatalogReviewClassification) => void;
+  onOpenMerge: (sourceId: string, targetId?: string) => void;
 }) {
   const aliasLabel =
     row.sourceInvoiceAliases.length > 0
@@ -318,13 +356,31 @@ function ReviewRowCard({
                   Sugestão canónica (informativa): {hint.suggestedCanonicalIngredientId}
                 </p>
               )}
-              <button
-                type="button"
-                className="text-xs px-2 py-1 rounded border border-border hover:bg-muted"
-                onClick={() => logCatalogManualMergeCandidate(hint)}
-              >
-                Candidato a fusão (registar log)
-              </button>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <button
+                  type="button"
+                  className="text-xs px-2 py-1 rounded border border-border hover:bg-muted"
+                  onClick={() => logCatalogManualMergeCandidate(hint)}
+                >
+                  Candidato a fusão (registar log)
+                </button>
+                {hint.suggestedCanonicalIngredientId && (
+                  <button
+                    type="button"
+                    className="text-xs px-2 py-1 rounded border border-primary/40 text-foreground hover:bg-primary/10"
+                    onClick={() => {
+                      const sourceId = hint.ingredientIds.find(
+                        (id) => id !== hint.suggestedCanonicalIngredientId,
+                      );
+                      if (sourceId) {
+                        onOpenMerge(sourceId, hint.suggestedCanonicalIngredientId ?? undefined);
+                      }
+                    }}
+                  >
+                    Abrir fusão manual
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

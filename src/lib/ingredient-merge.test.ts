@@ -6,8 +6,12 @@ import {
   buildIngredientMergePlanFromCluster,
   buildReferenceCountsFromRows,
   executeIngredientMerge,
+  executeManualCanonicalMerge,
   findAngusPattyMergeCluster,
   INGREDIENT_FK_REASSIGNMENT_TARGETS,
+  MANUAL_CANONICAL_MERGE_COMPLETE_PREFIX,
+  MANUAL_CANONICAL_MERGE_START_PREFIX,
+  previewManualCanonicalMergeImpact,
   rewriteIngredientIdInAliasMap,
   selectCanonicalIngredientId,
   validateIngredientMergePlan,
@@ -138,6 +142,150 @@ describe("picker filtering archived", () => {
   });
 });
 
+function mockPreviewClient(rows: {
+  recipes?: { id: string; recipes: { name: string } | null }[];
+  aliases?: { alias_name?: string; normalized_alias?: string }[];
+  prices?: { id: string }[];
+  margins?: { id: string }[];
+}) {
+  return {
+    from(table: string) {
+      return {
+        select: () => ({
+          eq: () => {
+            if (table === "recipe_ingredients") {
+              return Promise.resolve({ data: rows.recipes ?? [], error: null });
+            }
+            if (table === "ingredient_aliases") {
+              return Promise.resolve({ data: rows.aliases ?? [], error: null });
+            }
+            if (table === "ingredient_price_history") {
+              return Promise.resolve({ data: rows.prices ?? [], error: null });
+            }
+            if (table === "recipe_margin_impacts") {
+              return Promise.resolve({ data: rows.margins ?? [], error: null });
+            }
+            return Promise.resolve({ data: [], error: null });
+          },
+        }),
+      };
+    },
+  };
+}
+
+describe("previewManualCanonicalMergeImpact", () => {
+  it("returns counts and recipe/alias lists for source ingredient", async () => {
+    const catalog = [row("dup", "ANGUS PTY"), row("canonical", "Angus Patty")];
+    const client = mockPreviewClient({
+      recipes: [{ id: "ri1", recipes: { name: "Burger" } }],
+      aliases: [{ alias_name: "ANG PTY" }],
+      prices: [{ id: "p1" }, { id: "p2" }],
+      margins: [{ id: "m1" }],
+    });
+
+    const preview = await previewManualCanonicalMergeImpact(
+      client as never,
+      "dup",
+      "canonical",
+      catalog,
+    );
+
+    expect(preview.validation).toEqual({ ok: true });
+    expect(preview.recipeIngredients).toEqual({ count: 1, recipeNames: ["Burger"] });
+    expect(preview.ingredientAliases.count).toBe(1);
+    expect(preview.ingredientPriceHistory.count).toBe(2);
+    expect(preview.recipeMarginImpacts.count).toBe(1);
+    expect(preview.plan.canonicalIngredientId).toBe("canonical");
+    expect(preview.plan.sourceIngredientIds).toEqual(["dup"]);
+  });
+
+  it("flags source_equals_canonical when ids match", async () => {
+    const preview = await previewManualCanonicalMergeImpact(
+      mockPreviewClient({}) as never,
+      "same",
+      "same",
+      [row("same", "X")],
+    );
+    expect(preview.validation.ok).toBe(false);
+    if (!preview.validation.ok) {
+      expect(preview.validation.issues).toContain("source_equals_canonical");
+    }
+  });
+});
+
+describe("executeManualCanonicalMerge", () => {
+  it("executes merge plan, logs lifecycle, archives source via ingredients update", async () => {
+    const updates: { table: string; payload: Record<string, unknown>; filter: Record<string, unknown> }[] =
+      [];
+
+    const client = {
+      from(table: string) {
+        const api = {
+          select: () => ({
+            in: () => ({
+              eq: () => Promise.resolve({ data: [], error: null }),
+            }),
+            eq: () => ({
+              in: () => Promise.resolve({ data: [], error: null }),
+            }),
+          }),
+          update(payload: Record<string, unknown>) {
+            return {
+              eq(column: string, value: string) {
+                updates.push({ table, payload, filter: { [column]: value } });
+                return Promise.resolve({ error: null });
+              },
+              in(column: string, values: string[]) {
+                updates.push({ table, payload, filter: { [column]: values } });
+                return Promise.resolve({ error: null });
+              },
+            };
+          },
+          delete: () => ({
+            eq: () => Promise.resolve({ error: null }),
+          }),
+        };
+        return api;
+      },
+    };
+
+    const infoSpy = vi.spyOn(console, "info").mockImplementation(() => {});
+    const catalog = [row("dup", "ANGUS PTY"), row("canonical", "Angus Patty")];
+    const result = await executeManualCanonicalMerge({
+      client: client as never,
+      sourceId: "dup",
+      targetId: "canonical",
+      catalog,
+    });
+
+    expect("error" in result && typeof result.error === "string").toBe(false);
+    if (!("error" in result)) {
+      expect(result.error).toBeNull();
+      expect(result.plan.sourceIngredientIds).toEqual(["dup"]);
+    }
+    expect(updates.some((u) => u.table === "ingredients" && u.payload.is_archived === true)).toBe(
+      true,
+    );
+    expect(
+      infoSpy.mock.calls.some(
+        (call) =>
+          call[0] === MANUAL_CANONICAL_MERGE_START_PREFIX &&
+          (call[1] as { sourceId: string }).sourceId === "dup",
+      ),
+    ).toBe(true);
+    expect(
+      infoSpy.mock.calls.some(
+        (call) =>
+          call[0] === MANUAL_CANONICAL_MERGE_COMPLETE_PREFIX &&
+          (call[1] as { success: boolean; archivedSourceIds: string[] }).success === true &&
+          (call[1] as { archivedSourceIds: string[] }).archivedSourceIds.includes("dup"),
+      ),
+    ).toBe(true);
+
+    infoSpy.mockRestore();
+  });
+});
+
 describe("executeIngredientMerge", () => {
   it("reassigns FK tables and archives sources", async () => {
     const plan = buildIngredientMergePlan("canonical", ["dup"]);
@@ -149,11 +297,10 @@ describe("executeIngredientMerge", () => {
       from(table: string) {
         const api = {
           select: () => ({
-            in: () => ({
-              eq: () => Promise.resolve({ data: [], error: null }),
-              then: undefined,
+            in: () => Promise.resolve({ data: [], error: null }),
+            eq: () => ({
+              in: () => Promise.resolve({ data: [], error: null }),
             }),
-            eq: () => Promise.resolve({ data: [], error: null }),
           }),
           update(payload: Record<string, unknown>) {
             return {
@@ -203,7 +350,9 @@ describe("executeIngredientMerge", () => {
           return {
             select: () => ({
               in: () => Promise.resolve({ data: [], error: null }),
-              eq: () => Promise.resolve({ data: [], error: null }),
+              eq: () => ({
+                in: () => Promise.resolve({ data: [], error: null }),
+              }),
             }),
             update: () => ({
               eq: () => Promise.resolve({ error: null }),

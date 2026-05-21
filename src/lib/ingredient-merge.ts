@@ -8,11 +8,14 @@
  */
 
 import type { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
+import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
 import type { IngredientAliasMap, IngredientCanonicalInput } from "@/lib/ingredient-canonical";
 import {
   filterActiveCatalogIngredients,
   isArchivedIngredientEntry,
 } from "@/lib/ingredient-canonical";
+import { isSyntheticCatalogIngredientId } from "@/lib/ingredient-canonical-synthesis";
+import { isCanonicalIngredientEntry } from "@/lib/ingredient-kind";
 import type { IngredientMergeCluster } from "@/lib/ingredient-merge-hooks";
 import { findOperationalDuplicateClusters } from "@/lib/ingredient-identity-diagnostics";
 import {
@@ -81,6 +84,21 @@ export type IngredientMergeExecutionResult = {
   steps: IngredientMergeExecutionStep[];
   error: PostgrestError | null;
 };
+
+export type ManualCanonicalMergeImpactPreview = {
+  sourceIngredientId: string;
+  targetIngredientId: string;
+  plan: IngredientMergePlan;
+  validation: IngredientMergeValidationResult;
+  recipeIngredients: { count: number; recipeNames: string[] };
+  ingredientAliases: { count: number; aliasNames: string[] };
+  ingredientPriceHistory: { count: number };
+  recipeMarginImpacts: { count: number };
+  queryError: string | null;
+};
+
+export const MANUAL_CANONICAL_MERGE_START_PREFIX = "[manual_canonical_merge_start]";
+export const MANUAL_CANONICAL_MERGE_COMPLETE_PREFIX = "[manual_canonical_merge_complete]";
 
 function emptyReferenceCounts(): IngredientReferenceCounts {
   return {
@@ -215,6 +233,37 @@ export function buildIngredientMergePlanFromCluster(
     operationalKey: cluster.operationalKey,
     selectionReason: selection.reason,
   };
+}
+
+export type ManualMergePickerOption = { id: string; label: string };
+
+/** Active catalog rows eligible for manual merge pickers (includes polluted canonical rows). */
+export function buildManualMergePickerOptions(
+  catalog: IngredientMergeCatalogRow[],
+  options?: { allowNonCanonicalKind?: boolean },
+): ManualMergePickerOption[] {
+  const allowNonCanonical = options?.allowNonCanonicalKind ?? false;
+  const out: ManualMergePickerOption[] = [];
+
+  for (const row of catalog) {
+    const id = row.id?.trim();
+    if (!id) continue;
+    if (isArchivedIngredientEntry(row)) continue;
+    if (row.merged_into_ingredient_id) continue;
+    if (isSyntheticCatalogIngredientId(id)) continue;
+    if (id.startsWith("invoice:") || id.startsWith("temp:") || id.startsWith("temporary:")) {
+      continue;
+    }
+    if (!allowNonCanonical && !isCanonicalIngredientEntry(row)) continue;
+
+    const raw = row.name?.trim() || row.normalized_name?.trim() || id;
+    out.push({
+      id,
+      label: formatCanonicalIngredientDisplayName(raw) || raw,
+    });
+  }
+
+  return out.sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
 }
 
 export function buildIngredientMergePlan(
@@ -460,6 +509,115 @@ async function archiveMergedIngredients(
 }
 
 /**
+ * Read-only impact preview for a manual source → target canonical merge.
+ * Does not mutate the database.
+ */
+export async function previewManualCanonicalMergeImpact(
+  client: AppSupabaseClient,
+  sourceId: string,
+  targetId: string,
+  catalog: IngredientMergeCatalogRow[] = [],
+): Promise<ManualCanonicalMergeImpactPreview> {
+  const plan = buildIngredientMergePlan(targetId, [sourceId], {
+    selectionReason: "manual_user",
+  });
+  const validation: IngredientMergeValidationResult =
+    sourceId === targetId
+      ? { ok: false, issues: ["source_equals_canonical"] }
+      : validateIngredientMergePlan(plan, catalog);
+
+  const [recipeResult, aliasResult, priceResult, marginResult] = await Promise.all([
+    client
+      .from("recipe_ingredients")
+      .select("id, recipes(name)")
+      .eq("ingredient_id", sourceId),
+    client
+      .from("ingredient_aliases")
+      .select("id, alias_name, normalized_alias")
+      .eq("ingredient_id", sourceId),
+    client.from("ingredient_price_history").select("id").eq("ingredient_id", sourceId),
+    client.from("recipe_margin_impacts").select("id").eq("ingredient_id", sourceId),
+  ]);
+
+  const errors = [
+    recipeResult.error,
+    aliasResult.error,
+    priceResult.error,
+    marginResult.error,
+  ].filter(Boolean);
+  const queryError = errors.length > 0 ? errors.map((e) => e!.message).join("; ") : null;
+
+  const recipeRows = (recipeResult.data ?? []) as {
+    id: string;
+    recipes: { name: string | null } | null;
+  }[];
+  const recipeNames = [
+    ...new Set(
+      recipeRows
+        .map((row) => row.recipes?.name?.trim())
+        .filter((name): name is string => Boolean(name)),
+    ),
+  ].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+
+  const aliasRows = (aliasResult.data ?? []) as {
+    alias_name?: string | null;
+    normalized_alias?: string | null;
+  }[];
+  const aliasNames = [
+    ...new Set(
+      aliasRows
+        .map((row) => row.alias_name?.trim() || row.normalized_alias?.trim())
+        .filter((name): name is string => Boolean(name)),
+    ),
+  ].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+
+  return {
+    sourceIngredientId: sourceId,
+    targetIngredientId: targetId,
+    plan,
+    validation,
+    recipeIngredients: { count: recipeRows.length, recipeNames },
+    ingredientAliases: { count: aliasRows.length, aliasNames },
+    ingredientPriceHistory: { count: (priceResult.data ?? []).length },
+    recipeMarginImpacts: { count: (marginResult.data ?? []).length },
+    queryError,
+  };
+}
+
+export function logManualCanonicalMergeStart(
+  preview: ManualCanonicalMergeImpactPreview,
+): void {
+  console.info(MANUAL_CANONICAL_MERGE_START_PREFIX, {
+    sourceId: preview.sourceIngredientId,
+    targetId: preview.targetIngredientId,
+    validationOk: preview.validation.ok,
+    validationIssues: preview.validation.ok ? [] : preview.validation.issues,
+    recipeIngredientCount: preview.recipeIngredients.count,
+    recipeNames: preview.recipeIngredients.recipeNames,
+    aliasCount: preview.ingredientAliases.count,
+    aliasNames: preview.ingredientAliases.aliasNames,
+    priceHistoryCount: preview.ingredientPriceHistory.count,
+    marginImpactCount: preview.recipeMarginImpacts.count,
+  });
+}
+
+export function logManualCanonicalMergeComplete(params: {
+  sourceId: string;
+  targetId: string;
+  success: boolean;
+  archivedSourceIds: string[];
+  error?: string | null;
+}): void {
+  console.info(MANUAL_CANONICAL_MERGE_COMPLETE_PREFIX, {
+    sourceId: params.sourceId,
+    targetId: params.targetId,
+    success: params.success,
+    archivedSourceIds: params.archivedSourceIds,
+    error: params.error ?? null,
+  });
+}
+
+/**
  * Execute merge against Supabase: reassign FKs, then soft-archive source rows.
  * Invoice line links are preserved via ingredient_aliases + in-memory override maps.
  */
@@ -566,6 +724,113 @@ export function findAngusPattyMergeCluster(
       cluster.displayNames.some((name) => /angus|ang\s*pty/i.test(name)),
     ) ?? null
   );
+}
+
+export type ExecuteManualCanonicalMergeParams = {
+  client: AppSupabaseClient;
+  sourceId: string;
+  targetId: string;
+  catalog: IngredientMergeCatalogRow[];
+  confirmedAliases?: IngredientAliasMap;
+  canonicalIngredientName?: string;
+};
+
+export type ManualCanonicalMergeMemoryRewrites = {
+  overridesRemapped: number;
+  rejectedRemapped: number;
+};
+
+export type ExecuteManualCanonicalMergeResult =
+  | (IngredientMergeExecutionResult & {
+      plan: IngredientMergePlan;
+      preview: ManualCanonicalMergeImpactPreview;
+      nextConfirmedAliases?: IngredientAliasMap;
+      memoryRewrites?: ManualCanonicalMergeMemoryRewrites;
+    })
+  | { error: string; plan: IngredientMergePlan | null; preview: ManualCanonicalMergeImpactPreview | null };
+
+/**
+ * User-driven manual merge: preview impact, validate, execute FK reassignment + soft-archive.
+ */
+export async function executeManualCanonicalMerge(
+  params: ExecuteManualCanonicalMergeParams,
+): Promise<ExecuteManualCanonicalMergeResult> {
+  const preview = await previewManualCanonicalMergeImpact(
+    params.client,
+    params.sourceId,
+    params.targetId,
+    params.catalog,
+  );
+
+  if (preview.queryError) {
+    logManualCanonicalMergeStart(preview);
+    logManualCanonicalMergeComplete({
+      sourceId: params.sourceId,
+      targetId: params.targetId,
+      success: false,
+      archivedSourceIds: [],
+      error: preview.queryError,
+    });
+    return { error: preview.queryError, plan: preview.plan, preview };
+  }
+
+  if (!preview.validation.ok) {
+    logManualCanonicalMergeStart(preview);
+    const message = `Invalid merge: ${preview.validation.issues.join(", ")}`;
+    logManualCanonicalMergeComplete({
+      sourceId: params.sourceId,
+      targetId: params.targetId,
+      success: false,
+      archivedSourceIds: [],
+      error: message,
+    });
+    return { error: message, plan: preview.plan, preview };
+  }
+
+  logManualCanonicalMergeStart(preview);
+
+  const execution = await executeIngredientMerge(params.client, preview.plan);
+  if (execution.error) {
+    logManualCanonicalMergeComplete({
+      sourceId: params.sourceId,
+      targetId: params.targetId,
+      success: false,
+      archivedSourceIds: [],
+      error: execution.error.message,
+    });
+    return { ...execution, preview };
+  }
+
+  let nextConfirmedAliases = params.confirmedAliases;
+  let memoryRewrites: ManualCanonicalMergeMemoryRewrites | undefined;
+
+  if (params.confirmedAliases) {
+    const canonicalName =
+      params.canonicalIngredientName ??
+      params.catalog.find((row) => row.id === preview.plan.canonicalIngredientId)?.name ??
+      preview.plan.canonicalIngredientId;
+
+    const applied = applyInMemoryIngredientMergeRewrites(
+      params.sourceId,
+      params.targetId,
+      canonicalName,
+      params.confirmedAliases,
+    );
+    nextConfirmedAliases = applied.nextConfirmedAliases;
+    memoryRewrites = {
+      overridesRemapped: applied.overridesRemapped,
+      rejectedRemapped: applied.rejectedRemapped,
+    };
+  }
+
+  logManualCanonicalMergeComplete({
+    sourceId: params.sourceId,
+    targetId: params.targetId,
+    success: true,
+    archivedSourceIds: preview.plan.sourceIngredientIds,
+  });
+
+  return { ...execution, preview, nextConfirmedAliases, memoryRewrites };
 }
 
 export function clearIngredientMergeMemoryForTests(): void {
