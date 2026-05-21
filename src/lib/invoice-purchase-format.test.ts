@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   formatInvoiceLineRawPurchaseFallback,
   formatStructuredPurchaseDisplay,
+  formatCanonicalUsableStockLabel,
   formatUsableStockQuantityLabel,
   hasRichPackageSemantics,
   isCollapsedMeaninglessPurchaseLabel,
@@ -247,15 +248,15 @@ describe("formatStructuredPurchaseDisplay", () => {
       name: "OLEO GIRASSOL VAQUEIRO 1L",
       quantity: 1,
       unit: "ml",
-      display: "1 bottle x 1 L",
+      display: "1 L",
       usable: 1000,
       usableUnit: "ml",
     },
     {
       name: "BATATA PALHA 2KG",
-      quantity: 1,
+      quantity: 2,
       unit: "g",
-      display: "1 pack x 2 kg",
+      display: "2 kg",
       usable: 2000,
       usableUnit: "g",
     },
@@ -275,7 +276,12 @@ describe("formatStructuredPurchaseDisplay", () => {
             : structured.inferred.stock_unit);
       expect(stockQty).toBe(usable);
       expect(stockUnit).toBe(usableUnit);
-      expect(isCollapsedMeaninglessPurchaseLabel(`${quantity} ${unit}`)).toBe(true);
+      const rowPurchaseLabel = `${quantity} ${unit}`;
+      if (quantity === 1) {
+        expect(isCollapsedMeaninglessPurchaseLabel(rowPurchaseLabel)).toBe(true);
+      } else {
+        expect(resolveInvoicePurchaseDisplayLabel({ name, quantity, unit })).not.toBe(rowPurchaseLabel);
+      }
       expect(formatStructuredPurchaseDisplay(structured)).toBe(display);
       expect(resolveInvoicePurchaseDisplayLabel({ name, quantity, unit })).toBe(display);
     },
@@ -438,6 +444,8 @@ describe("resolveInvoiceLineStockPresentation", () => {
       usable: 2500,
       usableUnit: "g",
       pipelineId: "unified" as const,
+      labelPattern: /2\.5\s*kg\s+usable/i,
+      forbidPattern: /^\s*[246]\s*g\s+usable/i,
     },
     {
       name: "1 bottle x 450 ml",
@@ -446,6 +454,8 @@ describe("resolveInvoiceLineStockPresentation", () => {
       usable: 450,
       usableUnit: "ml",
       pipelineId: "unified" as const,
+      labelPattern: /450\s*ml\s+usable/i,
+      forbidPattern: /^\s*4\s*ml\s+usable/i,
     },
     {
       name: "250 g",
@@ -454,15 +464,39 @@ describe("resolveInvoiceLineStockPresentation", () => {
       usable: 250,
       usableUnit: "g",
       pipelineId: "unified" as const,
+      labelPattern: /250\s*g\s+usable/i,
+      forbidPattern: /^\s*1\s*g\s+usable/i,
+    },
+    {
+      name: "BATATA CONGELADA 1 pack x 875 g",
+      quantity: 2,
+      unit: "g",
+      usable: 875,
+      usableUnit: "g",
+      pipelineId: "unified" as const,
+      labelPattern: /875\s*g\s+usable/i,
+      forbidPattern: /^\s*2\s*g\s+usable/i,
+    },
+    {
+      name: "4 cases x 24 x 330ml",
+      quantity: 4,
+      unit: "ml",
+      usable: 31680,
+      usableUnit: "ml",
+      pipelineId: "unified" as const,
+      labelPattern: /31\.68\s*L\s+usable/i,
+      forbidPattern: /^\s*4\s*ml\s+usable/i,
     },
   ])(
     "unified pipeline: $name",
-    ({ name, quantity, unit, usable, usableUnit, pipelineId }) => {
+    ({ name, quantity, unit, usable, usableUnit, pipelineId, labelPattern, forbidPattern }) => {
       const presentation = resolveInvoiceLineStockPresentation({ name, quantity, unit });
       expect(presentation.pipelineId).toBe(pipelineId);
       expect(presentation.usableQuantity).toBe(usable);
       expect(presentation.usableUnit).toBe(usableUnit);
-      expect(presentation.quantityLabel).toContain(String(usable >= 1000 ? usable / 1000 : usable));
+      expect(presentation.renderSource).toBe("unified");
+      expect(presentation.quantityLabel).toMatch(labelPattern);
+      expect(presentation.quantityLabel).not.toMatch(forbidPattern);
     },
   );
 
@@ -475,9 +509,34 @@ describe("resolveInvoiceLineStockPresentation", () => {
     expect(presentation.quantityLabel).toMatch(/usable/i);
     expect(presentation.usableQuantity).toBeGreaterThanOrEqual(400);
     expect(presentation.pipelineId).toBe("unified");
-    if (presentation.detailLabel) {
-      expect(presentation.detailLabel).toBe("estimated kitchen yield");
-    }
+    expect(presentation.renderSource).toBe("estimated_yield");
+    expect(presentation.detailLabel).toBe("estimated kitchen yield");
+  });
+
+  it("does not use row OCR scalar when unified usable exists", () => {
+    const presentation = resolveInvoiceLineStockPresentation({
+      name: "1 bottle x 450 ml",
+      quantity: 4,
+      unit: "ml",
+    });
+    expect(presentation.renderSource).not.toBe("legacy_fallback");
+    expect(presentation.quantityLabel).not.toMatch(/^\s*4\s*ml\s+usable/i);
+  });
+
+  it("formatCanonicalUsableStockLabel maps large ml totals to L", () => {
+    expect(formatCanonicalUsableStockLabel(31680, "ml")).toBe("31.68 L usable");
+  });
+
+  it("live engine ignores stale row g/ml when name embeds pack kg (cheddar 1kg)", () => {
+    const presentation = resolveInvoiceLineStockPresentation(
+      { name: "cheddar 1kg", quantity: 2, unit: "g" },
+      "stale-row-test",
+    );
+    expect(presentation.usableQuantity).toBe(1000);
+    expect(presentation.usableUnit).toBe("g");
+    expect(presentation.quantityLabel).toMatch(/1\s*kg\s+usable/i);
+    expect(presentation.quantityLabel).not.toMatch(/^\s*2\s*g\s+usable/i);
+    expect(presentation.renderSource).toBe("unified");
   });
 });
 

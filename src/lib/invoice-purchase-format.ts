@@ -14,10 +14,21 @@ import {
 } from "@/lib/ingredient-unit-inference";
 import {
   isWeakInvoiceRowContentMeasure,
+  logStockGramMlTrace,
   logStockNormalize,
   logStockNormalizationSource,
+  logStockRenderSource,
+  logStockResidualSource,
+  type StockRenderSource,
+  normalizeMeasureUnit,
+  findBestContainerWithSizeMatch,
   normalizePurchasedToUsableStock,
+  parsePurchaseStructureFromText,
+  parseQuantityToken,
+  purchaseStructureToPackPhrase,
+  summarizePurchaseStructure,
   type NormalizedPackPhrase,
+  type PurchaseStructure,
   type StockNormalizationPipelineId,
   type StockNormalizeResult,
 } from "@/lib/stock-normalization";
@@ -108,7 +119,7 @@ function findLastRegexMatch(text: string, source: string): RegExpMatchArray | nu
 }
 
 function findContainerWithSizePhrase(text: string): RegExpMatchArray | null {
-  return findLastRegexMatch(text, CONTAINER_WITH_SIZE_RE.source);
+  return findBestContainerWithSizeMatch(text);
 }
 
 function findMultiUnitPackPhrase(text: string): RegExpMatchArray | null {
@@ -181,30 +192,33 @@ const PACKAGE_TYPE_BY_CONTAINER: Record<string, PackageType> = {
   bags: "saco",
 };
 
-function parseQuantityToken(raw: string): number | null {
-  const t = raw.trim();
-  if (!t) return null;
-  const normalized = /^\d+,\d+$/.test(t) ? t.replace(",", ".") : t.replace(/(\d),(\d)/g, "$1.$2");
-  const n = Number.parseFloat(normalized);
-  if (!Number.isFinite(n) || n <= 0) return null;
-  return n;
-}
+function parsedPhraseFromPurchaseStructure(structure: PurchaseStructure): ParsedPhrase {
+  const normalized = purchaseStructureToPackPhrase(structure);
+  const hasInner = structure.innerUnitCount != null && structure.innerUnitCount > 1;
+  const kind: ParsedPhrase["kind"] =
+    hasInner || normalized.kind === "multi_unit_pack"
+      ? "multi_unit_pack"
+      : normalized.kind === "container_with_size"
+        ? "container_with_size"
+        : normalized.kind === "unit_count"
+          ? "unit_count"
+          : "weight_or_volume";
 
-function normalizeMeasureUnit(raw: string): PackageMeasureUnit | null {
-  const unit = raw.trim().toLowerCase();
-  if (unit === "kg" || unit === "kgs") return "kg";
-  if (unit === "g" || unit === "gr" || unit === "grs" || unit === "mg") return "g";
-  if (unit === "ml") return "ml";
-  if (unit === "cl") return "ml";
-  if (unit === "l" || unit === "lt" || unit === "lts" || unit === "ltr" || unit === "ltrs") return "L";
-  if (
-    ["un", "uni", "und", "unds", "unid", "unids", "unit", "units", "unidade", "unidades", "pc", "pcs"].includes(
-      unit,
-    )
-  ) {
-    return "un";
-  }
-  return null;
+  return {
+    kind,
+    containerCount: structure.purchaseQuantity,
+    containerUnit:
+      structure.tier === "bare_measure" || structure.tier === "count_size"
+        ? structure.unitMeasurement
+        : structure.purchaseFormat === "unit"
+          ? structure.innerUnitType ?? "un"
+          : structure.purchaseFormat,
+    packageQuantity: hasInner ? structure.innerUnitCount : structure.unitSize,
+    packageUnit: structure.unitMeasurement,
+    matchedText: structure.matchedText,
+    confidence: 0.98,
+    reason: `purchase structure (${structure.tier})`,
+  };
 }
 
 function toNormalizedPackPhrase(phrase: ParsedPhrase): NormalizedPackPhrase {
@@ -253,6 +267,11 @@ function parseMeasureSizeFromGroups(
 export function parsePurchaseFormatPhrase(text: string): ParsedPhrase | null {
   const trimmed = text.trim();
   if (!trimmed) return null;
+
+  const structure = parsePurchaseStructureFromText(trimmed);
+  if (structure) {
+    return parsedPhraseFromPurchaseStructure(structure);
+  }
 
   const containerMatch = findContainerWithSizePhrase(trimmed);
   if (containerMatch?.groups) {
@@ -422,19 +441,24 @@ function structuredFromExplicitPhrase(
   name: string,
   inferred: UnitInferenceResult,
 ): StructuredPurchaseFormat {
+  const structure = stock.purchaseStructure;
+  const packageQuantity =
+    structure?.innerUnitCount != null ? structure.innerUnitCount : explicit.packageQuantity;
+  const packageUnit = structure?.unitMeasurement ?? explicit.packageUnit;
+
   return {
     kind: explicit.kind,
     ingredientIdentityHint: stripMatchedPurchaseText(name, explicit.matchedText),
     purchaseContainerCount: stock.purchaseContainerCount,
     purchaseContainerUnit: explicit.containerUnit,
-    packageQuantity: explicit.packageQuantity,
-    packageMeasurementUnit: explicit.packageUnit,
+    packageQuantity,
+    packageMeasurementUnit: packageUnit,
     normalizedUsableQuantity: stock.usableQuantity,
     usableQuantityUnit: stock.usableUnit,
     packageType: resolvePackageType(explicit.containerUnit) ?? inferred.package_type,
     inferred,
     confidence: explicit.confidence,
-    reason: explicit.reason,
+    reason: structure ? `${explicit.reason}; ${stock.reason}` : explicit.reason,
     stockNormalizationPipeline: pipelineIdFromStock(stock),
   };
 }
@@ -531,11 +555,27 @@ export function resolveInvoiceLinePurchaseFormat(
     explicitKind: explicit?.kind ?? null,
     stockSource: stock.source,
     pipelineId: stock.pipelineId,
+    purchaseStructure: stock.purchaseStructure
+      ? summarizePurchaseStructure(stock.purchaseStructure)
+      : null,
   });
 
-  if (stock.source === "explicit_phrase") {
+  logStockGramMlTrace("resolveInvoiceLinePurchaseFormat.stock", {
+    name,
+    beforeQty: rowQuantity,
+    afterQty: stock.usableQuantity,
+    unit: stock.usableUnit,
+    rowUnit,
+    stockSource: stock.source,
+    unitSize: stock.purchaseStructure?.unitSize ?? null,
+    structureTotal: stock.purchaseStructure?.totalUsableAmount ?? null,
+  });
+
+  if (stock.source === "explicit_phrase" || stock.source === "purchase_structure") {
     const phraseForStructured =
       explicit ??
+      namePhrase ??
+      (stock.purchaseStructure ? parsePurchaseFormatPhrase(name) : null) ??
       (namePhrase && stock.explicitPhrase && parsedPhraseMatchesNormalized(namePhrase, stock.explicitPhrase)
         ? namePhrase
         : null) ??
@@ -543,9 +583,16 @@ export function resolveInvoiceLinePurchaseFormat(
         ? rowPhrase
         : null);
     if (phraseForStructured) {
-      return sanitizeStructuredUsable(
-        structuredFromExplicitPhrase(phraseForStructured, stock, name, inferred),
-      );
+      const structured = structuredFromExplicitPhrase(phraseForStructured, stock, name, inferred);
+      logStockGramMlTrace("resolveInvoiceLinePurchaseFormat.structured", {
+        name,
+        beforeQty: stock.usableQuantity,
+        afterQty: structured.normalizedUsableQuantity,
+        unit: structured.usableQuantityUnit,
+        packageQuantity: structured.packageQuantity,
+        kind: structured.kind,
+      });
+      return sanitizeStructuredUsable(structured);
     }
   }
 
@@ -719,6 +766,13 @@ function sanitizeStructuredUsable(structured: StructuredPurchaseFormat): Structu
     isImpossibleUsableQuantity(normalizedUsableQuantity, usableQuantityUnit) ||
     isCollapsedMeaninglessUsable(normalizedUsableQuantity, usableQuantityUnit, structured)
   ) {
+    logStockGramMlTrace("sanitizeStructuredUsable.suppressed", {
+      beforeQty: normalizedUsableQuantity,
+      afterQty: null,
+      unit: usableQuantityUnit,
+      kind: structured.kind,
+      confidence: structured.confidence,
+    });
     logStockNormalize("impossible_usable", {
       quantity: normalizedUsableQuantity,
       unit: usableQuantityUnit,
@@ -745,6 +799,24 @@ function formatOperationalQuantity(value: number, unit: string): string {
     return formatQuantityWithUnit(value / 1000, "L");
   }
   return formatQuantityWithUnit(value, unit);
+}
+
+/** Maps canonical base usable (g/ml/un) to a stock-added label; optional kg/L display. */
+export function formatCanonicalUsableStockLabel(
+  totalUsableAmount: number,
+  usableUnit: "g" | "ml" | "un",
+): string | null {
+  if (!Number.isFinite(totalUsableAmount) || totalUsableAmount <= 0) return null;
+  if (isImpossibleUsableQuantity(totalUsableAmount, usableUnit)) return null;
+  const label = `${formatOperationalQuantity(totalUsableAmount, usableUnit)} usable`;
+  const result = isMeaninglessUsableStockLabel(label) ? null : label;
+  logStockGramMlTrace("formatCanonicalUsableStockLabel", {
+    beforeQty: totalUsableAmount,
+    afterQty: result ? totalUsableAmount : null,
+    unit: usableUnit,
+    label: result,
+  });
+  return result;
 }
 
 export function formatUsableStockQuantityLabel(
@@ -1015,6 +1087,7 @@ export type InvoiceLineStockPresentation = {
   pipelineId: StockNormalizationPipelineId;
   usableQuantity: number | null;
   usableUnit: "g" | "ml" | "un" | null;
+  renderSource: StockRenderSource;
 };
 
 /**
@@ -1027,92 +1100,118 @@ export function resolveInvoiceLineStockPresentation(
 ): InvoiceLineStockPresentation {
   const structured = resolveInvoiceLinePurchaseFormat(item);
   const inferred = structured.inferred;
-  const rowQuantity = item.quantity == null ? null : Number(item.quantity);
-  const purchaseQuantity =
-    Number.isFinite(rowQuantity) && rowQuantity != null && rowQuantity > 0 ? rowQuantity : 1;
+  const totalUsableAmount = structured.normalizedUsableQuantity;
+  const usableUnit = structured.usableQuantityUnit;
+  const pipelineId = structured.stockNormalizationPipeline;
 
   const empty: InvoiceLineStockPresentation = {
     quantityLabel: null,
     detailLabel: null,
-    pipelineId: structured.stockNormalizationPipeline,
-    usableQuantity: structured.normalizedUsableQuantity,
-    usableUnit: structured.usableQuantityUnit,
+    pipelineId,
+    usableQuantity: totalUsableAmount,
+    usableUnit,
+    renderSource: "none",
   };
 
+  const purchaseStructure = parsePurchaseStructureFromText(String(item.name ?? "").trim());
+
   if (rowKey) {
-    logStockNormalizationSource(rowKey, structured.stockNormalizationPipeline, {
+    logStockNormalizationSource(rowKey, pipelineId, {
       name: item.name,
       quantity: item.quantity,
       unit: item.unit,
       kind: structured.kind,
-      usableQuantity: structured.normalizedUsableQuantity,
-      usableUnit: structured.usableQuantityUnit,
+      totalUsableAmount,
+      usableUnit,
       reason: structured.reason,
+      purchaseStructure: purchaseStructure ? summarizePurchaseStructure(purchaseStructure) : null,
     });
   }
 
-  if (
-    structured.normalizedUsableQuantity != null &&
-    structured.usableQuantityUnit &&
-    structured.kind !== "unit_count"
-  ) {
-    const quantityLabel = formatUsableStockQuantityLabel(
-      structured.normalizedUsableQuantity,
-      structured.usableQuantityUnit,
-      structured,
-    );
-    if (quantityLabel) {
-      return { ...empty, quantityLabel, detailLabel: null };
+  const logRender = (renderSource: StockRenderSource, quantityLabel: string | null) => {
+    if (!rowKey) return;
+    logStockRenderSource(rowKey, renderSource, {
+      name: item.name,
+      quantity: item.quantity,
+      unit: item.unit,
+      pipelineId,
+      totalUsableAmount,
+      usableUnit,
+      purchaseStructure: purchaseStructure ? summarizePurchaseStructure(purchaseStructure) : null,
+      quantityLabel,
+    });
+  };
+
+  logStockGramMlTrace("resolveInvoiceLineStockPresentation", {
+    name: item.name,
+    beforeQty: item.quantity == null ? null : Number(item.quantity),
+    afterQty: totalUsableAmount,
+    unit: usableUnit,
+    rowUnit: item.unit,
+    pipelineId,
+    kind: structured.kind,
+    unitSize: purchaseStructure?.unitSize ?? null,
+    structureTotal: purchaseStructure?.totalUsableAmount ?? null,
+  });
+
+  if (pipelineId === "unified" && totalUsableAmount != null && usableUnit) {
+    if (structured.kind === "unit_count") {
+      const quantityLabel = formatUsableStockQuantityLabel(
+        totalUsableAmount ?? structured.purchaseContainerCount,
+        "units",
+        structured,
+      );
+      if (quantityLabel) {
+        logRender("unified", quantityLabel);
+        if (rowKey) {
+          logStockResidualSource(rowKey, "live_engine", {
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            pipelineId,
+            quantityLabel,
+            renderSource: "unified",
+          });
+        }
+        return { ...empty, quantityLabel, renderSource: "unified" };
+      }
+    } else {
+      const quantityLabel = formatCanonicalUsableStockLabel(totalUsableAmount, usableUnit);
+      if (quantityLabel) {
+        const estimatedYield = Boolean(inferred.conversion_hint);
+        logRender(estimatedYield ? "estimated_yield" : "unified", quantityLabel);
+        if (rowKey) {
+          logStockResidualSource(rowKey, "live_engine", {
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            pipelineId,
+            quantityLabel,
+            renderSource: estimatedYield ? "estimated_yield" : "unified",
+          });
+        }
+        return {
+          ...empty,
+          quantityLabel,
+          detailLabel: estimatedYield ? "estimated kitchen yield" : null,
+          renderSource: estimatedYield ? "estimated_yield" : "unified",
+        };
+      }
     }
   }
 
-  if (structured.kind === "unit_count") {
-    const quantityLabel = formatUsableStockQuantityLabel(
-      structured.normalizedUsableQuantity ?? structured.purchaseContainerCount,
-      "units",
-      structured,
-    );
-    if (quantityLabel) {
-      return { ...empty, quantityLabel, detailLabel: null };
-    }
+  logRender("none", null);
+  if (rowKey) {
+    logStockResidualSource(rowKey, "live_engine", {
+      name: item.name,
+      quantity: item.quantity,
+      unit: item.unit,
+      pipelineId,
+      totalUsableAmount,
+      usableUnit,
+      renderSource: "none",
+    });
   }
-
-  const hint = inferred.conversion_hint;
-  if (
-    hint &&
-    structured.normalizedUsableQuantity != null &&
-    structured.usableQuantityUnit === hint.stock_unit
-  ) {
-    const quantityLabel = `~${formatOperationalQuantity(
-      structured.normalizedUsableQuantity,
-      hint.stock_unit,
-    )} usable`;
-    if (!isMeaninglessUsableStockLabel(quantityLabel)) {
-      return {
-        ...empty,
-        quantityLabel,
-        detailLabel: "estimated kitchen yield",
-      };
-    }
-  }
-
-  if (hint) {
-    const estimatedStockQuantity = Math.max(1, purchaseQuantity * hint.estimated_quantity);
-    const quantityLabel = `~${formatOperationalQuantity(
-      estimatedStockQuantity,
-      hint.stock_unit,
-    )} usable`;
-    if (!isMeaninglessUsableStockLabel(quantityLabel)) {
-      return {
-        ...empty,
-        quantityLabel,
-        detailLabel: "estimated kitchen yield",
-        usableQuantity: estimatedStockQuantity,
-        usableUnit: hint.stock_unit,
-      };
-    }
-  }
-
   return empty;
 }
 
@@ -1137,11 +1236,18 @@ export function structuredPurchaseToIngredientFields(
       : (extractedUnit ?? inferred.base_unit ?? conversionHint?.purchase_unit ?? "kg");
 
   if (structured.normalizedUsableQuantity != null && structured.usableQuantityUnit) {
-    return {
+    const fields = {
       purchase_quantity: structured.normalizedUsableQuantity,
       purchase_unit: structured.usableQuantityUnit,
       base_unit: structured.usableQuantityUnit,
     };
+    logStockGramMlTrace("structuredPurchaseToIngredientFields", {
+      beforeQty: structured.normalizedUsableQuantity,
+      afterQty: fields.purchase_quantity,
+      unit: fields.purchase_unit,
+      kind: structured.kind,
+    });
+    return fields;
   }
 
   if (inferred.base_unit) {

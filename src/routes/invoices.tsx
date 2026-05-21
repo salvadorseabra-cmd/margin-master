@@ -2987,6 +2987,7 @@ function ItemsTable({
                     purchaseLabel,
                     stockLabel: stockPresentation?.quantityLabel ?? null,
                     stockNormalizationPipeline: stockMeta.pipelineId,
+                    stockRenderSource: stockMeta.renderSource,
                   });
                 }
                 if (!purchaseLabel || !stockPresentation) {
