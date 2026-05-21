@@ -1,5 +1,7 @@
 import type { IngredientAliasMap } from "@/lib/ingredient-canonical";
 import { buildOverrideKeysFromInvoiceLine } from "@/lib/ingredient-match-override";
+import { traceManualIngredientMatch } from "@/lib/manual-ingredient-match-trace";
+import { normalizeInvoiceAliasMemoryKey } from "@/lib/normalize-ingredient-name";
 import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
 
 const LOG_PREFIX = "[ingredient_aliases]";
@@ -34,6 +36,7 @@ export function lookupIngredientIdFromAliasMap(
   rawItemName?: string | null,
 ): string | undefined {
   const operationalCandidates = new Set<string>();
+  const keysTried: string[] = [];
   for (const name of [rawItemName, normalizedItemName]) {
     if (!name?.trim()) continue;
     const keys = buildOverrideKeysFromInvoiceLine(name, supplierName);
@@ -48,6 +51,7 @@ export function lookupIngredientIdFromAliasMap(
   }
 
   for (const key of operationalCandidates) {
+    keysTried.push(key);
     const hit = aliases[key];
     if (hit) {
       debugAliasLog("alias lookup hit (operational key)", {
@@ -55,11 +59,24 @@ export function lookupIngredientIdFromAliasMap(
         key,
         ingredientId: hit,
       });
+      traceManualIngredientMatch("[alias_link_lookup]", {
+        hit: true,
+        ingredientId: hit,
+        lookupKey: key,
+        keysTried,
+        normalizeInvoiceAliasMemoryKey: normalizeInvoiceAliasMemoryKey(
+          rawItemName ?? normalizedItemName,
+        ),
+        supplierScope: normalizeSupplierScope(supplierName),
+        rawItemName: rawItemName ?? null,
+        normalizedItemName,
+      });
       return hit;
     }
   }
 
   const supplierKey = buildIngredientAliasLookupKey(normalizedItemName, supplierName);
+  keysTried.push(supplierKey);
   const supplierHit = aliases[supplierKey];
   if (supplierHit) {
     debugAliasLog("alias lookup hit (supplier-scoped)", {
@@ -67,19 +84,56 @@ export function lookupIngredientIdFromAliasMap(
       supplierKey,
       ingredientId: supplierHit,
     });
+    traceManualIngredientMatch("[alias_link_lookup]", {
+      hit: true,
+      ingredientId: supplierHit,
+      lookupKey: supplierKey,
+      keysTried,
+      normalizeInvoiceAliasMemoryKey: normalizeInvoiceAliasMemoryKey(
+        rawItemName ?? normalizedItemName,
+      ),
+      supplierScope: normalizeSupplierScope(supplierName),
+      rawItemName: rawItemName ?? null,
+      normalizedItemName,
+    });
     return supplierHit;
   }
 
   const globalHit = aliases[normalizedItemName];
+  keysTried.push(normalizedItemName);
   if (globalHit) {
     debugAliasLog("alias lookup hit (global)", {
       normalizedItemName,
       ingredientId: globalHit,
     });
+    traceManualIngredientMatch("[alias_link_lookup]", {
+      hit: true,
+      ingredientId: globalHit,
+      lookupKey: normalizedItemName,
+      keysTried,
+      normalizeInvoiceAliasMemoryKey: normalizeInvoiceAliasMemoryKey(
+        rawItemName ?? normalizedItemName,
+      ),
+      supplierScope: normalizeSupplierScope(supplierName),
+      rawItemName: rawItemName ?? null,
+      normalizedItemName,
+    });
     return globalHit;
   }
 
   debugAliasLog("alias lookup miss", { normalizedItemName, supplierKey });
+  traceManualIngredientMatch("[alias_link_lookup]", {
+    hit: false,
+    ingredientId: null,
+    lookupKey: null,
+    keysTried,
+    normalizeInvoiceAliasMemoryKey: normalizeInvoiceAliasMemoryKey(
+      rawItemName ?? normalizedItemName,
+    ),
+    supplierScope: normalizeSupplierScope(supplierName),
+    rawItemName: rawItemName ?? null,
+    normalizedItemName,
+  });
   return undefined;
 }
 

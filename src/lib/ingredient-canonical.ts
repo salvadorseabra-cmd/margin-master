@@ -193,6 +193,7 @@ export type { MatchScoreBreakdown, MatchScoreRejectionReason } from "@/lib/ingre
 import { lookupIngredientMatchOverride } from "@/lib/ingredient-match-override";
 import { resolveOperationalAliasCatalogMatch } from "@/lib/ingredient-operational-alias-memory";
 import { isIngredientMatchPairRejected } from "@/lib/ingredient-rejected-match-memory";
+import { traceRematchBlockedExistingRow } from "@/lib/alias-state-trace";
 import { filterMatchingCatalogIngredients } from "@/lib/ingredient-kind";
 import { normalizeInvoiceMatchIngredientName } from "@/lib/normalize-ingredient-name";
 
@@ -1054,6 +1055,19 @@ export function findCanonicalIngredientMatch(
   );
   if (aliasIngredientId) {
     const ingredient = activeIngredients.find((candidate) => candidate.id === aliasIngredientId);
+    if (
+      ingredient &&
+      isRejectedIngredientCandidate(itemName, ingredient.id, supplierName, rawLookupNames)
+    ) {
+      traceRematchBlockedExistingRow({
+        phase: "alias_memory_hit_rejected_pair",
+        itemName,
+        ingredientId: aliasIngredientId,
+        supplierName: supplierName ?? null,
+        normalizedItemName,
+        note: "confirmed alias map still points here; wrong-match rejection blocks rematch until cleared",
+      });
+    }
     if (
       ingredient &&
       !isRejectedIngredientCandidate(itemName, ingredient.id, supplierName, rawLookupNames)

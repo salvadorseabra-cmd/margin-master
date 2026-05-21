@@ -16,9 +16,12 @@ import {
 } from "@/lib/ingredient-operational-alias-memory";
 import type { InvoiceRowIngredientMatchState } from "@/lib/ingredient-match-explanation";
 import {
+  clearRejectedIngredientMatchPair,
+  listRejectedIngredientMatches,
   rememberRejectedIngredientMatch,
   persistRejectedIngredientMatchesToStorage,
 } from "@/lib/ingredient-rejected-match-memory";
+import { traceUnmatchPersistState, traceAliasUnmatchOrphan } from "@/lib/alias-state-trace";
 import {
   getAliasTraceCompareBucket,
   traceIngredientAliases,
@@ -27,6 +30,8 @@ import {
   traceIngredientAliasesValidationRejection,
 } from "@/lib/ingredient-aliases-trace";
 import { traceAliasOnly } from "@/lib/ingredient-catalog-diagnostics";
+import { traceManualIngredientMatch } from "@/lib/manual-ingredient-match-trace";
+import { normalizeInvoiceAliasMemoryKey } from "@/lib/normalize-ingredient-name";
 
 export const MANUAL_CONFIRMATION_CONFIDENCE = 10;
 
@@ -166,6 +171,8 @@ export type PersistManualIngredientCorrectionParams = ManualIngredientCorrection
 export type PersistManualIngredientCorrectionResult = {
   applied: ApplyManualIngredientCorrectionResult | null;
   error: PostgrestError | null;
+  /** Wrong-match rejection entries removed for this line → ingredient pair. */
+  clearedRejectedPairs: number;
 };
 
 /**
@@ -187,6 +194,14 @@ export async function persistManualIngredientCorrection({
   confirmedAliases,
   supabase,
 }: PersistManualIngredientCorrectionParams): Promise<PersistManualIngredientCorrectionResult> {
+  traceManualIngredientMatch("[manual_match_attempt]", {
+    itemName,
+    ingredientId,
+    ingredientName,
+    supplierName: supplierName ?? null,
+    invoiceAliasMemoryKey: normalizeInvoiceAliasMemoryKey(itemName),
+    priorMapKeyCount: Object.keys(confirmedAliases).length,
+  });
   traceAliasOnly("persist-manual-correction", {
     itemName,
     ingredientId,
@@ -201,6 +216,18 @@ export async function persistManualIngredientCorrection({
     supplierName: supplierName ?? null,
   });
 
+  const rejectedBefore = listRejectedIngredientMatches().length;
+  const clearedRejected = clearRejectedIngredientMatchPair(itemName, ingredientId, supplierName);
+  traceUnmatchPersistState({
+    phase: "before_manual_rematch_persist",
+    itemName,
+    ingredientId,
+    supplierName: supplierName ?? null,
+    clearedRejectedPairs: clearedRejected,
+    rejectedPairCountBefore: rejectedBefore,
+    rejectedPairCountAfter: listRejectedIngredientMatches().length,
+  });
+
   const applied = applyManualIngredientCorrection(
     { itemName, ingredientId, ingredientName, supplierName },
     confirmedAliases,
@@ -209,6 +236,13 @@ export async function persistManualIngredientCorrection({
     traceManualAliasPersist("alias-persist-skipped", {
       itemName,
       reason: "invalid_invoice_line_name",
+    });
+    traceManualIngredientMatch("[manual_match_persist_result]", {
+      ok: false,
+      itemName,
+      reason: "applyManualIngredientCorrection_null",
+      keysWritten: [],
+      dbUpsertAttempted: false,
     });
     traceIngredientAliases("persistManualIngredientCorrection:early-return", {
       function: "persistManualIngredientCorrection",
@@ -219,6 +253,7 @@ export async function persistManualIngredientCorrection({
     return {
       applied: null,
       error: { message: "Invalid invoice line name", code: "invalid_alias" } as PostgrestError,
+      clearedRejectedPairs: clearedRejected,
     };
   }
 
@@ -261,15 +296,47 @@ export async function persistManualIngredientCorrection({
       message: error.message,
       code: error.code,
     });
+    traceManualIngredientMatch("[manual_match_persist_result]", {
+      ok: false,
+      itemName,
+      ingredientId,
+      aliasLookupKey: applied.aliasLookupKey,
+      operationalAliasKey: applied.operationalAliasKey,
+      normalizedAlias: applied.normalizedAlias,
+      keysWritten: Object.keys(applied.nextConfirmedAliases),
+      dbUpsertAttempted: true,
+      dbError: { message: error.message, code: error.code },
+    });
   } else {
     traceManualAliasPersist("alias-upsert-ok", {
       aliasName: applied.aliasName,
       normalizedAlias: applied.normalizedAlias,
       ingredientId,
     });
+    traceManualIngredientMatch("[manual_match_persist_result]", {
+      ok: true,
+      itemName,
+      ingredientId,
+      aliasLookupKey: applied.aliasLookupKey,
+      operationalAliasKey: applied.operationalAliasKey,
+      normalizedAlias: applied.normalizedAlias,
+      keysWritten: Object.keys(applied.nextConfirmedAliases),
+      dbUpsertAttempted: true,
+      dbError: null,
+    });
   }
 
-  return { applied, error };
+  traceUnmatchPersistState({
+    phase: "after_manual_rematch_persist",
+    itemName,
+    ingredientId,
+    supplierName: supplierName ?? null,
+    clearedRejectedPairs: clearedRejected,
+    persistOk: !error,
+    rejectedPairCount: listRejectedIngredientMatches().length,
+  });
+
+  return { applied, error, clearedRejectedPairs: clearedRejected };
 }
 
 export type IngredientCorrectionUiState = {
@@ -308,6 +375,14 @@ export function rejectIngredientMatchPair({
   userId,
   rawItemName,
 }: RejectIngredientMatchPairParams): void {
+  traceUnmatchPersistState({
+    phase: "before_wrong_match",
+    itemName,
+    rejectedIngredientId,
+    supplierName: supplierName ?? null,
+    rejectedPairCount: listRejectedIngredientMatches().length,
+    note: "alias row and confirmed map are not removed on wrong match",
+  });
   const remembered = rememberRejectedIngredientMatch(
     itemName,
     rejectedIngredientId,
@@ -315,6 +390,20 @@ export function rejectIngredientMatchPair({
     Date.now(),
     rawItemName ? [rawItemName] : [],
   );
+  traceUnmatchPersistState({
+    phase: "after_wrong_match",
+    itemName,
+    rejectedIngredientId,
+    supplierName: supplierName ?? null,
+    remembered: Boolean(remembered),
+    rejectedPairCount: listRejectedIngredientMatches().length,
+  });
+  traceAliasUnmatchOrphan({
+    itemName,
+    rejectedIngredientId,
+    supplierName: supplierName ?? null,
+    note: "ingredient_aliases row may remain; matcher blocks via rejected pair memory",
+  });
   if (remembered && userId) {
     persistRejectedIngredientMatchesToStorage(userId);
   }

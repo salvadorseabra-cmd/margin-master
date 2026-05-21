@@ -78,8 +78,19 @@ import {
   mergeIngredientPriceFields,
   type InvoiceOperationalMetadata,
 } from "@/lib/invoice-operational-metadata";
+import {
+  compareAliasMapsForDesync,
+  traceAliasMapSnapshot,
+  traceAliasPersistCycle,
+} from "@/lib/alias-state-trace";
 import { loadConfirmedIngredientAliasMap } from "@/lib/ingredient-alias-memory";
 import {
+  createIngredientAliasPersistQueue,
+  mergeConfirmedAliasMapsAfterReload,
+} from "@/lib/ingredient-alias-persist-queue";
+import { traceManualIngredientMatch } from "@/lib/manual-ingredient-match-trace";
+import {
+  buildManualIngredientCorrectionKeys,
   persistManualIngredientCorrection,
   rejectIngredientMatchPair,
   rejectIngredientMatchSuggestion,
@@ -88,6 +99,7 @@ import {
 import {
   ensureRejectedIngredientMatchesHydrated,
   hydrateRejectedIngredientMatchesFromStorage,
+  persistRejectedIngredientMatchesToStorage,
 } from "@/lib/ingredient-rejected-match-memory";
 import { hydrateIngredientMatchOverridesFromAliasRows } from "@/lib/ingredient-match-override";
 import { hydrateOperationalAliasMemoryFromConfirmedMap } from "@/lib/ingredient-operational-alias-memory";
@@ -873,6 +885,8 @@ function InvoicesPage() {
   const [confirmedIngredientAliases, setConfirmedIngredientAliases] = useState<IngredientAliasMap>(
     {},
   );
+  const confirmedIngredientAliasesRef = useRef<IngredientAliasMap>({});
+  const aliasPersistQueueRef = useRef(createIngredientAliasPersistQueue());
   const [, setInvoiceIdentities] = useState<InvoiceIdentityState>({});
   const invoiceIdentitiesRef = useRef<InvoiceIdentityState>({});
   const [creatingIngredientByItem, setCreatingIngredientByItem] = useState<IngredientCreationState>(
@@ -930,8 +944,13 @@ function InvoicesPage() {
   }, [refreshUnresolvedIngredientCounts]);
 
   useEffect(() => {
+    confirmedIngredientAliasesRef.current = confirmedIngredientAliases;
+  }, [confirmedIngredientAliases]);
+
+  useEffect(() => {
     if (!user) {
       setConfirmedIngredientAliases({});
+      confirmedIngredientAliasesRef.current = {};
       setInvoiceIdentities({});
       invoiceIdentitiesRef.current = {};
       return;
@@ -939,8 +958,11 @@ function InvoicesPage() {
 
     try {
       const raw = window.localStorage.getItem(`marginly:invoice-ingredient-aliases:${user.id}`);
-      setConfirmedIngredientAliases(raw ? (JSON.parse(raw) as IngredientAliasMap) : {});
+      const stored = raw ? (JSON.parse(raw) as IngredientAliasMap) : {};
+      confirmedIngredientAliasesRef.current = stored;
+      setConfirmedIngredientAliases(stored);
     } catch {
+      confirmedIngredientAliasesRef.current = {};
       setConfirmedIngredientAliases({});
     }
 
@@ -1024,8 +1046,18 @@ function InvoicesPage() {
       setConfirmedIngredientAliases((current) => {
         mergedConfirmedAliases = { ...current, ...dbAliases };
         hydrateOperationalAliasMemoryFromConfirmedMap(mergedConfirmedAliases, catalog);
+        compareAliasMapsForDesync(current, dbAliases, "load:merge_local_and_db");
+        traceManualIngredientMatch("[manual_match_reload_result]", {
+          phase: "merge_local_and_db",
+          reloadSource: "merge",
+          localKeyCount: Object.keys(current).length,
+          dbKeyCount: Object.keys(dbAliases).length,
+          mergedKeyCount: Object.keys(mergedConfirmedAliases).length,
+          sampleMergedKeys: Object.keys(mergedConfirmedAliases).slice(0, 12),
+        });
         return mergedConfirmedAliases;
       });
+      confirmedIngredientAliasesRef.current = mergedConfirmedAliases;
 
       const itemsByInvoiceId: Record<string, ItemRow[]> = {};
       if (ids.length > 0) {
@@ -1570,90 +1602,162 @@ function InvoicesPage() {
     });
   };
 
-  const persistIngredientCorrectionForItem = async (
+  const persistIngredientCorrectionForItem = (
     item: ItemRow,
     ingredientId: string,
     ingredientName: string,
     supplierName?: string | null,
-  ): Promise<{ ok: boolean; error?: string }> => {
-    traceIngredientAliases("persistIngredientCorrectionForItem:enter", {
-      function: "persistIngredientCorrectionForItem",
-      itemId: item.id,
-      itemName: item.name,
-      compareBucket: getAliasTraceCompareBucket(item.name),
-      ingredientId,
-      ingredientName,
-      supplierName: supplierName ?? null,
-    });
-    if (!user) {
-      traceIngredientAliases("persistIngredientCorrectionForItem:early-return", {
-        branch: "not_signed_in",
-        itemName: item.name,
-      });
-      return { ok: false, error: "Not signed in" };
-    }
-
-    const { applied, error } = await persistManualIngredientCorrection({
-      itemName: item.name,
-      ingredientId,
-      ingredientName,
-      supplierName,
-      confirmedAliases: confirmedIngredientAliases,
-      supabase,
-    });
-
-    if (!applied) {
-      traceCanonicalCreateFailure("alias-persist-invalid-line", {
+  ): Promise<{ ok: boolean; error?: string }> =>
+    aliasPersistQueueRef.current.enqueue(async () => {
+      traceIngredientAliases("persistIngredientCorrectionForItem:enter", {
+        function: "persistIngredientCorrectionForItem",
         itemId: item.id,
         itemName: item.name,
+        compareBucket: getAliasTraceCompareBucket(item.name),
+        ingredientId,
+        ingredientName,
+        supplierName: supplierName ?? null,
+        queueGeneration: aliasPersistQueueRef.current.getGeneration(),
       });
-      traceIngredientAliases("persistIngredientCorrectionForItem:early-return", {
-        branch: "applied_null",
-        itemName: item.name,
-        insertAttempted: false,
-      });
-      return { ok: false, error: "Invalid invoice line name" };
-    }
+      if (!user) {
+        traceIngredientAliases("persistIngredientCorrectionForItem:early-return", {
+          branch: "not_signed_in",
+          itemName: item.name,
+        });
+        return { ok: false, error: "Not signed in" };
+      }
 
-    if (error) {
-      const message = error.message || "Could not save ingredient alias";
-      traceIngredientAliases("persistIngredientCorrectionForItem:alias-error", {
+      const mapBeforePersist = confirmedIngredientAliasesRef.current;
+      traceAliasPersistCycle({
+        phase: "before_persist",
         itemName: item.name,
-        message,
-        code: error.code,
+        aliasKeyBefore:
+          buildManualIngredientCorrectionKeys(item.name, supplierName)?.aliasLookupKey ?? null,
+        mapKeyCount: Object.keys(mapBeforePersist).length,
+        sampleKeys: Object.keys(mapBeforePersist).slice(0, 12),
+        reloadSource: "memory",
+        queueGeneration: aliasPersistQueueRef.current.getGeneration(),
       });
-      setGlobalError(message);
-      return { ok: false, error: message };
-    }
 
-    traceIngredientAliases("persistIngredientCorrectionForItem:ok", {
-      itemName: item.name,
-      aliasLookupKey: applied.aliasLookupKey,
-      ingredientId,
-    });
-    setConfirmedIngredientAliases(applied.nextConfirmedAliases);
-    hydrateOperationalAliasMemoryFromConfirmedMap(applied.nextConfirmedAliases, ingredientCatalog);
-    setRejectedMatchItemIds((current) => {
-      if (!current.has(item.id)) return current;
-      const next = new Set(current);
-      next.delete(item.id);
-      return next;
-    });
-    try {
-      window.localStorage.setItem(
-        `marginly:invoice-ingredient-aliases:${user.id}`,
-        JSON.stringify(applied.nextConfirmedAliases),
+      traceManualIngredientMatch("[manual_match_attempt]", {
+        itemId: item.id,
+        rawName: item.name,
+        ingredientId,
+        supplierName: supplierName ?? null,
+        mapKeyCountBefore: Object.keys(mapBeforePersist).length,
+        queueGeneration: aliasPersistQueueRef.current.getGeneration(),
+      });
+
+      const { applied, error, clearedRejectedPairs } = await persistManualIngredientCorrection({
+        itemName: item.name,
+        ingredientId,
+        ingredientName,
+        supplierName,
+        confirmedAliases: mapBeforePersist,
+        supabase,
+      });
+
+      if (!applied) {
+        traceCanonicalCreateFailure("alias-persist-invalid-line", {
+          itemId: item.id,
+          itemName: item.name,
+        });
+        traceIngredientAliases("persistIngredientCorrectionForItem:early-return", {
+          branch: "applied_null",
+          itemName: item.name,
+          insertAttempted: false,
+        });
+        return { ok: false, error: "Invalid invoice line name" };
+      }
+
+      if (error) {
+        const message = error.message || "Could not save ingredient alias";
+        traceIngredientAliases("persistIngredientCorrectionForItem:alias-error", {
+          itemName: item.name,
+          message,
+          code: error.code,
+        });
+        setGlobalError(message);
+        return { ok: false, error: message };
+      }
+
+      traceAliasPersistCycle({
+        phase: "after_persist",
+        itemName: item.name,
+        aliasLookupKey: applied.aliasLookupKey,
+        aliasKeyBefore: applied.aliasLookupKey,
+        aliasKeyAfter: applied.aliasLookupKey,
+        mapKeyCount: Object.keys(applied.nextConfirmedAliases).length,
+        sampleKeys: Object.keys(applied.nextConfirmedAliases).slice(0, 12),
+        reloadSource: "persist",
+        queueGeneration: aliasPersistQueueRef.current.getGeneration(),
+      });
+
+      const dbAliases = await loadConfirmedIngredientAliasMap(supabase);
+      const mergedAfterDb = mergeConfirmedAliasMapsAfterReload(
+        applied.nextConfirmedAliases,
+        dbAliases,
       );
-    } catch (localStorageErr) {
-      traceIngredientAliasesCatch("persistIngredientCorrectionForItem:localStorage", localStorageErr, {
+      compareAliasMapsForDesync(
+        applied.nextConfirmedAliases,
+        dbAliases,
+        "persistIngredientCorrectionForItem:after_upsert",
+      );
+      traceAliasPersistCycle({
+        phase: "after_db_reload",
         itemName: item.name,
+        aliasLookupKey: applied.aliasLookupKey,
+        mapKeyCount: Object.keys(mergedAfterDb).length,
+        sampleKeys: Object.keys(mergedAfterDb).slice(0, 12),
+        reloadSource: "supabase",
+        queueGeneration: aliasPersistQueueRef.current.getGeneration(),
       });
-      // Local alias memory is an operational convenience; matching still works without it.
-    }
-    return { ok: true };
-  };
+      traceAliasMapSnapshot("after_db_reload", mergedAfterDb, {
+        itemName: item.name,
+        ingredientId,
+      });
 
-  const confirmIngredientMatch = (
+      traceIngredientAliases("persistIngredientCorrectionForItem:ok", {
+        itemName: item.name,
+        aliasLookupKey: applied.aliasLookupKey,
+        ingredientId,
+        mergedKeyCount: Object.keys(mergedAfterDb).length,
+      });
+      traceManualIngredientMatch("[manual_match_reload_result]", {
+        phase: "post_persist_db_merge",
+        itemName: item.name,
+        aliasLookupKey: applied.aliasLookupKey,
+        sessionKeyCount: Object.keys(applied.nextConfirmedAliases).length,
+        dbKeyCount: Object.keys(dbAliases).length,
+        mergedKeyCount: Object.keys(mergedAfterDb).length,
+      });
+
+      confirmedIngredientAliasesRef.current = mergedAfterDb;
+      setConfirmedIngredientAliases(mergedAfterDb);
+      hydrateOperationalAliasMemoryFromConfirmedMap(mergedAfterDb, ingredientCatalog);
+      if (clearedRejectedPairs > 0) {
+        persistRejectedIngredientMatchesToStorage(user.id);
+      }
+      setRejectedMatchItemIds((current) => {
+        if (!current.has(item.id)) return current;
+        const next = new Set(current);
+        next.delete(item.id);
+        return next;
+      });
+      try {
+        window.localStorage.setItem(
+          `marginly:invoice-ingredient-aliases:${user.id}`,
+          JSON.stringify(mergedAfterDb),
+        );
+      } catch (localStorageErr) {
+        traceIngredientAliasesCatch("persistIngredientCorrectionForItem:localStorage", localStorageErr, {
+          itemName: item.name,
+        });
+      }
+      return { ok: true };
+    });
+
+  const confirmIngredientMatch = async (
     item: ItemRow,
     match: IngredientCanonicalMatch,
     supplierName?: string | null,
@@ -1670,7 +1774,7 @@ function InvoicesPage() {
       blocked: true,
       blockReason: "ingredient_aliases_only",
     });
-    persistIngredientCorrectionForItem(
+    await persistIngredientCorrectionForItem(
       item,
       match.ingredient.id,
       match.ingredient.name ?? match.ingredient.normalized_name ?? "",
@@ -1684,7 +1788,7 @@ function InvoicesPage() {
     });
   };
 
-  const selectIngredientForItem = (
+  const selectIngredientForItem = async (
     item: ItemRow,
     ingredientId: string,
     supplierName?: string | null,
@@ -1703,7 +1807,7 @@ function InvoicesPage() {
       blocked: true,
       blockReason: "ingredient_aliases_only",
     });
-    persistIngredientCorrectionForItem(
+    await persistIngredientCorrectionForItem(
       item,
       ingredientId,
       ingredient.name ?? ingredient.normalized_name ?? "",

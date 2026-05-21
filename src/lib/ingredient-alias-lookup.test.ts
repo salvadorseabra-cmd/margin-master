@@ -5,6 +5,10 @@ import {
 } from "./ingredient-correction-memory";
 import type { AppSupabaseClient } from "./ingredient-alias-memory";
 import {
+  buildConfirmedAliasMapFromRows,
+  type ConfirmedIngredientAliasRow,
+} from "./ingredient-alias-memory";
+import {
   buildIngredientAliasLookupKey,
   lookupIngredientIdFromAliasMap,
   rememberAliasInMap,
@@ -156,6 +160,36 @@ describe("batata alias cluster independence", () => {
     const normalizedAliases = insertCalls.map((row) => row.normalized_alias);
     expect(new Set(normalizedAliases).size).toBe(3);
     expect(insertCalls.every((row) => row.ingredient_id === canonicalId)).toBe(true);
+  });
+
+  it("reload map keeps distinct batata keys when DB normalized_alias was collapsed", () => {
+    const rows: ConfirmedIngredientAliasRow[] = [
+      {
+        ingredient_id: "bat-palha",
+        alias_name: "BATATA PALHA 2KG SERVICE",
+        normalized_alias: "batata frita",
+        supplier_name: "Metro",
+      },
+      {
+        ingredient_id: "bat-frita",
+        alias_name: "BATATA FRITA CORTE FINO 2KG",
+        normalized_alias: "batata frita",
+        supplier_name: "Metro",
+      },
+    ];
+
+    const map = buildConfirmedAliasMapFromRows(rows);
+    const palhaKeys = buildOverrideKeysFromInvoiceLine(rows[0].alias_name, rows[0].supplier_name)!;
+    const fritaKeys = buildOverrideKeysFromInvoiceLine(rows[1].alias_name, rows[1].supplier_name)!;
+
+    expect(palhaKeys.rawNormalized).toBe("batata palha");
+    expect(fritaKeys.rawNormalized).toBe("batata frita");
+    expect(
+      lookupIngredientIdFromAliasMap(map, palhaKeys.rawNormalized, "Metro", rows[0].alias_name),
+    ).toBe("bat-palha");
+    expect(
+      lookupIngredientIdFromAliasMap(map, fritaKeys.rawNormalized, "Metro", rows[1].alias_name),
+    ).toBe("bat-frita");
   });
 
   it("only auto-resolves lines with their own confirmed alias key", () => {

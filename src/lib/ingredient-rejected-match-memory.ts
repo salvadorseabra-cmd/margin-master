@@ -99,6 +99,32 @@ export function isIngredientMatchPairRejected(
   return false;
 }
 
+/** Remove persisted wrong-match rejection for this invoice line → ingredient pair. */
+export function clearRejectedIngredientMatchPair(
+  itemName: string,
+  ingredientId: string,
+  supplierName?: string | null,
+  rawItemNames: string[] = [],
+): number {
+  const { normalizedTexts, supplierScopes } = lookupKeysForInvoiceLine(
+    itemName,
+    supplierName,
+    rawItemNames,
+  );
+  let removed = 0;
+  for (const normalizedInvoiceText of normalizedTexts) {
+    for (const supplierId of supplierScopes) {
+      const key = buildRejectedIngredientMatchKey(
+        normalizedInvoiceText,
+        ingredientId,
+        supplierId ?? null,
+      );
+      if (rejectedIngredientMatches.delete(key)) removed += 1;
+    }
+  }
+  return removed;
+}
+
 export function rememberRejectedIngredientMatch(
   itemName: string,
   rejectedIngredientId: string,

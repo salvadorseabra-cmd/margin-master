@@ -3,6 +3,15 @@ import { buildIngredientAliasLookupKey, rememberAliasInMap } from "@/lib/ingredi
 import type { IngredientAliasMap } from "@/lib/ingredient-canonical";
 import { normalizeInvoiceAliasMemoryKey } from "@/lib/normalize-ingredient-name";
 import { buildOverrideKeysFromInvoiceLine } from "@/lib/ingredient-match-override";
+import { normalizeSupplierShorthand } from "@/lib/ingredient-operational-aliases";
+import { normalizeOperationalAliasKey } from "@/lib/ingredient-operational-alias-memory";
+import {
+  traceAliasHiddenConstraint,
+  traceAliasReloadCollision,
+  traceAliasStateDesync,
+  traceRematchBlockedExistingRow,
+} from "@/lib/alias-state-trace";
+import { traceManualIngredientMatch } from "@/lib/manual-ingredient-match-trace";
 import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
 import type { Database } from "@/integrations/supabase/types";
 import {
@@ -163,6 +172,15 @@ export async function upsertConfirmedAlias({
   }
 
   if (existing) {
+    traceRematchBlockedExistingRow({
+      phase: "upsert_existing_row",
+      aliasName: alias,
+      ingredientId,
+      normalizedAlias,
+      supplierName: supplier,
+      existingId: existing.id,
+      note: "update path — not blocked; row already linked to this ingredient",
+    });
     traceIngredientAliases("upsertConfirmedAlias:update-branch", {
       aliasName: alias,
       existingId: existing.id,
@@ -264,6 +282,17 @@ export async function upsertConfirmedAlias({
 
   const insertError = insertResponse.error;
   if (insertError) {
+    if (insertError.code === "23505") {
+      traceAliasHiddenConstraint({
+        phase: "insert_unique_violation",
+        aliasName: alias,
+        ingredientId,
+        normalizedAlias,
+        supplierName: supplier,
+        code: insertError.code,
+        message: insertError.message,
+      });
+    }
     logSupabaseError("upsertConfirmedAlias insert", insertError);
     traceIngredientAliasesInsertError({
       function: "upsertConfirmedAlias",
@@ -293,6 +322,79 @@ export async function upsertConfirmedAlias({
   return { error: insertError };
 }
 
+export type ConfirmedIngredientAliasRow = {
+  ingredient_id: string;
+  alias_name: string;
+  normalized_alias: string;
+  supplier_name: string | null;
+};
+
+/** Resolve lookup key from DB row — prefer live line wording over stored normalized_alias. */
+export function resolveNormalizedAliasFromConfirmedRow(
+  row: ConfirmedIngredientAliasRow,
+): string | null {
+  const fromLine = row.alias_name?.trim()
+    ? buildOverrideKeysFromInvoiceLine(row.alias_name, row.supplier_name)
+    : null;
+  if (fromLine?.rawNormalized) return fromLine.rawNormalized;
+
+  const aliasName = row.alias_name?.trim();
+  if (aliasName) {
+    const expanded = normalizeSupplierShorthand(aliasName);
+    const operational = normalizeOperationalAliasKey(expanded || aliasName);
+    if (operational) return operational;
+  }
+
+  return row.normalized_alias?.trim().toLowerCase() || null;
+}
+
+/** Build the in-memory alias map used by invoice matching from confirmed DB rows. */
+export function buildConfirmedAliasMapFromRows(
+  rows: ConfirmedIngredientAliasRow[],
+): IngredientAliasMap {
+  const map: IngredientAliasMap = {};
+  const collisions: Array<{
+    lookupKey: string;
+    previousIngredientId: string;
+    nextIngredientId: string;
+    aliasName: string;
+  }> = [];
+
+  for (const row of rows) {
+    const normalizedAlias = resolveNormalizedAliasFromConfirmedRow(row);
+    if (!normalizedAlias) continue;
+
+    const lookupKey = buildIngredientAliasLookupKey(normalizedAlias, row.supplier_name);
+    const previousIngredientId = map[lookupKey];
+    if (previousIngredientId && previousIngredientId !== row.ingredient_id) {
+      const collision = {
+        lookupKey,
+        previousIngredientId,
+        nextIngredientId: row.ingredient_id,
+        aliasName: row.alias_name,
+      };
+      collisions.push(collision);
+      traceAliasReloadCollision({ ...collision, rowCount: rows.length });
+    }
+    map[lookupKey] = row.ingredient_id;
+  }
+
+  if (collisions.length > 0) {
+    traceAliasStateDesync({
+      memoryKeyCount: Object.keys(map).length,
+      trigger: "buildConfirmedAliasMapFromRows:collision_summary",
+    });
+    traceManualIngredientMatch("[manual_match_reload_result]", {
+      phase: "alias_map_collision",
+      collisionCount: collisions.length,
+      collisions,
+      mapKeyCount: Object.keys(map).length,
+    });
+  }
+
+  return map;
+}
+
 /**
  * Build the in-memory alias map used by invoice matching from confirmed DB rows.
  */
@@ -310,22 +412,14 @@ export async function loadConfirmedIngredientAliasMap(
       return {};
     }
 
-    const map: IngredientAliasMap = {};
-    for (const row of (data ?? []) as {
-      ingredient_id: string;
-      alias_name: string;
-      normalized_alias: string;
-      supplier_name: string | null;
-    }[]) {
-      const fromLine = row.alias_name?.trim()
-        ? buildOverrideKeysFromInvoiceLine(row.alias_name, row.supplier_name)
-        : null;
-      const normalizedAlias = (
-        fromLine?.rawNormalized ?? row.normalized_alias?.trim().toLowerCase()
-      );
-      if (!normalizedAlias) continue;
-      map[buildIngredientAliasLookupKey(normalizedAlias, row.supplier_name)] = row.ingredient_id;
-    }
+    const rows = (data ?? []) as ConfirmedIngredientAliasRow[];
+    const map = buildConfirmedAliasMapFromRows(rows);
+    traceManualIngredientMatch("[manual_match_reload_result]", {
+      phase: "load_confirmed_aliases",
+      rowCount: rows.length,
+      mapKeyCount: Object.keys(map).length,
+      sampleKeys: Object.keys(map).slice(0, 12),
+    });
     debugAliasLog("loaded confirmed aliases", { count: Object.keys(map).length });
     return map;
   } catch (err) {

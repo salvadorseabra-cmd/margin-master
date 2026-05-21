@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  clearRejectedIngredientMatchPair,
   clearRejectedIngredientMatchesForTests,
   hydrateRejectedIngredientMatchesFromStorage,
   isIngredientMatchPairRejected,
@@ -8,6 +9,8 @@ import {
   rejectedIngredientMatchStorageKey,
   rememberRejectedIngredientMatch,
 } from "./ingredient-rejected-match-memory";
+import { persistManualIngredientCorrection } from "./ingredient-correction-memory";
+import type { AppSupabaseClient } from "./ingredient-alias-memory";
 import { findCanonicalIngredientMatch, type IngredientCanonicalInput } from "./ingredient-canonical";
 import { findInvoiceItemIngredientMatch } from "./invoice-ingredient-match-propagation";
 import { clearIngredientMatchOverridesForTests } from "./ingredient-match-override";
@@ -105,6 +108,67 @@ describe("ingredient rejected match memory", () => {
 
     rememberRejectedIngredientMatch("ANGUS PTY", "angus-1");
     expect(findCanonicalIngredientMatch("ANGUS PTY", catalog, aliases)).toBeNull();
+  });
+
+  it("rematch succeeds after clearing rejection on manual persist", async () => {
+    const catalog = [ingredient("oleo-1", "Óleo Virgem")];
+    const aliases: Record<string, string> = { oleo: "oleo-1" };
+    rememberRejectedIngredientMatch("óleo", "oleo-1");
+    expect(findCanonicalIngredientMatch("óleo", catalog, aliases)).toBeNull();
+    expect(isIngredientMatchPairRejected("óleo", "oleo-1")).toBe(true);
+
+    const supabase = {
+      from(table: string) {
+        if (table !== "ingredient_aliases") throw new Error(`unexpected table ${table}`);
+        return {
+          select() {
+            return {
+              eq() {
+                return {
+                  eq() {
+                    return {
+                      is() {
+                        return { maybeSingle: async () => ({ data: null, error: null }) };
+                      },
+                      eq() {
+                        return { maybeSingle: async () => ({ data: null, error: null }) };
+                      },
+                    };
+                  },
+                };
+              },
+            };
+          },
+          insert: () => Promise.resolve({ error: null }),
+          update() {
+            return { eq: () => Promise.resolve({ error: null }) };
+          },
+        };
+      },
+    } as unknown as AppSupabaseClient;
+
+    const { applied, error, clearedRejectedPairs } = await persistManualIngredientCorrection({
+      itemName: "óleo",
+      ingredientId: "oleo-1",
+      ingredientName: "Óleo Virgem",
+      confirmedAliases: aliases,
+      supabase,
+    });
+
+    expect(error).toBeNull();
+    expect(applied).not.toBeNull();
+    expect(clearedRejectedPairs).toBeGreaterThan(0);
+    expect(isIngredientMatchPairRejected("óleo", "oleo-1")).toBe(false);
+    const rematch = findCanonicalIngredientMatch("óleo", catalog, applied!.nextConfirmedAliases);
+    expect(rematch?.ingredient.id).toBe("oleo-1");
+  });
+
+  it("clearRejectedIngredientMatchPair removes only the targeted pair", () => {
+    rememberRejectedIngredientMatch("óleo", "oleo-1");
+    rememberRejectedIngredientMatch("batata", "batata-1");
+    expect(clearRejectedIngredientMatchPair("óleo", "oleo-1")).toBeGreaterThan(0);
+    expect(isIngredientMatchPairRejected("óleo", "oleo-1")).toBe(false);
+    expect(isIngredientMatchPairRejected("batata", "batata-1")).toBe(true);
   });
 
   it("blocks exact self-match when rejection was stored from raw invoice wording", () => {
