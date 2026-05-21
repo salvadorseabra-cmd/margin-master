@@ -30,11 +30,37 @@ describe("mergeAliasIngredientIntoCanonical", () => {
       from: (table: string) => ({
         select: () => ({
           in: () => Promise.resolve({ data: [], error: null }),
-          eq: () => Promise.resolve({ data: [], error: null }),
+          eq: () => ({
+            in: () =>
+              Promise.resolve({
+                data: [{ id: "alias-1", is_archived: true, merged_into_ingredient_id: "canonical-1" }],
+                error: null,
+              }),
+          }),
         }),
         update: (payload: Record<string, unknown>) => ({
-          eq: (_col: string, id: string) => {
-            updates.push({ table, id });
+          eq: (column: string, value: string) => {
+            if (column === "user_id") {
+              return {
+                in: (_idCol: string, ids: string[]) => ({
+                  select: () => {
+                    for (const id of ids) updates.push({ table, id });
+                    return Promise.resolve({
+                      data:
+                        table === "ingredients" && payload.is_archived === true
+                          ? ids.map((id) => ({
+                              id,
+                              is_archived: true,
+                              merged_into_ingredient_id: payload.merged_into_ingredient_id,
+                            }))
+                          : [],
+                      error: null,
+                    });
+                  },
+                }),
+              };
+            }
+            updates.push({ table, id: value });
             return Promise.resolve({ error: null });
           },
           in: (_col: string, ids: string[]) => {
@@ -50,6 +76,7 @@ describe("mergeAliasIngredientIntoCanonical", () => {
 
     const result = await mergeAliasIngredientIntoCanonical({
       client,
+      userId: "user-1",
       aliasEntry: ingredient("alias-1", "BAC FUM FAT"),
       canonicalEntry: ingredient("canonical-1", "BACON FATIADO FUMADO 1KG"),
       confirmedAliases: { "bac fum fat": "alias-1" },

@@ -3,6 +3,7 @@ import type { IngredientCanonicalInput } from "./ingredient-canonical";
 import { detectCatalogLeakRows } from "./ingredient-catalog-diagnostics";
 import {
   buildCatalogReviewRows,
+  CATALOG_REVIEW_RECIPE_LINKS_SELECT,
   catalogReviewStorageKey,
   loadCatalogReviewClassifications,
   logCatalogManualMergeCandidate,
@@ -113,6 +114,15 @@ describe("logCatalogManualMergeCandidate", () => {
 
     executeSpy.mockRestore();
     infoSpy.mockRestore();
+  });
+});
+
+describe("CATALOG_REVIEW_RECIPE_LINKS_SELECT", () => {
+  it("disambiguates recipe_ingredients → recipes via recipe_id FK", () => {
+    expect(CATALOG_REVIEW_RECIPE_LINKS_SELECT).toBe(
+      "ingredient_id, recipes!recipe_ingredients_recipe_id_fkey(name)",
+    );
+    expect(CATALOG_REVIEW_RECIPE_LINKS_SELECT).not.toMatch(/recipes\(name\)/);
   });
 });
 

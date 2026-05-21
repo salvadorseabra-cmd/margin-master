@@ -145,8 +145,17 @@ async function main() {
   }
 
   const confirmedAliases = await loadConfirmedIngredientAliasMap(client);
+  const userId =
+    (activeBefore[0] as IngredientMergeCatalogRow & { user_id?: string | null })?.user_id ??
+    process.env.MARGINLY_USER_ID;
+  if (!userId) {
+    console.error("Missing user_id on catalog rows and MARGINLY_USER_ID env");
+    process.exit(1);
+  }
+
   const mergeResult = await mergeIngredientCluster({
     client,
+    userId,
     cluster,
     catalog: activeBefore,
     referenceCounts: refs,

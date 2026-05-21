@@ -479,12 +479,102 @@ async function reassignSimpleFkTable(
   return null;
 }
 
+function buildArchivePersistenceError(
+  code: string,
+  message: string,
+  details: Record<string, unknown>,
+  hint: string,
+): PostgrestError {
+  return {
+    message,
+    code,
+    details: JSON.stringify(details),
+    hint,
+  } as PostgrestError;
+}
+
+/** Confirms source rows are archived and point at the canonical target (read-after-write). */
+export async function verifyArchivedMergedIngredients(
+  client: AppSupabaseClient,
+  userId: string,
+  plan: IngredientMergePlan,
+): Promise<{ error: PostgrestError | null; result: ManualCanonicalMergeArchiveVerifyResult }> {
+  if (plan.sourceIngredientIds.length === 0) {
+    return {
+      error: null,
+      result: { ok: true, verifiedIds: [], missingIds: [], notArchivedIds: [] },
+    };
+  }
+
+  const { data, error } = await client
+    .from("ingredients")
+    .select("id, is_archived, merged_into_ingredient_id")
+    .eq("user_id", userId)
+    .in("id", plan.sourceIngredientIds);
+
+  if (error) {
+    return {
+      error,
+      result: {
+        ok: false,
+        verifiedIds: [],
+        missingIds: plan.sourceIngredientIds,
+        notArchivedIds: plan.sourceIngredientIds,
+      },
+    };
+  }
+
+  const byId = new Map((data ?? []).map((row) => [row.id, row]));
+  const missingIds = plan.sourceIngredientIds.filter((id) => !byId.has(id));
+  const notArchivedIds = plan.sourceIngredientIds.filter((id) => {
+    const row = byId.get(id);
+    return (
+      !row?.is_archived || row.merged_into_ingredient_id !== plan.canonicalIngredientId
+    );
+  });
+  const verifiedIds = plan.sourceIngredientIds.filter(
+    (id) => !missingIds.includes(id) && !notArchivedIds.includes(id),
+  );
+
+  const result: ManualCanonicalMergeArchiveVerifyResult = {
+    ok: missingIds.length === 0 && notArchivedIds.length === 0,
+    verifiedIds,
+    missingIds,
+    notArchivedIds,
+  };
+
+  if (!result.ok) {
+    return {
+      error: buildArchivePersistenceError(
+        "archive_verify_failed",
+        `Post-merge verify failed for source ingredient(s): ${[...missingIds, ...notArchivedIds].join(", ")}`,
+        { missingIds, notArchivedIds, canonicalId: plan.canonicalIngredientId, userId },
+        "Source rows must be is_archived=true with merged_into_ingredient_id set to canonical id",
+      ),
+      result,
+    };
+  }
+
+  return { error: null, result };
+}
+
 async function archiveMergedIngredients(
   client: AppSupabaseClient,
   plan: IngredientMergePlan,
+  userId: string,
   steps: IngredientMergeExecutionStep[],
 ): Promise<PostgrestError | null> {
   if (plan.sourceIngredientIds.length === 0) return null;
+
+  const trimmedUserId = userId?.trim();
+  if (!trimmedUserId) {
+    return buildArchivePersistenceError(
+      "archive_missing_user_id",
+      "userId is required to archive merged ingredients",
+      { sourceIds: plan.sourceIngredientIds },
+      "Pass authenticated user id so RLS-scoped archive updates affect the expected rows",
+    );
+  }
 
   const mergedAt = new Date().toISOString();
   const { data, error } = await client
@@ -494,30 +584,45 @@ async function archiveMergedIngredients(
       merged_into_ingredient_id: plan.canonicalIngredientId,
       merged_at: mergedAt,
     })
+    .eq("user_id", trimmedUserId)
     .in("id", plan.sourceIngredientIds)
     .select("id, is_archived, merged_into_ingredient_id");
 
   if (error) return error;
 
-  const archivedIds = new Set((data ?? []).map((row) => row.id));
+  const rows = data ?? [];
+  const archivedIds = new Set(rows.map((row) => row.id));
   const missingArchive = plan.sourceIngredientIds.filter((id) => !archivedIds.has(id));
-  if (missingArchive.length > 0) {
+  const invalidArchive = rows.filter(
+    (row) =>
+      !row.is_archived || row.merged_into_ingredient_id !== plan.canonicalIngredientId,
+  );
+
+  if (missingArchive.length > 0 || invalidArchive.length > 0) {
     console.info("[canonical_merge_archive_visibility]", "archive_update_incomplete", {
+      userId: trimmedUserId,
       sourceIds: plan.sourceIngredientIds,
       archivedIds: [...archivedIds],
       missingArchive,
+      invalidArchive: invalidArchive.map((row) => row.id),
       canonicalId: plan.canonicalIngredientId,
+      updatedCount: rows.length,
+      expectedCount: plan.sourceIngredientIds.length,
     });
-    return {
-      message: `Archive update incomplete for source ingredient(s): ${missingArchive.join(", ")}`,
-      code: "archive_update_incomplete",
-      details: JSON.stringify({
+    return buildArchivePersistenceError(
+      "archive_update_incomplete",
+      `Archive update incomplete for source ingredient(s): ${[...missingArchive, ...invalidArchive.map((r) => r.id)].join(", ")}`,
+      {
+        userId: trimmedUserId,
         missingArchive,
+        invalidArchive: invalidArchive.map((row) => row.id),
         archivedIds: [...archivedIds],
         canonicalId: plan.canonicalIngredientId,
-      }),
-      hint: "Update returned no row (wrong id or RLS); merge aborted after FK reassignment",
-    } as PostgrestError;
+        updatedCount: rows.length,
+        expectedCount: plan.sourceIngredientIds.length,
+      },
+      "Update returned fewer rows than sources (wrong id, user_id, or RLS); merge aborted after FK reassignment",
+    );
   }
 
   for (const sourceId of plan.sourceIngredientIds) {
@@ -551,7 +656,7 @@ export async function previewManualCanonicalMergeImpact(
   const [recipeResult, aliasResult, priceResult, marginResult] = await Promise.all([
     client
       .from("recipe_ingredients")
-      .select("id, recipes(name)")
+      .select("id, recipes!recipe_ingredients_recipe_id_fkey(name)")
       .eq("ingredient_id", sourceId),
     client
       .from("ingredient_aliases")
@@ -623,11 +728,19 @@ export function logManualCanonicalMergeStart(
   });
 }
 
+export type ManualCanonicalMergeArchiveVerifyResult = {
+  ok: boolean;
+  verifiedIds: string[];
+  missingIds: string[];
+  notArchivedIds: string[];
+};
+
 export function logManualCanonicalMergeComplete(params: {
   sourceId: string;
   targetId: string;
   success: boolean;
   archivedSourceIds: string[];
+  verifyResult?: ManualCanonicalMergeArchiveVerifyResult | null;
   error?: string | null;
 }): void {
   console.info(MANUAL_CANONICAL_MERGE_COMPLETE_PREFIX, {
@@ -635,9 +748,16 @@ export function logManualCanonicalMergeComplete(params: {
     targetId: params.targetId,
     success: params.success,
     archivedSourceIds: params.archivedSourceIds,
+    verifyResult: params.verifyResult ?? null,
     error: params.error ?? null,
   });
 }
+
+export type ExecuteIngredientMergeOptions = {
+  userId: string;
+  /** When true (default), re-read sources after archive and fail if not archived. */
+  verifyAfterArchive?: boolean;
+};
 
 /**
  * Execute merge against Supabase: reassign FKs, then soft-archive source rows.
@@ -646,6 +766,7 @@ export function logManualCanonicalMergeComplete(params: {
 export async function executeIngredientMerge(
   client: AppSupabaseClient,
   plan: IngredientMergePlan,
+  options: ExecuteIngredientMergeOptions,
 ): Promise<IngredientMergeExecutionResult> {
   const steps: IngredientMergeExecutionStep[] = [];
 
@@ -658,14 +779,24 @@ export async function executeIngredientMerge(
     if (error) return { plan, steps, error };
   }
 
-  const archiveError = await archiveMergedIngredients(client, plan, steps);
+  const archiveError = await archiveMergedIngredients(client, plan, options.userId, steps);
   if (archiveError) return { plan, steps, error: archiveError };
+
+  if (options.verifyAfterArchive !== false) {
+    const { error: verifyError } = await verifyArchivedMergedIngredients(
+      client,
+      options.userId,
+      plan,
+    );
+    if (verifyError) return { plan, steps, error: verifyError };
+  }
 
   return { plan, steps, error: null };
 }
 
 export type MergeIngredientClusterParams = {
   client: AppSupabaseClient;
+  userId: string;
   cluster: IngredientMergeCluster;
   catalog: IngredientMergeCatalogRow[];
   referenceCounts?: Map<string, IngredientReferenceCounts>;
@@ -698,7 +829,9 @@ export async function mergeIngredientCluster(
     return { error: `Invalid merge plan: ${validation.issues.join(", ")}`, plan: null };
   }
 
-  const execution = await executeIngredientMerge(params.client, plan);
+  const execution = await executeIngredientMerge(params.client, plan, {
+    userId: params.userId,
+  });
   if (execution.error) {
     return { ...execution, plan };
   }
@@ -750,6 +883,7 @@ export function findAngusPattyMergeCluster(
 
 export type ExecuteManualCanonicalMergeParams = {
   client: AppSupabaseClient;
+  userId: string;
   sourceId: string;
   targetId: string;
   catalog: IngredientMergeCatalogRow[];
@@ -811,7 +945,23 @@ export async function executeManualCanonicalMerge(
 
   logManualCanonicalMergeStart(preview);
 
-  const execution = await executeIngredientMerge(params.client, preview.plan);
+  const trimmedUserId = params.userId?.trim();
+  if (!trimmedUserId) {
+    const message = "Authenticated user id is required to persist merge archive";
+    logManualCanonicalMergeComplete({
+      sourceId: params.sourceId,
+      targetId: params.targetId,
+      success: false,
+      archivedSourceIds: [],
+      error: message,
+    });
+    return { error: message, plan: preview.plan, preview };
+  }
+
+  const execution = await executeIngredientMerge(params.client, preview.plan, {
+    userId: trimmedUserId,
+    verifyAfterArchive: false,
+  });
   if (execution.error) {
     logManualCanonicalMergeComplete({
       sourceId: params.sourceId,
@@ -821,6 +971,23 @@ export async function executeManualCanonicalMerge(
       error: execution.error.message,
     });
     return { ...execution, preview };
+  }
+
+  const { error: verifyError, result: verifyResult } = await verifyArchivedMergedIngredients(
+    params.client,
+    trimmedUserId,
+    preview.plan,
+  );
+  if (verifyError) {
+    logManualCanonicalMergeComplete({
+      sourceId: params.sourceId,
+      targetId: params.targetId,
+      success: false,
+      archivedSourceIds: preview.plan.sourceIngredientIds,
+      verifyResult,
+      error: verifyError.message,
+    });
+    return { plan: preview.plan, steps: execution.steps, error: verifyError, preview };
   }
 
   let nextConfirmedAliases = params.confirmedAliases;
@@ -850,6 +1017,7 @@ export async function executeManualCanonicalMerge(
     targetId: params.targetId,
     success: true,
     archivedSourceIds: preview.plan.sourceIngredientIds,
+    verifyResult,
   });
 
   return { ...execution, preview, nextConfirmedAliases, memoryRewrites };

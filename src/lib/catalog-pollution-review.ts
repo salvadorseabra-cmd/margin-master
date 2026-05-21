@@ -67,6 +67,10 @@ export type RecipeIngredientLink = {
   recipes: { name: string | null } | null;
 };
 
+/** PostgREST select for recipe usage on catalog review (parent recipe via recipe_id). */
+export const CATALOG_REVIEW_RECIPE_LINKS_SELECT =
+  "ingredient_id, recipes!recipe_ingredients_recipe_id_fkey(name)";
+
 export type BuildCatalogReviewRowsInput = {
   catalog: IngredientCanonicalInput[];
   aliasRows?: IngredientAliasRow[];

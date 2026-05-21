@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -51,6 +52,7 @@ export function ManualCanonicalMergeDialog({
   initialTargetId,
   onSuccess,
 }: ManualCanonicalMergeDialogProps) {
+  const { user } = useAuth();
   const [sourceId, setSourceId] = useState("");
   const [targetId, setTargetId] = useState("");
   const [preview, setPreview] = useState<ManualCanonicalMergeImpactPreview | null>(null);
@@ -96,11 +98,16 @@ export function ManualCanonicalMergeDialog({
 
   const handleMerge = async () => {
     if (!sourceId || !targetId) return;
+    if (!user?.id) {
+      setError("Sessão inválida — inicie sessão novamente.");
+      return;
+    }
     setMerging(true);
     setError(null);
 
     const result = await executeManualCanonicalMerge({
       client: supabase,
+      userId: user.id,
       sourceId,
       targetId,
       catalog,

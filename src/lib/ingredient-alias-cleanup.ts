@@ -59,6 +59,7 @@ export function buildMergeAliasIntoCanonicalPlan(
 
 export type MergeAliasIntoCanonicalParams = {
   client: AppSupabaseClient;
+  userId: string;
   aliasEntry: IngredientCanonicalInput;
   canonicalEntry: IngredientCanonicalInput;
   confirmedAliases?: IngredientAliasMap;
@@ -77,7 +78,9 @@ export async function mergeAliasIngredientIntoCanonical(
   params: MergeAliasIntoCanonicalParams,
 ): Promise<MergeAliasIntoCanonicalResult> {
   const plan = buildMergeAliasIntoCanonicalPlan(params.aliasEntry.id, params.canonicalEntry.id);
-  const execution = await executeIngredientMerge(params.client, plan);
+  const execution = await executeIngredientMerge(params.client, plan, {
+    userId: params.userId,
+  });
 
   if (execution.error) {
     return { plan, error: execution.error };

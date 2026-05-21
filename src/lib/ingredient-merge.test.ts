@@ -213,58 +213,97 @@ describe("previewManualCanonicalMergeImpact", () => {
   });
 });
 
+type MockMergeClientOptions = {
+  archiveReturns?: "all" | "none";
+  userId?: string;
+};
+
+function createMergeMockClient(options: MockMergeClientOptions = {}) {
+  const userId = options.userId ?? "user-1";
+  const archiveReturns = options.archiveReturns ?? "all";
+  const updates: { table: string; payload: Record<string, unknown>; filter: Record<string, unknown> }[] =
+    [];
+
+  const client = {
+    from(table: string) {
+      const api = {
+        select: () => ({
+          in: () => ({
+            eq: () => Promise.resolve({ data: [], error: null }),
+          }),
+          eq: (_column: string, filterUserId: string) => ({
+            in: (_idColumn: string, ids: string[]) =>
+              Promise.resolve({
+                data:
+                  table === "ingredients" && filterUserId === userId
+                    ? ids.map((id) => ({
+                        id,
+                        is_archived: archiveReturns === "all",
+                        merged_into_ingredient_id:
+                          archiveReturns === "all" ? "canonical" : null,
+                      }))
+                    : [],
+                error: null,
+              }),
+          }),
+        }),
+        update(payload: Record<string, unknown>) {
+          const finishUpdate = (filter: Record<string, unknown>) => {
+            updates.push({ table, payload, filter });
+            const sourceIds = (filter.id as string[] | undefined) ?? [];
+            const archivedRows =
+              table === "ingredients" &&
+              payload.is_archived === true &&
+              filter.user_id === userId &&
+              archiveReturns === "all"
+                ? sourceIds.map((id) => ({
+                    id,
+                    is_archived: true,
+                    merged_into_ingredient_id: payload.merged_into_ingredient_id,
+                  }))
+                : [];
+            return Promise.resolve({ data: archivedRows, error: null });
+          };
+          return {
+            eq(column: string, value: string) {
+              if (column === "user_id") {
+                return {
+                  in(idColumn: string, values: string[]) {
+                    return {
+                      select: () => finishUpdate({ user_id: value, [idColumn]: values }),
+                    };
+                  },
+                };
+              }
+              return finishUpdate({ [column]: value });
+            },
+            in(column: string, values: string[]) {
+              return {
+                select: () => finishUpdate({ [column]: values }),
+              };
+            },
+          };
+        },
+        delete: () => ({
+          eq: () => Promise.resolve({ error: null }),
+        }),
+      };
+      return api;
+    },
+  };
+
+  return { client, updates };
+}
+
 describe("executeManualCanonicalMerge", () => {
   it("executes merge plan, logs lifecycle, archives source via ingredients update", async () => {
-    const updates: { table: string; payload: Record<string, unknown>; filter: Record<string, unknown> }[] =
-      [];
-
-    const client = {
-      from(table: string) {
-        const api = {
-          select: () => ({
-            in: () => ({
-              eq: () => Promise.resolve({ data: [], error: null }),
-            }),
-            eq: () => ({
-              in: () => Promise.resolve({ data: [], error: null }),
-            }),
-          }),
-          update(payload: Record<string, unknown>) {
-            const finishUpdate = (filter: Record<string, unknown>) => {
-              updates.push({ table, payload, filter });
-              const archivedRows =
-                table === "ingredients" && payload.is_archived === true
-                  ? ((filter.id as string[] | undefined) ?? []).map((id) => ({
-                      id,
-                      is_archived: true,
-                      merged_into_ingredient_id: payload.merged_into_ingredient_id,
-                    }))
-                  : [];
-              return Promise.resolve({ data: archivedRows, error: null });
-            };
-            return {
-              eq(column: string, value: string) {
-                return finishUpdate({ [column]: value });
-              },
-              in(column: string, values: string[]) {
-                return {
-                  select: () => finishUpdate({ [column]: values }),
-                };
-              },
-            };
-          },
-          delete: () => ({
-            eq: () => Promise.resolve({ error: null }),
-          }),
-        };
-        return api;
-      },
-    };
+    const { client, updates } = createMergeMockClient();
 
     const infoSpy = vi.spyOn(console, "info").mockImplementation(() => {});
     const catalog = [row("dup", "ANGUS PTY"), row("canonical", "Angus Patty")];
     const result = await executeManualCanonicalMerge({
       client: client as never,
+      userId: "user-1",
       sourceId: "dup",
       targetId: "canonical",
       catalog,
@@ -294,50 +333,47 @@ describe("executeManualCanonicalMerge", () => {
       ),
     ).toBe(true);
 
+    const completeLog = infoSpy.mock.calls.find(
+      (call) => call[0] === MANUAL_CANONICAL_MERGE_COMPLETE_PREFIX,
+    )?.[1] as { verifyResult?: { ok: boolean } } | undefined;
+    expect(completeLog?.verifyResult?.ok).toBe(true);
+
     infoSpy.mockRestore();
+  });
+
+  it("fails when archive update returns zero rows", async () => {
+    const { client } = createMergeMockClient({ archiveReturns: "none" });
+    const catalog = [row("dup", "ANGUS PTY"), row("canonical", "Angus Patty")];
+
+    const result = await executeManualCanonicalMerge({
+      client: client as never,
+      userId: "user-1",
+      sourceId: "dup",
+      targetId: "canonical",
+      catalog,
+    });
+
+    expect(result.error).toBeTruthy();
+    if ("error" in result && typeof result.error === "string") {
+      expect(result.error).toMatch(/incomplete|archive/i);
+    } else if (result.error) {
+      expect(result.error.message).toMatch(/incomplete|archive/i);
+    }
   });
 });
 
 describe("executeIngredientMerge", () => {
   it("reassigns FK tables and archives sources", async () => {
     const plan = buildIngredientMergePlan("canonical", ["dup"]);
-    const updates: { table: string; payload: Record<string, unknown>; filter: Record<string, unknown> }[] =
-      [];
+    const { client, updates } = createMergeMockClient();
     const deletes: { table: string; id: string }[] = [];
 
-    const client = {
+    const wrappedClient = {
       from(table: string) {
-        const api = {
-          select: () => ({
-            in: () => Promise.resolve({ data: [], error: null }),
-            eq: () => ({
-              in: () => Promise.resolve({ data: [], error: null }),
-            }),
-          }),
-          update(payload: Record<string, unknown>) {
-            const finishUpdate = (filter: Record<string, unknown>) => {
-              updates.push({ table, payload, filter });
-              const archivedRows =
-                table === "ingredients" && payload.is_archived === true
-                  ? ((filter.id as string[] | undefined) ?? []).map((id) => ({
-                      id,
-                      is_archived: true,
-                      merged_into_ingredient_id: payload.merged_into_ingredient_id,
-                    }))
-                  : [];
-              return Promise.resolve({ data: archivedRows, error: null });
-            };
-            return {
-              eq(column: string, value: string) {
-                return finishUpdate({ [column]: value });
-              },
-              in(column: string, values: string[]) {
-                return {
-                  select: () => finishUpdate({ [column]: values }),
-                };
-              },
-            };
-          },
+        const base = client.from(table);
+        if (table !== "recipe_ingredients") return base;
+        return {
+          ...base,
           delete: () => ({
             eq: (_column: string, id: string) => {
               deletes.push({ table, id });
@@ -345,11 +381,12 @@ describe("executeIngredientMerge", () => {
             },
           }),
         };
-        return api;
       },
     };
 
-    const result = await executeIngredientMerge(client as never, plan);
+    const result = await executeIngredientMerge(wrappedClient as never, plan, {
+      userId: "user-1",
+    });
     expect(result.error).toBeNull();
     expect(updates.some((u) => u.table === "ingredients" && u.payload.is_archived === true)).toBe(
       true,
@@ -367,35 +404,12 @@ describe("executeIngredientMerge", () => {
   it("merges duplicate recipe lines into canonical line", async () => {
     const plan = buildIngredientMergePlan("canonical", ["dup"]);
     let recipeUpdates = 0;
+    const { client: baseClient } = createMergeMockClient();
 
     const client = {
       from(table: string) {
         if (table !== "recipe_ingredients") {
-          return {
-            select: () => ({
-              in: () => Promise.resolve({ data: [], error: null }),
-              eq: () => ({
-                in: () => Promise.resolve({ data: [], error: null }),
-              }),
-            }),
-            update: (payload: Record<string, unknown>) => ({
-              eq: () => Promise.resolve({ data: [], error: null }),
-              in: (_column: string, values: string[]) => ({
-                select: () =>
-                  Promise.resolve({
-                    data:
-                      table === "ingredients" && payload.is_archived === true
-                        ? values.map((id) => ({
-                            id,
-                            is_archived: true,
-                            merged_into_ingredient_id: payload.merged_into_ingredient_id,
-                          }))
-                        : [],
-                    error: null,
-                  }),
-              }),
-            }),
-          };
+          return baseClient.from(table);
         }
 
         return {
@@ -437,7 +451,9 @@ describe("executeIngredientMerge", () => {
       },
     };
 
-    const result = await executeIngredientMerge(client as never, plan);
+    const result = await executeIngredientMerge(client as never, plan, {
+      userId: "user-1",
+    });
     expect(result.error).toBeNull();
     expect(recipeUpdates).toBeGreaterThanOrEqual(1);
     expect(result.steps.some((s) => s.action === "merge_recipe_line")).toBe(true);

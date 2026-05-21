@@ -7,6 +7,7 @@ import {
   buildCatalogReviewRows,
   CATALOG_LEAK_REASON_LABELS,
   CATALOG_REVIEW_CLASSIFICATION_LABELS,
+  CATALOG_REVIEW_RECIPE_LINKS_SELECT,
   loadCatalogReviewClassifications,
   logCatalogManualMergeCandidate,
   setCatalogReviewClassification,
@@ -85,7 +86,7 @@ function CatalogReviewPage() {
       ingredientIds.length > 0
         ? supabase
             .from("recipe_ingredients")
-            .select("ingredient_id, recipes(name)")
+            .select(CATALOG_REVIEW_RECIPE_LINKS_SELECT)
             .in("ingredient_id", ingredientIds)
         : Promise.resolve({ data: [], error: null }),
     ]);
