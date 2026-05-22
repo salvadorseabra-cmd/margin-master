@@ -12,6 +12,7 @@ import {
 } from "@/lib/canonical-ingredient-display-name";
 import {
   generateOperationalIngredientName,
+  looksLikeSupplierAbbreviatedCatalogName,
   shouldBlockCanonicalNameOnCreate,
 } from "@/lib/canonical-ingredient-operational-name";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
@@ -116,10 +117,12 @@ export function validateCanonicalIngredientName(
       rawName: name,
       compareBucket: getAliasTraceCompareBucket(name),
     });
+    const operationalHint = generateOperationalIngredientName(name);
     return {
       ok: false,
-      message:
-        "Use a full product name for the catalog. Invoice shorthand belongs in alias memory.",
+      message: operationalHint
+        ? `Use "${operationalHint}" (or another full catalog name). Invoice shorthand belongs in alias memory.`
+        : "Use a full product name for the catalog. Invoice shorthand belongs in alias memory.",
     };
   }
   traceIngredientAliases("validateCanonicalIngredientName:ok", { rawName: name, normalized });
@@ -161,8 +164,12 @@ export function buildCanonicalIngredientCreateDefaults(
         ? unit
         : null;
 
-  let suggestedCanonicalName = looksLikeInvoiceShorthandName(invoiceAlias)
-    ? generateOperationalIngredientName(invoiceAlias) || null
+  const operationalName = generateOperationalIngredientName(invoiceAlias) || null;
+  const useOperationalSuggestion =
+    looksLikeInvoiceShorthandName(invoiceAlias) ||
+    looksLikeSupplierAbbreviatedCatalogName(invoiceAlias);
+  let suggestedCanonicalName = useOperationalSuggestion
+    ? operationalName
     : formatCanonicalIngredientDisplayName(invoiceAlias) || null;
   if (
     suggestedCanonicalName &&

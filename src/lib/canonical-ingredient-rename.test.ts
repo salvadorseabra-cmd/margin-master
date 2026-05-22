@@ -50,11 +50,10 @@ describe("buildCanonicalIngredientRenamePayload", () => {
 
   it("rejects shorthand canonical names", () => {
     const result = buildCanonicalIngredientRenamePayload("ing-a", "ANGUS PTY", catalog);
-    expect(result).toEqual({
-      ok: false,
-      message:
-        "Use a full product name for the catalog. Invoice shorthand belongs in alias memory.",
-    });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.message).toContain("Angus patty");
+    expect(result.message).toContain("alias memory");
   });
 
   it("blocks duplicate names on other catalog rows", () => {

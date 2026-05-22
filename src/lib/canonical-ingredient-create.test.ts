@@ -94,6 +94,16 @@ describe("buildCanonicalIngredientCreateDefaults", () => {
     expect(defaults.suggestedCanonicalName).toBeNull();
   });
 
+  it("suggests Batata shoestring for BAT shoestr invoice shorthand", () => {
+    const defaults = buildCanonicalIngredientCreateDefaults(item("BAT shoestr"));
+    expect(defaults.suggestedCanonicalName).toBe("Batata shoestring");
+  });
+
+  it("rejects BAT shoestr as confirmed catalog name", () => {
+    expect(validateCanonicalIngredientName("BAT shoestr").ok).toBe(false);
+    expect(validateCanonicalIngredientName("BAT shoestr").message).toContain("Batata shoestring");
+  });
+
   it("emits modal open log and omits suggestion when cleanup matches invoice alias", () => {
     const info = vi.spyOn(console, "info").mockImplementation(() => {});
     const oilDefaults = buildCanonicalIngredientCreateDefaults(item("Óleo girassol fula 1L"));

@@ -14,11 +14,16 @@ import {
 import {
   findActiveCanonicalIdsByNormalizedName,
   isAliasOnlyOperationalDependency,
+  isLegacyBatShoestrCatalogEntry,
   previewIngredientAliasReassignment,
   reassignAliasesAndArchiveIfOrphan,
   runPalhaToBatataPalhaAliasReassignment,
 } from "@/lib/ingredient-alias-reassignment";
-import { loadConfirmedIngredientAliasMap } from "@/lib/ingredient-alias-memory";
+import {
+  buildCanonicalIngredientRenamePayload,
+  traceCanonicalRename,
+} from "@/lib/canonical-ingredient-rename";
+import { generateOperationalIngredientName } from "@/lib/canonical-ingredient-operational-name";
 import { buildManualMergePickerOptions } from "@/lib/ingredient-merge";
 import { normalizeCanonicalIngredientName } from "@/lib/ingredient-canonical";
 import {
@@ -33,7 +38,15 @@ import {
   type CatalogReviewRow,
 } from "@/lib/catalog-pollution-review";
 import { ManualCanonicalMergeDialog } from "@/components/manual-canonical-merge-dialog";
-import { Archive, ArrowLeft, ArrowRightLeft, ClipboardList, GitMerge, Loader2 } from "lucide-react";
+import {
+  Archive,
+  ArrowLeft,
+  ArrowRightLeft,
+  ClipboardList,
+  GitMerge,
+  Loader2,
+  Pencil,
+} from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/ingredients/review")({
@@ -85,6 +98,7 @@ function CatalogReviewPage() {
   >([]);
   const [archivingOrphanId, setArchivingOrphanId] = useState<string | null>(null);
   const [reassigningSourceId, setReassigningSourceId] = useState<string | null>(null);
+  const [renamingBatShoestr, setRenamingBatShoestr] = useState(false);
   const [reassignTargetBySource, setReassignTargetBySource] = useState<Record<string, string>>(
     {},
   );
@@ -209,6 +223,64 @@ function CatalogReviewPage() {
     () => buildManualMergePickerOptions(filterCanonicalCatalogIngredients(catalogRows)),
     [catalogRows],
   );
+
+  const batShoestrRenameCard = useMemo(() => {
+    const canonical = filterCanonicalCatalogIngredients(catalogRows);
+    const source = canonical.find((entry) => isLegacyBatShoestrCatalogEntry(entry));
+    if (!source?.id) return null;
+    const targetName = generateOperationalIngredientName(source.name ?? "");
+    if (!targetName) return null;
+    return { source, targetName };
+  }, [catalogRows]);
+
+  const handleBatShoestrRename = async () => {
+    if (!user?.id || !batShoestrRenameCard) return;
+    const { source, targetName } = batShoestrRenameCard;
+    const fromName = source.name ?? source.id;
+    const confirmMsg = `Renomear "${fromName}" para "${targetName}"?\n\nMantém o mesmo ingrediente, aliases, matches e histórico.`;
+    if (!window.confirm(confirmMsg)) return;
+
+    setRenamingBatShoestr(true);
+    setError(null);
+    const catalog = filterCanonicalCatalogIngredients(catalogRows).map((row) => ({
+      id: row.id,
+      name: row.name,
+      normalized_name: row.normalized_name,
+    }));
+    const payload = buildCanonicalIngredientRenamePayload(source.id, targetName, catalog);
+    if (!payload.ok) {
+      setError(payload.message);
+      setRenamingBatShoestr(false);
+      return;
+    }
+
+    traceCanonicalRename("review-rename-attempt", {
+      ingredientId: payload.update.ingredientId,
+      name: payload.update.name,
+      normalizedName: payload.update.normalized_name,
+    });
+    const { error: updateError } = await supabase
+      .from("ingredients")
+      .update({
+        name: payload.update.name,
+        normalized_name: payload.update.normalized_name,
+      })
+      .eq("id", payload.update.ingredientId);
+
+    if (updateError) {
+      setError(updateError.message);
+      setRenamingBatShoestr(false);
+      return;
+    }
+
+    traceCanonicalRename("review-rename-ok", {
+      ingredientId: payload.update.ingredientId,
+      name: payload.update.name,
+    });
+    setRenamingBatShoestr(false);
+    await load();
+    await router.invalidate();
+  };
 
   const handleReassignAliases = async (
     fromIngredientId: string,
@@ -338,6 +410,36 @@ function CatalogReviewPage() {
       }
     >
       <div className="space-y-4">
+        {!loading && !error && batShoestrRenameCard && (
+          <Card className="p-4 space-y-3 border-violet-500/30">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h2 className="font-medium text-foreground">BAT shoestr — renomear catálogo</h2>
+                <p className="text-sm text-muted-foreground">
+                  Nome de fatura abreviado no canónico. Renomeia para o produto operacional sem
+                  fundir com Batata palha — aliases e histórico mantêm-se no mesmo ingrediente.
+                </p>
+                <p className="text-xs text-muted-foreground font-mono mt-1">
+                  {batShoestrRenameCard.source.id}
+                </p>
+              </div>
+              <button
+                type="button"
+                disabled={renamingBatShoestr || reassigningSourceId != null}
+                className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md border border-violet-500/40 hover:bg-violet-500/10 disabled:opacity-50"
+                onClick={() => void handleBatShoestrRename()}
+              >
+                {renamingBatShoestr ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Pencil className="h-4 w-4" />
+                )}
+                Rename to {batShoestrRenameCard.targetName}
+              </button>
+            </div>
+          </Card>
+        )}
+
         {!loading && !error && aliasOnlyEntries.length > 0 && (
           <Card className="p-4 space-y-3 border-sky-500/30">
             <div className="flex flex-wrap items-start justify-between gap-2">

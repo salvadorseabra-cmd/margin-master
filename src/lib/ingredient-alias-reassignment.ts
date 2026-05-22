@@ -453,6 +453,13 @@ export const PALHA_LEGACY_ALIAS_SEARCH_TERMS = [
   "PALHA SNACK",
 ] as const;
 
+export const BAT_SHOESTR_LEGACY_ALIAS_SEARCH_TERMS = [
+  "BAT shoestr",
+  "BAT SHOESTR",
+  "bat shoestr",
+  "shoestr",
+] as const;
+
 export type CanonicalIngredientSourceState = "active" | "archived" | "merged" | "unknown";
 
 export type CanonicalIngredientResolverMethod =
@@ -475,6 +482,8 @@ export type CanonicalReassignmentHints = {
   aliasSearchTerms?: string[];
   /** Fuzzy legacy PALHA name match in catalog (excludes Batata palha identities). */
   legacyPalhaFuzzyCatalog?: boolean;
+  /** Fuzzy legacy BAT shoestr catalog match (excludes Batata palha). */
+  legacyBatShoestrFuzzyCatalog?: boolean;
   excludeNormalizedNames?: string[];
   catalog?: IngredientCanonicalInput[];
   includeArchived?: boolean;
@@ -544,6 +553,60 @@ export function isLegacyPalhaAliasField(
   return false;
 }
 
+/** Invoice/catalog shorthand for legacy BAT shoestr rows (merge scripts only; not Batata palha). */
+export function isBatShoestrMisclassifiedShorthand(
+  raw: string | null | undefined,
+): boolean {
+  const field = raw?.trim();
+  if (!field) return false;
+  const canonical = normalizeCanonicalIngredientName(field);
+  if (isBatataPalhaNormalizedIdentity(canonical)) return false;
+  if (canonical === "batata shoestring") return false;
+  if (canonical === "bat shoestr") return true;
+  if (/^bat\s+shoestr$/i.test(field)) return true;
+  if (/\bbat\s*shoestr\b/i.test(field) && !/\bbatata\s+palha\b/i.test(field)) return true;
+  return false;
+}
+
+/** Catalog row is legacy BAT shoestr source, not Batata palha or full shoestring product. */
+export function isLegacyBatShoestrCatalogEntry(entry: IngredientCanonicalInput): boolean {
+  const displayNorm = normalizeCanonicalIngredientName(entry.name ?? "");
+  const storedNorm = entry.normalized_name
+    ? normalizeCanonicalIngredientName(entry.normalized_name)
+    : "";
+  if (
+    isBatataPalhaNormalizedIdentity(displayNorm) ||
+    isBatataPalhaNormalizedIdentity(storedNorm)
+  ) {
+    return false;
+  }
+  if (displayNorm === "batata shoestring" || storedNorm === "batata shoestring") return false;
+  if (displayNorm === "bat shoestr" || storedNorm === "bat shoestr") return true;
+  const lower = (entry.name ?? "").toLowerCase();
+  if (/\bbat\s*shoestr\b/i.test(lower) && !/\bbatata\s+palha\b/i.test(lower)) return true;
+  return false;
+}
+
+/** True when alias text refers to legacy BAT shoestr lines, not Batata palha products. */
+export function isLegacyBatShoestrAliasField(
+  raw: string | null | undefined,
+  searchTerms: string[] = [...BAT_SHOESTR_LEGACY_ALIAS_SEARCH_TERMS],
+): boolean {
+  const field = raw?.trim();
+  if (!field) return false;
+  if (isBatataPalhaNormalizedIdentity(normalizeCanonicalIngredientName(field))) return false;
+  if (isBatShoestrMisclassifiedShorthand(field)) return true;
+  for (const term of searchTerms) {
+    const termNorm = normalizeCanonicalIngredientName(term);
+    const fieldNorm = normalizeCanonicalIngredientName(field);
+    if (termNorm && fieldNorm === termNorm) return true;
+    if (term.toLowerCase() === "shoestr" && /\bshoestr\b/i.test(field) && /\bbat\b/i.test(field)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /** Catalog row is legacy PALHA source, not active Batata palha canonical. */
 export function isLegacyPalhaCatalogEntry(entry: IngredientCanonicalInput): boolean {
   const displayNorm = normalizeCanonicalIngredientName(entry.name ?? "");
@@ -575,12 +638,39 @@ export type AliasOwnershipResolution = {
 /**
  * Resolve legacy canonical id from `ingredient_aliases` ownership (works when catalog name is archived/missing).
  */
+function aliasOwnershipMatchesSearchTerms(
+  aliasName: string,
+  normalizedAlias: string,
+  terms: string[],
+  mode: "palha" | "bat_shoestr" | "generic",
+): boolean {
+  if (mode === "palha") {
+    return (
+      isLegacyPalhaAliasField(aliasName, terms) || isLegacyPalhaAliasField(normalizedAlias, terms)
+    );
+  }
+  if (mode === "bat_shoestr") {
+    return (
+      isLegacyBatShoestrAliasField(aliasName, terms) ||
+      isLegacyBatShoestrAliasField(normalizedAlias, terms)
+    );
+  }
+  return (
+    isLegacyPalhaAliasField(aliasName, terms) ||
+    isLegacyPalhaAliasField(normalizedAlias, terms) ||
+    isLegacyBatShoestrAliasField(aliasName, terms) ||
+    isLegacyBatShoestrAliasField(normalizedAlias, terms)
+  );
+}
+
 export async function findSourceCanonicalFromAliasOwnership(
   client: AppSupabaseClient,
   userId: string,
   searchTerms: string[],
+  options?: { ownershipMode?: "palha" | "bat_shoestr" | "generic" },
 ): Promise<AliasOwnershipResolution> {
   const terms = searchTerms.length > 0 ? searchTerms : [...PALHA_LEGACY_ALIAS_SEARCH_TERMS];
+  const ownershipMode = options?.ownershipMode ?? "palha";
   const { data, error } = await client
     .from("ingredient_aliases")
     .select("ingredient_id, alias_name, normalized_alias");
@@ -599,10 +689,7 @@ export async function findSourceCanonicalFromAliasOwnership(
     if (!id) continue;
     const aliasName = row.alias_name ?? "";
     const normalizedAlias = row.normalized_alias ?? "";
-    if (
-      !isLegacyPalhaAliasField(aliasName, terms) &&
-      !isLegacyPalhaAliasField(normalizedAlias, terms)
-    ) {
+    if (!aliasOwnershipMatchesSearchTerms(aliasName, normalizedAlias, terms, ownershipMode)) {
       continue;
     }
     counts.set(id, (counts.get(id) ?? 0) + 1);
@@ -653,7 +740,13 @@ function resolveFromCatalogHints(
   hints: CanonicalReassignmentHints,
 ): CanonicalIngredientResolution | null {
   const wanted = normalizedNamesSet(hints.normalizedNames);
-  if (wanted.size === 0 && !hints.legacyPalhaFuzzyCatalog) return null;
+  if (
+    wanted.size === 0 &&
+    !hints.legacyPalhaFuzzyCatalog &&
+    !hints.legacyBatShoestrFuzzyCatalog
+  ) {
+    return null;
+  }
 
   const activeOnly = hints.activeOnly === true;
   const includeArchived = hints.includeArchived === true;
@@ -696,23 +789,42 @@ function resolveFromCatalogHints(
     }
   }
 
-  if (!hints.legacyPalhaFuzzyCatalog) return null;
+  if (hints.legacyPalhaFuzzyCatalog) {
+    for (const entry of catalog) {
+      const id = entry.id?.trim();
+      if (!id) continue;
+      if (activeOnly && isArchivedIngredientEntry(entry)) continue;
+      if (!includeArchived && !activeOnly && isArchivedIngredientEntry(entry)) continue;
+      if (!isLegacyPalhaCatalogEntry(entry)) continue;
+      const displayNorm = normalizeCanonicalIngredientName(entry.name ?? "");
+      if (isExcludedNormalizedIdentity(displayNorm, hints.excludeNormalizedNames)) continue;
+      return {
+        ingredientId: id,
+        sourceState: catalogEntrySourceState(entry),
+        aliasCount: 0,
+        resolverMethod: "catalog_fuzzy_legacy_palha",
+        fallbackReason: null,
+      };
+    }
+  }
 
-  for (const entry of catalog) {
-    const id = entry.id?.trim();
-    if (!id) continue;
-    if (activeOnly && isArchivedIngredientEntry(entry)) continue;
-    if (!includeArchived && !activeOnly && isArchivedIngredientEntry(entry)) continue;
-    if (!isLegacyPalhaCatalogEntry(entry)) continue;
-    const displayNorm = normalizeCanonicalIngredientName(entry.name ?? "");
-    if (isExcludedNormalizedIdentity(displayNorm, hints.excludeNormalizedNames)) continue;
-    return {
-      ingredientId: id,
-      sourceState: catalogEntrySourceState(entry),
-      aliasCount: 0,
-      resolverMethod: "catalog_fuzzy_legacy_palha",
-      fallbackReason: null,
-    };
+  if (hints.legacyBatShoestrFuzzyCatalog) {
+    for (const entry of catalog) {
+      const id = entry.id?.trim();
+      if (!id) continue;
+      if (activeOnly && isArchivedIngredientEntry(entry)) continue;
+      if (!includeArchived && !activeOnly && isArchivedIngredientEntry(entry)) continue;
+      if (!isLegacyBatShoestrCatalogEntry(entry)) continue;
+      const displayNorm = normalizeCanonicalIngredientName(entry.name ?? "");
+      if (isExcludedNormalizedIdentity(displayNorm, hints.excludeNormalizedNames)) continue;
+      return {
+        ingredientId: id,
+        sourceState: catalogEntrySourceState(entry),
+        aliasCount: 0,
+        resolverMethod: "catalog_fuzzy_legacy_palha",
+        fallbackReason: null,
+      };
+    }
   }
 
   return null;
@@ -742,10 +854,16 @@ export async function resolveCanonicalIngredientForReassignment(params: {
 
   const aliasTerms = params.hints.aliasSearchTerms;
   if (aliasTerms && aliasTerms.length > 0) {
+    const ownershipMode = params.hints.legacyBatShoestrFuzzyCatalog
+      ? "bat_shoestr"
+      : params.hints.legacyPalhaFuzzyCatalog
+        ? "palha"
+        : "generic";
     const ownership = await findSourceCanonicalFromAliasOwnership(
       params.client,
       params.userId,
       aliasTerms,
+      { ownershipMode },
     );
     if (ownership.ingredientId) {
       const entry = catalog.find((row) => row.id?.trim() === ownership.ingredientId);

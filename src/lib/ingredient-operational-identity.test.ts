@@ -51,6 +51,19 @@ describe("guardIngredientCreation", () => {
     expect(guard.action).toBe("create");
   });
 
+  it("does not reuse Batata palha when creating BAT shoestr shorthand", () => {
+    const catalog = [
+      ingredient("palha-1", "Batata palha", "batata palha"),
+      ingredient("dup", "BAT shoestr", "bat shoestr"),
+    ];
+    const guard = guardIngredientCreation("BAT shoestr", catalog);
+    expect(guard.action).toBe("reuse");
+    if (guard.action === "reuse") {
+      expect(guard.existing.id).not.toBe("palha-1");
+      expect(guard.existing.id).toBe("dup");
+    }
+  });
+
   it("reuses on duplicate display name", () => {
     const catalog = [ingredient("b1", "BACON FATIAS")];
     const guard = guardIngredientCreation("bacon fatias", catalog);
