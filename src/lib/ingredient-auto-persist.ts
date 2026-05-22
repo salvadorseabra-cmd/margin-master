@@ -27,7 +27,8 @@ import {
   type StructuredPurchaseFormat,
 } from "@/lib/invoice-purchase-format";
 import { findInvoiceItemIngredientMatch } from "@/lib/invoice-ingredient-match-propagation";
-import { looksLikeInvoiceShorthandName, INGREDIENT_KIND_CANONICAL } from "@/lib/ingredient-kind";
+import { INGREDIENT_KIND_CANONICAL, looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
+import { shouldBlockCanonicalNameOnCreate } from "@/lib/canonical-ingredient-operational-name";
 import { recordInvoiceLineAliasMemory } from "@/lib/ingredient-match-alias-memory";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 import {
@@ -361,7 +362,7 @@ export async function persistIngredientFromInvoiceItem(
     };
   }
 
-  if (looksLikeInvoiceShorthandName(payload.name)) {
+  if (shouldBlockCanonicalNameOnCreate(payload.name)) {
     traceCanonicalCreateAttempt({
       flowFunction: "persistIngredientFromInvoiceItem",
       flowOrigin: "explicit_user",

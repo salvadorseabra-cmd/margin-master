@@ -562,11 +562,16 @@ const formatPurchaseCount = (value: number) => {
   return rounded;
 };
 
-const resolveItemPurchaseFormat = (item: Pick<ItemRow, "name" | "quantity" | "unit">) =>
+type InvoicePurchaseContext = Pick<ItemRow, "name" | "quantity" | "unit"> & {
+  matchedIngredientName?: string | null;
+};
+
+const resolveItemPurchaseFormat = (item: InvoicePurchaseContext) =>
   resolveInvoiceLinePurchaseFormat({
     name: item.name,
     quantity: item.quantity,
     unit: item.unit,
+    matchedIngredientName: item.matchedIngredientName ?? null,
   });
 
 const hasClearInferredQuantityUnit = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {
@@ -682,12 +687,13 @@ const getInvoiceItemOperationalSummary = (item: Pick<ItemRow, "name" | "quantity
   return null;
 };
 
-const getInvoiceItemPurchaseLabel = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {
+const getInvoiceItemPurchaseLabel = (item: InvoicePurchaseContext) => {
   const structured = resolveItemPurchaseFormat(item);
   const structuredLabel = resolveInvoicePurchaseDisplayLabel({
     name: item.name,
     quantity: item.quantity,
     unit: item.unit,
+    matchedIngredientName: item.matchedIngredientName ?? null,
   });
   if (structuredLabel && !isCollapsedMeaninglessPurchaseLabel(structuredLabel)) {
     return structuredLabel;
@@ -745,9 +751,17 @@ const getInvoiceItemPurchaseLabel = (item: Pick<ItemRow, "name" | "quantity" | "
   return rowFallback;
 };
 
-const getInvoiceItemStockPresentation = (item: Pick<ItemRow, "id" | "name" | "quantity" | "unit">) => {
+const getInvoiceItemStockPresentation = (
+  item: Pick<ItemRow, "id" | "name" | "quantity" | "unit">,
+  matchedIngredientName?: string | null,
+) => {
   const presentation = resolveInvoiceLineStockPresentation(
-    { name: item.name, quantity: item.quantity, unit: item.unit },
+    {
+      name: item.name,
+      quantity: item.quantity,
+      unit: item.unit,
+      matchedIngredientName: matchedIngredientName ?? null,
+    },
     item.id,
   );
   if (!presentation.quantityLabel) return null;
@@ -2972,14 +2986,26 @@ function ItemsTable({
                 const creatingIngredient = !!creatingIngredientByItem[renderItem.id];
                 const creationError = ingredientCreationErrors[renderItem.id];
                 const operationalSummary = getInvoiceItemOperationalSummary(renderItem);
-                const purchaseLabel = getInvoiceItemPurchaseLabel(renderItem);
-                const stockPresentation = getInvoiceItemStockPresentation(renderItem);
+                const matchedIngredientForStock = ingredientMatch
+                  ? (ingredientById.get(ingredientMatch.ingredient.id)?.name ??
+                    ingredientMatch.ingredient.name ??
+                    null)
+                  : null;
+                const purchaseLabel = getInvoiceItemPurchaseLabel({
+                  ...renderItem,
+                  matchedIngredientName: matchedIngredientForStock,
+                });
+                const stockPresentation = getInvoiceItemStockPresentation(
+                  renderItem,
+                  matchedIngredientForStock,
+                );
                 if (index === 0) {
                   const stockMeta = resolveInvoiceLineStockPresentation(
                     {
                       name: renderItem.name,
                       quantity: renderItem.quantity,
                       unit: renderItem.unit,
+                      matchedIngredientName: matchedIngredientForStock,
                     },
                     renderItem.id,
                   );

@@ -2,7 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
 import { loadActiveIngredientCatalog } from "@/lib/ingredient-catalog-load";
+import { filterCanonicalCatalogIngredients } from "@/lib/ingredient-kind";
+import {
+  archiveOrphanIngredient,
+  detectOrphanCanonicalIngredients,
+  isIngredientOperationallyOrphaned,
+  type IngredientOrphanReport,
+} from "@/lib/ingredient-orphan-detection";
 import {
   buildCatalogReviewRows,
   CATALOG_LEAK_REASON_LABELS,
@@ -15,7 +23,7 @@ import {
   type CatalogReviewRow,
 } from "@/lib/catalog-pollution-review";
 import { ManualCanonicalMergeDialog } from "@/components/manual-canonical-merge-dialog";
-import { ArrowLeft, ClipboardList, GitMerge, Loader2 } from "lucide-react";
+import { Archive, ArrowLeft, ClipboardList, GitMerge, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/ingredients/review")({
@@ -58,6 +66,10 @@ function CatalogReviewPage() {
     sourceId?: string;
     targetId?: string;
   }>({});
+  const [orphanEntries, setOrphanEntries] = useState<
+    { entry: (typeof catalogRows)[number]; report: IngredientOrphanReport }[]
+  >([]);
+  const [archivingOrphanId, setArchivingOrphanId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!user?.id) return;
@@ -103,6 +115,34 @@ function CatalogReviewPage() {
     }
 
     setCatalogRows(catalog);
+
+    const canonicalCatalog = filterCanonicalCatalogIngredients(catalog);
+    const { reports: orphanReports, error: orphanError } =
+      await detectOrphanCanonicalIngredients(supabase, canonicalCatalog);
+    if (orphanError) {
+      setError(orphanError);
+      setLoading(false);
+      return;
+    }
+
+    const orphans = canonicalCatalog
+      .filter((entry) => {
+        const id = entry.id?.trim();
+        if (!id) return false;
+        const report = orphanReports.get(id);
+        return report ? isIngredientOperationallyOrphaned(report) : false;
+      })
+      .map((entry) => ({
+        entry,
+        report: orphanReports.get(entry.id)!,
+      }))
+      .sort((a, b) =>
+        (a.entry.name ?? "").localeCompare(b.entry.name ?? "", undefined, {
+          sensitivity: "base",
+        }),
+      );
+    setOrphanEntries(orphans);
+
     const stored = loadCatalogReviewClassifications(user.id);
     setClassifications(stored);
     setRows(
@@ -117,6 +157,24 @@ function CatalogReviewPage() {
     );
     setLoading(false);
   }, [user?.id]);
+
+  const handleArchiveOrphan = async (ingredientId: string) => {
+    if (!user?.id) return;
+    setArchivingOrphanId(ingredientId);
+    setError(null);
+    const { error: archiveError } = await archiveOrphanIngredient({
+      client: supabase,
+      ingredientId,
+      userId: user.id,
+    });
+    if (archiveError) {
+      setError(archiveError.message);
+      setArchivingOrphanId(null);
+      return;
+    }
+    setArchivingOrphanId(null);
+    await load();
+  };
 
   useEffect(() => {
     void load();
@@ -152,7 +210,7 @@ function CatalogReviewPage() {
   return (
     <AppShell
       title="Revisão do catálogo"
-      subtitle="Poluição legada e duplicados operacionais — classificação manual, sem fusão automática."
+      subtitle="Poluição legada, órfãos sem uso operacional e duplicados — revisão manual, sem fusão automática."
       action={
         <div className="flex flex-wrap items-center gap-3">
           <button
@@ -177,6 +235,56 @@ function CatalogReviewPage() {
       }
     >
       <div className="space-y-4">
+        {!loading && !error && orphanEntries.length > 0 && (
+          <Card className="p-4 space-y-3 border-amber-500/30">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h2 className="font-medium text-foreground">Ingredientes órfãos</h2>
+                <p className="text-sm text-muted-foreground">
+                  Canónicos ativos sem aliases, receitas, prep, histórico de preço nem impactos de
+                  margem. Não aparecem na lista principal até arquivar.
+                </p>
+              </div>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-900 dark:text-amber-100">
+                {orphanEntries.length}
+              </span>
+            </div>
+            <ul className="space-y-2">
+              {orphanEntries.map(({ entry, report }) => (
+                <li
+                  key={entry.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-3"
+                >
+                  <div>
+                    <p className="font-medium">
+                      {formatCanonicalIngredientDisplayName(entry.name) || entry.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground font-mono">{entry.id}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Refs: aliases {report.invoiceAliasCount}, receitas{" "}
+                      {report.recipeIngredientCount}, prep {report.prepRecipeIngredientCount},
+                      preço {report.priceHistoryCount}, margem {report.marginImpactCount}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={archivingOrphanId === entry.id}
+                    className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md border border-border hover:bg-muted disabled:opacity-50"
+                    onClick={() => void handleArchiveOrphan(entry.id)}
+                  >
+                    {archivingOrphanId === entry.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Archive className="h-4 w-4" />
+                    )}
+                    Arquivar
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        )}
+
         <Card className="p-4 flex flex-wrap gap-3 items-end">
           <label className="flex flex-col gap-1 text-sm">
             <span className="text-muted-foreground">Classificação</span>

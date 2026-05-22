@@ -7,6 +7,9 @@
  * g/ml values (invoice row qty mistaken for content size).
  */
 
+import { looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
+import { extractLineWeightGrams } from "@/lib/ingredient-weight-match";
+
 export type UnitFamily = "mass" | "volume" | "count";
 
 export type PackMeasureUnit = "g" | "ml" | "kg" | "L" | "un";
@@ -40,6 +43,8 @@ export type PurchaseStructure = {
   tier:
     | "triple_nested"
     | "caixa_units_size"
+    | "caixa_compact_size"
+    | "units_size"
     | "container_size"
     | "count_size"
     | "bare_measure";
@@ -63,7 +68,36 @@ export type StockNormalizeInput = {
   rowQuantity: number | null;
   rowUnit: string | null;
   inferred?: StockInferenceHints | null;
+  /** Canonical catalog display name for shorthand per-piece weight (e.g. BRCH 80 → brioche 80g). */
+  matchedIngredientName?: string | null;
 };
+
+/** Structure extracted from a canonical catalog display name. */
+export type CanonicalIngredientStructure = {
+  unitType: "g" | "ml";
+  unitSize: number;
+  usableQuantity: number;
+  confidence: number;
+};
+
+/** Semantic per-piece pack inferred after explicit parse, before OCR / same-as-purchased. */
+export type SemanticPackStructure = {
+  perUnitSize: number;
+  usableUnit: "g" | "ml";
+  structureMultiplier: number;
+  outerPurchaseQty: number;
+  totalUsable: number;
+  confidence: number;
+  source:
+    | "embedded_title_weight"
+    | "matched_ingredient_structure"
+    | "matched_ingredient_weight"
+    | "line_canonical_consistent"
+    | "inference_hint";
+};
+
+/** Per-piece usable inferred from invoice shorthand when row is generic count. */
+export type ShorthandUsableInference = SemanticPackStructure;
 
 /** Grep-friendly pipeline id logged per invoice row (`[stock_normalization_source]`). */
 export type StockNormalizationPipelineId = "unified" | "suppressed" | "none";
@@ -122,6 +156,9 @@ const GENERIC_UNIT_TOKEN = String.raw`un|uni|und|unds|unid|unids|unit|units|unid
 
 const INNER_UNIT_TOKEN = String.raw`un|uni|und|unds|unid|unids|unit|units|can|cans|lata|latas|garrafa|garrafas|bottle|bottles`;
 
+/** Only generic count tokens — excludes bottle/garrafa so `1 bottle x 450 ml` stays container×size. */
+const GENERIC_INNER_UNIT_TOKEN = String.raw`un|uni|und|unds|unid|unids|unit|units|pc|pcs`;
+
 const GENERIC_PURCHASE_UNITS = new Set([
   "un",
   "uni",
@@ -162,8 +199,32 @@ const CAIXA_UNITS_SIZE_RE = new RegExp(
   "iu",
 );
 
+/** `caixa 24x80g` / `cx 24X80G` without an inner unit word. */
+const CAIXA_COMPACT_SIZE_RE = new RegExp(
+  String.raw`\b(?:caixa|caixas|cx)\s*(?<inner>\d+(?:[.,]\d+)?)\s*${MULTIPLIER_SEP}\s*(?<size>\d+(?:[.,]\d+)?)\s*(?<unit>${MEASURE_UNIT_TOKEN})\b`,
+  "iu",
+);
+
+/** `caixa 24` beside a per-piece weight elsewhere in the title (`Pão Batata 80g caixa 24`). */
+const CAIXA_COUNT_ONLY_RE = new RegExp(
+  String.raw`\b(?:caixa|caixas|cx)\s*(?<inner>\d+(?:[.,]\d+)?)\b`,
+  "iu",
+);
+
+/** `24 un x 80 g` / `40 un x 180g` (no caixa prefix). */
+const UNITS_SIZE_RE = new RegExp(
+  String.raw`\b(?<inner>\d+(?:[.,]\d+)?)\s*(?<innerUnit>${GENERIC_INNER_UNIT_TOKEN})\s*${MULTIPLIER_SEP}\s*(?<size>\d+(?:[.,]\d+)?)\s*(?<unit>${MEASURE_UNIT_TOKEN})\b`,
+  "iu",
+);
+
 const CONTAINER_WITH_SIZE_RE = new RegExp(
   String.raw`\b(?<purchase>\d+(?:[.,]\d+)?)\s*(?<format>${CONTAINER_TOKEN})\s*${MULTIPLIER_SEP}\s*(?<size>\d+(?:[.,]\d+)?)\s*(?<unit>${MEASURE_UNIT_TOKEN})\b`,
+  "iu",
+);
+
+/** `Pack 6 x 1 L` / `packs 3 x 500g` (container noun before count). */
+const CONTAINER_LEADING_SIZE_RE = new RegExp(
+  String.raw`\b(?<format>${CONTAINER_TOKEN})\s*(?<purchase>\d+(?:[.,]\d+)?)\s*${MULTIPLIER_SEP}\s*(?<size>\d+(?:[.,]\d+)?)\s*(?<unit>${MEASURE_UNIT_TOKEN})\b`,
   "iu",
 );
 
@@ -174,6 +235,23 @@ const COUNT_SIZE_RE = new RegExp(
 
 const BARE_MEASURE_RE = new RegExp(
   String.raw`^\s*(?<size>\d+(?:[.,]\d+)?)\s*(?<unit>${MEASURE_UNIT_TOKEN})\s*$`,
+  "iu",
+);
+
+/** Trailing per-piece measure in a longer product title (`Pão Batata 80g`). */
+const EMBEDDED_BARE_MEASURE_RE = new RegExp(
+  String.raw`\b(?<size>\d+(?:[.,]\d+)?)\s*(?<unit>${MEASURE_UNIT_TOKEN})\b`,
+  "giu",
+);
+
+const MULTIPLIER_IN_TEXT_RE = new RegExp(
+  String.raw`\b\d+(?:[.,]\d+)?\s*${MULTIPLIER_SEP}\s*\d+(?:[.,]\d+)?\s*(?:${MEASURE_UNIT_TOKEN})\b`,
+  "iu",
+);
+
+/** `80g 120 UN` bakery tail — defers to unit-count inference instead of bare 80g. */
+const BAKERY_PIECE_THEN_UNIT_COUNT_RE = new RegExp(
+  String.raw`\b(?<size>\d+(?:[.,]\d+)?)\s*(?<unit>${MEASURE_UNIT_TOKEN})\s+(?<inner>\d+(?:[.,]\d+)?)\s*(?<innerUnit>${GENERIC_INNER_UNIT_TOKEN})\s*$`,
   "iu",
 );
 
@@ -253,18 +331,117 @@ function scoreContainerSizeMatch(match: RegExpMatchArray): number {
   return purchaseQuantity * measureToBase(unitSize, unitMeasurement).amount;
 }
 
-function scoreCaixaUnitsSizeMatch(match: RegExpMatchArray): number {
+function scoreInnerUnitsSizeMatch(match: RegExpMatchArray): number {
   const innerUnitCount = parseQuantityToken(match.groups?.inner ?? "");
   const { unitSize, unitMeasurement } = parseSizeAndUnit(match.groups?.size, match.groups?.unit);
   if (innerUnitCount == null || unitSize == null || !unitMeasurement) return -1;
   return innerUnitCount * measureToBase(unitSize, unitMeasurement).amount;
 }
 
+function scoreCaixaUnitsSizeMatch(match: RegExpMatchArray): number {
+  return scoreInnerUnitsSizeMatch(match);
+}
+
+function scoreCaixaCompactSizeMatch(match: RegExpMatchArray): number {
+  return scoreInnerUnitsSizeMatch(match);
+}
+
+function scoreUnitsSizeMatch(match: RegExpMatchArray): number {
+  return scoreInnerUnitsSizeMatch(match);
+}
+
 function scoreCountSizeMatch(match: RegExpMatchArray): number {
   const purchaseQuantity = parseQuantityToken(match.groups?.purchase ?? "");
   const { unitSize, unitMeasurement } = parseSizeAndUnit(match.groups?.size, match.groups?.unit);
   if (purchaseQuantity == null || unitSize == null || !unitMeasurement) return -1;
+  if (purchaseQuantity <= 1) return -1;
   return purchaseQuantity * measureToBase(unitSize, unitMeasurement).amount;
+}
+
+function hasMultiplierStructureInText(text: string): boolean {
+  return MULTIPLIER_IN_TEXT_RE.test(text);
+}
+
+function hasBakeryPieceThenUnitCount(text: string): boolean {
+  return BAKERY_PIECE_THEN_UNIT_COUNT_RE.test(text.trim());
+}
+
+/** `PACK6` / `PACK 24` — outer count comes from inference, not embedded `1L`/`500G`. */
+function hasPackCountInferenceSignal(text: string): boolean {
+  return /\bPACK\s*\d+\b/i.test(text) || /\bPACK\d+\b/i.test(text);
+}
+
+/** OCR often turns `80g 120 UN` into `1 pack x 120 g` — skip when a per-piece weight is already in the title. */
+function shouldSkipSuspiciousContainerMatch(text: string, match: RegExpMatchArray): boolean {
+  const purchaseQuantity = parseQuantityToken(match.groups?.purchase ?? "") ?? 1;
+  if (purchaseQuantity !== 1) return false;
+  const { unitSize, unitMeasurement } = parseSizeAndUnit(match.groups?.size, match.groups?.unit);
+  if (unitSize == null || !unitMeasurement || unitMeasurement === "un") return false;
+  const containerBase = measureToBase(unitSize, unitMeasurement).amount;
+  if (containerBase < 100) return false;
+
+  const matchIndex = match.index ?? 0;
+  const prefix = text.slice(0, matchIndex);
+  let bestPiece: number | null = null;
+  const pieceRe = new RegExp(EMBEDDED_BARE_MEASURE_RE.source, "giu");
+  let pieceMatch: RegExpExecArray | null = null;
+  while ((pieceMatch = pieceRe.exec(prefix)) !== null) {
+    const { unitSize: pieceSize, unitMeasurement: pieceUnit } = parseSizeAndUnit(
+      pieceMatch.groups?.size,
+      pieceMatch.groups?.unit,
+    );
+    if (pieceSize == null || !pieceUnit || pieceUnit === "un") continue;
+    const pieceBase = measureToBase(pieceSize, pieceUnit);
+    if (pieceBase.family !== measureToBase(unitSize, unitMeasurement).family) continue;
+    if (bestPiece == null || pieceBase.amount < bestPiece) {
+      bestPiece = pieceBase.amount;
+    }
+  }
+
+  if (bestPiece == null) return false;
+  return containerBase >= bestPiece * 1.25;
+}
+
+function findEmbeddedPieceMeasure(
+  text: string,
+): { unitSize: number; unitMeasurement: PackMeasureUnit; matchedText: string } | null {
+  const embeddedBare = findBestRegexMatch(text, EMBEDDED_BARE_MEASURE_RE, (match) => {
+    const { unitSize, unitMeasurement } = parseSizeAndUnit(match.groups?.size, match.groups?.unit);
+    if (unitSize == null || !unitMeasurement) return -1;
+    return measureToBase(unitSize, unitMeasurement).amount;
+  });
+  if (!embeddedBare?.groups) return null;
+  const { unitSize, unitMeasurement } = parseSizeAndUnit(
+    embeddedBare.groups.size,
+    embeddedBare.groups.unit,
+  );
+  if (unitSize == null || !unitMeasurement) return null;
+  return {
+    unitSize,
+    unitMeasurement,
+    matchedText: embeddedBare[0] ?? "",
+  };
+}
+
+function buildInnerUnitsStructure(params: {
+  innerUnitCount: number;
+  innerUnitType?: string;
+  unitSize: number;
+  unitMeasurement: PackMeasureUnit;
+  matchedText: string;
+  tier: "caixa_units_size" | "caixa_compact_size" | "units_size";
+  purchaseFormat?: string;
+}): PurchaseStructure {
+  return buildStructure({
+    purchaseQuantity: 1,
+    purchaseFormat: params.purchaseFormat ?? "case",
+    innerUnitCount: params.innerUnitCount,
+    innerUnitType: params.innerUnitType,
+    unitSize: params.unitSize,
+    unitMeasurement: params.unitMeasurement,
+    matchedText: params.matchedText,
+    tier: params.tier,
+  });
 }
 
 /** Numeric measure tokens in text (debug: detect row qty merged into the name). */
@@ -422,7 +599,19 @@ function buildStructure(params: {
 
 /** Best `N container x SIZE` match (largest content measure wins over weak OCR duplicates). */
 export function findBestContainerWithSizeMatch(text: string): RegExpMatchArray | null {
-  return findBestRegexMatch(text, CONTAINER_WITH_SIZE_RE, scoreContainerSizeMatch);
+  const matches = findAllRegexMatches(text, CONTAINER_WITH_SIZE_RE).filter(
+    (match) => !shouldSkipSuspiciousContainerMatch(text, match),
+  );
+  let best: RegExpMatchArray | null = null;
+  let bestScore = -1;
+  for (const match of matches) {
+    const value = scoreContainerSizeMatch(match);
+    if (value > bestScore) {
+      bestScore = value;
+      best = match;
+    }
+  }
+  return best;
 }
 
 /**
@@ -463,9 +652,7 @@ export function parsePurchaseStructureFromText(text: string): PurchaseStructure 
       logPurchaseStructureParse(trimmed, null, "caixa_units_size");
       return null;
     }
-    const structure = buildStructure({
-      purchaseQuantity: 1,
-      purchaseFormat: "case",
+    const structure = buildInnerUnitsStructure({
       innerUnitCount,
       innerUnitType: normalizeInnerUnitType(caixa.groups.innerUnit),
       unitSize,
@@ -474,6 +661,97 @@ export function parsePurchaseStructureFromText(text: string): PurchaseStructure 
       tier: "caixa_units_size",
     });
     logPurchaseStructureParse(trimmed, structure, "caixa_units_size");
+    return structure;
+  }
+
+  const caixaCompact = findBestRegexMatch(trimmed, CAIXA_COMPACT_SIZE_RE, scoreCaixaCompactSizeMatch);
+  if (caixaCompact?.groups) {
+    const innerUnitCount = parseQuantityToken(caixaCompact.groups.inner ?? "");
+    const { unitSize, unitMeasurement } = parseSizeAndUnit(caixaCompact.groups.size, caixaCompact.groups.unit);
+    if (innerUnitCount == null || unitSize == null || !unitMeasurement) {
+      logPurchaseStructureParse(trimmed, null, "caixa_compact_size");
+      return null;
+    }
+    const structure = buildInnerUnitsStructure({
+      innerUnitCount,
+      innerUnitType: "unit",
+      unitSize,
+      unitMeasurement,
+      matchedText: caixaCompact[0] ?? trimmed,
+      tier: "caixa_compact_size",
+    });
+    logPurchaseStructureParse(trimmed, structure, "caixa_compact_size");
+    return structure;
+  }
+
+  const unitsSize = findBestRegexMatch(trimmed, UNITS_SIZE_RE, scoreUnitsSizeMatch);
+  if (unitsSize?.groups) {
+    const innerUnitCount = parseQuantityToken(unitsSize.groups.inner ?? "");
+    const { unitSize, unitMeasurement } = parseSizeAndUnit(unitsSize.groups.size, unitsSize.groups.unit);
+    if (innerUnitCount == null || unitSize == null || !unitMeasurement) {
+      logPurchaseStructureParse(trimmed, null, "units_size");
+      return null;
+    }
+    const structure = buildInnerUnitsStructure({
+      innerUnitCount,
+      innerUnitType: normalizeInnerUnitType(unitsSize.groups.innerUnit),
+      unitSize,
+      unitMeasurement,
+      matchedText: unitsSize[0] ?? trimmed,
+      tier: "units_size",
+      purchaseFormat: "unit",
+    });
+    logPurchaseStructureParse(trimmed, structure, "units_size");
+    return structure;
+  }
+
+  const caixaCountOnly = findBestRegexMatch(trimmed, CAIXA_COUNT_ONLY_RE, (match) => {
+    const innerUnitCount = parseQuantityToken(match.groups?.inner ?? "");
+    const piece = findEmbeddedPieceMeasure(trimmed);
+    if (innerUnitCount == null || !piece) return -1;
+    return innerUnitCount * measureToBase(piece.unitSize, piece.unitMeasurement).amount;
+  });
+  if (caixaCountOnly?.groups) {
+    const innerUnitCount = parseQuantityToken(caixaCountOnly.groups.inner ?? "");
+    const piece = findEmbeddedPieceMeasure(trimmed);
+    if (innerUnitCount != null && piece) {
+      const structure = buildInnerUnitsStructure({
+        innerUnitCount,
+        innerUnitType: "unit",
+        unitSize: piece.unitSize,
+        unitMeasurement: piece.unitMeasurement,
+        matchedText: `${piece.matchedText} ${caixaCountOnly[0] ?? ""}`.trim(),
+        tier: "caixa_compact_size",
+      });
+      logPurchaseStructureParse(trimmed, structure, "caixa_compact_size");
+      return structure;
+    }
+  }
+
+  const containerLeading = findBestRegexMatch(
+    trimmed,
+    CONTAINER_LEADING_SIZE_RE,
+    scoreContainerSizeMatch,
+  );
+  if (containerLeading?.groups) {
+    const purchaseQuantity = parseQuantityToken(containerLeading.groups.purchase ?? "");
+    const { unitSize, unitMeasurement } = parseSizeAndUnit(
+      containerLeading.groups.size,
+      containerLeading.groups.unit,
+    );
+    if (purchaseQuantity == null || unitSize == null || !unitMeasurement) {
+      logPurchaseStructureParse(trimmed, null, "container_size");
+      return null;
+    }
+    const structure = buildStructure({
+      purchaseQuantity,
+      purchaseFormat: normalizePurchaseFormat(containerLeading.groups.format ?? "unit"),
+      unitSize,
+      unitMeasurement,
+      matchedText: containerLeading[0] ?? trimmed,
+      tier: "container_size",
+    });
+    logPurchaseStructureParse(trimmed, structure, "container_size");
     return structure;
   }
 
@@ -530,8 +808,44 @@ export function parsePurchaseStructureFromText(text: string): PurchaseStructure 
     return structure;
   }
 
+  if (
+    !hasMultiplierStructureInText(trimmed) &&
+    !hasBakeryPieceThenUnitCount(trimmed) &&
+    !hasPackCountInferenceSignal(trimmed)
+  ) {
+    const embeddedBare = findBestRegexMatch(trimmed, EMBEDDED_BARE_MEASURE_RE, (match) => {
+      const { unitSize, unitMeasurement } = parseSizeAndUnit(match.groups?.size, match.groups?.unit);
+      if (unitSize == null || !unitMeasurement) return -1;
+      return measureToBase(unitSize, unitMeasurement).amount;
+    });
+    if (embeddedBare?.groups) {
+      const hit = embeddedBare[0] ?? "";
+      const containerMatch = findBestContainerWithSizeMatch(trimmed);
+      if (containerMatch?.[0]?.includes(hit)) {
+        logPurchaseStructureParse(trimmed, null, "embedded_bare_skipped");
+      } else {
+        const { unitSize, unitMeasurement } = parseSizeAndUnit(
+          embeddedBare.groups.size,
+          embeddedBare.groups.unit,
+        );
+        if (unitSize != null && unitMeasurement) {
+          const structure = buildStructure({
+            purchaseQuantity: 1,
+            purchaseFormat: "unit",
+            unitSize,
+            unitMeasurement,
+            matchedText: hit,
+            tier: "bare_measure",
+          });
+          logPurchaseStructureParse(trimmed, structure, "bare_measure");
+          return structure;
+        }
+      }
+    }
+  }
+
   const bare = trimmed.match(BARE_MEASURE_RE);
-  if (bare?.groups) {
+  if (bare?.groups && !hasMultiplierStructureInText(trimmed)) {
     const { unitSize, unitMeasurement } = parseSizeAndUnit(bare.groups.size, bare.groups.unit);
     if (unitSize == null || !unitMeasurement) {
       logPurchaseStructureParse(trimmed, null, "bare_measure");
@@ -564,8 +878,8 @@ export function purchaseStructureToPackPhrase(structure: PurchaseStructure): Nor
   if (hasInner) {
     return {
       kind: "multi_unit_pack",
-      containerCount: structure.purchaseQuantity,
-      packageQuantity: (structure.innerUnitCount ?? 1) * structure.unitSize,
+      containerCount: structure.innerUnitCount ?? structure.purchaseQuantity,
+      packageQuantity: structure.unitSize,
       packageUnit: structure.unitMeasurement,
       confidence: 0.98,
     };
@@ -705,7 +1019,17 @@ function isWeakRowAgainstStructure(
   const rowBase = measureToBase(rowQuantity, rowMeasure);
   const perItem = measureToBase(structure.unitSize, structure.unitMeasurement);
   if (rowBase.family !== perItem.family) return false;
-  return rowBase.amount < perItem.amount * 0.25;
+  if (rowBase.amount < perItem.amount * 0.25) return true;
+  const hasCarton =
+    (structure.innerUnitCount ?? 1) > 1 ||
+    structure.tier === "count_size" ||
+    structure.tier === "units_size" ||
+    structure.tier === "caixa_units_size" ||
+    structure.tier === "caixa_compact_size";
+  if (hasCarton && rowBase.amount < structure.totalUsableAmount * 0.25) {
+    return true;
+  }
+  return false;
 }
 
 /** OCR replaces inner unit count with g/ml (e.g. `40 un` → row `40 g`). */
@@ -718,6 +1042,45 @@ function isRowQtyConflatedWithInnerCount(
     return false;
   }
   if (Math.abs(rowQuantity - structure.innerUnitCount) >= 0.01) return false;
+  const rowMeasure = normalizeMeasureUnit(rowUnit ?? "");
+  return rowMeasure != null && rowMeasure !== "un";
+}
+
+/**
+ * `totalUsableAmount` already reflects full N×SIZE from the product name; invoice row must not
+ * rescale inner pack counts (24×80g) — only explicit outer containers in the name (2 caixas).
+ */
+function structureTotalIsFinalForGenericRow(
+  structure: PurchaseStructure,
+  rowUnit: string | null,
+): boolean {
+  if (!isGenericPurchaseUnit(rowUnit)) return false;
+  if (structure.tier === "count_size" || structure.tier === "units_size") {
+    return true;
+  }
+  const hasInner = (structure.innerUnitCount ?? 1) > 1;
+  return (
+    hasInner ||
+    structure.tier === "caixa_units_size" ||
+    structure.tier === "caixa_compact_size"
+  );
+}
+
+/** OCR row pack count matches outer purchase count but unit is g/ml (e.g. row `24 g` on `24x80g`). */
+function isRowQtyConflatedWithPurchaseCount(
+  structure: PurchaseStructure,
+  rowQuantity: number | null,
+  rowUnit: string | null,
+): boolean {
+  if (
+    structure.tier !== "count_size" &&
+    structure.tier !== "triple_nested" &&
+    structure.tier !== "container_size"
+  ) {
+    return false;
+  }
+  if (rowQuantity == null || rowQuantity <= 0) return false;
+  if (Math.abs(rowQuantity - structure.purchaseQuantity) >= 0.01) return false;
   const rowMeasure = normalizeMeasureUnit(rowUnit ?? "");
   return rowMeasure != null && rowMeasure !== "un";
 }
@@ -739,12 +1102,47 @@ export function resolveStructurePurchaseQuantity(
 
   const hasInner = structure.innerUnitCount != null && structure.innerUnitCount > 1;
 
-  if (hasInner || structure.tier === "triple_nested" || structure.tier === "caixa_units_size") {
+  if (
+    hasInner ||
+    structure.tier === "triple_nested" ||
+    structure.tier === "caixa_units_size" ||
+    structure.tier === "caixa_compact_size" ||
+    structure.tier === "units_size"
+  ) {
     if (isRowQtyConflatedWithInnerCount(structure, rowQuantity, rowUnit)) {
       return fromName;
     }
-    if (isGenericPurchaseUnit(rowUnit) || isWeakRowAgainstStructure(structure, rowQuantity, rowUnit)) {
+    if (isGenericPurchaseUnit(rowUnit)) {
+      return structureTotalIsFinalForGenericRow(structure, rowUnit) ? 1 : Math.max(1, Math.round(rowQuantity));
+    }
+    if (isWeakRowAgainstStructure(structure, rowQuantity, rowUnit)) {
+      return fromName;
+    }
+    return fromName;
+  }
+
+  if (structure.tier === "count_size") {
+    if (isRowQtyConflatedWithPurchaseCount(structure, rowQuantity, rowUnit)) {
+      return fromName;
+    }
+    if (isGenericPurchaseUnit(rowUnit)) {
+      return 1;
+    }
+    if (isWeakRowAgainstStructure(structure, rowQuantity, rowUnit)) {
+      return fromName;
+    }
+    return fromName;
+  }
+
+  if (structure.tier === "triple_nested") {
+    if (isRowQtyConflatedWithPurchaseCount(structure, rowQuantity, rowUnit)) {
+      return fromName;
+    }
+    if (isGenericPurchaseUnit(rowUnit)) {
       return Math.max(1, Math.round(rowQuantity));
+    }
+    if (isWeakRowAgainstStructure(structure, rowQuantity, rowUnit)) {
+      return fromName;
     }
     return fromName;
   }
@@ -808,28 +1206,115 @@ export function computeUsableFromPurchaseStructure(
   const hasInner = structure.innerUnitCount != null && structure.innerUnitCount > 1;
   const weakRow = isWeakRowAgainstStructure(structure, rowQuantity, rowUnit);
   const rowConflatedInner = isRowQtyConflatedWithInnerCount(structure, rowQuantity, rowUnit);
-  const weak_scalar_activated = weakRow || rowConflatedInner;
+  const rowConflatedPurchase = isRowQtyConflatedWithPurchaseCount(
+    structure,
+    rowQuantity,
+    rowUnit,
+  );
+  const weak_scalar_activated = weakRow || rowConflatedInner || rowConflatedPurchase;
 
   let total: number;
   let usableSource: UsableQuantitySource;
   let fallbackReason: string | null = null;
 
-  if (hasInner || structure.tier === "triple_nested" || structure.tier === "caixa_units_size") {
-    if (rowConflatedInner || purchaseContainerCount === structure.purchaseQuantity) {
+  if (
+    hasInner ||
+    structure.tier === "triple_nested" ||
+    structure.tier === "caixa_units_size" ||
+    structure.tier === "caixa_compact_size" ||
+    structure.tier === "units_size"
+  ) {
+    const rowMeasure = normalizeMeasureUnit(rowUnit ?? "");
+    const rowBase =
+      rowQuantity != null && rowMeasure && rowMeasure !== "un"
+        ? measureToBase(rowQuantity, rowMeasure)
+        : null;
+    const cartonPartialWeak =
+      weakRow &&
+      rowBase != null &&
+      rowBase.amount < structure.totalUsableAmount * 0.25;
+    if (rowConflatedPurchase) {
+      total = structure.totalUsableAmount;
+      usableSource = "structure_total";
+      fallbackReason = "row qty conflated with purchase count; ignored row g/ml";
+    } else if (cartonPartialWeak && rowBase) {
+      total = rowBase.amount;
+      usableSource = "structure_total";
+      fallbackReason = "weak invoice row g/ml; row amount as partial usable";
+    } else if (
+      rowConflatedInner ||
+      purchaseContainerCount === structure.purchaseQuantity ||
+      structureTotalIsFinalForGenericRow(structure, rowUnit)
+    ) {
       total = structure.totalUsableAmount;
       usableSource = "structure_total";
       if (rowConflatedInner) {
         fallbackReason = "row qty conflated with inner count; ignored row g/ml";
+      } else if (structureTotalIsFinalForGenericRow(structure, rowUnit)) {
+        fallbackReason = "name N×SIZE total is final; generic row does not rescale inner pack";
       }
     } else {
       total = scaleStructureTotal(structure, purchaseContainerCount);
       usableSource = "structure_scaled_outer";
       fallbackReason = `outer count ${purchaseContainerCount} (name ${structure.purchaseQuantity})`;
     }
-  } else if (weakRow) {
+  } else if (structure.tier === "count_size") {
+    const rowMeasure = normalizeMeasureUnit(rowUnit ?? "");
+    const rowBase =
+      rowQuantity != null && rowMeasure && rowMeasure !== "un"
+        ? measureToBase(rowQuantity, rowMeasure)
+        : null;
+    const cartonPartialWeak =
+      weakRow &&
+      rowBase != null &&
+      rowBase.amount < structure.totalUsableAmount * 0.25;
+    if (rowConflatedPurchase) {
+      total = structure.totalUsableAmount;
+      usableSource = "structure_total";
+      fallbackReason = "row qty conflated with purchase count; ignored row g/ml";
+    } else if (cartonPartialWeak && rowBase) {
+      total = rowBase.amount;
+      usableSource = "structure_total";
+      fallbackReason = "weak invoice row g/ml; row amount as partial usable";
+    } else if (
+      isGenericPurchaseUnit(rowUnit) &&
+      rowQuantity != null &&
+      rowQuantity > 0 &&
+      !structureTotalIsFinalForGenericRow(structure, rowUnit)
+    ) {
+      total = Math.max(1, Math.round(rowQuantity)) * structure.totalUsableAmount;
+      usableSource = "structure_scaled_outer";
+      fallbackReason = `generic row unit × N×SIZE pack (${rowQuantity} × ${structure.purchaseQuantity}×${structure.unitSize} ${structure.unitMeasurement})`;
+    } else {
+      total = structure.totalUsableAmount;
+      usableSource = "structure_total";
+      if (structureTotalIsFinalForGenericRow(structure, rowUnit)) {
+        fallbackReason = "count_size total is final; generic row does not rescale inner N×SIZE";
+      }
+    }
+  } else if (rowConflatedPurchase) {
     total = structure.totalUsableAmount;
     usableSource = "structure_total";
-    fallbackReason = "weak invoice row g/ml; using name structure total";
+    fallbackReason = "row qty conflated with purchase count; ignored row g/ml";
+  } else if (weakRow) {
+    const rowMeasure = normalizeMeasureUnit(rowUnit ?? "");
+    const rowBase =
+      rowQuantity != null && rowMeasure && rowMeasure !== "un"
+        ? measureToBase(rowQuantity, rowMeasure)
+        : null;
+    const cartonWeak =
+      rowBase != null &&
+      ((structure.innerUnitCount ?? 1) > 1 || structure.tier === "count_size") &&
+      rowBase.amount < structure.totalUsableAmount * 0.25;
+    if (cartonWeak && rowBase) {
+      total = rowBase.amount;
+      usableSource = "structure_total";
+      fallbackReason = "weak invoice row g/ml; row amount as partial usable";
+    } else {
+      total = structure.totalUsableAmount;
+      usableSource = "structure_total";
+      fallbackReason = "weak invoice row g/ml; using name structure total";
+    }
   } else if (isGenericPurchaseUnit(rowUnit) && rowQuantity != null && rowQuantity > 0) {
     total = Math.max(1, Math.round(rowQuantity)) * perItem.amount;
     usableSource = "structure_recomputed";
@@ -1054,6 +1539,203 @@ function deriveUsableFromInference(
   return { usableQuantity: null, usableUnit: null, unitFamily: null };
 }
 
+function semanticWeightsAreConsistent(lineGrams: number, canonicalGrams: number): boolean {
+  const delta = Math.abs(lineGrams - canonicalGrams);
+  const max = Math.max(lineGrams, canonicalGrams);
+  return delta <= 15 || (max > 0 && delta / max <= 0.15);
+}
+
+function semanticPackFromMeasure(
+  unitSize: number,
+  unitType: "g" | "ml",
+  outerPurchaseQty: number,
+  confidence: number,
+  source: SemanticPackStructure["source"],
+): SemanticPackStructure {
+  const totalUsable = Math.max(1, Math.round(outerPurchaseQty * unitSize));
+  return {
+    perUnitSize: unitSize,
+    usableUnit: unitType,
+    structureMultiplier: 1,
+    outerPurchaseQty,
+    totalUsable,
+    confidence,
+    source,
+  };
+}
+
+/**
+ * Parses g/ml (and nested N×SIZE when per-piece) from a canonical catalog display name.
+ */
+export function extractCanonicalIngredientStructure(
+  canonicalName: string,
+): CanonicalIngredientStructure | null {
+  const trimmed = canonicalName.trim();
+  if (!trimmed) return null;
+
+  const structure = parsePurchaseStructureFromText(trimmed);
+  if (structure && structure.unitMeasurement !== "un") {
+    const perItem = measureToBase(structure.unitSize, structure.unitMeasurement);
+    if (perItem.base !== "g" && perItem.base !== "ml") return null;
+    const inner = structure.innerUnitCount ?? 1;
+    const isCarton =
+      inner > 1 ||
+      structure.tier === "units_size" ||
+      structure.tier === "caixa_units_size" ||
+      structure.tier === "caixa_compact_size" ||
+      structure.tier === "count_size";
+    if (isCarton) {
+      return {
+        unitType: perItem.base,
+        unitSize: structure.unitSize,
+        usableQuantity: perItem.amount,
+        confidence: 0.94,
+      };
+    }
+    return {
+      unitType: perItem.base,
+      unitSize: structure.unitSize,
+      usableQuantity: perItem.amount,
+      confidence: 0.97,
+    };
+  }
+
+  const fromWeight = extractLineWeightGrams(trimmed);
+  if (!fromWeight) return null;
+  return {
+    unitType: "g",
+    unitSize: fromWeight.grams,
+    usableQuantity: fromWeight.grams,
+    confidence: fromWeight.inferredUnit ? 0.9 : 0.96,
+  };
+}
+
+/**
+ * Semantic layer after explicit structure parse: shorthand line number, matched catalog
+ * structure, then inference — before weak OCR / same-as-purchased.
+ */
+export function inferSemanticPackStructure(input: {
+  lineName: string;
+  rowQuantity: number | null;
+  rowUnit: string | null;
+  matchedIngredientName?: string | null;
+  inferred?: StockInferenceHints | null;
+}): SemanticPackStructure | null {
+  if (!isGenericPurchaseUnit(input.rowUnit)) return null;
+
+  const lineName = input.lineName.trim();
+  if (hasPackCountInferenceSignal(lineName)) return null;
+
+  const isShorthandLine = looksLikeInvoiceShorthandName(lineName);
+  const matchedName = input.matchedIngredientName?.trim() ?? "";
+  if (!isShorthandLine && !matchedName) return null;
+
+  const outerPurchaseQty =
+    input.rowQuantity != null && Number.isFinite(input.rowQuantity) && input.rowQuantity > 0
+      ? Math.max(1, Math.round(input.rowQuantity))
+      : 1;
+
+  const lineWeight =
+    isShorthandLine && !hasBakeryPieceThenUnitCount(lineName)
+      ? extractLineWeightGrams(lineName)
+      : null;
+  const canonicalStructure = matchedName
+    ? extractCanonicalIngredientStructure(matchedName)
+    : null;
+
+  if (lineWeight && canonicalStructure) {
+    const canonicalGrams = canonicalStructure.usableQuantity;
+    if (semanticWeightsAreConsistent(lineWeight.grams, canonicalGrams)) {
+      return semanticPackFromMeasure(
+        lineWeight.grams,
+        canonicalStructure.unitType,
+        outerPurchaseQty,
+        Math.min(0.98, canonicalStructure.confidence + 0.02),
+        "line_canonical_consistent",
+      );
+    }
+  }
+
+  if (lineWeight) {
+    return semanticPackFromMeasure(
+      lineWeight.grams,
+      "g",
+      outerPurchaseQty,
+      lineWeight.inferredUnit ? 0.9 : 0.95,
+      "embedded_title_weight",
+    );
+  }
+
+  if (canonicalStructure) {
+    return semanticPackFromMeasure(
+      canonicalStructure.unitSize,
+      canonicalStructure.unitType,
+      outerPurchaseQty,
+      canonicalStructure.confidence,
+      "matched_ingredient_structure",
+    );
+  }
+
+  if (matchedName) {
+    const fromMatch = extractLineWeightGrams(matchedName);
+    if (fromMatch) {
+      return semanticPackFromMeasure(
+        fromMatch.grams,
+        "g",
+        outerPurchaseQty,
+        fromMatch.inferredUnit ? 0.88 : 0.93,
+        "matched_ingredient_weight",
+      );
+    }
+  }
+
+  const inferred = input.inferred;
+  if (
+    isShorthandLine &&
+    inferred?.normalized_stock_quantity != null &&
+    inferred.stock_unit
+  ) {
+    const stockUnit = inferred.stock_unit === "L" ? "ml" : inferred.stock_unit;
+    if (stockUnit === "g" || stockUnit === "ml") {
+      const perUnit = Math.max(1, Math.round(inferred.normalized_stock_quantity));
+      return semanticPackFromMeasure(perUnit, stockUnit, outerPurchaseQty, 0.86, "inference_hint");
+    }
+  }
+
+  return null;
+}
+
+/** Resolves total usable g/ml from semantic pack structure + invoice row count. */
+export function resolveSemanticUsableQuantity(input: {
+  lineName: string;
+  rowQuantity: number | null;
+  rowUnit: string | null;
+  matchedIngredientName?: string | null;
+  inferred?: StockInferenceHints | null;
+}): SemanticPackStructure | null {
+  return inferSemanticPackStructure(input);
+}
+
+/**
+ * Infers per-piece g/ml for invoice shorthand (`BRCH 80`, `ANG PTY 180`) when the row is a
+ * generic unit count. Delegates to {@link inferSemanticPackStructure}.
+ */
+export function inferShorthandUsableFromContext(input: {
+  name: string;
+  rowQuantity: number | null;
+  rowUnit: string | null;
+  matchedIngredientName?: string | null;
+  inferred?: StockInferenceHints | null;
+}): ShorthandUsableInference | null {
+  return inferSemanticPackStructure({
+    lineName: input.name,
+    rowQuantity: input.rowQuantity,
+    rowUnit: input.rowUnit,
+    matchedIngredientName: input.matchedIngredientName,
+    inferred: input.inferred,
+  });
+}
+
 /**
  * Deterministic purchase → usable stock resolution.
  */
@@ -1109,6 +1791,42 @@ export function normalizePurchasedToUsableStock(input: StockNormalizeInput): Sto
       structureTotal: structure.totalUsableAmount,
     });
     logStockNormalize("result", { ...result, structure: summarizePurchaseStructure(structure) });
+    return result;
+  }
+
+  const shorthand = resolveSemanticUsableQuantity({
+    lineName: input.name,
+    rowQuantity,
+    rowUnit: input.rowUnit,
+    matchedIngredientName: input.matchedIngredientName,
+    inferred: input.inferred,
+  });
+  if (shorthand) {
+    const unitFamily: UnitFamily = shorthand.usableUnit === "g" ? "mass" : "volume";
+    const result: StockNormalizeResult = {
+      explicitPhrase: null,
+      purchaseStructure: null,
+      purchaseContainerCount: shorthand.outerPurchaseQty,
+      packQuantity: shorthand.perUnitSize,
+      packUnit: shorthand.usableUnit,
+      usableQuantity: shorthand.totalUsable,
+      usableUnit: shorthand.usableUnit,
+      unitFamily,
+      source: "inference",
+      pipelineId: "unified",
+      reason: `shorthand usable (${shorthand.source})`,
+    };
+    logStockUsableSource({
+      name: input.name,
+      structure: null,
+      computedTotal: shorthand.totalUsable,
+      structureTotal: null,
+      usableSource: "inference",
+      fallbackReason: shorthand.source,
+      rowQuantity: input.rowQuantity,
+      rowUnit: input.rowUnit,
+    });
+    logStockNormalize("result", result);
     return result;
   }
 

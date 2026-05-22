@@ -30,6 +30,11 @@ import {
   logCatalogLeakDiagnostics,
   logNearDuplicateCanonicalClusters,
 } from "@/lib/ingredient-catalog-diagnostics";
+import {
+  detectOrphanCanonicalIngredients,
+  filterOperationallyActiveCatalog,
+  INGREDIENT_ORPHAN_LOG_PREFIX,
+} from "@/lib/ingredient-orphan-detection";
 import type { Database } from "@/integrations/supabase/types";
 
 type CatalogClient = SupabaseClient<Database>;
@@ -228,5 +233,23 @@ export async function loadCanonicalIngredientCatalog(
     canonical,
     "loadCanonicalIngredientCatalog:after-filter",
   );
-  return { rows: canonical, error: null };
+
+  const { reports: orphanReports, error: orphanError } =
+    await detectOrphanCanonicalIngredients(client, canonical);
+  if (orphanError) {
+    return { rows: [], error: orphanError };
+  }
+
+  const operationallyActive = filterOperationallyActiveCatalog(canonical, orphanReports);
+  const hiddenOrphanIds = canonical
+    .filter((entry) => entry.id?.trim() && !operationallyActive.some((row) => row.id === entry.id))
+    .map((entry) => entry.id);
+  if (hiddenOrphanIds.length > 0) {
+    console.info(INGREDIENT_ORPHAN_LOG_PREFIX, "catalog_load_hidden_orphans", {
+      count: hiddenOrphanIds.length,
+      ingredientIds: hiddenOrphanIds,
+    });
+  }
+
+  return { rows: operationallyActive, error: null };
 }

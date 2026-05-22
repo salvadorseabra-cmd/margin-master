@@ -9,8 +9,11 @@ import { looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
 import {
   buildCatalogIngredientIdentity,
   formatCanonicalIngredientDisplayName,
-  suggestCanonicalIngredientIdentityName,
 } from "@/lib/canonical-ingredient-display-name";
+import {
+  generateOperationalIngredientName,
+  shouldBlockCanonicalNameOnCreate,
+} from "@/lib/canonical-ingredient-operational-name";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 import {
   getAliasTraceCompareBucket,
@@ -108,7 +111,7 @@ export function validateCanonicalIngredientName(
     );
     return { ok: false, message: "Enter a valid catalog ingredient name." };
   }
-  if (looksLikeInvoiceShorthandName(name)) {
+  if (shouldBlockCanonicalNameOnCreate(name)) {
     traceIngredientAliasesShorthandRejection("validateCanonicalIngredientName", "shorthand_name", {
       rawName: name,
       compareBucket: getAliasTraceCompareBucket(name),
@@ -159,9 +162,8 @@ export function buildCanonicalIngredientCreateDefaults(
         : null;
 
   let suggestedCanonicalName = looksLikeInvoiceShorthandName(invoiceAlias)
-    ? null
-    : formatCanonicalIngredientDisplayName(suggestCanonicalIngredientIdentityName(invoiceAlias)) ||
-      null;
+    ? generateOperationalIngredientName(invoiceAlias) || null
+    : formatCanonicalIngredientDisplayName(invoiceAlias) || null;
   if (
     suggestedCanonicalName &&
     confirmedNameMatchesInvoiceAlias(suggestedCanonicalName, invoiceAlias)

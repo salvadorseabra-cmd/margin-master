@@ -33,6 +33,19 @@ function selectChain(result: MockResult) {
   };
 }
 
+const ORPHAN_DEPENDENCY_TABLES = new Set([
+  "ingredient_aliases",
+  "recipe_ingredients",
+  "ingredient_price_history",
+  "recipe_margin_impacts",
+]);
+
+function mockOrphanDependencySelect() {
+  return {
+    in: () => Promise.resolve({ data: [], error: null }),
+  };
+}
+
 function mockCatalogClient(
   rows: IngredientCanonicalInput[],
   options?: {
@@ -47,8 +60,11 @@ function mockCatalogClient(
   const archiveExists = options?.archiveColumnsExist ?? true;
 
   const client = {
-    from: () => ({
+    from: (table: string) => ({
       select: (select: string) => {
+        if (ORPHAN_DEPENDENCY_TABLES.has(table)) {
+          return mockOrphanDependencySelect();
+        }
         if (select === "is_archived") {
           const probeResult = {
             data: [],
@@ -304,6 +320,38 @@ describe("loadCanonicalIngredientCatalog", () => {
     const { rows: canonical, error } = await loadCanonicalIngredientCatalog(client);
     expect(error).toBeNull();
     expect(canonical.map((row) => row.id)).toEqual(["chk-canonical"]);
+  });
+
+  it("hides operationally orphaned canonicals from human-facing catalog load", async () => {
+    const rows = [
+      ingredient("palha", "PALHA", { ingredient_kind: "canonical" }),
+      ingredient("batata", "Batata palha", { ingredient_kind: "canonical" }),
+    ];
+    const base = mockCatalogClient(rows);
+    const client = {
+      from: (table: string) => {
+        if (table === "ingredients") return base.client.from(table);
+        if (!ORPHAN_DEPENDENCY_TABLES.has(table)) {
+          throw new Error(`unexpected table ${table}`);
+        }
+        return {
+          select: () => ({
+            in: () =>
+              Promise.resolve({
+                data:
+                  table === "ingredient_aliases"
+                    ? [{ ingredient_id: "batata", supplier_name: "Metro" }]
+                    : [],
+                error: null,
+              }),
+          }),
+        };
+      },
+    } as never;
+
+    const { rows: canonical, error } = await loadCanonicalIngredientCatalog(client);
+    expect(error).toBeNull();
+    expect(canonical.map((row) => row.id)).toEqual(["batata"]);
   });
 
   it("feeds recipe/invoice picker with canonical rows only (no CHK BREADED)", async () => {

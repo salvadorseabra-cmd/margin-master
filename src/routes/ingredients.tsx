@@ -5,10 +5,14 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import type { Tables } from "@/integrations/supabase/types";
-import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
+import {
+  buildCatalogIngredientIdentity,
+  formatCanonicalIngredientDisplayName,
+} from "@/lib/canonical-ingredient-display-name";
+import { shouldBlockCanonicalNameOnCreate } from "@/lib/canonical-ingredient-operational-name";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 import { guardIngredientCreation } from "@/lib/ingredient-operational-identity";
-import { INGREDIENT_KIND_CANONICAL, looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
+import { INGREDIENT_KIND_CANONICAL } from "@/lib/ingredient-kind";
 import { INGREDIENT_CREATE_LOG_PREFIX } from "@/lib/ingredient-auto-persist";
 import {
   effectiveIngredientUnitCostEur,
@@ -162,7 +166,15 @@ function IngredientsIndexPage() {
     if (!user) return;
     setSaving(true);
     setError(null);
-    const name = formatCanonicalIngredientDisplayName(form.name.trim());
+    const rawName = form.name.trim();
+    if (shouldBlockCanonicalNameOnCreate(rawName)) {
+      setSaving(false);
+      setError(
+        "Use a full product name for the catalog. Invoice shorthand belongs in alias memory.",
+      );
+      return;
+    }
+    const { name, normalized_name: normalizedName } = buildCatalogIngredientIdentity(rawName);
     const unit = form.unit.trim() || "kg";
     const pq = Number(form.purchase_quantity);
     const purchase_quantity = Number.isFinite(pq) && pq > 0 ? pq : 1;
@@ -174,13 +186,6 @@ function IngredientsIndexPage() {
       name: row.name,
       normalized_name: row.normalized_name,
     }));
-    if (looksLikeInvoiceShorthandName(name)) {
-      setSaving(false);
-      setError(
-        "Use a full product name for the catalog. Invoice shorthand belongs in alias memory.",
-      );
-      return;
-    }
 
     const guard = guardIngredientCreation(name, catalog, {
       flowFunction: "IngredientsPage.saveNewIngredient",
@@ -195,7 +200,6 @@ function IngredientsIndexPage() {
       return;
     }
 
-    const normalizedName = normalizeIngredientName(name);
     traceCanonicalCreateNameSource({
       flowFunction: "IngredientsPage.saveNewIngredient",
       flowOrigin: "manual_form",

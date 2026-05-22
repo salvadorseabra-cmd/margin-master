@@ -2,17 +2,23 @@ import { describe, expect, it } from "vitest";
 import {
   resolveInvoiceLinePurchaseFormat,
   resolveInvoiceLineStockPresentation,
+  resolveInvoicePurchaseDisplayLabel,
 } from "./invoice-purchase-format";
 import {
   computeUsableFromPurchaseStructure,
   deriveUsableFromPackPhrase,
+  extractCanonicalIngredientStructure,
   extractNumericMeasureTokens,
+  inferSemanticPackStructure,
+  inferShorthandUsableFromContext,
   isWeakInvoiceRowContentMeasure,
   measureToBase,
   normalizePurchasedToUsableStock,
   parsePurchaseStructureFromText,
   pickExplicitPackPhrase,
   purchaseStructureMultiplierChain,
+  purchaseStructureToPackPhrase,
+  resolveSemanticUsableQuantity,
   summarizePurchaseStructure,
   type NormalizedPackPhrase,
 } from "./stock-normalization";
@@ -123,6 +129,72 @@ describe("parsePurchaseStructureFromText", () => {
       unitSize: 180,
       unitMeasurement: "g",
       totalUsableAmount: 7200,
+      usableUnit: "g",
+    },
+    {
+      name: "24x80g",
+      tier: "count_size",
+      purchaseQuantity: 24,
+      unitSize: 80,
+      unitMeasurement: "g",
+      totalUsableAmount: 1920,
+      usableUnit: "g",
+    },
+    {
+      name: "24X80G",
+      tier: "count_size",
+      purchaseQuantity: 24,
+      unitSize: 80,
+      unitMeasurement: "g",
+      totalUsableAmount: 1920,
+      usableUnit: "g",
+    },
+    {
+      name: "24 un x 80 g",
+      tier: "units_size",
+      purchaseQuantity: 1,
+      innerUnitCount: 24,
+      unitSize: 80,
+      unitMeasurement: "g",
+      totalUsableAmount: 1920,
+      usableUnit: "g",
+    },
+    {
+      name: "40 un x 180 g",
+      tier: "units_size",
+      purchaseQuantity: 1,
+      innerUnitCount: 40,
+      unitSize: 180,
+      unitMeasurement: "g",
+      totalUsableAmount: 7200,
+      usableUnit: "g",
+    },
+    {
+      name: "Caixa 24x80g",
+      tier: "caixa_compact_size",
+      purchaseQuantity: 1,
+      innerUnitCount: 24,
+      unitSize: 80,
+      unitMeasurement: "g",
+      totalUsableAmount: 1920,
+      usableUnit: "g",
+    },
+    {
+      name: "Pack 6 x 1 L",
+      tier: "container_size",
+      purchaseQuantity: 6,
+      unitSize: 1,
+      unitMeasurement: "L",
+      totalUsableAmount: 6000,
+      usableUnit: "ml",
+    },
+    {
+      name: "Pão Hamb. Brioche 80g 24x80g",
+      tier: "count_size",
+      purchaseQuantity: 24,
+      unitSize: 80,
+      unitMeasurement: "g",
+      totalUsableAmount: 1920,
       usableUnit: "g",
     },
   ])("parses $name", ({ name, tier, purchaseQuantity, innerUnitCount, unitSize, unitMeasurement, totalUsableAmount, usableUnit }) => {
@@ -608,5 +680,259 @@ describe("computeUsableFromPurchaseStructure", () => {
     const derived = computeUsableFromPurchaseStructure(structure!, 4, "ml");
     expect(derived.usableQuantity).toBe(31680);
     expect(derived.usableUnit).toBe("ml");
+  });
+});
+
+describe("bakery and compact purchase structures", () => {
+  it.each([
+    { name: "24x80g", usable: 1920 },
+    { name: "40 un x 180 g", usable: 7200 },
+    { name: "Pack 6 x 1 L", usable: 6000 },
+  ] as const)("$name → $usable usable", ({ name, usable }) => {
+    const stock = normalizePurchasedToUsableStock({
+      name,
+      namePhrase: null,
+      rowPhrase: null,
+      rowQuantity: null,
+      rowUnit: null,
+    });
+    expect(stock.usableQuantity).toBe(usable);
+    expect(stock.source).toBe("purchase_structure");
+  });
+
+  it("Pão Batata 80g with weak row 60g and 24x80g in name → 60g usable", () => {
+    const name = "Pão Batata 80g 24x80g";
+    const structure = parsePurchaseStructureFromText(name);
+    expect(structure?.totalUsableAmount).toBe(1920);
+    const derived = computeUsableFromPurchaseStructure(structure!, 60, "g");
+    expect(derived.usableQuantity).toBe(60);
+    expect(derived.weak_scalar_activated).toBe(true);
+
+    const stock = normalizePurchasedToUsableStock({
+      name,
+      namePhrase: null,
+      rowPhrase: null,
+      rowQuantity: 60,
+      rowUnit: "g",
+    });
+    expect(stock.usableQuantity).toBe(60);
+  });
+
+  it("Pão Batata 80g caixa 24 with weak row 60g → 60g usable", () => {
+    const name = "Pão Batata 80g caixa 24";
+    const structure = parsePurchaseStructureFromText(name);
+    expect(structure?.tier).toBe("caixa_compact_size");
+    expect(structure?.totalUsableAmount).toBe(1920);
+    const stock = normalizePurchasedToUsableStock({
+      name,
+      namePhrase: null,
+      rowPhrase: null,
+      rowQuantity: 60,
+      rowUnit: "g",
+    });
+    expect(stock.usableQuantity).toBe(60);
+  });
+
+  it("brioche 24x80g pack phrase keeps unit count × unit size for display", () => {
+    const structure = parsePurchaseStructureFromText("Pão Hamb. Brioche 80g 24x80g");
+    expect(structure).not.toBeNull();
+    const phrase = purchaseStructureToPackPhrase(structure!);
+    expect(phrase).toMatchObject({
+      kind: "multi_unit_pack",
+      containerCount: 24,
+      packageQuantity: 80,
+      packageUnit: "g",
+    });
+
+    const resolved = resolveInvoiceLinePurchaseFormat({
+      name: "Pão Hamb. Brioche 80g 24x80g",
+      quantity: 1,
+      unit: "un",
+    });
+    expect(resolveInvoicePurchaseDisplayLabel({
+      name: "Pão Hamb. Brioche 80g 24x80g",
+      quantity: 1,
+      unit: "un",
+    })).toBe("24 x 80 g");
+    expect(resolved.normalizedUsableQuantity).toBe(1920);
+  });
+
+  it("ignores OCR 1 pack x 120 g when title already has per-piece 80g and 24x80g", () => {
+    const structure = parsePurchaseStructureFromText(
+      "Pão Hamb. Brioche 80g 24x80g 1 pack x 120 g",
+    );
+    expect(structure?.tier).toBe("count_size");
+    expect(structure?.purchaseQuantity).toBe(24);
+    expect(structure?.unitSize).toBe(80);
+    expect(structure?.totalUsableAmount).toBe(1920);
+  });
+
+  it("malformed OCR row g/ml does not replace compact structure total", () => {
+    const stock = normalizePurchasedToUsableStock({
+      name: "24x80g",
+      namePhrase: null,
+      rowPhrase: null,
+      rowQuantity: 24,
+      rowUnit: "g",
+    });
+    expect(stock.usableQuantity).toBe(1920);
+  });
+
+  it.each([
+    { name: "24x80g", rowQuantity: 2, rowUnit: "un", usable: 1920 },
+    { name: "12x90g", rowQuantity: 1, rowUnit: "un", usable: 1080 },
+    { name: "6x1L", rowQuantity: 1, rowUnit: "un", usable: 6000 },
+  ] as const)(
+    "$name row $rowQuantity $rowUnit stays at $usable (no inner rescale)",
+    ({ name, rowQuantity, rowUnit, usable }) => {
+      const resolved = resolveInvoiceLinePurchaseFormat({
+        name,
+        quantity: rowQuantity,
+        unit: rowUnit,
+      });
+      expect(resolved.normalizedUsableQuantity).toBe(usable);
+      expect(resolveInvoiceLineStockPresentation({ name, quantity: rowQuantity, unit: rowUnit }).quantityLabel).toMatch(
+        new RegExp(String(usable >= 1000 ? usable / 1000 : usable)),
+      );
+    },
+  );
+
+  it("2 caixas x 24x80g with row 2 un → 3840g", () => {
+    const resolved = resolveInvoiceLinePurchaseFormat({
+      name: "2 caixas x 24x80g",
+      quantity: 2,
+      unit: "un",
+    });
+    expect(resolved.normalizedUsableQuantity).toBe(3840);
+    expect(resolved.usableQuantityUnit).toBe("g");
+  });
+});
+
+describe("extractCanonicalIngredientStructure", () => {
+  it.each([
+    { name: "Pão hambúrguer brioche 80g", unitSize: 80, unitType: "g" as const },
+    { name: "Hambúrguer bovino 180g", unitSize: 180, unitType: "g" as const },
+    { name: "Smash Burger Patty 90g", unitSize: 90, unitType: "g" as const },
+  ])("parses $name", ({ name, unitSize, unitType }) => {
+    const structure = extractCanonicalIngredientStructure(name);
+    expect(structure).toMatchObject({ unitSize, unitType, usableQuantity: unitSize });
+    expect(structure?.confidence).toBeGreaterThanOrEqual(0.9);
+  });
+});
+
+describe("invoice shorthand semantic usable", () => {
+  it.each([
+    {
+      name: "BRCH 80",
+      matchedIngredientName: "Pão hambúrguer brioche 80g",
+      rowQuantity: 1,
+      rowUnit: "un",
+      usable: 80,
+      expectSource: "line_canonical_consistent" as const,
+    },
+    {
+      name: "SES BUN 80",
+      matchedIngredientName: "Pão hambúrguer brioche 80g",
+      rowQuantity: 1,
+      rowUnit: "un",
+      usable: 80,
+      expectSource: "line_canonical_consistent" as const,
+    },
+    {
+      name: "BRCH BUN",
+      matchedIngredientName: "Pão hambúrguer brioche 80g",
+      rowQuantity: 1,
+      rowUnit: "un",
+      usable: 80,
+      expectSource: "matched_ingredient_structure" as const,
+    },
+    {
+      name: "ANG PTY 180",
+      matchedIngredientName: null,
+      rowQuantity: 1,
+      rowUnit: "un",
+      usable: 180,
+      expectSource: "embedded_title_weight" as const,
+    },
+    {
+      name: "SMASH PTY 90",
+      matchedIngredientName: "Smash Burger Patty 90g",
+      rowQuantity: 2,
+      rowUnit: "un",
+      usable: 180,
+      expectSource: "line_canonical_consistent" as const,
+    },
+  ] as const)(
+    "$name → $usable g usable",
+    ({ name, matchedIngredientName, rowQuantity, rowUnit, usable, expectSource }) => {
+      const inferred = inferSemanticPackStructure({
+        lineName: name,
+        rowQuantity,
+        rowUnit,
+        matchedIngredientName,
+      });
+      expect(inferred?.totalUsable).toBe(usable);
+      expect(inferred?.usableUnit).toBe("g");
+      if (expectSource) {
+        expect(inferred?.source).toBe(expectSource);
+      }
+      expect(
+        resolveSemanticUsableQuantity({
+          lineName: name,
+          rowQuantity,
+          rowUnit,
+          matchedIngredientName,
+        })?.totalUsable,
+      ).toBe(usable);
+
+      const resolved = resolveInvoiceLinePurchaseFormat({
+        name,
+        quantity: rowQuantity,
+        unit: rowUnit,
+        matchedIngredientName,
+      });
+      expect(resolved.normalizedUsableQuantity).toBe(usable);
+      expect(resolved.usableQuantityUnit).toBe("g");
+      expect(resolved.kind).toBe("weight_or_volume");
+      const perPiece =
+        rowQuantity > 1 ? Math.round(usable / rowQuantity) : usable;
+      expect(resolveInvoicePurchaseDisplayLabel({
+        name,
+        quantity: rowQuantity,
+        unit: rowUnit,
+        matchedIngredientName,
+      })).toMatch(new RegExp(`${perPiece}\\s*g`, "i"));
+      const presentation = resolveInvoiceLineStockPresentation({
+        name,
+        quantity: rowQuantity,
+        unit: rowUnit,
+        matchedIngredientName,
+      });
+      expect(presentation.quantityLabel).toMatch(new RegExp(`${usable}\\s*g`, "i"));
+    },
+  );
+
+  it("does not invent usable weight without shorthand or match signal", () => {
+    expect(
+      inferShorthandUsableFromContext({
+        name: "Tomate cherry premium",
+        rowQuantity: 1,
+        rowUnit: "un",
+        matchedIngredientName: null,
+      }),
+    ).toBeNull();
+
+    const resolved = resolveInvoiceLinePurchaseFormat({
+      name: "Tomate cherry premium",
+      quantity: 1,
+      unit: "un",
+    });
+    expect(resolved.normalizedUsableQuantity).not.toBe(1);
+    const label = resolveInvoiceLineStockPresentation({
+      name: "Tomate cherry premium",
+      quantity: 1,
+      unit: "un",
+    }).quantityLabel;
+    expect(label == null || !/^1\s*g\s+usable$/i.test(label)).toBe(true);
   });
 });

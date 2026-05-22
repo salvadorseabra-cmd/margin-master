@@ -12,6 +12,7 @@ import {
   type PackageType,
   type UnitInferenceResult,
 } from "@/lib/ingredient-unit-inference";
+import { looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
 import {
   isWeakInvoiceRowContentMeasure,
   logStockGramMlTrace,
@@ -70,6 +71,8 @@ export type InvoiceLinePurchaseInput = {
   name: string;
   quantity?: number | null;
   unit?: string | null;
+  /** Matched catalog display name — used for shorthand per-piece weight when the line has no pack structure. */
+  matchedIngredientName?: string | null;
 };
 
 type ParsedPhrase = {
@@ -204,16 +207,22 @@ function parsedPhraseFromPurchaseStructure(structure: PurchaseStructure): Parsed
           ? "unit_count"
           : "weight_or_volume";
 
+  const containerCount = hasInner
+    ? structure.innerUnitCount ?? structure.purchaseQuantity
+    : structure.tier === "count_size"
+      ? structure.purchaseQuantity
+      : structure.purchaseQuantity;
+
   return {
     kind,
-    containerCount: structure.purchaseQuantity,
+    containerCount,
     containerUnit:
       structure.tier === "bare_measure" || structure.tier === "count_size"
         ? structure.unitMeasurement
         : structure.purchaseFormat === "unit"
           ? structure.innerUnitType ?? "un"
           : structure.purchaseFormat,
-    packageQuantity: hasInner ? structure.innerUnitCount : structure.unitSize,
+    packageQuantity: structure.unitSize,
     packageUnit: structure.unitMeasurement,
     matchedText: structure.matchedText,
     confidence: 0.98,
@@ -435,6 +444,49 @@ function pipelineIdFromStock(stock: StockNormalizeResult): StockNormalizationPip
   return stock.pipelineId;
 }
 
+function isSemanticShorthandStock(
+  stock: StockNormalizeResult,
+  item: InvoiceLinePurchaseInput,
+): boolean {
+  if (!stock.reason.startsWith("shorthand usable")) return false;
+  const name = String(item.name ?? "").trim();
+  const hasMatch = Boolean(item.matchedIngredientName?.trim());
+  if (!looksLikeInvoiceShorthandName(name) && !hasMatch) return false;
+  return (
+    stock.source === "inference" &&
+    stock.pipelineId === "unified" &&
+    stock.usableUnit != null &&
+    stock.usableUnit !== "un" &&
+    stock.packQuantity != null &&
+    stock.packUnit != null &&
+    stock.packUnit !== "un"
+  );
+}
+
+/** Maps semantic shorthand stock (per-piece g/ml) into structured purchase fields for display. */
+function structuredFromSemanticShorthandStock(
+  stock: StockNormalizeResult,
+  name: string,
+  rowUnit: string | null,
+  inferred: UnitInferenceResult,
+): StructuredPurchaseFormat {
+  return {
+    kind: "weight_or_volume",
+    ingredientIdentityHint: name,
+    purchaseContainerCount: stock.purchaseContainerCount,
+    purchaseContainerUnit: rowUnit?.trim() || "un",
+    packageQuantity: stock.packQuantity,
+    packageMeasurementUnit: stock.packUnit as PackageMeasureUnit,
+    normalizedUsableQuantity: stock.usableQuantity,
+    usableQuantityUnit: stock.usableUnit,
+    packageType: inferred.package_type,
+    inferred,
+    confidence: 0.94,
+    reason: stock.reason,
+    stockNormalizationPipeline: pipelineIdFromStock(stock),
+  };
+}
+
 function structuredFromExplicitPhrase(
   explicit: ParsedPhrase,
   stock: StockNormalizeResult,
@@ -442,14 +494,19 @@ function structuredFromExplicitPhrase(
   inferred: UnitInferenceResult,
 ): StructuredPurchaseFormat {
   const structure = stock.purchaseStructure;
-  const packageQuantity =
-    structure?.innerUnitCount != null ? structure.innerUnitCount : explicit.packageQuantity;
+  const packageQuantity = structure?.unitSize ?? explicit.packageQuantity;
   const packageUnit = structure?.unitMeasurement ?? explicit.packageUnit;
+  const purchaseContainerCount =
+    structure?.innerUnitCount != null && structure.innerUnitCount > 1
+      ? structure.innerUnitCount
+      : structure?.tier === "count_size"
+        ? structure.purchaseQuantity
+        : stock.purchaseContainerCount;
 
   return {
     kind: explicit.kind,
     ingredientIdentityHint: stripMatchedPurchaseText(name, explicit.matchedText),
-    purchaseContainerCount: stock.purchaseContainerCount,
+    purchaseContainerCount,
     purchaseContainerUnit: explicit.containerUnit,
     packageQuantity,
     packageMeasurementUnit: packageUnit,
@@ -544,6 +601,7 @@ export function resolveInvoiceLinePurchaseFormat(
     rowQuantity,
     rowUnit,
     inferred: inferenceHintsFromResult(inferred),
+    matchedIngredientName: item.matchedIngredientName ?? null,
   });
 
   logStockNormalize("resolve_line", {
@@ -570,6 +628,12 @@ export function resolveInvoiceLinePurchaseFormat(
     unitSize: stock.purchaseStructure?.unitSize ?? null,
     structureTotal: stock.purchaseStructure?.totalUsableAmount ?? null,
   });
+
+  if (isSemanticShorthandStock(stock, item)) {
+    return sanitizeStructuredUsable(
+      structuredFromSemanticShorthandStock(stock, name, rowUnit, inferred),
+    );
+  }
 
   if (stock.source === "explicit_phrase" || stock.source === "purchase_structure") {
     const phraseForStructured =
@@ -744,6 +808,7 @@ function backfillUsableFromPackageFields(
     rowQuantity,
     rowUnit,
     inferred: inferenceHintsFromResult(structured.inferred),
+    matchedIngredientName: null,
   });
 
   if (stock.usableQuantity == null || !stock.usableUnit) return structured;

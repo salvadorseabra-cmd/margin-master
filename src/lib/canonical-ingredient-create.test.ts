@@ -74,7 +74,7 @@ describe("buildCanonicalIngredientCreateDefaults", () => {
       supplierName: "Metro",
     });
     expect(defaults.invoiceAlias).toBe("ANGUS PTY");
-    expect(defaults.suggestedCanonicalName).toBeNull();
+    expect(defaults.suggestedCanonicalName).toBe("Angus patty");
     expect(defaults.supplierName).toBe("Metro");
     expect(defaults.current_price).toBe("12.5");
     expect(defaults.itemId).toBe("item-1");

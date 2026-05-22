@@ -10,10 +10,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import {
-  formatCanonicalIngredientDisplayName,
-  suggestCanonicalIngredientIdentityName,
-} from "@/lib/canonical-ingredient-display-name";
+import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
+import { generateOperationalIngredientName } from "@/lib/canonical-ingredient-operational-name";
+import { looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
 
 type CanonicalIngredientRenameDialogProps = {
   open: boolean;
@@ -51,12 +50,21 @@ export function CanonicalIngredientRenameDialog({
     ? formatCanonicalIngredientDisplayName(canonicalName)
     : "";
 
-  const cleanedSuggestion = currentName.trim()
-    ? formatCanonicalIngredientDisplayName(suggestCanonicalIngredientIdentityName(currentName))
+  const operationalSuggestion = currentName.trim()
+    ? generateOperationalIngredientName(currentName)
     : "";
-  const showSuggestion =
+  const cleanedSuggestion = currentName.trim()
+    ? formatCanonicalIngredientDisplayName(currentName)
+    : "";
+  const applyOperationalName =
+    looksLikeInvoiceShorthandName(currentName) && Boolean(operationalSuggestion);
+  const showCleanedSuggestion =
     Boolean(cleanedSuggestion) &&
-    cleanedSuggestion !== formatCanonicalIngredientDisplayName(currentName);
+    cleanedSuggestion !== formatCanonicalIngredientDisplayName(currentName) &&
+    !applyOperationalName;
+  const showOperationalSuggestion =
+    applyOperationalName &&
+    operationalSuggestion !== formatCanonicalIngredientDisplayName(currentName);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -86,7 +94,24 @@ export function CanonicalIngredientRenameDialog({
                 <span className="font-medium text-foreground">{preview}</span>
               </p>
             )}
-            {showSuggestion && (
+            {showOperationalSuggestion && (
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <span>
+                  Operational name:{" "}
+                  <span className="font-medium text-foreground">{operationalSuggestion}</span>
+                </span>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  disabled={saving}
+                  onClick={() => setCanonicalName(operationalSuggestion)}
+                >
+                  Apply operational name
+                </Button>
+              </div>
+            )}
+            {showCleanedSuggestion && (
               <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span>
                   Suggested:{" "}
