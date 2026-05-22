@@ -16,6 +16,8 @@ export type RecentPurchaseRow = {
   supplierLabel: string;
   dateLabel: string;
   priceLabel: string;
+  /** Short invoice line wording for timeline display (no ids or match metadata). */
+  productHint?: string | null;
 };
 
 function normalizeProductNameKey(value: string): string {
@@ -129,6 +131,7 @@ export function buildRecentPurchases(
         normalizeSupplierDisplayName(product.supplierName) || "Unknown supplier",
       dateLabel: formatPurchaseDate(product.invoiceDate),
       priceLabel: formatPurchasePrice(product),
+      productHint: product.itemName?.trim() || null,
     }));
 }
 

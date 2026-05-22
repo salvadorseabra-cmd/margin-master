@@ -39,6 +39,12 @@ import {
 } from "@/lib/canonical-ingredient-rename";
 import { traceFoodCostRecalculationSource } from "@/lib/recipe-canonical-graph-trace";
 import { loadCanonicalIngredientCatalog } from "@/lib/ingredient-catalog-load";
+import { getVolatileIngredients } from "@/lib/ingredient-price-history";
+import {
+  deriveIngredientListGlanceSignals,
+  ingredientListGlanceDotClassName,
+  ingredientListGlanceTitle,
+} from "@/lib/ingredient-list-glance-signals";
 import {
   traceCanonicalCreateAttempt,
   traceCanonicalCreateNameSource,
@@ -81,6 +87,7 @@ function IngredientsIndexPage() {
   const [recipeLinkActivity, setRecipeLinkActivity] = useState<Record<string, RecipeLinkActivity>>(
     {},
   );
+  const [volatileIngredientIds, setVolatileIngredientIds] = useState<Set<string>>(new Set());
   const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -195,8 +202,9 @@ function IngredientsIndexPage() {
       if (ingredientIds.length === 0) {
         setPriceActivity({});
         setRecipeLinkActivity({});
+        setVolatileIngredientIds(new Set());
       } else {
-        const [{ data: historyData }, { data: linkData }] = await Promise.all([
+        const [{ data: historyData }, { data: linkData }, volatileRows] = await Promise.all([
           supabase
             .from("ingredient_price_history")
             .select("ingredient_id, created_at, delta, delta_percent")
@@ -206,7 +214,12 @@ function IngredientsIndexPage() {
             .from("recipe_ingredients")
             .select("ingredient_id, created_at")
             .in("ingredient_id", ingredientIds),
+          getVolatileIngredients(supabase),
         ]);
+
+        setVolatileIngredientIds(
+          new Set(volatileRows.map((row) => row.ingredient_id)),
+        );
 
         const latestActivity: Record<string, PriceActivity> = {};
         (historyData ?? []).forEach((activity) => {
@@ -535,15 +548,15 @@ function IngredientsIndexPage() {
         </Card>
       )}
 
-      <div className="grid gap-2 lg:grid-cols-[clamp(360px,42%,480px)_minmax(0,1fr)] lg:items-stretch lg:min-h-[min(70vh,640px)]">
-        <Card className="flex min-h-0 flex-col p-0 lg:max-h-[min(70vh,640px)]">
+      <div className="grid gap-2 lg:grid-cols-[minmax(0,47fr)_minmax(0,53fr)] lg:items-stretch lg:min-h-[min(70vh,640px)]">
+        <Card className="flex min-h-0 min-w-0 flex-col p-0 lg:max-h-[min(70vh,640px)]">
           <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto">
             <table className="w-full text-sm">
               <thead className="sticky top-0 z-[1] bg-muted/50 backdrop-blur-sm">
                 <tr className="text-left text-[10px] uppercase tracking-wide text-muted-foreground">
-                  <th className="py-1.5 px-2.5 font-medium">Ingredient</th>
-                  <th className="py-1.5 px-2.5 font-medium text-right whitespace-nowrap">Pack</th>
-                  <th className="py-1.5 pl-1 pr-2.5 font-medium text-right w-[4.5rem]">Actions</th>
+                  <th className="py-1 px-2.5 font-medium">Ingredient</th>
+                  <th className="py-1 px-2.5 font-medium text-right whitespace-nowrap">Pack</th>
+                  <th className="py-1 pl-1 pr-2.5 font-medium text-right w-[4.5rem]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -578,11 +591,19 @@ function IngredientsIndexPage() {
                         selected ? "bg-muted/35 shadow-[inset_2px_0_0_var(--color-foreground)]" : ""
                       }`}
                     >
-                      <td className="py-1.5 px-2.5 min-w-0">
-                        <div className="text-[13px] font-medium leading-tight transition-colors group-hover:text-foreground">
-                          {formatCanonicalIngredientDisplayName(ing.name)}
+                      <td className="py-1 px-2.5 min-w-0">
+                        <div className="flex min-w-0 items-center gap-1.5">
+                          <span className="min-w-0 truncate text-[13px] font-medium leading-snug transition-colors group-hover:text-foreground">
+                            {formatCanonicalIngredientDisplayName(ing.name)}
+                          </span>
+                          <IngredientListGlanceDots
+                            ingredient={ing}
+                            priceActivity={latestPriceActivity}
+                            recipeLinkActivity={linkActivity}
+                            volatileIngredientIds={volatileIngredientIds}
+                          />
                         </div>
-                        <div className="text-[10px] leading-tight text-muted-foreground">
+                        <div className="text-[10px] leading-snug text-muted-foreground">
                           {denom > 1
                             ? `${formatUnitCostCurrency(eff)}/${base} · ${formatQuantityWithUnit(denom, ing.purchase_unit)}`
                             : `per ${base}`}
@@ -591,11 +612,11 @@ function IngredientsIndexPage() {
                             : ""}
                         </div>
                       </td>
-                      <td className="py-1.5 px-2.5 text-right tabular-nums text-[13px] font-medium whitespace-nowrap">
+                      <td className="py-1 px-2.5 text-right tabular-nums text-[13px] font-medium whitespace-nowrap">
                         <div>{formatCurrency(Number(ing.current_price))}</div>
                         <PriceActivityNote activity={latestPriceActivity} />
                       </td>
-                      <td className="py-1.5 pl-1 pr-2.5 text-right align-middle whitespace-nowrap">
+                      <td className="py-1 pl-1 pr-2.5 text-right align-middle whitespace-nowrap">
                         <div className="flex items-center justify-end gap-0.5">
                           <button
                             type="button"
@@ -676,6 +697,42 @@ function IngredientsIndexPage() {
         onConfirm={() => void confirmDelete()}
       />
     </AppShell>
+  );
+}
+
+function IngredientListGlanceDots({
+  ingredient,
+  priceActivity,
+  recipeLinkActivity,
+  volatileIngredientIds,
+}: {
+  ingredient: Row;
+  priceActivity: PriceActivity | undefined;
+  recipeLinkActivity: RecipeLinkActivity | undefined;
+  volatileIngredientIds: ReadonlySet<string>;
+}) {
+  const signals = deriveIngredientListGlanceSignals({
+    ingredient,
+    priceActivity,
+    recipeLinkActivity,
+    volatileIngredientIds,
+  });
+  if (signals.length === 0) return null;
+
+  return (
+    <span
+      className="inline-flex shrink-0 items-center gap-[3px]"
+      aria-label={signals.map(ingredientListGlanceTitle).join(", ")}
+    >
+      {signals.map((signal) => (
+        <span
+          key={signal}
+          className={`size-[5px] rounded-full ${ingredientListGlanceDotClassName(signal)}`}
+          title={ingredientListGlanceTitle(signal)}
+          aria-hidden
+        />
+      ))}
+    </span>
   );
 }
 

@@ -328,26 +328,3 @@ export function recipeTotalCostWithIngredientUnitOverrides(
 
   return walk(recipeId);
 }
-
-export function recipeTotalCostEurForRecipe(
-  recipeId: string,
-  linesByRecipe: Map<string, RecipeIngredientLine[]>,
-  unitEurByIngredientId: Map<string, number>,
-): number | null {
-  return recipeTotalCostWithIngredientUnitOverrides(
-    recipeId,
-    linesByRecipe,
-    unitEurByIngredientId,
-  );
-}
-export function recipeTotalCostUsingEffectiveUnitForIngredient(
-  recipeId: string,
-  linesByRecipe: Map<string, RecipeIngredientLine[]>,
-  unitEurByIngredientId: Map<string, number>,
-): number | null {
-  return recipeTotalCostWithIngredientUnitOverrides(
-    recipeId,
-    linesByRecipe,
-    unitEurByIngredientId,
-  );
-}
