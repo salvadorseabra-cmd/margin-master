@@ -5,6 +5,7 @@ import {
   normalizeCanonicalRootIngredientName,
   shouldBlockCanonicalNameOnCreate,
   suggestCanonicalRootNameRepair,
+  traceSupplierTokenExpansions,
 } from "./canonical-ingredient-operational-name";
 
 describe("expandSupplierAbbreviations", () => {
@@ -22,6 +23,31 @@ describe("expandSupplierAbbreviations", () => {
 
   it("maps standalone PALHA to batata palha", () => {
     expect(expandSupplierAbbreviations("PALHA")).toBe("batata palha");
+  });
+
+  it("expands OREG to orégãos", () => {
+    expect(expandSupplierAbbreviations("OREG")).toBe("orégãos");
+  });
+
+  it("expands BAC FAT to bacon fatiado", () => {
+    expect(expandSupplierAbbreviations("BAC FAT")).toBe("bacon fatiado");
+  });
+
+  it("expands CHED FAT to cheddar fatiado", () => {
+    expect(expandSupplierAbbreviations("CHED FAT")).toBe("cheddar fatiado");
+  });
+
+  it("expands FRAN BUR via new dictionary tokens", () => {
+    expect(expandSupplierAbbreviations("FRAN BUR")).toBe("frango burger");
+  });
+});
+
+describe("traceSupplierTokenExpansions", () => {
+  it("returns BAT SHOESTR expansion trace via operational-name re-export", () => {
+    const trace = traceSupplierTokenExpansions("BAT SHOESTR");
+    expect(trace.expanded).toBe("batata shoestring");
+    expect(trace.tokens[0]?.reason).toBe("BAT → Batata");
+    expect(trace.tokens[1]?.reason).toBe("SHOESTR → Shoestring");
   });
 });
 

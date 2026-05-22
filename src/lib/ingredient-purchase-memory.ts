@@ -1,0 +1,151 @@
+import { formatCurrency } from "@/lib/display-format";
+import { shouldSkipByOperationalProductFamilyGate } from "@/lib/ingredient-operational-family-gate";
+import {
+  filterMatchedInvoiceProductsForIngredient,
+  type IngredientMatchedInvoiceProduct,
+  type IngredientOperationalAliasRow,
+} from "@/lib/ingredient-operational-intelligence";
+import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
+
+export type RecognizedSupplierProduct = {
+  name: string;
+};
+
+export type RecentPurchaseRow = {
+  itemId: string;
+  supplierLabel: string;
+  dateLabel: string;
+  priceLabel: string;
+};
+
+function normalizeProductNameKey(value: string): string {
+  return value.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function isSameIngredientScopedAlias(
+  row: IngredientOperationalAliasRow,
+  ingredientId: string,
+): boolean {
+  return row.ingredientId.trim() === ingredientId.trim();
+}
+
+function isIngredientScopedMatchedProduct(
+  product: IngredientMatchedInvoiceProduct,
+  ingredientId: string,
+): boolean {
+  return product.matchedIngredientId?.trim() === ingredientId.trim();
+}
+
+function passesFamilyGateForIngredient(
+  lineText: string,
+  canonicalName: string | null | undefined,
+): boolean {
+  const canonical = canonicalName?.trim();
+  if (!canonical) return true;
+  const text = lineText.trim();
+  if (!text) return false;
+  return !shouldSkipByOperationalProductFamilyGate(text, canonical);
+}
+
+function formatPurchaseDate(value: string | null | undefined): string {
+  if (!value?.trim()) return "—";
+  const parsed = new Date(value.includes("T") ? value : `${value}T12:00:00`);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return parsed.toLocaleDateString("pt-PT");
+}
+
+function formatPurchasePrice(product: IngredientMatchedInvoiceProduct): string {
+  if (product.unitPrice != null && Number.isFinite(product.unitPrice)) {
+    return formatCurrency(product.unitPrice);
+  }
+  if (product.lineTotal != null && Number.isFinite(product.lineTotal)) {
+    return formatCurrency(product.lineTotal);
+  }
+  return "—";
+}
+
+/**
+ * Distinct supplier product names for one ingredient (aliases + matched invoice lines).
+ * Scoped to ingredient id; drops cross-family invoice text vs canonical name.
+ */
+export function buildRecognizedSupplierProducts(
+  ingredientId: string,
+  canonicalName: string | null | undefined,
+  aliases: readonly IngredientOperationalAliasRow[],
+  matchedProducts: readonly IngredientMatchedInvoiceProduct[],
+): RecognizedSupplierProduct[] {
+  const trimmedId = ingredientId.trim();
+  if (!trimmedId) return [];
+
+  const scopedProducts = filterMatchedInvoiceProductsForIngredient(
+    matchedProducts,
+    trimmedId,
+  );
+
+  const seen = new Set<string>();
+  const names: string[] = [];
+
+  const addName = (raw: string | null | undefined) => {
+    const name = raw?.trim();
+    if (!name) return;
+    if (!passesFamilyGateForIngredient(name, canonicalName)) return;
+    const key = normalizeProductNameKey(name);
+    if (seen.has(key)) return;
+    seen.add(key);
+    names.push(name);
+  };
+
+  for (const alias of aliases) {
+    if (!isSameIngredientScopedAlias(alias, trimmedId)) continue;
+    addName(alias.aliasName);
+    addName(alias.sampleInvoiceLine?.name);
+  }
+
+  for (const product of scopedProducts) {
+    if (!isIngredientScopedMatchedProduct(product, trimmedId)) continue;
+    addName(product.itemName);
+  }
+
+  return names.sort((a, b) => a.localeCompare(b, "pt")).map((name) => ({ name }));
+}
+
+/**
+ * Chronological purchase rows for one ingredient (matched invoice lines only).
+ */
+export function buildRecentPurchases(
+  ingredientId: string,
+  canonicalName: string | null | undefined,
+  matchedProducts: readonly IngredientMatchedInvoiceProduct[],
+): RecentPurchaseRow[] {
+  const trimmedId = ingredientId.trim();
+  if (!trimmedId) return [];
+
+  return filterMatchedInvoiceProductsForIngredient(matchedProducts, trimmedId)
+    .filter((product) => isIngredientScopedMatchedProduct(product, trimmedId))
+    .filter((product) => passesFamilyGateForIngredient(product.itemName, canonicalName))
+    .map((product) => ({
+      itemId: product.itemId,
+      supplierLabel:
+        normalizeSupplierDisplayName(product.supplierName) || "Unknown supplier",
+      dateLabel: formatPurchaseDate(product.invoiceDate),
+      priceLabel: formatPurchasePrice(product),
+    }));
+}
+
+export function purchaseMemorySummary(
+  recognizedCount: number,
+  purchaseCount: number,
+): string {
+  const parts: string[] = [];
+  if (recognizedCount > 0) {
+    parts.push(
+      `${recognizedCount} product${recognizedCount === 1 ? "" : "s"}`,
+    );
+  }
+  if (purchaseCount > 0) {
+    parts.push(
+      `${purchaseCount} purchase${purchaseCount === 1 ? "" : "s"}`,
+    );
+  }
+  return parts.join(" · ") || "No purchase history yet";
+}

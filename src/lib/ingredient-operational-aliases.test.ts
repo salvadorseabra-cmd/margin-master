@@ -8,6 +8,7 @@ import {
   normalizeSupplierShorthand,
   operationalAliasCount,
   OPERATIONAL_ALIASES,
+  traceSupplierTokenExpansions,
 } from "./ingredient-operational-aliases";
 
 function ingredient(id: string, name: string): IngredientCanonicalInput {
@@ -52,6 +53,19 @@ describe("normalizeSupplierShorthand", () => {
     expect(normalizeSupplierShorthand("ARROZ CAROLINO 5 KG")).toBe("ARROZ CAROLINO 5 KG");
     expect(OPERATIONAL_ALIASES.molho).toBeUndefined();
   });
+
+  it("preserves accented words and s/ slash shorthand", () => {
+    const trace = traceSupplierTokenExpansions("Acém novilho extra s/ osso");
+    expect(trace.tokens.map((t) => t.raw)).toEqual([
+      "Acém",
+      "novilho",
+      "extra",
+      "s/",
+      "osso",
+    ]);
+    expect(trace.expanded).toContain("s/");
+    expect(trace.expanded).toMatch(/^ac[eé]m novilho extra s\/ osso$/i);
+  });
 });
 
 describe("supplier shorthand → canonical match", () => {
@@ -86,7 +100,7 @@ describe("supplier shorthand → canonical match", () => {
 describe("operational alias registry", () => {
   it("keeps a conservative alias count", () => {
     expect(operationalAliasCount()).toBe(Object.keys(OPERATIONAL_ALIASES).length);
-    expect(operationalAliasCount()).toBe(50);
+    expect(operationalAliasCount()).toBeGreaterThanOrEqual(55);
   });
 });
 

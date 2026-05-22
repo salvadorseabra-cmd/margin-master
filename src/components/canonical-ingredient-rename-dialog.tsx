@@ -18,6 +18,8 @@ type CanonicalIngredientRenameDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   currentName: string;
+  /** Pre-fill when opened from a deterministic suggestion (e.g. Ingredients quality panel). */
+  initialCanonicalName?: string | null;
   saving: boolean;
   error: string | null;
   onSubmit: (canonicalName: string) => void;
@@ -30,6 +32,7 @@ export function CanonicalIngredientRenameDialog({
   open,
   onOpenChange,
   currentName,
+  initialCanonicalName,
   saving,
   error,
   onSubmit,
@@ -38,8 +41,9 @@ export function CanonicalIngredientRenameDialog({
 
   useEffect(() => {
     if (!open) return;
-    setCanonicalName(currentName);
-  }, [open, currentName]);
+    const seed = initialCanonicalName?.trim();
+    setCanonicalName(seed || currentName);
+  }, [open, currentName, initialCanonicalName]);
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();

@@ -87,6 +87,69 @@ describe("ingredient-operational-intelligence", () => {
     expect(result.truncated).toBe(false);
   });
 
+  it("buildMatchedInvoiceProductsFromScan excludes oleo lines when scanning alface iceberg", () => {
+    const catalog = [
+      { id: "ing-alface", name: "ALFACE ICEBERG" },
+      { id: "ing-oil", name: "OLEO GIRASSOL FULA 1L" },
+    ];
+    const result = buildMatchedInvoiceProductsFromScan("ing-alface", catalog, {}, [
+      {
+        id: "line-oil",
+        invoice_id: "inv-oil",
+        name: "OLEO GIRASSOL VAQUEIRO 1L",
+        quantity: 1,
+        unit: "un",
+        unit_price: 4.5,
+        total: 4.5,
+        created_at: "2026-03-01T00:00:00.000Z",
+        invoices: { invoice_date: "2026-03-02", supplier_name: "Metro" },
+      },
+      {
+        id: "line-alface",
+        invoice_id: "inv-alface",
+        name: "ALFACE ICEBERG INTEIRA",
+        quantity: 2,
+        unit: "un",
+        unit_price: 2.1,
+        total: 4.2,
+        created_at: "2026-02-01T00:00:00.000Z",
+        invoices: { invoice_date: "2026-02-10", supplier_name: "Metro" },
+      },
+    ]);
+
+    expect(result.products.map((row) => row.itemName)).toEqual(["ALFACE ICEBERG INTEIRA"]);
+    expect(result.products.every((row) => row.matchedIngredientId === "ing-alface")).toBe(
+      true,
+    );
+  });
+
+  it("buildMatchedInvoiceProductsFromScan ignores confirmed aliases for other ingredients", () => {
+    const catalog = [
+      { id: "ing-alface", name: "ALFACE ICEBERG" },
+      { id: "ing-oil", name: "OLEO GIRASSOL FULA 1L" },
+    ];
+    const result = buildMatchedInvoiceProductsFromScan(
+      "ing-alface",
+      catalog,
+      { "oleo girassol": "ing-oil" },
+      [
+        {
+          id: "line-oil",
+          invoice_id: "inv-oil",
+          name: "OLEO GIRASSOL VAQUEIRO 1L",
+          quantity: 1,
+          unit: "un",
+          unit_price: 4.5,
+          total: 4.5,
+          created_at: "2026-03-01T00:00:00.000Z",
+          invoices: { invoice_date: "2026-03-02", supplier_name: "Metro" },
+        },
+      ],
+    );
+
+    expect(result.products).toEqual([]);
+  });
+
   it("buildMatchedInvoiceProductsFromScan dedupes by invoice item id", () => {
     const row = {
       id: "line-dup",

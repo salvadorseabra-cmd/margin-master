@@ -54,6 +54,14 @@ describe("inferOperationalProductFamily", () => {
     expect(inferOperationalProductFamily("PKL SLC")).toBe("vegetable");
   });
 
+  it("classifies OLEO GIRASSOL as cooking_oil", () => {
+    expect(inferOperationalProductFamily("OLEO GIRASSOL VAQUEIRO 1L")).toBe("cooking_oil");
+  });
+
+  it("classifies ALFACE ICEBERG as vegetable", () => {
+    expect(inferOperationalProductFamily("ALFACE ICEBERG INTEIRA")).toBe("vegetable");
+  });
+
   it("keeps SMASH PTY as meat even when catalog line mentions hamburguer", () => {
     expect(inferOperationalProductFamily("SMASH PTY 90")).toBe("meat_protein");
     expect(
@@ -79,6 +87,15 @@ describe("shouldSkipByOperationalProductFamilyGate", () => {
     expect(shouldSkipByOperationalProductFamilyGate("SMASH PTY 90", "Smash Burger Patty 90g")).toBe(
       false,
     );
+  });
+
+  it("blocks cooking oil vs leafy vegetable", () => {
+    expect(
+      shouldSkipByOperationalProductFamilyGate(
+        "OLEO GIRASSOL VAQUEIRO 1L",
+        "ALFACE ICEBERG",
+      ),
+    ).toBe(true);
   });
 });
 

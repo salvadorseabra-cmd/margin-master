@@ -21,6 +21,7 @@ export type OperationalProductFamily =
   | "cheese"
   | "processed_protein"
   | "beverage"
+  | "cooking_oil"
   | "unknown";
 
 const MEAT_TOKENS = new Set([
@@ -112,6 +113,15 @@ const VEGETABLE_TOKENS = new Set([
   "pickl",
   "pkl",
   "alho",
+]);
+
+const COOKING_OIL_TOKENS = new Set([
+  "oleo",
+  "girassol",
+  "azeite",
+  "oil",
+  "sunflower",
+  "fritura",
 ]);
 
 const CHEESE_SAUCE_DISP_TOKENS = new Set([
@@ -212,6 +222,10 @@ function hasPicklesSlicedSignal(tokens: string[]): boolean {
   return hasPickles && hasSliced;
 }
 
+function hasCookingOilSignal(tokens: string[]): boolean {
+  return tokens.some((t) => COOKING_OIL_TOKENS.has(t));
+}
+
 function hasProcessedProteinSignal(tokens: string[]): boolean {
   const hasBacon = tokens.includes("bac") || tokens.includes("bacon");
   const hasChicken =
@@ -291,6 +305,8 @@ export function inferOperationalProductFamily(rawName: string): OperationalProdu
   if (tokens.some((t) => SAUCE_TOKENS.has(t))) return "sauce";
 
   if (tokens.some((t) => BEVERAGE_TOKENS.has(t))) return "beverage";
+
+  if (hasCookingOilSignal(tokens)) return "cooking_oil";
 
   if (tokens.some((t) => VEGETABLE_TOKENS.has(t))) return "vegetable";
 

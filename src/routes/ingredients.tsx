@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
-import { Plus, Loader2, Pencil, Trash2, TrendingDown, TrendingUp, X, ClipboardList } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Plus, Loader2, Pencil, Trash2, TrendingDown, TrendingUp, ClipboardList } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import type { Tables } from "@/integrations/supabase/types";
@@ -24,10 +24,15 @@ import {
   formatQuantityWithUnit,
   formatUnitCostCurrency,
 } from "@/lib/display-format";
-import { inferPurchaseUnitsFromLineItemName } from "@/lib/ingredient-unit-inference";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 import { CanonicalIngredientRenameDialog } from "@/components/canonical-ingredient-rename-dialog";
-import { IngredientOperationalProfileSection } from "@/components/ingredient-operational-profile";
+import { IngredientDetailOperationalLayout } from "@/components/ingredient-detail-operational-layout";
+import {
+  buildActionableCanonicalNamingQueue,
+  type ActionableCanonicalNamingQueueEntry,
+} from "@/lib/canonical-ingredient-naming-queue";
+import { readLocalInvoiceIngredientAliases } from "@/lib/operational-review-queue";
+import { OperationalReviewQueueSection } from "@/components/operational-review-queue-section";
 import {
   buildCanonicalIngredientRenamePayload,
   traceCanonicalRename,
@@ -92,8 +97,85 @@ function IngredientsIndexPage() {
   const [error, setError] = useState<string | null>(null);
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameTargetId, setRenameTargetId] = useState<string | null>(null);
+  const [renameInitialName, setRenameInitialName] = useState<string | null>(null);
   const [renameSaving, setRenameSaving] = useState(false);
   const [renameError, setRenameError] = useState<string | null>(null);
+  const [namingReviewActive, setNamingReviewActive] = useState(false);
+  const [namingReviewIndex, setNamingReviewIndex] = useState(0);
+  const [namingReviewEpoch, setNamingReviewEpoch] = useState(0);
+
+  const catalogForNaming = useMemo(
+    () =>
+      rows.map((row) => ({
+        id: row.id,
+        name: row.name,
+        normalized_name: row.normalized_name,
+      })),
+    [rows],
+  );
+
+  const confirmedAliases = useMemo(
+    () => readLocalInvoiceIngredientAliases(user?.id),
+    [user?.id, namingReviewEpoch],
+  );
+
+  const namingReviewQueue = useMemo((): ActionableCanonicalNamingQueueEntry[] => {
+    void namingReviewEpoch;
+    return buildActionableCanonicalNamingQueue({
+      catalog: catalogForNaming,
+      userId: user?.id,
+      confirmedAliases,
+    });
+  }, [catalogForNaming, user?.id, confirmedAliases, namingReviewEpoch]);
+
+  const enterNamingReview = useCallback(() => {
+    const queue = buildActionableCanonicalNamingQueue({
+      catalog: catalogForNaming,
+      userId: user?.id,
+      confirmedAliases,
+    });
+    if (queue.length === 0) return;
+    setNamingReviewActive(true);
+    setNamingReviewIndex(0);
+    setSelectedIngredientId(queue[0]!.ingredientId);
+  }, [catalogForNaming, user?.id, confirmedAliases]);
+
+  const exitNamingReview = useCallback(() => {
+    setNamingReviewActive(false);
+    setNamingReviewIndex(0);
+  }, []);
+
+  const refreshNamingReviewQueue = useCallback(() => {
+    setNamingReviewEpoch((epoch) => epoch + 1);
+  }, []);
+
+  const handleNamingReviewIndexChange = useCallback(
+    (index: number) => {
+      if (namingReviewQueue.length === 0) return;
+      const clampedIndex = Math.min(Math.max(0, index), namingReviewQueue.length - 1);
+      setNamingReviewIndex(clampedIndex);
+      const entry = namingReviewQueue[clampedIndex];
+      if (entry) setSelectedIngredientId(entry.ingredientId);
+    },
+    [namingReviewQueue],
+  );
+
+  useEffect(() => {
+    if (!namingReviewActive) return;
+    if (namingReviewQueue.length === 0) {
+      setNamingReviewActive(false);
+      setNamingReviewIndex(0);
+      return;
+    }
+    if (namingReviewIndex >= namingReviewQueue.length) {
+      handleNamingReviewIndexChange(namingReviewQueue.length - 1);
+    }
+  }, [
+    namingReviewActive,
+    namingReviewQueue,
+    namingReviewIndex,
+    handleNamingReviewIndexChange,
+  ]);
 
   const load = async () => {
     setLoading(true);
@@ -277,9 +359,10 @@ function IngredientsIndexPage() {
     await remove(id);
   };
 
-  const openRename = (ingredientId: string) => {
+  const openRename = (ingredientId: string, suggestedName?: string | null) => {
     setSelectedIngredientId(ingredientId);
     setRenameTargetId(ingredientId);
+    setRenameInitialName(suggestedName?.trim() || null);
     setRenameError(null);
     setRenameOpen(true);
   };
@@ -338,6 +421,10 @@ function IngredientsIndexPage() {
     });
     setRenameOpen(false);
     setRenameTargetId(null);
+    setRenameInitialName(null);
+    if (namingReviewActive) {
+      refreshNamingReviewQueue();
+    }
     await load();
   };
 
@@ -371,9 +458,14 @@ function IngredientsIndexPage() {
         </div>
       }
     >
-      <div className="flex flex-1 min-h-0 flex-col lg:overflow-hidden">
+      <OperationalReviewQueueSection
+        userId={user?.id}
+        catalog={rows}
+        onSelectIngredient={(id) => setSelectedIngredientId(id)}
+        onEnterNamingReview={enterNamingReview}
+      />
       {open && (
-        <Card className="mb-4 shrink-0">
+        <Card className="mb-3">
           <form onSubmit={save} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-end">
             <Field label="Name">
               <input
@@ -443,15 +535,15 @@ function IngredientsIndexPage() {
         </Card>
       )}
 
-      <div className="grid gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_360px] lg:overflow-hidden">
-        <Card className="flex min-h-0 flex-col p-0 lg:max-h-full lg:overflow-hidden">
-          <div className="min-h-0 overflow-x-auto lg:overflow-y-auto">
+      <div className="grid gap-2 lg:grid-cols-[clamp(360px,42%,480px)_minmax(0,1fr)] lg:items-stretch lg:min-h-[min(70vh,640px)]">
+        <Card className="flex min-h-0 flex-col p-0 lg:max-h-[min(70vh,640px)]">
+          <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto">
             <table className="w-full text-sm">
-              <thead className="bg-muted/40">
-                <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
-                  <th className="py-3 px-5 font-medium">Ingredient</th>
-                  <th className="py-3 px-5 font-medium text-right">Pack price</th>
-                  <th className="py-3 pl-2 pr-5 font-medium text-right w-28">Actions</th>
+              <thead className="sticky top-0 z-[1] bg-muted/50 backdrop-blur-sm">
+                <tr className="text-left text-[10px] uppercase tracking-wide text-muted-foreground">
+                  <th className="py-1.5 px-2.5 font-medium">Ingredient</th>
+                  <th className="py-1.5 px-2.5 font-medium text-right whitespace-nowrap">Pack</th>
+                  <th className="py-1.5 pl-1 pr-2.5 font-medium text-right w-[4.5rem]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -486,42 +578,35 @@ function IngredientsIndexPage() {
                         selected ? "bg-muted/35 shadow-[inset_2px_0_0_var(--color-foreground)]" : ""
                       }`}
                     >
-                      <td className="py-4 px-5">
-                        <div className="font-medium transition-colors group-hover:text-foreground">
+                      <td className="py-1.5 px-2.5 min-w-0">
+                        <div className="text-[13px] font-medium leading-tight transition-colors group-hover:text-foreground">
                           {formatCanonicalIngredientDisplayName(ing.name)}
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="text-[10px] leading-tight text-muted-foreground">
                           {denom > 1
-                            ? `${formatUnitCostCurrency(eff)} per ${base} · pack ${formatCurrency(Number(ing.current_price))} / ${formatQuantityWithUnit(denom, ing.purchase_unit)}`
+                            ? `${formatUnitCostCurrency(eff)}/${base} · ${formatQuantityWithUnit(denom, ing.purchase_unit)}`
                             : `per ${base}`}
+                          {linkActivity
+                            ? ` · ${linkActivity.count} ${linkActivity.count === 1 ? "recipe" : "recipes"}`
+                            : ""}
                         </div>
-                        {linkActivity && (
-                          <div className="mt-1 text-[11px] text-muted-foreground">
-                            Used in {linkActivity.count}{" "}
-                            {linkActivity.count === 1 ? "recipe" : "recipes"}
-                            {linkActivity.recentlyLinked ? " · added to recipes recently" : ""}
-                          </div>
-                        )}
                       </td>
-                      <td className="py-4 px-5 text-right tabular-nums font-medium">
+                      <td className="py-1.5 px-2.5 text-right tabular-nums text-[13px] font-medium whitespace-nowrap">
                         <div>{formatCurrency(Number(ing.current_price))}</div>
                         <PriceActivityNote activity={latestPriceActivity} />
                       </td>
-                      <td className="py-4 pl-2 pr-5 text-right align-middle whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-1">
+                      <td className="py-1.5 pl-1 pr-2.5 text-right align-middle whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-0.5">
                           <button
                             type="button"
                             onClick={(event) => {
                               event.stopPropagation();
                               openRename(ing.id);
                             }}
-                            className="inline-flex h-8 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/15 md:min-w-8 md:px-2"
+                            className="inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/15"
                             aria-label={`Rename ${formatCanonicalIngredientDisplayName(ing.name)}`}
                           >
-                            <Pencil className="h-4 w-4" />
-                            <span className="sr-only md:not-sr-only md:inline text-xs font-medium">
-                              Edit
-                            </span>
+                            <Pencil className="h-3.5 w-3.5" />
                           </button>
                           <button
                             type="button"
@@ -529,7 +614,7 @@ function IngredientsIndexPage() {
                               event.stopPropagation();
                               requestDelete(ing.id);
                             }}
-                            className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/70 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/15"
+                            className="inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/70 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/15"
                             aria-label={`Delete ${formatCanonicalIngredientDisplayName(ing.name)}`}
                           >
                             <Trash2 className="h-4 w-4" />
@@ -544,18 +629,28 @@ function IngredientsIndexPage() {
           </div>
         </Card>
 
-        <IngredientDetailPanel
+        <IngredientDetailOperationalLayout
           ingredient={selectedIngredient}
           userId={user?.id}
+          catalog={rows}
           priceActivity={selectedIngredient ? priceActivity[selectedIngredient.id] : undefined}
           recipeLinkActivity={
             selectedIngredient ? recipeLinkActivity[selectedIngredient.id] : undefined
           }
-          onClose={() => setSelectedIngredientId(null)}
-          onRename={(id) => openRename(id)}
+          namingReviewActive={namingReviewActive}
+          namingReviewQueue={namingReviewQueue}
+          namingReviewIndex={namingReviewIndex}
+          onNamingReviewIndexChange={handleNamingReviewIndexChange}
+          onExitNamingReview={exitNamingReview}
+          onNamingReviewQueueChanged={refreshNamingReviewQueue}
+          onClose={() => {
+            exitNamingReview();
+            setSelectedIngredientId(null);
+          }}
+          onSelectRelated={(id) => setSelectedIngredientId(id)}
+          onRename={(id, suggestedName) => openRename(id, suggestedName)}
           onDelete={(id) => requestDelete(id)}
         />
-      </div>
       </div>
       <CanonicalIngredientRenameDialog
         open={renameOpen && renameTarget !== null}
@@ -564,9 +659,11 @@ function IngredientsIndexPage() {
           if (!open) {
             setRenameError(null);
             setRenameTargetId(null);
+            setRenameInitialName(null);
           }
         }}
         currentName={renameTarget?.name ?? ""}
+        initialCanonicalName={renameInitialName}
         saving={renameSaving}
         error={renameError}
         onSubmit={(canonicalName) => void saveRename(canonicalName)}
@@ -580,268 +677,6 @@ function IngredientsIndexPage() {
       />
     </AppShell>
   );
-}
-
-function IngredientDetailPanel({
-  ingredient,
-  userId,
-  priceActivity,
-  recipeLinkActivity,
-  onClose,
-  onRename,
-  onDelete,
-}: {
-  ingredient: Row | null;
-  userId: string | undefined;
-  priceActivity: PriceActivity | undefined;
-  recipeLinkActivity: RecipeLinkActivity | undefined;
-  onClose: () => void;
-  onRename: (id: string) => void;
-  onDelete: (id: string) => void;
-}) {
-  if (!ingredient) {
-    return (
-      <Card className="h-fit border-dashed bg-card/70">
-        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          Ingredient cost details
-        </div>
-        <div className="mt-2 text-sm leading-6 text-muted-foreground">
-          Select a row for pack cost and recipe exposure, or use Edit on any row to rename the
-          catalog name.
-        </div>
-      </Card>
-    );
-  }
-
-  const base = ingredientDisplayBaseUnit(ingredient);
-  const pq = Number(ingredient.purchase_quantity);
-  const denom = Number.isFinite(pq) && pq > 0 ? pq : 1;
-  const eff = effectiveIngredientUnitCostEur(ingredient);
-  const usageCount = recipeLinkActivity?.count ?? 0;
-  const packLabel = ingredient.purchase_unit?.trim() || ingredient.unit;
-  const inferred = inferPurchaseUnitsFromLineItemName(ingredient.name);
-  const conversionHint = denom > 1 ? null : inferred.conversion_hint;
-  const stockQuantityLabel =
-    denom > 1
-      ? formatQuantityWithUnit(denom, ingredient.purchase_unit || base)
-      : formatQuantityWithUnit(1, ingredient.unit);
-  const purchasePackLabel =
-    denom > 1
-      ? `1 pack -> ${stockQuantityLabel}`
-      : conversionHint
-        ? `1 ${conversionHint.purchase_unit} purchase`
-        : `1 ${ingredient.unit || base}`;
-  const recipeUsageUnit = conversionHint ? `${conversionHint.recipe_usage_unit} (hint)` : base;
-  const recentlyUpdated = priceActivity && isRecentDate(priceActivity.created_at);
-
-  return (
-    <Card className="flex min-h-0 flex-col overflow-hidden p-0 lg:h-full">
-      <div className="shrink-0 border-b border-border/70 px-4 pb-4 pt-4">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              Ingredient cost details
-            </div>
-            <h2 className="mt-1.5 text-xl font-semibold leading-tight tracking-tight">
-              {formatCanonicalIngredientDisplayName(ingredient.name)}
-            </h2>
-            <div className="mt-1 text-xs text-muted-foreground">
-              {usageCount > 0 ? `Used in ${formatRecipeCount(usageCount)}` : "Not linked to recipes"}
-            </div>
-          </div>
-          <div className="flex shrink-0 items-center gap-1">
-            <button
-              type="button"
-              onClick={() => onRename(ingredient.id)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
-              aria-label="Rename catalog ingredient"
-            >
-              <Pencil className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
-              aria-label="Close ingredient cost details"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
-      <div className="grid grid-cols-2 gap-2.5">
-        <DetailMetric
-          label="Pack price"
-          value={formatCurrency(Number(ingredient.current_price))}
-          helper={denom > 1 ? formatQuantityWithUnit(denom, packLabel) : `per ${base}`}
-        />
-        <DetailMetric
-          label="Unit cost"
-          value={formatUnitCostCurrency(eff)}
-          helper={`per ${base}`}
-        />
-        <DetailMetric
-          label="Stock qty"
-          value={stockQuantityLabel}
-          helper={denom > 1 ? "Normalized per pack" : "Stored purchase unit"}
-        />
-        <DetailMetric label="Recipes" value={String(usageCount)} helper="Recipe impact" />
-      </div>
-
-      <section className="mt-3 rounded-lg border border-border/70 bg-muted/10 p-3.5">
-        <div className="flex items-center justify-between gap-3">
-          <div className="text-sm font-semibold">Operational status</div>
-          <span className="rounded-md border border-border/60 bg-background/45 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-            {recentlyUpdated ? "Recently updated" : "In cost library"}
-          </span>
-        </div>
-        <div className="mt-3 space-y-1 text-sm">
-          <DetailRow
-            label="Purchase pack"
-            value={
-              denom > 1
-                ? `${formatCurrency(Number(ingredient.current_price))} / ${formatQuantityWithUnit(denom, packLabel)}`
-                : `${formatCurrency(Number(ingredient.current_price))} per ${base}`
-            }
-          />
-          <DetailRow label="Stock quantity" value={stockQuantityLabel} />
-          <DetailRow label="Recipe usage unit" value={recipeUsageUnit} />
-          <DetailRow label="Purchase unit" value={purchasePackLabel} />
-          {conversionHint && (
-            <DetailRow
-              label="Conversion hint"
-              value={`${formatQuantityWithUnit(
-                conversionHint.estimated_quantity,
-                conversionHint.stock_unit,
-              )} usable / ${conversionHint.purchase_unit}`}
-              valueClassName="text-muted-foreground"
-            />
-          )}
-          <DetailRow label="Linked recipes" value={formatRecipeCount(usageCount)} />
-        </div>
-      </section>
-
-      <section className="mt-3 rounded-lg border border-border/70 bg-muted/10 p-3.5">
-        <div className="text-sm font-semibold">Price movement</div>
-        {priceActivity ? (
-          <div className="mt-3 space-y-1 text-sm">
-            <DetailRow
-              label="Latest movement"
-              value={formatActivityChange(priceActivity)}
-              valueClassName={getActivityTone(priceActivity)}
-            />
-            <DetailRow
-              label="Price recency"
-              value={
-                recentlyUpdated ? "Updated in the last 14 days" : "No change in the last 14 days"
-              }
-            />
-          </div>
-        ) : (
-          <div className="mt-3 rounded-md border border-dashed border-border/70 bg-background/35 px-3 py-2 text-sm text-muted-foreground">
-            No price changes logged yet.
-          </div>
-        )}
-      </section>
-
-      <section className="mt-3 rounded-lg border border-border/70 bg-muted/10 p-3.5">
-        <div className="text-sm font-semibold">Recipe impact</div>
-        <div className="mt-2 text-sm leading-6 text-muted-foreground">
-          {usageCount > 0
-            ? `Price changes may affect ${formatRecipeCount(usageCount)}.`
-            : "Not currently linked to recipes."}
-          {recipeLinkActivity?.recentlyLinked ? " Added to recipes recently." : ""}
-        </div>
-      </section>
-
-      <IngredientOperationalProfileSection
-        ingredientId={ingredient.id}
-        userId={userId}
-        canonicalName={formatCanonicalIngredientDisplayName(ingredient.name)}
-      />
-
-      <div className="mt-3 flex flex-wrap justify-end gap-2">
-        <button
-          type="button"
-          onClick={() => onRename(ingredient.id)}
-          className="inline-flex items-center gap-2 rounded-lg border border-foreground/20 bg-foreground/5 px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-foreground/10"
-        >
-          <Pencil className="h-4 w-4" />
-          Rename catalog name
-        </button>
-        <button
-          type="button"
-          onClick={() => onDelete(ingredient.id)}
-          className="inline-flex items-center gap-2 rounded-lg border border-border/70 px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-destructive"
-        >
-          <Trash2 className="h-4 w-4" />
-          Delete
-        </button>
-      </div>
-      </div>
-    </Card>
-  );
-}
-
-function DetailMetric({ label, value, helper }: { label: string; value: string; helper: string }) {
-  return (
-    <div className="rounded-lg border border-border/70 bg-background/35 p-3">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-        {label}
-      </div>
-      <div className="mt-1.5 text-lg font-semibold leading-none tabular-nums">{value}</div>
-      <div className="mt-1.5 text-xs text-muted-foreground">{helper}</div>
-    </div>
-  );
-}
-
-function DetailRow({
-  label,
-  value,
-  valueClassName = "text-foreground",
-}: {
-  label: string;
-  value: string;
-  valueClassName?: string;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-3 py-0.5">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className={`text-right text-sm font-medium ${valueClassName}`}>{value}</span>
-    </div>
-  );
-}
-
-function formatRecipeCount(count: number) {
-  return `${count} ${count === 1 ? "recipe" : "recipes"}`;
-}
-
-function formatActivityChange(activity: PriceActivity) {
-  const deltaPercent = activity.delta_percent;
-  if (typeof deltaPercent === "number" && deltaPercent !== 0) {
-    return formatPercent(deltaPercent, { signDisplay: "always" });
-  }
-
-  const delta = activity.delta;
-  if (typeof delta === "number" && delta !== 0) {
-    return `${delta > 0 ? "+" : ""}${formatCurrency(delta)}`;
-  }
-
-  return "Updated";
-}
-
-function getActivityTone(activity: PriceActivity) {
-  const deltaPercent = activity.delta_percent;
-  if (typeof deltaPercent === "number" && deltaPercent > 0) return "text-destructive";
-  if (typeof deltaPercent === "number" && deltaPercent < 0) return "text-success";
-
-  const delta = activity.delta;
-  if (typeof delta === "number" && delta > 0) return "text-destructive";
-  if (typeof delta === "number" && delta < 0) return "text-success";
-
-  return "text-foreground";
 }
 
 function PriceActivityNote({ activity }: { activity: PriceActivity | undefined }) {

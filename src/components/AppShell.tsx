@@ -20,8 +20,8 @@ import { supabase } from "@/integrations/supabase/client";
 const nav = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/invoices", label: "Invoices", icon: Receipt },
-  { to: "/recipes", label: "Recipes", icon: ChefHat },
   { to: "/ingredients", label: "Ingredients", icon: LineChart },
+  { to: "/recipes", label: "Recipes", icon: ChefHat },
   { to: "/alerts", label: "Margin Alerts", icon: Bell },
 ] as const;
 
@@ -39,8 +39,7 @@ export function AppShell({
   const [open, setOpen] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
   const isInvoicesRoute = path.startsWith("/invoices");
-  const isScrollContainedRoute =
-    isInvoicesRoute || path.startsWith("/ingredients");
+  const isScrollContainedRoute = isInvoicesRoute;
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 

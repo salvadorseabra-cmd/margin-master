@@ -8,7 +8,13 @@ import type { IngredientCanonicalInput } from "@/lib/ingredient-canonical";
 import {
   normalizeSupplierShorthand,
   OPERATIONAL_ALIASES,
+  type ExpandSupplierTokensOptions,
+  traceSupplierTokenExpansions,
+  type SupplierTokenExpansionTrace,
 } from "@/lib/ingredient-operational-aliases";
+
+export type { ExpandSupplierTokensOptions, SupplierTokenExpansionTrace };
+export { traceSupplierTokenExpansions };
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 
 const BARE_WEIGHT_CONTEXT = new Set([
@@ -36,11 +42,14 @@ const BREAD_PREFIX_SKIP = /\b(pao|pão|bread|bun)\b/i;
  * Expand supplier invoice tokens to operational words (deterministic, not LLM).
  * Wraps {@link normalizeSupplierShorthand} with catalog-oriented context fixes.
  */
-export function expandSupplierAbbreviations(text: string | null | undefined): string {
+export function expandSupplierAbbreviations(
+  text: string | null | undefined,
+  options?: ExpandSupplierTokensOptions,
+): string {
   const trimmed = text?.trim() ?? "";
   if (!trimmed) return "";
 
-  let expanded = normalizeSupplierShorthand(trimmed);
+  let expanded = normalizeSupplierShorthand(trimmed, options);
   expanded = applyStandalonePalhaContext(expanded, trimmed);
   expanded = attachGramSuffixToBareWeights(expanded);
   expanded = applyBriocheBreadPrefix(expanded);
@@ -100,8 +109,11 @@ function applyBriocheBreadPrefix(expanded: string): string {
 /**
  * Human-readable operational catalog label from invoice/shorthand raw text.
  */
-export function generateOperationalIngredientName(raw: string | null | undefined): string {
-  const expanded = expandSupplierAbbreviations(raw);
+export function generateOperationalIngredientName(
+  raw: string | null | undefined,
+  options?: ExpandSupplierTokensOptions,
+): string {
+  const expanded = expandSupplierAbbreviations(raw, options);
   if (!expanded) return "";
   return formatCanonicalIngredientDisplayName(expanded);
 }

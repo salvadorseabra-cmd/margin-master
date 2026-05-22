@@ -13,6 +13,7 @@ import type {
   IngredientCanonicalInput,
   IngredientCanonicalMatchKind,
 } from "@/lib/ingredient-canonical";
+import { shouldSkipByOperationalProductFamilyGate } from "@/lib/ingredient-operational-family-gate";
 import { buildInvoiceMatchCatalog } from "@/lib/ingredient-canonical-synthesis";
 import {
   buildMatchExplanation,
@@ -42,11 +43,15 @@ export const MATCHED_INVOICE_PRODUCTS_SCAN_LIMIT = 5000;
 const MATCHED_INVOICE_PRODUCTS_CACHE_TTL_MS = 60_000;
 
 export type IngredientMatchedInvoiceProduct = {
+  /** Catalog ingredient id from the live matcher (`match.ingredient.id`). */
+  matchedIngredientId: string;
   itemId: string;
   itemName: string;
   supplierName: string | null;
   invoiceDate: string | null;
   invoiceId: string;
+  unitPrice: number | null;
+  lineTotal: number | null;
   matchBucket: "matched" | "suggested";
   matchDisplayState: InvoiceIngredientDisplayState;
   matchKind: IngredientCanonicalMatchKind;
@@ -529,6 +534,30 @@ function resolveCanonicalNameForIngredient(
   return formatCanonicalIngredientDisplayName(entry.name.trim());
 }
 
+/** Confirmed alias keys that resolve to one ingredient id (purchase-memory scan scope). */
+export function filterConfirmedAliasesForIngredientId(
+  confirmedAliases: IngredientAliasMap,
+  ingredientId: string,
+): IngredientAliasMap {
+  const trimmedId = ingredientId.trim();
+  if (!trimmedId) return {};
+  const scoped: IngredientAliasMap = {};
+  for (const [key, mappedId] of Object.entries(confirmedAliases)) {
+    if (mappedId?.trim() === trimmedId) scoped[key] = trimmedId;
+  }
+  return scoped;
+}
+
+/** Drops invoice rows whose stored match ingredient id differs from the selected ingredient. */
+export function filterMatchedInvoiceProductsForIngredient(
+  products: readonly IngredientMatchedInvoiceProduct[],
+  ingredientId: string,
+): IngredientMatchedInvoiceProduct[] {
+  const trimmedId = ingredientId.trim();
+  if (!trimmedId) return [];
+  return products.filter((row) => row.matchedIngredientId?.trim() === trimmedId);
+}
+
 function compareInvoiceDatesDesc(a: string | null, b: string | null): number {
   const left = a?.trim() || "";
   const right = b?.trim() || "";
@@ -558,6 +587,8 @@ export function buildMatchedInvoiceProductsFromScan(
     scanLimit: options?.scanLimit ?? MATCHED_INVOICE_PRODUCTS_SCAN_LIMIT,
   };
   if (!trimmedId) return empty;
+
+  const scopedAliases = filterConfirmedAliasesForIngredientId(confirmedAliases, trimmedId);
 
   const eligibleRows = scanRows
     .map((row) =>
@@ -592,11 +623,17 @@ export function buildMatchedInvoiceProductsFromScan(
     const { match, state } = resolveInvoiceTableRowIngredientMatch(
       normalized.name,
       matchCatalog,
-      confirmedAliases,
+      scopedAliases,
       supplierName,
     );
     const matchedIngredientId = match?.ingredient.id?.trim();
     if (!match || !matchedIngredientId || matchedIngredientId !== trimmedId) continue;
+    if (
+      canonicalName?.trim() &&
+      shouldSkipByOperationalProductFamilyGate(normalized.name, canonicalName)
+    ) {
+      continue;
+    }
 
     const bucket = invoiceRowMatchSummaryBucket(state.displayState);
     if (bucket === "unmatched") continue;
@@ -618,6 +655,7 @@ export function buildMatchedInvoiceProductsFromScan(
     const structure = parsePurchaseStructureFromText(normalized.name.trim());
 
     products.push({
+      matchedIngredientId: trimmedId,
       itemId: normalized.id,
       itemName: source.name.trim() || normalized.name,
       supplierName,
@@ -626,6 +664,8 @@ export function buildMatchedInvoiceProductsFromScan(
         source.created_at?.trim()?.slice(0, 10) ||
         null,
       invoiceId: source.invoice_id,
+      unitPrice: normalized.unit_price,
+      lineTotal: normalized.total,
       matchBucket: bucket,
       matchDisplayState: state.displayState,
       matchKind: match.kind,
@@ -642,7 +682,7 @@ export function buildMatchedInvoiceProductsFromScan(
   return {
     ingredientId: trimmedId,
     canonicalName,
-    products,
+    products: filterMatchedInvoiceProductsForIngredient(products, trimmedId),
     truncated: options?.truncated ?? false,
     scanLimit: options?.scanLimit ?? MATCHED_INVOICE_PRODUCTS_SCAN_LIMIT,
   };
