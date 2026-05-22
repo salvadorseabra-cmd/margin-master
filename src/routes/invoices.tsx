@@ -2062,10 +2062,16 @@ function InvoicesPage() {
   };
 
   return (
-    <AppShell
-      title="Invoices"
-      subtitle="Upload supplier invoices — your files stay private and are extracted automatically."
-    >
+    <AppShell title="Invoices">
+      <div className="app-route-scroll">
+        <div className="min-w-0 shrink-0 pb-4 pt-6 lg:pt-10">
+          <h1 className="text-2xl lg:text-3xl font-semibold tracking-tight text-foreground">
+            Invoices
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Upload supplier invoices — your files stay private and are extracted automatically.
+          </p>
+        </div>
       {/* Operational snapshot */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         {operationalSummaryCards.map((card) => (
@@ -2387,6 +2393,7 @@ function InvoicesPage() {
         }}
         onConfirm={() => void confirmDeleteRow()}
       />
+      </div>
     </AppShell>
   );
 }

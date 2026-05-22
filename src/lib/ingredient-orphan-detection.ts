@@ -81,6 +81,18 @@ export function isIngredientOperationallyOrphaned(report: IngredientOrphanReport
   return orphanBlockingReasons(report).length === 0;
 }
 
+/** True when the only operational blockers are alias rows (no recipes, price, margin). */
+export function isAliasOnlyOperationalDependency(report: IngredientOrphanReport): boolean {
+  if (isIngredientOperationallyOrphaned(report)) return false;
+  return (
+    report.invoiceAliasCount > 0 &&
+    report.recipeIngredientCount === 0 &&
+    report.prepRecipeIngredientCount === 0 &&
+    report.priceHistoryCount === 0 &&
+    report.marginImpactCount === 0
+  );
+}
+
 export type OrphanDependencyRows = {
   aliases: { ingredient_id: string; supplier_name: string | null }[];
   recipeLinks: {
@@ -200,8 +212,42 @@ export async function detectOrphanCanonicalIngredients(
   };
 }
 
+function canonicalNameIsSubsetOf(
+  entry: IngredientCanonicalInput,
+  other: IngredientCanonicalInput,
+): boolean {
+  const entryNorm = normalizeCanonicalIngredientName(entry.name ?? "");
+  const otherNorm = normalizeCanonicalIngredientName(other.name ?? "");
+  if (!entryNorm || !otherNorm) return false;
+  if (otherNorm.includes(entryNorm)) return true;
+  const entryTokens = entryNorm.split(/\s+/).filter(Boolean);
+  if (entryTokens.length > 0 && entryTokens.every((token) => otherNorm.includes(token))) {
+    return true;
+  }
+  return false;
+}
+
+/** True when another active canonical with real usage is a name superset (e.g. Batata palha ⊃ PALHA). */
+export function hasNonOrphanSupersetCanonical(
+  entry: IngredientCanonicalInput,
+  catalog: IngredientCanonicalInput[],
+  orphanReports: Map<string, IngredientOrphanReport>,
+): boolean {
+  const id = entry.id?.trim();
+  if (!id) return false;
+  for (const other of catalog) {
+    const otherId = other.id?.trim();
+    if (!otherId || otherId === id || isArchivedIngredientEntry(other)) continue;
+    const otherReport = orphanReports.get(otherId);
+    if (!otherReport || isIngredientOperationallyOrphaned(otherReport)) continue;
+    if (canonicalNameIsSubsetOf(entry, other)) return true;
+  }
+  return false;
+}
+
 /**
- * Whether a zero-ref canonical should be hidden from the main Ingredients list.
+ * Whether a canonical should be hidden from the main Ingredients list.
+ * Hides zero-ref orphans/shorthand and alias-only legacy roots superseded by a fuller canonical.
  * Review page may still list all {@link isIngredientOperationallyOrphaned} rows.
  */
 export function shouldHideOrphanFromMainCatalog(
@@ -212,25 +258,16 @@ export function shouldHideOrphanFromMainCatalog(
   const id = entry.id?.trim();
   if (!id) return false;
   const report = orphanReports.get(id);
-  if (!report || !isIngredientOperationallyOrphaned(report)) return false;
+  if (!report) return false;
 
-  if (looksLikeInvoiceShorthandName(entry.name)) return true;
+  if (isIngredientOperationallyOrphaned(report)) {
+    if (looksLikeInvoiceShorthandName(entry.name)) return true;
+    if (hasNonOrphanSupersetCanonical(entry, catalog, orphanReports)) return true;
+    return false;
+  }
 
-  const entryNorm = normalizeCanonicalIngredientName(entry.name ?? "");
-  if (!entryNorm) return false;
-  const entryTokens = entryNorm.split(/\s+/).filter(Boolean);
-
-  for (const other of catalog) {
-    const otherId = other.id?.trim();
-    if (!otherId || otherId === id || isArchivedIngredientEntry(other)) continue;
-    const otherReport = orphanReports.get(otherId);
-    if (!otherReport || isIngredientOperationallyOrphaned(otherReport)) continue;
-    const otherNorm = normalizeCanonicalIngredientName(other.name ?? "");
-    if (!otherNorm) continue;
-    if (otherNorm.includes(entryNorm)) return true;
-    if (entryTokens.length > 0 && entryTokens.every((token) => otherNorm.includes(token))) {
-      return true;
-    }
+  if (isAliasOnlyOperationalDependency(report)) {
+    return hasNonOrphanSupersetCanonical(entry, catalog, orphanReports);
   }
 
   return false;

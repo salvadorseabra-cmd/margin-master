@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +12,16 @@ import {
   type IngredientOrphanReport,
 } from "@/lib/ingredient-orphan-detection";
 import {
+  findActiveCanonicalIdsByNormalizedName,
+  isAliasOnlyOperationalDependency,
+  previewIngredientAliasReassignment,
+  reassignAliasesAndArchiveIfOrphan,
+  runPalhaToBatataPalhaAliasReassignment,
+} from "@/lib/ingredient-alias-reassignment";
+import { loadConfirmedIngredientAliasMap } from "@/lib/ingredient-alias-memory";
+import { buildManualMergePickerOptions } from "@/lib/ingredient-merge";
+import { normalizeCanonicalIngredientName } from "@/lib/ingredient-canonical";
+import {
   buildCatalogReviewRows,
   CATALOG_LEAK_REASON_LABELS,
   CATALOG_REVIEW_CLASSIFICATION_LABELS,
@@ -23,7 +33,7 @@ import {
   type CatalogReviewRow,
 } from "@/lib/catalog-pollution-review";
 import { ManualCanonicalMergeDialog } from "@/components/manual-canonical-merge-dialog";
-import { Archive, ArrowLeft, ClipboardList, GitMerge, Loader2 } from "lucide-react";
+import { Archive, ArrowLeft, ArrowRightLeft, ClipboardList, GitMerge, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/ingredients/review")({
@@ -50,6 +60,7 @@ const CLASSIFICATION_OPTIONS: CatalogReviewClassification[] = [
 
 function CatalogReviewPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const [rows, setRows] = useState<CatalogReviewRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -69,7 +80,14 @@ function CatalogReviewPage() {
   const [orphanEntries, setOrphanEntries] = useState<
     { entry: (typeof catalogRows)[number]; report: IngredientOrphanReport }[]
   >([]);
+  const [aliasOnlyEntries, setAliasOnlyEntries] = useState<
+    { entry: (typeof catalogRows)[number]; report: IngredientOrphanReport }[]
+  >([]);
   const [archivingOrphanId, setArchivingOrphanId] = useState<string | null>(null);
+  const [reassigningSourceId, setReassigningSourceId] = useState<string | null>(null);
+  const [reassignTargetBySource, setReassignTargetBySource] = useState<Record<string, string>>(
+    {},
+  );
 
   const load = useCallback(async () => {
     if (!user?.id) return;
@@ -142,6 +160,35 @@ function CatalogReviewPage() {
         }),
       );
     setOrphanEntries(orphans);
+    const aliasOnly = canonicalCatalog
+      .filter((entry) => {
+        const id = entry.id?.trim();
+        if (!id) return false;
+        const report = orphanReports.get(id);
+        return report ? isAliasOnlyOperationalDependency(report) : false;
+      })
+      .map((entry) => ({
+        entry,
+        report: orphanReports.get(entry.id)!,
+      }))
+      .sort((a, b) =>
+        (a.entry.name ?? "").localeCompare(b.entry.name ?? "", undefined, {
+          sensitivity: "base",
+        }),
+      );
+    setAliasOnlyEntries(aliasOnly);
+
+    const batataId = findActiveCanonicalIdsByNormalizedName(canonicalCatalog, [
+      "Batata palha",
+    ]).get("batata palha");
+    if (batataId) {
+      const defaults: Record<string, string> = {};
+      for (const { entry } of aliasOnly) {
+        const norm = normalizeCanonicalIngredientName(entry.name ?? "");
+        if (norm === "palha") defaults[entry.id] = batataId;
+      }
+      setReassignTargetBySource((prev) => ({ ...defaults, ...prev }));
+    }
 
     const stored = loadCatalogReviewClassifications(user.id);
     setClassifications(stored);
@@ -157,6 +204,62 @@ function CatalogReviewPage() {
     );
     setLoading(false);
   }, [user?.id]);
+
+  const canonicalPickerOptions = useMemo(
+    () => buildManualMergePickerOptions(filterCanonicalCatalogIngredients(catalogRows)),
+    [catalogRows],
+  );
+
+  const handleReassignAliases = async (
+    fromIngredientId: string,
+    toIngredientId: string,
+    options?: { palhaPreset?: boolean },
+  ) => {
+    if (!user?.id) return;
+    const fromName =
+      catalogRows.find((r) => r.id === fromIngredientId)?.name ?? fromIngredientId;
+    const toName = catalogRows.find((r) => r.id === toIngredientId)?.name ?? toIngredientId;
+    const preview = await previewIngredientAliasReassignment({
+      client: supabase,
+      fromIngredientId,
+      toIngredientId,
+    });
+    const confirmMsg = options?.palhaPreset
+      ? `Mover todos os aliases de "${fromName}" para "${toName}" e arquivar PALHA se ficar sem uso?\n\n${preview.aliasCount} alias(es): ${preview.aliasNames.slice(0, 5).join(", ")}${preview.aliasNames.length > 5 ? "…" : ""}`
+      : `Mover ${preview.aliasCount} alias(es) de "${fromName}" para "${toName}"?\nNão funde ingredientes nem receitas. PALHA/arquivo automático só se o origem ficar órfão.\n\n${preview.aliasNames.slice(0, 8).join("\n")}${preview.aliasNames.length > 8 ? "\n…" : ""}`;
+    if (!window.confirm(confirmMsg)) return;
+
+    setReassigningSourceId(fromIngredientId);
+    setError(null);
+    const canonicalCatalog = filterCanonicalCatalogIngredients(catalogRows);
+    const confirmedAliases = await loadConfirmedIngredientAliasMap(supabase);
+    const result = options?.palhaPreset
+      ? await runPalhaToBatataPalhaAliasReassignment({
+          client: supabase,
+          userId: user.id,
+          catalog: canonicalCatalog,
+          confirmedAliases,
+          fromIngredientId,
+          toIngredientId,
+        })
+      : await reassignAliasesAndArchiveIfOrphan({
+          client: supabase,
+          fromIngredientId,
+          toIngredientId,
+          userId: user.id,
+          catalog: canonicalCatalog,
+          confirmedAliases,
+        });
+
+    if (result.error) {
+      setError(result.error.message);
+      setReassigningSourceId(null);
+      return;
+    }
+    setReassigningSourceId(null);
+    await load();
+    await router.invalidate();
+  };
 
   const handleArchiveOrphan = async (ingredientId: string) => {
     if (!user?.id) return;
@@ -235,6 +338,106 @@ function CatalogReviewPage() {
       }
     >
       <div className="space-y-4">
+        {!loading && !error && aliasOnlyEntries.length > 0 && (
+          <Card className="p-4 space-y-3 border-sky-500/30">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h2 className="font-medium text-foreground">Legado só com aliases</h2>
+                <p className="text-sm text-muted-foreground">
+                  Canónicos com memória de fatura mas sem receitas, prep, preço nem margem. Reatribua
+                  aliases ao canónico correto (sem fusão) para libertar órfãos como PALHA.
+                </p>
+              </div>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-900 dark:text-sky-100">
+                {aliasOnlyEntries.length}
+              </span>
+            </div>
+            <ul className="space-y-2">
+              {aliasOnlyEntries.map(({ entry, report }) => {
+                const targetId = reassignTargetBySource[entry.id] ?? "";
+                const isPalha =
+                  normalizeCanonicalIngredientName(entry.name ?? "") === "palha";
+                const batataId = findActiveCanonicalIdsByNormalizedName(
+                  filterCanonicalCatalogIngredients(catalogRows),
+                  ["Batata palha"],
+                ).get("batata palha");
+                return (
+                  <li
+                    key={entry.id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-3"
+                  >
+                    <div>
+                      <p className="font-medium">
+                        {formatCanonicalIngredientDisplayName(entry.name) || entry.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground font-mono">{entry.id}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Aliases {report.invoiceAliasCount} (fornecedor {report.supplierAliasCount})
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-end gap-2">
+                      <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+                        Reatribuir aliases para
+                        <select
+                          className="border border-border rounded-md px-2 py-1.5 bg-background text-sm text-foreground min-w-[200px]"
+                          value={targetId}
+                          onChange={(e) =>
+                            setReassignTargetBySource((prev) => ({
+                              ...prev,
+                              [entry.id]: e.target.value,
+                            }))
+                          }
+                        >
+                          <option value="">— escolher —</option>
+                          {canonicalPickerOptions
+                            .filter((opt) => opt.id !== entry.id)
+                            .map((opt) => (
+                              <option key={opt.id} value={opt.id}>
+                                {opt.label}
+                              </option>
+                            ))}
+                        </select>
+                      </label>
+                      {isPalha && batataId && (
+                        <button
+                          type="button"
+                          disabled={reassigningSourceId != null}
+                          className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md border border-primary/40 hover:bg-primary/10 disabled:opacity-50"
+                          onClick={() =>
+                            void handleReassignAliases(entry.id, batataId, { palhaPreset: true })
+                          }
+                        >
+                          {reassigningSourceId === entry.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <ArrowRightLeft className="h-4 w-4" />
+                          )}
+                          Mover aliases para Batata palha
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        disabled={
+                          !targetId || targetId === entry.id || reassigningSourceId != null
+                        }
+                        className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md border border-border hover:bg-muted disabled:opacity-50"
+                        onClick={() => void handleReassignAliases(entry.id, targetId)}
+                      >
+                        {reassigningSourceId === entry.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <ArrowRightLeft className="h-4 w-4" />
+                        )}
+                        Confirmar reatribuição
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </Card>
+        )}
+
         {!loading && !error && orphanEntries.length > 0 && (
           <Card className="p-4 space-y-3 border-amber-500/30">
             <div className="flex flex-wrap items-start justify-between gap-2">

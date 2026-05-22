@@ -82,9 +82,47 @@ describe("isIngredientOperationallyOrphaned", () => {
     expect(shouldHideOrphanFromMainCatalog(catalog[0]!, catalog, reports)).toBe(true);
     expect(shouldHideOrphanFromMainCatalog(catalog[1]!, catalog, reports)).toBe(false);
   });
+
+  it("hides PALHA from main catalog when only aliases block orphan (alias-only)", () => {
+    const catalog = [row("palha-id", "PALHA"), row("batata-id", "Batata palha")];
+    const reports = new Map([
+      [
+        "palha-id",
+        { ...emptyOrphanReport("palha-id"), invoiceAliasCount: 3 },
+      ],
+      [
+        "batata-id",
+        { ...emptyOrphanReport("batata-id"), recipeIngredientCount: 1 },
+      ],
+    ]);
+    expect(shouldHideOrphanFromMainCatalog(catalog[0]!, catalog, reports)).toBe(true);
+    expect(shouldHideOrphanFromMainCatalog(catalog[1]!, catalog, reports)).toBe(false);
+  });
 });
 
 describe("detectOrphanCanonicalIngredients", () => {
+  it("PALHA with aliases on PALHA is not orphan until aliases move", async () => {
+    const catalog = [row("palha-id", "PALHA"), row("batata-id", "Batata palha")];
+    const client = createOrphanMockClient({
+      ingredient_aliases: [
+        { ingredient_id: "palha-id", supplier_name: "Metro" },
+        { ingredient_id: "palha-id", supplier_name: null },
+        { ingredient_id: "palha-id", supplier_name: null },
+      ],
+      recipe_ingredients: [],
+      ingredient_price_history: [],
+      recipe_margin_impacts: [],
+    });
+
+    const { reports, error } = await detectOrphanCanonicalIngredients(
+      client as never,
+      catalog,
+    );
+    expect(error).toBeNull();
+    expect(isIngredientOperationallyOrphaned(reports.get("palha-id")!)).toBe(false);
+    expect(reports.get("palha-id")?.invoiceAliasCount).toBe(3);
+  });
+
   it("marks PALHA orphan and flags ingredient with alias", async () => {
     const catalog = [row("palha-id", "PALHA"), row("batata-id", "Batata palha")];
     const client = createOrphanMockClient({

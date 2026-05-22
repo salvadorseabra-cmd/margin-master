@@ -38,6 +38,9 @@ export function AppShell({
 }) {
   const [open, setOpen] = useState(false);
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const isInvoicesRoute = path.startsWith("/invoices");
+  const isScrollContainedRoute =
+    isInvoicesRoute || path.startsWith("/ingredients");
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -56,9 +59,9 @@ export function AppShell({
   const initials = (user.email ?? "?").slice(0, 2).toUpperCase();
 
   return (
-    <div className="flex min-h-screen w-full min-w-0 bg-background">
+    <div className="flex h-dvh min-h-0 w-full min-w-0 overflow-hidden bg-background">
       {/* Sidebar — desktop */}
-      <aside className="group hidden lg:flex w-16 hover:w-64 flex-col overflow-hidden border-r border-border bg-card/40 sticky top-0 h-screen transition-[width] duration-200 ease-out">
+      <aside className="group hidden lg:flex h-full min-h-0 w-16 shrink-0 flex-col overflow-hidden border-r border-border bg-card/40 transition-[width] duration-200 ease-out hover:w-64">
         <BrandHeader />
         <SidebarNav path={path} />
         <SidebarFooter />
@@ -79,9 +82,9 @@ export function AppShell({
         </div>
       )}
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="app-shell-content">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 min-w-0 border-b border-border bg-background/80 backdrop-blur">
+        <header className="sticky top-0 z-30 min-w-0 shrink-0 border-b border-border bg-background/80 backdrop-blur">
           <div className="flex h-16 min-w-0 items-center gap-3 px-4 lg:px-8">
             <button
               className="lg:hidden -ml-1 p-2 rounded-md hover:bg-muted"
@@ -124,20 +127,30 @@ export function AppShell({
           </div>
         </header>
 
-        {/* Page header */}
-        <div className="min-w-0 box-border px-4 pb-4 pt-6 lg:px-8 lg:pt-10">
-          <div className="flex min-w-0 flex-wrap items-end justify-between gap-3">
-            <div className="min-w-0">
-              <h1 className="text-2xl lg:text-3xl font-semibold tracking-tight text-foreground">
-                {title}
-              </h1>
-              {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+        {/* Page header — invoices title lives inside InvoicesPage scroll */}
+        {!isInvoicesRoute && (
+          <div className="min-w-0 shrink-0 box-border px-4 pb-4 pt-6 lg:px-8 lg:pt-10">
+            <div className="flex min-w-0 flex-wrap items-end justify-between gap-3">
+              <div className="min-w-0">
+                <h1 className="text-2xl lg:text-3xl font-semibold tracking-tight text-foreground">
+                  {title}
+                </h1>
+                {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+              </div>
+              {action}
             </div>
-            {action}
           </div>
-        </div>
+        )}
 
-        <main className="min-w-0 flex-1 min-w-0 box-border px-4 pb-16 lg:px-8">{children}</main>
+        <main
+          className={
+            isScrollContainedRoute
+              ? "app-shell-main-contained box-border px-4 pb-16 lg:px-8"
+              : "app-shell-main-contained app-route-scroll box-border px-4 pb-16 lg:px-8"
+          }
+        >
+          {children}
+        </main>
       </div>
     </div>
   );

@@ -27,6 +27,7 @@ import {
 import { inferPurchaseUnitsFromLineItemName } from "@/lib/ingredient-unit-inference";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 import { CanonicalIngredientRenameDialog } from "@/components/canonical-ingredient-rename-dialog";
+import { IngredientOperationalProfileSection } from "@/components/ingredient-operational-profile";
 import {
   buildCanonicalIngredientRenamePayload,
   traceCanonicalRename,
@@ -370,8 +371,9 @@ function IngredientsIndexPage() {
         </div>
       }
     >
+      <div className="flex flex-1 min-h-0 flex-col lg:overflow-hidden">
       {open && (
-        <Card className="mb-4">
+        <Card className="mb-4 shrink-0">
           <form onSubmit={save} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-end">
             <Field label="Name">
               <input
@@ -441,9 +443,9 @@ function IngredientsIndexPage() {
         </Card>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <Card className="p-0 overflow-hidden">
-          <div className="overflow-x-auto">
+      <div className="grid gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_360px] lg:overflow-hidden">
+        <Card className="flex min-h-0 flex-col p-0 lg:max-h-full lg:overflow-hidden">
+          <div className="min-h-0 overflow-x-auto lg:overflow-y-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/40">
                 <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -544,6 +546,7 @@ function IngredientsIndexPage() {
 
         <IngredientDetailPanel
           ingredient={selectedIngredient}
+          userId={user?.id}
           priceActivity={selectedIngredient ? priceActivity[selectedIngredient.id] : undefined}
           recipeLinkActivity={
             selectedIngredient ? recipeLinkActivity[selectedIngredient.id] : undefined
@@ -552,6 +555,7 @@ function IngredientsIndexPage() {
           onRename={(id) => openRename(id)}
           onDelete={(id) => requestDelete(id)}
         />
+      </div>
       </div>
       <CanonicalIngredientRenameDialog
         open={renameOpen && renameTarget !== null}
@@ -580,6 +584,7 @@ function IngredientsIndexPage() {
 
 function IngredientDetailPanel({
   ingredient,
+  userId,
   priceActivity,
   recipeLinkActivity,
   onClose,
@@ -587,6 +592,7 @@ function IngredientDetailPanel({
   onDelete,
 }: {
   ingredient: Row | null;
+  userId: string | undefined;
   priceActivity: PriceActivity | undefined;
   recipeLinkActivity: RecipeLinkActivity | undefined;
   onClose: () => void;
@@ -629,40 +635,43 @@ function IngredientDetailPanel({
   const recentlyUpdated = priceActivity && isRecentDate(priceActivity.created_at);
 
   return (
-    <Card className="h-fit p-4 lg:sticky lg:top-4">
-      <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-            Ingredient cost details
+    <Card className="flex min-h-0 flex-col overflow-hidden p-0 lg:h-full">
+      <div className="shrink-0 border-b border-border/70 px-4 pb-4 pt-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              Ingredient cost details
+            </div>
+            <h2 className="mt-1.5 text-xl font-semibold leading-tight tracking-tight">
+              {formatCanonicalIngredientDisplayName(ingredient.name)}
+            </h2>
+            <div className="mt-1 text-xs text-muted-foreground">
+              {usageCount > 0 ? `Used in ${formatRecipeCount(usageCount)}` : "Not linked to recipes"}
+            </div>
           </div>
-          <h2 className="mt-1.5 text-xl font-semibold leading-tight tracking-tight">
-            {formatCanonicalIngredientDisplayName(ingredient.name)}
-          </h2>
-          <div className="mt-1 text-xs text-muted-foreground">
-            {usageCount > 0 ? `Used in ${formatRecipeCount(usageCount)}` : "Not linked to recipes"}
+          <div className="flex shrink-0 items-center gap-1">
+            <button
+              type="button"
+              onClick={() => onRename(ingredient.id)}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+              aria-label="Rename catalog ingredient"
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+              aria-label="Close ingredient cost details"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
-        </div>
-        <div className="flex shrink-0 items-center gap-1">
-          <button
-            type="button"
-            onClick={() => onRename(ingredient.id)}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
-            aria-label="Rename catalog ingredient"
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
-            aria-label="Close ingredient cost details"
-          >
-            <X className="h-4 w-4" />
-          </button>
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-2.5">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+      <div className="grid grid-cols-2 gap-2.5">
         <DetailMetric
           label="Pack price"
           value={formatCurrency(Number(ingredient.current_price))}
@@ -747,6 +756,12 @@ function IngredientDetailPanel({
         </div>
       </section>
 
+      <IngredientOperationalProfileSection
+        ingredientId={ingredient.id}
+        userId={userId}
+        canonicalName={formatCanonicalIngredientDisplayName(ingredient.name)}
+      />
+
       <div className="mt-3 flex flex-wrap justify-end gap-2">
         <button
           type="button"
@@ -764,6 +779,7 @@ function IngredientDetailPanel({
           <Trash2 className="h-4 w-4" />
           Delete
         </button>
+      </div>
       </div>
     </Card>
   );
