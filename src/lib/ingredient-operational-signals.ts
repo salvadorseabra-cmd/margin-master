@@ -1,5 +1,10 @@
 import type { IngredientCanonicalMatchKind } from "@/lib/ingredient-canonical";
 import { buildIngredientAliasLookupKey } from "@/lib/ingredient-alias-lookup";
+import {
+  derivePricingFreshnessSnapshot,
+  isCatalogConfirmationPending,
+  isStaleForPriceReview,
+} from "@/lib/ingredient-pricing-freshness";
 import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
 
 export type OperationalSignalTone = "muted" | "review" | "success" | "increase" | "decrease";
@@ -30,6 +35,7 @@ export type InvoiceLineOperationalContext = {
   recipeCountByIngredientId?: Record<string, number>;
   volatileIngredientIds?: ReadonlySet<string>;
   priceHistoryLatestAtByIngredientId?: Record<string, string | null>;
+  lastPurchaseAtByIngredientId?: Record<string, string | null>;
   aliasCreatedAtByLookupKey?: Record<string, string>;
   knownSupplierNames?: ReadonlySet<string>;
   currentSupplierName?: string | null;
@@ -61,13 +67,6 @@ function isRecentIsoDate(value: string | null | undefined, days: number): boolea
   if (!Number.isFinite(timestamp)) return false;
   const ageMs = Date.now() - timestamp;
   return ageMs >= 0 && ageMs <= days * 86_400_000;
-}
-
-function isStaleIsoDate(value: string | null | undefined, days: number): boolean {
-  if (!value) return true;
-  const timestamp = new Date(value).getTime();
-  if (!Number.isFinite(timestamp)) return true;
-  return Date.now() - timestamp > days * 86_400_000;
 }
 
 function formatPercentLabel(percent: number): string {
@@ -150,33 +149,47 @@ export function deriveInvoiceLineOperationalSignals(
     if (context.volatileIngredientIds?.has(ingredient.id)) {
       signals.push({
         kind: "volatile",
-        label: "Volatile pricing",
-        title: "Frequent price changes logged for this ingredient in the last 90 days.",
+        label: "Inconsistent pricing",
+        title: "Purchase prices have varied for this ingredient in the last 90 days.",
         tone: "review",
         priority: 70,
       });
     }
 
-    const historyAt = context.priceHistoryLatestAtByIngredientId?.[ingredient.id];
-    const pricingRecency = historyAt ?? ingredient.updated_at ?? null;
     const catalogPrice = finitePrice(ingredient.current_price);
-    if (catalogPrice != null && isStaleIsoDate(pricingRecency, staleDays)) {
-      signals.push({
-        kind: "stale-pricing",
-        label: "Stale catalog price",
-        title: historyAt
-          ? "No ingredient price history update in the last 90 days."
-          : "Ingredient catalog price has not been refreshed recently.",
-        tone: "review",
-        priority: 82,
-      });
+    if (catalogPrice != null) {
+      const pricingInput = {
+        currentPrice: ingredient.current_price,
+        priceRefreshAt: context.priceHistoryLatestAtByIngredientId?.[ingredient.id] ?? null,
+        lastPurchaseAt: context.lastPurchaseAtByIngredientId?.[ingredient.id] ?? null,
+      };
+      if (isCatalogConfirmationPending(pricingInput)) {
+        signals.push({
+          kind: "catalog-confirmation",
+          label: "Confirm latest price",
+          title: "Latest purchase on file — confirm pack price matches.",
+          tone: "review",
+          priority: 84,
+        });
+      } else if (isStaleForPriceReview(pricingInput, staleDays)) {
+        const snapshot = derivePricingFreshnessSnapshot(pricingInput, staleDays);
+        signals.push({
+          kind: "stale-pricing",
+          label: "Outdated pricing",
+          title: snapshot.recencyAt
+            ? `No pricing update in ${staleDays}+ days.`
+            : "No pricing update on record.",
+          tone: "review",
+          priority: 82,
+        });
+      }
     }
 
     if (recipeCount >= highImportanceThreshold) {
       signals.push({
         kind: "high-importance",
-        label: "High recipe exposure",
-        title: `Used in ${recipeCount} recipes — prioritize confirming price and match.`,
+        label: "Used in many recipes",
+        title: `Used in ${recipeCount} recipes — prioritize confirming price and supplier wording.`,
         tone: "review",
         priority: 76,
       });

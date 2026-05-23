@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
-import { Plus, Loader2, Pencil, Trash2, TrendingDown, TrendingUp, ClipboardList } from "lucide-react";
+import { Plus, Loader2, Pencil, Trash2, ClipboardList } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -14,16 +14,7 @@ import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 import { guardIngredientCreation } from "@/lib/ingredient-operational-identity";
 import { INGREDIENT_KIND_CANONICAL } from "@/lib/ingredient-kind";
 import { INGREDIENT_CREATE_LOG_PREFIX } from "@/lib/ingredient-auto-persist";
-import {
-  effectiveIngredientUnitCostEur,
-  ingredientDisplayBaseUnit,
-} from "@/lib/ingredient-unit-cost";
-import {
-  formatCurrency,
-  formatPercent,
-  formatQuantityWithUnit,
-  formatUnitCostCurrency,
-} from "@/lib/display-format";
+import { formatCurrency } from "@/lib/display-format";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 import { CanonicalIngredientRenameDialog } from "@/components/canonical-ingredient-rename-dialog";
 import { IngredientDetailOperationalLayout } from "@/components/ingredient-detail-operational-layout";
@@ -31,7 +22,24 @@ import {
   buildActionableCanonicalNamingQueue,
   type ActionableCanonicalNamingQueueEntry,
 } from "@/lib/canonical-ingredient-naming-queue";
-import { readLocalInvoiceIngredientAliases } from "@/lib/operational-review-queue";
+import {
+  detectOrphanCanonicalIngredients,
+  emptyOrphanReport,
+  isAliasOnlyOperationalDependency,
+  type IngredientOrphanReport,
+} from "@/lib/ingredient-orphan-detection";
+import {
+  buildDuplicateReviewListGroups,
+  duplicateClusterIngredientIds,
+  findOperationalDuplicateClusterForIngredient,
+  operationalListFilterReviewBarTitle,
+  operationalListBrowseRowSelectedClass,
+  operationalListReviewBannerClass,
+  operationalListReviewRowSelectedClass,
+  readLocalInvoiceIngredientAliases,
+  unusedReviewIngredientIds,
+  type OperationalListFilter,
+} from "@/lib/operational-review-queue";
 import { OperationalReviewQueueSection } from "@/components/operational-review-queue-section";
 import {
   buildCanonicalIngredientRenamePayload,
@@ -41,10 +49,15 @@ import { traceFoodCostRecalculationSource } from "@/lib/recipe-canonical-graph-t
 import { loadCanonicalIngredientCatalog } from "@/lib/ingredient-catalog-load";
 import { getVolatileIngredients } from "@/lib/ingredient-price-history";
 import {
-  deriveIngredientListGlanceSignals,
-  ingredientListGlanceDotClassName,
-  ingredientListGlanceTitle,
+  formatIngredientListLastPurchaseColumn,
+  formatIngredientListRowSubline,
+  formatOperationalListRowDominantReason,
+  pricingSnapshotForListRow,
 } from "@/lib/ingredient-list-glance-signals";
+import { loadMatchingIngredientCatalog } from "@/lib/ingredient-catalog-load";
+import { loadConfirmedIngredientAliasMap } from "@/lib/ingredient-alias-memory";
+import { loadLatestPurchaseGlanceByIngredientId } from "@/lib/ingredient-pricing-freshness";
+import type { IngredientLatestPurchaseGlance } from "@/lib/ingredient-operational-intelligence";
 import {
   traceCanonicalCreateAttempt,
   traceCanonicalCreateNameSource,
@@ -54,7 +67,10 @@ export const Route = createFileRoute("/ingredients")({
   head: () => ({
     meta: [
       { title: "Ingredient Costs — Marginly" },
-      { name: "description", content: "Manage ingredient pack prices and recipe unit costs." },
+      {
+        name: "description",
+        content: "Catalog ingredients, purchase history, and operational hygiene queues.",
+      },
     ],
   }),
   component: IngredientsPage,
@@ -84,6 +100,9 @@ function IngredientsIndexPage() {
   const { user } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
   const [priceActivity, setPriceActivity] = useState<Record<string, PriceActivity>>({});
+  const [lastPurchaseGlanceByIngredientId, setLastPurchaseGlanceByIngredientId] = useState<
+    Record<string, IngredientLatestPurchaseGlance>
+  >({});
   const [recipeLinkActivity, setRecipeLinkActivity] = useState<Record<string, RecipeLinkActivity>>(
     {},
   );
@@ -110,6 +129,32 @@ function IngredientsIndexPage() {
   const [namingReviewActive, setNamingReviewActive] = useState(false);
   const [namingReviewIndex, setNamingReviewIndex] = useState(0);
   const [namingReviewEpoch, setNamingReviewEpoch] = useState(0);
+  const [listQueueFilter, setListQueueFilter] = useState<OperationalListFilter | null>(null);
+  const [unusedReviewIds, setUnusedReviewIds] = useState<Set<string>>(new Set());
+  const [orphanReportsByIngredientId, setOrphanReportsByIngredientId] = useState<
+    Map<string, IngredientOrphanReport>
+  >(new Map());
+  const exitToBrowse = useCallback(() => {
+    setListQueueFilter(null);
+    setNamingReviewActive(false);
+    setNamingReviewIndex(0);
+    setSelectedIngredientId(null);
+  }, []);
+
+  const clearListReview = exitToBrowse;
+
+  const applyListReview = useCallback(
+    (filter: OperationalListFilter | null) => {
+      if (!filter) {
+        exitToBrowse();
+        return;
+      }
+      setListQueueFilter(filter);
+      setNamingReviewActive(false);
+      setNamingReviewIndex(0);
+    },
+    [exitToBrowse],
+  );
 
   const catalogForNaming = useMemo(
     () =>
@@ -177,12 +222,7 @@ function IngredientsIndexPage() {
     if (namingReviewIndex >= namingReviewQueue.length) {
       handleNamingReviewIndexChange(namingReviewQueue.length - 1);
     }
-  }, [
-    namingReviewActive,
-    namingReviewQueue,
-    namingReviewIndex,
-    handleNamingReviewIndexChange,
-  ]);
+  }, [namingReviewActive, namingReviewQueue, namingReviewIndex, handleNamingReviewIndexChange]);
 
   const load = async () => {
     setLoading(true);
@@ -201,10 +241,22 @@ function IngredientsIndexPage() {
 
       if (ingredientIds.length === 0) {
         setPriceActivity({});
+        setLastPurchaseGlanceByIngredientId({});
         setRecipeLinkActivity({});
         setVolatileIngredientIds(new Set());
       } else {
-        const [{ data: historyData }, { data: linkData }, volatileRows] = await Promise.all([
+        const catalogForPurchaseScan = ingredientRows.map((row) => ({
+          id: row.id,
+          name: row.name,
+          normalized_name: row.normalized_name,
+        }));
+        const [
+          { data: historyData },
+          { data: linkData },
+          volatileRows,
+          dbAliases,
+          matchCatalogResult,
+        ] = await Promise.all([
           supabase
             .from("ingredient_price_history")
             .select("ingredient_id, created_at, delta, delta_percent")
@@ -215,11 +267,20 @@ function IngredientsIndexPage() {
             .select("ingredient_id, created_at")
             .in("ingredient_id", ingredientIds),
           getVolatileIngredients(supabase),
+          loadConfirmedIngredientAliasMap(supabase),
+          loadMatchingIngredientCatalog(supabase),
         ]);
-
-        setVolatileIngredientIds(
-          new Set(volatileRows.map((row) => row.ingredient_id)),
+        const purchaseRecencyAliases = {
+          ...readLocalInvoiceIngredientAliases(user?.id),
+          ...dbAliases,
+        };
+        const lastPurchasesResolved = await loadLatestPurchaseGlanceByIngredientId(
+          supabase,
+          matchCatalogResult.rows.length > 0 ? matchCatalogResult.rows : catalogForPurchaseScan,
+          purchaseRecencyAliases,
         );
+
+        setVolatileIngredientIds(new Set(volatileRows.map((row) => row.ingredient_id)));
 
         const latestActivity: Record<string, PriceActivity> = {};
         (historyData ?? []).forEach((activity) => {
@@ -228,6 +289,7 @@ function IngredientsIndexPage() {
           }
         });
         setPriceActivity(latestActivity);
+        setLastPurchaseGlanceByIngredientId(lastPurchasesResolved);
 
         const linkActivity: Record<string, RecipeLinkActivity> = {};
         (linkData ?? []).forEach((link) => {
@@ -256,6 +318,28 @@ function IngredientsIndexPage() {
   useEffect(() => {
     if (user) load();
   }, [user]);
+
+  useEffect(() => {
+    if (!user || rows.length === 0) {
+      setUnusedReviewIds(new Set());
+      setOrphanReportsByIngredientId(new Map());
+      return;
+    }
+    let cancelled = false;
+    const catalog = rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      normalized_name: row.normalized_name,
+    }));
+    void detectOrphanCanonicalIngredients(supabase, catalog).then(({ reports }) => {
+      if (cancelled) return;
+      setOrphanReportsByIngredientId(reports);
+      setUnusedReviewIds(unusedReviewIngredientIds(catalog, reports));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [user, rows]);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -393,11 +477,7 @@ function IngredientsIndexPage() {
       name: row.name,
       normalized_name: row.normalized_name,
     }));
-    const payload = buildCanonicalIngredientRenamePayload(
-      renameTarget.id,
-      rawName,
-      catalog,
-    );
+    const payload = buildCanonicalIngredientRenamePayload(renameTarget.id, rawName, catalog);
     if (!payload.ok) {
       setRenameSaving(false);
       setRenameError(payload.message);
@@ -449,10 +529,159 @@ function IngredientsIndexPage() {
     ? (rows.find((ingredient) => ingredient.id === selectedIngredientId) ?? null)
     : null;
 
+  const duplicateIngredientIds = useMemo(
+    () =>
+      duplicateClusterIngredientIds(
+        rows.map((row) => ({
+          id: row.id,
+          name: row.name,
+          normalized_name: row.normalized_name,
+        })),
+      ),
+    [rows],
+  );
+
+  const catalogCanonicalInput = useMemo(
+    () =>
+      rows.map((row) => ({
+        id: row.id,
+        name: row.name,
+        normalized_name: row.normalized_name,
+        created_at: row.created_at,
+      })),
+    [rows],
+  );
+
+  const visibleRows = useMemo(() => {
+    if (!listQueueFilter) return rows;
+    if (listQueueFilter === "duplicates") {
+      return rows.filter((row) => duplicateIngredientIds.has(row.id));
+    }
+    if (listQueueFilter === "unused") {
+      return rows.filter((row) => unusedReviewIds.has(row.id));
+    }
+    return rows;
+  }, [rows, listQueueFilter, duplicateIngredientIds, unusedReviewIds]);
+
+  const recipeCountById = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const [id, activity] of Object.entries(recipeLinkActivity)) {
+      counts[id] = activity?.count ?? 0;
+    }
+    return counts;
+  }, [recipeLinkActivity]);
+
+  const selectedDuplicateCluster = useMemo(() => {
+    if (!selectedIngredient || listQueueFilter !== "duplicates") return null;
+    return findOperationalDuplicateClusterForIngredient(
+      catalogCanonicalInput,
+      selectedIngredient.id,
+    );
+  }, [selectedIngredient, listQueueFilter, catalogCanonicalInput]);
+
+  const duplicateListGroups = useMemo(() => {
+    if (listQueueFilter !== "duplicates") return null;
+    return buildDuplicateReviewListGroups(catalogCanonicalInput, visibleRows);
+  }, [listQueueFilter, catalogCanonicalInput, visibleRows]);
+
+  const rowsById = useMemo(() => new Map(rows.map((row) => [row.id, row])), [rows]);
+
+  const renderIngredientRow = (ing: Row) => {
+    const latestPriceActivity = priceActivity[ing.id];
+    const purchaseGlance = lastPurchaseGlanceByIngredientId[ing.id];
+    const pricingRecency = {
+      priceRefreshAt: latestPriceActivity?.created_at ?? null,
+      lastPurchaseAt: purchaseGlance?.lastPurchaseAt ?? null,
+    };
+    const aliasOnly = isAliasOnlyOperationalDependency(
+      orphanReportsByIngredientId.get(ing.id) ?? emptyOrphanReport(ing.id),
+    );
+    const pricingSnapshot = pricingSnapshotForListRow({
+      ingredient: ing,
+      priceActivity: latestPriceActivity,
+      pricingRecency,
+    });
+    const dominantReason = formatOperationalListRowDominantReason({
+      listReviewMode: listQueueFilter,
+      pricingSnapshot,
+      aliasOnly,
+      purchaseGlance,
+    });
+    const rowSubline = formatIngredientListRowSubline({
+      listReviewMode: listQueueFilter,
+      dominantReason,
+      purchaseGlance,
+    });
+    const lastPurchaseColumn = formatIngredientListLastPurchaseColumn(purchaseGlance);
+    const selected = selectedIngredientId === ing.id;
+    const selectedRowClass = selected
+      ? listQueueFilter
+        ? operationalListReviewRowSelectedClass(listQueueFilter)
+        : operationalListBrowseRowSelectedClass()
+      : "";
+    return (
+      <tr
+        key={ing.id}
+        aria-selected={selected}
+        onClick={() => setSelectedIngredientId(ing.id)}
+        className={`group cursor-pointer transition-colors duration-150 ease-out hover:bg-muted/[0.04] focus-within:bg-muted/[0.04] ${
+          selectedRowClass
+        }`}
+      >
+        <td className="min-w-0 px-3 py-2">
+          <div className="min-w-0">
+            <p className="min-w-0 truncate text-sm font-semibold leading-snug text-foreground">
+              {formatCanonicalIngredientDisplayName(ing.name)}
+            </p>
+            {rowSubline ? (
+              <p className="mt-0.5 truncate text-xs leading-snug text-muted-foreground">
+                {rowSubline}
+              </p>
+            ) : null}
+          </div>
+        </td>
+        <td className="px-3 py-2 align-middle tabular-nums whitespace-nowrap">
+          <span className="text-xs text-muted-foreground">{lastPurchaseColumn}</span>
+        </td>
+        <td className="px-3 py-2 text-right align-middle tabular-nums whitespace-nowrap">
+          <span className="text-xs font-medium text-foreground/90">
+            {formatCurrency(Number(ing.current_price))}
+          </span>
+        </td>
+        <td className="py-2 pl-1 pr-3 text-right align-middle whitespace-nowrap">
+          <div className="flex items-center justify-end gap-0.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus-within:opacity-100">
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                openRename(ing.id);
+              }}
+              className="inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground/70 transition-colors duration-150 ease-out hover:bg-muted/40 hover:text-foreground focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/10"
+              aria-label={`Rename ${formatCanonicalIngredientDisplayName(ing.name)}`}
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                requestDelete(ing.id);
+              }}
+              className="inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground/70 transition-colors duration-150 ease-out hover:bg-muted/40 hover:text-destructive focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/10"
+              aria-label={`Delete ${formatCanonicalIngredientDisplayName(ing.name)}`}
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        </td>
+      </tr>
+    );
+  };
+
   return (
     <AppShell
       title="Ingredient costs"
-      subtitle="Manage pack prices and recipe unit costs for margin control."
+      subtitle="Review what matters. Act with confidence."
       action={
         <div className="flex flex-wrap items-center gap-2">
           <Link
@@ -460,7 +689,7 @@ function IngredientsIndexPage() {
             className="inline-flex items-center gap-2 rounded-lg border border-border px-3.5 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50"
           >
             <ClipboardList className="h-4 w-4" />
-            Revisão catálogo
+            Catalog review
           </Link>
           <button
             onClick={() => setOpen((v) => !v)}
@@ -474,8 +703,10 @@ function IngredientsIndexPage() {
       <OperationalReviewQueueSection
         userId={user?.id}
         catalog={rows}
+        activeListFilter={listQueueFilter}
         onSelectIngredient={(id) => setSelectedIngredientId(id)}
         onEnterNamingReview={enterNamingReview}
+        onApplyListFilter={applyListReview}
       />
       {open && (
         <Card className="mb-3">
@@ -548,112 +779,83 @@ function IngredientsIndexPage() {
         </Card>
       )}
 
-      <div className="grid gap-2 lg:grid-cols-[minmax(0,47fr)_minmax(0,53fr)] lg:items-stretch lg:min-h-[min(70vh,640px)]">
-        <Card className="flex min-h-0 min-w-0 flex-col p-0 lg:max-h-[min(70vh,640px)]">
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,40fr)_minmax(0,60fr)] lg:items-stretch lg:min-h-[min(72vh,680px)]">
+        <Card className="flex min-h-0 min-w-0 flex-col overflow-hidden border-border/50 bg-card p-0 shadow-sm lg:max-h-[min(72vh,680px)]">
+          {listQueueFilter && (
+            <div
+              className={`flex shrink-0 items-center justify-between gap-2 border-b border-border/10 px-2.5 py-1 ${operationalListReviewBannerClass(listQueueFilter)}`}
+            >
+              <p className="min-w-0 truncate text-[10px] font-medium text-foreground/90">
+                {operationalListFilterReviewBarTitle(listQueueFilter, visibleRows.length)}
+              </p>
+              <button
+                type="button"
+                onClick={clearListReview}
+                className="shrink-0 text-[10px] text-muted-foreground/55 hover:text-foreground"
+              >
+                All
+              </button>
+            </div>
+          )}
           <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto">
             <table className="w-full text-sm">
-              <thead className="sticky top-0 z-[1] bg-muted/50 backdrop-blur-sm">
-                <tr className="text-left text-[10px] uppercase tracking-wide text-muted-foreground">
-                  <th className="py-1 px-2.5 font-medium">Ingredient</th>
-                  <th className="py-1 px-2.5 font-medium text-right whitespace-nowrap">Pack</th>
-                  <th className="py-1 pl-1 pr-2.5 font-medium text-right w-[4.5rem]">Actions</th>
+              <thead className="sticky top-0 z-[1] border-b border-border/15 bg-card">
+                <tr className="text-left text-xs font-medium text-muted-foreground/70">
+                  <th className="px-3 py-2 font-medium">Ingredient</th>
+                  <th className="px-3 py-2 font-medium whitespace-nowrap">Last purchase</th>
+                  <th className="px-3 py-2 font-medium text-right whitespace-nowrap">Pack price</th>
+                  <th className="w-14 py-2 pr-3 font-medium text-right" aria-label="Actions" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-border/20">
                 {loading && (
                   <tr>
-                    <td colSpan={3} className="py-10 text-center">
+                    <td colSpan={4} className="py-6 text-center">
                       <Loader2 className="h-4 w-4 animate-spin inline text-muted-foreground" />
                     </td>
                   </tr>
                 )}
                 {!loading && rows.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="py-10 text-center text-sm text-muted-foreground">
-                      Add ingredients to start tracking pack prices.
+                    <td colSpan={4} className="px-2.5 py-6">
+                      <p className="text-[12px] font-medium text-foreground/85">
+                        No ingredients yet
+                      </p>
                     </td>
                   </tr>
                 )}
-                {rows.map((ing) => {
-                  const base = ingredientDisplayBaseUnit(ing);
-                  const pq = Number(ing.purchase_quantity);
-                  const denom = Number.isFinite(pq) && pq > 0 ? pq : 1;
-                  const eff = effectiveIngredientUnitCostEur(ing);
-                  const linkActivity = recipeLinkActivity[ing.id];
-                  const latestPriceActivity = priceActivity[ing.id];
-                  const selected = selectedIngredient?.id === ing.id;
-                  return (
-                    <tr
-                      key={ing.id}
-                      aria-selected={selected}
-                      onClick={() => setSelectedIngredientId(ing.id)}
-                      className={`group cursor-pointer transition-[background-color,box-shadow] duration-150 ease-out hover:bg-muted/25 hover:shadow-[inset_2px_0_0_var(--color-border)] focus-within:bg-muted/25 ${
-                        selected ? "bg-muted/35 shadow-[inset_2px_0_0_var(--color-foreground)]" : ""
-                      }`}
-                    >
-                      <td className="py-1 px-2.5 min-w-0">
-                        <div className="flex min-w-0 items-center gap-1.5">
-                          <span className="min-w-0 truncate text-[13px] font-medium leading-snug transition-colors group-hover:text-foreground">
-                            {formatCanonicalIngredientDisplayName(ing.name)}
-                          </span>
-                          <IngredientListGlanceDots
-                            ingredient={ing}
-                            priceActivity={latestPriceActivity}
-                            recipeLinkActivity={linkActivity}
-                            volatileIngredientIds={volatileIngredientIds}
-                          />
-                        </div>
-                        <div className="text-[10px] leading-snug text-muted-foreground">
-                          {denom > 1
-                            ? `${formatUnitCostCurrency(eff)}/${base} · ${formatQuantityWithUnit(denom, ing.purchase_unit)}`
-                            : `per ${base}`}
-                          {linkActivity
-                            ? ` · ${linkActivity.count} ${linkActivity.count === 1 ? "recipe" : "recipes"}`
-                            : ""}
-                        </div>
-                      </td>
-                      <td className="py-1 px-2.5 text-right tabular-nums text-[13px] font-medium whitespace-nowrap">
-                        <div>{formatCurrency(Number(ing.current_price))}</div>
-                        <PriceActivityNote activity={latestPriceActivity} />
-                      </td>
-                      <td className="py-1 pl-1 pr-2.5 text-right align-middle whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-0.5">
-                          <button
-                            type="button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              openRename(ing.id);
-                            }}
-                            className="inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/15"
-                            aria-label={`Rename ${formatCanonicalIngredientDisplayName(ing.name)}`}
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              requestDelete(ing.id);
-                            }}
-                            className="inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/70 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/15"
-                            aria-label={`Delete ${formatCanonicalIngredientDisplayName(ing.name)}`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {!loading && rows.length > 0 && visibleRows.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-2.5 py-6">
+                      <p className="text-[12px] text-muted-foreground/60">Queue clear</p>
+                    </td>
+                  </tr>
+                )}
+                {duplicateListGroups
+                  ? duplicateListGroups.flatMap((group) =>
+                      group.rowIds.map((rowId) => {
+                        const ing = rowsById.get(rowId);
+                        return ing ? renderIngredientRow(ing) : null;
+                      }),
+                    )
+                  : visibleRows.map((ing) => renderIngredientRow(ing))}
               </tbody>
             </table>
           </div>
+          {!loading && rows.length > 0 ? (
+            <div className="shrink-0 border-t border-border/40 px-3 py-2 text-xs text-muted-foreground">
+              {rows.length} {rows.length === 1 ? "ingredient" : "ingredients"}
+            </div>
+          ) : null}
         </Card>
 
         <IngredientDetailOperationalLayout
           ingredient={selectedIngredient}
           userId={user?.id}
           catalog={rows}
+          listReviewMode={listQueueFilter}
+          duplicateCluster={selectedDuplicateCluster}
+          recipeCountById={recipeCountById}
           priceActivity={selectedIngredient ? priceActivity[selectedIngredient.id] : undefined}
           recipeLinkActivity={
             selectedIngredient ? recipeLinkActivity[selectedIngredient.id] : undefined
@@ -669,6 +871,9 @@ function IngredientsIndexPage() {
             setSelectedIngredientId(null);
           }}
           onSelectRelated={(id) => setSelectedIngredientId(id)}
+          onExitListReview={clearListReview}
+          onApplyListFilter={applyListReview}
+          onSelectIngredient={(id) => setSelectedIngredientId(id)}
           onRename={(id, suggestedName) => openRename(id, suggestedName)}
           onDelete={(id) => requestDelete(id)}
         />
@@ -697,69 +902,6 @@ function IngredientsIndexPage() {
         onConfirm={() => void confirmDelete()}
       />
     </AppShell>
-  );
-}
-
-function IngredientListGlanceDots({
-  ingredient,
-  priceActivity,
-  recipeLinkActivity,
-  volatileIngredientIds,
-}: {
-  ingredient: Row;
-  priceActivity: PriceActivity | undefined;
-  recipeLinkActivity: RecipeLinkActivity | undefined;
-  volatileIngredientIds: ReadonlySet<string>;
-}) {
-  const signals = deriveIngredientListGlanceSignals({
-    ingredient,
-    priceActivity,
-    recipeLinkActivity,
-    volatileIngredientIds,
-  });
-  if (signals.length === 0) return null;
-
-  return (
-    <span
-      className="inline-flex shrink-0 items-center gap-[3px]"
-      aria-label={signals.map(ingredientListGlanceTitle).join(", ")}
-    >
-      {signals.map((signal) => (
-        <span
-          key={signal}
-          className={`size-[5px] rounded-full ${ingredientListGlanceDotClassName(signal)}`}
-          title={ingredientListGlanceTitle(signal)}
-          aria-hidden
-        />
-      ))}
-    </span>
-  );
-}
-
-function PriceActivityNote({ activity }: { activity: PriceActivity | undefined }) {
-  if (!activity || !isRecentDate(activity.created_at)) return null;
-
-  const deltaPercent = activity.delta_percent;
-  const hasDirectionalChange = typeof deltaPercent === "number" && deltaPercent !== 0;
-  const direction = hasDirectionalChange && deltaPercent > 0 ? "up" : "down";
-  const Icon = direction === "up" ? TrendingUp : TrendingDown;
-
-  return (
-    <div
-      className={`mt-1 inline-flex items-center justify-end gap-1 whitespace-nowrap text-[11px] font-normal ${
-        hasDirectionalChange
-          ? direction === "up"
-            ? "text-destructive"
-            : "text-success"
-          : "text-muted-foreground"
-      }`}
-    >
-      {hasDirectionalChange && <Icon className="h-3 w-3" />}
-      <span>
-        Price updated in last 14 days
-        {hasDirectionalChange ? ` · ${formatPercent(deltaPercent, { signDisplay: "always" })}` : ""}
-      </span>
-    </div>
   );
 }
 

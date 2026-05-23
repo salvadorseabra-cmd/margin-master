@@ -1,5 +1,7 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import {
+  buildLatestConfirmedPurchaseAtByIngredientIdFromScan,
+  buildLatestPurchaseGlanceByIngredientIdFromScan,
   buildMatchedInvoiceProductsFromScan,
   buildOperationalProfileFromAliasRows,
   buildUsableQuantityPreview,
@@ -48,6 +50,40 @@ describe("ingredient-operational-intelligence", () => {
     );
 
     expect(result.products).toHaveLength(2);
+
+    const scanRows = [
+      {
+        id: "line-1",
+        invoice_id: "inv-1",
+        name: "BATATA PALHA EXTRA FINA FS 2KG",
+        quantity: 2,
+        unit: "un",
+        unit_price: 10,
+        total: 20,
+        created_at: "2026-02-01T00:00:00.000Z",
+        invoices: { invoice_date: "2026-02-10", supplier_name: "Metro" },
+      },
+      {
+        id: "line-2",
+        invoice_id: "inv-2",
+        name: "PALHA AUCHAN 2KG",
+        quantity: 1,
+        unit: "un",
+        unit_price: 8,
+        total: 8,
+        created_at: "2026-01-15T00:00:00.000Z",
+        invoices: { invoice_date: "2026-01-20", supplier_name: "Auchan" },
+      },
+    ];
+    const latestById = buildLatestConfirmedPurchaseAtByIngredientIdFromScan(
+      palhaCatalog,
+      {},
+      scanRows,
+    );
+    const glanceById = buildLatestPurchaseGlanceByIngredientIdFromScan(palhaCatalog, {}, scanRows);
+    expect(glanceById["bat-palha"]?.supplierLabel).toBe("Metro");
+    expect(glanceById["bat-palha"]?.lastPurchaseAt).toBe("2026-02-10");
+    expect(latestById["bat-palha"]).toBe("2026-02-10");
     expect(result.products.map((row) => row.itemName)).toEqual([
       "BATATA PALHA EXTRA FINA FS 2KG",
       "PALHA AUCHAN 2KG",

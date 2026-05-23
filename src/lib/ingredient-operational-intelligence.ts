@@ -688,6 +688,117 @@ export function buildMatchedInvoiceProductsFromScan(
   };
 }
 
+export type IngredientLatestPurchaseGlance = {
+  lastPurchaseAt: string | null;
+  supplierLabel: string | null;
+};
+
+/**
+ * Latest matched invoice purchase (date + supplier) per catalog ingredient id.
+ * Uses the same live ItemsTable matcher scan as purchase memory — one pass over invoice lines.
+ */
+export function buildLatestPurchaseGlanceByIngredientIdFromScan(
+  catalog: readonly IngredientCanonicalInput[],
+  confirmedAliases: IngredientAliasMap,
+  scanRows: readonly MatchedInvoiceItemScanRow[],
+): Record<string, IngredientLatestPurchaseGlance> {
+  const catalogIds = new Set(
+    catalog.map((row) => row.id?.trim()).filter((id): id is string => Boolean(id)),
+  );
+  if (catalogIds.size === 0 || scanRows.length === 0) return {};
+
+  const eligibleRows = scanRows
+    .map((row) =>
+      normalizeInvoiceItemFields({
+        id: row.id,
+        name: row.name,
+        quantity: row.quantity,
+        unit: row.unit,
+        unit_price: row.unit_price,
+        total: row.total,
+      }),
+    )
+    .filter(isEligibleInvoiceIngredientRow);
+  if (eligibleRows.length === 0) return {};
+
+  const matchCatalog = buildInvoiceMatchCatalog(
+    [...catalog],
+    eligibleRows.map((row) => ({ name: row.name })),
+  );
+  const canonicalNameById = new Map(
+    catalog
+      .map((row) => [row.id?.trim() ?? "", resolveCanonicalNameForIngredient(row.id ?? "", catalog)] as const)
+      .filter(([id]) => Boolean(id)),
+  );
+  const sourceById = new Map(scanRows.map((row) => [row.id, row]));
+  const seenItemIds = new Set<string>();
+  const latest: Record<string, IngredientLatestPurchaseGlance> = {};
+
+  for (const normalized of eligibleRows) {
+    const source = sourceById.get(normalized.id);
+    if (!source || seenItemIds.has(normalized.id)) continue;
+
+    const supplierName = normalizeSupplierScope(source.invoices?.supplier_name ?? null);
+    const { match, state } = resolveInvoiceTableRowIngredientMatch(
+      normalized.name,
+      matchCatalog,
+      confirmedAliases,
+      supplierName,
+    );
+    const matchedIngredientId = match?.ingredient.id?.trim();
+    if (!match || !matchedIngredientId || !catalogIds.has(matchedIngredientId)) continue;
+
+    const canonicalName = canonicalNameById.get(matchedIngredientId);
+    if (
+      canonicalName?.trim() &&
+      shouldSkipByOperationalProductFamilyGate(normalized.name, canonicalName)
+    ) {
+      continue;
+    }
+
+    const bucket = invoiceRowMatchSummaryBucket(state.displayState);
+    if (bucket === "unmatched") continue;
+
+    seenItemIds.add(normalized.id);
+    const invoiceDate =
+      source.invoices?.invoice_date?.trim() ||
+      source.created_at?.trim()?.slice(0, 10) ||
+      null;
+    if (!invoiceDate) continue;
+
+    const previous = latest[matchedIngredientId]?.lastPurchaseAt ?? null;
+    if (!previous || compareInvoiceDatesDesc(previous, invoiceDate) > 0) {
+      latest[matchedIngredientId] = {
+        lastPurchaseAt: invoiceDate,
+        supplierLabel: supplierName,
+      };
+    }
+  }
+
+  return latest;
+}
+
+/**
+ * Latest confirmed invoice purchase date (ISO or YYYY-MM-DD) per catalog ingredient id.
+ * Uses the same live ItemsTable matcher scan as purchase memory — one pass over invoice lines.
+ */
+export function buildLatestConfirmedPurchaseAtByIngredientIdFromScan(
+  catalog: readonly IngredientCanonicalInput[],
+  confirmedAliases: IngredientAliasMap,
+  scanRows: readonly MatchedInvoiceItemScanRow[],
+): Record<string, string | null> {
+  const glance = buildLatestPurchaseGlanceByIngredientIdFromScan(
+    catalog,
+    confirmedAliases,
+    scanRows,
+  );
+  const latest: Record<string, string | null> = {};
+  for (const [id, entry] of Object.entries(glance)) {
+    latest[id] = entry.lastPurchaseAt;
+  }
+  return latest;
+}
+
 export async function loadInvoiceItemsForMatchedProductScan(
   client: DbClient,
 ): Promise<{ rows: MatchedInvoiceItemScanRow[]; truncated: boolean }> {

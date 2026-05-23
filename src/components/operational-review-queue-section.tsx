@@ -1,74 +1,63 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { AlertCircle, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { AlertCircle, ChevronRight, Copy, FolderOpen, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  buildOperationalPriorityTiers,
   buildOperationalReviewQueue,
+  countDuplicateCanonicalRisk,
+  INGREDIENTS_PAGE_LIST_FILTERS,
+  operationalHygieneCardSubtext,
+  operationalListFilterLabel,
+  operationalListFilterQueueCardActiveClass,
+  queueCardCount,
+  type OperationalListFilter,
+  type OperationalPriorityTierGroup,
   type OperationalReviewCtaTarget,
-  type OperationalReviewItem,
-  type OperationalReviewSeverity,
 } from "@/lib/operational-review-queue";
 import type { Tables } from "@/integrations/supabase/types";
 
-type IngredientRow = Pick<Tables<"ingredients">, "id" | "name" | "normalized_name">;
+type IngredientRow = Pick<
+  Tables<"ingredients">,
+  "id" | "name" | "normalized_name" | "current_price" | "updated_at"
+>;
+
+const PAGE_QUEUE_LABELS: Record<(typeof INGREDIENTS_PAGE_LIST_FILTERS)[number], string> = {
+  duplicates: "Possible duplicates",
+  unused: "Unused catalog entries",
+};
 
 type Props = {
   userId: string | undefined;
   catalog: IngredientRow[];
+  activeListFilter?: OperationalListFilter | null;
   onSelectIngredient: (ingredientId: string) => void;
   onEnterNamingReview?: () => void;
+  onApplyListFilter?: (filter: OperationalListFilter | null) => void;
 };
-
-function severityBadgeClass(severity: OperationalReviewSeverity): string {
-  if (severity === "high") return "border-destructive/30 bg-destructive/10 text-destructive";
-  if (severity === "medium") return "border-warning/30 bg-warning/10 text-warning";
-  return "border-border/70 bg-muted/40 text-muted-foreground";
-}
-
-function ReviewQueueStripItem({
-  item,
-  onCta,
-}: {
-  item: OperationalReviewItem;
-  onCta: (target: OperationalReviewCtaTarget) => void;
-}) {
-  return (
-    <div className="flex min-w-[200px] max-w-[280px] shrink-0 items-center gap-2 rounded-md border border-border/60 bg-card/90 px-2 py-1">
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1">
-          <span className="truncate text-[11px] font-semibold leading-none">{item.title}</span>
-          <span
-            className={`shrink-0 rounded border px-1 py-px text-[9px] font-bold tabular-nums leading-none ${severityBadgeClass(item.severity)}`}
-          >
-            {item.count}
-          </span>
-        </div>
-        <p className="mt-0.5 truncate text-[10px] leading-none text-muted-foreground" title={item.explanation}>
-          {item.explanation}
-        </p>
-      </div>
-      <button
-        type="button"
-        onClick={() => onCta(item.ctaTarget)}
-        className="inline-flex shrink-0 cursor-pointer items-center gap-0.5 text-[10px] font-medium text-foreground hover:opacity-80"
-      >
-        {item.ctaLabel}
-        <ArrowRight className="h-2.5 w-2.5" />
-      </button>
-    </div>
-  );
-}
 
 export function OperationalReviewQueueSection({
   userId,
   catalog,
+  activeListFilter = null,
   onSelectIngredient,
   onEnterNamingReview,
+  onApplyListFilter,
 }: Props) {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [items, setItems] = useState<OperationalReviewItem[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [tierGroups, setTierGroups] = useState<OperationalPriorityTierGroup[]>([]);
+
+  const duplicateRisk = useMemo(
+    () =>
+      countDuplicateCanonicalRisk(
+        catalog.map((row) => ({
+          id: row.id,
+          name: row.name,
+          normalized_name: row.normalized_name,
+        })),
+      ),
+    [catalog],
+  );
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -79,7 +68,7 @@ export function OperationalReviewQueueSection({
       catalog,
       includeInvoiceUnmatched: false,
     });
-    setItems(result.items);
+    setTierGroups(buildOperationalPriorityTiers(result.items, catalog.length));
     setError(result.error);
     setLoading(false);
   }, [userId, catalog]);
@@ -90,93 +79,139 @@ export function OperationalReviewQueueSection({
 
   const handleCta = useCallback(
     (target: OperationalReviewCtaTarget) => {
-      if (target.kind === "route") {
-        void navigate({ to: target.path });
-        return;
-      }
       if (target.kind === "naming_review") {
+        onApplyListFilter?.(null);
         onEnterNamingReview?.();
-        requestAnimationFrame(() => {
-          document
-            .getElementById("canonical-ingredient-naming-review")
-            ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        });
         return;
       }
-      if (target.kind === "catalog_review") {
-        void navigate({ to: "/ingredients/review" });
+      if (target.kind === "catalog_review" || target.kind === "informational") {
+        return;
+      }
+      if (target.kind === "list_filter") {
+        const next = activeListFilter === target.filter ? null : target.filter;
+        onApplyListFilter?.(next);
+        if (next) {
+          const id = target.ingredientId?.trim();
+          if (id) onSelectIngredient(id);
+        }
         return;
       }
       if (target.kind === "ingredient_suggestions" || target.kind === "ingredient_family") {
+        onApplyListFilter?.(null);
         onSelectIngredient(target.ingredientId);
-        const scrollId =
-          target.kind === "ingredient_suggestions"
-            ? "canonical-ingredient-suggestions"
-            : "ingredient-family-section";
-        requestAnimationFrame(() => {
-          document.getElementById(scrollId)?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        });
       }
     },
-    [navigate, onEnterNamingReview, onSelectIngredient],
+    [onEnterNamingReview, onSelectIngredient, onApplyListFilter, activeListFilter],
   );
+
+  const hygieneCards = useMemo(() => {
+    return INGREDIENTS_PAGE_LIST_FILTERS.map((filter) => ({
+      filter,
+      label: PAGE_QUEUE_LABELS[filter],
+      count: queueCardCount(tierGroups, filter),
+      subtext: operationalHygieneCardSubtext(filter, {
+        clusterCount: duplicateRisk.clusterCount,
+        entryCount: queueCardCount(tierGroups, filter),
+      }),
+    }));
+  }, [tierGroups, duplicateRisk.clusterCount]);
 
   if (loading) {
     return (
-      <section className="mb-2 shrink-0 rounded-md border border-border/60 bg-muted/10 px-2.5 py-1.5">
-        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-          <Loader2 className="h-3 w-3 animate-spin" />
-          Checking catalog review queue…
-        </div>
-      </section>
+      <div className="mb-3 flex items-center gap-2 rounded-lg border border-border/50 bg-card px-3 py-2.5 text-xs text-muted-foreground shadow-sm">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        Loading catalog hygiene…
+      </div>
     );
   }
 
   if (error) {
     return (
-      <section className="mb-2 shrink-0 rounded-md border border-destructive/25 bg-destructive/5 px-2.5 py-1.5">
-        <div className="flex items-center gap-1.5 text-[11px] text-destructive">
-          <AlertCircle className="h-3 w-3 shrink-0" />
-          <span className="truncate">Could not load review queue. {error}</span>
-        </div>
-      </section>
+      <div className="mb-3 flex items-center gap-2 rounded-lg border border-destructive/25 bg-destructive/5 px-3 py-2.5 text-xs text-destructive shadow-sm">
+        <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+        <span className="truncate">Catalog hygiene unavailable</span>
+      </div>
     );
   }
-
-  if (items.length === 0) {
-    return (
-      <section className="mb-2 shrink-0 rounded-md border border-border/60 bg-muted/10 px-2.5 py-1.5">
-        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-          <CheckCircle2 className="h-3 w-3 text-success" />
-          <span>Catalog review queue is clear.</span>
-        </div>
-      </section>
-    );
-  }
-
-  const headline =
-    items.length === 1 ? "1 catalog item needs review" : `${items.length} catalog items need review`;
 
   return (
-    <section className="mb-2 shrink-0 rounded-md border border-border/60 bg-muted/10 px-2 py-1.5">
-      <div className="flex items-center gap-2">
-        <div className="min-w-0 shrink-0">
-          <h2 className="text-[11px] font-semibold leading-none tracking-tight">{headline}</h2>
-        </div>
-        <div className="min-w-0 flex-1 overflow-x-auto">
-          <div className="flex gap-1.5 pb-px">
-            {items.map((item) => (
-              <ReviewQueueStripItem key={item.id} item={item} onCta={handleCta} />
-            ))}
-          </div>
-        </div>
-        <Link
-          to="/ingredients/review"
-          className="shrink-0 text-[10px] font-medium text-muted-foreground hover:text-foreground"
-        >
-          Full review
-        </Link>
-      </div>
-    </section>
+    <div className="mb-3 grid gap-2 sm:grid-cols-2">
+      {hygieneCards.map((card) => {
+        const interactive = card.count > 0;
+        const active = activeListFilter === card.filter;
+        const shellClass = [
+          "group flex w-full items-center gap-3 rounded-lg border bg-card px-3 py-2.5 text-left shadow-sm transition-colors duration-150 ease-out",
+          card.filter === "duplicates" ? "border-border/60" : "border-border/60",
+          active ? operationalListFilterQueueCardActiveClass(card.filter) : "hover:bg-muted/20",
+          interactive ? "cursor-pointer" : "cursor-default opacity-70",
+        ].join(" ");
+
+        const body = (
+          <>
+            {card.filter === "duplicates" ? (
+              <div className="flex shrink-0 items-center gap-2 border-l-2 border-destructive/70 pl-2.5">
+                <Copy className="h-4 w-4 text-destructive/75" aria-hidden />
+              </div>
+            ) : (
+              <div className="flex shrink-0 items-center pl-0.5">
+                <FolderOpen className="h-4 w-4 text-muted-foreground/70" aria-hidden />
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="truncate text-sm font-semibold text-foreground">{card.label}</span>
+                <span
+                  className={`shrink-0 rounded-md px-1.5 py-0.5 text-xs font-semibold tabular-nums leading-none ${
+                    card.filter === "duplicates" && card.count > 0
+                      ? "bg-destructive/10 text-destructive"
+                      : "bg-muted/50 text-foreground"
+                  }`}
+                >
+                  {card.count}
+                </span>
+              </div>
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">{card.subtext}</p>
+            </div>
+            <ChevronRight
+              className={`h-4 w-4 shrink-0 text-muted-foreground/45 transition-transform ${
+                interactive ? "group-hover:translate-x-0.5" : ""
+              }`}
+              aria-hidden
+            />
+          </>
+        );
+
+        if (!interactive) {
+          return (
+            <div
+              key={card.filter}
+              className={shellClass}
+              title={operationalListFilterLabel(card.filter)}
+            >
+              {body}
+            </div>
+          );
+        }
+
+        return (
+          <button
+            key={card.filter}
+            type="button"
+            onClick={() => {
+              if (active) {
+                onApplyListFilter?.(null);
+              } else {
+                handleCta({ kind: "list_filter", filter: card.filter });
+              }
+            }}
+            className={shellClass}
+            aria-pressed={active}
+            title={operationalListFilterLabel(card.filter)}
+          >
+            {body}
+          </button>
+        );
+      })}
+    </div>
   );
 }
