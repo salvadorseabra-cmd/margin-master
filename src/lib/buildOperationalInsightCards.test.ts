@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { buildOperationalInsightCards } from "@/lib/buildOperationalInsightCards";
+import {
+  buildOperationalInsightCards,
+  operationalInsightCardClassName,
+} from "@/lib/buildOperationalInsightCards";
 import type { RecentPurchaseRow } from "@/lib/ingredient-purchase-memory";
 
 function purchase(
@@ -14,6 +17,12 @@ function purchase(
 }
 
 describe("buildOperationalInsightCards", () => {
+  it("uses relative positioning shell for dismiss control overlay", () => {
+    const className = operationalInsightCardClassName("recipe-usage");
+    expect(className).toContain("relative");
+    expect(className).not.toContain("group");
+  });
+
   it("surfaces supplier price increase with percentage", () => {
     const cards = buildOperationalInsightCards({
       recentPurchases: [

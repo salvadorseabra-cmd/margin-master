@@ -21,16 +21,35 @@ function ingredient(
 
 type MockResult = { data: IngredientCanonicalInput[] | null; error: { message: string } | null };
 
-function selectChain(result: MockResult) {
+function activeArchiveFilterChain(result: MockResult, serverActiveFilterCalls?: string[]) {
   return {
-    eq: () => ({
-      is: () => Promise.resolve(result),
-    }),
+    or: (filter: string) => {
+      serverActiveFilterCalls?.push(`or=${filter}`);
+      return {
+        is: (column2: string, value2: unknown) => {
+          serverActiveFilterCalls?.push(`${column2}=${String(value2)}`);
+          return Promise.resolve(result);
+        },
+      };
+    },
+    eq: (column: string, value: unknown) => {
+      serverActiveFilterCalls?.push(`${column}=${String(value)}`);
+      return {
+        is: (column2: string, value2: unknown) => {
+          serverActiveFilterCalls?.push(`${column2}=${String(value2)}`);
+          return Promise.resolve(result);
+        },
+      };
+    },
     then: (
       onfulfilled?: (value: MockResult) => unknown,
       onrejected?: (reason: unknown) => unknown,
     ) => Promise.resolve(result).then(onfulfilled, onrejected),
   };
+}
+
+function selectChain(result: MockResult) {
+  return activeArchiveFilterChain(result);
 }
 
 const ORPHAN_DEPENDENCY_TABLES = new Set([
@@ -90,17 +109,7 @@ function mockCatalogClient(
         const result: MockResult = { data: rows, error: null };
         if (select.includes("is_archived")) {
           if (options?.trackServerActiveFilter) {
-            return {
-              eq: (column: string, value: unknown) => {
-                serverActiveFilterCalls.push(`${column}=${String(value)}`);
-                return {
-                  is: (column2: string, value2: unknown) => {
-                    serverActiveFilterCalls.push(`${column2}=${String(value2)}`);
-                    return Promise.resolve(result);
-                  },
-                };
-              },
-            };
+            return activeArchiveFilterChain(result, serverActiveFilterCalls);
           }
           return selectChain(result);
         }
@@ -175,7 +184,7 @@ describe("loadActiveIngredientCatalog", () => {
 
     await loadActiveIngredientCatalog(client);
     expect(serverActiveFilterCalls).toEqual([
-      "is_archived=false",
+      "or=is_archived.is.null,is_archived.eq.false",
       "merged_into_ingredient_id=null",
     ]);
   });

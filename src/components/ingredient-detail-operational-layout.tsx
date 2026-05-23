@@ -4,6 +4,7 @@ import {
   ChevronRight,
   FileText,
   Loader2,
+  Archive,
   MoreHorizontal,
   Pencil,
   Tags,
@@ -36,6 +37,7 @@ import {
 import {
   appendIngredientOperationalNote,
   readIngredientOperationalNotes,
+  removeIngredientOperationalNote,
 } from "@/lib/ingredient-operational-notes";
 import {
   buildDuplicateReviewDetail,
@@ -105,6 +107,7 @@ export type IngredientDetailPanelProps = {
   onApplyListFilter?: (filter: OperationalListFilter | null) => void;
   onSelectIngredient?: (ingredientId: string) => void;
   onRename: (id: string, suggestedName?: string | null) => void;
+  onArchive?: (id: string) => void;
   onDelete: (id: string) => void;
 };
 
@@ -143,9 +146,11 @@ function OperationalInsightCardView({
   onDismiss: (insightId: string) => void;
 }) {
   return (
-    <div className={operationalInsightCardClassName(card.kind)}>
+    <div
+      className={`${operationalInsightCardClassName(card.kind)} hover:[&>button]:opacity-100`}
+    >
       <InsightCardIcon kind={card.kind} />
-      <div className="min-w-0 flex-1 pr-5">
+      <div className="relative z-0 min-w-0 flex-1 pr-5">
         <p className="text-xs leading-snug font-medium text-foreground/90">{card.text}</p>
         {card.detail ? (
           <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground/85">{card.detail}</p>
@@ -153,8 +158,11 @@ function OperationalInsightCardView({
       </div>
       <button
         type="button"
-        onClick={() => onDismiss(card.id)}
-        className="absolute top-1.5 right-1.5 inline-flex h-5 w-5 items-center justify-center rounded opacity-0 transition-opacity group-hover:opacity-100 text-muted-foreground/70 hover:bg-muted/50 hover:text-foreground"
+        onClick={(event) => {
+          event.stopPropagation();
+          onDismiss(card.id);
+        }}
+        className="absolute top-1.5 right-1.5 z-10 inline-flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded opacity-0 transition-opacity hover:opacity-100 focus-visible:opacity-100 text-muted-foreground/70 hover:bg-muted/50 hover:text-foreground"
         aria-label="Dismiss insight"
       >
         <X className="h-3 w-3" aria-hidden />
@@ -246,6 +254,7 @@ function IngredientDetailContent({
   onNamingReviewQueueChanged,
   onClose,
   onRename,
+  onArchive,
   onDelete,
 }: IngredientDetailPanelProps & { ingredient: Row }) {
   const displayName = formatCanonicalIngredientDisplayName(ingredient.name);
@@ -418,6 +427,12 @@ function IngredientDetailContent({
     setNoteSaving(false);
   };
 
+  const removeNote = (noteIndex: number) => {
+    if (!userId) return;
+    const next = removeIngredientOperationalNote(userId, ingredient.id, noteIndex);
+    setSavedNotes(next);
+  };
+
   return (
     <Card className={`${detailCardClass} p-0`}>
       <header className="flex items-start justify-between gap-3 border-b border-border/25 px-4 py-3">
@@ -444,6 +459,12 @@ function IngredientDetailContent({
               <Pencil className="mr-2 h-3.5 w-3.5" />
               Rename
             </DropdownMenuItem>
+            {onArchive ? (
+              <DropdownMenuItem onClick={() => onArchive(ingredient.id)}>
+                <Archive className="mr-2 h-3.5 w-3.5" />
+                Archive
+              </DropdownMenuItem>
+            ) : null}
             <DropdownMenuItem
               className="text-destructive focus:text-destructive"
               onClick={() => onDelete(ingredient.id)}
@@ -547,9 +568,23 @@ function IngredientDetailContent({
             )}
             {savedNotes.length > 0 ? (
               <ul className="mt-2.5 space-y-1 border-t border-border/20 pt-2">
-                {savedNotes.map((note) => (
-                  <li key={note} className="text-xs leading-relaxed text-muted-foreground">
-                    {note}
+                {savedNotes.map((note, noteIndex) => (
+                  <li
+                    key={`${noteIndex}-${note}`}
+                    className="group relative flex items-start gap-1 rounded-sm py-0.5 text-xs leading-relaxed text-muted-foreground"
+                  >
+                    <span className="relative z-0 min-w-0 flex-1">{note}</span>
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        removeNote(noteIndex);
+                      }}
+                      className="relative z-10 inline-flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 text-muted-foreground/60 hover:bg-muted/50 hover:text-muted-foreground"
+                      aria-label="Delete note"
+                    >
+                      <Trash2 className="h-3 w-3" aria-hidden />
+                    </button>
                   </li>
                 ))}
               </ul>

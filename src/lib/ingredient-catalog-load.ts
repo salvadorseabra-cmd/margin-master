@@ -87,7 +87,11 @@ async function ingredientArchiveColumnsExist(client: CatalogClient): Promise<boo
   return !error;
 }
 
-/** PostgREST select for catalog tiers; applies server-side active filter when archive columns are selected. */
+/**
+ * PostgREST select for catalog tiers; applies server-side active filter when archive columns are selected.
+ * Archived rows are excluded from active catalog, recipe pickers, and operational queues via `activeOnly`.
+ * Future: optional `includeArchived` could widen search/admin surfaces without changing default behavior.
+ */
 function fetchIngredientCatalogSelect(
   client: CatalogClient,
   select: string,
@@ -95,7 +99,9 @@ function fetchIngredientCatalogSelect(
 ) {
   const query = client.from("ingredients").select(select);
   if (options?.activeOnly && selectIncludesArchiveColumns(select)) {
-    return query.eq("is_archived", false).is("merged_into_ingredient_id", null);
+    return query
+      .or("is_archived.is.null,is_archived.eq.false")
+      .is("merged_into_ingredient_id", null);
   }
   return query;
 }

@@ -3,10 +3,23 @@ import { AppShell, Card } from "@/components/AppShell";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
+import { loadConfirmedIngredientAliasMap } from "@/lib/ingredient-alias-memory";
 import { loadActiveIngredientCatalog } from "@/lib/ingredient-catalog-load";
 import { filterCanonicalCatalogIngredients } from "@/lib/ingredient-kind";
 import {
-  archiveOrphanIngredient,
+  archiveIngredient,
+  clearIngredientArchiveReason,
+  formatArchivedDateLabel,
+  formatIngredientArchiveReasonLine,
+  getIngredientArchiveReason,
+  loadArchivedIngredientCatalog,
+  restoreIngredient,
+  sortOperationallyArchivedIngredients,
+  setIngredientArchiveReason,
+  type IngredientArchiveReason,
+  type OperationallyArchivedIngredient,
+} from "@/lib/ingredient-archive";
+import {
   detectOrphanCanonicalIngredients,
   isIngredientOperationallyOrphaned,
   type IngredientOrphanReport,
@@ -28,7 +41,6 @@ import { buildManualMergePickerOptions } from "@/lib/ingredient-merge";
 import { normalizeCanonicalIngredientName } from "@/lib/ingredient-canonical";
 import {
   buildCatalogReviewRows,
-  CATALOG_LEAK_REASON_LABELS,
   CATALOG_REVIEW_CLASSIFICATION_LABELS,
   CATALOG_REVIEW_RECIPE_LINKS_SELECT,
   loadCatalogReviewClassifications,
@@ -37,6 +49,15 @@ import {
   type CatalogReviewClassification,
   type CatalogReviewRow,
 } from "@/lib/catalog-pollution-review";
+import {
+  catalogReviewArchiveIsProminent,
+  catalogReviewOffersArchive,
+  formatCatalogReviewQueueIssue,
+} from "@/lib/catalog-review-queue-issue";
+import {
+  isStaleForPriceReview,
+  loadLatestConfirmedPurchaseAtByIngredientId,
+} from "@/lib/ingredient-pricing-freshness";
 import { ManualCanonicalMergeDialog } from "@/components/manual-canonical-merge-dialog";
 import {
   Archive,
@@ -48,21 +69,20 @@ import {
   Pencil,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/ingredients/review")({
   head: () => ({
     meta: [
-      { title: "Revisão catálogo — Marginly" },
+      { title: "Catalog review — Marginly" },
       {
         name: "description",
-        content: "Revisão manual de poluição no catálogo de ingredientes (somente leitura).",
+        content: "Operational catalog review inbox — merge, archive, map, and rename.",
       },
     ],
   }),
   component: CatalogReviewPage,
 });
-
-type ClassificationFilter = CatalogReviewClassification | "all" | "unclassified";
 
 const CLASSIFICATION_OPTIONS: CatalogReviewClassification[] = [
   "review_needed",
@@ -71,20 +91,33 @@ const CLASSIFICATION_OPTIONS: CatalogReviewClassification[] = [
   "packaging_pollution",
 ];
 
+type CatalogReviewListMode = "active" | "archived";
+
+type CatalogReviewQueueItem = {
+  ingredientId: string;
+  displayName: string;
+  issueLine: string;
+  row: CatalogReviewRow | null;
+  isOrphan: boolean;
+  isAliasOnly: boolean;
+  isStale: boolean;
+  needsRename: boolean;
+  orphanReport?: IngredientOrphanReport;
+};
+
 function CatalogReviewPage() {
   const { user } = useAuth();
   const router = useRouter();
   const [rows, setRows] = useState<CatalogReviewRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [classFilter, setClassFilter] = useState<ClassificationFilter>("all");
-  const [leakFilter, setLeakFilter] = useState<string>("all");
-  const [classifications, setClassifications] = useState<
-    Record<string, CatalogReviewClassification>
-  >({});
   const [catalogRows, setCatalogRows] = useState<
     Awaited<ReturnType<typeof loadActiveIngredientCatalog>>["rows"]
   >([]);
+  const [lastPurchaseAtById, setLastPurchaseAtById] = useState<Record<string, string | null>>(
+    {},
+  );
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mergeDialogOpen, setMergeDialogOpen] = useState(false);
   const [mergePrefill, setMergePrefill] = useState<{
     sourceId?: string;
@@ -96,12 +129,18 @@ function CatalogReviewPage() {
   const [aliasOnlyEntries, setAliasOnlyEntries] = useState<
     { entry: (typeof catalogRows)[number]; report: IngredientOrphanReport }[]
   >([]);
-  const [archivingOrphanId, setArchivingOrphanId] = useState<string | null>(null);
+  const [archivingIngredientId, setArchivingIngredientId] = useState<string | null>(null);
+  const [optimisticallyArchivedIds, setOptimisticallyArchivedIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [reassigningSourceId, setReassigningSourceId] = useState<string | null>(null);
   const [renamingBatShoestr, setRenamingBatShoestr] = useState(false);
   const [reassignTargetBySource, setReassignTargetBySource] = useState<Record<string, string>>(
     {},
   );
+  const [catalogListMode, setCatalogListMode] = useState<CatalogReviewListMode>("active");
+  const [archivedRows, setArchivedRows] = useState<OperationallyArchivedIngredient[]>([]);
+  const [restoringIngredientId, setRestoringIngredientId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!user?.id) return;
@@ -120,7 +159,9 @@ function CatalogReviewPage() {
 
     const ingredientIds = catalog.map((r) => r.id).filter(Boolean) as string[];
 
-    const [aliasResult, recipeResult] = await Promise.all([
+    const confirmedAliases = await loadConfirmedIngredientAliasMap(supabase);
+
+    const [aliasResult, recipeResult, purchaseAtById] = await Promise.all([
       ingredientIds.length > 0
         ? supabase
             .from("ingredient_aliases")
@@ -133,6 +174,7 @@ function CatalogReviewPage() {
             .select(CATALOG_REVIEW_RECIPE_LINKS_SELECT)
             .in("ingredient_id", ingredientIds)
         : Promise.resolve({ data: [], error: null }),
+      loadLatestConfirmedPurchaseAtByIngredientId(supabase, catalog, confirmedAliases),
     ]);
 
     if (aliasResult.error) {
@@ -147,6 +189,7 @@ function CatalogReviewPage() {
     }
 
     setCatalogRows(catalog);
+    setLastPurchaseAtById(purchaseAtById);
 
     const canonicalCatalog = filterCanonicalCatalogIngredients(catalog);
     const { reports: orphanReports, error: orphanError } =
@@ -174,6 +217,7 @@ function CatalogReviewPage() {
         }),
       );
     setOrphanEntries(orphans);
+
     const aliasOnly = canonicalCatalog
       .filter((entry) => {
         const id = entry.id?.trim();
@@ -205,7 +249,6 @@ function CatalogReviewPage() {
     }
 
     const stored = loadCatalogReviewClassifications(user.id);
-    setClassifications(stored);
     setRows(
       buildCatalogReviewRows({
         catalog,
@@ -218,6 +261,33 @@ function CatalogReviewPage() {
     );
     setLoading(false);
   }, [user?.id]);
+
+  const loadArchived = useCallback(async () => {
+    if (!user?.id) return;
+    setLoading(true);
+    setError(null);
+    const { rows, error: archiveError } = await loadArchivedIngredientCatalog(supabase);
+    if (archiveError) {
+      setError(archiveError);
+      setArchivedRows([]);
+    } else {
+      setArchivedRows(sortOperationallyArchivedIngredients(rows));
+    }
+    setLoading(false);
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (catalogListMode === "archived") {
+      void loadArchived();
+    } else {
+      void load();
+    }
+  }, [catalogListMode, load, loadArchived]);
+
+  const switchCatalogListMode = useCallback((mode: CatalogReviewListMode) => {
+    setCatalogListMode(mode);
+    setSelectedId(null);
+  }, []);
 
   const canonicalPickerOptions = useMemo(
     () => buildManualMergePickerOptions(filterCanonicalCatalogIngredients(catalogRows)),
@@ -233,11 +303,264 @@ function CatalogReviewPage() {
     return { source, targetName };
   }, [catalogRows]);
 
+  const orphanById = useMemo(
+    () => new Map(orphanEntries.map((item) => [item.entry.id, item])),
+    [orphanEntries],
+  );
+  const aliasOnlyById = useMemo(
+    () => new Map(aliasOnlyEntries.map((item) => [item.entry.id, item])),
+    [aliasOnlyEntries],
+  );
+  const rowById = useMemo(() => new Map(rows.map((row) => [row.ingredientId, row])), [rows]);
+
+  const queueItems = useMemo((): CatalogReviewQueueItem[] => {
+    const byId = new Map<string, CatalogReviewQueueItem>();
+
+    const upsert = (ingredientId: string, patch: Partial<CatalogReviewQueueItem> & { displayName: string }) => {
+      const existing = byId.get(ingredientId);
+      const row = patch.row ?? existing?.row ?? rowById.get(ingredientId) ?? null;
+      const displayName =
+        patch.displayName ||
+        existing?.displayName ||
+        row?.canonicalDisplayName ||
+        ingredientId;
+      const isOrphan = patch.isOrphan ?? existing?.isOrphan ?? false;
+      const isAliasOnly = patch.isAliasOnly ?? existing?.isAliasOnly ?? false;
+      const isStale =
+        patch.isStale ??
+        existing?.isStale ??
+        isStaleForPriceReview({
+          lastPurchaseAt: lastPurchaseAtById[ingredientId] ?? null,
+          currentPrice: catalogRows.find((r) => r.id === ingredientId)?.current_price ?? null,
+        });
+      const needsRename =
+        patch.needsRename ??
+        existing?.needsRename ??
+        (batShoestrRenameCard?.source.id === ingredientId);
+      const orphanReport = patch.orphanReport ?? existing?.orphanReport;
+
+      const issueLine = formatCatalogReviewQueueIssue({
+        displayName,
+        row,
+        isOrphan,
+        isAliasOnly,
+        needsRename,
+        isStale,
+      });
+
+      byId.set(ingredientId, {
+        ingredientId,
+        displayName,
+        issueLine,
+        row,
+        isOrphan,
+        isAliasOnly,
+        isStale,
+        needsRename,
+        orphanReport,
+      });
+    };
+
+    for (const row of rows) {
+      upsert(row.ingredientId, {
+        displayName: row.canonicalDisplayName,
+        row,
+        isOrphan: orphanById.has(row.ingredientId),
+        isAliasOnly: aliasOnlyById.has(row.ingredientId),
+        orphanReport: orphanById.get(row.ingredientId)?.report,
+      });
+    }
+
+    for (const { entry, report } of orphanEntries) {
+      if (!entry.id) continue;
+      upsert(entry.id, {
+        displayName: formatCanonicalIngredientDisplayName(entry.name) || entry.name || entry.id,
+        isOrphan: true,
+        orphanReport: report,
+      });
+    }
+
+    for (const { entry, report } of aliasOnlyEntries) {
+      if (!entry.id) continue;
+      upsert(entry.id, {
+        displayName: formatCanonicalIngredientDisplayName(entry.name) || entry.name || entry.id,
+        isAliasOnly: true,
+        orphanReport: report,
+      });
+    }
+
+    if (batShoestrRenameCard?.source.id) {
+      const id = batShoestrRenameCard.source.id;
+      upsert(id, {
+        displayName:
+          formatCanonicalIngredientDisplayName(batShoestrRenameCard.source.name) ||
+          batShoestrRenameCard.source.name ||
+          id,
+        needsRename: true,
+      });
+    }
+
+    return [...byId.values()].sort((a, b) =>
+      a.displayName.localeCompare(b.displayName, undefined, { sensitivity: "base" }),
+    );
+  }, [
+    rows,
+    orphanEntries,
+    aliasOnlyEntries,
+    orphanById,
+    aliasOnlyById,
+    rowById,
+    batShoestrRenameCard,
+    lastPurchaseAtById,
+    catalogRows,
+  ]);
+
+  const visibleQueueItems = useMemo(
+    () => queueItems.filter((item) => !optimisticallyArchivedIds.has(item.ingredientId)),
+    [queueItems, optimisticallyArchivedIds],
+  );
+
+  useEffect(() => {
+    if (catalogListMode !== "active") return;
+    if (visibleQueueItems.length === 0) {
+      setSelectedId(null);
+      return;
+    }
+    if (
+      !selectedId ||
+      !visibleQueueItems.some((item) => item.ingredientId === selectedId)
+    ) {
+      setSelectedId(visibleQueueItems[0]!.ingredientId);
+    }
+  }, [catalogListMode, visibleQueueItems, selectedId]);
+
+  const selectedItem = useMemo(
+    () => visibleQueueItems.find((item) => item.ingredientId === selectedId) ?? null,
+    [visibleQueueItems, selectedId],
+  );
+
+  const showArchiveUndoToast = useCallback(
+    (ingredientId: string) => {
+      toast("Ingredient archived", {
+        action: {
+          label: "Undo",
+          onClick: () => {
+            void (async () => {
+              if (!user?.id) return;
+              const { error: restoreError } = await restoreIngredient({
+                client: supabase,
+                ingredientId,
+                userId: user.id,
+              });
+              if (restoreError) {
+                toast.error(restoreError.message);
+                await load();
+                return;
+              }
+              clearIngredientArchiveReason(user.id, ingredientId);
+              setOptimisticallyArchivedIds((prev) => {
+                const next = new Set(prev);
+                next.delete(ingredientId);
+                return next;
+              });
+              await load();
+              await router.invalidate();
+            })();
+          },
+        },
+      });
+    },
+    [user?.id, load, router],
+  );
+
+  const handleArchiveIngredient = useCallback(
+    async (ingredientId: string) => {
+      if (!user?.id) return;
+
+      const visible = visibleQueueItems;
+      const archivedIndex = visible.findIndex((item) => item.ingredientId === ingredientId);
+      const nextSelectedId =
+        archivedIndex >= 0 && archivedIndex < visible.length - 1
+          ? visible[archivedIndex + 1]!.ingredientId
+          : archivedIndex > 0
+            ? visible[archivedIndex - 1]!.ingredientId
+            : null;
+
+      setOptimisticallyArchivedIds((prev) => new Set(prev).add(ingredientId));
+      if (selectedId === ingredientId) {
+        setSelectedId(nextSelectedId);
+      }
+
+      const archivedItem = queueItems.find((item) => item.ingredientId === ingredientId);
+      const archiveReason: IngredientArchiveReason = archivedItem?.isOrphan
+        ? "unused"
+        : "catalog_review";
+      setIngredientArchiveReason(user.id, ingredientId, archiveReason);
+
+      setArchivingIngredientId(ingredientId);
+      setError(null);
+      const { error: archiveError } = await archiveIngredient({
+        client: supabase,
+        ingredientId,
+        userId: user.id,
+      });
+      setArchivingIngredientId(null);
+
+      if (archiveError) {
+        setOptimisticallyArchivedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(ingredientId);
+          return next;
+        });
+        if (selectedId === ingredientId) {
+          setSelectedId(ingredientId);
+        }
+        setError(archiveError.message);
+        return;
+      }
+
+      showArchiveUndoToast(ingredientId);
+      await load();
+      await router.invalidate();
+      setOptimisticallyArchivedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(ingredientId);
+        return next;
+      });
+    },
+    [user?.id, visibleQueueItems, selectedId, queueItems, showArchiveUndoToast, load, router],
+  );
+
+  const handleRestoreArchived = useCallback(
+    async (ingredientId: string) => {
+      if (!user?.id) return;
+      setRestoringIngredientId(ingredientId);
+      setError(null);
+      const { error: restoreError } = await restoreIngredient({
+        client: supabase,
+        ingredientId,
+        userId: user.id,
+      });
+      setRestoringIngredientId(null);
+      if (restoreError) {
+        toast.error(restoreError.message);
+        return;
+      }
+      clearIngredientArchiveReason(user.id, ingredientId);
+      setArchivedRows((prev) => prev.filter((row) => row.id !== ingredientId));
+      toast("Ingredient restored");
+      setCatalogListMode("active");
+      await load();
+      await router.invalidate();
+    },
+    [user?.id, load, router],
+  );
+
   const handleBatShoestrRename = async () => {
     if (!user?.id || !batShoestrRenameCard) return;
     const { source, targetName } = batShoestrRenameCard;
     const fromName = source.name ?? source.id;
-    const confirmMsg = `Renomear "${fromName}" para "${targetName}"?\n\nMantém o mesmo ingrediente, aliases, matches e histórico.`;
+    const confirmMsg = `Rename "${fromName}" to "${targetName}"?\n\nKeeps aliases, matches, and history on the same ingredient.`;
     if (!window.confirm(confirmMsg)) return;
 
     setRenamingBatShoestr(true);
@@ -297,8 +620,8 @@ function CatalogReviewPage() {
       toIngredientId,
     });
     const confirmMsg = options?.palhaPreset
-      ? `Mover todos os aliases de "${fromName}" para "${toName}" e arquivar PALHA se ficar sem uso?\n\n${preview.aliasCount} alias(es): ${preview.aliasNames.slice(0, 5).join(", ")}${preview.aliasNames.length > 5 ? "…" : ""}`
-      : `Mover ${preview.aliasCount} alias(es) de "${fromName}" para "${toName}"?\nNão funde ingredientes nem receitas. PALHA/arquivo automático só se o origem ficar órfão.\n\n${preview.aliasNames.slice(0, 8).join("\n")}${preview.aliasNames.length > 8 ? "\n…" : ""}`;
+      ? `Move all aliases from "${fromName}" to "${toName}" and archive PALHA if unused?\n\n${preview.aliasCount} alias(es): ${preview.aliasNames.slice(0, 5).join(", ")}${preview.aliasNames.length > 5 ? "…" : ""}`
+      : `Move ${preview.aliasCount} alias(es) from "${fromName}" to "${toName}"?\nDoes not merge recipes. Auto-archive only if the source becomes orphaned.\n\n${preview.aliasNames.slice(0, 8).join("\n")}${preview.aliasNames.length > 8 ? "\n…" : ""}`;
     if (!window.confirm(confirmMsg)) return;
 
     setReassigningSourceId(fromIngredientId);
@@ -333,48 +656,9 @@ function CatalogReviewPage() {
     await router.invalidate();
   };
 
-  const handleArchiveOrphan = async (ingredientId: string) => {
-    if (!user?.id) return;
-    setArchivingOrphanId(ingredientId);
-    setError(null);
-    const { error: archiveError } = await archiveOrphanIngredient({
-      client: supabase,
-      ingredientId,
-      userId: user.id,
-    });
-    if (archiveError) {
-      setError(archiveError.message);
-      setArchivingOrphanId(null);
-      return;
-    }
-    setArchivingOrphanId(null);
-    await load();
-  };
-
-  useEffect(() => {
-    void load();
-  }, [load]);
-
-  const leakReasons = useMemo(() => {
-    const reasons = new Set(rows.map((r) => r.leakReason).filter(Boolean) as string[]);
-    return [...reasons].sort();
-  }, [rows]);
-
-  const filtered = useMemo(() => {
-    return rows.filter((row) => {
-      if (classFilter === "unclassified" && row.classification) return false;
-      if (classFilter !== "all" && classFilter !== "unclassified" && row.classification !== classFilter) {
-        return false;
-      }
-      if (leakFilter !== "all" && row.leakReason !== leakFilter) return false;
-      return true;
-    });
-  }, [rows, classFilter, leakFilter]);
-
   const handleClassification = (ingredientId: string, classification: CatalogReviewClassification) => {
     if (!user?.id) return;
-    const next = setCatalogReviewClassification(user.id, ingredientId, classification);
-    setClassifications(next);
+    setCatalogReviewClassification(user.id, ingredientId, classification);
     setRows((prev) =>
       prev.map((row) =>
         row.ingredientId === ingredientId ? { ...row, classification } : row,
@@ -382,441 +666,536 @@ function CatalogReviewPage() {
     );
   };
 
+  const openMerge = (sourceId: string, targetId?: string) => {
+    setMergePrefill({ sourceId, targetId });
+    setMergeDialogOpen(true);
+  };
+
   return (
     <AppShell
-      title="Revisão do catálogo"
-      subtitle="Poluição legada, órfãos sem uso operacional e duplicados — revisão manual, sem fusão automática."
+      title="Catalog review"
+      subtitle="Resolve catalog issues one at a time."
       action={
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
-            className="inline-flex items-center gap-2 text-sm px-3 py-1.5 rounded-md border border-border hover:bg-muted"
+            className="inline-flex items-center gap-2 rounded-lg border border-border px-3.5 py-2 text-sm font-medium text-muted-foreground hover:bg-muted/50 hover:text-foreground"
             onClick={() => {
               setMergePrefill({});
               setMergeDialogOpen(true);
             }}
           >
             <GitMerge className="h-4 w-4" />
-            Fusão manual
+            Manual merge
           </button>
           <Link
             to="/ingredients"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
-            Ingredientes
+            Ingredients
           </Link>
         </div>
       }
     >
-      <div className="space-y-4">
-        {!loading && !error && batShoestrRenameCard && (
-          <Card className="p-4 space-y-3 border-violet-500/30">
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div>
-                <h2 className="font-medium text-foreground">BAT shoestr — renomear catálogo</h2>
-                <p className="text-sm text-muted-foreground">
-                  Nome de fatura abreviado no canónico. Renomeia para o produto operacional sem
-                  fundir com Batata palha — aliases e histórico mantêm-se no mesmo ingrediente.
-                </p>
-                <p className="text-xs text-muted-foreground font-mono mt-1">
-                  {batShoestrRenameCard.source.id}
-                </p>
-              </div>
+      {error && (
+        <Card className="mb-3 border-destructive/40 p-3 text-sm text-destructive">{error}</Card>
+      )}
+
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,38fr)_minmax(0,62fr)] lg:items-stretch lg:min-h-[min(72vh,680px)]">
+        <Card className="flex min-h-0 min-w-0 flex-col overflow-hidden border-border/50 bg-card p-0 shadow-sm lg:max-h-[min(72vh,680px)]">
+          <div className="flex shrink-0 items-center border-b border-border/15 px-2.5 py-2">
+            <div
+              className="inline-flex rounded-lg border border-border/50 p-0.5"
+              role="tablist"
+              aria-label="Catalog review view"
+            >
               <button
                 type="button"
-                disabled={renamingBatShoestr || reassigningSourceId != null}
-                className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md border border-violet-500/40 hover:bg-violet-500/10 disabled:opacity-50"
-                onClick={() => void handleBatShoestrRename()}
+                role="tab"
+                aria-selected={catalogListMode === "active"}
+                onClick={() => switchCatalogListMode("active")}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  catalogListMode === "active"
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
-                {renamingBatShoestr ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Pencil className="h-4 w-4" />
-                )}
-                Rename to {batShoestrRenameCard.targetName}
+                Active
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={catalogListMode === "archived"}
+                onClick={() => switchCatalogListMode("archived")}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  catalogListMode === "archived"
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Archived
               </button>
             </div>
-          </Card>
-        )}
-
-        {!loading && !error && aliasOnlyEntries.length > 0 && (
-          <Card className="p-4 space-y-3 border-sky-500/30">
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div>
-                <h2 className="font-medium text-foreground">Legado só com aliases</h2>
-                <p className="text-sm text-muted-foreground">
-                  Canónicos com memória de fatura mas sem receitas, prep, preço nem margem. Reatribua
-                  aliases ao canónico correto (sem fusão) para libertar órfãos como PALHA.
-                </p>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            {loading && (
+              <div className="flex justify-center py-10">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-900 dark:text-sky-100">
-                {aliasOnlyEntries.length}
-              </span>
-            </div>
-            <ul className="space-y-2">
-              {aliasOnlyEntries.map(({ entry, report }) => {
-                const targetId = reassignTargetBySource[entry.id] ?? "";
-                const isPalha =
-                  normalizeCanonicalIngredientName(entry.name ?? "") === "palha";
-                const batataId = findActiveCanonicalIdsByNormalizedName(
-                  filterCanonicalCatalogIngredients(catalogRows),
-                  ["Batata palha"],
-                ).get("batata palha");
-                return (
-                  <li
-                    key={entry.id}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-3"
-                  >
-                    <div>
-                      <p className="font-medium">
-                        {formatCanonicalIngredientDisplayName(entry.name) || entry.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground font-mono">{entry.id}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Aliases {report.invoiceAliasCount} (fornecedor {report.supplierAliasCount})
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap items-end gap-2">
-                      <label className="flex flex-col gap-1 text-xs text-muted-foreground">
-                        Reatribuir aliases para
-                        <select
-                          className="border border-border rounded-md px-2 py-1.5 bg-background text-sm text-foreground min-w-[200px]"
-                          value={targetId}
-                          onChange={(e) =>
-                            setReassignTargetBySource((prev) => ({
-                              ...prev,
-                              [entry.id]: e.target.value,
-                            }))
-                          }
-                        >
-                          <option value="">— escolher —</option>
-                          {canonicalPickerOptions
-                            .filter((opt) => opt.id !== entry.id)
-                            .map((opt) => (
-                              <option key={opt.id} value={opt.id}>
-                                {opt.label}
-                              </option>
-                            ))}
-                        </select>
-                      </label>
-                      {isPalha && batataId && (
-                        <button
-                          type="button"
-                          disabled={reassigningSourceId != null}
-                          className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md border border-primary/40 hover:bg-primary/10 disabled:opacity-50"
-                          onClick={() =>
-                            void handleReassignAliases(entry.id, batataId, { palhaPreset: true })
-                          }
-                        >
-                          {reassigningSourceId === entry.id ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <ArrowRightLeft className="h-4 w-4" />
-                          )}
-                          Mover aliases para Batata palha
-                        </button>
-                      )}
+            )}
+            {!loading && catalogListMode === "active" && visibleQueueItems.length === 0 && (
+              <div className="px-3 py-10 text-center text-sm text-muted-foreground">
+                <ClipboardList className="mx-auto mb-2 h-7 w-7 opacity-40" />
+                Nothing to review right now.
+              </div>
+            )}
+            {!loading && catalogListMode === "active" && visibleQueueItems.length > 0 && (
+              <ul className="divide-y divide-border/20">
+                {visibleQueueItems.map((item) => {
+                  const selected = item.ingredientId === selectedId;
+                  return (
+                    <li key={item.ingredientId}>
                       <button
                         type="button"
-                        disabled={
-                          !targetId || targetId === entry.id || reassigningSourceId != null
-                        }
-                        className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md border border-border hover:bg-muted disabled:opacity-50"
-                        onClick={() => void handleReassignAliases(entry.id, targetId)}
+                        onClick={() => setSelectedId(item.ingredientId)}
+                        className={`w-full px-3 py-2.5 text-left transition-colors ${
+                          selected
+                            ? "bg-primary/8 border-l-2 border-l-primary"
+                            : "hover:bg-muted/40 border-l-2 border-l-transparent"
+                        }`}
                       >
-                        {reassigningSourceId === entry.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <ArrowRightLeft className="h-4 w-4" />
-                        )}
-                        Confirmar reatribuição
+                        <p className="truncate text-sm font-medium text-foreground">
+                          {item.displayName}
+                        </p>
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground/75">
+                          {item.issueLine}
+                        </p>
                       </button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </Card>
-        )}
-
-        {!loading && !error && orphanEntries.length > 0 && (
-          <Card className="p-4 space-y-3 border-amber-500/30">
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div>
-                <h2 className="font-medium text-foreground">Ingredientes órfãos</h2>
-                <p className="text-sm text-muted-foreground">
-                  Canónicos ativos sem aliases, receitas, prep, histórico de preço nem impactos de
-                  margem. Não aparecem na lista principal até arquivar.
-                </p>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            {!loading && catalogListMode === "archived" && archivedRows.length === 0 && (
+              <div className="px-3 py-10 text-center text-sm text-muted-foreground">
+                No archived ingredients.
               </div>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-900 dark:text-amber-100">
-                {orphanEntries.length}
-              </span>
+            )}
+            {!loading && catalogListMode === "archived" && archivedRows.length > 0 && (
+              <ul className="divide-y divide-border/20">
+                {archivedRows.map((ing) => {
+                  const id = ing.id?.trim();
+                  if (!id) return null;
+                  const displayName =
+                    formatCanonicalIngredientDisplayName(ing.name) || ing.name || id;
+                  const reasonLine = formatIngredientArchiveReasonLine(
+                    getIngredientArchiveReason(user?.id ?? "", id),
+                  );
+                  const restoring = restoringIngredientId === id;
+                  return (
+                    <li
+                      key={id}
+                      className="flex items-start justify-between gap-3 px-3 py-2.5"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-foreground">
+                          {displayName}
+                        </p>
+                        <p className="mt-0.5 text-xs text-muted-foreground/75">
+                          {formatArchivedDateLabel(ing.archived_at)}
+                        </p>
+                        <p className="mt-0.5 text-xs text-muted-foreground/60">{reasonLine}</p>
+                      </div>
+                      <button
+                        type="button"
+                        disabled={restoring}
+                        onClick={() => void handleRestoreArchived(id)}
+                        className="shrink-0 rounded-md px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground disabled:opacity-50"
+                      >
+                        {restoring ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          "Restore"
+                        )}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+          {!loading && catalogListMode === "active" && visibleQueueItems.length > 0 ? (
+            <div className="shrink-0 border-t border-border/40 px-3 py-2 text-xs text-muted-foreground">
+              {visibleQueueItems.length}{" "}
+              {visibleQueueItems.length === 1 ? "item" : "items"}
             </div>
-            <ul className="space-y-2">
-              {orphanEntries.map(({ entry, report }) => (
-                <li
-                  key={entry.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-3"
-                >
-                  <div>
-                    <p className="font-medium">
-                      {formatCanonicalIngredientDisplayName(entry.name) || entry.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground font-mono">{entry.id}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Refs: aliases {report.invoiceAliasCount}, receitas{" "}
-                      {report.recipeIngredientCount}, prep {report.prepRecipeIngredientCount},
-                      preço {report.priceHistoryCount}, margem {report.marginImpactCount}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    disabled={archivingOrphanId === entry.id}
-                    className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md border border-border hover:bg-muted disabled:opacity-50"
-                    onClick={() => void handleArchiveOrphan(entry.id)}
-                  >
-                    {archivingOrphanId === entry.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Archive className="h-4 w-4" />
-                    )}
-                    Arquivar
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        )}
-
-        <Card className="p-4 flex flex-wrap gap-3 items-end">
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-muted-foreground">Classificação</span>
-            <select
-              className="border border-border rounded-md px-2 py-1.5 bg-background min-w-[180px]"
-              value={classFilter}
-              onChange={(e) => setClassFilter(e.target.value as ClassificationFilter)}
-            >
-              <option value="all">Todas</option>
-              <option value="unclassified">Sem classificar</option>
-              {CLASSIFICATION_OPTIONS.map((c) => (
-                <option key={c} value={c}>
-                  {CATALOG_REVIEW_CLASSIFICATION_LABELS[c]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="text-muted-foreground">Motivo leak</span>
-            <select
-              className="border border-border rounded-md px-2 py-1.5 bg-background min-w-[200px]"
-              value={leakFilter}
-              onChange={(e) => setLeakFilter(e.target.value)}
-            >
-              <option value="all">Todos</option>
-              {leakReasons.map((reason) => (
-                <option key={reason} value={reason}>
-                  {CATALOG_LEAK_REASON_LABELS[reason as keyof typeof CATALOG_LEAK_REASON_LABELS] ??
-                    reason}
-                </option>
-              ))}
-            </select>
-          </label>
-          <p className="text-sm text-muted-foreground ml-auto">
-            {filtered.length} de {rows.length} linhas
-          </p>
+          ) : null}
+          {!loading && catalogListMode === "archived" && archivedRows.length > 0 ? (
+            <div className="shrink-0 border-t border-border/15 px-3 py-2 text-xs text-muted-foreground/70">
+              {archivedRows.length} archived
+            </div>
+          ) : null}
         </Card>
 
-        {loading && (
-          <div className="flex justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          </div>
-        )}
-
-        {error && (
-          <Card className="p-4 border-destructive/40 text-destructive text-sm">{error}</Card>
-        )}
-
-        {!loading && !error && filtered.length === 0 && (
-          <Card className="p-8 text-center text-muted-foreground text-sm">
-            <ClipboardList className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            Nenhuma linha para rever com estes filtros.
-          </Card>
-        )}
-
-        {!loading &&
-          !error &&
-          filtered.map((row) => (
-            <ReviewRowCard
-              key={row.ingredientId}
-              row={row}
+        <Card className="flex min-h-0 min-w-0 flex-col overflow-hidden border-border/50 bg-card p-0 shadow-sm">
+          {catalogListMode === "archived" ? (
+            <div className="flex flex-1 items-center justify-center p-6 text-sm text-muted-foreground">
+              Select an ingredient
+            </div>
+          ) : null}
+          {catalogListMode === "active" && loading && (
+            <div className="flex flex-1 items-center justify-center py-12">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          )}
+          {catalogListMode === "active" && !loading && !selectedItem && (
+            <div className="flex flex-1 items-center justify-center p-6 text-sm text-muted-foreground">
+              Select an item from the queue.
+            </div>
+          )}
+          {catalogListMode === "active" && !loading && selectedItem && (
+            <CatalogReviewWorkspace
+              item={selectedItem}
+              batShoestrTargetName={batShoestrRenameCard?.targetName ?? null}
+              canonicalPickerOptions={canonicalPickerOptions}
+              reassignTargetId={reassignTargetBySource[selectedItem.ingredientId] ?? ""}
+              onReassignTargetChange={(targetId) =>
+                setReassignTargetBySource((prev) => ({
+                  ...prev,
+                  [selectedItem.ingredientId]: targetId,
+                }))
+              }
+              archivingIngredientId={archivingIngredientId}
+              reassigningSourceId={reassigningSourceId}
+              renamingBatShoestr={renamingBatShoestr}
               onClassify={handleClassification}
-              onOpenMerge={(sourceId, targetId) => {
-                setMergePrefill({ sourceId, targetId });
-                setMergeDialogOpen(true);
-              }}
+              onArchiveIngredient={handleArchiveIngredient}
+              onReassignAliases={handleReassignAliases}
+              onBatShoestrRename={handleBatShoestrRename}
+              onOpenMerge={openMerge}
+              catalogRows={catalogRows}
             />
-          ))}
-
-        <ManualCanonicalMergeDialog
-          open={mergeDialogOpen}
-          onOpenChange={setMergeDialogOpen}
-          catalog={catalogRows}
-          initialSourceId={mergePrefill.sourceId}
-          initialTargetId={mergePrefill.targetId}
-          onSuccess={() => void load()}
-        />
+          )}
+        </Card>
       </div>
+
+      <ManualCanonicalMergeDialog
+        open={mergeDialogOpen}
+        onOpenChange={setMergeDialogOpen}
+        catalog={catalogRows}
+        initialSourceId={mergePrefill.sourceId}
+        initialTargetId={mergePrefill.targetId}
+        onSuccess={() => void load()}
+      />
     </AppShell>
   );
 }
 
-function ReviewRowCard({
-  row,
-  onClassify,
-  onOpenMerge,
+function CatalogReviewArchiveButton({
+  ingredientId,
+  archiving,
+  prominent,
+  disabled,
+  onArchive,
 }: {
-  row: CatalogReviewRow;
-  onClassify: (id: string, c: CatalogReviewClassification) => void;
-  onOpenMerge: (sourceId: string, targetId?: string) => void;
+  ingredientId: string;
+  archiving: boolean;
+  prominent: boolean;
+  disabled?: boolean;
+  onArchive: (id: string) => void;
 }) {
-  const aliasLabel =
-    row.sourceInvoiceAliases.length > 0
-      ? row.sourceInvoiceAliases.join(" · ")
-      : "desconhecido/legado";
+  return (
+    <button
+      type="button"
+      disabled={archiving || disabled}
+      className={
+        prominent
+          ? "inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground shadow-sm hover:bg-muted disabled:opacity-50"
+          : "inline-flex items-center gap-1.5 rounded-md border border-border/80 px-3 py-1.5 text-sm text-muted-foreground hover:bg-muted/60 hover:text-foreground disabled:opacity-50"
+      }
+      onClick={() => void onArchive(ingredientId)}
+    >
+      {archiving ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <Archive className="h-4 w-4" />
+      )}
+      Archive ingredient
+    </button>
+  );
+}
+
+function CatalogReviewWorkspace({
+  item,
+  batShoestrTargetName,
+  canonicalPickerOptions,
+  reassignTargetId,
+  onReassignTargetChange,
+  archivingIngredientId,
+  reassigningSourceId,
+  renamingBatShoestr,
+  onClassify,
+  onArchiveIngredient,
+  onReassignAliases,
+  onBatShoestrRename,
+  onOpenMerge,
+  catalogRows,
+}: {
+  item: CatalogReviewQueueItem;
+  batShoestrTargetName: string | null;
+  canonicalPickerOptions: ReturnType<typeof buildManualMergePickerOptions>;
+  reassignTargetId: string;
+  onReassignTargetChange: (targetId: string) => void;
+  archivingIngredientId: string | null;
+  reassigningSourceId: string | null;
+  renamingBatShoestr: boolean;
+  onClassify: (id: string, c: CatalogReviewClassification) => void;
+  onArchiveIngredient: (id: string) => void;
+  onReassignAliases: (from: string, to: string, options?: { palhaPreset?: boolean }) => void;
+  onBatShoestrRename: () => void;
+  onOpenMerge: (sourceId: string, targetId?: string) => void;
+  catalogRows: Awaited<ReturnType<typeof loadActiveIngredientCatalog>>["rows"];
+}) {
+  const row = item.row;
+  const mergeHint = row?.mergeHints[0];
+  const similar = row?.similarityCandidates[0];
+  const offersArchive = catalogReviewOffersArchive(item);
+  const prominentArchive = catalogReviewArchiveIsProminent(item);
+  const archiving = archivingIngredientId === item.ingredientId;
+  const archiveDisabled = archiving || reassigningSourceId != null || renamingBatShoestr;
+  const isPalha =
+    normalizeCanonicalIngredientName(
+      catalogRows.find((r) => r.id === item.ingredientId)?.name ?? "",
+    ) === "palha";
+  const batataId = findActiveCanonicalIdsByNormalizedName(
+    filterCanonicalCatalogIngredients(catalogRows),
+    ["Batata palha"],
+  ).get("batata palha");
 
   return (
-    <Card className="p-4 space-y-3">
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <h3 className="font-medium text-foreground">{row.canonicalDisplayName}</h3>
-          <p className="text-xs text-muted-foreground font-mono">{row.ingredientId}</p>
-          {row.rawName !== row.canonicalDisplayName && (
-            <p className="text-sm text-muted-foreground">Nome DB: {row.rawName}</p>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-1">
-          {row.discoveryKinds.map((kind) => (
-            <span
-              key={kind}
-              className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground"
-            >
-              {kind === "catalog_leak" ? "leak catálogo" : "dup. operacional"}
-            </span>
-          ))}
-          {row.leakReason && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-800 dark:text-amber-200">
-              {CATALOG_LEAK_REASON_LABELS[row.leakReason]}
-            </span>
-          )}
-        </div>
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="shrink-0 border-b border-border/15 px-4 py-3">
+        <h2 className="text-base font-medium text-foreground">{item.displayName}</h2>
+        <p className="mt-0.5 text-sm text-muted-foreground">{item.issueLine}</p>
       </div>
 
-      <dl className="grid sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
-        <div>
-          <dt className="text-muted-foreground">Alias fatura</dt>
-          <dd>{aliasLabel}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Criado em</dt>
-          <dd>{row.createdAt ? new Date(row.createdAt).toLocaleString("pt-PT") : "—"}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Receitas</dt>
-          <dd>
-            {row.recipeUsage.count === 0
-              ? "0"
-              : `${row.recipeUsage.count} — ${row.recipeUsage.names.join(", ")}`}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Refs. fatura (aliases DB)</dt>
-          <dd>{row.invoiceReferenceCount}</dd>
-        </div>
-      </dl>
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4">
+        {offersArchive && prominentArchive && (
+          <section className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              {item.isOrphan
+                ? "No recipes, aliases, or price history — hide from the active catalog without losing history."
+                : item.isStale
+                  ? "Still in recipes but quiet on invoices — archive to clear the inbox; restore anytime."
+                  : item.isAliasOnly
+                    ? "Only invoice aliases point here — archive if reassignment is not needed."
+                    : "Not used in recipes — archive to tidy the catalog; invoices and history stay linked."}
+            </p>
+            <CatalogReviewArchiveButton
+              ingredientId={item.ingredientId}
+              archiving={archiving}
+              prominent
+              disabled={archiveDisabled}
+              onArchive={onArchiveIngredient}
+            />
+          </section>
+        )}
 
-      {row.similarityCandidates.length > 0 && (
-        <div className="space-y-1 border-t border-border pt-3">
-          <p className="text-sm font-medium text-foreground">Candidatos por similaridade (só leitura)</p>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            {row.similarityCandidates.map((candidate) => (
-              <li key={candidate.ingredientId}>
-                {candidate.displayName}{" "}
-                <span className="font-mono text-xs">({candidate.ingredientId})</span>
-                {" — "}
-                score {(candidate.score * 100).toFixed(0)}%
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {row.mergeHints.length > 0 && (
-        <div className="space-y-2 border-t border-border pt-3">
-          <p className="text-sm font-medium text-foreground">Duplicados operacionais (só leitura)</p>
-          {row.mergeHints.map((hint) => (
-            <div
-              key={hint.operationalKey}
-              className="text-sm bg-muted/40 rounded-md p-2 space-y-1"
+        {item.needsRename && batShoestrTargetName && (
+          <section className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Expand shorthand invoice name to a clear catalog label.
+            </p>
+            <button
+              type="button"
+              disabled={renamingBatShoestr || reassigningSourceId != null}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted disabled:opacity-50"
+              onClick={() => void onBatShoestrRename()}
             >
-              <p className="text-muted-foreground">
-                Chave: <span className="font-mono">{hint.operationalKey}</span>
-              </p>
-              <p>IDs: {hint.ingredientIds.join(", ")}</p>
-              <p>Nomes: {hint.displayNames.join(" · ")}</p>
-              {hint.suggestedCanonicalIngredientId && (
-                <p className="text-xs text-muted-foreground">
-                  Sugestão canónica (informativa): {hint.suggestedCanonicalIngredientId}
-                </p>
+              {renamingBatShoestr ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Pencil className="h-4 w-4" />
               )}
-              <div className="flex flex-wrap gap-2 pt-1">
+              Rename to {batShoestrTargetName}
+            </button>
+          </section>
+        )}
+
+        {item.isAliasOnly && (
+          <section className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Move invoice aliases to the right ingredient without merging recipes.
+            </p>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Move aliases to
+              <select
+                className="min-w-[200px] rounded-md border border-border bg-background px-2 py-1.5 text-sm text-foreground"
+                value={reassignTargetId}
+                onChange={(e) => onReassignTargetChange(e.target.value)}
+              >
+                <option value="">Choose ingredient</option>
+                {canonicalPickerOptions
+                  .filter((opt) => opt.id !== item.ingredientId)
+                  .map((opt) => (
+                    <option key={opt.id} value={opt.id}>
+                      {opt.label}
+                    </option>
+                  ))}
+              </select>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {isPalha && batataId && (
                 <button
                   type="button"
-                  className="text-xs px-2 py-1 rounded border border-border hover:bg-muted"
-                  onClick={() => logCatalogManualMergeCandidate(hint)}
+                  disabled={reassigningSourceId != null}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-primary/40 px-3 py-1.5 text-sm hover:bg-primary/10 disabled:opacity-50"
+                  onClick={() =>
+                    void onReassignAliases(item.ingredientId, batataId, { palhaPreset: true })
+                  }
                 >
-                  Candidato a fusão (registar log)
+                  {reassigningSourceId === item.ingredientId ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ArrowRightLeft className="h-4 w-4" />
+                  )}
+                  Move to Batata palha
                 </button>
-                {hint.suggestedCanonicalIngredientId && (
-                  <button
-                    type="button"
-                    className="text-xs px-2 py-1 rounded border border-primary/40 text-foreground hover:bg-primary/10"
-                    onClick={() => {
-                      const sourceId = hint.ingredientIds.find(
-                        (id) => id !== hint.suggestedCanonicalIngredientId,
-                      );
-                      if (sourceId) {
-                        onOpenMerge(sourceId, hint.suggestedCanonicalIngredientId ?? undefined);
-                      }
-                    }}
-                  >
-                    Abrir fusão manual
-                  </button>
+              )}
+              <button
+                type="button"
+                disabled={
+                  !reassignTargetId ||
+                  reassignTargetId === item.ingredientId ||
+                  reassigningSourceId != null
+                }
+                className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted disabled:opacity-50"
+                onClick={() => void onReassignAliases(item.ingredientId, reassignTargetId)}
+              >
+                {reassigningSourceId === item.ingredientId ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ArrowRightLeft className="h-4 w-4" />
                 )}
-              </div>
+                Confirm reassignment
+              </button>
+              {offersArchive && !prominentArchive && (
+                <CatalogReviewArchiveButton
+                  ingredientId={item.ingredientId}
+                  archiving={archiving}
+                  prominent={false}
+                  disabled={archiveDisabled}
+                  onArchive={onArchiveIngredient}
+                />
+              )}
             </div>
-          ))}
-        </div>
-      )}
+          </section>
+        )}
 
-      <div className="flex flex-wrap gap-2 border-t border-border pt-3">
-        <span className="text-sm text-muted-foreground w-full sm:w-auto">Classificar:</span>
-        {CLASSIFICATION_OPTIONS.map((c) => (
-          <button
-            key={c}
-            type="button"
-            onClick={() => onClassify(row.ingredientId, c)}
-            className={`text-xs px-2 py-1 rounded border ${
-              row.classification === c
-                ? "border-primary bg-primary/10 text-foreground"
-                : "border-border hover:bg-muted"
-            }`}
-          >
-            {CATALOG_REVIEW_CLASSIFICATION_LABELS[c]}
-          </button>
-        ))}
+        {similar && (
+          <section className="space-y-2">
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={archiveDisabled}
+                className="inline-flex items-center gap-1.5 rounded-md border border-primary/40 px-3 py-1.5 text-sm hover:bg-primary/10 disabled:opacity-50"
+                onClick={() => onOpenMerge(item.ingredientId, similar.ingredientId)}
+              >
+                <GitMerge className="h-4 w-4" />
+                Merge with {similar.displayName}
+              </button>
+              {offersArchive && !prominentArchive && (
+                <CatalogReviewArchiveButton
+                  ingredientId={item.ingredientId}
+                  archiving={archiving}
+                  prominent={false}
+                  disabled={archiveDisabled}
+                  onArchive={onArchiveIngredient}
+                />
+              )}
+            </div>
+          </section>
+        )}
+
+        {mergeHint && (
+          <section className="space-y-2">
+            {mergeHint.displayNames.length > 1 && (
+              <p className="text-sm text-muted-foreground">
+                Same product under {mergeHint.displayNames.join(" · ")}
+              </p>
+            )}
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={archiveDisabled}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted disabled:opacity-50"
+                onClick={() => logCatalogManualMergeCandidate(mergeHint)}
+              >
+                Log merge candidate
+              </button>
+              {mergeHint.suggestedCanonicalIngredientId && (
+                <button
+                  type="button"
+                  disabled={archiveDisabled}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-primary/40 px-3 py-1.5 text-sm hover:bg-primary/10 disabled:opacity-50"
+                  onClick={() => {
+                    const sourceId = mergeHint.ingredientIds.find(
+                      (id) => id !== mergeHint.suggestedCanonicalIngredientId,
+                    );
+                    if (sourceId) {
+                      onOpenMerge(sourceId, mergeHint.suggestedCanonicalIngredientId ?? undefined);
+                    }
+                  }}
+                >
+                  <GitMerge className="h-4 w-4" />
+                  Open manual merge
+                </button>
+              )}
+              {offersArchive && !prominentArchive && (
+                <CatalogReviewArchiveButton
+                  ingredientId={item.ingredientId}
+                  archiving={archiving}
+                  prominent={false}
+                  disabled={archiveDisabled}
+                  onArchive={onArchiveIngredient}
+                />
+              )}
+            </div>
+          </section>
+        )}
+
+        {row && row.recipeUsage.count > 0 && (
+          <p className="text-sm text-muted-foreground">
+            Used in {row.recipeUsage.count}{" "}
+            {row.recipeUsage.count === 1 ? "recipe" : "recipes"}
+            {row.recipeUsage.names.length > 0 ? `: ${row.recipeUsage.names.slice(0, 4).join(", ")}` : ""}
+            {row.recipeUsage.names.length > 4 ? "…" : ""}
+          </p>
+        )}
+
+        {row && (
+          <section className="space-y-2 border-t border-border/20 pt-3">
+            <p className="text-xs font-medium text-muted-foreground/80">Mark reviewed as</p>
+            <div className="flex flex-wrap gap-1.5">
+              {CLASSIFICATION_OPTIONS.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => onClassify(row.ingredientId, c)}
+                  className={`rounded border px-2 py-1 text-xs ${
+                    row.classification === c
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border hover:bg-muted"
+                  }`}
+                >
+                  {CATALOG_REVIEW_CLASSIFICATION_LABELS[c]}
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
-    </Card>
+    </div>
   );
 }

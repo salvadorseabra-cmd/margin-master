@@ -3,6 +3,7 @@ import {
   appendIngredientOperationalNote,
   ingredientOperationalNotesStorageKey,
   readIngredientOperationalNotes,
+  removeIngredientOperationalNote,
 } from "./ingredient-operational-notes";
 
 describe("ingredient-operational-notes", () => {
@@ -42,5 +43,31 @@ describe("ingredient-operational-notes", () => {
 
     expect(readIngredientOperationalNotes(userId)["ing-1"]).toEqual(second);
     expect(readIngredientOperationalNotes(userId)["ing-2"]).toBeUndefined();
+  });
+
+  it("removes a note by index and persists the rest", () => {
+    appendIngredientOperationalNote(userId, "ing-1", "First");
+    appendIngredientOperationalNote(userId, "ing-1", "Second");
+    appendIngredientOperationalNote(userId, "ing-1", "Third");
+
+    const remaining = removeIngredientOperationalNote(userId, "ing-1", 1);
+    expect(remaining).toEqual(["First", "Third"]);
+    expect(readIngredientOperationalNotes(userId)["ing-1"]).toEqual(["First", "Third"]);
+  });
+
+  it("drops the ingredient key when the last note is removed", () => {
+    appendIngredientOperationalNote(userId, "ing-1", "Only note");
+
+    const remaining = removeIngredientOperationalNote(userId, "ing-1", 0);
+    expect(remaining).toEqual([]);
+    expect(readIngredientOperationalNotes(userId)["ing-1"]).toBeUndefined();
+  });
+
+  it("ignores out-of-range indices", () => {
+    appendIngredientOperationalNote(userId, "ing-1", "Stable");
+
+    expect(removeIngredientOperationalNote(userId, "ing-1", -1)).toEqual(["Stable"]);
+    expect(removeIngredientOperationalNote(userId, "ing-1", 3)).toEqual(["Stable"]);
+    expect(readIngredientOperationalNotes(userId)["ing-1"]).toEqual(["Stable"]);
   });
 });

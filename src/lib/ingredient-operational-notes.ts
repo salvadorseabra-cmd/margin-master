@@ -39,3 +39,21 @@ export function appendIngredientOperationalNote(
   writeIngredientOperationalNotes(userId, { ...map, [ingredientId]: next });
   return next;
 }
+
+export function removeIngredientOperationalNote(
+  userId: string,
+  ingredientId: string,
+  noteIndex: number,
+): string[] {
+  const map = readIngredientOperationalNotes(userId);
+  const existing = map[ingredientId] ?? [];
+  if (noteIndex < 0 || noteIndex >= existing.length) return existing;
+  const next = existing.filter((_, index) => index !== noteIndex);
+  if (next.length === 0) {
+    const { [ingredientId]: _removed, ...rest } = map;
+    writeIngredientOperationalNotes(userId, rest);
+  } else {
+    writeIngredientOperationalNotes(userId, { ...map, [ingredientId]: next });
+  }
+  return next;
+}

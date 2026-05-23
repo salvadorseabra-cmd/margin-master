@@ -4,6 +4,7 @@
  */
 
 import type { PostgrestError, SupabaseClient } from "@supabase/supabase-js";
+import { archiveIngredient } from "@/lib/ingredient-archive";
 import {
   isArchivedIngredientEntry,
   normalizeCanonicalIngredientName,
@@ -306,12 +307,11 @@ export async function archiveOrphanIngredient(
     return { error: null };
   }
 
-  const { error } = await params.client
-    .from("ingredients")
-    .update({ is_archived: true })
-    .eq("user_id", userId)
-    .eq("id", ingredientId)
-    .is("merged_into_ingredient_id", null);
+  const { error } = await archiveIngredient({
+    client: params.client,
+    ingredientId,
+    userId,
+  });
 
   console.info(INGREDIENT_ORPHAN_LOG_PREFIX, "archive_orphan_ingredient", {
     ingredientId,

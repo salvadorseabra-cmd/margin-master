@@ -8,6 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
+import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -115,6 +116,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <div className="flex h-full min-h-0 flex-col overflow-hidden">
         <Outlet />
+        <Toaster richColors closeButton position="bottom-center" />
       </div>
     </QueryClientProvider>
   );

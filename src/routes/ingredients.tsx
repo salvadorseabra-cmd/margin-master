@@ -1,6 +1,7 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
 import { Plus, Loader2, Pencil, Trash2, ClipboardList } from "lucide-react";
+import { toast } from "sonner";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -47,6 +48,15 @@ import {
 } from "@/lib/canonical-ingredient-rename";
 import { traceFoodCostRecalculationSource } from "@/lib/recipe-canonical-graph-trace";
 import { loadCanonicalIngredientCatalog } from "@/lib/ingredient-catalog-load";
+import {
+  archiveIngredient,
+  clearIngredientArchiveReason,
+  formatArchivedRecency,
+  formatLastPurchaseRecencyPhrase,
+  loadArchivedIngredientCatalog,
+  restoreIngredient,
+  sortOperationallyArchivedIngredients,
+} from "@/lib/ingredient-archive";
 import { getVolatileIngredients } from "@/lib/ingredient-price-history";
 import {
   formatIngredientListLastPurchaseColumn,
@@ -76,7 +86,9 @@ export const Route = createFileRoute("/ingredients")({
   component: IngredientsPage,
 });
 
-type Row = Tables<"ingredients">;
+type Row = Tables<"ingredients"> & { archived_at?: string | null };
+
+type CatalogListMode = "active" | "archived";
 
 type PriceActivity = Pick<
   Tables<"ingredient_price_history">,
@@ -98,7 +110,9 @@ function IngredientsPage() {
 
 function IngredientsIndexPage() {
   const { user } = useAuth();
+  const [catalogListMode, setCatalogListMode] = useState<CatalogListMode>("active");
   const [rows, setRows] = useState<Row[]>([]);
+  const [archivedRows, setArchivedRows] = useState<Row[]>([]);
   const [priceActivity, setPriceActivity] = useState<Record<string, PriceActivity>>({});
   const [lastPurchaseGlanceByIngredientId, setLastPurchaseGlanceByIngredientId] = useState<
     Record<string, IngredientLatestPurchaseGlance>
@@ -224,7 +238,47 @@ function IngredientsIndexPage() {
     }
   }, [namingReviewActive, namingReviewQueue, namingReviewIndex, handleNamingReviewIndexChange]);
 
+  const loadArchived = async () => {
+    setLoading(true);
+    const { rows: catalogRows, error: catalogError } = await loadArchivedIngredientCatalog(supabase);
+    if (catalogError) setError(catalogError);
+    else {
+      const ingredientRows = sortOperationallyArchivedIngredients(catalogRows) as Row[];
+      setArchivedRows(ingredientRows);
+
+      const ingredientIds = ingredientRows.map((ingredient) => ingredient.id);
+      if (ingredientIds.length === 0) {
+        setLastPurchaseGlanceByIngredientId({});
+      } else {
+        const catalogForPurchaseScan = ingredientRows.map((row) => ({
+          id: row.id,
+          name: row.name,
+          normalized_name: row.normalized_name,
+        }));
+        const [dbAliases, matchCatalogResult] = await Promise.all([
+          loadConfirmedIngredientAliasMap(supabase),
+          loadMatchingIngredientCatalog(supabase),
+        ]);
+        const purchaseRecencyAliases = {
+          ...readLocalInvoiceIngredientAliases(user?.id),
+          ...dbAliases,
+        };
+        const lastPurchasesResolved = await loadLatestPurchaseGlanceByIngredientId(
+          supabase,
+          matchCatalogResult.rows.length > 0 ? matchCatalogResult.rows : catalogForPurchaseScan,
+          purchaseRecencyAliases,
+        );
+        setLastPurchaseGlanceByIngredientId(lastPurchasesResolved);
+      }
+    }
+    setLoading(false);
+  };
+
   const load = async () => {
+    if (catalogListMode === "archived") {
+      await loadArchived();
+      return;
+    }
     setLoading(true);
     const { rows: catalogRows, error: catalogError } = await loadCanonicalIngredientCatalog(
       supabase,
@@ -316,8 +370,89 @@ function IngredientsIndexPage() {
   };
 
   useEffect(() => {
-    if (user) load();
-  }, [user]);
+    if (user) void load();
+  }, [user, catalogListMode]);
+
+  const switchCatalogListMode = useCallback(
+    (mode: CatalogListMode) => {
+      setCatalogListMode(mode);
+      exitToBrowse();
+      setSelectedIngredientId(null);
+      setOpen(false);
+    },
+    [exitToBrowse],
+  );
+
+  const showArchiveUndoToast = useCallback(
+    (ingredientId: string) => {
+      toast("Ingredient archived", {
+        action: {
+          label: "Undo",
+          onClick: () => {
+            void (async () => {
+              if (!user?.id) return;
+              const { error: restoreError } = await restoreIngredient({
+                client: supabase,
+                ingredientId,
+                userId: user.id,
+              });
+              if (restoreError) {
+                toast.error(restoreError.message);
+                await load();
+                return;
+              }
+              await load();
+            })();
+          },
+        },
+      });
+    },
+    [user?.id],
+  );
+
+  const handleArchive = useCallback(
+    async (ingredientId: string) => {
+      if (!user?.id) return;
+      setRows((prev) => prev.filter((row) => row.id !== ingredientId));
+      if (selectedIngredientId === ingredientId) setSelectedIngredientId(null);
+      const { error: archiveError } = await archiveIngredient({
+        client: supabase,
+        ingredientId,
+        userId: user.id,
+      });
+      if (archiveError) {
+        toast.error(archiveError.message);
+        await load();
+        return;
+      }
+      showArchiveUndoToast(ingredientId);
+      if (catalogListMode === "archived") {
+        await loadArchived();
+      }
+    },
+    [user?.id, selectedIngredientId, showArchiveUndoToast, catalogListMode],
+  );
+
+  const handleRestore = useCallback(
+    async (ingredientId: string) => {
+      if (!user?.id) return;
+      const { error: restoreError } = await restoreIngredient({
+        client: supabase,
+        ingredientId,
+        userId: user.id,
+      });
+      if (restoreError) {
+        toast.error(restoreError.message);
+        return;
+      }
+      clearIngredientArchiveReason(user.id, ingredientId);
+      setArchivedRows((prev) => prev.filter((row) => row.id !== ingredientId));
+      toast("Ingredient restored");
+      setCatalogListMode("active");
+      await load();
+    },
+    [user?.id],
+  );
 
   useEffect(() => {
     if (!user || rows.length === 0) {
@@ -691,24 +826,28 @@ function IngredientsIndexPage() {
             <ClipboardList className="h-4 w-4" />
             Catalog review
           </Link>
-          <button
-            onClick={() => setOpen((v) => !v)}
-            className="inline-flex cursor-pointer items-center gap-2 bg-foreground text-background rounded-lg px-3.5 py-2 text-sm font-medium hover:opacity-90"
-          >
-            <Plus className="h-4 w-4" /> Add ingredient
-          </button>
+          {catalogListMode === "active" ? (
+            <button
+              onClick={() => setOpen((v) => !v)}
+              className="inline-flex cursor-pointer items-center gap-2 bg-foreground text-background rounded-lg px-3.5 py-2 text-sm font-medium hover:opacity-90"
+            >
+              <Plus className="h-4 w-4" /> Add ingredient
+            </button>
+          ) : null}
         </div>
       }
     >
-      <OperationalReviewQueueSection
-        userId={user?.id}
-        catalog={rows}
-        activeListFilter={listQueueFilter}
-        onSelectIngredient={(id) => setSelectedIngredientId(id)}
-        onEnterNamingReview={enterNamingReview}
-        onApplyListFilter={applyListReview}
-      />
-      {open && (
+      {catalogListMode === "active" ? (
+        <OperationalReviewQueueSection
+          userId={user?.id}
+          catalog={rows}
+          activeListFilter={listQueueFilter}
+          onSelectIngredient={(id) => setSelectedIngredientId(id)}
+          onEnterNamingReview={enterNamingReview}
+          onApplyListFilter={applyListReview}
+        />
+      ) : null}
+      {open && catalogListMode === "active" && (
         <Card className="mb-3">
           <form onSubmit={save} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-end">
             <Field label="Name">
@@ -779,9 +918,53 @@ function IngredientsIndexPage() {
         </Card>
       )}
 
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,40fr)_minmax(0,60fr)] lg:items-stretch lg:min-h-[min(72vh,680px)]">
-        <Card className="flex min-h-0 min-w-0 flex-col overflow-hidden border-border/50 bg-card p-0 shadow-sm lg:max-h-[min(72vh,680px)]">
-          {listQueueFilter && (
+      <div
+        className={
+          catalogListMode === "archived"
+            ? "grid gap-3"
+            : "grid gap-3 lg:grid-cols-[minmax(0,40fr)_minmax(0,60fr)] lg:items-stretch lg:min-h-[min(72vh,680px)]"
+        }
+      >
+        <Card
+          className={`flex min-h-0 min-w-0 flex-col overflow-hidden border-border/50 bg-card p-0 shadow-sm ${
+            catalogListMode === "archived" ? "" : "lg:max-h-[min(72vh,680px)]"
+          }`}
+        >
+          <div className="flex shrink-0 items-center border-b border-border/15 px-2.5 py-2">
+            <div
+              className="inline-flex rounded-lg border border-border/50 p-0.5"
+              role="tablist"
+              aria-label="Ingredient catalog view"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={catalogListMode === "active"}
+                onClick={() => switchCatalogListMode("active")}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  catalogListMode === "active"
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Active
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={catalogListMode === "archived"}
+                onClick={() => switchCatalogListMode("archived")}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  catalogListMode === "archived"
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Archived
+              </button>
+            </div>
+          </div>
+          {catalogListMode === "active" && listQueueFilter && (
             <div
               className={`flex shrink-0 items-center justify-between gap-2 border-b border-border/10 px-2.5 py-1 ${operationalListReviewBannerClass(listQueueFilter)}`}
             >
@@ -798,85 +981,148 @@ function IngredientsIndexPage() {
             </div>
           )}
           <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto">
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 z-[1] border-b border-border/15 bg-card">
-                <tr className="text-left text-xs font-medium text-muted-foreground/70">
-                  <th className="px-3 py-2 font-medium">Ingredient</th>
-                  <th className="px-3 py-2 font-medium whitespace-nowrap">Last purchase</th>
-                  <th className="px-3 py-2 font-medium text-right whitespace-nowrap">Pack price</th>
-                  <th className="w-14 py-2 pr-3 font-medium text-right" aria-label="Actions" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/20">
+            {catalogListMode === "archived" ? (
+              <div className="mx-auto max-w-xl divide-y divide-border/15">
                 {loading && (
-                  <tr>
-                    <td colSpan={4} className="py-6 text-center">
-                      <Loader2 className="h-4 w-4 animate-spin inline text-muted-foreground" />
-                    </td>
-                  </tr>
+                  <div className="flex justify-center py-8">
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/70" />
+                  </div>
                 )}
-                {!loading && rows.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="px-2.5 py-6">
-                      <p className="text-[12px] font-medium text-foreground/85">
-                        No ingredients yet
-                      </p>
-                    </td>
-                  </tr>
+                {!loading && archivedRows.length === 0 && (
+                  <div className="px-4 py-8">
+                    <p className="text-sm text-muted-foreground">No archived ingredients</p>
+                    <p className="mt-1 text-xs text-muted-foreground/70">
+                      Archived items stay in history and can be restored anytime.
+                    </p>
+                  </div>
                 )}
-                {!loading && rows.length > 0 && visibleRows.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="px-2.5 py-6">
-                      <p className="text-[12px] text-muted-foreground/60">Queue clear</p>
-                    </td>
+                {!loading &&
+                  archivedRows.map((ing) => {
+                    const purchaseGlance = lastPurchaseGlanceByIngredientId[ing.id];
+                    const lastPurchasePhrase = formatLastPurchaseRecencyPhrase(
+                      purchaseGlance?.lastPurchaseAt,
+                    );
+                    const archivedPhrase = formatArchivedRecency(ing.archived_at);
+                    return (
+                      <div
+                        key={ing.id}
+                        className="flex items-start justify-between gap-4 px-4 py-3"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-normal text-foreground/70">
+                            {formatCanonicalIngredientDisplayName(ing.name)}
+                          </p>
+                          <p className="mt-0.5 text-xs font-normal text-muted-foreground">
+                            {archivedPhrase}
+                          </p>
+                          {lastPurchasePhrase ? (
+                            <p className="mt-0.5 text-xs font-normal text-muted-foreground/65">
+                              {lastPurchasePhrase}
+                            </p>
+                          ) : null}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => void handleRestore(ing.id)}
+                          className="shrink-0 rounded-md px-2.5 py-1 text-xs font-normal text-muted-foreground transition-colors hover:bg-muted/20 hover:text-foreground/90"
+                        >
+                          Restore
+                        </button>
+                      </div>
+                    );
+                  })}
+              </div>
+            ) : (
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 z-[1] border-b border-border/15 bg-card">
+                  <tr className="text-left text-xs font-medium text-muted-foreground/70">
+                    <th className="px-3 py-2 font-medium">Ingredient</th>
+                    <th className="px-3 py-2 font-medium whitespace-nowrap">Last purchase</th>
+                    <th className="px-3 py-2 font-medium text-right whitespace-nowrap">
+                      Pack price
+                    </th>
+                    <th className="w-14 py-2 pr-3 font-medium text-right" aria-label="Actions" />
                   </tr>
-                )}
-                {duplicateListGroups
-                  ? duplicateListGroups.flatMap((group) =>
-                      group.rowIds.map((rowId) => {
-                        const ing = rowsById.get(rowId);
-                        return ing ? renderIngredientRow(ing) : null;
-                      }),
-                    )
-                  : visibleRows.map((ing) => renderIngredientRow(ing))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-border/20">
+                  {loading && (
+                    <tr>
+                      <td colSpan={4} className="py-6 text-center">
+                        <Loader2 className="h-4 w-4 animate-spin inline text-muted-foreground" />
+                      </td>
+                    </tr>
+                  )}
+                  {!loading && rows.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="px-2.5 py-6">
+                        <p className="text-[12px] font-medium text-foreground/85">
+                          No ingredients yet
+                        </p>
+                      </td>
+                    </tr>
+                  )}
+                  {!loading && rows.length > 0 && visibleRows.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="px-2.5 py-6">
+                        <p className="text-[12px] text-muted-foreground/60">Queue clear</p>
+                      </td>
+                    </tr>
+                  )}
+                  {duplicateListGroups
+                    ? duplicateListGroups.flatMap((group) =>
+                        group.rowIds.map((rowId) => {
+                          const ing = rowsById.get(rowId);
+                          return ing ? renderIngredientRow(ing) : null;
+                        }),
+                      )
+                    : visibleRows.map((ing) => renderIngredientRow(ing))}
+                </tbody>
+              </table>
+            )}
           </div>
-          {!loading && rows.length > 0 ? (
+          {!loading && catalogListMode === "active" && rows.length > 0 ? (
             <div className="shrink-0 border-t border-border/40 px-3 py-2 text-xs text-muted-foreground">
               {rows.length} {rows.length === 1 ? "ingredient" : "ingredients"}
             </div>
           ) : null}
+          {!loading && catalogListMode === "archived" && archivedRows.length > 0 ? (
+            <div className="shrink-0 border-t border-border/15 px-4 py-2 text-xs text-muted-foreground/70">
+              {archivedRows.length} archived
+            </div>
+          ) : null}
         </Card>
 
-        <IngredientDetailOperationalLayout
-          ingredient={selectedIngredient}
-          userId={user?.id}
-          catalog={rows}
-          listReviewMode={listQueueFilter}
-          duplicateCluster={selectedDuplicateCluster}
-          recipeCountById={recipeCountById}
-          priceActivity={selectedIngredient ? priceActivity[selectedIngredient.id] : undefined}
-          recipeLinkActivity={
-            selectedIngredient ? recipeLinkActivity[selectedIngredient.id] : undefined
-          }
-          namingReviewActive={namingReviewActive}
-          namingReviewQueue={namingReviewQueue}
-          namingReviewIndex={namingReviewIndex}
-          onNamingReviewIndexChange={handleNamingReviewIndexChange}
-          onExitNamingReview={exitNamingReview}
-          onNamingReviewQueueChanged={refreshNamingReviewQueue}
-          onClose={() => {
-            exitNamingReview();
-            setSelectedIngredientId(null);
-          }}
-          onSelectRelated={(id) => setSelectedIngredientId(id)}
-          onExitListReview={clearListReview}
-          onApplyListFilter={applyListReview}
-          onSelectIngredient={(id) => setSelectedIngredientId(id)}
-          onRename={(id, suggestedName) => openRename(id, suggestedName)}
-          onDelete={(id) => requestDelete(id)}
-        />
+        {catalogListMode === "active" ? (
+          <IngredientDetailOperationalLayout
+            ingredient={selectedIngredient}
+            userId={user?.id}
+            catalog={rows}
+            listReviewMode={listQueueFilter}
+            duplicateCluster={selectedDuplicateCluster}
+            recipeCountById={recipeCountById}
+            priceActivity={selectedIngredient ? priceActivity[selectedIngredient.id] : undefined}
+            recipeLinkActivity={
+              selectedIngredient ? recipeLinkActivity[selectedIngredient.id] : undefined
+            }
+            namingReviewActive={namingReviewActive}
+            namingReviewQueue={namingReviewQueue}
+            namingReviewIndex={namingReviewIndex}
+            onNamingReviewIndexChange={handleNamingReviewIndexChange}
+            onExitNamingReview={exitNamingReview}
+            onNamingReviewQueueChanged={refreshNamingReviewQueue}
+            onClose={() => {
+              exitNamingReview();
+              setSelectedIngredientId(null);
+            }}
+            onSelectRelated={(id) => setSelectedIngredientId(id)}
+            onExitListReview={clearListReview}
+            onApplyListFilter={applyListReview}
+            onSelectIngredient={(id) => setSelectedIngredientId(id)}
+            onRename={(id, suggestedName) => openRename(id, suggestedName)}
+            onArchive={(id) => void handleArchive(id)}
+            onDelete={(id) => requestDelete(id)}
+          />
+        ) : null}
       </div>
       <CanonicalIngredientRenameDialog
         open={renameOpen && renameTarget !== null}

@@ -169,7 +169,9 @@ describe("archiveOrphanIngredient", () => {
           return {
             eq: () => ({
               eq: () => ({
-                is: () => Promise.resolve({ error: null }),
+                is: () => ({
+                  select: () => Promise.resolve({ data: [{ id: "palha-id" }], error: null }),
+                }),
               }),
             }),
           };
@@ -185,7 +187,8 @@ describe("archiveOrphanIngredient", () => {
     });
 
     expect(error).toBeNull();
-    expect(updates[0]).toEqual({ is_archived: true });
+    expect(updates[0]?.is_archived).toBe(true);
+    expect(updates[0]).toHaveProperty("archived_at");
     expect(updates[0]).not.toHaveProperty("merged_into_ingredient_id");
     infoSpy.mockRestore();
   });

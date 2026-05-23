@@ -350,7 +350,7 @@ export function buildOperationalInsightCards(input: {
 }
 
 export function operationalInsightCardClassName(kind: OperationalInsightCardKind): string {
-  const shell = "group relative flex min-w-0 items-start gap-2 rounded-lg border px-2.5 py-2";
+  const shell = "relative flex min-w-0 items-start gap-2 rounded-lg border px-2.5 py-2";
   switch (kind) {
     case "supplier-price-up":
       return `${shell} border-destructive/20 bg-destructive/5`;
