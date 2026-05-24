@@ -7,6 +7,10 @@ export type CatalogReviewQueueIssueInput = {
   isOrphan?: boolean;
   /** True when only aliases block archival (legacy canonical). */
   isAliasOnly?: boolean;
+  /** Persisted ingredient_aliases rows linked to this canonical (DB source of truth). */
+  persistedAliasCount?: number;
+  /** Aliases failing semantic integrity audit (review attention signal). */
+  suspiciousAliasCount?: number;
   /** Pack price / purchase recency stale (optional; loaded on review page). */
   isStale?: boolean;
   /** Legacy BAT shoestr shorthand row — rename in workspace. */

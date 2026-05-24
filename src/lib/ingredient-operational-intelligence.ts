@@ -108,6 +108,8 @@ export type IngredientOperationalAliasRow = {
   confirmedByUser: boolean;
   createdAt: string;
   lastInvoiceUsageDate: string | null;
+  /** Latest matched invoice line (when resolved from invoice_items scan). */
+  invoiceId: string | null;
   sampleInvoiceLine: {
     name: string;
     quantity: number | null;
@@ -145,6 +147,7 @@ type InvoiceItemScanRow = {
   quantity: number | null;
   unit: string | null;
   created_at: string;
+  invoice_id?: string | null;
   invoices: {
     invoice_date: string | null;
     supplier_name: string | null;
@@ -306,6 +309,7 @@ function enrichAliasRow(
     createdAt: row.created_at,
     lastInvoiceUsageDate:
       invoiceUsage.date ?? (row.created_at ? row.created_at.slice(0, 10) : null),
+    invoiceId: invoiceUsage.sample?.invoice_id?.trim() ?? null,
     sampleInvoiceLine: invoiceUsage.sample
       ? {
           name: invoiceUsage.sample.name,
@@ -396,7 +400,7 @@ async function loadRecentInvoiceItemsForMatching(client: DbClient): Promise<Invo
   const { data, error } = await client
     .from("invoice_items")
     .select(
-      "name, quantity, unit, created_at, invoices!inner(invoice_date, supplier_name)",
+      "name, quantity, unit, created_at, invoice_id, invoices!inner(invoice_date, supplier_name)",
     )
     .order("created_at", { ascending: false })
     .limit(INVOICE_ITEM_SCAN_LIMIT);
@@ -468,6 +472,19 @@ export async function loadIngredientOperationalProfile(
       );
       return enrichAliasRow(row, usage);
     });
+
+    if (import.meta.env.DEV) {
+      for (const alias of aliases) {
+        if (alias.ingredientId.trim() !== trimmedId) {
+          console.warn(`${LOG_PREFIX} alias ingredient_id mismatch`, {
+            selectedIngredientId: trimmedId,
+            aliasId: alias.id,
+            aliasIngredientId: alias.ingredientId,
+            aliasName: alias.aliasName,
+          });
+        }
+      }
+    }
 
     const memoryKeys = buildMemoryKeysForIngredient(
       trimmedId,

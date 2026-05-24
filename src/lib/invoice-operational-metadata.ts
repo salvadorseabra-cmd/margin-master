@@ -32,6 +32,54 @@ function logQueryFailure(label: string, message: string): void {
   console.error(`${LOG_PREFIX} ${label} failed: ${message}`);
 }
 
+/** Counts `recipe_ingredients` rows per canonical ingredient id (same query as invoice metadata). */
+export async function loadRecipeCountByIngredientId(
+  client: AppSupabaseClient,
+  ingredientIds: readonly string[],
+): Promise<{ counts: Record<string, number>; error: string | null }> {
+  const counts: Record<string, number> = {};
+  const ids = [...new Set(ingredientIds.map((id) => id.trim()).filter(Boolean))];
+  if (ids.length === 0) {
+    return { counts, error: null };
+  }
+
+  try {
+    const { data, error } = await client
+      .from("recipe_ingredients")
+      .select("ingredient_id")
+      .in("ingredient_id", ids);
+
+    if (error) {
+      logQueryFailure("recipe_ingredients", error.message);
+      return { counts, error: error.message };
+    }
+
+    for (const link of data ?? []) {
+      if (!link.ingredient_id) continue;
+      counts[link.ingredient_id] = (counts[link.ingredient_id] ?? 0) + 1;
+    }
+
+    return { counts, error: null };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    logQueryFailure("recipe_ingredients", message);
+    return { counts, error: message };
+  }
+}
+
+export function buildExplicitRecipeCountMap(
+  ingredientIds: readonly string[],
+  counts: Readonly<Record<string, number>>,
+): Record<string, number> {
+  const byId: Record<string, number> = {};
+  for (const id of ingredientIds) {
+    const trimmed = id.trim();
+    if (!trimmed) continue;
+    byId[trimmed] = counts[trimmed] ?? 0;
+  }
+  return byId;
+}
+
 /**
  * Optional catalog price fields for operational badges. Matching uses id/name/unit only.
  */

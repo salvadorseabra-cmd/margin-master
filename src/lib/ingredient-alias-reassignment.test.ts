@@ -9,6 +9,7 @@ import {
   isLegacyPalhaAliasField,
   reassignAliasesAndArchiveIfOrphan,
   reassignIngredientAliases,
+  reassignSingleIngredientAlias,
   resolveCanonicalIngredientForReassignment,
   runPalhaToBatataPalhaAliasReassignment,
   validateReassignIngredientAliasesParams,
@@ -44,6 +45,8 @@ function createReassignMockClient(options: {
   const archiveUpdates = options.archiveUpdates ?? [];
   const ingredientOwners = options.ingredientOwners ?? [];
   const deletedIds: string[] = [];
+  const updateEqCalls: { column: string; value: string }[] = [];
+  const updatePayloads: Record<string, unknown>[] = [];
 
   const toDbRow = (r: MockAliasRow) => ({
     id: r.id,
@@ -57,42 +60,62 @@ function createReassignMockClient(options: {
   const client = {
     from: (table: string) => {
       if (table === "ingredient_aliases") {
-        const allAliasRowsPromise = Promise.resolve({
-          data: aliasRows.map(toDbRow),
-          error: null,
-        });
-        return {
-          select: () =>
-            Object.assign(allAliasRowsPromise, {
-              eq: (col: string, val: string) => {
-                if (col === "ingredient_id") {
-                  return Promise.resolve({
-                    data: aliasRows.filter((r) => r.ingredient_id === val).map(toDbRow),
-                    error: null,
-                  });
-                }
-                return Promise.resolve({ data: [], error: null });
-              },
-              in: (_col: string, ids: string[]) =>
-                Promise.resolve({
-                  data: aliasRows
-                    .filter((r) => ids.includes(r.ingredient_id))
-                    .map((r) => ({
-                      ingredient_id: r.ingredient_id,
-                      supplier_name: r.supplier_name ?? null,
-                    })),
-                  error: null,
-                }),
+        const filterRows = (filters: { col: string; val: string }[]) =>
+          aliasRows.filter((row) =>
+            filters.every((f) => {
+              if (f.col === "id") return row.id === f.val;
+              if (f.col === "ingredient_id") return row.ingredient_id === f.val;
+              return false;
             }),
-          update: (payload: Partial<MockAliasRow & { ingredient_id: string; confidence: number }>) => ({
+          );
+
+        const makeSelectChain = (filters: { col: string; val: string }[] = []) => {
+          const chain = {
+            eq: (col: string, val: string) => makeSelectChain([...filters, { col, val }]),
+            in: (_col: string, ids: string[]) =>
+              Promise.resolve({
+                data: aliasRows
+                  .filter((r) => ids.includes(r.ingredient_id))
+                  .map((r) => ({
+                    ingredient_id: r.ingredient_id,
+                    supplier_name: r.supplier_name ?? null,
+                  })),
+                error: null,
+              }),
+            maybeSingle: async () => ({
+              data: (() => {
+                const matches = filterRows(filters);
+                return matches[0] ? toDbRow(matches[0]) : null;
+              })(),
+              error: null,
+            }),
+            then: (
+              onFulfilled?: (value: { data: ReturnType<typeof toDbRow>[]; error: null }) => unknown,
+              onRejected?: (reason: unknown) => unknown,
+            ) =>
+              Promise.resolve({
+                data: filterRows(filters).map(toDbRow),
+                error: null,
+              }).then(onFulfilled, onRejected),
+          };
+          return chain;
+        };
+
+        return {
+          select: () => makeSelectChain(),
+          update: (payload: Partial<MockAliasRow & { ingredient_id: string; confidence: number }>) => {
+            updatePayloads.push(payload);
+            return {
             eq: (col: string, val: string) => {
+              updateEqCalls.push({ column: col, value: val });
               const row = aliasRows.find((r) =>
                 col === "id" ? r.id === val : col === "ingredient_id" && r.ingredient_id === val,
               );
               if (row) Object.assign(row, payload);
               return Promise.resolve({ error: null });
             },
-          }),
+          };
+          },
           delete: () => ({
             eq: (_col: string, val: string) => {
               deletedIds.push(val);
@@ -125,7 +148,9 @@ function createReassignMockClient(options: {
               eq: () => ({
                 is: () => {
                   archiveUpdates.push(payload);
-                  return Promise.resolve({ error: null });
+                  return {
+                    select: () => Promise.resolve({ data: [{ id: "archived" }], error: null }),
+                  };
                 },
               }),
             }),
@@ -146,7 +171,7 @@ function createReassignMockClient(options: {
       throw new Error(`unexpected table ${table}`);
     },
   };
-  return { client, deletedIds, aliasRows };
+  return { client, deletedIds, aliasRows, updateEqCalls, updatePayloads };
 }
 
 describe("validateReassignIngredientAliasesParams", () => {
@@ -238,6 +263,49 @@ describe("reassignIngredientAliases", () => {
   });
 });
 
+describe("reassignSingleIngredientAlias", () => {
+  it("updates only the targeted alias row by id (not all rows for the ingredient)", async () => {
+    const aliasRows = [
+      {
+        id: "alias-keep",
+        ingredient_id: "palha-id",
+        alias_name: "PALHA SNACK",
+        normalized_alias: "palha snack",
+      },
+      {
+        id: "alias-move",
+        ingredient_id: "palha-id",
+        alias_name: "BATATA PALHA 2KG",
+        normalized_alias: "batata palha 2kg",
+      },
+      {
+        id: "alias-other",
+        ingredient_id: "palha-id",
+        alias_name: "OTHER PALHA",
+        normalized_alias: "other palha",
+      },
+    ];
+    const { client, aliasRows: liveRows, updateEqCalls, updatePayloads, deletedIds } =
+      createReassignMockClient({ aliasRows });
+
+    const { aliasesReassigned, error } = await reassignSingleIngredientAlias({
+      client: client as never,
+      aliasId: "alias-move",
+      fromIngredientId: "palha-id",
+      toIngredientId: "batata-id",
+      userId: "user-1",
+    });
+
+    expect(error).toBeNull();
+    expect(aliasesReassigned).toBe(1);
+    expect(updateEqCalls).toEqual([{ column: "id", value: "alias-move" }]);
+    expect(updatePayloads).toEqual([{ ingredient_id: "batata-id" }]);
+    expect(deletedIds).toEqual([]);
+    expect(liveRows.find((row) => row.id === "alias-move")?.ingredient_id).toBe("batata-id");
+    expect(liveRows.filter((row) => row.ingredient_id === "palha-id")).toHaveLength(2);
+  });
+});
+
 describe("reassignAliasesAndArchiveIfOrphan", () => {
   it("archives PALHA after reassignment when zero refs remain", async () => {
     const aliasRows = [
@@ -263,7 +331,7 @@ describe("reassignAliasesAndArchiveIfOrphan", () => {
     expect(result.aliasesReassigned).toBe(3);
     expect(result.sourceOrphanReport).not.toBeNull();
     expect(result.archived).toBe(true);
-    expect(archiveUpdates[0]).toEqual({ is_archived: true });
+    expect(archiveUpdates[0]).toEqual(expect.objectContaining({ is_archived: true }));
     infoSpy.mockRestore();
   });
 });

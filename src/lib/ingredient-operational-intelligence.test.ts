@@ -322,12 +322,14 @@ describe("ingredient-operational-intelligence", () => {
           quantity: 2,
           unit: "un",
           created_at: "2026-02-01T00:00:00.000Z",
+          invoice_id: "inv-mayo-99",
           invoices: { invoice_date: "2026-02-15", supplier_name: "Makro" },
         },
       ],
     );
 
     expect(profile.aliases[0]?.lastInvoiceUsageDate).toBe("2026-02-15");
+    expect(profile.aliases[0]?.invoiceId).toBe("inv-mayo-99");
     expect(profile.aliases[0]?.sampleInvoiceLine).toMatchObject({
       name: "MAYO 1 pack x 250 g",
       quantity: 2,

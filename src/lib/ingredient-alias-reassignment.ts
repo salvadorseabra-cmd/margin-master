@@ -1,6 +1,10 @@
 /**
  * Reassign ingredient_aliases (and in-memory alias map) from one canonical to another.
  * Does not merge ingredients, archive sources, or touch recipe_ingredients unless done separately.
+ *
+ * Catalog Review saves MUST use {@link reassignSingleIngredientAlias} only (`.eq("id", aliasId)`).
+ * Never call {@link reassignIngredientAliases} from Catalog Review — that bulk path moves every
+ * alias on the source canonical and caused historical mapping corruption.
  */
 
 import type { PostgrestError } from "@supabase/supabase-js";
@@ -254,6 +258,7 @@ export async function reassignIngredientAliases(
 
     const { error: moveError } = await params.client
       .from("ingredient_aliases")
+      // CRITICAL: update by alias row id only — never `.eq("ingredient_id", …)` here (would move all aliases).
       .update({ ingredient_id: toIngredientId })
       .eq("id", sourceRow.id);
     if (moveError) {
@@ -435,6 +440,174 @@ export async function reassignAliasesAndArchiveIfOrphan(
     error: archiveError?.message ?? null,
     orphanBefore,
     orphanAfter: sourceOrphanReport,
+  });
+
+  return {
+    ...reassignment,
+    sourceOrphanReport,
+    archived: !archiveError,
+    archiveError,
+  };
+}
+
+export type ReassignSingleIngredientAliasParams = ReassignIngredientAliasesParams & {
+  aliasId: string;
+};
+
+/**
+ * Move one `ingredient_aliases` row by primary key only — updates `ingredient_id` and nothing else.
+ * No collision merge/delete, orphan archive, or in-memory alias map rewrite (Catalog Review path).
+ */
+export async function reassignSingleIngredientAlias(
+  params: ReassignSingleIngredientAliasParams,
+): Promise<ReassignIngredientAliasesResult> {
+  const aliasId = params.aliasId?.trim() ?? "";
+  if (!aliasId) {
+    return {
+      aliasesReassigned: 0,
+      nextConfirmedAliases: params.confirmedAliases,
+      error: {
+        message: "Invalid alias reassignment: missing_alias_id",
+        code: "alias_reassignment_validation",
+        details: "missing_alias_id",
+        hint: "",
+      } as PostgrestError,
+    };
+  }
+
+  const issues = validateReassignIngredientAliasesParams(params);
+  const fromIngredientId = params.fromIngredientId?.trim() ?? "";
+  const toIngredientId = params.toIngredientId?.trim() ?? "";
+
+  if (issues.length > 0) {
+    return {
+      aliasesReassigned: 0,
+      nextConfirmedAliases: params.confirmedAliases,
+      error: {
+        message: `Invalid alias reassignment: ${issues.join(", ")}`,
+        code: "alias_reassignment_validation",
+        details: issues.join(","),
+        hint: "",
+      } as PostgrestError,
+    };
+  }
+
+  const sourceResult = await params.client
+    .from("ingredient_aliases")
+    .select("id, ingredient_id")
+    .eq("id", aliasId)
+    .eq("ingredient_id", fromIngredientId)
+    .maybeSingle();
+
+  if (sourceResult.error) {
+    return {
+      aliasesReassigned: 0,
+      nextConfirmedAliases: params.confirmedAliases,
+      error: sourceResult.error,
+    };
+  }
+
+  if (!sourceResult.data?.id) {
+    return {
+      aliasesReassigned: 0,
+      nextConfirmedAliases: params.confirmedAliases,
+      error: {
+        message: "Alias not found on source ingredient",
+        code: "alias_not_found",
+        details: aliasId,
+        hint: "",
+      } as PostgrestError,
+    };
+  }
+
+  const { error: moveError } = await params.client
+    .from("ingredient_aliases")
+    // CRITICAL: update by alias row id only — never `.eq("ingredient_id", …)` here (would move all aliases).
+    .update({ ingredient_id: toIngredientId })
+    .eq("id", aliasId);
+
+  if (moveError) {
+    return {
+      aliasesReassigned: 0,
+      nextConfirmedAliases: params.confirmedAliases,
+      error: moveError,
+    };
+  }
+
+  return {
+    aliasesReassigned: 1,
+    nextConfirmedAliases: params.confirmedAliases,
+    error: null,
+  };
+}
+
+export type ReassignSingleAliasAndArchiveIfOrphanParams = ReassignSingleIngredientAliasParams & {
+  catalog: IngredientCanonicalInput[];
+  autoArchiveIfOrphan?: boolean;
+};
+
+export async function reassignSingleAliasAndArchiveIfOrphan(
+  params: ReassignSingleAliasAndArchiveIfOrphanParams,
+): Promise<ReassignAliasesAndArchiveIfOrphanResult> {
+  const autoArchive = params.autoArchiveIfOrphan !== false;
+  const fromId = params.fromIngredientId.trim();
+  const toId = params.toIngredientId.trim();
+
+  const sourceEntry = params.catalog.find((row) => row.id?.trim() === fromId);
+  const detectCatalog = sourceEntry ? [sourceEntry] : [{ id: fromId, name: fromId }];
+
+  const { reports: reportsBefore } = await detectOrphanCanonicalIngredients(
+    params.client,
+    detectCatalog,
+  );
+  const orphanBefore = reportsBefore.get(fromId) ?? null;
+
+  const reassignment = await reassignSingleIngredientAlias(params);
+  if (reassignment.error) {
+    return {
+      ...reassignment,
+      sourceOrphanReport: orphanBefore,
+      archived: false,
+      archiveError: null,
+    };
+  }
+
+  const { reports, error: detectError } = await detectOrphanCanonicalIngredients(
+    params.client,
+    detectCatalog,
+  );
+
+  if (detectError) {
+    return {
+      ...reassignment,
+      sourceOrphanReport: orphanBefore,
+      archived: false,
+      archiveError: {
+        message: detectError,
+        code: "orphan_detect_after_reassignment",
+        details: "",
+        hint: "",
+      } as PostgrestError,
+    };
+  }
+
+  const sourceOrphanReport = reports.get(fromId) ?? null;
+  const isOrphan =
+    sourceOrphanReport != null && isIngredientOperationallyOrphaned(sourceOrphanReport);
+
+  if (!autoArchive || !isOrphan) {
+    return {
+      ...reassignment,
+      sourceOrphanReport,
+      archived: false,
+      archiveError: null,
+    };
+  }
+
+  const { error: archiveError } = await archiveOrphanIngredient({
+    client: params.client,
+    ingredientId: fromId,
+    userId: params.userId,
   });
 
   return {
