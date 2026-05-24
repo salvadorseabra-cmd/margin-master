@@ -1,9 +1,19 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
-import { ClipboardList, Download, Loader2, Plus, Trash2, TrendingUp, TrendingDown, X } from "lucide-react";
+import {
+  ClipboardList,
+  Download,
+  Loader2,
+  Plus,
+  Trash2,
+  TrendingUp,
+  TrendingDown,
+  X,
+} from "lucide-react";
 
 import { useCallback, useEffect, useState } from "react";
 import type { FormEvent } from "react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { downloadRecipeTechnicalSheet } from "@/lib/recipe-technical-sheet";
@@ -26,6 +36,21 @@ import {
   traceRecipeLineFoodCostSource,
 } from "@/lib/recipe-canonical-integrity";
 import { traceFoodCostRecalculationSource } from "@/lib/recipe-canonical-graph-trace";
+import { formatRecipeQuantityDisplay, parseRecipeQuantityInput } from "@/lib/recipe-quantity-input";
+import { RecipeQuantityInput } from "@/components/recipe-quantity-input";
+import { deleteRecipe, loadRecipeDeleteBlockers } from "@/lib/recipe-delete";
+import {
+  computeFoodCostPct,
+  computeGrossMarginPct,
+  formatOptionalMarginPercent,
+  getRecipeHealth,
+  hasRecipeSellingPrice,
+  isPrepRecipe,
+  recipeSellingPriceForSave,
+  recipeSellingPriceToFormValue,
+  validateRecipeSellingPrice,
+  type RecipeHealth,
+} from "@/lib/recipe-selling-price";
 
 export const Route = createFileRoute("/recipes")({
   head: () => ({
@@ -96,18 +121,6 @@ type RecipeCostLine = {
   contribution: number;
 };
 
-type RecipeHealth = {
-  label:
-    | "Add quantities"
-    | "No selling price"
-    | "Margin protected"
-    | "Cost concentration"
-    | "Margin pressure"
-    | "Margin below target";
-  tone: "success" | "warning" | "destructive";
-  helper: string;
-};
-
 const emptyRecipeForm: RecipeForm = {
   name: "",
   type: "",
@@ -119,14 +132,14 @@ function recipeToForm(recipe: RecipeRow): RecipeForm {
   return {
     name: recipe.name,
     type: recipe.type ?? "dish",
-    selling_price: String(Number(recipe.selling_price ?? 0)),
+    selling_price: recipeSellingPriceToFormValue(recipe.selling_price, recipe.type),
     lines:
       recipe.recipe_ingredients
         ?.filter((line) => line.ingredient_id)
         .map((line) => ({
           id: line.id,
           ingredient_id: line.ingredient_id ?? "",
-          quantity: String(Number(line.quantity ?? 0)),
+          quantity: formatRecipeQuantityDisplay(Number(line.quantity ?? 0)),
           unit: line.unit ?? line.ingredients?.unit ?? "",
         })) ?? [],
   };
@@ -147,6 +160,7 @@ function RecipesIndexPage() {
   const [recipeCosts, setRecipeCosts] = useState<Record<string, number>>({});
   const [ingredientOptions, setIngredientOptions] = useState<IngredientOption[]>([]);
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeRow | null>(null);
+  const [editingRecipeId, setEditingRecipeId] = useState<string | null>(null);
   const [recipeForm, setRecipeForm] = useState<RecipeForm>(emptyRecipeForm);
   const [formMode, setFormMode] = useState<RecipeFormMode>("edit");
   const [deletedLineIds, setDeletedLineIds] = useState<string[]>([]);
@@ -155,9 +169,12 @@ function RecipesIndexPage() {
 
   const [detailOpen, setDetailOpen] = useState(false);
   const [pendingDeleteLineIndex, setPendingDeleteLineIndex] = useState<number | null>(null);
+  const [pendingRecipeDelete, setPendingRecipeDelete] = useState(false);
+  const [checkingRecipeDelete, setCheckingRecipeDelete] = useState(false);
 
   const openRecipe = (recipe: RecipeRow) => {
     setFormMode("edit");
+    setEditingRecipeId(recipe.id);
     setSelectedRecipe(recipe);
     setRecipeForm(recipeToForm(recipe));
     setDeletedLineIds([]);
@@ -167,6 +184,7 @@ function RecipesIndexPage() {
 
   const openNewRecipe = () => {
     setFormMode("create");
+    setEditingRecipeId(null);
     setSelectedRecipe(null);
     setRecipeForm({
       ...emptyRecipeForm,
@@ -180,10 +198,13 @@ function RecipesIndexPage() {
 
   const closeRecipeForm = useCallback(() => {
     setDetailOpen(false);
+    setEditingRecipeId(null);
     setSelectedRecipe(null);
     setRecipeForm(emptyRecipeForm);
     setFormMode("edit");
     setDeletedLineIds([]);
+    setPendingRecipeDelete(false);
+    setCheckingRecipeDelete(false);
     setSaving(false);
     setError(null);
   }, []);
@@ -372,6 +393,57 @@ function RecipesIndexPage() {
     removeRecipeLine(lineIndex);
   };
 
+  const requestDeleteRecipe = async () => {
+    if (!user || !editingRecipeId || formMode !== "edit") return;
+
+    setCheckingRecipeDelete(true);
+    setError(null);
+
+    const { blockers, error: blockerError } = await loadRecipeDeleteBlockers(
+      supabase,
+      editingRecipeId,
+    );
+
+    setCheckingRecipeDelete(false);
+
+    if (blockerError) {
+      setError(blockerError);
+      return;
+    }
+
+    if (blockers.blocked) {
+      const names = blockers.dependentRecipeNames;
+      setError(
+        names.length
+          ? `${blockers.message} Used in: ${names.join(", ")}.`
+          : (blockers.message ?? "This recipe cannot be deleted."),
+      );
+      return;
+    }
+
+    setPendingRecipeDelete(true);
+  };
+
+  const confirmDeleteRecipe = async () => {
+    if (!user || !editingRecipeId) return;
+
+    setPendingRecipeDelete(false);
+    setSaving(true);
+    setError(null);
+
+    const { error: deleteError } = await deleteRecipe(supabase, editingRecipeId, user.id);
+
+    setSaving(false);
+
+    if (deleteError) {
+      setError(deleteError);
+      return;
+    }
+
+    closeRecipeForm();
+    await load();
+  };
+
   const saveRecipe = async (event: FormEvent) => {
     event.preventDefault();
     if (!user) return;
@@ -382,18 +454,40 @@ function RecipesIndexPage() {
       return;
     }
 
+    const sellingPriceError = validateRecipeSellingPrice(recipeForm.selling_price, recipeForm.type);
+    if (sellingPriceError) {
+      setError(sellingPriceError);
+      return;
+    }
+
     setSaving(true);
     setError(null);
 
     const recipePayload = {
       name,
       type: recipeForm.type.trim() || "dish",
-      selling_price: Number(recipeForm.selling_price) || 0,
+      selling_price: recipeSellingPriceForSave(recipeForm.selling_price, recipeForm.type),
     };
 
-    let recipeId = selectedRecipe?.id ?? null;
+    let recipeId = editingRecipeId ?? selectedRecipe?.id ?? null;
+    const isEditing = recipeId != null;
+    const mode = isEditing ? "update" : "create";
+    const wasCreate = !isEditing;
 
-    if (formMode === "create") {
+    console.log("[RECIPE_SAVE_MODE]", { recipeId, mode, isEditing });
+
+    if (isEditing) {
+      const { error: recipeError } = await supabase
+        .from("recipes")
+        .update(recipePayload)
+        .eq("id", recipeId);
+
+      if (recipeError) {
+        setSaving(false);
+        setError(recipeError.message);
+        return;
+      }
+    } else {
       const { data: createdRecipe, error: recipeError } = await supabase
         .from("recipes")
         .insert({
@@ -410,17 +504,6 @@ function RecipesIndexPage() {
       }
 
       recipeId = createdRecipe?.id ?? null;
-    } else if (recipeId) {
-      const { error: recipeError } = await supabase
-        .from("recipes")
-        .update(recipePayload)
-        .eq("id", recipeId);
-
-      if (recipeError) {
-        setSaving(false);
-        setError(recipeError.message);
-        return;
-      }
     }
 
     if (!recipeId) {
@@ -455,7 +538,7 @@ function RecipesIndexPage() {
           .from("recipe_ingredients")
           .update({
             ingredient_id: line.ingredient_id,
-            quantity: Number(line.quantity) || 0,
+            quantity: parseRecipeQuantityInput(line.quantity) ?? 0,
             unit: line.unit || getIngredientUnit(line.ingredient_id, ingredientOptions),
           })
           .eq("id", line.id),
@@ -464,10 +547,9 @@ function RecipesIndexPage() {
     const newLines = editableLines
       .filter((line) => !line.id)
       .map((line) => ({
-        user_id: user.id,
         recipe_id: recipeId,
         ingredient_id: line.ingredient_id,
-        quantity: Number(line.quantity) || 0,
+        quantity: parseRecipeQuantityInput(line.quantity) ?? 0,
         unit: line.unit || getIngredientUnit(line.ingredient_id, ingredientOptions),
       }));
 
@@ -481,6 +563,7 @@ function RecipesIndexPage() {
     }
 
     if (newLines.length > 0) {
+      console.log("[RECIPE_INGREDIENT_INSERT]", newLines);
       const { error: insertError } = await supabase.from("recipe_ingredients").insert(newLines);
 
       if (insertError) {
@@ -492,8 +575,9 @@ function RecipesIndexPage() {
 
     setDeletedLineIds([]);
     await load(recipeId);
-    setFormMode("edit");
-    setSaving(false);
+    closeRecipeForm();
+    toast(wasCreate ? "Recipe created" : "Recipe updated");
+
     traceFoodCostRecalculationSource("recipe_save_reload", {
       recipeId,
       surface: "recipes",
@@ -507,10 +591,15 @@ function RecipesIndexPage() {
     canonicalCatalogIdSet(ingredientOptions),
   );
   const recipeTotalCost = recipeCostLines.reduce((sum, line) => sum + line.lineCost, 0);
-  const sellingPrice = Number(recipeForm.selling_price || 0);
-  const grossProfit = sellingPrice - recipeTotalCost;
-  const grossMargin = sellingPrice > 0 ? (grossProfit / sellingPrice) * 100 : 0;
-  const foodCostPercentage = sellingPrice > 0 ? (recipeTotalCost / sellingPrice) * 100 : 0;
+  const sellingPriceOrNull = recipeSellingPriceForSave(recipeForm.selling_price, recipeForm.type);
+  const sellingPrice = sellingPriceOrNull ?? 0;
+  const grossProfit = hasRecipeSellingPrice(sellingPriceOrNull)
+    ? sellingPriceOrNull - recipeTotalCost
+    : null;
+  const grossMargin = computeGrossMarginPct(sellingPriceOrNull, recipeTotalCost);
+  const foodCostPercentage = computeFoodCostPct(sellingPriceOrNull, recipeTotalCost);
+  const isPrepWithoutPrice =
+    isPrepRecipe(recipeForm.type) && !hasRecipeSellingPrice(sellingPriceOrNull);
   const activeIngredientCount = recipeCostLines.filter((line) => line.line.ingredient_id).length;
   const topCostDrivers = [...recipeCostLines]
     .filter((line) => line.lineCost > 0)
@@ -518,11 +607,12 @@ function RecipesIndexPage() {
     .slice(0, 3);
   const highestCostDriver = topCostDrivers[0] ?? null;
   const recipeHealth = getRecipeHealth(
-    sellingPrice,
+    sellingPriceOrNull,
     recipeTotalCost,
     foodCostPercentage,
     highestCostDriver?.contribution ?? 0,
     activeIngredientCount,
+    recipeForm.type,
   );
   const recipeActivityNote = getRecipeActivityNote(
     selectedRecipe,
@@ -548,7 +638,7 @@ function RecipesIndexPage() {
           lineCost: line.lineCost,
         })),
       totalFoodCost: recipeTotalCost,
-      sellingPrice,
+      sellingPrice: sellingPriceOrNull,
       grossMargin,
     });
   };
@@ -580,15 +670,12 @@ function RecipesIndexPage() {
     >
       <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {(recipes ?? []).map((r) => {
-          const price = r.selling_price ?? 0;
-
+          const priceOrNull = hasRecipeSellingPrice(r.selling_price) ? r.selling_price : null;
           const cost = Number(recipeCosts?.[r.id] ?? 0);
-
-          const margin = price > 0 ? ((price - cost) / price) * 100 : 0;
-
-          const fc = price > 0 ? (cost / price) * 100 : 0;
-
-          const healthy = margin >= 65;
+          const margin = computeGrossMarginPct(priceOrNull, cost);
+          const fc = computeFoodCostPct(priceOrNull, cost);
+          const prepWithoutPrice = isPrepRecipe(r.type) && priceOrNull == null;
+          const healthy = margin != null && margin >= 65;
 
           return (
             <div
@@ -619,15 +706,25 @@ function RecipesIndexPage() {
                     <div className="flex min-w-0 flex-col items-end gap-2 text-right">
                       <div
                         className={`flex max-w-full flex-wrap items-center justify-end gap-1 text-xs font-medium ${
-                          healthy ? "text-success" : "text-destructive"
+                          prepWithoutPrice
+                            ? "text-muted-foreground"
+                            : healthy
+                              ? "text-success"
+                              : "text-destructive"
                         }`}
                       >
-                        {healthy ? (
-                          <TrendingUp className="h-3.5 w-3.5" />
+                        {prepWithoutPrice ? (
+                          "No selling price"
                         ) : (
-                          <TrendingDown className="h-3.5 w-3.5" />
+                          <>
+                            {healthy ? (
+                              <TrendingUp className="h-3.5 w-3.5" />
+                            ) : (
+                              <TrendingDown className="h-3.5 w-3.5" />
+                            )}
+                            Gross Margin {formatOptionalMarginPercent(margin)}
+                          </>
                         )}
-                        Gross Margin {formatPercent(margin)}
                       </div>
                     </div>
                   </div>
@@ -635,30 +732,36 @@ function RecipesIndexPage() {
                   <div className="mt-4 grid min-w-0 grid-cols-2 gap-2 text-center">
                     <Mini
                       label="Selling Price"
-                      value={formatCurrency(Number(r.selling_price ?? 0))}
+                      value={prepWithoutPrice ? "—" : formatCurrency(Number(priceOrNull ?? 0))}
                     />
 
                     <Mini label="Food Cost" value={formatCurrency(cost)} />
                   </div>
 
-                  <div className="mt-4">
-                    <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
-                      <span>Food Cost %</span>
+                  {fc != null ? (
+                    <div className="mt-4">
+                      <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
+                        <span>Food Cost %</span>
 
-                      <span className="tabular-nums">{formatPercent(fc)}</span>
-                    </div>
+                        <span className="tabular-nums">{formatPercent(fc)}</span>
+                      </div>
 
-                    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${
-                          fc > 35 ? "bg-destructive" : fc > 30 ? "bg-warning" : "bg-success"
-                        }`}
-                        style={{
-                          width: `${Math.min(fc * 2, 100)}%`,
-                        }}
-                      />
+                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${
+                            fc > 35 ? "bg-destructive" : fc > 30 ? "bg-warning" : "bg-success"
+                          }`}
+                          style={{
+                            width: `${Math.min(fc * 2, 100)}%`,
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="mt-4 text-xs text-muted-foreground">
+                      Food cost % unavailable without selling price
+                    </div>
+                  )}
                 </div>
               </Card>
             </div>
@@ -764,10 +867,19 @@ function RecipesIndexPage() {
 
                     <label className="text-sm font-medium text-muted-foreground sm:col-span-2">
                       Selling price (€)
+                      {isPrepRecipe(recipeForm.type) ? (
+                        <span className="ml-1 text-xs font-normal text-muted-foreground">
+                          Optional
+                        </span>
+                      ) : null}
                       <input
-                        required
+                        required={!isPrepRecipe(recipeForm.type)}
                         type="number"
                         step="0.01"
+                        min={isPrepRecipe(recipeForm.type) ? undefined : "0.01"}
+                        placeholder={
+                          isPrepRecipe(recipeForm.type) ? "Leave empty if not sold" : undefined
+                        }
                         value={recipeForm.selling_price}
                         onChange={(event) =>
                           setRecipeForm({
@@ -791,14 +903,18 @@ function RecipesIndexPage() {
                     </div>
                     <div
                       className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                        recipeHealth.tone === "success"
-                          ? "bg-success/10 text-success"
-                          : recipeHealth.tone === "warning"
-                            ? "bg-warning/10 text-warning"
-                            : "bg-destructive/10 text-destructive"
+                        isPrepWithoutPrice
+                          ? "bg-muted text-muted-foreground"
+                          : recipeHealth.tone === "success"
+                            ? "bg-success/10 text-success"
+                            : recipeHealth.tone === "warning"
+                              ? "bg-warning/10 text-warning"
+                              : "bg-destructive/10 text-destructive"
                       }`}
                     >
-                      {formatPercent(foodCostPercentage)} food cost
+                      {isPrepWithoutPrice
+                        ? "Operational prep"
+                        : `${formatPercent(foodCostPercentage ?? 0)} food cost`}
                     </div>
                   </div>
 
@@ -827,14 +943,26 @@ function RecipesIndexPage() {
               </div>
 
               <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
-                <KpiCard label="Selling price" value={formatCurrency(sellingPrice)} />
+                <KpiCard
+                  label="Selling price"
+                  value={isPrepWithoutPrice ? "—" : formatCurrency(sellingPrice)}
+                />
                 <KpiCard label="Food cost" value={formatCurrency(recipeTotalCost)} />
-                <KpiCard label="Gross profit" value={formatCurrency(grossProfit)} />
+                <KpiCard
+                  label="Gross profit"
+                  value={grossProfit == null ? "—" : formatCurrency(grossProfit)}
+                />
                 <KpiCard
                   label="Gross margin"
-                  value={formatPercent(grossMargin)}
+                  value={formatOptionalMarginPercent(grossMargin)}
                   tone={
-                    grossMargin >= 65 ? "success" : grossMargin >= 55 ? "warning" : "destructive"
+                    grossMargin == null
+                      ? undefined
+                      : grossMargin >= 65
+                        ? "success"
+                        : grossMargin >= 55
+                          ? "warning"
+                          : "destructive"
                   }
                 />
                 <KpiCard label="Ingredients" value={String(activeIngredientCount)} />
@@ -970,15 +1098,10 @@ function RecipesIndexPage() {
 
                               <td className="px-4 py-3.5 text-right">
                                 <div className="flex items-center justify-end gap-2">
-                                  <input
+                                  <RecipeQuantityInput
                                     required
-                                    type="number"
-                                    step="0.001"
-                                    min="0"
                                     value={line.quantity}
-                                    onChange={(event) =>
-                                      updateRecipeLine(idx, { quantity: event.target.value })
-                                    }
+                                    onChange={(quantity) => updateRecipeLine(idx, { quantity })}
                                     className="w-24 rounded-lg border border-input bg-background px-3 py-2 text-right text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
                                   />
                                   <span className="w-10 text-left text-xs text-muted-foreground">
@@ -1032,7 +1155,18 @@ function RecipesIndexPage() {
                 )}
               </div>
 
-              <div className="flex items-center justify-end gap-2">
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                {formMode === "edit" && (
+                  <button
+                    type="button"
+                    disabled={saving || checkingRecipeDelete}
+                    onClick={() => void requestDeleteRecipe()}
+                    className="mr-auto inline-flex items-center gap-2 rounded-lg border border-transparent px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-destructive/20 hover:bg-destructive/5 hover:text-destructive disabled:opacity-60"
+                  >
+                    {checkingRecipeDelete && <Loader2 className="h-4 w-4 animate-spin" />}
+                    Delete recipe
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={closeRecipeForm}
@@ -1059,6 +1193,15 @@ function RecipesIndexPage() {
           if (!open) setPendingDeleteLineIndex(null);
         }}
         onConfirm={confirmDeleteRecipeLine}
+      />
+      <ConfirmDeleteDialog
+        open={pendingRecipeDelete}
+        onOpenChange={(open) => {
+          if (!open) setPendingRecipeDelete(false);
+        }}
+        onConfirm={() => void confirmDeleteRecipe()}
+        title="Delete recipe?"
+        description="This action cannot be undone."
       />
     </AppShell>
   );
@@ -1104,7 +1247,7 @@ function getRecipeCostLines(
       Number(ingredient?.current_price ?? 0),
       Number(ingredient?.purchase_quantity ?? 1),
     );
-    const quantity = Number(line.quantity) || 0;
+    const quantity = parseRecipeQuantityInput(line.quantity) ?? 0;
     const lineCost = unitCost * quantity;
 
     return {
@@ -1123,63 +1266,6 @@ function getRecipeCostLines(
     ...line,
     contribution: totalCost > 0 ? (line.lineCost / totalCost) * 100 : 0,
   }));
-}
-
-function getRecipeHealth(
-  sellingPrice: number,
-  totalCost: number,
-  foodCostPercentage: number,
-  highestContribution: number,
-  ingredientCount: number,
-): RecipeHealth {
-  if (ingredientCount === 0 || totalCost <= 0) {
-    return {
-      label: "Add quantities",
-      tone: "warning",
-      helper: "Add quantities to see margin exposure.",
-    };
-  }
-
-  if (sellingPrice <= 0) {
-    return {
-      label: "No selling price",
-      tone: "destructive",
-      helper: "Ingredient cost needs selling price cover.",
-    };
-  }
-
-  const grossMargin = 100 - foodCostPercentage;
-  const concentrationNeedsReview = highestContribution > 65 && ingredientCount > 1;
-
-  if (grossMargin >= 65 && !concentrationNeedsReview) {
-    return {
-      label: "Margin protected",
-      tone: "success",
-      helper: "Margin protected; cost mix balanced.",
-    };
-  }
-
-  if (grossMargin >= 65) {
-    return {
-      label: "Cost concentration",
-      tone: "warning",
-      helper: "Margin strong; primary ingredient drives exposure.",
-    };
-  }
-
-  if (grossMargin >= 55 || foodCostPercentage <= 45) {
-    return {
-      label: "Margin pressure",
-      tone: "warning",
-      helper: "Margin workable; review price cover and top inputs.",
-    };
-  }
-
-  return {
-    label: "Margin below target",
-    tone: "destructive",
-    helper: "Food cost is eroding margin cover.",
-  };
 }
 
 function getRecipeActivityNote(

@@ -41,7 +41,6 @@ import {
   unusedReviewIngredientIds,
   type OperationalListFilter,
 } from "@/lib/operational-review-queue";
-import { OperationalReviewQueueSection } from "@/components/operational-review-queue-section";
 import {
   buildCanonicalIngredientRenamePayload,
   traceCanonicalRename,
@@ -79,7 +78,7 @@ export const Route = createFileRoute("/ingredients")({
       { title: "Ingredient Costs — Marginly" },
       {
         name: "description",
-        content: "Catalog ingredients, purchase history, and operational hygiene queues.",
+        content: "Catalog ingredients and purchase history.",
       },
     ],
   }),
@@ -193,18 +192,6 @@ function IngredientsIndexPage() {
       confirmedAliases,
     });
   }, [catalogForNaming, user?.id, confirmedAliases, namingReviewEpoch]);
-
-  const enterNamingReview = useCallback(() => {
-    const queue = buildActionableCanonicalNamingQueue({
-      catalog: catalogForNaming,
-      userId: user?.id,
-      confirmedAliases,
-    });
-    if (queue.length === 0) return;
-    setNamingReviewActive(true);
-    setNamingReviewIndex(0);
-    setSelectedIngredientId(queue[0]!.ingredientId);
-  }, [catalogForNaming, user?.id, confirmedAliases]);
 
   const exitNamingReview = useCallback(() => {
     setNamingReviewActive(false);
@@ -837,16 +824,6 @@ function IngredientsIndexPage() {
         </div>
       }
     >
-      {catalogListMode === "active" ? (
-        <OperationalReviewQueueSection
-          userId={user?.id}
-          catalog={rows}
-          activeListFilter={listQueueFilter}
-          onSelectIngredient={(id) => setSelectedIngredientId(id)}
-          onEnterNamingReview={enterNamingReview}
-          onApplyListFilter={applyListReview}
-        />
-      ) : null}
       {open && catalogListMode === "active" && (
         <Card className="mb-3">
           <form onSubmit={save} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 items-end">
