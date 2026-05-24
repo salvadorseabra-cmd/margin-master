@@ -21,6 +21,7 @@ const baconAlias: IngredientOperationalAliasRow = {
   confirmedByUser: true,
   createdAt: "2026-01-01T00:00:00.000Z",
   lastInvoiceUsageDate: null,
+  invoiceId: null,
   sampleInvoiceLine: null,
   purchaseStructureSummary: null,
   usableQuantityPreview: null,
