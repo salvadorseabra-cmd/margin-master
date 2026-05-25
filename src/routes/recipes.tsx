@@ -93,6 +93,7 @@ import {
   buildOperationalIngredientCostById,
   enrichRecipeLinesForOperationalCost,
   logCostProp,
+  logRecipeHydrate,
   OPERATIONAL_INGREDIENT_COST_CHANGED_EVENT,
   operationalIngredientCostFieldsForLine,
   resolveOperationalIngredientCostFields,
@@ -362,19 +363,25 @@ function RecipesIndexPage() {
       console.log(error);
 
       const loadedRecipes = (recipesData ?? []) as RecipeRow[];
-      setRecipes(loadedRecipes);
       if (ingredientCatalog.error) {
         console.error("[recipes] ingredients catalog load failed:", ingredientCatalog.error);
       }
       const catalogRows = ingredientCatalog.rows ?? [];
       const pickerRows = catalogRows as IngredientOption[];
-      setIngredientOptions(pickerRows);
       const invoiceOverlay = await loadOperationalIngredientCostOverlay(
         supabase,
         catalogRows,
         confirmedAliases,
       );
+      logRecipeHydrate({
+        recipeCount: loadedRecipes.length,
+        catalogRowCount: catalogRows.length,
+        overlayEntryCount: invoiceOverlay.size,
+        trigger: activeRecipeId ? "recipe_save_reload" : "catalog_reload",
+      });
+      setIngredientOptions(pickerRows);
       setInvoiceOperationalCostByIngredientId(invoiceOverlay);
+      setRecipes(loadedRecipes);
       logCostProp({
         trigger: "catalog_reload",
         source: "catalog",
@@ -455,7 +462,6 @@ function RecipesIndexPage() {
   useEffect(() => {
     const onOperationalCostChanged = (event: Event) => {
       const detail = (event as CustomEvent<{ trigger?: string; ingredientId?: string }>).detail;
-      setOperationalCostEpoch((epoch) => epoch + 1);
       logCostProp({
         trigger: detail?.trigger ?? "operational_ingredient_cost_changed",
         ingredientId: detail?.ingredientId ?? null,

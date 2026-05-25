@@ -15,7 +15,12 @@ export type OperationalIngredientCostSource =
 
 const COST_PROP_PREFIX = "[COST_PROP]";
 const COST_RESOLVE_PREFIX = "[OPERATIONAL_COST_RESOLVE]";
+/** DEV alias for operational source selection (same payload as COST_RESOLVE_PREFIX). */
+const OPERATIONAL_RESOLVE_PREFIX = "[OPERATIONAL_RESOLVE]";
 const COST_OVERWRITE_PREFIX = "[OPERATIONAL_COST_OVERWRITE]";
+/** DEV alias when async pricing overwrites embed/catalog (same payload as COST_OVERWRITE_PREFIX). */
+const RECIPE_COST_OVERWRITE_PREFIX = "[RECIPE_COST_OVERWRITE]";
+const RECIPE_HYDRATE_PREFIX = "[RECIPE_HYDRATE]";
 
 export function buildOperationalIngredientCostById(
   catalog: readonly { id: string; current_price?: number | null; purchase_quantity?: number | null }[],
@@ -58,7 +63,7 @@ export function logOperationalCostResolve(input: {
   trigger?: string;
 }): void {
   if (!shouldLogOperationalCostResolve()) return;
-  console.info(COST_RESOLVE_PREFIX, {
+  const payload = {
     ingredientId: input.ingredientId,
     latestInvoicePrice: input.latestInvoiceUnitCost,
     operationalUnitCostEur: input.operationalUnitCostEur,
@@ -67,6 +72,24 @@ export function logOperationalCostResolve(input: {
     resolvedPrice: input.resolvedPrice,
     purchaseQuantity: input.purchaseQuantity,
     trigger: input.trigger ?? null,
+  };
+  console.info(COST_RESOLVE_PREFIX, payload);
+  console.info(OPERATIONAL_RESOLVE_PREFIX, payload);
+}
+
+/** DEV: recipes list hydrated with catalog + invoice overlay before first paint. */
+export function logRecipeHydrate(input: {
+  recipeCount: number;
+  catalogRowCount: number;
+  overlayEntryCount: number;
+  trigger?: string;
+}): void {
+  if (!shouldLogOperationalCostResolve()) return;
+  console.info(RECIPE_HYDRATE_PREFIX, {
+    recipeCount: input.recipeCount,
+    catalogRowCount: input.catalogRowCount,
+    overlayEntryCount: input.overlayEntryCount,
+    trigger: input.trigger ?? "catalog_reload",
   });
 }
 
@@ -161,7 +184,7 @@ export function logOperationalCostOverwrite(input: {
   trigger?: string;
 }): void {
   if (!shouldLogOperationalCostResolve()) return;
-  console.info(COST_OVERWRITE_PREFIX, {
+  const payload = {
     ingredientId: input.ingredientId,
     source: input.source,
     beforeUnitCost: input.beforeUnitCost,
@@ -173,7 +196,9 @@ export function logOperationalCostOverwrite(input: {
     beforeLineCost: input.beforeLineCost,
     afterLineCost: input.afterLineCost,
     trigger: input.trigger ?? null,
-  });
+  };
+  console.info(COST_OVERWRITE_PREFIX, payload);
+  console.info(RECIPE_COST_OVERWRITE_PREFIX, payload);
 }
 
 export function enrichRecipeIngredientLineForCost(
