@@ -223,11 +223,11 @@ export async function computeRecipeCost(
 ): Promise<RecipeCostResult> {
   traceFoodCostRecalculationSource("compute_recipe_cost", { recipeId, surface: "recipe-impact" });
 
-  const linesByRecipe = await loadRecipeLinesByRecipeMapForClosure(client, [recipeId]);
+  const { linesByRecipe, recipesById } = await loadRecipeLinesByRecipeMapForClosure(client, [recipeId]);
   const topLines = linesByRecipe.get(recipeId) ?? [];
   if (!topLines.length) return { costEur: 0, lines: [] };
 
-  const costEur = recipeTotalCostEurForRecipe(recipeId, linesByRecipe) ?? 0;
+  const costEur = recipeTotalCostEurForRecipe(recipeId, linesByRecipe, recipesById) ?? 0;
 
   const priceById = new Map<string, number>();
   for (const line of topLines) {
@@ -335,7 +335,7 @@ export async function computeMarginDelta(
   if (rErr) throw rErr;
   if (!recipe) return null;
 
-  const linesByRecipe = await loadRecipeLinesByRecipeMapForClosure(client, [recipeId]);
+  const { linesByRecipe, recipesById } = await loadRecipeLinesByRecipeMapForClosure(client, [recipeId]);
   const topLines = linesByRecipe.get(recipeId) ?? [];
 
   const selling = finiteOr(recipe.selling_price, 0);
@@ -364,7 +364,7 @@ export async function computeMarginDelta(
   const ingredientIds = [...allClosureIngredientIds];
 
   if (!ingredientIds.length) {
-    const currentCost = recipeTotalCostEurForRecipe(recipeId, linesByRecipe) ?? 0;
+    const currentCost = recipeTotalCostEurForRecipe(recipeId, linesByRecipe, recipesById) ?? 0;
     const currentMarginPct = grossMarginPct(selling, currentCost);
     return {
       recipeId: recipe.id,
@@ -416,8 +416,9 @@ export async function computeMarginDelta(
     previousUnitById.set(id, previousUnit);
   }
 
-  const currentCost = recipeTotalCostEurForRecipe(recipeId, linesByRecipe) ?? 0;
-  const previousCost = recipeTotalCostWithIngredientUnitOverrides(recipeId, linesByRecipe, previousUnitById) ?? 0;
+  const currentCost = recipeTotalCostEurForRecipe(recipeId, linesByRecipe, recipesById) ?? 0;
+  const previousCost =
+    recipeTotalCostWithIngredientUnitOverrides(recipeId, linesByRecipe, previousUnitById, recipesById) ?? 0;
 
   const lines: RecipeMarginDeltaLine[] = [];
   for (const line of topLines) {
@@ -675,7 +676,7 @@ export async function computeRecipeMarginImpactsForRecipeIds(
   if (rErr) throw rErr;
   const recipeList = recipes ?? [];
 
-  const linesByRecipe = await loadRecipeLinesByRecipeMapForClosure(client, recipeIds);
+  const { linesByRecipe, recipesById } = await loadRecipeLinesByRecipeMapForClosure(client, recipeIds);
 
   const ingredientIds = new Set<string>();
   for (const ls of linesByRecipe.values()) {
@@ -739,9 +740,10 @@ export async function computeRecipeMarginImpactsForRecipeIds(
       continue;
     }
 
-    const newFoodCost = recipeTotalCostEurForRecipe(recipe.id, linesByRecipe) ?? 0;
+    const newFoodCost = recipeTotalCostEurForRecipe(recipe.id, linesByRecipe, recipesById) ?? 0;
     const previousFoodCost =
-      recipeTotalCostWithIngredientUnitOverrides(recipe.id, linesByRecipe, previousUnitById) ?? 0;
+      recipeTotalCostWithIngredientUnitOverrides(recipe.id, linesByRecipe, previousUnitById, recipesById) ??
+      0;
 
     const affectedIngredients: RecipeMarginImpactAffectedLine[] = [];
 

@@ -4,9 +4,51 @@ import { effectiveIngredientUnitCostEur } from "@/lib/ingredient-unit-cost";
 import {
   computeRecipeLineCostEur,
   computeRecipeTotalCostEur,
+  prepLineCostEur,
   type RecipeForPrepCost,
   type RecipeIngredientLineForCost,
 } from "@/lib/recipe-prep-cost";
+
+function prepOutputForSubRecipeLine(
+  line: RecipeIngredientLine,
+  recipesById: Map<string, RecipeForPrepCost>,
+): Pick<RecipeForPrepCost, "output_quantity" | "output_unit"> {
+  const prepId = line.sub_recipe_id;
+  if (!prepId) return { output_quantity: null, output_unit: null };
+  const fromMap = recipesById.get(prepId);
+  if (fromMap) {
+    return {
+      output_quantity: fromMap.output_quantity ?? null,
+      output_unit: fromMap.output_unit ?? null,
+    };
+  }
+  const embed = line.sub_recipe ?? line.subRecipe;
+  if (embed && typeof embed === "object") {
+    const row = embed as { output_quantity?: number | null; output_unit?: string | null };
+    return {
+      output_quantity: row.output_quantity ?? null,
+      output_unit: row.output_unit ?? null,
+    };
+  }
+  return { output_quantity: null, output_unit: null };
+}
+
+function prepUsageLineCostEur(
+  line: RecipeIngredientLine,
+  prepBatchTotalEur: number,
+  recipesById: Map<string, RecipeForPrepCost>,
+): number | null {
+  const qty = Number(line.quantity);
+  const safeQty = Number.isFinite(qty) ? qty : 0;
+  const { output_quantity, output_unit } = prepOutputForSubRecipeLine(line, recipesById);
+  return prepLineCostEur(
+    safeQty,
+    line.unit,
+    prepBatchTotalEur,
+    output_quantity,
+    output_unit,
+  );
+}
 
 export type IngredientEmbed = any;
 
@@ -128,7 +170,7 @@ export function lineIngredientCost(
   }
 
   if (line.sub_recipe_id) {
-    const unitTotal =
+    const prepBatchTotal =
       computeRecipeTotalCostCached(
         line.sub_recipe_id,
         linesByRecipe,
@@ -137,11 +179,11 @@ export function lineIngredientCost(
         recipesById,
       );
 
-    if (unitTotal === null) {
+    if (prepBatchTotal === null) {
       return null;
     }
 
-    return safeQty * unitTotal;
+    return prepUsageLineCostEur(line, prepBatchTotal, recipesById);
   }
 
   return 0;
@@ -232,6 +274,7 @@ export function recipeTotalCostUsingEffectiveUnitForIngredient(
   >,
   ingredientId: string,
   effectiveUnitEur: number,
+  recipesById: Map<string, RecipeForPrepCost> = new Map(),
 ): number | null {
   const path = new Set<string>();
 
@@ -272,16 +315,19 @@ export function recipeTotalCostUsingEffectiveUnitForIngredient(
 
         sum += safeQty * unit;
       } else if (line.sub_recipe_id) {
-        const sub = walk(
-          line.sub_recipe_id,
-        );
+        const prepBatchTotal = walk(line.sub_recipe_id);
 
-        if (sub === null) {
+        if (prepBatchTotal === null) {
           path.delete(rid);
           return null;
         }
 
-        sum += safeQty * sub;
+        const part = prepUsageLineCostEur(line, prepBatchTotal, recipesById);
+        if (part === null) {
+          path.delete(rid);
+          return null;
+        }
+        sum += part;
       }
     }
 
@@ -302,6 +348,7 @@ export function recipeTotalCostWithIngredientUnitOverrides(
     RecipeIngredientLine[]
   >,
   unitEurByIngredientId: Map<string, number>,
+  recipesById: Map<string, RecipeForPrepCost> = new Map(),
 ): number | null {
   const path = new Set<string>();
 
@@ -342,16 +389,19 @@ export function recipeTotalCostWithIngredientUnitOverrides(
 
         sum += safeQty * unit;
       } else if (line.sub_recipe_id) {
-        const sub = walk(
-          line.sub_recipe_id,
-        );
+        const prepBatchTotal = walk(line.sub_recipe_id);
 
-        if (sub === null) {
+        if (prepBatchTotal === null) {
           path.delete(rid);
           return null;
         }
 
-        sum += safeQty * sub;
+        const part = prepUsageLineCostEur(line, prepBatchTotal, recipesById);
+        if (part === null) {
+          path.delete(rid);
+          return null;
+        }
+        sum += part;
       }
     }
 

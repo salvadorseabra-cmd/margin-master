@@ -29,8 +29,7 @@ import {
   resolveInvoicePurchaseDisplayLabel,
 } from "@/lib/invoice-purchase-format";
 import {
-  formatInvoiceRowMatchStatusLine,
-  formatInvoiceRowReviewWarning,
+  deriveInvoiceRowInlineChips,
   resolveInvoiceLinePricingPresentation,
   type InvoiceLineNormalizationCard,
 } from "@/lib/invoice-purchase-price-semantics";
@@ -129,9 +128,15 @@ import {
 import {
   autoPersistUnmatchedInvoiceItems,
   persistIngredientFromInvoiceItem,
+  persistOperationalIngredientCostFromInvoiceLine,
 } from "@/lib/ingredient-auto-persist";
 import { traceCanonicalCreateAttempt } from "@/lib/ingredient-catalog-diagnostics";
 import { traceFoodCostRecalculationSource } from "@/lib/recipe-canonical-graph-trace";
+import {
+  clearIngredientMatchedInvoiceProductsCache,
+  syncOperationalIngredientCostsFromInvoiceLines,
+} from "@/lib/ingredient-operational-intelligence";
+import { dispatchOperationalIngredientCostChanged } from "@/lib/resolve-operational-ingredient-cost";
 import { guardIngredientCreation } from "@/lib/ingredient-operational-identity";
 import {
   fileNameFromInvoicePath,
@@ -946,6 +951,7 @@ function InvoicesPage() {
 
       if (loadSeq !== invoiceLoadSeqRef.current) return;
       setIngredientCatalog(catalog);
+      dispatchOperationalIngredientCostChanged({ trigger: "invoices_catalog_reload" });
       if (isIngredientPickerTraceEnabled()) {
         traceIngredientPickerCatalogStage("01_catalog_fetch_merged", catalog, {
           source: "supabase.ingredients + mergeIngredientPriceFields",
@@ -1079,6 +1085,10 @@ function InvoicesPage() {
         setIngredientCatalog((current) => {
           if (current.some((entry) => entry.id === row.id)) return current;
           return [...current, row as IngredientMatchRow];
+        });
+        dispatchOperationalIngredientCostChanged({
+          trigger: "invoice_auto_persist",
+          ingredientId: row.id,
         });
       },
     });
@@ -1274,6 +1284,27 @@ function InvoicesPage() {
         traceInvoiceQuantityStage("insert-payload:first-item", insertRows[0], { invoiceId });
         const { error: insertError } = await supabase.from("invoice_items").insert(insertRows);
         if (insertError) throw insertError;
+
+        const supplierForSync = normalizeSupplierDisplayName(data?.supplier);
+        const costSync = await syncOperationalIngredientCostsFromInvoiceLines(
+          supabase,
+          ingredientCatalog,
+          confirmedIngredientAliasesRef.current,
+          normalizedItems.map((it: ItemRow) => ({
+            name: String(it.name ?? ""),
+            quantity: it.quantity ?? null,
+            unit: it.unit ?? null,
+            unit_price: it.unit_price ?? null,
+            supplierName: supplierForSync,
+          })),
+          { isGenericUnit },
+        );
+        if (costSync.updatedIngredientIds.length > 0) {
+          clearIngredientMatchedInvoiceProductsCache();
+          dispatchOperationalIngredientCostChanged({
+            trigger: "invoice_extract_cost_sync",
+          });
+        }
       }
       const supplier = normalizeSupplierDisplayName(data?.supplier);
       const invoiceNumber = normalizeInvoiceNumber(data?.invoice_number);
@@ -1609,6 +1640,23 @@ function InvoicesPage() {
         return { ok: false, error: message };
       }
 
+      const costSync = await persistOperationalIngredientCostFromInvoiceLine(
+        supabase,
+        ingredientId,
+        {
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit,
+          unit_price: item.unit_price,
+        },
+        { isGenericUnit },
+      );
+      if (costSync.error) {
+        console.error("[invoices] operational cost sync failed:", costSync.error.message);
+      } else if (costSync.updated) {
+        clearIngredientMatchedInvoiceProductsCache(ingredientId);
+      }
+
       traceAliasPersistCycle({
         phase: "after_persist",
         itemName: item.name,
@@ -1702,12 +1750,18 @@ function InvoicesPage() {
       blocked: true,
       blockReason: "ingredient_aliases_only",
     });
-    await persistIngredientCorrectionForItem(
+    const aliasResult = await persistIngredientCorrectionForItem(
       item,
       match.ingredient.id,
       match.ingredient.name ?? match.ingredient.normalized_name ?? "",
       supplierName,
     );
+    if (aliasResult.ok) {
+      dispatchOperationalIngredientCostChanged({
+        trigger: "invoice_match_confirm",
+        ingredientId: match.ingredient.id,
+      });
+    }
     traceFoodCostRecalculationSource("match_confirm", {
       canonicalIngredientId: match.ingredient.id,
       invoiceItemId: item.id,
@@ -1742,6 +1796,10 @@ function InvoicesPage() {
       supplierName,
     );
     if (result.ok) {
+      dispatchOperationalIngredientCostChanged({
+        trigger: "invoice_manual_match",
+        ingredientId,
+      });
       traceFoodCostRecalculationSource("match_confirm", {
         canonicalIngredientId: ingredientId,
         invoiceItemId: item.id,
@@ -1961,6 +2019,11 @@ function InvoicesPage() {
         ingredientId,
         ingredientReused,
       });
+      dispatchOperationalIngredientCostChanged({
+        trigger: "invoice_canonical_save",
+        ingredientId,
+      });
+      void load();
       setCanonicalCreateContext(null);
       setCanonicalCreateError(null);
       setIngredientCreationErrors((current) => removeKey(current, item.id));
@@ -2618,36 +2681,28 @@ function PreviewModal({
 }
 
 function InvoiceNormalizationCardCell({ card }: { card: InvoiceLineNormalizationCard }) {
-  const hasPurchase = card.purchaseQuantityLine || card.purchasePriceLine;
-  const hasNormalized = card.normalizedLine || card.usableCostLine;
-  if (!hasPurchase && !hasNormalized) {
+  const lines = [
+    card.purchaseQuantityLine,
+    card.purchasePriceLine,
+    card.normalizedLine,
+    card.usableCostLine,
+  ].filter((line): line is string => Boolean(line?.trim()));
+
+  if (lines.length === 0) {
     return <span className="text-muted-foreground/60">—</span>;
   }
 
-  const sectionLabelClass =
-    "text-[9px] font-medium uppercase tracking-wider text-muted-foreground/55";
-
   return (
-    <div className="min-w-[10.5rem] max-w-xs space-y-1.5 rounded-md border border-border/35 bg-muted/10 px-2 py-1.5 text-xs leading-snug tabular-nums">
-      {hasPurchase && (
-        <div className="space-y-0.5">
-          <div className={sectionLabelClass}>Purchase</div>
-          {card.purchaseQuantityLine && (
-            <div className="text-foreground">{card.purchaseQuantityLine}</div>
-          )}
-          {card.purchasePriceLine && (
-            <div className="text-muted-foreground">{card.purchasePriceLine}</div>
-          )}
-        </div>
+    <div className="min-w-[10.5rem] max-w-xs space-y-0.5 text-xs leading-snug tabular-nums">
+      {card.purchaseQuantityLine && (
+        <div className="text-foreground">{card.purchaseQuantityLine}</div>
       )}
-      {hasNormalized && (
-        <div className="space-y-0.5">
-          <div className={sectionLabelClass}>Normalized</div>
-          {card.normalizedLine && <div className="text-foreground">{card.normalizedLine}</div>}
-          {card.usableCostLine && (
-            <div className="font-medium text-foreground">{card.usableCostLine}</div>
-          )}
-        </div>
+      {card.purchasePriceLine && (
+        <div className="text-muted-foreground">{card.purchasePriceLine}</div>
+      )}
+      {card.normalizedLine && <div className="text-foreground">{card.normalizedLine}</div>}
+      {card.usableCostLine && (
+        <div className="font-medium text-foreground">{card.usableCostLine}</div>
       )}
     </div>
   );
@@ -3067,16 +3122,7 @@ function ItemsTable({
                   line_total: renderItem.total,
                   matchedIngredientName: matchedIngredientForStock,
                 });
-                const pricingRecencyAt = ingredientMatch?.ingredient.id
-                  ? (operationalMetadata.priceHistoryLatestAtByIngredientId[
-                      ingredientMatch.ingredient.id
-                    ] ?? null)
-                  : null;
-                const reviewWarning = formatInvoiceRowReviewWarning({
-                  signals: lineSignals,
-                  pricingRecencyAt,
-                });
-                const matchStatusLine = formatInvoiceRowMatchStatusLine({
+                const inlineChips = deriveInvoiceRowInlineChips({
                   matchedAutomatically:
                     confirmedIngredientMatch &&
                     !correctionUi.suppressMatchPresentation &&
@@ -3084,7 +3130,16 @@ function ItemsTable({
                     !quantityReview &&
                     !amountReview,
                   confidenceLabel: matchExplanation?.confidenceLabel ?? null,
-                  warning: reviewWarning,
+                  unmatched:
+                    unmatchedIngredient ||
+                    (correctionUi.suppressMatchPresentation && !ingredientMatch),
+                  suggestedMatch: showSuggestedMatch,
+                  signals: lineSignals,
+                  previousInvoiceLinePrice: priceComparisons[renderItem.id],
+                  currentUnitPrice: renderItem.unit_price,
+                  matchTooltip: matchExplanation
+                    ? formatMatchReasoningTooltip(matchExplanation)
+                    : null,
                 });
                 const correctionOpen = editingMatchRowId === renderItem.id;
                 const correctionBusy = savingCorrectionLineId === renderItem.id;
@@ -3141,21 +3196,17 @@ function ItemsTable({
                             disabled={correctionBusy}
                           />
                         )}
-                        {matchStatusLine && (
-                          <p
-                            className={`text-[11px] leading-snug ${
-                              reviewWarning
-                                ? "text-amber-700/90 dark:text-amber-300/90"
-                                : "text-muted-foreground"
-                            }`}
-                            title={
-                              matchExplanation && !reviewWarning
-                                ? formatMatchReasoningTooltip(matchExplanation)
-                                : undefined
-                            }
-                          >
-                            {matchStatusLine}
-                          </p>
+                        {inlineChips.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-1 pt-0.5">
+                            {inlineChips.map((chip) => (
+                              <OperationalBadge
+                                key={chip.label}
+                                label={chip.label}
+                                tone={chip.tone}
+                                title={chip.title}
+                              />
+                            ))}
+                          </div>
                         )}
                         {(correctionUi.showConfirm || showCorrectionTrigger) && (
                           <div className="flex flex-wrap items-center gap-1.5 pt-0.5">

@@ -48,6 +48,7 @@ import {
   traceCanonicalRename,
 } from "@/lib/canonical-ingredient-rename";
 import { traceFoodCostRecalculationSource } from "@/lib/recipe-canonical-graph-trace";
+import { dispatchOperationalIngredientCostChanged } from "@/lib/resolve-operational-ingredient-cost";
 import { loadCanonicalIngredientCatalog } from "@/lib/ingredient-catalog-load";
 import {
   archiveIngredient,
@@ -279,6 +280,7 @@ function IngredientsIndexPage() {
         (a.name ?? "").localeCompare(b.name ?? "", undefined, { sensitivity: "base" }),
       ) as Row[];
       setRows(ingredientRows);
+      dispatchOperationalIngredientCostChanged({ trigger: "ingredients_catalog_reload" });
 
       const ingredientIds = ingredientRows.map((ingredient) => ingredient.id);
 

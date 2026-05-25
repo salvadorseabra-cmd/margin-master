@@ -1,10 +1,85 @@
 import { formatUnitCostCurrency } from "@/lib/display-format";
 import { effectiveIngredientUnitCostEur } from "@/lib/ingredient-unit-cost";
-import {
-  computeNormalizedUnitCost,
-  computePrepLineCost,
-  unitCostPerDisplayUnit,
-} from "@/lib/recipe-unit-normalization";
+import { computePrepLineCost } from "@/lib/recipe-unit-normalization";
+
+const PREP_UNIT_COST_PREFIX = "[PREP_UNIT_COST]";
+const PREP_PROPAGATION_PREFIX = "[PREP_PROPAGATION]";
+const RESOLVED_LINE_COST_PREFIX = "[RESOLVED_LINE_COST]";
+
+function shouldLogPrepCostDiagnostics(): boolean {
+  if (import.meta.env.DEV) return true;
+  if (typeof window === "undefined") return false;
+  const w = window as Window & { __MARGINLY_RECIPE_CANONICAL_TRACE__?: boolean };
+  return w.__MARGINLY_RECIPE_CANONICAL_TRACE__ === true;
+}
+
+/** Temporary DEV/trace diagnostics for prep €/output unit. */
+export function logPrepUnitCost(input: {
+  prepId: string;
+  batchTotalEur: number;
+  outputQuantity: number | null | undefined;
+  outputUnit?: string | null;
+  unitCostEur: number;
+  trigger?: string;
+}): void {
+  if (!shouldLogPrepCostDiagnostics()) return;
+  console.info(PREP_UNIT_COST_PREFIX, {
+    prepId: input.prepId,
+    batchTotalEur: input.batchTotalEur,
+    outputQuantity: input.outputQuantity ?? null,
+    outputUnit: input.outputUnit ?? null,
+    unitCostEur: input.unitCostEur,
+    trigger: input.trigger ?? null,
+  });
+}
+
+/** Temporary DEV/trace diagnostics when a parent recipe uses a prep. */
+export function logPrepPropagation(input: {
+  parentRecipeId?: string | null;
+  prepId: string;
+  usageQuantity: number;
+  usageUnit?: string | null;
+  batchTotalEur: number;
+  lineCostEur: number | null;
+  outputQuantity: number | null | undefined;
+  outputUnit?: string | null;
+  trigger?: string;
+}): void {
+  if (!shouldLogPrepCostDiagnostics()) return;
+  console.info(PREP_PROPAGATION_PREFIX, {
+    parentRecipeId: input.parentRecipeId ?? null,
+    prepId: input.prepId,
+    usageQuantity: input.usageQuantity,
+    usageUnit: input.usageUnit ?? null,
+    batchTotalEur: input.batchTotalEur,
+    lineCostEur: input.lineCostEur,
+    outputQuantity: input.outputQuantity ?? null,
+    outputUnit: input.outputUnit ?? null,
+    trigger: input.trigger ?? null,
+  });
+}
+
+/** Temporary DEV/trace diagnostics for a resolved recipe line cost. */
+export function logResolvedLineCost(input: {
+  recipeId?: string | null;
+  ingredientId?: string | null;
+  prepId?: string | null;
+  quantity: number;
+  unit?: string | null;
+  lineCostEur: number | null;
+  trigger?: string;
+}): void {
+  if (!shouldLogPrepCostDiagnostics()) return;
+  console.info(RESOLVED_LINE_COST_PREFIX, {
+    recipeId: input.recipeId ?? null,
+    ingredientId: input.ingredientId ?? null,
+    prepId: input.prepId ?? null,
+    quantity: input.quantity,
+    unit: input.unit ?? null,
+    lineCostEur: input.lineCostEur,
+    trigger: input.trigger ?? null,
+  });
+}
 
 export type PrepOutputFields = {
   output_quantity: number | null | undefined;
@@ -31,23 +106,21 @@ function safeQuantity(quantity: number | null | undefined): number {
   return Number.isFinite(qty) ? qty : 0;
 }
 
-/** € per output unit (L, kg, ml, …): total ingredient cost ÷ normalized batch output. */
+/** € per output unit (L, kg, ml, …): batch total ÷ output quantity (same rules as {@link computePrepLineCost}). */
 export function prepUnitCostEur(
   prepTotalIngredientCost: number,
   outputQuantity: number | null | undefined,
   outputUnit?: string | null,
 ): number {
-  const perBase = computeNormalizedUnitCost(prepTotalIngredientCost, outputQuantity, outputUnit);
-  if (perBase != null) {
-    const perDisplay = unitCostPerDisplayUnit(perBase, outputUnit);
-    if (perDisplay != null) return perDisplay;
-  }
-
-  const out = Number(outputQuantity);
-  if (!Number.isFinite(out) || out <= 0) return 0;
-  const total = Number(prepTotalIngredientCost);
-  const safeTotal = Number.isFinite(total) ? total : 0;
-  return safeTotal / out;
+  const displayUnit = outputUnit?.trim() || null;
+  const unitCost = computePrepLineCost(
+    1,
+    displayUnit,
+    prepTotalIngredientCost,
+    outputQuantity,
+    outputUnit,
+  ).cost;
+  return unitCost ?? 0;
 }
 
 /** Line cost when a parent recipe uses `usageQuantity` of a prep (units normalized when known). */
@@ -98,7 +171,31 @@ export function computeRecipeLineCostEur(
     );
     if (prepTotal === null) return null;
     const prep = recipesById.get(line.sub_recipe_id);
-    return prepLineCostEur(qty, line.unit, prepTotal, prep?.output_quantity, prep?.output_unit);
+    const lineCost = prepLineCostEur(
+      qty,
+      line.unit,
+      prepTotal,
+      prep?.output_quantity,
+      prep?.output_unit,
+    );
+    logPrepPropagation({
+      prepId: line.sub_recipe_id,
+      usageQuantity: qty,
+      usageUnit: line.unit,
+      batchTotalEur: prepTotal,
+      lineCostEur: lineCost,
+      outputQuantity: prep?.output_quantity,
+      outputUnit: prep?.output_unit,
+      trigger: "computeRecipeLineCostEur",
+    });
+    logResolvedLineCost({
+      prepId: line.sub_recipe_id,
+      quantity: qty,
+      unit: line.unit,
+      lineCostEur: lineCost,
+      trigger: "computeRecipeLineCostEur",
+    });
+    return lineCost;
   }
 
   return 0;
@@ -163,10 +260,20 @@ export function computePrepUnitCost(
   prepRecipeId: string,
   linesByRecipe: Map<string, RecipeIngredientLineForCost[]>,
   recipesById: Map<string, RecipeForPrepCost>,
+  logContext?: { trigger?: string },
 ): number {
   const prep = recipesById.get(prepRecipeId);
   const total = computeRecipeTotalCostEurOrZero(prepRecipeId, linesByRecipe, recipesById);
-  return prepUnitCostEur(total, prep?.output_quantity, prep?.output_unit);
+  const unitCost = prepUnitCostEur(total, prep?.output_quantity, prep?.output_unit);
+  logPrepUnitCost({
+    prepId: prepRecipeId,
+    batchTotalEur: total,
+    outputQuantity: prep?.output_quantity,
+    outputUnit: prep?.output_unit,
+    unitCostEur: unitCost,
+    trigger: logContext?.trigger,
+  });
+  return unitCost;
 }
 
 export function formatPrepUnitCostLabel(

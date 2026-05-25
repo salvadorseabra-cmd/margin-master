@@ -26,7 +26,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
+import { loadConfirmedIngredientAliasMap } from "@/lib/ingredient-alias-memory";
 import { loadCanonicalIngredientCatalog } from "@/lib/ingredient-catalog-load";
+import {
+  loadOperationalIngredientCostOverlay,
+  type OperationalInvoiceCostEntry,
+} from "@/lib/ingredient-operational-intelligence";
 import {
   canonicalCatalogIdSet,
   logPickerAliasLeaksIfAny,
@@ -60,6 +65,9 @@ import {
   computePrepLineCost,
   computePrepUnitCost,
   computeRecipeLineCostEur,
+  logPrepPropagation,
+  logPrepUnitCost,
+  logResolvedLineCost,
   computeRecipeTotalCostEur,
   formatPrepUnitCostLabel,
   recipeLineContributionPct,
@@ -81,6 +89,15 @@ import {
   validateRecipeSellingPrice,
   type RecipeHealth,
 } from "@/lib/recipe-selling-price";
+import {
+  buildOperationalIngredientCostById,
+  enrichRecipeLinesForOperationalCost,
+  logCostProp,
+  OPERATIONAL_INGREDIENT_COST_CHANGED_EVENT,
+  operationalIngredientCostFieldsForLine,
+  resolveOperationalIngredientCostFields,
+  resolveOperationalIngredientUnitCostEur,
+} from "@/lib/resolve-operational-ingredient-cost";
 
 export const Route = createFileRoute("/recipes")({
   head: () => ({
@@ -228,8 +245,11 @@ function RecipesIndexPage() {
   const { user } = useAuth();
 
   const [recipes, setRecipes] = useState<RecipeRow[]>([]);
-  const [recipeCosts, setRecipeCosts] = useState<Record<string, number>>({});
   const [ingredientOptions, setIngredientOptions] = useState<IngredientOption[]>([]);
+  const [invoiceOperationalCostByIngredientId, setInvoiceOperationalCostByIngredientId] =
+    useState<Map<string, OperationalInvoiceCostEntry>>(() => new Map());
+  /** Bumped on operational cost events so list cards recompute even if recipe rows are unchanged. */
+  const [operationalCostEpoch, setOperationalCostEpoch] = useState(0);
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeRow | null>(null);
   const [editingRecipeId, setEditingRecipeId] = useState<string | null>(null);
   const [recipeForm, setRecipeForm] = useState<RecipeForm>(emptyRecipeForm);
@@ -298,7 +318,7 @@ function RecipesIndexPage() {
     async (activeRecipeId?: string) => {
       if (!user) return;
 
-      const [{ data: recipesData, error }, ingredientCatalog] = await Promise.all([
+      const [{ data: recipesData, error }, ingredientCatalog, confirmedAliases] = await Promise.all([
         supabase
           .from("recipes")
           .select(
@@ -336,6 +356,7 @@ function RecipesIndexPage() {
           )
           .order("name", { ascending: true }),
         loadCanonicalIngredientCatalog(supabase, "current_price, purchase_quantity"),
+        loadConfirmedIngredientAliasMap(supabase),
       ]);
 
       console.log(error);
@@ -348,6 +369,21 @@ function RecipesIndexPage() {
       const catalogRows = ingredientCatalog.rows ?? [];
       const pickerRows = catalogRows as IngredientOption[];
       setIngredientOptions(pickerRows);
+      const invoiceOverlay = await loadOperationalIngredientCostOverlay(
+        supabase,
+        catalogRows,
+        confirmedAliases,
+      );
+      setInvoiceOperationalCostByIngredientId(invoiceOverlay);
+      logCostProp({
+        trigger: "catalog_reload",
+        source: "catalog",
+      });
+      traceFoodCostRecalculationSource("recipes_catalog_loaded", {
+        surface: "recipes",
+        catalogRowCount: pickerRows.length,
+        recalcTrigger: "catalog_reload",
+      });
       logPickerAliasLeaksIfAny(
         pickerRows.map((row) => ({ id: row.id, name: row.name })),
         catalogRows,
@@ -361,25 +397,6 @@ function RecipesIndexPage() {
         setSelectedRecipe(activeRecipe);
         if (activeRecipe) setRecipeForm(recipeToForm(activeRecipe));
       }
-
-      const linesByRecipe = buildLinesByRecipeId(loadedRecipes);
-      const recipesById = buildRecipesById(
-        loadedRecipes.map((recipe) => ({
-          id: recipe.id,
-          output_quantity: recipe.output_quantity,
-          output_unit: recipe.output_unit,
-        })),
-      );
-      const costs: Record<string, number> = {};
-
-      loadedRecipes.forEach((recipe) => {
-        const path = new Set<string>();
-        const memo = new Map<string, number>();
-        costs[recipe.id] =
-          computeRecipeTotalCostEur(recipe.id, linesByRecipe, recipesById, path, memo) ?? 0;
-      });
-
-      setRecipeCosts(costs);
 
       const canonicalIds = canonicalCatalogIdSet(catalogRows);
       const recipeLines = loadedRecipes.flatMap((recipe) =>
@@ -434,6 +451,30 @@ function RecipesIndexPage() {
 
     load();
   }, [load, user]);
+
+  useEffect(() => {
+    const onOperationalCostChanged = (event: Event) => {
+      const detail = (event as CustomEvent<{ trigger?: string; ingredientId?: string }>).detail;
+      setOperationalCostEpoch((epoch) => epoch + 1);
+      logCostProp({
+        trigger: detail?.trigger ?? "operational_ingredient_cost_changed",
+        ingredientId: detail?.ingredientId ?? null,
+      });
+      traceFoodCostRecalculationSource("catalog_reload", {
+        surface: "recipes",
+        note: "operational_ingredient_cost_changed_event",
+        ingredientId: detail?.ingredientId,
+        trigger: detail?.trigger,
+      });
+      void load();
+    };
+    window.addEventListener(OPERATIONAL_INGREDIENT_COST_CHANGED_EVENT, onOperationalCostChanged);
+    return () =>
+      window.removeEventListener(
+        OPERATIONAL_INGREDIENT_COST_CHANGED_EVENT,
+        onOperationalCostChanged,
+      );
+  }, [load]);
 
   useEffect(() => {
     if (!detailOpen) return;
@@ -727,6 +768,92 @@ function RecipesIndexPage() {
     [ingredientOptions],
   );
 
+  const operationalCostByIngredientId = useMemo(
+    () => buildOperationalIngredientCostById(ingredientOptions),
+    [ingredientOptions],
+  );
+
+  const liveRecipeCosts = useMemo(() => {
+    if (recipes.length === 0) return {} as Record<string, number>;
+
+    const linesByRecipe = buildLinesByRecipeId(
+      recipes.map((recipe) => ({
+        id: recipe.id,
+        recipe_ingredients: enrichRecipeLinesForOperationalCost(
+          (recipe.recipe_ingredients ?? []).map((row) => ({
+            ingredient_id: row.ingredient_id,
+            sub_recipe_id: row.sub_recipe_id,
+            quantity: row.quantity,
+            unit: row.unit,
+            ingredients: row.ingredients,
+          })),
+          operationalCostByIngredientId,
+          invoiceOperationalCostByIngredientId,
+          { trigger: "list_recalc" },
+        ),
+      })),
+    );
+    const recipesById = buildRecipesById(
+      recipes.map((recipe) => ({
+        id: recipe.id,
+        output_quantity: recipe.output_quantity,
+        output_unit: recipe.output_unit,
+      })),
+    );
+    const costs: Record<string, number> = {};
+    for (const recipe of recipes) {
+      const path = new Set<string>();
+      const memo = new Map<string, number>();
+      costs[recipe.id] =
+        computeRecipeTotalCostEur(recipe.id, linesByRecipe, recipesById, path, memo) ?? 0;
+      const topIngredientLine = (recipe.recipe_ingredients ?? []).find((line) => line.ingredient_id);
+      if (topIngredientLine?.ingredient_id) {
+        const { fields, source, chosenDate, latestInvoiceUnitCost } =
+          resolveOperationalIngredientCostFields(
+            topIngredientLine.ingredient_id,
+            operationalCostByIngredientId,
+            topIngredientLine.ingredients,
+            invoiceOperationalCostByIngredientId,
+            { trigger: "list_recalc" },
+          );
+        logCostProp({
+          trigger: "list_recalc",
+          recipeId: recipe.id,
+          ingredientId: topIngredientLine.ingredient_id,
+          totalFoodCost: costs[recipe.id],
+          unitCostEur: resolveOperationalIngredientUnitCostEur(
+            topIngredientLine.ingredient_id,
+            operationalCostByIngredientId,
+            topIngredientLine.ingredients,
+            invoiceOperationalCostByIngredientId,
+          ),
+          resolvedPrice: fields.current_price,
+          purchaseQuantity: fields.purchase_quantity,
+          source,
+          chosenDate,
+          latestInvoiceUnitCost,
+        });
+      } else {
+        logCostProp({
+          trigger: "list_recalc",
+          recipeId: recipe.id,
+          totalFoodCost: costs[recipe.id],
+        });
+      }
+    }
+    traceFoodCostRecalculationSource("compute_recipe_cost", {
+      surface: "recipes.list_cards",
+      recipeCount: recipes.length,
+      operationalCostEpoch,
+    });
+    return costs;
+  }, [
+    operationalCostByIngredientId,
+    invoiceOperationalCostByIngredientId,
+    operationalCostEpoch,
+    recipes,
+  ]);
+
   const linePickerOptions = useMemo(
     () =>
       buildRecipeLinePickerOptions({
@@ -764,36 +891,42 @@ function RecipesIndexPage() {
         id: recipe.id,
         recipe_ingredients:
           selectedRecipe?.id === recipe.id
-            ? recipeForm.lines
-                .filter((line) => line.ingredient_id || line.sub_recipe_id)
-                .map((line) => {
-                  const ingredient = line.ingredient_id
-                    ? getIngredientForLine(
-                        line.ingredient_id,
-                        selectedRecipe?.recipe_ingredients ?? null,
-                        ingredientOptions,
-                      )
-                    : null;
-                  return {
-                    ingredient_id: line.sub_recipe_id ? null : line.ingredient_id || null,
-                    sub_recipe_id: line.sub_recipe_id || null,
-                    quantity: parseRecipeQuantityInput(line.quantity) ?? 0,
-                    unit: line.unit || null,
-                    ingredients: ingredient
-                      ? {
-                          current_price: ingredient.current_price,
-                          purchase_quantity: ingredient.purchase_quantity,
-                        }
-                      : null,
-                  };
-                })
-            : (recipe.recipe_ingredients ?? []).map((row) => ({
-                ingredient_id: row.ingredient_id,
-                sub_recipe_id: row.sub_recipe_id,
-                quantity: row.quantity,
-                unit: row.unit,
-                ingredients: row.ingredients,
-              })),
+            ? enrichRecipeLinesForOperationalCost(
+                recipeForm.lines
+                  .filter((line) => line.ingredient_id || line.sub_recipe_id)
+                  .map((line) => {
+                    return {
+                      ingredient_id: line.sub_recipe_id ? null : line.ingredient_id || null,
+                      sub_recipe_id: line.sub_recipe_id || null,
+                      quantity: parseRecipeQuantityInput(line.quantity) ?? 0,
+                      unit: line.unit || null,
+                      ingredients: line.ingredient_id
+                        ? operationalIngredientCostFieldsForLine(
+                            line.ingredient_id,
+                            operationalCostByIngredientId,
+                            recipeLineEmbedCostSnapshot(
+                              line.ingredient_id,
+                              selectedRecipe?.recipe_ingredients ?? null,
+                            ),
+                            invoiceOperationalCostByIngredientId,
+                          )
+                        : null,
+                    };
+                  }),
+                operationalCostByIngredientId,
+                invoiceOperationalCostByIngredientId,
+              )
+            : enrichRecipeLinesForOperationalCost(
+                (recipe.recipe_ingredients ?? []).map((row) => ({
+                  ingredient_id: row.ingredient_id,
+                  sub_recipe_id: row.sub_recipe_id,
+                  quantity: row.quantity,
+                  unit: row.unit,
+                  ingredients: row.ingredients,
+                })),
+                operationalCostByIngredientId,
+                invoiceOperationalCostByIngredientId,
+              ),
       })),
     );
     const recipesById = buildRecipesById(
@@ -812,11 +945,16 @@ function RecipesIndexPage() {
     const map = new Map<string, number>();
     for (const recipe of recipes) {
       if (!isPrepRecipe(recipe.type)) continue;
-      map.set(recipe.id, computePrepUnitCost(recipe.id, linesByRecipe, recipesById));
+      map.set(
+        recipe.id,
+        computePrepUnitCost(recipe.id, linesByRecipe, recipesById, { trigger: "prepUnitCostById" }),
+      );
     }
     return map;
   }, [
     ingredientOptions,
+    invoiceOperationalCostByIngredientId,
+    operationalCostByIngredientId,
     prepOutputOverride,
     recipeForm.lines,
     recipes,
@@ -830,6 +968,8 @@ function RecipesIndexPage() {
         selectedRecipe,
         allRecipes: recipes,
         ingredientOptions,
+        operationalCostByIngredientId,
+        invoiceOperationalCostByIngredientId,
         pickerOptions: linePickerOptions,
         canonicalCatalogIds,
         prepOutputOverride,
@@ -838,7 +978,9 @@ function RecipesIndexPage() {
     [
       canonicalCatalogIds,
       ingredientOptions,
+      invoiceOperationalCostByIngredientId,
       linePickerOptions,
+      operationalCostByIngredientId,
       prepOutputOverride,
       recipeForm.lines,
       recipes,
@@ -847,6 +989,20 @@ function RecipesIndexPage() {
     ],
   );
   const recipeTotalCost = recipeCostLines.reduce((sum, line) => sum + line.lineCost, 0);
+
+  useEffect(() => {
+    if (!detailOpen || !selectedRecipe) return;
+    logCostProp({
+      trigger: "form_recalc",
+      recipeId: selectedRecipe.id,
+      totalFoodCost: recipeTotalCost,
+    });
+    traceFoodCostRecalculationSource("recipe_form_recalc", {
+      recipeId: selectedRecipe.id,
+      surface: "recipes.modal",
+      totalFoodCost: recipeTotalCost,
+    });
+  }, [detailOpen, recipeTotalCost, selectedRecipe]);
   const sellingPriceOrNull = recipeSellingPriceForSave(recipeForm.selling_price, recipeForm.type);
   const sellingPrice = sellingPriceOrNull ?? 0;
   const grossProfit = hasRecipeSellingPrice(sellingPriceOrNull)
@@ -929,7 +1085,7 @@ function RecipesIndexPage() {
       <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {(recipes ?? []).map((r) => {
           const priceOrNull = hasRecipeSellingPrice(r.selling_price) ? r.selling_price : null;
-          const cost = Number(recipeCosts?.[r.id] ?? 0);
+          const cost = Number(liveRecipeCosts[r.id] ?? 0);
           const margin = computeGrossMarginPct(priceOrNull, cost);
           const fc = computeFoodCostPct(priceOrNull, cost);
           const prepWithoutPrice = isPrepRecipe(r.type) && priceOrNull == null;
@@ -1655,6 +1811,11 @@ function getRecipeCostLines(input: {
   selectedRecipe: RecipeRow | null;
   allRecipes: RecipeRow[];
   ingredientOptions: IngredientOption[];
+  operationalCostByIngredientId: Map<
+    string,
+    { current_price: number | null; purchase_quantity: number | null }
+  >;
+  invoiceOperationalCostByIngredientId: Map<string, OperationalInvoiceCostEntry>;
   pickerOptions: RecipeLinePickerOption[];
   canonicalCatalogIds: Set<string>;
   prepOutputOverride?: { output_quantity: number | null; output_unit: string } | null;
@@ -1665,6 +1826,8 @@ function getRecipeCostLines(input: {
     selectedRecipe,
     allRecipes,
     ingredientOptions,
+    operationalCostByIngredientId,
+    invoiceOperationalCostByIngredientId,
     pickerOptions,
     canonicalCatalogIds,
     prepOutputOverride,
@@ -1672,32 +1835,28 @@ function getRecipeCostLines(input: {
   } = input;
   const formLinesForCost = lines
     .filter((line) => line.ingredient_id || line.sub_recipe_id)
-    .map((line) => {
-      const ingredient = line.ingredient_id
-        ? getIngredientForLine(
+    .map((line) => ({
+      ingredient_id: line.sub_recipe_id ? null : line.ingredient_id || null,
+      sub_recipe_id: line.sub_recipe_id || null,
+      quantity: parseRecipeQuantityInput(line.quantity) ?? 0,
+      unit: line.unit || null,
+      ingredients: line.ingredient_id
+        ? operationalIngredientCostFieldsForLine(
             line.ingredient_id,
-            selectedRecipe?.recipe_ingredients ?? null,
-            ingredientOptions,
+            operationalCostByIngredientId,
+            recipeLineEmbedCostSnapshot(
+              line.ingredient_id,
+              selectedRecipe?.recipe_ingredients ?? null,
+            ),
+            invoiceOperationalCostByIngredientId,
           )
-        : null;
-      return {
-        ingredient_id: line.sub_recipe_id ? null : line.ingredient_id || null,
-        sub_recipe_id: line.sub_recipe_id || null,
-        quantity: parseRecipeQuantityInput(line.quantity) ?? 0,
-        unit: line.unit || null,
-        ingredients: ingredient
-          ? {
-              current_price: ingredient.current_price,
-              purchase_quantity: ingredient.purchase_quantity,
-            }
-          : null,
-      };
-    });
+        : null,
+    }));
 
   const linesByRecipe = buildLinesByRecipeId(
     allRecipes.map((recipe) => ({
       id: recipe.id,
-      recipe_ingredients:
+      recipe_ingredients: enrichRecipeLinesForOperationalCost(
         selectedRecipe?.id === recipe.id
           ? formLinesForCost
           : (recipe.recipe_ingredients ?? []).map((row) => ({
@@ -1707,6 +1866,9 @@ function getRecipeCostLines(input: {
               unit: row.unit,
               ingredients: row.ingredients,
             })),
+        operationalCostByIngredientId,
+        invoiceOperationalCostByIngredientId,
+      ),
     })),
   );
   const recipesById = buildRecipesById(
@@ -1778,11 +1940,16 @@ function getRecipeCostLines(input: {
       sub_recipe_id: line.sub_recipe_id || null,
       quantity,
       unit: usageUnit || null,
-      ingredients: ingredient
-        ? {
-            current_price: ingredient.current_price,
-            purchase_quantity: ingredient.purchase_quantity,
-          }
+      ingredients: line.ingredient_id
+        ? operationalIngredientCostFieldsForLine(
+            line.ingredient_id,
+            operationalCostByIngredientId,
+            recipeLineEmbedCostSnapshot(
+              line.ingredient_id,
+              selectedRecipe?.recipe_ingredients ?? null,
+            ),
+            invoiceOperationalCostByIngredientId,
+          )
         : null,
     };
     const isPrepUsageLine = line.sub_recipe_id != null && line.sub_recipe_id !== "";
@@ -1790,6 +1957,46 @@ function getRecipeCostLines(input: {
     let lineCost =
       computeRecipeLineCostEur(costLine, linesByRecipe, recipesById, path, memo) ?? 0;
     let unitCostWarning: string | null = null;
+    logResolvedLineCost({
+      recipeId: selectedRecipe?.id,
+      ingredientId: line.ingredient_id || null,
+      prepId: line.sub_recipe_id || null,
+      quantity,
+      unit: usageUnit || null,
+      lineCostEur: lineCost,
+      trigger: "getRecipeCostLines_initial",
+    });
+    if (line.ingredient_id) {
+      const embed = recipeLineEmbedCostSnapshot(
+        line.ingredient_id,
+        selectedRecipe?.recipe_ingredients ?? null,
+      );
+      const { fields, source, chosenDate, latestInvoiceUnitCost } =
+        resolveOperationalIngredientCostFields(
+          line.ingredient_id,
+          operationalCostByIngredientId,
+          embed,
+          invoiceOperationalCostByIngredientId,
+          { trigger: "line_cost" },
+        );
+      logCostProp({
+        trigger: "line_cost",
+        recipeId: selectedRecipe?.id,
+        ingredientId: line.ingredient_id,
+        lineCost,
+        unitCostEur: resolveOperationalIngredientUnitCostEur(
+          line.ingredient_id,
+          operationalCostByIngredientId,
+          embed,
+          invoiceOperationalCostByIngredientId,
+        ),
+        resolvedPrice: fields.current_price,
+        purchaseQuantity: fields.purchase_quantity,
+        source,
+        chosenDate,
+        latestInvoiceUnitCost,
+      });
+    }
     if (isPrepUsageLine) {
       const prepPath = new Set<string>();
       const prepMemo = new Map<string, number>();
@@ -1810,7 +2017,41 @@ function getRecipeCostLines(input: {
         );
         unitCostWarning = prepLine.warning ?? null;
         lineCost = prepLine.cost ?? 0;
+        logPrepPropagation({
+          parentRecipeId: selectedRecipe?.id,
+          prepId: line.sub_recipe_id,
+          usageQuantity: quantity,
+          usageUnit,
+          batchTotalEur: prepTotal,
+          lineCostEur: lineCost,
+          outputQuantity: prep?.output_quantity,
+          outputUnit: prep?.output_unit,
+          trigger: "getRecipeCostLines",
+        });
+        logPrepUnitCost({
+          prepId: line.sub_recipe_id,
+          batchTotalEur: prepTotal,
+          outputQuantity: prep?.output_quantity,
+          outputUnit: prep?.output_unit,
+          unitCostEur:
+            quantity > 0 && lineCost != null ? lineCost / quantity : 0,
+          trigger: "getRecipeCostLines_usage_unit",
+        });
       }
+      logResolvedLineCost({
+        recipeId: selectedRecipe?.id,
+        prepId: line.sub_recipe_id,
+        quantity,
+        unit: usageUnit || null,
+        lineCostEur: lineCost,
+        trigger: "getRecipeCostLines_prep",
+      });
+      logCostProp({
+        trigger: "prep_line_cost",
+        recipeId: selectedRecipe?.id,
+        prepId: line.sub_recipe_id,
+        lineCost,
+      });
     }
     const unitCost = quantity > 0 ? lineCost / quantity : 0;
     const unitCostLabel =
@@ -1931,15 +2172,27 @@ function isRecentDate(value: string | null | undefined, days = 14) {
   return ageMs >= 0 && ageMs <= days * 24 * 60 * 60 * 1000;
 }
 
+function recipeLineEmbedCostSnapshot(
+  ingredientId: string,
+  recipeIngredients: RecipeIngredient[] | null,
+) {
+  const embed = recipeIngredients?.find((line) => line.ingredient_id === ingredientId)?.ingredients;
+  if (!embed) return null;
+  return {
+    current_price: embed.current_price,
+    purchase_quantity: embed.purchase_quantity,
+  };
+}
+
 function getIngredientForLine(
   ingredientId: string,
   recipeIngredients: RecipeIngredient[] | null,
   ingredientOptions: IngredientOption[],
 ) {
+  const catalog = ingredientOptions.find((ingredient) => ingredient.id === ingredientId);
+  if (catalog) return catalog;
   return (
-    recipeIngredients?.find((line) => line.ingredient_id === ingredientId)?.ingredients ??
-    ingredientOptions.find((ingredient) => ingredient.id === ingredientId) ??
-    null
+    recipeIngredients?.find((line) => line.ingredient_id === ingredientId)?.ingredients ?? null
   );
 }
 

@@ -4,7 +4,6 @@
  */
 
 import { formatCurrency, formatUnitCostCurrency } from "@/lib/display-format";
-import { daysSinceRecency } from "@/lib/ingredient-pricing-freshness";
 import type { PackageType } from "@/lib/ingredient-unit-inference";
 import {
   resolveInvoiceLinePurchaseFormat,
@@ -262,7 +261,7 @@ function inferProductUnitNoun(name: string, count: number): string | null {
   return null;
 }
 
-function resolveUsablePerPricedUnit(
+export function resolveUsablePerPricedUnit(
   metadata: InvoicePurchasePriceMetadata,
   structured: StructuredPurchaseFormat,
 ): { amount: number; unit: "g" | "ml" | "un" } | null {
@@ -289,7 +288,7 @@ function resolveUsablePerPricedUnit(
   return { amount: totalUsable / rowQuantity, unit: usableUnit };
 }
 
-function computeEffectiveUsableCost(
+export function computeEffectiveUsableCost(
   unitPrice: number,
   metadata: InvoicePurchasePriceMetadata,
   structured: StructuredPurchaseFormat,
@@ -314,6 +313,28 @@ function computeEffectiveUsableCost(
     cost: unitPrice / usable.amount,
     unit: inferCountableCostUnit(name),
   };
+}
+
+/**
+ * Ingredient `current_price` / `purchase_quantity` for recipe costing from an invoice line.
+ * Recipe ingredient quantities are stored in base units (g, ml, un); `unit_price` on kg rows is €/kg.
+ */
+export function recipeOperationalCostFieldsFromInvoiceLine(
+  metadata: InvoicePurchasePriceMetadata,
+): { current_price: number; purchase_quantity: number } | null {
+  const unitPrice = metadata.unit_price == null ? null : Number(metadata.unit_price);
+  if (!Number.isFinite(unitPrice) || unitPrice < 0) return null;
+
+  const rowUnit = metadata.unit?.trim().toLowerCase();
+  if (rowUnit === "kg") {
+    return { current_price: unitPrice, purchase_quantity: 1000 };
+  }
+
+  const structured = resolveInvoiceLinePurchaseFormat(metadata);
+  const usable = resolveUsablePerPricedUnit(metadata, structured);
+  if (!usable || usable.amount <= 0) return null;
+
+  return { current_price: unitPrice, purchase_quantity: usable.amount };
 }
 
 /** Units-per-pack from metadata (not invoice row quantity). */
@@ -591,53 +612,133 @@ export function deriveInvoicePricingInsights(
   return insights.slice(0, 3);
 }
 
+/** Minimum percent increase vs last invoice before surfacing a price-spike chip. */
+export const INVOICE_PRICE_SPIKE_THRESHOLD_PERCENT = 15;
+
 export type InvoiceRowReviewWarningInput = {
   signals: readonly InvoicePricingInsightSignal[];
-  /** Latest purchase or price-refresh timestamp for recency copy. */
-  pricingRecencyAt?: string | null;
+  previousInvoiceLinePrice?: number | null;
+  currentUnitPrice?: number | null;
 };
 
+function finiteUnitPrice(value: number | null | undefined): number | null {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+function isAbnormalPriceSpike(
+  current: number,
+  previous: number,
+  thresholdPercent = INVOICE_PRICE_SPIKE_THRESHOLD_PERCENT,
+): boolean {
+  if (!Number.isFinite(previous) || previous <= 0) return false;
+  const percent = ((current - previous) / previous) * 100;
+  return percent > thresholdPercent;
+}
+
+const VISIBLE_ROW_WARNING_LABELS = new Set(["New supplier", "Price spike"]);
+
+function isVisibleRowWarning(warning: string | null | undefined): warning is string {
+  return Boolean(warning && VISIBLE_ROW_WARNING_LABELS.has(warning));
+}
+
 /**
- * At most one calm warning for the invoice row left column.
- * Priority: stale pricing → last invoice age → price spike → new supplier → catalog delta.
+ * At most one inline warning chip label for invoice rows.
+ * Stale pricing, catalog deltas, and recency copy stay internal — not shown in the row UI.
  */
 export function formatInvoiceRowReviewWarning(input: InvoiceRowReviewWarningInput): string | null {
   const signalByKind = new Map(input.signals.map((signal) => [signal.kind, signal]));
+  const current = finiteUnitPrice(input.currentUnitPrice);
+  const previous = finiteUnitPrice(input.previousInvoiceLinePrice);
 
-  if (signalByKind.has("stale-pricing") || signalByKind.has("catalog-confirmation")) {
-    return "Pricing may be outdated";
-  }
-
-  if (signalByKind.has("price-increased") || signalByKind.has("catalog-price-up")) {
-    return "Higher than recent purchases";
+  if (
+    signalByKind.has("price-increased") &&
+    current != null &&
+    previous != null &&
+    isAbnormalPriceSpike(current, previous)
+  ) {
+    return "Price spike";
   }
 
   if (signalByKind.has("new-supplier")) {
     return "New supplier";
   }
 
-  if (signalByKind.has("catalog-price-down")) {
-    return "Below recent purchases";
-  }
-
-  const purchaseDays = daysSinceRecency(input.pricingRecencyAt);
-  if (purchaseDays != null && purchaseDays >= 1) {
-    return `Last invoice ${purchaseDays}d ago`;
-  }
-
   return null;
 }
 
-/** Single calm status under the match target line (match confidence or one warning). */
+/** Single calm status under the match target line (match confidence or one visible warning). */
 export function formatInvoiceRowMatchStatusLine(args: {
   matchedAutomatically: boolean;
   confidenceLabel: string | null;
   warning: string | null;
+  unmatched?: boolean;
+  suggestedMatch?: boolean;
 }): string | null {
-  if (args.warning) return args.warning;
+  if (isVisibleRowWarning(args.warning)) return args.warning;
+  if (args.unmatched) return "No match";
+  if (args.suggestedMatch) return "Possible match";
   if (args.matchedAutomatically) return "Matched automatically";
   if (args.confidenceLabel === "High confidence") return "High confidence";
   return null;
+}
+
+export type InvoiceRowInlineChipTone = "muted" | "review" | "success" | "increase";
+
+export type InvoiceRowInlineChip = {
+  label: string;
+  tone: InvoiceRowInlineChipTone;
+  title?: string;
+};
+
+export type InvoiceRowInlineChipInput = {
+  matchedAutomatically: boolean;
+  confidenceLabel: string | null;
+  unmatched: boolean;
+  suggestedMatch: boolean;
+  signals: readonly InvoicePricingInsightSignal[];
+  previousInvoiceLinePrice?: number | null;
+  currentUnitPrice?: number | null;
+  matchTooltip?: string | null;
+};
+
+/** Up to two inline chips: one match-status chip plus an optional warning chip. */
+export function deriveInvoiceRowInlineChips(input: InvoiceRowInlineChipInput): InvoiceRowInlineChip[] {
+  const chips: InvoiceRowInlineChip[] = [];
+
+  const matchLabel = formatInvoiceRowMatchStatusLine({
+    matchedAutomatically: input.matchedAutomatically,
+    confidenceLabel: input.confidenceLabel,
+    warning: null,
+    unmatched: input.unmatched,
+    suggestedMatch: input.suggestedMatch,
+  });
+  if (matchLabel) {
+    chips.push({
+      label: matchLabel,
+      tone:
+        input.unmatched || input.suggestedMatch
+          ? "review"
+          : input.matchedAutomatically
+            ? "success"
+            : "muted",
+      title: input.matchTooltip ?? undefined,
+    });
+  }
+
+  const warning = formatInvoiceRowReviewWarning({
+    signals: input.signals,
+    previousInvoiceLinePrice: input.previousInvoiceLinePrice,
+    currentUnitPrice: input.currentUnitPrice,
+  });
+  if (warning && chips.length < 2) {
+    chips.push({
+      label: warning,
+      tone: warning === "Price spike" ? "increase" : "muted",
+    });
+  }
+
+  return chips.slice(0, 2);
 }
 
 /** Maps badge severity to UI tone keys used by invoice review chips. */

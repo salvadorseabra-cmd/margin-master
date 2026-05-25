@@ -5,6 +5,7 @@ import {
   type IngredientEmbed,
   type RecipeIngredientLine,
 } from "@/lib/recipe-merge";
+import { buildRecipesById, type RecipeForPrepCost } from "@/lib/recipe-prep-cost";
 
 type AppSupabaseClient = SupabaseClient<Database>;
 
@@ -15,7 +16,12 @@ export const DEFAULT_ESTIMATED_MONTHLY_RECIPE_SALES = 300;
 /** Align with `INGREDIENT_PRICE_EQ_EPS` in invoice sync — skip work/inserts when effective €/base-unit is unchanged. */
 const EFFECTIVE_UNIT_PRICE_EQ_EPS = 1e-6;
 
-type RecipeIngredientRow = Pick<Tables<"recipe_ingredients">, "id" | "recipe_id" | "ingredient_id" | "sub_recipe_id" | "quantity">;
+type RecipeIngredientRow = Pick<
+  Tables<"recipe_ingredients">,
+  "id" | "recipe_id" | "ingredient_id" | "sub_recipe_id" | "quantity" | "unit"
+>;
+
+type RecipeOutputRow = Pick<Tables<"recipes">, "id" | "output_quantity" | "output_unit">;
 
 function grossMarginPctOrZero(selling: number, cost: number): number {
   if (!(selling > COST_EPS)) return 0;
@@ -48,14 +54,26 @@ async function expandRecipeIdsForSubRecipeClosure(client: AppSupabaseClient, see
 export async function loadRecipeLinesByRecipeMapForClosure(
   client: AppSupabaseClient,
   seedRecipeIds: string[],
-): Promise<Map<string, RecipeIngredientLine[]>> {
+): Promise<{
+  linesByRecipe: Map<string, RecipeIngredientLine[]>;
+  recipesById: Map<string, RecipeForPrepCost>;
+}> {
   const expandedIds = await expandRecipeIdsForSubRecipeClosure(client, seedRecipeIds);
-  const { data: allRi, error: allRiErr } = await client
-    .from("recipe_ingredients")
-    .select("id,recipe_id,ingredient_id,sub_recipe_id,quantity")
-    .in("recipe_id", expandedIds);
+  const [{ data: allRi, error: allRiErr }, { data: recipeOutputs, error: recipesErr }] =
+    await Promise.all([
+      client
+        .from("recipe_ingredients")
+        .select("id,recipe_id,ingredient_id,sub_recipe_id,quantity,unit")
+        .in("recipe_id", expandedIds),
+      client
+        .from("recipes")
+        .select("id,output_quantity,output_unit")
+        .in("id", expandedIds),
+    ]);
   if (allRiErr) throw allRiErr;
+  if (recipesErr) throw recipesErr;
   const riRows = (allRi ?? []) as RecipeIngredientRow[];
+  const recipesById = buildRecipesById((recipeOutputs ?? []) as RecipeOutputRow[]);
   const allIngredientIds = [...new Set(riRows.map((r) => r.ingredient_id).filter((id): id is string => Boolean(id)))];
   const byIngredient = new Map<string, IngredientEmbed>();
   if (allIngredientIds.length) {
@@ -68,7 +86,10 @@ export async function loadRecipeLinesByRecipeMapForClosure(
       byIngredient.set(ing.id, ing);
     }
   }
-  return buildLinesByRecipeMap(expandedIds, riRows, byIngredient);
+  return {
+    linesByRecipe: buildLinesByRecipeMap(expandedIds, riRows, byIngredient),
+    recipesById,
+  };
 }
 
 function buildLinesForRecipe(
@@ -85,6 +106,7 @@ function buildLinesForRecipe(
       ingredient_id: row.ingredient_id,
       sub_recipe_id: row.sub_recipe_id,
       quantity: row.quantity,
+      unit: row.unit,
       ingredients: row.ingredient_id ? byIngredient.get(row.ingredient_id) ?? null : null,
       subRecipe: null,
     });
@@ -194,7 +216,7 @@ export async function calculateRecipeMarginImpact(
     };
   }
 
-  const linesByRecipe = await loadRecipeLinesByRecipeMapForClosure(client, [recipeId]);
+  const { linesByRecipe, recipesById } = await loadRecipeLinesByRecipeMapForClosure(client, [recipeId]);
   const topLines = linesByRecipe.get(recipeId) ?? [];
   if (!topLines.length) {
     const oldRecipeCost = 0;
@@ -219,9 +241,21 @@ export async function calculateRecipeMarginImpact(
   }
 
   const oldRecipeCost =
-    recipeTotalCostUsingEffectiveUnitForIngredient(recipeId, linesByRecipe, ingredientId, oldUnitPrice) ?? 0;
+    recipeTotalCostUsingEffectiveUnitForIngredient(
+      recipeId,
+      linesByRecipe,
+      ingredientId,
+      oldUnitPrice,
+      recipesById,
+    ) ?? 0;
   const newRecipeCost =
-    recipeTotalCostUsingEffectiveUnitForIngredient(recipeId, linesByRecipe, ingredientId, newUnitPrice) ?? 0;
+    recipeTotalCostUsingEffectiveUnitForIngredient(
+      recipeId,
+      linesByRecipe,
+      ingredientId,
+      newUnitPrice,
+      recipesById,
+    ) ?? 0;
 
   const oldMarginPct = grossMarginPctOrZero(sellingPriceEur, oldRecipeCost);
   const newMarginPct = grossMarginPctOrZero(sellingPriceEur, newRecipeCost);
@@ -299,10 +333,11 @@ export async function recordIngredientPriceChangeImpacts(
 
   const recipeIdsToImpact = [...new Set([...childRecipeIds, ...parentRecipeIds])];
 
-  const [{ data: recipes, error: recErr }, linesByRecipe] = await Promise.all([
+  const [{ data: recipes, error: recErr }, closure] = await Promise.all([
     client.from("recipes").select("id,selling_price").in("id", recipeIdsToImpact),
     loadRecipeLinesByRecipeMapForClosure(client, recipeIdsToImpact),
   ]);
+  const { linesByRecipe, recipesById } = closure;
   if (recErr) throw recErr;
 
   const recipeRows = (recipes ?? []) as Pick<Tables<"recipes">, "id" | "selling_price">[];
@@ -321,8 +356,21 @@ export async function recordIngredientPriceChangeImpacts(
     if (!lines.length) continue;
 
     const oldRecipeCost =
-      recipeTotalCostUsingEffectiveUnitForIngredient(rid, linesByRecipe, ingredientId, previousPrice) ?? 0;
-    const newRecipeCost = recipeTotalCostUsingEffectiveUnitForIngredient(rid, linesByRecipe, ingredientId, newPrice) ?? 0;
+      recipeTotalCostUsingEffectiveUnitForIngredient(
+        rid,
+        linesByRecipe,
+        ingredientId,
+        previousPrice,
+        recipesById,
+      ) ?? 0;
+    const newRecipeCost =
+      recipeTotalCostUsingEffectiveUnitForIngredient(
+        rid,
+        linesByRecipe,
+        ingredientId,
+        newPrice,
+        recipesById,
+      ) ?? 0;
 
     const oldMarginPct = grossMarginPctOrZero(sellingPriceEur, oldRecipeCost);
     const newMarginPct = grossMarginPctOrZero(sellingPriceEur, newRecipeCost);

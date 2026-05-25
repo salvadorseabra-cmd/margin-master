@@ -26,6 +26,7 @@ import {
   structuredPurchaseToIngredientFields,
   type StructuredPurchaseFormat,
 } from "@/lib/invoice-purchase-format";
+import { recipeOperationalCostFieldsFromInvoiceLine } from "@/lib/invoice-purchase-price-semantics";
 import { findInvoiceItemIngredientMatch } from "@/lib/invoice-ingredient-match-propagation";
 import { INGREDIENT_KIND_CANONICAL, looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
 import { shouldBlockCanonicalNameOnCreate } from "@/lib/canonical-ingredient-operational-name";
@@ -52,6 +53,54 @@ export type AutoPersistInvoiceItem = {
   unit: string | null;
   unit_price: number | null;
 };
+
+export type OperationalIngredientCostFields = {
+  current_price: number | null;
+  purchase_quantity: number | null;
+};
+
+/** Maps a matched invoice line to catalog `current_price` / `purchase_quantity` fields. */
+export function operationalCostFieldsFromInvoiceLine(
+  item: Pick<AutoPersistInvoiceItem, "name" | "quantity" | "unit" | "unit_price">,
+  _options: {
+    isGenericUnit?: (unit: string | null | undefined) => boolean;
+  } = {},
+): OperationalIngredientCostFields | null {
+  const recipeFields = recipeOperationalCostFieldsFromInvoiceLine({
+    name: item.name,
+    quantity: item.quantity,
+    unit: item.unit,
+    unit_price: item.unit_price,
+  });
+  if (!recipeFields) return null;
+  return {
+    current_price: recipeFields.current_price,
+    purchase_quantity: recipeFields.purchase_quantity,
+  };
+}
+
+/** Persists latest invoice operational pack price onto the canonical ingredient row. */
+export async function persistOperationalIngredientCostFromInvoiceLine(
+  client: AppSupabaseClient,
+  ingredientId: string,
+  item: Pick<AutoPersistInvoiceItem, "name" | "quantity" | "unit" | "unit_price">,
+  options: {
+    isGenericUnit?: (unit: string | null | undefined) => boolean;
+  } = {},
+): Promise<{ updated: boolean; error: PostgrestError | null }> {
+  const id = ingredientId.trim();
+  if (!id) return { updated: false, error: null };
+  const fields = operationalCostFieldsFromInvoiceLine(item, options);
+  if (!fields) return { updated: false, error: null };
+  const { error } = await client
+    .from("ingredients")
+    .update({
+      current_price: fields.current_price,
+      purchase_quantity: fields.purchase_quantity,
+    })
+    .eq("id", id);
+  return { updated: !error, error: error ?? null };
+}
 
 export type AutoPersistCatalogEntry = IngredientCanonicalInput;
 

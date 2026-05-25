@@ -23,6 +23,12 @@ import {
   invoiceRowMatchSummaryBucket,
   resolveInvoiceTableRowIngredientMatch,
 } from "@/lib/invoice-ingredient-row-display";
+import {
+  defaultIsGenericUnit,
+  operationalCostFieldsFromInvoiceLine,
+  persistOperationalIngredientCostFromInvoiceLine,
+  type OperationalIngredientCostFields,
+} from "@/lib/ingredient-auto-persist";
 import { normalizeInvoiceItemFields } from "@/lib/invoice-item-fields";
 import { isEligibleInvoiceIngredientRow } from "@/lib/invoice-unresolved-ingredient-count";
 import { resolveInvoiceLineStockPresentation } from "@/lib/invoice-purchase-format";
@@ -793,6 +799,185 @@ export function buildLatestPurchaseGlanceByIngredientIdFromScan(
   }
 
   return latest;
+}
+
+export type OperationalInvoiceCostEntry = {
+  fields: OperationalIngredientCostFields;
+  invoiceDate: string | null;
+  /** Raw invoice line unit_price before pack→base normalization. */
+  latestInvoiceUnitCost: number | null;
+  supplierLabel: string | null;
+};
+
+/**
+ * Latest matched invoice operational cost per catalog ingredient id (same scan as purchase memory).
+ * Newest invoice line by date wins; fields use the same mapping as explicit ingredient create.
+ */
+export function buildLatestOperationalIngredientCostByIngredientIdFromScan(
+  catalog: readonly IngredientCanonicalInput[],
+  confirmedAliases: IngredientAliasMap,
+  scanRows: readonly MatchedInvoiceItemScanRow[],
+): Map<string, OperationalInvoiceCostEntry> {
+  const catalogIds = new Set(
+    catalog.map((row) => row.id?.trim()).filter((id): id is string => Boolean(id)),
+  );
+  const latest = new Map<string, OperationalInvoiceCostEntry>();
+  if (catalogIds.size === 0 || scanRows.length === 0) return latest;
+
+  const eligibleRows = scanRows
+    .map((row) =>
+      normalizeInvoiceItemFields({
+        id: row.id,
+        name: row.name,
+        quantity: row.quantity,
+        unit: row.unit,
+        unit_price: row.unit_price,
+        total: row.total,
+      }),
+    )
+    .filter(isEligibleInvoiceIngredientRow);
+  if (eligibleRows.length === 0) return latest;
+
+  const matchCatalog = buildInvoiceMatchCatalog(
+    [...catalog],
+    eligibleRows.map((row) => ({ name: row.name })),
+  );
+  const canonicalNameById = new Map(
+    catalog
+      .map((row) => [row.id?.trim() ?? "", resolveCanonicalNameForIngredient(row.id ?? "", catalog)] as const)
+      .filter(([id]) => Boolean(id)),
+  );
+  const sourceById = new Map(scanRows.map((row) => [row.id, row]));
+  const seenItemIds = new Set<string>();
+
+  for (const normalized of eligibleRows) {
+    const source = sourceById.get(normalized.id);
+    if (!source || seenItemIds.has(normalized.id)) continue;
+
+    const supplierName = normalizeSupplierScope(source.invoices?.supplier_name ?? null);
+    const { match, state } = resolveInvoiceTableRowIngredientMatch(
+      normalized.name,
+      matchCatalog,
+      confirmedAliases,
+      supplierName,
+    );
+    const matchedIngredientId = match?.ingredient.id?.trim();
+    if (!match || !matchedIngredientId || !catalogIds.has(matchedIngredientId)) continue;
+
+    const canonicalName = canonicalNameById.get(matchedIngredientId);
+    if (
+      canonicalName?.trim() &&
+      shouldSkipByOperationalProductFamilyGate(normalized.name, canonicalName)
+    ) {
+      continue;
+    }
+
+    const bucket = invoiceRowMatchSummaryBucket(state.displayState);
+    if (bucket === "unmatched") continue;
+
+    const invoiceDate =
+      source.invoices?.invoice_date?.trim() ||
+      source.created_at?.trim()?.slice(0, 10) ||
+      null;
+    if (!invoiceDate) continue;
+
+    const fields = operationalCostFieldsFromInvoiceLine({
+      name: normalized.name,
+      quantity: normalized.quantity,
+      unit: normalized.unit,
+      unit_price: normalized.unit_price,
+    });
+    if (!fields) continue;
+
+    seenItemIds.add(normalized.id);
+    const previous = latest.get(matchedIngredientId)?.invoiceDate ?? null;
+    if (!previous || compareInvoiceDatesDesc(previous, invoiceDate) > 0) {
+      const unitPrice = normalized.unit_price == null ? null : Number(normalized.unit_price);
+      latest.set(matchedIngredientId, {
+        fields,
+        invoiceDate,
+        latestInvoiceUnitCost: Number.isFinite(unitPrice) ? unitPrice : null,
+        supplierLabel: supplierName,
+      });
+    }
+  }
+
+  return latest;
+}
+
+export async function loadOperationalIngredientCostOverlay(
+  client: DbClient,
+  catalog: readonly IngredientCanonicalInput[],
+  confirmedAliases: IngredientAliasMap,
+): Promise<Map<string, OperationalInvoiceCostEntry>> {
+  if (catalog.length === 0) return new Map();
+  const { rows } = await loadInvoiceItemsForMatchedProductScan(client);
+  return buildLatestOperationalIngredientCostByIngredientIdFromScan(
+    catalog,
+    confirmedAliases,
+    rows,
+  );
+}
+
+export type InvoiceLineOperationalCostSyncInput = {
+  name: string;
+  quantity: number | null;
+  unit: string | null;
+  unit_price: number | null;
+  supplierName?: string | null;
+};
+
+/** After invoice ingest, push matched line prices onto canonical `ingredients` rows. */
+export async function syncOperationalIngredientCostsFromInvoiceLines(
+  client: DbClient,
+  catalog: readonly IngredientCanonicalInput[],
+  confirmedAliases: IngredientAliasMap,
+  items: readonly InvoiceLineOperationalCostSyncInput[],
+  options: {
+    isGenericUnit?: (unit: string | null | undefined) => boolean;
+  } = {},
+): Promise<{ updatedIngredientIds: string[] }> {
+  if (catalog.length === 0 || items.length === 0) {
+    return { updatedIngredientIds: [] };
+  }
+  const isGenericUnit = options.isGenericUnit ?? defaultIsGenericUnit;
+  const matchCatalog = buildInvoiceMatchCatalog(
+    [...catalog],
+    items.map((row) => ({ name: row.name })),
+  );
+  const updatedIngredientIds = new Set<string>();
+
+  for (const item of items) {
+    const supplierName = normalizeSupplierScope(item.supplierName ?? null);
+    const { match, state } = resolveInvoiceTableRowIngredientMatch(
+      item.name,
+      matchCatalog,
+      confirmedAliases,
+      supplierName,
+    );
+    const matchedIngredientId = match?.ingredient.id?.trim();
+    if (!match || !matchedIngredientId) continue;
+    if (invoiceRowMatchSummaryBucket(state.displayState) === "unmatched") continue;
+
+    const { updated, error } = await persistOperationalIngredientCostFromInvoiceLine(
+      client,
+      matchedIngredientId,
+      {
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        unit_price: item.unit_price,
+      },
+      { isGenericUnit },
+    );
+    if (error) {
+      logQueryFailure("syncOperationalIngredientCostsFromInvoiceLines", error.message);
+      continue;
+    }
+    if (updated) updatedIngredientIds.add(matchedIngredientId);
+  }
+
+  return { updatedIngredientIds: [...updatedIngredientIds] };
 }
 
 /**

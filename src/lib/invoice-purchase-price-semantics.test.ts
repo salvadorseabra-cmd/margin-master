@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { resolveInvoiceLinePurchaseFormat } from "./invoice-purchase-format";
 import {
+  deriveInvoiceRowInlineChips,
   formatInvoicePurchasePriceLabel,
   formatInvoiceRowMatchStatusLine,
   formatInvoiceRowReviewWarning,
   formatPurchasedPackDetail,
   formatRowPurchaseQuantityLabel,
   groupInvoiceLineBadges,
+  INVOICE_PRICE_SPIKE_THRESHOLD_PERCENT,
   resolveInvoiceLinePricingPresentation,
 } from "./invoice-purchase-price-semantics";
 
@@ -187,7 +189,7 @@ describe("resolveInvoiceLinePricingPresentation", () => {
 });
 
 describe("formatInvoiceRowReviewWarning", () => {
-  it("picks the highest-severity calm warning", () => {
+  it("only surfaces new supplier and abnormal price spikes", () => {
     expect(
       formatInvoiceRowReviewWarning({
         signals: [
@@ -196,34 +198,66 @@ describe("formatInvoiceRowReviewWarning", () => {
           { kind: "stale-pricing", label: "Outdated pricing" },
         ],
       }),
-    ).toBe("Pricing may be outdated");
+    ).toBe("New supplier");
 
     expect(
       formatInvoiceRowReviewWarning({
         signals: [{ kind: "catalog-price-up", label: "Above catalog pack price" }],
       }),
-    ).toBe("Higher than recent purchases");
+    ).toBeNull();
 
+    expect(
+      formatInvoiceRowReviewWarning({
+        signals: [{ kind: "stale-pricing", label: "Outdated pricing" }],
+      }),
+    ).toBeNull();
+
+    expect(
+      formatInvoiceRowReviewWarning({
+        signals: [{ kind: "price-increased", label: "Price up vs last invoice" }],
+        previousInvoiceLinePrice: 10,
+        currentUnitPrice: 10.5,
+      }),
+    ).toBeNull();
+
+    expect(
+      formatInvoiceRowReviewWarning({
+        signals: [{ kind: "price-increased", label: "Price up vs last invoice" }],
+        previousInvoiceLinePrice: 10,
+        currentUnitPrice: 10 + 10 * (INVOICE_PRICE_SPIKE_THRESHOLD_PERCENT / 100) + 0.01,
+      }),
+    ).toBe("Price spike");
+  });
+
+  it("returns new supplier when present without hidden pricing signals", () => {
     expect(
       formatInvoiceRowReviewWarning({
         signals: [{ kind: "new-supplier", label: "New supplier" }],
       }),
     ).toBe("New supplier");
   });
-
-  it("formats last invoice recency when no higher-priority signal", () => {
-    const fortyTwoDaysAgo = new Date(Date.now() - 42 * 86_400_000).toISOString();
-    expect(
-      formatInvoiceRowReviewWarning({
-        signals: [],
-        pricingRecencyAt: fortyTwoDaysAgo,
-      }),
-    ).toBe("Last invoice 42d ago");
-  });
 });
 
 describe("formatInvoiceRowMatchStatusLine", () => {
-  it("prefers a warning over match confidence copy", () => {
+  it("ignores hidden pricing warnings", () => {
+    expect(
+      formatInvoiceRowMatchStatusLine({
+        matchedAutomatically: true,
+        confidenceLabel: "High confidence",
+        warning: "Pricing may be outdated",
+      }),
+    ).toBe("Matched automatically");
+
+    expect(
+      formatInvoiceRowMatchStatusLine({
+        matchedAutomatically: false,
+        confidenceLabel: "High confidence",
+        warning: "Higher than recent purchases",
+      }),
+    ).toBe("High confidence");
+  });
+
+  it("prefers a visible warning over match confidence copy", () => {
     expect(
       formatInvoiceRowMatchStatusLine({
         matchedAutomatically: true,
@@ -233,7 +267,7 @@ describe("formatInvoiceRowMatchStatusLine", () => {
     ).toBe("New supplier");
   });
 
-  it("shows matched automatically or high confidence when calm", () => {
+  it("shows match states when calm", () => {
     expect(
       formatInvoiceRowMatchStatusLine({
         matchedAutomatically: true,
@@ -249,6 +283,46 @@ describe("formatInvoiceRowMatchStatusLine", () => {
         warning: null,
       }),
     ).toBe("High confidence");
+
+    expect(
+      formatInvoiceRowMatchStatusLine({
+        matchedAutomatically: false,
+        confidenceLabel: "Suggested match",
+        warning: null,
+        suggestedMatch: true,
+      }),
+    ).toBe("Possible match");
+
+    expect(
+      formatInvoiceRowMatchStatusLine({
+        matchedAutomatically: false,
+        confidenceLabel: null,
+        warning: null,
+        unmatched: true,
+      }),
+    ).toBe("No match");
+  });
+});
+
+describe("deriveInvoiceRowInlineChips", () => {
+  it("returns at most one match chip and one warning chip", () => {
+    expect(
+      deriveInvoiceRowInlineChips({
+        matchedAutomatically: true,
+        confidenceLabel: "High confidence",
+        unmatched: false,
+        suggestedMatch: false,
+        signals: [
+          { kind: "price-increased", label: "Price up vs last invoice" },
+          { kind: "new-supplier", label: "New supplier" },
+        ],
+        previousInvoiceLinePrice: 10,
+        currentUnitPrice: 12,
+      }),
+    ).toEqual([
+      { label: "Matched automatically", tone: "success" },
+      { label: "Price spike", tone: "increase" },
+    ]);
   });
 });
 
