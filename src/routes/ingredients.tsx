@@ -34,6 +34,8 @@ import {
   duplicateClusterIngredientIds,
   findOperationalDuplicateClusterForIngredient,
   operationalListFilterReviewBarTitle,
+  operationalListBrowseRowBaseClass,
+  operationalListBrowseRowHoverClass,
   operationalListBrowseRowSelectedClass,
   operationalListReviewBannerClass,
   operationalListReviewRowSelectedClass,
@@ -746,17 +748,23 @@ function IngredientsIndexPage() {
         key={ing.id}
         aria-selected={selected}
         onClick={() => setSelectedIngredientId(ing.id)}
-        className={`group cursor-pointer transition-colors duration-150 ease-out hover:bg-muted/[0.04] focus-within:bg-muted/[0.04] ${
-          selectedRowClass
+        className={`group relative cursor-pointer transition-colors duration-150 ease-out ${operationalListBrowseRowBaseClass()} ${
+          selected ? selectedRowClass : operationalListBrowseRowHoverClass()
         }`}
       >
         <td className="min-w-0 px-3 py-2">
           <div className="min-w-0">
-            <p className="min-w-0 truncate text-sm font-semibold leading-snug text-foreground">
+            <p
+              className={`min-w-0 truncate text-sm leading-snug ${
+                selected
+                  ? "font-semibold text-foreground"
+                  : "font-medium text-foreground/85"
+              }`}
+            >
               {formatCanonicalIngredientDisplayName(ing.name)}
             </p>
             {rowSubline ? (
-              <p className="mt-0.5 truncate text-xs leading-snug text-muted-foreground">
+              <p className="mt-0.5 truncate text-xs font-normal leading-snug text-muted-foreground/70">
                 {rowSubline}
               </p>
             ) : null}

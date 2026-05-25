@@ -1,6 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, Tables } from "@/integrations/supabase/types";
 import { effectiveIngredientUnitCostEur } from "@/lib/ingredient-unit-cost";
+import {
+  computeRecipeLineCostEur,
+  computeRecipeTotalCostEur,
+  type RecipeForPrepCost,
+  type RecipeIngredientLineForCost,
+} from "@/lib/recipe-prep-cost";
 
 export type IngredientEmbed = any;
 
@@ -35,7 +41,18 @@ export function computeRecipeTotalCostCached(
   >,
   path: Set<string>,
   memo: Map<string, number>,
+  recipesById: Map<string, RecipeForPrepCost> = new Map(),
 ): number | null {
+  if (recipesById.size > 0) {
+    return computeRecipeTotalCostEur(
+      recipeId,
+      linesByRecipe as Map<string, RecipeIngredientLineForCost[]>,
+      recipesById,
+      path,
+      memo,
+    );
+  }
+
   if (path.has(recipeId)) return null;
 
   if (memo.has(recipeId)) {
@@ -55,6 +72,7 @@ export function computeRecipeTotalCostCached(
       linesByRecipe,
       path,
       memo,
+      recipesById,
     );
 
     if (part === null) {
@@ -80,7 +98,18 @@ export function lineIngredientCost(
   >,
   path: Set<string>,
   memo: Map<string, number>,
+  recipesById: Map<string, RecipeForPrepCost> = new Map(),
 ): number | null {
+  if (recipesById.size > 0) {
+    return computeRecipeLineCostEur(
+      line as RecipeIngredientLineForCost,
+      linesByRecipe as Map<string, RecipeIngredientLineForCost[]>,
+      recipesById,
+      path,
+      memo,
+    );
+  }
+
   const qty = Number(line.quantity);
 
   const safeQty = Number.isFinite(qty)
@@ -105,6 +134,7 @@ export function lineIngredientCost(
         linesByRecipe,
         path,
         memo,
+        recipesById,
       );
 
     if (unitTotal === null) {
@@ -126,6 +156,7 @@ export function recipeCostFromLines(
     string,
     RecipeIngredientLine[]
   >,
+  recipesById: Map<string, RecipeForPrepCost> = new Map(),
 ): number | null {
   const path = new Set<string>();
 
@@ -139,6 +170,7 @@ export function recipeCostFromLines(
       linesByRecipe,
       path,
       memo,
+      recipesById,
     );
 
     if (c === null) {
@@ -160,11 +192,13 @@ export function recipeCostFromLinesOrZero(
     string,
     RecipeIngredientLine[]
   >,
+  recipesById: Map<string, RecipeForPrepCost> = new Map(),
 ): number {
   return (
     recipeCostFromLines(
       lines,
       linesByRecipe,
+      recipesById,
     ) ?? 0
   );
 }
@@ -175,6 +209,7 @@ export function recipeTotalCostEurForRecipe(
     string,
     RecipeIngredientLine[]
   >,
+  recipesById: Map<string, RecipeForPrepCost> = new Map(),
 ): number | null {
   const path = new Set<string>();
 
@@ -185,6 +220,7 @@ export function recipeTotalCostEurForRecipe(
     linesByRecipe,
     path,
     memo,
+    recipesById,
   );
 }
 

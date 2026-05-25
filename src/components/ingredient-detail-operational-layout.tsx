@@ -24,12 +24,15 @@ import {
 import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
 import type { ActionableCanonicalNamingQueueEntry } from "@/lib/canonical-ingredient-naming-queue";
 import {
-  buildOperationalInsightCards,
-  operationalInsightCardClassName,
-  operationalInsightIconClassName,
-  type OperationalInsightCard,
-  type OperationalInsightCardKind,
-} from "@/lib/buildOperationalInsightCards";
+  buildIngredientOperationalSignals,
+  deriveMarginExposureScore,
+  deriveOperationalMood,
+  formatIngredientOperationalHeadline,
+  formatOperationalMoodLine,
+  groupOperationalSignals,
+  operationalMoodToneClass,
+  pickOperationalSummarySignals,
+} from "@/lib/buildIngredientOperationalSignals";
 import {
   dismissIngredientInsight,
   readIngredientDismissedInsights,
@@ -53,6 +56,13 @@ import {
   sortRecentPurchasesByDate,
   type IngredientReviewDetailSection,
 } from "@/lib/ingredient-detail-panel";
+import {
+  buildOperationalInsightCards,
+  operationalInsightCardClassName,
+  operationalInsightIconClassName,
+  type OperationalInsightCard,
+  type OperationalInsightCardKind,
+} from "@/lib/buildOperationalInsightCards";
 import { ingredientDisplayBaseUnit } from "@/lib/ingredient-unit-cost";
 import {
   detectOrphanCanonicalIngredients,
@@ -113,8 +123,114 @@ export type IngredientDetailPanelProps = {
 
 const sectionTitleClass = "text-xs font-medium text-muted-foreground/75";
 
+const signalToneClass: Record<string, string> = {
+  muted: "text-muted-foreground",
+  caution: "text-warning-foreground/85",
+  positive: "text-success/85",
+  negative: "text-destructive/80",
+};
+
 const detailCardClass =
   "flex min-h-0 min-w-0 flex-col overflow-hidden border-border/50 bg-card shadow-sm lg:max-h-[min(72vh,680px)]";
+
+function OperationalSummaryBlock({
+  headline,
+  moodLine,
+  moodToneClass,
+  marginExposureScore,
+  signalGroups,
+  lastPurchaseLabel,
+  topRecipes,
+  extraSignalCount,
+  signalsExpanded,
+  onToggleSignals,
+}: {
+  headline?: string;
+  moodLine?: string;
+  moodToneClass?: string;
+  marginExposureScore: number | null;
+  signalGroups: ReturnType<typeof groupOperationalSignals>;
+  lastPurchaseLabel?: string;
+  topRecipes?: string[];
+  extraSignalCount?: number;
+  signalsExpanded?: boolean;
+  onToggleSignals?: () => void;
+}) {
+  if (!headline && signalGroups.length === 0 && marginExposureScore == null && !moodLine) {
+    return null;
+  }
+
+  return (
+    <section className="rounded-lg border border-border/30 bg-muted/[0.03] px-3 py-2">
+      <h3 className={sectionTitleClass}>Operational summary</h3>
+      {headline ? (
+        <p className="mt-1 text-sm font-medium leading-snug text-foreground/90">{headline}</p>
+      ) : null}
+      {moodLine ? (
+        <p
+          className={`mt-1 text-[11px] font-medium tracking-wide uppercase ${moodToneClass ?? "text-muted-foreground/70"}`}
+        >
+          {moodLine}
+        </p>
+      ) : null}
+      <div className="mt-1.5 flex flex-wrap gap-1.5">
+        {marginExposureScore != null ? (
+          <span className="inline-flex items-center rounded-full border border-border/50 bg-background/70 px-2 py-0.5 text-[11px] text-muted-foreground">
+            Margin exposure{" "}
+            <span className="ml-1 font-semibold tabular-nums text-foreground/85">
+              {marginExposureScore}/100
+            </span>
+          </span>
+        ) : null}
+        {lastPurchaseLabel ? (
+          <span className="inline-flex items-center rounded-full border border-border/50 bg-background/70 px-2 py-0.5 text-[11px] text-muted-foreground">
+            Last purchase{" "}
+            <span className="ml-1 font-medium text-foreground/85">{lastPurchaseLabel}</span>
+          </span>
+        ) : null}
+        {topRecipes && topRecipes.length > 0 ? (
+          <span className="inline-flex max-w-full items-center rounded-full border border-border/50 bg-background/70 px-2 py-0.5 text-[11px] text-muted-foreground">
+            Top recipes{" "}
+            <span className="ml-1 truncate font-medium text-foreground/85">
+              {topRecipes.slice(0, 2).join(", ")}
+              {topRecipes.length > 2 ? ` +${topRecipes.length - 2}` : ""}
+            </span>
+          </span>
+        ) : null}
+      </div>
+      {signalGroups.length > 0 ? (
+        <div className="mt-2 space-y-1.5">
+          {signalGroups.map((group) => (
+            <div key={group.category}>
+              <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
+                {group.title}
+              </div>
+              <ul className="mt-0.5 space-y-0.5">
+                {group.signals.map((signal) => (
+                  <li
+                    key={signal.id}
+                    className={`text-xs leading-snug ${signalToneClass[signal.tone] ?? "text-muted-foreground"}`}
+                  >
+                    {signal.label}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+          {extraSignalCount != null && extraSignalCount > 0 && onToggleSignals ? (
+            <button
+              type="button"
+              onClick={onToggleSignals}
+              className="text-[11px] text-muted-foreground/80 underline-offset-2 hover:text-foreground hover:underline"
+            >
+              {signalsExpanded ? "Show fewer" : `Show ${extraSignalCount} more`}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+    </section>
+  );
+}
 
 function InsightCardIcon({ kind }: { kind: OperationalInsightCardKind }) {
   const className = `mt-0.5 h-3.5 w-3.5 shrink-0 ${operationalInsightIconClassName(kind)}`;
@@ -196,27 +312,27 @@ function PurchaseExtentCard({
   const isBest = kind === "best";
   return (
     <div
-      className={`flex min-w-0 items-center justify-between gap-2 rounded-lg px-2.5 py-2 ${
-        isBest ? "bg-success/5" : "bg-destructive/5"
+      className={`flex min-w-0 items-center justify-between gap-2 rounded-md px-2 py-1.5 ${
+        isBest ? "bg-success/[0.04]" : "bg-destructive/[0.04]"
       }`}
     >
       <div className="min-w-0 flex-1">
         <p
-          className={`text-xs font-semibold ${isBest ? "text-success" : "text-destructive"}`}
+          className={`text-[11px] font-medium ${isBest ? "text-success/90" : "text-destructive/85"}`}
         >
-          {isBest ? "Best purchase" : "Most expensive"}
+          {isBest ? "Best buy" : "Highest paid"}
         </p>
-        <p className="mt-1 truncate text-sm font-semibold tabular-nums text-foreground">
+        <p className="mt-0.5 truncate text-xs font-medium tabular-nums text-foreground/90">
           <span className={purchaseExtentPriceTextClassName(kind)}>
             {row.priceLabel.trim()}
           </span>
         </p>
-        <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
+        <p className="mt-0.5 truncate text-[10px] text-muted-foreground/85">
           {row.supplierLabel.trim()} · {formatPurchaseTimelineMonthDay(row.dateLabel)}
         </p>
       </div>
       <ChevronRight
-        className={`h-4 w-4 shrink-0 ${isBest ? "text-success/60" : "text-destructive/60"}`}
+        className={`h-3.5 w-3.5 shrink-0 opacity-50 ${isBest ? "text-success/50" : "text-destructive/50"}`}
         aria-hidden
       />
     </div>
@@ -279,6 +395,13 @@ function IngredientDetailContent({
   const [noteDraft, setNoteDraft] = useState("");
   const [noteSaving, setNoteSaving] = useState(false);
   const [orphanReport, setOrphanReport] = useState<IngredientOrphanReport | null>(null);
+  const [summarySignalsExpanded, setSummarySignalsExpanded] = useState(false);
+  const [insightCardsExpanded, setInsightCardsExpanded] = useState(false);
+
+  useEffect(() => {
+    setSummarySignalsExpanded(false);
+    setInsightCardsExpanded(false);
+  }, [ingredient.id]);
 
   const catalogCanonicalInput = useMemo(
     () =>
@@ -393,12 +516,72 @@ function IngredientDetailContent({
     [sortedPurchases],
   );
 
+  const operationalSummary = useMemo(() => {
+    if (inListReview) {
+      return {
+        headline: undefined as string | undefined,
+        mood: undefined as ReturnType<typeof deriveOperationalMood> | undefined,
+        marginExposureScore: null as number | null,
+        signalGroups: [] as ReturnType<typeof groupOperationalSignals>,
+        hiddenSignalCount: 0,
+        lastPurchaseLabel: undefined as string | undefined,
+        topRecipes: undefined as string[] | undefined,
+      };
+    }
+
+    const allSignals = buildIngredientOperationalSignals({
+      ingredientId: ingredient.id,
+      ingredientName: displayName,
+      recentPurchases: sortedPurchases,
+      priceActivity: priceActivity,
+      recipeCount,
+      lastPriceUpdateAt: sortedPurchases[0]?.dateLabel ?? priceActivity?.created_at ?? null,
+    });
+    const marginExposureScore = deriveMarginExposureScore({
+      recipeCount,
+    });
+    const mood = deriveOperationalMood({
+      signals: allSignals,
+      recipeCount,
+      marginExposureScore,
+      recentPurchaseCount: sortedPurchases.length,
+      hasStalePricing: allSignals.some((s) => s.id === "stale-invoice"),
+    });
+    const visibleSignals = summarySignalsExpanded
+      ? allSignals
+      : pickOperationalSummarySignals(allSignals, 3);
+    const headline = formatIngredientOperationalHeadline(allSignals);
+    const latestPurchase = sortedPurchases[0];
+
+    return {
+      headline,
+      mood,
+      marginExposureScore,
+      signalGroups: groupOperationalSignals(visibleSignals),
+      hiddenSignalCount: Math.max(0, allSignals.length - visibleSignals.length),
+      lastPurchaseLabel: latestPurchase
+        ? `${formatPurchaseTimelineMonthDay(latestPurchase.dateLabel)} · ${latestPurchase.supplierLabel.trim()}`
+        : undefined,
+      topRecipes: undefined,
+    };
+  }, [
+    inListReview,
+    ingredient.id,
+    displayName,
+    sortedPurchases,
+    priceActivity,
+    recipeCount,
+    summarySignalsExpanded,
+  ]);
+
   const insightCards = useMemo(() => {
     const cards = buildOperationalInsightCards({
       recentPurchases: inListReview ? [] : sortedPurchases,
       priceActivity: inListReview ? undefined : priceActivity,
       aliasCount: operationalProfile?.aliases.length ?? 0,
       recipeCount,
+      ingredientName: displayName,
+      maxCards: 6,
     });
     const dismissed = new Set(dismissedInsightIds);
     return cards.filter((card) => !dismissed.has(card.id));
@@ -409,7 +592,11 @@ function IngredientDetailContent({
     recipeCount,
     inListReview,
     dismissedInsightIds,
+    displayName,
   ]);
+
+  const visibleInsightCards = insightCardsExpanded ? insightCards : insightCards.slice(0, 3);
+  const hiddenInsightCount = Math.max(0, insightCards.length - visibleInsightCards.length);
 
   const dismissInsight = (insightId: string) => {
     if (!userId) return;
@@ -479,6 +666,29 @@ function IngredientDetailContent({
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
         <div className="space-y-3">
+          {!inListReview ? (
+            <OperationalSummaryBlock
+              headline={operationalSummary.headline}
+              moodLine={
+                operationalSummary.mood
+                  ? `${operationalSummary.mood} · ${formatOperationalMoodLine(operationalSummary.mood)}`
+                  : undefined
+              }
+              moodToneClass={
+                operationalSummary.mood
+                  ? operationalMoodToneClass(operationalSummary.mood)
+                  : undefined
+              }
+              marginExposureScore={operationalSummary.marginExposureScore}
+              signalGroups={operationalSummary.signalGroups}
+              lastPurchaseLabel={operationalSummary.lastPurchaseLabel}
+              topRecipes={operationalSummary.topRecipes}
+              extraSignalCount={operationalSummary.hiddenSignalCount}
+              signalsExpanded={summarySignalsExpanded}
+              onToggleSignals={() => setSummarySignalsExpanded((value) => !value)}
+            />
+          ) : null}
+
           <section className="overflow-hidden rounded-lg border border-border/30 bg-muted/[0.02]">
             <h3 className={`border-b border-border/20 px-3 py-2 ${sectionTitleClass}`}>
               Purchase history
@@ -540,7 +750,7 @@ function IngredientDetailContent({
             )}
 
             {purchaseExtents.best ? (
-              <div className="grid gap-2 border-t border-border/20 p-3 sm:grid-cols-2">
+              <div className="grid gap-1.5 border-t border-border/20 px-3 py-2 sm:grid-cols-2">
                 <PurchaseExtentCard kind="best" row={purchaseExtents.best} />
                 {purchaseExtents.showWorstPurchase && purchaseExtents.worst ? (
                   <PurchaseExtentCard kind="worst" row={purchaseExtents.worst} />
@@ -551,20 +761,31 @@ function IngredientDetailContent({
             ) : null}
           </section>
 
-          <section className="rounded-lg border border-border/30 bg-muted/[0.02] px-3 py-2.5">
+          <section className="rounded-lg border border-border/30 bg-muted/[0.02] px-3 py-2">
             <h3 className={sectionTitleClass}>Notes &amp; insights</h3>
-            {insightCards.length > 0 ? (
-              <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
-                {insightCards.map((card) => (
+            {visibleInsightCards.length > 0 ? (
+              <div className="mt-2 space-y-1.5">
+                {visibleInsightCards.map((card) => (
                   <OperationalInsightCardView
                     key={card.id}
                     card={card}
                     onDismiss={dismissInsight}
                   />
                 ))}
+                {hiddenInsightCount > 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => setInsightCardsExpanded((value) => !value)}
+                    className="text-[11px] text-muted-foreground/80 underline-offset-2 hover:text-foreground hover:underline"
+                  >
+                    {insightCardsExpanded
+                      ? "Show fewer insights"
+                      : `Show ${hiddenInsightCount} more`}
+                  </button>
+                ) : null}
               </div>
             ) : (
-              <p className="mt-2 text-xs text-muted-foreground/80">No insights yet.</p>
+              <p className="mt-1.5 text-xs text-muted-foreground/80">No insights yet.</p>
             )}
             {savedNotes.length > 0 ? (
               <ul className="mt-2.5 space-y-1 border-t border-border/20 pt-2">

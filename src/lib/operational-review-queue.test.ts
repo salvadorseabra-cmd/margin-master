@@ -7,6 +7,8 @@ import {
   buildOperationalPriorityTiers,
   buildOperationalReviewQueue,
   buildOperationalSummarySnapshot,
+  operationalListBrowseRowBaseClass,
+  operationalListBrowseRowHoverClass,
   operationalListBrowseRowSelectedClass,
   countDuplicateCanonicalRisk,
   countLowQualityCanonicalNames,
@@ -166,6 +168,15 @@ describe("operational review accent classes", () => {
     expect(operationalListBrowseRowSelectedClass()).toContain("muted");
     expect(operationalListReviewRowSelectedClass("duplicates")).not.toContain("primary");
     expect(operationalListBrowseRowSelectedClass()).not.toContain("primary");
+  });
+
+  it("makes selected rows stronger than hover", () => {
+    expect(operationalListBrowseRowSelectedClass()).toContain("bg-muted/15");
+    expect(operationalListBrowseRowHoverClass()).toContain("bg-muted/[0.05]");
+    expect(operationalListBrowseRowSelectedClass()).toContain("border-l-foreground");
+    expect(operationalListBrowseRowSelectedClass()).toContain("shadow-sm");
+    expect(operationalListBrowseRowSelectedClass()).toContain("ring-border/40");
+    expect(operationalListBrowseRowBaseClass()).toContain("border-l-transparent");
   });
 });
 

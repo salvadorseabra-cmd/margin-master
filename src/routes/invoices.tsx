@@ -14,10 +14,10 @@ import {
   ChevronRight,
   Wand2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 import { type UnitInferenceResult, type PackageType } from "@/lib/ingredient-unit-inference";
 import {
@@ -28,6 +28,12 @@ import {
   resolveInvoiceLineStockPresentation,
   resolveInvoicePurchaseDisplayLabel,
 } from "@/lib/invoice-purchase-format";
+import {
+  formatInvoiceRowMatchStatusLine,
+  formatInvoiceRowReviewWarning,
+  resolveInvoiceLinePricingPresentation,
+  type InvoiceLineNormalizationCard,
+} from "@/lib/invoice-purchase-price-semantics";
 import { formatQuantityWithUnit } from "@/lib/display-format";
 import {
   normalizeInvoiceIngredientName,
@@ -38,9 +44,9 @@ import { loadMatchingIngredientCatalog } from "@/lib/ingredient-catalog-load";
 import {
   buildMatchExplanation,
   buildMatchTargetLabel,
+  formatMatchTargetLabel,
   formatMatchReasoningTooltip,
   type MatchReasoning,
-  type MatchTargetLabel,
 } from "@/lib/ingredient-match-explanation";
 import { buildInvoiceMatchCatalog } from "@/lib/ingredient-canonical-synthesis";
 import {
@@ -68,7 +74,6 @@ import {
   buildKnownSupplierNames,
   deriveInvoiceLineOperationalSignals,
   isNewSupplierForInvoice,
-  type OperationalSignal,
 } from "@/lib/ingredient-operational-signals";
 import {
   emptyInvoiceOperationalMetadata,
@@ -92,7 +97,6 @@ import {
   buildManualIngredientCorrectionKeys,
   persistManualIngredientCorrection,
   rejectIngredientMatchPair,
-  rejectIngredientMatchSuggestion,
   resolveIngredientCorrectionUiState,
 } from "@/lib/ingredient-correction-memory";
 import {
@@ -103,6 +107,7 @@ import {
 import { hydrateIngredientMatchOverridesFromAliasRows } from "@/lib/ingredient-match-override";
 import { hydrateOperationalAliasMemoryFromConfirmedMap } from "@/lib/ingredient-operational-alias-memory";
 import { IngredientCorrectionActions } from "@/components/invoice-ingredient-correction";
+import { InvoiceIngredientCorrectionPicker } from "@/components/invoice-ingredient-correction-picker";
 import {
   CanonicalIngredientCreateDialog,
   type CanonicalIngredientCreateSubmitValues,
@@ -670,21 +675,6 @@ const resolveInvoiceItemUnit = (item: Pick<ItemRow, "name" | "unit">) => {
   const inferred = resolveItemPurchaseFormat(item).inferred;
   if (inferred.base_unit && isGenericUnit(extractedUnit)) return inferred.base_unit;
   return extractedUnit ?? inferred.base_unit ?? inferred.conversion_hint?.purchase_unit;
-};
-
-const getInvoiceItemOperationalSummary = (item: Pick<ItemRow, "name" | "quantity">) => {
-  const inferred = resolveItemPurchaseFormat(item).inferred;
-  const hint = inferred.conversion_hint;
-  if (hint) {
-    return {
-      tone: "review" as const,
-      stockUnit: hint.stock_unit,
-      badgeLabel: "estimated yield",
-      badgeTitle: "Estimated kitchen-ready amount from the product type.",
-    };
-  }
-
-  return null;
 };
 
 const getInvoiceItemPurchaseLabel = (item: InvoicePurchaseContext) => {
@@ -1730,9 +1720,9 @@ function InvoicesPage() {
     item: ItemRow,
     ingredientId: string,
     supplierName?: string | null,
-  ) => {
+  ): Promise<{ ok: boolean; error?: string }> => {
     const ingredient = ingredientCatalog.find((row) => row.id === ingredientId);
-    if (!ingredient) return;
+    if (!ingredient) return { ok: false, error: "Ingredient not found" };
     traceCanonicalCreateAttempt({
       flowFunction: "selectIngredientForItem",
       flowOrigin: "rematch",
@@ -1745,12 +1735,21 @@ function InvoicesPage() {
       blocked: true,
       blockReason: "ingredient_aliases_only",
     });
-    await persistIngredientCorrectionForItem(
+    const result = await persistIngredientCorrectionForItem(
       item,
       ingredientId,
       ingredient.name ?? ingredient.normalized_name ?? "",
       supplierName,
     );
+    if (result.ok) {
+      traceFoodCostRecalculationSource("match_confirm", {
+        canonicalIngredientId: ingredientId,
+        invoiceItemId: item.id,
+        surface: "invoices",
+        note: "Alias link only; recipe food cost updates when ingredient price/catalog reloads",
+      });
+    }
+    return result;
   };
 
   const canonicalCreateDefaults = useMemo(() => {
@@ -2510,109 +2509,11 @@ function SettlementBadge({ state, onToggle }: { state: SettlementState; onToggle
   );
 }
 
-function PriceDeltaIndicator({
-  currentPrice,
-  previousPrice,
-}: {
-  currentPrice: number | null;
-  previousPrice: number | undefined;
-}) {
-  const delta = getPriceDeltaDetails(currentPrice, previousPrice);
-  if (!delta) return null;
-
-  if (delta.direction === "stable") {
-    return (
-      <span
-        className="text-[11px] text-muted-foreground/80 font-normal"
-        title={delta.previousLabel}
-      >
-        Stable
-      </span>
-    );
-  }
-
-  const increasing = delta.direction === "increased";
-  return (
-    <span
-      className={`text-[11px] font-medium ${increasing ? "text-destructive/80" : "text-success/80"}`}
-      title={delta.previousLabel}
-    >
-      {increasing ? "↑ price increased" : "↓ price decreased"} {delta.percentLabel}
-    </span>
-  );
-}
-
 function MissingValue({ label }: { label: string }) {
   return (
     <span className="text-muted-foreground/60" title={`${label} was not separated confidently`}>
       Check
     </span>
-  );
-}
-
-function IngredientMatchTargetLine({
-  label,
-  ingredientId,
-}: {
-  label: MatchTargetLabel;
-  ingredientId: string;
-}) {
-  return (
-    <p className="text-sm leading-snug text-muted-foreground">
-      <span>{label.prefix} </span>
-      <a
-        href="/ingredients"
-        title={label.name}
-        className="inline-block max-w-[min(100%,18rem)] truncate align-bottom font-medium text-foreground/85 underline-offset-2 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        data-ingredient-id={ingredientId}
-      >
-        {label.name}
-      </a>
-    </p>
-  );
-}
-
-function IngredientMatchInsight({
-  reasoning,
-  expandable = false,
-}: {
-  reasoning: MatchReasoning;
-  expandable?: boolean;
-}) {
-  const tooltip = formatMatchReasoningTooltip(reasoning);
-
-  if (!expandable) {
-    return (
-      <span
-        className="rounded-full border border-border/80 bg-muted/30 px-1.5 py-0.5 text-[10px] font-medium leading-none text-muted-foreground"
-        title={tooltip}
-      >
-        {reasoning.confidenceLabel}
-      </span>
-    );
-  }
-
-  return (
-    <details className="group w-full basis-full text-[11px] text-muted-foreground">
-      <summary
-        className="inline-flex cursor-pointer list-none items-center gap-1 hover:text-foreground [&::-webkit-details-marker]:hidden"
-        title={tooltip}
-      >
-        <ChevronRight className="h-3 w-3 transition-transform group-open:rotate-90" />
-        <span className="font-medium text-foreground/80">{reasoning.confidenceLabel}</span>
-        <span className="text-muted-foreground">· {reasoning.headline}</span>
-      </summary>
-      <div className="mt-1 space-y-1 border-l border-border/70 pl-3">
-        <p>{reasoning.detail}</p>
-        {reasoning.caveats.length > 0 && (
-          <ul className="list-disc space-y-0.5 pl-4 marker:text-muted-foreground/70">
-            {reasoning.caveats.map((caveat) => (
-              <li key={caveat}>{caveat}</li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </details>
   );
 }
 
@@ -2716,8 +2617,40 @@ function PreviewModal({
   );
 }
 
-function OperationalSignalBadge({ signal }: { signal: OperationalSignal }) {
-  return <OperationalBadge label={signal.label} tone={signal.tone} title={signal.title} />;
+function InvoiceNormalizationCardCell({ card }: { card: InvoiceLineNormalizationCard }) {
+  const hasPurchase = card.purchaseQuantityLine || card.purchasePriceLine;
+  const hasNormalized = card.normalizedLine || card.usableCostLine;
+  if (!hasPurchase && !hasNormalized) {
+    return <span className="text-muted-foreground/60">—</span>;
+  }
+
+  const sectionLabelClass =
+    "text-[9px] font-medium uppercase tracking-wider text-muted-foreground/55";
+
+  return (
+    <div className="min-w-[10.5rem] max-w-xs space-y-1.5 rounded-md border border-border/35 bg-muted/10 px-2 py-1.5 text-xs leading-snug tabular-nums">
+      {hasPurchase && (
+        <div className="space-y-0.5">
+          <div className={sectionLabelClass}>Purchase</div>
+          {card.purchaseQuantityLine && (
+            <div className="text-foreground">{card.purchaseQuantityLine}</div>
+          )}
+          {card.purchasePriceLine && (
+            <div className="text-muted-foreground">{card.purchasePriceLine}</div>
+          )}
+        </div>
+      )}
+      {hasNormalized && (
+        <div className="space-y-0.5">
+          <div className={sectionLabelClass}>Normalized</div>
+          {card.normalizedLine && <div className="text-foreground">{card.normalizedLine}</div>}
+          {card.usableCostLine && (
+            <div className="font-medium text-foreground">{card.usableCostLine}</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function ItemsTable({
@@ -2757,8 +2690,15 @@ function ItemsTable({
   onExtract?: () => void;
   onCreateIngredient: (item: ItemRow) => void;
   onConfirmIngredientMatch: (item: ItemRow, match: IngredientCanonicalMatch) => void;
-  onSelectIngredientForItem: (item: ItemRow, ingredientId: string) => void;
+  onSelectIngredientForItem: (
+    item: ItemRow,
+    ingredientId: string,
+  ) => Promise<{ ok: boolean; error?: string }>;
 }) {
+  const [editingMatchRowId, setEditingMatchRowId] = useState<string | null>(null);
+  const [savingCorrectionLineId, setSavingCorrectionLineId] = useState<string | null>(null);
+  const correctionSnapshotRef = useRef<Map<string, string | null>>(new Map());
+
   const ingredientPickerOptions = useMemo(() => {
     const built = buildIngredientPickerOptionsForInvoice(
       ingredientCatalog,
@@ -2788,6 +2728,66 @@ function ItemsTable({
       ),
     [ingredientCatalog, items],
   );
+
+  const openIngredientCorrection = (
+    item: ItemRow,
+    options: {
+      ingredientMatch?: IngredientCanonicalMatch | null;
+      possibleIngredientMatch?: IngredientCanonicalMatch | null;
+    },
+  ) => {
+    const previousIngredientId =
+      options.ingredientMatch?.ingredient.id ??
+      options.possibleIngredientMatch?.ingredient.id ??
+      null;
+    correctionSnapshotRef.current.set(item.id, previousIngredientId);
+    setEditingMatchRowId(item.id);
+  };
+
+  const closeIngredientCorrection = (itemId: string) => {
+    correctionSnapshotRef.current.delete(itemId);
+    setEditingMatchRowId((current) => (current === itemId ? null : current));
+  };
+
+  const handleSelectCorrectionIngredient = async (
+    item: ItemRow,
+    ingredientId: string,
+    rawName: string,
+  ) => {
+    const previousIngredientId = correctionSnapshotRef.current.get(item.id) ?? null;
+    correctionSnapshotRef.current.delete(item.id);
+    setEditingMatchRowId(null);
+
+    if (previousIngredientId && previousIngredientId !== ingredientId) {
+      rejectIngredientMatchPair({
+        itemName: item.name,
+        rawItemName: rawName,
+        rejectedIngredientId: previousIngredientId,
+        supplierName,
+        userId,
+      });
+    }
+
+    if (previousIngredientId === ingredientId) {
+      return;
+    }
+
+    setSavingCorrectionLineId(item.id);
+    onRejectedMatchItemIdsChange((current) => {
+      const next = new Set(current);
+      next.delete(item.id);
+      return next;
+    });
+    const result = await onSelectIngredientForItem(item, ingredientId);
+    setSavingCorrectionLineId(null);
+    if (result.ok) {
+      toast("Ingredient mapping saved");
+      return;
+    }
+    if (result.error) {
+      toast.error(result.error);
+    }
+  };
 
   const operationalSummary = items.reduce(
     (summary, item) => {
@@ -2926,11 +2926,9 @@ function ItemsTable({
           <table className="w-full text-sm">
             <thead className="bg-muted/40">
               <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
-                <th className="py-2.5 px-4 font-medium">Ingredient</th>
-                <th className="py-2.5 px-4 font-medium text-right">Purchased</th>
-                <th className="py-2.5 px-4 font-medium">Stock added</th>
-                <th className="py-2.5 px-4 font-medium text-right">Unit price</th>
-                <th className="py-2.5 px-4 font-medium text-right">Total</th>
+                <th className="py-2 px-3 font-medium">Ingredient</th>
+                <th className="py-2 px-3 font-medium">Operational cost</th>
+                <th className="py-2 px-3 font-medium text-right">Total</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -2979,20 +2977,14 @@ function ItemsTable({
                   confirmedMatch: confirmedIngredientMatch,
                   possibleMatch: possibleIngredientMatch,
                   unmatched: unmatchedIngredient,
-                  showMatchTargetLine,
                   badgeLabel: suggestedMatchBadgeLabel,
                 } = ingredientMatchState;
                 const extractionReview = needsExtractionConfirmation(renderItem);
                 const quantityReview = needsQuantityUnitConfirmation(renderItem);
                 const amountReview = needsAmountConfirmation(renderItem);
-                const delta = getPriceDeltaDetails(
-                  renderItem.unit_price,
-                  priceComparisons[renderItem.id],
-                );
                 const canCreateIngredient = !isPlaceholderItemName(renderItem.name);
                 const creatingIngredient = !!creatingIngredientByItem[renderItem.id];
                 const creationError = ingredientCreationErrors[renderItem.id];
-                const operationalSummary = getInvoiceItemOperationalSummary(renderItem);
                 const matchedIngredientForStock = ingredientMatch
                   ? (ingredientById.get(ingredientMatch.ingredient.id)?.name ??
                     ingredientMatch.ingredient.name ??
@@ -3034,13 +3026,6 @@ function ItemsTable({
                   ingredientMatchState,
                   rejectedMatchItemIds,
                 );
-                const showMatchedBadge =
-                  confirmedIngredientMatch &&
-                  !correctionUi.suppressMatchPresentation &&
-                  !extractionReview &&
-                  !quantityReview &&
-                  !amountReview &&
-                  !delta;
                 const showSuggestedMatch =
                   possibleIngredientMatch &&
                   suggestedMatchBadgeLabel &&
@@ -3074,6 +3059,46 @@ function ItemsTable({
                     normalizedItemName: normalizeInvoiceIngredientName(renderItem.name),
                   },
                 );
+                const pricingPresentation = resolveInvoiceLinePricingPresentation({
+                  name: renderItem.name,
+                  quantity: renderItem.quantity,
+                  unit: renderItem.unit,
+                  unit_price: renderItem.unit_price,
+                  line_total: renderItem.total,
+                  matchedIngredientName: matchedIngredientForStock,
+                });
+                const pricingRecencyAt = ingredientMatch?.ingredient.id
+                  ? (operationalMetadata.priceHistoryLatestAtByIngredientId[
+                      ingredientMatch.ingredient.id
+                    ] ?? null)
+                  : null;
+                const reviewWarning = formatInvoiceRowReviewWarning({
+                  signals: lineSignals,
+                  pricingRecencyAt,
+                });
+                const matchStatusLine = formatInvoiceRowMatchStatusLine({
+                  matchedAutomatically:
+                    confirmedIngredientMatch &&
+                    !correctionUi.suppressMatchPresentation &&
+                    !extractionReview &&
+                    !quantityReview &&
+                    !amountReview,
+                  confidenceLabel: matchExplanation?.confidenceLabel ?? null,
+                  warning: reviewWarning,
+                });
+                const correctionOpen = editingMatchRowId === renderItem.id;
+                const correctionBusy = savingCorrectionLineId === renderItem.id;
+                const showCorrectionTrigger =
+                  correctionUi.showWrongMatch ||
+                  correctionUi.showPicker ||
+                  unmatchedIngredient ||
+                  showSuggestedMatch;
+                const showIngredientMatchPicker =
+                  Boolean(matchTargetLabel) ||
+                  correctionUi.showPicker ||
+                  correctionOpen ||
+                  unmatchedIngredient;
+
                 return (
                   <tr
                     key={renderItem.id}
@@ -3083,123 +3108,74 @@ function ItemsTable({
                         : "hover:bg-muted/20"
                     }`}
                   >
-                    <td className="py-2.5 px-4">
-                      <div className="space-y-1">
-                        <div className="font-medium leading-tight">{renderItem.name}</div>
-                        {showMatchTargetLine &&
-                          !correctionUi.suppressMatchPresentation &&
-                          matchTargetLabel &&
-                          ingredientMatch && (
-                          <IngredientMatchTargetLine
-                            label={matchTargetLabel}
-                            ingredientId={ingredientMatch.ingredient.id}
+                    <td className="px-3 py-2">
+                      <div className="space-y-0.5">
+                        <div className="text-sm font-medium leading-tight">{renderItem.name}</div>
+                        {showIngredientMatchPicker && (
+                          <InvoiceIngredientCorrectionPicker
+                            open={correctionOpen}
+                            onOpenChange={(nextOpen) => {
+                              if (nextOpen) {
+                                openIngredientCorrection(renderItem, {
+                                  ingredientMatch,
+                                  possibleIngredientMatch,
+                                });
+                                return;
+                              }
+                              closeIngredientCorrection(renderItem.id);
+                            }}
+                            onCancel={() => closeIngredientCorrection(renderItem.id)}
+                            ingredients={ingredientPickerOptions}
+                            selectedIngredientId={ingredientMatch?.ingredient.id ?? null}
+                            matchLabel={
+                              matchTargetLabel ? formatMatchTargetLabel(matchTargetLabel) : null
+                            }
+                            ingredientId={ingredientMatch?.ingredient.id ?? null}
+                            onSelect={(ingredientId) =>
+                              void handleSelectCorrectionIngredient(
+                                renderItem,
+                                ingredientId,
+                                rawName,
+                              )
+                            }
+                            disabled={correctionBusy}
                           />
                         )}
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {extractionReview && (
-                            <OperationalBadge label="needs review" tone="review" />
-                          )}
-                          {quantityReview && <OperationalBadge label="confirm quantity" />}
-                          {amountReview && <OperationalBadge label="verify amounts" />}
-                          {operationalSummary?.badgeLabel && (
-                            <OperationalBadge
-                              label={operationalSummary.badgeLabel}
-                              tone={operationalSummary.tone}
-                              title={operationalSummary.badgeTitle}
-                            />
-                          )}
-                          {showSuggestedMatch ? (
-                            <>
-                              <OperationalBadge
-                                label={suggestedMatchBadgeLabel!}
-                                tone="review"
-                                title={
-                                  matchExplanation
-                                    ? formatMatchReasoningTooltip(matchExplanation)
-                                    : undefined
-                                }
-                              />
-                              <IngredientMatchInsight reasoning={matchExplanation} expandable />
-                            </>
-                          ) : unmatchedIngredient || correctionUi.suppressMatchPresentation ? (
-                            <>
-                              {!correctionUi.suppressMatchPresentation && (
-                                <OperationalBadge label="not in ingredient list" />
-                              )}
-                            </>
-                          ) : showMatchedBadge ? (
-                            <>
-                              <OperationalBadge
-                                label={
-                                  ingredientMatch?.kind === "confirmed-alias"
-                                    ? "confirmed match"
-                                    : "matched automatically"
-                                }
-                                tone="success"
-                                title={[
-                                  matchExplanation.headline,
-                                  ingredientMatch?.ingredient.name
-                                    ? `→ ${formatCanonicalIngredientDisplayName(ingredientMatch.ingredient.name)}`
-                                    : null,
-                                  matchExplanation.detail,
-                                ]
-                                  .filter(Boolean)
-                                  .join(" ")}
-                              />
-                              <IngredientMatchInsight reasoning={matchExplanation} />
-                            </>
-                          ) : null}
-                          {lineSignals.map((signal) => (
-                            <OperationalSignalBadge key={signal.kind} signal={signal} />
-                          ))}
-                        </div>
-                        {(correctionUi.showConfirm ||
-                          correctionUi.showWrongMatch ||
-                          correctionUi.showPicker ||
-                          unmatchedIngredient ||
-                          showSuggestedMatch) && (
+                        {matchStatusLine && (
+                          <p
+                            className={`text-[11px] leading-snug ${
+                              reviewWarning
+                                ? "text-amber-700/90 dark:text-amber-300/90"
+                                : "text-muted-foreground"
+                            }`}
+                            title={
+                              matchExplanation && !reviewWarning
+                                ? formatMatchReasoningTooltip(matchExplanation)
+                                : undefined
+                            }
+                          >
+                            {matchStatusLine}
+                          </p>
+                        )}
+                        {(correctionUi.showConfirm || showCorrectionTrigger) && (
                           <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                             <IngredientCorrectionActions
                               showConfirm={correctionUi.showConfirm}
-                              showWrongMatch={correctionUi.showWrongMatch}
-                              showPicker={correctionUi.showPicker}
-                              pickerLabel={
-                                correctionUi.suppressMatchPresentation
-                                  ? "Choose ingredient"
-                                  : "Find ingredient"
-                              }
-                              ingredients={ingredientPickerOptions}
+                              showCorrectionTrigger={showCorrectionTrigger}
+                              correctionOpen={correctionOpen}
+                              correctionDisabled={correctionBusy}
                               onConfirm={
                                 correctionUi.showConfirm && possibleIngredientMatch
                                   ? () =>
                                       onConfirmIngredientMatch(renderItem, possibleIngredientMatch)
                                   : undefined
                               }
-                              onWrongMatch={() => {
-                                const rejectedIngredientId =
-                                  ingredientMatch?.ingredient.id ??
-                                  possibleIngredientMatch?.ingredient.id;
-                                if (rejectedIngredientId) {
-                                  rejectIngredientMatchPair({
-                                    itemName: renderItem.name,
-                                    rawItemName: rawName,
-                                    rejectedIngredientId,
-                                    supplierName,
-                                    userId,
-                                  });
-                                }
-                                onRejectedMatchItemIdsChange((current) =>
-                                  rejectIngredientMatchSuggestion(current, renderItem.id),
-                                );
-                              }}
-                              onSelectIngredient={(ingredientId) => {
-                                onRejectedMatchItemIdsChange((current) => {
-                                  const next = new Set(current);
-                                  next.delete(renderItem.id);
-                                  return next;
-                                });
-                                onSelectIngredientForItem(renderItem, ingredientId);
-                              }}
+                              onOpenCorrection={() =>
+                                openIngredientCorrection(renderItem, {
+                                  ingredientMatch,
+                                  possibleIngredientMatch,
+                                })
+                              }
                             />
                             {(unmatchedIngredient || correctionUi.suppressMatchPresentation) && (
                               <button
@@ -3224,45 +3200,10 @@ function ItemsTable({
                         )}
                       </div>
                     </td>
-                    <td className="py-2.5 px-4 text-right tabular-nums">
-                      {purchaseLabel ? (
-                        <span className="inline-flex max-w-44 justify-end whitespace-normal text-right leading-snug">
-                          <span>{purchaseLabel}</span>
-                        </span>
-                      ) : (
-                        <MissingValue label="Quantity" />
-                      )}
+                    <td className="px-3 py-2 align-top">
+                      <InvoiceNormalizationCardCell card={pricingPresentation.card} />
                     </td>
-                    <td className="py-2.5 px-4 text-muted-foreground">
-                      {stockPresentation ? (
-                        <span className="inline-flex flex-col gap-0.5">
-                          <span className="text-foreground tabular-nums">
-                            {stockPresentation.quantityLabel}
-                          </span>
-                          {stockPresentation.detailLabel && (
-                            <span className="text-[11px]">{stockPresentation.detailLabel}</span>
-                          )}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground/60">Same as purchased</span>
-                      )}
-                    </td>
-                    <td className="py-2.5 px-4 text-right tabular-nums">
-                      {renderItem.unit_price != null ? (
-                        <span className="inline-flex flex-col items-end gap-0.5">
-                          <span className="font-medium">
-                            €{Number(renderItem.unit_price).toFixed(2)}
-                          </span>
-                          <PriceDeltaIndicator
-                            currentPrice={renderItem.unit_price}
-                            previousPrice={priceComparisons[renderItem.id]}
-                          />
-                        </span>
-                      ) : (
-                        <MissingValue label="Unit price" />
-                      )}
-                    </td>
-                    <td className="py-2.5 px-4 text-right tabular-nums font-medium">
+                    <td className="px-3 py-2 text-right tabular-nums text-sm font-medium">
                       {renderItem.total != null ? (
                         `€${Number(renderItem.total).toFixed(2)}`
                       ) : (

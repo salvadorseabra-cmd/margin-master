@@ -434,14 +434,24 @@ export function operationalListFilterReviewBarTitle(
   }
 }
 
-/** Selected list row in review mode — soft tint, no primary glow. */
-export function operationalListReviewRowSelectedClass(_filter: OperationalListFilter): string {
-  return "bg-muted/[0.09] shadow-[inset_2px_0_0_hsl(var(--border))]";
+/** Left accent slot on list rows — transparent until selected. */
+export function operationalListBrowseRowBaseClass(): string {
+  return "border-l-2 border-l-transparent";
 }
 
-/** Browse-mode selected row (no active queue). */
+/** Hover/focus on unselected rows — lighter than selection. */
+export function operationalListBrowseRowHoverClass(): string {
+  return "hover:bg-muted/[0.05] focus-visible:bg-muted/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/10";
+}
+
+/** Selected list row — calm tint + left accent, clearly above hover, no primary glow. */
 export function operationalListBrowseRowSelectedClass(): string {
-  return "bg-muted/[0.09] shadow-[inset_2px_0_0_hsl(var(--border))]";
+  return "bg-muted/15 border-l-foreground/30 shadow-sm ring-1 ring-inset ring-border/40 hover:bg-muted/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-foreground/15";
+}
+
+/** Selected list row in review mode (same tokens as browse). */
+export function operationalListReviewRowSelectedClass(_filter: OperationalListFilter): string {
+  return operationalListBrowseRowSelectedClass();
 }
 
 /** Shared tint for an open review queue (priority card + list banner). */

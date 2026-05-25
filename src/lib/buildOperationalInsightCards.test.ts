@@ -23,14 +23,15 @@ describe("buildOperationalInsightCards", () => {
     expect(className).not.toContain("group");
   });
 
-  it("surfaces supplier price increase with percentage", () => {
+  it("surfaces change-oriented copy with ingredient name and percent", () => {
     const cards = buildOperationalInsightCards({
+      ingredientName: "Beef",
       recentPurchases: [
         purchase({
           itemId: "latest",
           supplierLabel: "Frilima",
           dateLabel: "18/05/2026",
-          priceLabel: "€11.20",
+          priceLabel: "€11.80",
         }),
         purchase({
           itemId: "prior",
@@ -39,14 +40,37 @@ describe("buildOperationalInsightCards", () => {
           priceLabel: "€10.00",
         }),
       ],
-      recipeCount: 0,
+      recipeCount: 2,
     });
     const priceUp = cards.find((c) => c.id === "insight:supplier-price-up");
-    expect(priceUp?.text).toMatch(/Frilima raised prices/i);
-    expect(priceUp?.detail).toMatch(/12%/);
+    expect(priceUp?.text).toBe("Beef cost increased 18% since last invoice");
+    expect(priceUp?.detail).toMatch(/Frilima/i);
   });
 
-  it("prefers no-longer-cheapest over supplier-changed when redundant", () => {
+  it("caps visible insights at three by default", () => {
+    const cards = buildOperationalInsightCards({
+      ingredientName: "Beef",
+      recentPurchases: [
+        purchase({
+          itemId: "latest",
+          supplierLabel: "Frilima",
+          dateLabel: "18/05/2026",
+          priceLabel: "€12.00",
+        }),
+        purchase({
+          itemId: "prior",
+          supplierLabel: "Makro",
+          dateLabel: "01/04/2026",
+          priceLabel: "€8.00",
+        }),
+      ],
+      aliasCount: 3,
+      recipeCount: 4,
+    });
+    expect(cards.length).toBeLessThanOrEqual(3);
+  });
+
+  it("prefers pricing tier over supplier-changed when redundant", () => {
     const cards = buildOperationalInsightCards({
       recentPurchases: [
         purchase({
@@ -64,25 +88,28 @@ describe("buildOperationalInsightCards", () => {
       ],
       recipeCount: 0,
     });
-    expect(cards.some((c) => c.id === "insight:no-longer-cheapest")).toBe(true);
+    expect(cards.some((c) => c.id === "insight:supplier-price-up")).toBe(true);
     expect(cards.some((c) => c.id === "insight:supplier-changed")).toBe(false);
+    expect(cards.every((c) => c.kind !== "supplier-changed")).toBe(true);
   });
 
-  it("skips vague invoice and volatility copy", () => {
+  it("skips marginal recipe-usage and engine jargon", () => {
     const cards = buildOperationalInsightCards({
       recentPurchases: [
         purchase({ itemId: "a", priceLabel: "€5.00", dateLabel: "01/05/2026" }),
         purchase({ itemId: "b", priceLabel: "€5.10", dateLabel: "01/04/2026" }),
       ],
-      recipeCount: 2,
+      recipeCount: 1,
     });
     const joined = cards.map((c) => `${c.text} ${c.detail ?? ""}`).join(" ");
+    expect(cards.some((c) => c.id === "insight:recipe-usage")).toBe(false);
+    expect(joined).not.toMatch(/aliases detected/i);
+    expect(joined).not.toMatch(/catalog mapping/i);
+    expect(joined).not.toMatch(/semantic/i);
     expect(joined).not.toMatch(/volatility detected/i);
-    expect(joined).not.toMatch(/invoice not confirmed/i);
-    expect(joined).not.toMatch(/needs review/i);
   });
 
-  it("shows multiple aliases and unused recipe insights when data supports", () => {
+  it("shows aliases and unused when only confidence-tier data exists", () => {
     const cards = buildOperationalInsightCards({
       recentPurchases: [],
       aliasCount: 3,
@@ -90,6 +117,7 @@ describe("buildOperationalInsightCards", () => {
     });
     expect(cards.some((c) => c.id === "insight:multiple-aliases")).toBe(true);
     expect(cards.some((c) => c.id === "insight:unused-in-recipes")).toBe(true);
+    expect(cards.some((c) => /Several invoice names/i.test(c.text))).toBe(true);
   });
 
   it("assigns stable insight-prefixed ids for dismiss persistence", () => {
@@ -130,7 +158,7 @@ describe("buildOperationalInsightCards", () => {
     expect(visible.some((c) => c.id === "insight:unused-in-recipes")).toBe(true);
   });
 
-  it("detects catalog mapping change from invoice line hints", () => {
+  it("detects pack size change from invoice line hints", () => {
     const cards = buildOperationalInsightCards({
       recentPurchases: [
         purchase({
@@ -142,17 +170,13 @@ describe("buildOperationalInsightCards", () => {
         purchase({
           itemId: "prior",
           dateLabel: "01/04/2026",
-          priceLabel: "€3.80",
+          priceLabel: "€4.00",
           productHint: "OLEO GIRASSOL 5L",
         }),
       ],
       recipeCount: 0,
     });
-    expect(
-      cards.some(
-        (c) =>
-          c.id === "insight:pack-size-changed" || c.id === "insight:catalog-mapping-changed",
-      ),
-    ).toBe(true);
+    expect(cards.some((c) => c.id === "insight:pack-size-changed")).toBe(true);
+    expect(cards.some((c) => /catalog mapping/i.test(c.text))).toBe(false);
   });
 });

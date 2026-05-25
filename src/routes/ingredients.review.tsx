@@ -44,7 +44,11 @@ import {
   buildExplicitRecipeCountMap,
   loadRecipeCountByIngredientId,
 } from "@/lib/invoice-operational-metadata";
-import { operationalListBrowseRowSelectedClass } from "@/lib/operational-review-queue";
+import {
+  operationalListBrowseRowBaseClass,
+  operationalListBrowseRowHoverClass,
+  operationalListBrowseRowSelectedClass,
+} from "@/lib/operational-review-queue";
 import { filterCanonicalCatalogIngredients } from "@/lib/ingredient-kind";
 import { buildCanonicalIngredientPickerOptions } from "@/lib/ingredient-picker-options";
 import { clearIngredientMatchedInvoiceProductsCache } from "@/lib/ingredient-operational-intelligence";
@@ -548,12 +552,20 @@ function CatalogReviewPage() {
                       <button
                         type="button"
                         onClick={() => setSelectedId(item.ingredientId)}
-                        className={`flex w-full gap-2 px-3 py-2.5 text-left transition-colors duration-150 ease-out hover:bg-muted/[0.04] border-l-2 border-l-transparent ${
-                          selected ? operationalListBrowseRowSelectedClass() : ""
+                        className={`flex w-full gap-2 px-3 py-2.5 text-left transition-colors duration-150 ease-out ${operationalListBrowseRowBaseClass()} ${
+                          selected
+                            ? operationalListBrowseRowSelectedClass()
+                            : operationalListBrowseRowHoverClass()
                         }`}
                       >
                         <span className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-foreground">
+                          <p
+                            className={`truncate text-sm ${
+                              selected
+                                ? "font-semibold text-foreground"
+                                : "font-medium text-foreground/85"
+                            }`}
+                          >
                             {item.displayName}
                           </p>
                           <div className="mt-1">

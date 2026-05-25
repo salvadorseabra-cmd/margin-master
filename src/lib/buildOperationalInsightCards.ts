@@ -6,6 +6,10 @@ import {
   sortRecentPurchasesByDate,
 } from "@/lib/ingredient-detail-panel";
 import type { RecentPurchaseRow } from "@/lib/ingredient-purchase-memory";
+import {
+  pickTopInsights,
+  type InsightPriorityTier,
+} from "@/lib/buildIngredientOperationalSignals";
 
 export type OperationalInsightCardKind =
   | "supplier-price-up"
@@ -29,11 +33,28 @@ export type OperationalInsightCard = {
 type InsightCandidate = {
   id: string;
   priority: number;
+  tier: InsightPriorityTier;
   kind: OperationalInsightCardKind;
   text: string;
   detail?: string;
   suppresses?: readonly string[];
 };
+
+function displayIngredientName(name: string | null | undefined): string {
+  const trimmed = name?.trim();
+  return trimmed || "This ingredient";
+}
+
+function costChangeSinceInvoice(
+  ingredientName: string | null | undefined,
+  pct: number,
+): string {
+  const name = displayIngredientName(ingredientName);
+  const rounded = Math.abs(Math.round(pct));
+  if (rounded < 1) return `${name} cost is about flat since your last invoice`;
+  if (pct > 0) return `${name} cost increased ${rounded}% since last invoice`;
+  return `${name} cost decreased ${rounded}% since last invoice`;
+}
 
 function parsePriceLabel(label: string): number | null {
   const match = label.replace(/\s/g, "").match(/[\d,.]+/);
@@ -49,10 +70,8 @@ function normalizeProductHint(hint: string | null | undefined): string | null {
   return trimmed.toLowerCase().replace(/\s+/g, " ");
 }
 
-function formatDeltaPercent(current: number, baseline: number): string {
-  const pct = Math.round(((current - baseline) / baseline) * 100);
-  if (pct === 0) return "0%";
-  return `${pct > 0 ? "+" : ""}${pct}%`;
+function formatDeltaPercent(current: number, baseline: number): number {
+  return Math.round(((current - baseline) / baseline) * 100);
 }
 
 function purchasePrices(purchases: readonly RecentPurchaseRow[]): number[] {
@@ -120,12 +139,13 @@ function hasSupplierPriceVariation(purchases: readonly RecentPurchaseRow[]): boo
 }
 
 function hintLooksLikePackSize(hint: string): boolean {
-  return /\d/.test(hint) && /\b(kg|g|ml|l|lt|pack|x\s*\d|unit)/i.test(hint);
+  return /\d+\s*(kg|g|ml|l|lt)\b|\b(kg|g|ml|l|lt|pack|x\s*\d|unit)\b/i.test(hint);
 }
 
 function buildPurchaseInsightCandidates(
   purchases: readonly RecentPurchaseRow[],
-  priceActivity?: IngredientPriceActivity | null,
+  priceActivity: IngredientPriceActivity | null | undefined,
+  ingredientName: string | null | undefined,
 ): InsightCandidate[] {
   const candidates: InsightCandidate[] = [];
   if (purchases.length === 0) return candidates;
@@ -142,30 +162,35 @@ function buildPurchaseInsightCandidates(
 
   if (current != null && priorPrice != null && priorPrice > 0 && current > priorPrice * 1.03) {
     const pct = formatDeltaPercent(current, priorPrice);
-    const supplierPhrase = latestSupplier || "Latest supplier";
-    const comparePhrase = priorSupplier ? `your ${priorSupplier} buy` : "your previous buy";
     candidates.push({
       id: "insight:supplier-price-up",
       priority: 90,
+      tier: "pricing",
       kind: "supplier-price-up",
-      text: `${supplierPhrase} raised prices`,
-      detail: `Last invoice was ${pct} higher than ${comparePhrase}.`,
-      suppresses: ["insight:lower-historical-price"],
+      text: costChangeSinceInvoice(ingredientName, pct),
+      detail: latestSupplier
+        ? `Latest buy from ${latestSupplier}${priorSupplier ? ` — up from ${priorSupplier}` : ""}.`
+        : priorSupplier
+          ? `Up from your ${priorSupplier} buy.`
+          : undefined,
+      suppresses: ["insight:lower-historical-price", "insight:pack-price-activity"],
     });
   }
 
   if (
     priceActivity?.delta_percent != null &&
     typeof priceActivity.delta_percent === "number" &&
-    priceActivity.delta_percent > 0
+    priceActivity.delta_percent > 0 &&
+    !candidates.some((c) => c.id === "insight:supplier-price-up")
   ) {
     const pctLabel = formatPercent(priceActivity.delta_percent, { signDisplay: "always" });
     candidates.push({
       id: "insight:pack-price-activity",
       priority: 85,
+      tier: "pricing",
       kind: "supplier-price-up",
-      text: "Pack price moved up recently",
-      detail: `Catalog pack price is ${pctLabel} vs two weeks ago.`,
+      text: costChangeSinceInvoice(ingredientName, priceActivity.delta_percent),
+      detail: `Tracked pack price is ${pctLabel} vs two weeks ago.`,
       suppresses: ["insight:lower-historical-price"],
     });
   }
@@ -182,9 +207,10 @@ function buildPurchaseInsightCandidates(
     candidates.push({
       id: "insight:no-longer-cheapest",
       priority: 80,
+      tier: "pricing",
       kind: "no-longer-cheapest",
-      text: `You're buying from ${latestSupplier} now`,
-      detail: `${cheapestSupplier} was cheaper on your recent orders.`,
+      text: `Latest buy isn't your best price`,
+      detail: `${cheapestSupplier} was cheaper on a recent order — you're with ${latestSupplier} now.`,
       suppresses: ["insight:supplier-changed", "insight:lower-historical-price"],
     });
   }
@@ -200,6 +226,7 @@ function buildPurchaseInsightCandidates(
     candidates.push({
       id: "insight:lower-historical-price",
       priority: 70,
+      tier: "pricing",
       kind: "lower-historical-price",
       text: "You've paid less for this before",
       detail: bestSupplier
@@ -212,9 +239,10 @@ function buildPurchaseInsightCandidates(
     candidates.push({
       id: "insight:supplier-changed",
       priority: 60,
+      tier: "supplier",
       kind: "supplier-changed",
-      text: `Supplier changed — now ${latestSupplier}`,
-      detail: `Previous purchase was from ${priorSupplier}.`,
+      text: `Now buying from ${latestSupplier}`,
+      detail: `Previous invoice was ${priorSupplier}.`,
     });
   }
 
@@ -228,18 +256,20 @@ function buildPurchaseInsightCandidates(
         candidates.push({
           id: "insight:pack-size-changed",
           priority: 55,
+          tier: "supplier",
           kind: "pack-size-changed",
-          text: "Pack size changed on recent purchase",
-          detail: "Invoice line wording differs from your previous buy.",
+          text: "Pack size looks different on the last invoice",
+          detail: "Line wording changed — confirm the unit price still matches what you expect.",
           suppresses: ["insight:catalog-mapping-changed"],
         });
       } else {
         candidates.push({
           id: "insight:catalog-mapping-changed",
           priority: 50,
+          tier: "confidence",
           kind: "catalog-mapping-changed",
-          text: "Recent purchase uses different catalog mapping",
-          detail: "Invoice line wording differs from your previous buy.",
+          text: "Invoice line wording changed",
+          detail: "Description differs from your previous buy — worth a quick check.",
         });
       }
     }
@@ -257,47 +287,45 @@ function buildPurchaseInsightCandidates(
             ((Math.max(...prices) - Math.min(...prices)) / Math.min(...prices)) * 100,
           )
         : null;
-    candidates.push({
-      id: "insight:price-spread",
-      priority: 40,
-      kind: "price-spread",
-      text: "Large price variation across purchases",
-      detail:
-        spreadPct != null && spreadPct >= 10
-          ? `Spread is about ${spreadPct}% across suppliers — worth comparing before the next order.`
-          : "Prices differ noticeably across suppliers.",
-    });
+    if (spreadPct != null && spreadPct >= 10) {
+      candidates.push({
+        id: "insight:price-spread",
+        priority: 40,
+        tier: "supplier",
+        kind: "price-spread",
+        text: `About ${spreadPct}% spread across recent buys`,
+        detail: "Compare suppliers before the next order.",
+      });
+    }
   }
 
   return candidates;
 }
 
 function selectInsightCards(candidates: InsightCandidate[], maxCards: number): OperationalInsightCard[] {
-  const sorted = [...candidates].sort((a, b) => b.priority - a.priority);
   const suppressed = new Set<string>();
   const seenText = new Set<string>();
-  const cards: OperationalInsightCard[] = [];
+  const filtered: InsightCandidate[] = [];
 
+  const sorted = [...candidates].sort((a, b) => b.priority - a.priority);
   for (const candidate of sorted) {
     if (suppressed.has(candidate.id)) continue;
     const textKey = `${candidate.text}|${candidate.detail ?? ""}`.toLowerCase();
     if (seenText.has(textKey)) continue;
-
     for (const id of candidate.suppresses ?? []) {
       suppressed.add(id);
     }
-
     seenText.add(textKey);
-    cards.push({
-      id: candidate.id,
-      text: candidate.text,
-      detail: candidate.detail,
-      kind: candidate.kind,
-    });
-    if (cards.length >= maxCards) break;
+    filtered.push(candidate);
   }
 
-  return cards;
+  const picked = pickTopInsights(filtered, maxCards);
+  return picked.map((candidate) => ({
+    id: candidate.id,
+    text: candidate.text,
+    detail: candidate.detail,
+    kind: candidate.kind,
+  }));
 }
 
 /** Calm insight cards for Notes & insights — pastel shells, operational copy. */
@@ -306,43 +334,56 @@ export function buildOperationalInsightCards(input: {
   priceActivity?: IngredientPriceActivity | null;
   aliasCount?: number;
   recipeCount: number;
+  ingredientName?: string | null;
   maxCards?: number;
 }): OperationalInsightCard[] {
-  const maxCards = input.maxCards ?? 6;
-  const candidates: InsightCandidate[] = [
-    ...buildPurchaseInsightCandidates(input.recentPurchases ?? [], input.priceActivity),
-  ];
+  const maxCards = input.maxCards ?? 3;
+  const purchases = input.recentPurchases ?? [];
+  const purchaseCandidates = buildPurchaseInsightCandidates(
+    purchases,
+    input.priceActivity,
+    input.ingredientName,
+  );
+  const candidates: InsightCandidate[] = [...purchaseCandidates];
 
   const aliasCount = input.aliasCount ?? 0;
   if (aliasCount >= 2) {
     candidates.push({
       id: "insight:multiple-aliases",
       priority: 30,
+      tier: "confidence",
       kind: "multiple-aliases",
-      text: "Multiple invoice aliases detected",
-      detail: `${aliasCount} names map to this ingredient — check mappings if totals look off.`,
+      text: "Several invoice names point here",
+      detail: `${aliasCount} line names match this ingredient — confirm totals if something looks off.`,
     });
   }
 
-  if (input.recipeCount === 0) {
+  if (input.recipeCount === 0 && purchases.length > 0) {
+    candidates.push({
+      id: "insight:unused-in-recipes",
+      priority: 35,
+      tier: "confidence",
+      kind: "unused-in-recipes",
+      text: "Buying this but it's not on the menu",
+      detail: "Safe to tidy pricing without moving recipe cost.",
+    });
+  } else if (input.recipeCount === 0) {
     candidates.push({
       id: "insight:unused-in-recipes",
       priority: 20,
+      tier: "confidence",
       kind: "unused-in-recipes",
-      text: "Not used in any recipe yet",
-      detail: "Safe to review pricing without affecting menu cost.",
+      text: "Not on any recipe yet",
+      detail: "Won't change menu cost until you link it.",
     });
-  } else if (input.recipeCount > 0) {
-    const recipeText =
-      input.recipeCount === 1
-        ? "Used in 1 recipe"
-        : `Used in ${input.recipeCount} recipes`;
+  } else if (input.recipeCount >= 3) {
     candidates.push({
       id: "insight:recipe-usage",
       priority: 10,
+      tier: "confidence",
       kind: "recipe-usage",
-      text: recipeText,
-      detail: "Price changes here will move menu cost.",
+      text: `On the menu in ${input.recipeCount} recipes`,
+      detail: "Price moves here will show up in dish cost.",
     });
   }
 
@@ -350,7 +391,7 @@ export function buildOperationalInsightCards(input: {
 }
 
 export function operationalInsightCardClassName(kind: OperationalInsightCardKind): string {
-  const shell = "relative flex min-w-0 items-start gap-2 rounded-lg border px-2.5 py-2";
+  const shell = "relative flex min-w-0 items-start gap-2 rounded-lg border px-2 py-1.5";
   switch (kind) {
     case "supplier-price-up":
       return `${shell} border-destructive/20 bg-destructive/5`;

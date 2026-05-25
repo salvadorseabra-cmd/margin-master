@@ -11,7 +11,7 @@ import {
   X,
 } from "lucide-react";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +23,7 @@ import {
   formatQuantityWithUnit,
   formatUnitCostCurrency,
 } from "@/lib/display-format";
+import { Button } from "@/components/ui/button";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
 import { loadCanonicalIngredientCatalog } from "@/lib/ingredient-catalog-load";
@@ -37,8 +38,37 @@ import {
 } from "@/lib/recipe-canonical-integrity";
 import { traceFoodCostRecalculationSource } from "@/lib/recipe-canonical-graph-trace";
 import { formatRecipeQuantityDisplay, parseRecipeQuantityInput } from "@/lib/recipe-quantity-input";
+import {
+  normalizeRecipeUsageUnitOption,
+  RECIPE_USAGE_UNIT_OPTIONS,
+  rememberRecipeUsageUnit,
+  resolveRecipeUsageUnitForIngredient,
+  type RecipeUsageUnitOption,
+} from "@/lib/recipe-usage-unit-memory";
+import { RecipeLinePicker } from "@/components/recipe-line-picker";
 import { RecipeQuantityInput } from "@/components/recipe-quantity-input";
 import { deleteRecipe, loadRecipeDeleteBlockers } from "@/lib/recipe-delete";
+import {
+  buildRecipeLinePickerOptions,
+  parseRecipeLinePickerValue,
+  recipeLinePickerValue,
+  type RecipeLinePickerOption,
+} from "@/lib/recipe-line-picker-options";
+import {
+  buildLinesByRecipeId,
+  buildRecipesById,
+  computePrepLineCost,
+  computePrepUnitCost,
+  computeRecipeLineCostEur,
+  computeRecipeTotalCostEur,
+  formatPrepUnitCostLabel,
+  recipeLineContributionPct,
+} from "@/lib/recipe-prep-cost";
+import {
+  computePrepServingsPerBatch,
+  formatPrepServingHint,
+} from "@/lib/recipe-prep-servings";
+import { cn } from "@/lib/utils";
 import {
   computeFoodCostPct,
   computeGrossMarginPct,
@@ -68,6 +98,7 @@ export const Route = createFileRoute("/recipes")({
 type RecipeIngredient = {
   id: string;
   ingredient_id: string | null;
+  sub_recipe_id: string | null;
   quantity: number | null;
   unit: string | null;
   created_at: string | null;
@@ -78,6 +109,13 @@ type RecipeIngredient = {
     current_price: number | null;
     purchase_quantity: number | null;
   } | null;
+  sub_recipe: {
+    id: string;
+    name: string | null;
+    type: string | null;
+    output_quantity: number | null;
+    output_unit: string | null;
+  } | null;
 };
 
 type RecipeRow = {
@@ -85,6 +123,8 @@ type RecipeRow = {
   name: string;
   selling_price: number | null;
   type: string | null;
+  output_quantity: number | null;
+  output_unit: string | null;
   recipe_ingredients: RecipeIngredient[] | null;
 };
 
@@ -99,14 +139,19 @@ type IngredientOption = {
 type RecipeLineForm = {
   id: string | null;
   ingredient_id: string;
+  sub_recipe_id: string;
   quantity: string;
   unit: string;
+  /** When true, ingredient re-picks do not replace the unit. */
+  unitManuallySet: boolean;
 };
 
 type RecipeForm = {
   name: string;
   type: string;
   selling_price: string;
+  output_quantity: string;
+  output_unit: string;
   lines: RecipeLineForm[];
 };
 
@@ -115,8 +160,14 @@ type RecipeFormMode = "create" | "edit";
 type RecipeCostLine = {
   line: RecipeLineForm;
   ingredient: RecipeIngredient["ingredients"] | IngredientOption | null;
+  subRecipe: RecipeIngredient["sub_recipe"] | null;
+  isPrepLine: boolean;
+  displayName: string;
   quantity: number;
   unitCost: number;
+  unitCostLabel: string | null;
+  unitCostWarning: string | null;
+  prepServingHint: string | null;
   lineCost: number;
   contribution: number;
 };
@@ -125,23 +176,43 @@ const emptyRecipeForm: RecipeForm = {
   name: "",
   type: "",
   selling_price: "",
+  output_quantity: "",
+  output_unit: "",
   lines: [],
 };
+
+function recipeLinePickerValueFromForm(line: RecipeLineForm): string {
+  if (line.sub_recipe_id) return recipeLinePickerValue("prep", line.sub_recipe_id);
+  if (line.ingredient_id) return recipeLinePickerValue("ingredient", line.ingredient_id);
+  return "";
+}
 
 function recipeToForm(recipe: RecipeRow): RecipeForm {
   return {
     name: recipe.name,
     type: recipe.type ?? "dish",
     selling_price: recipeSellingPriceToFormValue(recipe.selling_price, recipe.type),
+    output_quantity:
+      recipe.output_quantity != null ? formatRecipeQuantityDisplay(Number(recipe.output_quantity)) : "",
+    output_unit: isPrepRecipe(recipe.type ?? "dish")
+      ? prepOutputUnitSelectValue(recipe.output_unit ?? "")
+      : normalizeRecipeUsageUnitOption(recipe.output_unit) ?? "",
     lines:
-      recipe.recipe_ingredients
-        ?.filter((line) => line.ingredient_id)
-        .map((line) => ({
-          id: line.id,
-          ingredient_id: line.ingredient_id ?? "",
-          quantity: formatRecipeQuantityDisplay(Number(line.quantity ?? 0)),
-          unit: line.unit ?? line.ingredients?.unit ?? "",
-        })) ?? [],
+      recipe.recipe_ingredients?.map((line) => ({
+        id: line.id,
+        ingredient_id: line.ingredient_id ?? "",
+        sub_recipe_id: line.sub_recipe_id ?? "",
+        quantity: formatRecipeQuantityDisplay(Number(line.quantity ?? 0)),
+        unit:
+          normalizeRecipeUsageUnitOption(line.unit) ??
+          normalizeRecipeUsageUnitOption(line.ingredients?.unit) ??
+          normalizeRecipeUsageUnitOption(line.sub_recipe?.output_unit) ??
+          line.unit ??
+          line.ingredients?.unit ??
+          line.sub_recipe?.output_unit ??
+          "",
+        unitManuallySet: Boolean(line.unit?.trim()),
+      })) ?? [],
   };
 }
 
@@ -168,7 +239,7 @@ function RecipesIndexPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [detailOpen, setDetailOpen] = useState(false);
-  const [pendingDeleteLineIndex, setPendingDeleteLineIndex] = useState<number | null>(null);
+  const linePickerOpenCountRef = useRef(0);
   const [pendingRecipeDelete, setPendingRecipeDelete] = useState(false);
   const [checkingRecipeDelete, setCheckingRecipeDelete] = useState(false);
 
@@ -189,14 +260,28 @@ function RecipesIndexPage() {
     setRecipeForm({
       ...emptyRecipeForm,
       type: "dish",
-      lines: [{ id: null, ingredient_id: "", quantity: "0", unit: "" }],
+      lines: [
+        {
+          id: null,
+          ingredient_id: "",
+          sub_recipe_id: "",
+          quantity: "0",
+          unit: "",
+          unitManuallySet: false,
+        },
+      ],
     });
     setDeletedLineIds([]);
     setError(null);
     setDetailOpen(true);
   };
 
+  const handleLinePickerOpenChange = useCallback((open: boolean) => {
+    linePickerOpenCountRef.current = Math.max(0, linePickerOpenCountRef.current + (open ? 1 : -1));
+  }, []);
+
   const closeRecipeForm = useCallback(() => {
+    linePickerOpenCountRef.current = 0;
     setDetailOpen(false);
     setEditingRecipeId(null);
     setSelectedRecipe(null);
@@ -222,9 +307,12 @@ function RecipesIndexPage() {
           name,
           selling_price,
           type,
+          output_quantity,
+          output_unit,
           recipe_ingredients!recipe_ingredients_recipe_id_fkey (
             id,
             ingredient_id,
+            sub_recipe_id,
             quantity,
             unit,
             created_at,
@@ -234,7 +322,14 @@ function RecipesIndexPage() {
             unit,
             current_price,
             purchase_quantity
-           )
+           ),
+            sub_recipe:recipes!recipe_ingredients_sub_recipe_id_fkey (
+              id,
+              name,
+              type,
+              output_quantity,
+              output_unit
+            )
             )
           )
         `,
@@ -267,23 +362,21 @@ function RecipesIndexPage() {
         if (activeRecipe) setRecipeForm(recipeToForm(activeRecipe));
       }
 
+      const linesByRecipe = buildLinesByRecipeId(loadedRecipes);
+      const recipesById = buildRecipesById(
+        loadedRecipes.map((recipe) => ({
+          id: recipe.id,
+          output_quantity: recipe.output_quantity,
+          output_unit: recipe.output_unit,
+        })),
+      );
       const costs: Record<string, number> = {};
 
       loadedRecipes.forEach((recipe) => {
-        const total =
-          recipe.recipe_ingredients?.reduce((sum, ri) => {
-            const ingredientPrice = Number(ri.ingredients?.current_price ?? 0);
-
-            const purchaseQty = Number(ri.ingredients?.purchase_quantity ?? 1);
-
-            const qty = Number(ri.quantity ?? 0);
-
-            const unitCost = getUnitCost(ingredientPrice, purchaseQty);
-
-            return sum + unitCost * qty;
-          }, 0) ?? 0;
-
-        costs[recipe.id] = total;
+        const path = new Set<string>();
+        const memo = new Map<string, number>();
+        costs[recipe.id] =
+          computeRecipeTotalCostEur(recipe.id, linesByRecipe, recipesById, path, memo) ?? 0;
       });
 
       setRecipeCosts(costs);
@@ -347,6 +440,7 @@ function RecipesIndexPage() {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        if (linePickerOpenCountRef.current > 0) return;
         closeRecipeForm();
       }
     };
@@ -368,7 +462,17 @@ function RecipesIndexPage() {
   const addRecipeLine = () => {
     setRecipeForm((current) => ({
       ...current,
-      lines: [...current.lines, { id: null, ingredient_id: "", quantity: "0", unit: "" }],
+      lines: [
+        ...current.lines,
+        {
+          id: null,
+          ingredient_id: "",
+          sub_recipe_id: "",
+          quantity: "0",
+          unit: "",
+          unitManuallySet: false,
+        },
+      ],
     }));
   };
 
@@ -384,13 +488,6 @@ function RecipesIndexPage() {
         lines: current.lines.filter((_, lineIndex) => lineIndex !== index),
       };
     });
-  };
-
-  const confirmDeleteRecipeLine = () => {
-    if (pendingDeleteLineIndex === null) return;
-    const lineIndex = pendingDeleteLineIndex;
-    setPendingDeleteLineIndex(null);
-    removeRecipeLine(lineIndex);
   };
 
   const requestDeleteRecipe = async () => {
@@ -460,13 +557,46 @@ function RecipesIndexPage() {
       return;
     }
 
+    const recipeType = recipeForm.type.trim() || "dish";
+    if (isPrepRecipe(recipeType)) {
+      const outputQty = parseRecipeQuantityInput(recipeForm.output_quantity);
+      if (outputQty == null || outputQty <= 0) {
+        setError("Batch output quantity must be greater than 0 for prep recipes.");
+        return;
+      }
+    }
+
+    const prepLinesMissingYield = recipeForm.lines.filter((line) => {
+      if (!line.sub_recipe_id) return false;
+      const prep = recipes.find((recipe) => recipe.id === line.sub_recipe_id);
+      const qty = Number(prep?.output_quantity);
+      return !Number.isFinite(qty) || qty <= 0;
+    });
+    if (prepLinesMissingYield.length > 0) {
+      const names = prepLinesMissingYield
+        .map((line) => recipes.find((recipe) => recipe.id === line.sub_recipe_id)?.name)
+        .filter(Boolean);
+      setError(
+        names.length
+          ? `Prep "${names.join('", "')}" has no batch output — set output quantity on the prep recipe for costing.`
+          : "A linked prep recipe has no batch output quantity.",
+      );
+      return;
+    }
+
     setSaving(true);
     setError(null);
 
     const recipePayload = {
       name,
-      type: recipeForm.type.trim() || "dish",
+      type: recipeType,
       selling_price: recipeSellingPriceForSave(recipeForm.selling_price, recipeForm.type),
+      output_quantity: isPrepRecipe(recipeType)
+        ? parseRecipeQuantityInput(recipeForm.output_quantity)
+        : null,
+      output_unit: isPrepRecipe(recipeType)
+        ? prepOutputUnitSelectValue(recipeForm.output_unit)
+        : null,
     };
 
     let recipeId = editingRecipeId ?? selectedRecipe?.id ?? null;
@@ -516,7 +646,9 @@ function RecipesIndexPage() {
       supabase.from("recipe_ingredients").delete().eq("id", lineId),
     );
 
-    const editableLines = recipeForm.lines.filter((line) => line.ingredient_id);
+    const editableLines = recipeForm.lines.filter(
+      (line) => line.ingredient_id || line.sub_recipe_id,
+    );
 
     logRecipeCanonicalIntegrityOnSave({
       recipeId,
@@ -537,9 +669,12 @@ function RecipesIndexPage() {
         supabase
           .from("recipe_ingredients")
           .update({
-            ingredient_id: line.ingredient_id,
+            ingredient_id: line.sub_recipe_id ? null : line.ingredient_id,
+            sub_recipe_id: line.sub_recipe_id || null,
             quantity: parseRecipeQuantityInput(line.quantity) ?? 0,
-            unit: line.unit || getIngredientUnit(line.ingredient_id, ingredientOptions),
+            unit:
+              line.unit ||
+              getLineDefaultUnit(line, ingredientOptions, recipes, user.id),
           })
           .eq("id", line.id),
       );
@@ -548,9 +683,12 @@ function RecipesIndexPage() {
       .filter((line) => !line.id)
       .map((line) => ({
         recipe_id: recipeId,
-        ingredient_id: line.ingredient_id,
+        ingredient_id: line.sub_recipe_id ? null : line.ingredient_id,
+        sub_recipe_id: line.sub_recipe_id || null,
         quantity: parseRecipeQuantityInput(line.quantity) ?? 0,
-        unit: line.unit || getIngredientUnit(line.ingredient_id, ingredientOptions),
+        unit:
+          line.unit ||
+          getLineDefaultUnit(line, ingredientOptions, recipes, user.id),
       }));
 
     const lineResults = await Promise.all([...deleteRequests, ...updateRequests]);
@@ -584,11 +722,129 @@ function RecipesIndexPage() {
     });
   };
 
-  const recipeCostLines = getRecipeCostLines(
-    recipeForm.lines,
-    selectedRecipe,
+  const canonicalCatalogIds = useMemo(
+    () => canonicalCatalogIdSet(ingredientOptions),
+    [ingredientOptions],
+  );
+
+  const linePickerOptions = useMemo(
+    () =>
+      buildRecipeLinePickerOptions({
+        ingredients: ingredientOptions.map((row) => ({
+          id: row.id,
+          name: row.name,
+          unit: row.unit,
+        })),
+        prepRecipes: recipes
+          .filter((recipe) => isPrepRecipe(recipe.type))
+          .map((recipe) => ({
+            id: recipe.id,
+            name: recipe.name,
+            output_unit: recipe.output_unit,
+          })),
+        excludeRecipeId: editingRecipeId,
+      }),
+    [editingRecipeId, ingredientOptions, recipes],
+  );
+
+  const prepOutputOverride = useMemo(
+    () =>
+      isPrepRecipe(recipeForm.type)
+        ? {
+            output_quantity: parseRecipeQuantityInput(recipeForm.output_quantity),
+            output_unit: prepOutputUnitSelectValue(recipeForm.output_unit),
+          }
+        : null,
+    [recipeForm.output_quantity, recipeForm.output_unit, recipeForm.type],
+  );
+
+  const prepUnitCostById = useMemo(() => {
+    const linesByRecipe = buildLinesByRecipeId(
+      recipes.map((recipe) => ({
+        id: recipe.id,
+        recipe_ingredients:
+          selectedRecipe?.id === recipe.id
+            ? recipeForm.lines
+                .filter((line) => line.ingredient_id || line.sub_recipe_id)
+                .map((line) => {
+                  const ingredient = line.ingredient_id
+                    ? getIngredientForLine(
+                        line.ingredient_id,
+                        selectedRecipe?.recipe_ingredients ?? null,
+                        ingredientOptions,
+                      )
+                    : null;
+                  return {
+                    ingredient_id: line.sub_recipe_id ? null : line.ingredient_id || null,
+                    sub_recipe_id: line.sub_recipe_id || null,
+                    quantity: parseRecipeQuantityInput(line.quantity) ?? 0,
+                    unit: line.unit || null,
+                    ingredients: ingredient
+                      ? {
+                          current_price: ingredient.current_price,
+                          purchase_quantity: ingredient.purchase_quantity,
+                        }
+                      : null,
+                  };
+                })
+            : (recipe.recipe_ingredients ?? []).map((row) => ({
+                ingredient_id: row.ingredient_id,
+                sub_recipe_id: row.sub_recipe_id,
+                quantity: row.quantity,
+                unit: row.unit,
+                ingredients: row.ingredients,
+              })),
+      })),
+    );
+    const recipesById = buildRecipesById(
+      recipes.map((recipe) => ({
+        id: recipe.id,
+        output_quantity:
+          selectedRecipe?.id === recipe.id && prepOutputOverride
+            ? prepOutputOverride.output_quantity
+            : recipe.output_quantity,
+        output_unit:
+          selectedRecipe?.id === recipe.id && prepOutputOverride
+            ? prepOutputOverride.output_unit
+            : recipe.output_unit,
+      })),
+    );
+    const map = new Map<string, number>();
+    for (const recipe of recipes) {
+      if (!isPrepRecipe(recipe.type)) continue;
+      map.set(recipe.id, computePrepUnitCost(recipe.id, linesByRecipe, recipesById));
+    }
+    return map;
+  }, [
     ingredientOptions,
-    canonicalCatalogIdSet(ingredientOptions),
+    prepOutputOverride,
+    recipeForm.lines,
+    recipes,
+    selectedRecipe,
+  ]);
+
+  const recipeCostLines = useMemo(
+    () =>
+      getRecipeCostLines({
+        lines: recipeForm.lines,
+        selectedRecipe,
+        allRecipes: recipes,
+        ingredientOptions,
+        pickerOptions: linePickerOptions,
+        canonicalCatalogIds,
+        prepOutputOverride,
+        userId: user?.id,
+      }),
+    [
+      canonicalCatalogIds,
+      ingredientOptions,
+      linePickerOptions,
+      prepOutputOverride,
+      recipeForm.lines,
+      recipes,
+      selectedRecipe,
+      user?.id,
+    ],
   );
   const recipeTotalCost = recipeCostLines.reduce((sum, line) => sum + line.lineCost, 0);
   const sellingPriceOrNull = recipeSellingPriceForSave(recipeForm.selling_price, recipeForm.type);
@@ -600,7 +856,9 @@ function RecipesIndexPage() {
   const foodCostPercentage = computeFoodCostPct(sellingPriceOrNull, recipeTotalCost);
   const isPrepWithoutPrice =
     isPrepRecipe(recipeForm.type) && !hasRecipeSellingPrice(sellingPriceOrNull);
-  const activeIngredientCount = recipeCostLines.filter((line) => line.line.ingredient_id).length;
+  const activeIngredientCount = recipeCostLines.filter(
+    (line) => line.line.ingredient_id || line.line.sub_recipe_id,
+  ).length;
   const topCostDrivers = [...recipeCostLines]
     .filter((line) => line.lineCost > 0)
     .sort((a, b) => b.lineCost - a.lineCost)
@@ -629,9 +887,9 @@ function RecipesIndexPage() {
       recipeName: recipeForm.name,
       category: recipeForm.type,
       ingredients: recipeCostLines
-        .filter((line) => line.line.ingredient_id)
+        .filter((line) => line.line.ingredient_id || line.line.sub_recipe_id)
         .map((line) => ({
-          name: formatCanonicalIngredientDisplayName(line.ingredient?.name) || "Unnamed ingredient",
+          name: line.displayName || "Unnamed line",
           quantity: line.quantity,
           unit: line.line.unit || line.ingredient?.unit || "",
           unitCost: line.unitCost,
@@ -855,9 +1113,17 @@ function RecipesIndexPage() {
                       Type
                       <select
                         value={recipeForm.type}
-                        onChange={(event) =>
-                          setRecipeForm({ ...recipeForm, type: event.target.value })
-                        }
+                        onChange={(event) => {
+                          const type = event.target.value;
+                          setRecipeForm({
+                            ...recipeForm,
+                            type,
+                            output_unit:
+                              isPrepRecipe(type) && !normalizeRecipeUsageUnitOption(recipeForm.output_unit)
+                                ? "g"
+                                : recipeForm.output_unit,
+                          });
+                        }}
                         className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
                       >
                         <option value="dish">Dish</option>
@@ -890,6 +1156,37 @@ function RecipesIndexPage() {
                         className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
                       />
                     </label>
+
+                    {isPrepRecipe(recipeForm.type) ? (
+                      <>
+                        <label className="text-sm font-medium text-muted-foreground sm:col-span-2">
+                          Batch output quantity
+                          <div className="mt-1 flex items-center gap-2">
+                            <RecipeQuantityInput
+                              value={recipeForm.output_quantity}
+                              onChange={(output_quantity) =>
+                                setRecipeForm({ ...recipeForm, output_quantity })
+                              }
+                              className="min-w-0 flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
+                            />
+                            <select
+                              value={prepOutputUnitSelectValue(recipeForm.output_unit)}
+                              onChange={(event) =>
+                                setRecipeForm({ ...recipeForm, output_unit: event.target.value })
+                              }
+                              aria-label="Output unit"
+                              className="w-[3.25rem] shrink-0 rounded-lg border border-input bg-background px-1 py-2 text-left text-xs text-foreground outline-none transition-colors focus:border-foreground/30"
+                            >
+                              {RECIPE_USAGE_UNIT_OPTIONS.map((unitOption) => (
+                                <option key={unitOption} value={unitOption}>
+                                  {unitOption}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </label>
+                      </>
+                    ) : null}
                   </div>
                 </div>
 
@@ -923,8 +1220,8 @@ function RecipesIndexPage() {
                     <InsightRow
                       label="Primary margin exposure"
                       value={
-                        highestCostDriver?.ingredient?.name
-                          ? formatCanonicalIngredientDisplayName(highestCostDriver.ingredient.name)
+                        highestCostDriver?.displayName
+                          ? highestCostDriver.displayName
                           : "Add ingredients"
                       }
                       detail={highestCostDriverDetail}
@@ -988,12 +1285,21 @@ function RecipesIndexPage() {
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
-                              <div className="truncate text-sm font-medium">
-                                {formatCanonicalIngredientDisplayName(driver.ingredient?.name) ||
-                                  "Unnamed ingredient"}
+                              <div className="flex min-w-0 items-center gap-2">
+                                <div className="truncate text-sm font-medium">
+                                  {driver.displayName || "Unnamed line"}
+                                </div>
+                                {driver.isPrepLine ? (
+                                  <span className="shrink-0 rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                                    Prep
+                                  </span>
+                                ) : null}
                               </div>
                               <div className="mt-1 text-xs text-muted-foreground">
                                 {formatQuantityWithUnit(driver.quantity, driver.line.unit)}
+                                {driver.unitCostLabel ? (
+                                  <span className="ml-1 tabular-nums">· {driver.unitCostLabel}</span>
+                                ) : null}
                               </div>
                               {getCostDriverNote(
                                 index,
@@ -1070,48 +1376,138 @@ function RecipesIndexPage() {
                           const lineCost = costLine?.lineCost ?? 0;
                           const contribution = costLine?.contribution ?? 0;
 
+                          const isPrepRow = Boolean(line.sub_recipe_id);
+
                           return (
                             <tr
                               key={line.id ?? `new-${idx}`}
-                              className="align-middle transition-colors hover:bg-muted/25 focus-within:bg-muted/25"
+                              className={cn(
+                                "align-middle transition-colors",
+                                isPrepRow
+                                  ? "border-l-2 border-l-border/70 bg-muted/20 hover:bg-muted/30 focus-within:bg-muted/30"
+                                  : "hover:bg-muted/25 focus-within:bg-muted/25",
+                              )}
                             >
                               <td className="px-4 py-3.5">
-                                <select
-                                  value={line.ingredient_id}
-                                  onChange={(event) => {
-                                    const ingredientId = event.target.value;
-                                    updateRecipeLine(idx, {
-                                      ingredient_id: ingredientId,
-                                      unit: getIngredientUnit(ingredientId, ingredientOptions),
-                                    });
-                                  }}
-                                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
-                                >
-                                  <option value="">Choose ingredient</option>
-                                  {ingredientOptions.map((ingredient) => (
-                                    <option key={ingredient.id} value={ingredient.id}>
-                                      {formatCanonicalIngredientDisplayName(ingredient.name)}
-                                    </option>
-                                  ))}
-                                </select>
+                                <div className="min-w-0 space-y-1">
+                                  <RecipeLinePicker
+                                    options={linePickerOptions}
+                                    value={recipeLinePickerValueFromForm(line)}
+                                    prepUnitCostById={prepUnitCostById}
+                                    onOpenChange={handleLinePickerOpenChange}
+                                    onChange={(pickerValue) => {
+                                      const parsed = parseRecipeLinePickerValue(pickerValue);
+                                      if (!parsed) {
+                                        updateRecipeLine(idx, {
+                                          ingredient_id: "",
+                                          sub_recipe_id: "",
+                                          unit: "",
+                                          unitManuallySet: false,
+                                        });
+                                        return;
+                                      }
+                                      if (parsed.kind === "prep") {
+                                        const prep = linePickerOptions.find(
+                                          (option) =>
+                                            option.kind === "prep" && option.id === parsed.id,
+                                        );
+                                        updateRecipeLine(idx, {
+                                          ingredient_id: "",
+                                          sub_recipe_id: parsed.id,
+                                          ...(line.unitManuallySet
+                                            ? {}
+                                            : { unit: prep?.unit ?? "" }),
+                                        });
+                                        return;
+                                      }
+                                      const ingredient = ingredientOptions.find(
+                                        (row) => row.id === parsed.id,
+                                      );
+                                      updateRecipeLine(idx, {
+                                        ingredient_id: parsed.id,
+                                        sub_recipe_id: "",
+                                        ...(line.unitManuallySet || !ingredient
+                                          ? {}
+                                          : {
+                                              unit: resolveRecipeUsageUnitForIngredient(
+                                                user?.id,
+                                                parsed.id,
+                                                ingredient.name,
+                                                ingredient.unit,
+                                              ),
+                                            }),
+                                      });
+                                    }}
+                                  />
+                                  {isPrepRow ? (
+                                    <p className="text-[11px] text-muted-foreground">
+                                      Uses prep recipe
+                                    </p>
+                                  ) : null}
+                                </div>
                               </td>
 
                               <td className="px-4 py-3.5 text-right">
-                                <div className="flex items-center justify-end gap-2">
-                                  <RecipeQuantityInput
-                                    required
-                                    value={line.quantity}
-                                    onChange={(quantity) => updateRecipeLine(idx, { quantity })}
-                                    className="w-24 rounded-lg border border-input bg-background px-3 py-2 text-right text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
-                                  />
-                                  <span className="w-10 text-left text-xs text-muted-foreground">
-                                    {line.unit}
-                                  </span>
+                                <div className="flex flex-col items-end gap-0.5">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <RecipeQuantityInput
+                                      required
+                                      value={line.quantity}
+                                      onChange={(quantity) => updateRecipeLine(idx, { quantity })}
+                                      className="w-24 rounded-lg border border-input bg-background px-3 py-2 text-right text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
+                                    />
+                                    {line.ingredient_id || line.sub_recipe_id ? (
+                                      <select
+                                        value={recipeLineUsageUnitValue(
+                                          line,
+                                          ingredientOptions,
+                                          recipes,
+                                          user?.id,
+                                        )}
+                                        onChange={(event) => {
+                                          const unit = event.target.value;
+                                          updateRecipeLine(idx, {
+                                            unit,
+                                            unitManuallySet: true,
+                                          });
+                                          if (user?.id && line.ingredient_id) {
+                                            rememberRecipeUsageUnit(
+                                              user.id,
+                                              line.ingredient_id,
+                                              unit,
+                                            );
+                                          }
+                                        }}
+                                        aria-label="Usage unit"
+                                        className="w-[3.25rem] shrink-0 rounded-lg border border-input bg-background px-1 py-2 text-left text-xs text-foreground outline-none transition-colors focus:border-foreground/30"
+                                      >
+                                        {RECIPE_USAGE_UNIT_OPTIONS.map((unitOption) => (
+                                          <option key={unitOption} value={unitOption}>
+                                            {unitOption}
+                                          </option>
+                                        ))}
+                                      </select>
+                                    ) : null}
+                                  </div>
+                                  {costLine?.prepServingHint ? (
+                                    <p className="max-w-[12rem] text-[11px] leading-tight text-muted-foreground">
+                                      {costLine.prepServingHint}
+                                    </p>
+                                  ) : null}
                                 </div>
                               </td>
 
                               <td className="px-4 py-3.5 text-right tabular-nums text-muted-foreground">
-                                {formatUnitCostCurrency(unitCost)}
+                                <div className="flex flex-col items-end gap-0.5">
+                                  <span>
+                                    {costLine?.unitCostLabel ?? formatUnitCostCurrency(unitCost)}
+                                  </span>
+                                  {costLine?.unitCostWarning ? (
+                                    <span className="max-w-[10rem] text-[10px] font-normal leading-tight text-muted-foreground/80">
+                                      {costLine.unitCostWarning}
+                                    </span>
+                                  ) : null}
+                                </div>
                               </td>
 
                               <td className="px-4 py-3.5 text-right font-semibold tabular-nums">
@@ -1125,14 +1521,16 @@ function RecipesIndexPage() {
                               </td>
 
                               <td className="px-4 py-3.5 text-right">
-                                <button
+                                <Button
                                   type="button"
-                                  onClick={() => setPendingDeleteLineIndex(idx)}
-                                  className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                  onClick={() => removeRecipeLine(idx)}
                                   aria-label="Remove recipe line"
                                 >
                                   <Trash2 className="h-3.5 w-3.5" />
-                                </button>
+                                </Button>
                               </td>
                             </tr>
                           );
@@ -1188,13 +1586,6 @@ function RecipesIndexPage() {
         </div>
       )}
       <ConfirmDeleteDialog
-        open={pendingDeleteLineIndex !== null}
-        onOpenChange={(open) => {
-          if (!open) setPendingDeleteLineIndex(null);
-        }}
-        onConfirm={confirmDeleteRecipeLine}
-      />
-      <ConfirmDeleteDialog
         open={pendingRecipeDelete}
         onOpenChange={(open) => {
           if (!open) setPendingRecipeDelete(false);
@@ -1207,54 +1598,248 @@ function RecipesIndexPage() {
   );
 }
 
-function getIngredientUnit(ingredientId: string, ingredientOptions: IngredientOption[]) {
-  return ingredientOptions.find((ingredient) => ingredient.id === ingredientId)?.unit ?? "kg";
-}
-
-function getUnitCost(price: number, purchaseQuantity: number) {
-  const denominator =
-    Number.isFinite(purchaseQuantity) && purchaseQuantity > 0 ? purchaseQuantity : 1;
-
-  return price / denominator;
-}
-
-function getRecipeCostLines(
-  lines: RecipeLineForm[],
-  selectedRecipe: RecipeRow | null,
+function getInferredIngredientUsageUnit(
+  ingredientId: string,
   ingredientOptions: IngredientOption[],
-  canonicalCatalogIds: Set<string>,
-): RecipeCostLine[] {
-  const costLines = lines.map((line) => {
-    const ingredient = getIngredientForLine(
-      line.ingredient_id,
-      selectedRecipe?.recipe_ingredients ?? null,
-      ingredientOptions,
+  userId: string | undefined,
+): string {
+  const ingredient = ingredientOptions.find((row) => row.id === ingredientId);
+  if (!ingredient) return "g";
+  return resolveRecipeUsageUnitForIngredient(
+    userId,
+    ingredientId,
+    ingredient.name,
+    ingredient.unit,
+  );
+}
+
+function getLineDefaultUnit(
+  line: RecipeLineForm,
+  ingredientOptions: IngredientOption[],
+  allRecipes: RecipeRow[],
+  userId?: string,
+): string {
+  if (line.sub_recipe_id) {
+    const prep = allRecipes.find((recipe) => recipe.id === line.sub_recipe_id);
+    return (
+      normalizeRecipeUsageUnitOption(prep?.output_unit) ??
+      normalizeRecipeUsageUnitOption(line.unit) ??
+      prep?.output_unit ??
+      line.unit ??
+      "g"
     );
-    const resolution = resolveRecipeLineIngredientSource(
-      line.ingredient_id,
-      selectedRecipe?.recipe_ingredients ?? null,
-      ingredientOptions,
-    );
-    traceRecipeLineFoodCostSource({
-      surface: "recipes.getRecipeCostLines",
-      recipeId: selectedRecipe?.id,
-      ingredientId: line.ingredient_id,
-      source: recipeLineFoodCostSourceKind(line.ingredient_id, canonicalCatalogIds, resolution),
-      inCanonicalCatalog: canonicalCatalogIds.has(line.ingredient_id),
+  }
+  if (line.unitManuallySet && line.unit.trim()) {
+    return normalizeRecipeUsageUnitOption(line.unit) ?? line.unit.trim();
+  }
+  return getInferredIngredientUsageUnit(line.ingredient_id, ingredientOptions, userId);
+}
+
+function prepOutputUnitSelectValue(unit: string): RecipeUsageUnitOption {
+  return normalizeRecipeUsageUnitOption(unit) ?? "g";
+}
+
+function recipeLineUsageUnitValue(
+  line: RecipeLineForm,
+  ingredientOptions: IngredientOption[],
+  allRecipes: RecipeRow[],
+  userId: string | undefined,
+): string {
+  const normalized = normalizeRecipeUsageUnitOption(line.unit);
+  if (normalized) return normalized;
+  return getLineDefaultUnit(line, ingredientOptions, allRecipes, userId);
+}
+
+function getRecipeCostLines(input: {
+  lines: RecipeLineForm[];
+  selectedRecipe: RecipeRow | null;
+  allRecipes: RecipeRow[];
+  ingredientOptions: IngredientOption[];
+  pickerOptions: RecipeLinePickerOption[];
+  canonicalCatalogIds: Set<string>;
+  prepOutputOverride?: { output_quantity: number | null; output_unit: string } | null;
+  userId?: string;
+}): RecipeCostLine[] {
+  const {
+    lines,
+    selectedRecipe,
+    allRecipes,
+    ingredientOptions,
+    pickerOptions,
+    canonicalCatalogIds,
+    prepOutputOverride,
+    userId,
+  } = input;
+  const formLinesForCost = lines
+    .filter((line) => line.ingredient_id || line.sub_recipe_id)
+    .map((line) => {
+      const ingredient = line.ingredient_id
+        ? getIngredientForLine(
+            line.ingredient_id,
+            selectedRecipe?.recipe_ingredients ?? null,
+            ingredientOptions,
+          )
+        : null;
+      return {
+        ingredient_id: line.sub_recipe_id ? null : line.ingredient_id || null,
+        sub_recipe_id: line.sub_recipe_id || null,
+        quantity: parseRecipeQuantityInput(line.quantity) ?? 0,
+        unit: line.unit || null,
+        ingredients: ingredient
+          ? {
+              current_price: ingredient.current_price,
+              purchase_quantity: ingredient.purchase_quantity,
+            }
+          : null,
+      };
     });
 
-    const unitCost = getUnitCost(
-      Number(ingredient?.current_price ?? 0),
-      Number(ingredient?.purchase_quantity ?? 1),
+  const linesByRecipe = buildLinesByRecipeId(
+    allRecipes.map((recipe) => ({
+      id: recipe.id,
+      recipe_ingredients:
+        selectedRecipe?.id === recipe.id
+          ? formLinesForCost
+          : (recipe.recipe_ingredients ?? []).map((row) => ({
+              ingredient_id: row.ingredient_id,
+              sub_recipe_id: row.sub_recipe_id,
+              quantity: row.quantity,
+              unit: row.unit,
+              ingredients: row.ingredients,
+            })),
+    })),
+  );
+  const recipesById = buildRecipesById(
+    allRecipes.map((recipe) => ({
+      id: recipe.id,
+      output_quantity:
+        selectedRecipe?.id === recipe.id && prepOutputOverride
+          ? prepOutputOverride.output_quantity
+          : recipe.output_quantity,
+      output_unit:
+        selectedRecipe?.id === recipe.id && prepOutputOverride
+          ? prepOutputOverride.output_unit
+          : recipe.output_unit,
+    })),
+  );
+  const path = new Set<string>();
+  const memo = new Map<string, number>();
+
+  const costLines = lines.map((line) => {
+    const ingredient = line.ingredient_id
+      ? getIngredientForLine(
+          line.ingredient_id,
+          selectedRecipe?.recipe_ingredients ?? null,
+          ingredientOptions,
+        )
+      : null;
+    const subRecipe =
+      line.sub_recipe_id != null && line.sub_recipe_id !== ""
+        ? (selectedRecipe?.recipe_ingredients?.find((row) => row.sub_recipe_id === line.sub_recipe_id)
+            ?.sub_recipe ??
+          allRecipes.find((recipe) => recipe.id === line.sub_recipe_id) ??
+          null)
+        : null;
+    const pickerOption = pickerOptions.find(
+      (option) =>
+        (option.kind === "prep" && option.id === line.sub_recipe_id) ||
+        (option.kind === "ingredient" && option.id === line.ingredient_id),
     );
+    const displayName = line.sub_recipe_id
+      ? subRecipe?.name ?? pickerOption?.name ?? "Prep"
+      : formatCanonicalIngredientDisplayName(ingredient?.name) ||
+        pickerOption?.name ||
+        "Unnamed ingredient";
+
+    if (line.ingredient_id) {
+      const resolution = resolveRecipeLineIngredientSource(
+        line.ingredient_id,
+        selectedRecipe?.recipe_ingredients ?? null,
+        ingredientOptions,
+      );
+      traceRecipeLineFoodCostSource({
+        surface: "recipes.getRecipeCostLines",
+        recipeId: selectedRecipe?.id,
+        ingredientId: line.ingredient_id,
+        source: recipeLineFoodCostSourceKind(line.ingredient_id, canonicalCatalogIds, resolution),
+        inCanonicalCatalog: canonicalCatalogIds.has(line.ingredient_id),
+      });
+    }
+
     const quantity = parseRecipeQuantityInput(line.quantity) ?? 0;
-    const lineCost = unitCost * quantity;
+    const usageUnit = recipeLineUsageUnitValue(
+      line,
+      ingredientOptions,
+      allRecipes,
+      userId,
+    );
+    const costLine = {
+      ingredient_id: line.ingredient_id || null,
+      sub_recipe_id: line.sub_recipe_id || null,
+      quantity,
+      unit: usageUnit || null,
+      ingredients: ingredient
+        ? {
+            current_price: ingredient.current_price,
+            purchase_quantity: ingredient.purchase_quantity,
+          }
+        : null,
+    };
+    const isPrepUsageLine = line.sub_recipe_id != null && line.sub_recipe_id !== "";
+    const prep = isPrepUsageLine ? recipesById.get(line.sub_recipe_id) : undefined;
+    let lineCost =
+      computeRecipeLineCostEur(costLine, linesByRecipe, recipesById, path, memo) ?? 0;
+    let unitCostWarning: string | null = null;
+    if (isPrepUsageLine) {
+      const prepPath = new Set<string>();
+      const prepMemo = new Map<string, number>();
+      const prepTotal = computeRecipeTotalCostEur(
+        line.sub_recipe_id,
+        linesByRecipe,
+        recipesById,
+        prepPath,
+        prepMemo,
+      );
+      if (prepTotal != null) {
+        const prepLine = computePrepLineCost(
+          quantity,
+          usageUnit,
+          prepTotal,
+          prep?.output_quantity,
+          prep?.output_unit,
+        );
+        unitCostWarning = prepLine.warning ?? null;
+        lineCost = prepLine.cost ?? 0;
+      }
+    }
+    const unitCost = quantity > 0 ? lineCost / quantity : 0;
+    const unitCostLabel =
+      isPrepUsageLine && quantity > 0 && usageUnit
+        ? formatPrepUnitCostLabel(unitCost, usageUnit)
+        : null;
+    const prepServings =
+      isPrepUsageLine && quantity > 0 && usageUnit
+        ? computePrepServingsPerBatch({
+            prepOutputQty: prep?.output_quantity,
+            prepOutputUnit: prep?.output_unit,
+            usageQty: quantity,
+            usageUnit,
+          })
+        : null;
+    const prepServingHint =
+      prepServings != null ? formatPrepServingHint(quantity, usageUnit, prepServings) : null;
 
     return {
       line,
       ingredient,
+      subRecipe: subRecipe as RecipeIngredient["sub_recipe"] | null,
+      isPrepLine: Boolean(line.sub_recipe_id),
+      displayName,
       quantity,
       unitCost,
+      unitCostLabel,
+      unitCostWarning,
+      prepServingHint,
       lineCost,
       contribution: 0,
     };
@@ -1264,7 +1849,7 @@ function getRecipeCostLines(
 
   return costLines.map((line) => ({
     ...line,
-    contribution: totalCost > 0 ? (line.lineCost / totalCost) * 100 : 0,
+    contribution: recipeLineContributionPct(line.lineCost, totalCost),
   }));
 }
 
@@ -1273,7 +1858,8 @@ function getRecipeActivityNote(
   highestContribution: number,
   ingredientCount: number,
 ) {
-  const lines = recipe?.recipe_ingredients?.filter((line) => line.ingredient_id) ?? [];
+  const lines =
+    recipe?.recipe_ingredients?.filter((line) => line.ingredient_id || line.sub_recipe_id) ?? [];
   const recentlyLinked = lines.some((line) => isRecentDate(line.created_at));
 
   if (recentlyLinked) return "Recently updated ingredient links";
