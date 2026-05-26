@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { MarginAlertsSections } from "@/components/margin-alerts-sections";
-import { MarginAlertsSummary } from "@/components/margin-alerts-summary";
+import { OperationalIntelligenceHeaderControls } from "@/components/operational-intelligence/operational-intelligence-header";
+import { OperationalIntelligencePage } from "@/components/operational-intelligence/operational-intelligence-page";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { loadCanonicalIngredientCatalog } from "@/lib/ingredient-catalog-load";
+import { getRecentPriceChanges } from "@/lib/ingredient-price-history";
+import { PRICE_WINDOW_180_DAYS } from "@/lib/exposure-drill-down";
 import { buildMarginAlertsFromSupabase } from "@/lib/margin-alerts";
 import { formatVisitDeltaLine } from "@/lib/margin-alert-copy";
 import {
@@ -21,7 +23,6 @@ import {
   type RecipeIngredientRecord,
   type RecipeRecord,
 } from "@/lib/margin-alert-data";
-import { groupAlertsIntoSections } from "@/lib/margin-alert-sections";
 import {
   buildVisitDelta,
   loadLastVisitSnapshot,
@@ -31,10 +32,10 @@ import {
 export const Route = createFileRoute("/alerts")({
   head: () => ({
     meta: [
-      { title: "Margin Alerts — Marginly" },
+      { title: "Operational Intelligence — Marginly" },
       {
         name: "description",
-        content: "Operational intelligence from invoices, ingredient prices and recipe costings.",
+        content: "Daily margin briefing from invoices, recipe costs, and supplier activity.",
       },
     ],
   }),
@@ -53,6 +54,7 @@ type RecipeIngredientRow = {
 
 function AlertsPage() {
   const { user } = useAuth();
+  const [dateRange, setDateRange] = useState("7");
   const [data, setData] = useState<MarginAlertData>({
     ingredients: [],
     recipes: [],
@@ -102,13 +104,7 @@ function AlertsPage() {
         supabase
           .from("recipe_ingredients")
           .select("id, recipe_id, ingredient_id, sub_recipe_id, quantity, unit, created_at"),
-        supabase
-          .from("ingredient_price_history")
-          .select(
-            "id, ingredient_id, invoice_id, ingredient_name, supplier_name, ingredient_unit, previous_price, new_price, delta, delta_percent, created_at",
-          )
-          .order("created_at", { ascending: false })
-          .limit(100),
+        getRecentPriceChanges(supabase, PRICE_WINDOW_180_DAYS),
         supabase
           .from("invoices")
           .select("id, supplier_name, total, created_at")
@@ -149,7 +145,7 @@ function AlertsPage() {
       setData({
         ingredients,
         recipes,
-        priceHistory: historyResult.error ? [] : (historyResult.data ?? []),
+        priceHistory: Array.isArray(historyResult) ? historyResult : [],
         invoices: invoicesResult.error ? [] : (invoicesResult.data ?? []),
       });
       setLibAlertsRaw(libAlertsResult);
@@ -178,8 +174,6 @@ function AlertsPage() {
     return finalizeOperationalAlertItems(local, lib, data);
   }, [data, libAlertsRaw]);
 
-  const sections = useMemo(() => groupAlertsIntoSections(alertItems), [alertItems]);
-
   const recipeMetrics = useMemo(() => getRecipeMetrics(data.recipes), [data.recipes]);
   const recipesBelowTarget = recipeMetrics.filter(
     (metric) => metric.grossMargin !== null && metric.grossMargin < TARGET_MARGIN,
@@ -189,15 +183,6 @@ function AlertsPage() {
     () => buildOperationalHealthPanel(data, libAlertsRaw),
     [data, libAlertsRaw],
   );
-
-  const monitoredIngredients = new Set([
-    ...data.ingredients.map((ingredient) => ingredient.id),
-    ...data.priceHistory.map((row) => row.ingredient_id),
-  ]).size;
-
-  const criticalCount = alertItems.filter(
-    (alert) => alert.severity === "critical" || alert.severity === "high",
-  ).length;
 
   useEffect(() => {
     if (loading || error) return;
@@ -214,45 +199,36 @@ function AlertsPage() {
 
   return (
     <AppShell
-      title="Operational intelligence"
-      subtitle="Real signals from invoices, ingredient pricing, and recipe costings."
-    >
-      {!loading && !error && (
-        <MarginAlertsSummary
-          visitDelta={visitDelta}
-          criticalCount={criticalCount}
-          sectionCount={sections.length}
-          monitoredIngredients={monitoredIngredients}
-          health={health}
+      title="Operational Intelligence"
+      subtitle="Daily margin signals from invoices, recipe costs, and supplier activity."
+      action={
+        <OperationalIntelligenceHeaderControls
+          dateRange={dateRange}
+          onDateRangeChange={setDateRange}
         />
-      )}
-
+      }
+    >
       {loading && (
-        <div className="mt-4 rounded-xl border border-border bg-muted/20 p-8 text-center text-sm text-muted-foreground">
+        <div className="rounded-xl border border-border bg-muted/20 p-8 text-center text-sm text-muted-foreground">
           <Loader2 className="mr-2 inline h-4 w-4 animate-spin" />
           Loading operational signals
         </div>
       )}
 
       {!loading && error && (
-        <div className="mt-4 rounded-xl border border-destructive/20 bg-destructive/[0.03] p-4 text-sm text-destructive">
+        <div className="rounded-xl border border-destructive/20 bg-destructive/[0.03] p-4 text-sm text-destructive">
           {error}
         </div>
       )}
 
-      {!loading && !error && sections.length === 0 && (
-        <div className="mt-4 rounded-xl border border-border bg-muted/10 p-8 text-center">
-          <CheckCircle2 className="mx-auto h-8 w-8 text-success" />
-          <div className="mt-3 text-sm font-medium">
-            No margin risks detected from recent invoice data
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Marginly is monitoring ingredient costs, supplier trends, and linked recipe margins.
-          </p>
-        </div>
+      {!loading && !error && (
+        <OperationalIntelligencePage
+          data={data}
+          alerts={alertItems}
+          health={health}
+          visitDelta={visitDelta}
+        />
       )}
-
-      {!loading && !error && sections.length > 0 && <MarginAlertsSections sections={sections} />}
     </AppShell>
   );
 }

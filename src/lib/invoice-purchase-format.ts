@@ -33,6 +33,8 @@ import {
   type StockNormalizationPipelineId,
   type StockNormalizeResult,
 } from "@/lib/stock-normalization";
+import { inferUnitFamily } from "@/lib/recipe-unit-normalization";
+import { detectObviousCountableUsage } from "@/lib/recipe-usage-unit-inference";
 export type PackageMeasureUnit = "g" | "ml" | "kg" | "L" | "un";
 
 export type PurchaseFormatKind =
@@ -341,7 +343,7 @@ export function parsePurchaseFormatPhrase(text: string): ParsedPhrase | null {
       kind: "weight_or_volume",
       containerCount: 1,
       containerUnit: packageUnit,
-      packageQuantity: containerCount,
+      packageQuantity,
       packageUnit,
       matchedText: embeddedMeasure[0] ?? trimmed,
       confidence: 0.9,
@@ -1300,7 +1302,28 @@ export function structuredPurchaseToIngredientFields(
       ? inferred.base_unit
       : (extractedUnit ?? inferred.base_unit ?? conversionHint?.purchase_unit ?? "kg");
 
-  if (structured.normalizedUsableQuantity != null && structured.usableQuantityUnit) {
+  const familyOpts = {
+    usableQuantityUnit: structured.usableQuantityUnit,
+    purchaseFormatKind: structured.kind,
+  };
+  const extractedFamily = extractedUnit
+    ? inferUnitFamily(extractedUnit, familyOpts)
+    : null;
+  const unitFamily = inferUnitFamily(structured.purchaseContainerUnit ?? extractedUnit, familyOpts);
+  const countableInvoiceRow =
+    extractedFamily === "countable" ||
+    unitFamily === "countable" ||
+    structured.kind === "unit_count" ||
+    structured.kind === "multi_unit_pack";
+
+  const shouldUseUsableAsCanonical =
+    !countableInvoiceRow &&
+    structured.normalizedUsableQuantity != null &&
+    structured.usableQuantityUnit != null &&
+    structured.usableQuantityUnit !== "un" &&
+    (unitFamily === "weight" || unitFamily === "volume");
+
+  if (shouldUseUsableAsCanonical) {
     const fields = {
       purchase_quantity: structured.normalizedUsableQuantity,
       purchase_unit: structured.usableQuantityUnit,
@@ -1313,6 +1336,35 @@ export function structuredPurchaseToIngredientFields(
       kind: structured.kind,
     });
     return fields;
+  }
+
+  if (countableInvoiceRow) {
+    const purchaseQty =
+      structured.purchaseContainerCount ??
+      (inferred.purchase_unit === "un" || inferred.purchase_unit === "unit"
+        ? inferred.purchase_quantity
+        : null) ??
+      1;
+
+    const identityName = structured.ingredientIdentityHint || "";
+    if (
+      purchaseQty === 1 &&
+      !detectObviousCountableUsage(identityName) &&
+      structured.normalizedUsableQuantity != null &&
+      structured.usableQuantityUnit === "ml"
+    ) {
+      return {
+        purchase_quantity: structured.normalizedUsableQuantity,
+        purchase_unit: "ml",
+        base_unit: "ml",
+      };
+    }
+
+    return {
+      purchase_quantity: purchaseQty,
+      purchase_unit: "un",
+      base_unit: "un",
+    };
   }
 
   if (inferred.base_unit) {

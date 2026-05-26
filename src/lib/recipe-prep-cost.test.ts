@@ -7,9 +7,11 @@ import {
   computeRecipeLineCostEur,
   computeRecipeTotalCostEur,
   formatPrepUnitCostLabel,
+  recipeLineDisplayUnitCostEur,
   prepLineCostEur,
   prepUnitCostEur,
   recipeLineContributionPct,
+  resolvePrepUsageLineOperationalCost,
 } from "./recipe-prep-cost";
 
 describe("prepUnitCostEur", () => {
@@ -21,10 +23,15 @@ describe("prepUnitCostEur", () => {
     expect(prepUnitCostEur(21.49, 3, "L")).toBeCloseTo(21.49 / 3);
   });
 
-  it("returns 0 when output quantity is missing or non-positive", () => {
-    expect(prepUnitCostEur(10, null, "ml")).toBe(0);
-    expect(prepUnitCostEur(10, 0, "ml")).toBe(0);
-    expect(prepUnitCostEur(10, -1, "L")).toBe(0);
+  it("returns null when output quantity is missing or non-positive", () => {
+    expect(prepUnitCostEur(10, null, "ml")).toBeNull();
+    expect(prepUnitCostEur(10, 0, "ml")).toBeNull();
+    expect(prepUnitCostEur(10, -1, "L")).toBeNull();
+  });
+
+  it("Molho Casa: €20.42 batch over 3 L → €/L; 25 ml usage ≈ €0.17", () => {
+    expect(prepUnitCostEur(20.42, 3, "L")).toBeCloseTo(20.42 / 3, 4);
+    expect(prepLineCostEur(25, "ml", 20.42, 3, "L")).toBeCloseTo(0.17, 2);
   });
 
   it("Molho Casa: €21.55 batch over 1000 ml → €0.02155/ml", () => {
@@ -252,16 +259,38 @@ describe("computePrepUnitCost", () => {
   });
 });
 
+describe("recipeLineDisplayUnitCostEur", () => {
+  it("shows €/un from line cost for countable bakery lines, not internal €/g", () => {
+    const lineCostEur = 0.21;
+    const quantity = 1;
+    const resolvedUnitCostEur = 0.21 / 80;
+    const display = recipeLineDisplayUnitCostEur({
+      lineCostEur,
+      quantity,
+      recipeUsageUnit: "un",
+      resolvedUnitCostEur,
+      costFields: {
+        current_price: 0.21,
+        purchase_quantity: 80,
+        cost_base_unit: "un",
+      },
+    });
+    expect(display).toBeCloseTo(0.21, 2);
+    expect(formatPrepUnitCostLabel(display!, "un")).toBe("€0.21/un");
+    expect(formatPrepUnitCostLabel(display!, "un")).not.toContain("0.0026");
+  });
+});
+
 describe("formatPrepUnitCostLabel", () => {
   it("formats currency per output unit", () => {
-    expect(formatPrepUnitCostLabel(0.00094, "ml")).toBe("€0.0009 / ml");
+    expect(formatPrepUnitCostLabel(0.00094, "ml")).toBe("€0.94/L");
   });
 
-  it("formats €/ml for partial prep usage rows", () => {
+  it("formats €/L for partial prep usage rows", () => {
     const lineCost = prepLineCostEur(25, "ml", 21.49, 3, "L")!;
     const unitCost = lineCost / 25;
     expect(unitCost).toBeCloseTo(21.49 / 3000, 5);
-    expect(formatPrepUnitCostLabel(unitCost, "ml")).toBe("€0.0072 / ml");
+    expect(formatPrepUnitCostLabel(unitCost, "ml")).toBe("€7.16/L");
   });
 });
 
@@ -272,6 +301,190 @@ describe("recipeLineContributionPct", () => {
 
   it("returns 0 when total is zero", () => {
     expect(recipeLineContributionPct(1, 0)).toBe(0);
+  });
+});
+
+describe("resolvePrepUsageLineOperationalCost", () => {
+  it("treats zero batch total as unresolved (not €0.00 line cost)", () => {
+    const molhoId = "prep-empty";
+    const parentId = "dish-1";
+    const linesByRecipe = buildLinesByRecipeId([
+      {
+        id: molhoId,
+        recipe_ingredients: [
+          {
+            ingredient_id: "ing-missing",
+            sub_recipe_id: null,
+            quantity: 1,
+            ingredients: { current_price: null, purchase_quantity: null },
+          },
+        ],
+      },
+      {
+        id: parentId,
+        recipe_ingredients: [
+          {
+            ingredient_id: null,
+            sub_recipe_id: molhoId,
+            quantity: 25,
+            unit: "ml",
+            ingredients: null,
+          },
+        ],
+      },
+    ]);
+    const recipesById = buildRecipesById([
+      { id: molhoId, output_quantity: 3, output_unit: "L" },
+      { id: parentId, output_quantity: null, output_unit: null },
+    ]);
+    const result = resolvePrepUsageLineOperationalCost(
+      molhoId,
+      25,
+      "ml",
+      linesByRecipe,
+      recipesById,
+    );
+    expect(result.pricingResolved).toBe(false);
+    expect(result.lineCostEur).toBeNull();
+    expect(result.unitCostEur).toBeNull();
+  });
+
+  it("propagates 15 ml usage when prep batch is only partially priced", () => {
+    const molhoId = "prep-partial";
+    const parentId = "burger-partial";
+    const linesByRecipe = buildLinesByRecipeId([
+      {
+        id: molhoId,
+        recipe_ingredients: [
+          {
+            ingredient_id: "priced",
+            sub_recipe_id: null,
+            quantity: 1,
+            ingredients: { current_price: 20.42, purchase_quantity: 1 },
+          },
+          {
+            ingredient_id: "unpriced",
+            sub_recipe_id: null,
+            quantity: 1,
+            ingredients: { current_price: null, purchase_quantity: null },
+          },
+        ],
+      },
+      {
+        id: parentId,
+        recipe_ingredients: [
+          {
+            ingredient_id: null,
+            sub_recipe_id: molhoId,
+            quantity: 15,
+            unit: "ml",
+            ingredients: null,
+          },
+        ],
+      },
+    ]);
+    const recipesById = buildRecipesById([
+      { id: molhoId, output_quantity: 3, output_unit: "L" },
+      { id: parentId, output_quantity: null, output_unit: null },
+    ]);
+    const result = resolvePrepUsageLineOperationalCost(
+      molhoId,
+      15,
+      "ml",
+      linesByRecipe,
+      recipesById,
+    );
+    expect(result.pricingResolved).toBe(true);
+    expect(result.batchTotalEur).toBeCloseTo(20.42, 2);
+    expect(result.lineCostEur).toBeCloseTo(0.102, 2);
+  });
+
+  it("15 ml Molho from €20.42 / 3 L batch: lineCost equals unitCost × qty", () => {
+    const molhoId = "prep-molho-15";
+    const parentId = "burger-15";
+    const linesByRecipe = buildLinesByRecipeId([
+      {
+        id: molhoId,
+        recipe_ingredients: [
+          {
+            ingredient_id: "ing-base",
+            sub_recipe_id: null,
+            quantity: 1,
+            ingredients: { current_price: 20.42, purchase_quantity: 1 },
+          },
+        ],
+      },
+      {
+        id: parentId,
+        recipe_ingredients: [
+          {
+            ingredient_id: null,
+            sub_recipe_id: molhoId,
+            quantity: 15,
+            unit: "ml",
+            ingredients: null,
+          },
+        ],
+      },
+    ]);
+    const recipesById = buildRecipesById([
+      { id: molhoId, output_quantity: 3, output_unit: "L" },
+      { id: parentId, output_quantity: null, output_unit: null },
+    ]);
+    const result = resolvePrepUsageLineOperationalCost(
+      molhoId,
+      15,
+      "ml",
+      linesByRecipe,
+      recipesById,
+    );
+    expect(result.lineCostEur).toBeCloseTo(0.102, 2);
+    expect(result.unitCostEur! * 15).toBeCloseTo(result.lineCostEur!, 6);
+  });
+
+  it("parent 25 ml Molho from €20.42 / 3 L batch ≈ €0.17", () => {
+    const molhoId = "prep-molho-casa";
+    const parentId = "burger-1";
+    const linesByRecipe = buildLinesByRecipeId([
+      {
+        id: molhoId,
+        recipe_ingredients: [
+          {
+            ingredient_id: "ing-base",
+            sub_recipe_id: null,
+            quantity: 1,
+            ingredients: { current_price: 20.42, purchase_quantity: 1 },
+          },
+        ],
+      },
+      {
+        id: parentId,
+        recipe_ingredients: [
+          {
+            ingredient_id: null,
+            sub_recipe_id: molhoId,
+            quantity: 25,
+            unit: "ml",
+            ingredients: null,
+          },
+        ],
+      },
+    ]);
+    const recipesById = buildRecipesById([
+      { id: molhoId, output_quantity: 3, output_unit: "L" },
+      { id: parentId, output_quantity: null, output_unit: null },
+    ]);
+    const result = resolvePrepUsageLineOperationalCost(
+      molhoId,
+      25,
+      "ml",
+      linesByRecipe,
+      recipesById,
+      { parentRecipeId: parentId },
+    );
+    expect(result.pricingResolved).toBe(true);
+    expect(result.lineCostEur).toBeCloseTo(0.17, 2);
+    expect(result.batchTotalEur).toBeCloseTo(20.42, 2);
   });
 });
 

@@ -21,6 +21,17 @@ import {
   resolvePricingRecency,
   type PricingFreshnessLevel,
 } from "@/lib/ingredient-pricing-freshness";
+import {
+  buildLinesByRecipeId,
+  buildRecipesById,
+  resolvePrepUsageLineOperationalCost,
+} from "@/lib/recipe-prep-cost";
+import { deriveRecipePricingSummary, type RecipePricingSummary } from "@/lib/recipe-pricing-state";
+import {
+  buildOperationalIngredientCostById,
+  enrichRecipeLinesForOperationalCost,
+  resolveRecipeLineOperationalCost,
+} from "@/lib/resolve-operational-ingredient-cost";
 
 export type MarginAlertSeverity = "critical" | "high" | "watch" | "info" | "positive";
 export type MarginAlertTarget = "/ingredients" | "/recipes" | "/invoices";
@@ -108,7 +119,7 @@ export type RecipeCostLine = {
   ingredientName: string;
   quantity: number;
   unit: string;
-  lineCost: number;
+  lineCost: number | null;
   contribution: number;
 };
 
@@ -120,6 +131,7 @@ export type RecipeMetric = {
   foodCostPercent: number | null;
   topLine: RecipeCostLine | null;
   ingredientCount: number;
+  pricingSummary: RecipePricingSummary;
 };
 
 export type MarginAlertData = {
@@ -168,15 +180,6 @@ function formatDate(value: string | null | undefined): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "No date";
   return date.toLocaleDateString();
-}
-
-function effectiveUnitCost(ingredient: IngredientRecord | null): number {
-  const price = Number(ingredient?.current_price ?? 0);
-  const purchaseQuantity = Number(ingredient?.purchase_quantity ?? 1);
-  return (
-    (Number.isFinite(price) ? price : 0) /
-    (Number.isFinite(purchaseQuantity) && purchaseQuantity > 0 ? purchaseQuantity : 1)
-  );
 }
 
 function ingredientDisplayUnit(ingredient: IngredientRecord | null | undefined): string {
@@ -241,29 +244,108 @@ function severityOrder(severity: MarginAlertSeverity): number {
 }
 
 export function getRecipeMetrics(recipes: RecipeRecord[]): RecipeMetric[] {
+  const catalogById = buildOperationalIngredientCostById(
+    recipes.flatMap((recipe) =>
+      (recipe.recipe_ingredients ?? [])
+        .filter((line) => line.ingredient_id && line.ingredients)
+        .map((line) => ({
+          id: line.ingredient_id!,
+          current_price: line.ingredients!.current_price,
+          purchase_quantity: line.ingredients!.purchase_quantity,
+        })),
+    ),
+  );
+  const linesByRecipe = buildLinesByRecipeId(
+    recipes.map((recipe) => ({
+      id: recipe.id,
+      recipe_ingredients: enrichRecipeLinesForOperationalCost(
+        (recipe.recipe_ingredients ?? []).map((line) => ({
+          ingredient_id: line.ingredient_id,
+          sub_recipe_id: line.sub_recipe_id ?? null,
+          quantity: line.quantity,
+          unit: line.unit,
+          ingredients: line.ingredients,
+        })),
+        catalogById,
+      ),
+    })),
+  );
+  const recipesById = buildRecipesById(
+    recipes.map((recipe) => ({
+      id: recipe.id,
+      output_quantity: recipe.output_quantity ?? null,
+      output_unit: recipe.output_unit ?? null,
+    })),
+  );
+
   return recipes.map((recipe) => {
-    const rawLines = recipe.recipe_ingredients?.filter((line) => line.ingredient_id) ?? [];
-    const costLines = rawLines.map((line) => {
-      const ingredient = line.ingredients;
+    const rawLines =
+      recipe.recipe_ingredients?.filter((line) => line.ingredient_id || line.sub_recipe_id) ?? [];
+    const costLines: RecipeCostLine[] = rawLines.map((line) => {
       const quantity = Number(line.quantity ?? 0);
-      const lineCost = quantity * effectiveUnitCost(ingredient);
-      return {
-        ingredientId: line.ingredient_id ?? "",
-        ingredientName: ingredient?.name?.trim() || "Ingredient",
+      if (line.ingredient_id && line.ingredients) {
+        const enriched = linesByRecipe
+          .get(recipe.id)
+          ?.find(
+            (row) =>
+              row.ingredient_id === line.ingredient_id &&
+              (row.sub_recipe_id ?? null) === (line.sub_recipe_id ?? null),
+          )?.ingredients;
+        const resolved = resolveRecipeLineOperationalCost(
+          line.ingredient_id,
+          quantity,
+          catalogById,
+          enriched ?? line.ingredients,
+          undefined,
+          {
+            recipeUnit: line.unit,
+            ingredientName: line.ingredients.name,
+            trigger: "margin_alert.getRecipeMetrics",
+          },
+        );
+        return {
+          ingredientId: line.ingredient_id,
+          ingredientName: line.ingredients.name?.trim() || "Ingredient",
+          quantity,
+          unit: line.unit || ingredientDisplayUnit(line.ingredients),
+          lineCost: resolved.lineCostEur,
+          contribution: 0,
+        };
+      }
+      const prep = recipes.find((row) => row.id === line.sub_recipe_id);
+      const prepResolved = resolvePrepUsageLineOperationalCost(
+        line.sub_recipe_id!,
         quantity,
-        unit: line.unit || ingredientDisplayUnit(ingredient),
-        lineCost,
+        line.unit,
+        linesByRecipe,
+        recipesById,
+      );
+      return {
+        ingredientId: line.sub_recipe_id ?? "",
+        ingredientName: prep?.name?.trim() || "Prep",
+        quantity,
+        unit: line.unit || prep?.output_unit || "unit",
+        lineCost: prepResolved.lineCostEur,
         contribution: 0,
       };
     });
-    const foodCost = costLines.reduce((sum, line) => sum + line.lineCost, 0);
+    const pricingSummary = deriveRecipePricingSummary(costLines);
+    const foodCost = pricingSummary.resolvedFoodCostEur ?? 0;
     const linesWithContribution = costLines.map((line) => ({
       ...line,
-      contribution: foodCost > 0 ? (line.lineCost / foodCost) * 100 : 0,
+      contribution: foodCost > 0 && line.lineCost != null ? (line.lineCost / foodCost) * 100 : 0,
     }));
     const sellingPrice = Number(recipe.selling_price ?? 0);
-    const grossMargin = sellingPrice > 0 ? ((sellingPrice - foodCost) / sellingPrice) * 100 : null;
-    const foodCostPercent = sellingPrice > 0 ? (foodCost / sellingPrice) * 100 : null;
+    const grossMargin =
+      sellingPrice > 0 &&
+      pricingSummary.status !== "unresolved" &&
+      pricingSummary.resolvedFoodCostEur != null
+        ? ((sellingPrice - pricingSummary.resolvedFoodCostEur) / sellingPrice) * 100
+        : null;
+    const foodCostPercent =
+      sellingPrice > 0 && pricingSummary.status !== "unresolved" && foodCost > 0
+        ? (foodCost / sellingPrice) * 100
+        : null;
 
     return {
       recipe,
@@ -271,7 +353,11 @@ export function getRecipeMetrics(recipes: RecipeRecord[]): RecipeMetric[] {
       foodCost,
       grossMargin,
       foodCostPercent,
-      topLine: [...linesWithContribution].sort((a, b) => b.lineCost - a.lineCost)[0] ?? null,
+      pricingSummary,
+      topLine:
+        [...linesWithContribution]
+          .filter((line) => line.lineCost != null)
+          .sort((a, b) => (b.lineCost ?? 0) - (a.lineCost ?? 0))[0] ?? null,
       ingredientCount: rawLines.length,
     };
   });
@@ -610,7 +696,10 @@ export function buildOperationalAlertItems(data: MarginAlertData): MarginAlertIt
           ...(metric.topLine
             ? [
                 { label: "Largest driver", value: metric.topLine.ingredientName },
-                { label: "Line cost", value: formatCurrency(metric.topLine.lineCost) },
+                {
+                  label: "Line cost",
+                  value: formatCurrency(metric.topLine.lineCost ?? 0),
+                },
               ]
             : []),
         ],
@@ -636,12 +725,12 @@ export function buildOperationalAlertItems(data: MarginAlertData): MarginAlertIt
         context: formatCostExposureContext(
           topLine.contribution,
           metric.recipe.name,
-          topLine.lineCost,
+          topLine.lineCost ?? 0,
         ),
         target: "/recipes",
         meta: [
           { label: "Cost share", value: formatPercent(topLine.contribution) },
-          { label: "Line cost", value: formatCurrency(topLine.lineCost) },
+          { label: "Line cost", value: formatCurrency(topLine.lineCost ?? 0) },
           { label: "Recipe", value: metric.recipe.name },
         ],
         priority: 5_000 + topLine.contribution,

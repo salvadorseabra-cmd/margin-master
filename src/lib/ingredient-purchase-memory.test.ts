@@ -35,7 +35,11 @@ const potatoProduct = (
   itemName: "BAT SHOE 2.5KG",
   supplierName: "Makro",
   invoiceDate: "2026-03-01",
+  chronologySourceType: "invoice_issue_date",
   invoiceId: "inv-1",
+  invoiceCreatedAt: null,
+  invoiceIssueDateRaw: "2026-03-01",
+  itemCreatedAt: null,
   unitPrice: 12.5,
   lineTotal: 25,
   matchBucket: "matched",
@@ -83,6 +87,23 @@ describe("ingredient-purchase-memory", () => {
 
     expect(recognized.map((row) => row.name)).toEqual(["BAC STRK 1KG"]);
     expect(recent).toEqual([]);
+  });
+
+  it("buildRecentPurchases display date follows invoice issue date not item created_at", () => {
+    const recent = buildRecentPurchases("ing-bacon", "Bacon", [
+      potatoProduct({
+        itemName: "BAC STRK CONTINENTE 1KG",
+        supplierName: "Continente",
+        invoiceDate: "2026-05-13",
+        invoiceIssueDateRaw: "13/05/2026",
+        chronologySourceType: "invoice_issue_date",
+        itemCreatedAt: "2026-05-18T09:00:00.000Z",
+        invoiceCreatedAt: "2026-05-18T08:00:00.000Z",
+      }),
+    ]);
+
+    expect(recent[0]?.dateLabel).toMatch(/13/);
+    expect(recent[0]?.dateLabel).not.toMatch(/18/);
   });
 
   it("buildRecentPurchases formats supplier, date, and unit price", () => {

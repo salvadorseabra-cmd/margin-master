@@ -1,4 +1,5 @@
 import { formatCurrency } from "@/lib/display-format";
+import { logChronologyAudit } from "@/lib/invoice-chronology";
 import { shouldSkipByOperationalProductFamilyGate } from "@/lib/ingredient-operational-family-gate";
 import {
   filterMatchedInvoiceProductsForIngredient,
@@ -125,14 +126,29 @@ export function buildRecentPurchases(
   return filterMatchedInvoiceProductsForIngredient(matchedProducts, trimmedId)
     .filter((product) => isIngredientScopedMatchedProduct(product, trimmedId))
     .filter((product) => passesFamilyGateForIngredient(product.itemName, canonicalName))
-    .map((product) => ({
-      itemId: product.itemId,
-      supplierLabel:
-        normalizeSupplierDisplayName(product.supplierName) || "Unknown supplier",
-      dateLabel: formatPurchaseDate(product.invoiceDate),
-      priceLabel: formatPurchasePrice(product),
-      productHint: product.itemName?.trim() || null,
-    }));
+    .map((product) => {
+      const row: RecentPurchaseRow = {
+        itemId: product.itemId,
+        supplierLabel:
+          normalizeSupplierDisplayName(product.supplierName) || "Unknown supplier",
+        dateLabel: formatPurchaseDate(product.invoiceDate),
+        priceLabel: formatPurchasePrice(product),
+        productHint: product.itemName?.trim() || null,
+      };
+      logChronologyAudit({
+        surface: "ingredient_purchase_history",
+        ingredientId: trimmedId,
+        itemId: product.itemId,
+        invoiceId: product.invoiceId,
+        supplierName: product.supplierName,
+        sourceInvoiceIssueDate: product.invoiceIssueDateRaw,
+        displayedDate: row.dateLabel,
+        persistenceTimestamp: product.invoiceCreatedAt ?? null,
+        chronologySourceType: product.chronologySourceType,
+        invoiceItemCreatedAt: product.itemCreatedAt ?? null,
+      });
+      return row;
+    });
 }
 
 export function purchaseMemorySummary(

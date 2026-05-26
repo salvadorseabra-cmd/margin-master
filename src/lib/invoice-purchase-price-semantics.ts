@@ -11,6 +11,9 @@ import {
   type InvoiceLinePurchaseInput,
   type StructuredPurchaseFormat,
 } from "@/lib/invoice-purchase-format";
+import type { BaseUnit } from "@/lib/recipe-unit-normalization";
+import { inferUnitFamily } from "@/lib/recipe-unit-normalization";
+import { detectObviousCountableUsage } from "@/lib/recipe-usage-unit-inference";
 
 export type InvoicePurchasePriceMetadata = InvoiceLinePurchaseInput & {
   unit_price?: number | null;
@@ -261,6 +264,40 @@ function inferProductUnitNoun(name: string, count: number): string | null {
   return null;
 }
 
+/**
+ * OCR often puts pack size on the row (`450 ml`) instead of an outer count (`1 un`).
+ * That quantity is content measure, not a multiplier — do not divide usable stock by it.
+ */
+function isRowQuantityPackContentMeasure(
+  metadata: InvoicePurchasePriceMetadata,
+  structured: StructuredPurchaseFormat,
+  totalUsable: number,
+  usableUnit: "g" | "ml" | "un",
+): boolean {
+  const rowQuantity = metadata.quantity == null ? null : Number(metadata.quantity);
+  if (!Number.isFinite(rowQuantity) || rowQuantity == null || rowQuantity <= 1) return false;
+
+  const rowUnit = normalizeToken(metadata.unit);
+  if (usableUnit === "ml" && (rowUnit === "ml" || rowUnit === "l" || rowUnit === "lt" || rowUnit === "ltr")) {
+    const rowMl = rowUnit === "ml" ? rowQuantity : rowQuantity * 1000;
+    if (Math.abs(rowMl - totalUsable) < 0.01) return true;
+  }
+  if (usableUnit === "g" && (rowUnit === "g" || rowUnit === "kg" || rowUnit === "kgs")) {
+    const rowG = rowUnit === "g" ? rowQuantity : rowQuantity * 1000;
+    if (Math.abs(rowG - totalUsable) < 0.01) return true;
+  }
+
+  const pkgQty = structured.packageQuantity;
+  const pkgUnit = structured.packageMeasurementUnit;
+  if (pkgQty != null && pkgUnit != null && pkgUnit === usableUnit && Math.abs(pkgQty - rowQuantity) < 0.01) {
+    if (rowUnit === pkgUnit) return true;
+    if (rowUnit === "kg" && pkgUnit === "g") return true;
+    if ((rowUnit === "l" || rowUnit === "lt") && pkgUnit === "ml") return true;
+  }
+
+  return false;
+}
+
 export function resolveUsablePerPricedUnit(
   metadata: InvoicePurchasePriceMetadata,
   structured: StructuredPurchaseFormat,
@@ -271,6 +308,10 @@ export function resolveUsablePerPricedUnit(
 
   const rowQuantity = metadata.quantity == null ? null : Number(metadata.quantity);
   if (!Number.isFinite(rowQuantity) || rowQuantity == null || rowQuantity <= 1) {
+    return { amount: totalUsable, unit: usableUnit };
+  }
+
+  if (isRowQuantityPackContentMeasure(metadata, structured, totalUsable, usableUnit)) {
     return { amount: totalUsable, unit: usableUnit };
   }
 
@@ -315,30 +356,174 @@ export function computeEffectiveUsableCost(
   };
 }
 
+export type RecipeOperationalCostFields = {
+  current_price: number;
+  purchase_quantity: number;
+  cost_base_unit: BaseUnit;
+  /** Usable grams per one countable purchase unit (overlay; not pack total). */
+  usable_weight_grams?: number | null;
+  usable_volume_ml?: number | null;
+};
+
+/** Grams/ml per priced countable unit from stock normalization or pack inner size. */
+export function resolveCountableUsableMeasure(
+  metadata: InvoicePurchasePriceMetadata,
+  structured: StructuredPurchaseFormat,
+): { usableWeightGrams: number | null; usableVolumeMl: number | null } {
+  const perUnit = resolveUsablePerPricedUnit(metadata, structured);
+  if (perUnit?.unit === "g" && perUnit.amount > 0) {
+    return { usableWeightGrams: perUnit.amount, usableVolumeMl: null };
+  }
+  if (perUnit?.unit === "ml" && perUnit.amount > 0) {
+    return { usableWeightGrams: null, usableVolumeMl: perUnit.amount };
+  }
+
+  const pkgQty = structured.packageQuantity;
+  const pkgUnit = structured.packageMeasurementUnit;
+  if (pkgQty != null && pkgQty > 0 && pkgUnit === "g") {
+    return { usableWeightGrams: pkgQty, usableVolumeMl: null };
+  }
+  if (pkgQty != null && pkgQty > 0 && pkgUnit === "ml") {
+    return { usableWeightGrams: null, usableVolumeMl: pkgQty };
+  }
+
+  return { usableWeightGrams: null, usableVolumeMl: null };
+}
+
+/**
+ * Countable purchase denominator (un/cx/pack) — never gram weight from product name alone.
+ * Root cause fix for buns priced as €/g: row `un` + name "80g" must not set purchase_quantity=80.
+ */
+export function resolveCountablePurchaseQuantityForCost(
+  metadata: InvoicePurchasePriceMetadata,
+  structured: StructuredPurchaseFormat,
+): number | null {
+  if (structured.usableQuantityUnit === "un" && structured.normalizedUsableQuantity != null) {
+    const perUnit = resolveUsablePerPricedUnit(metadata, structured);
+    if (perUnit?.unit === "un" && perUnit.amount > 0) return perUnit.amount;
+  }
+
+  const rowUnit = normalizeToken(metadata.unit);
+  const rowQtyRaw = metadata.quantity == null ? 1 : Number(metadata.quantity);
+  const rowQty = Number.isFinite(rowQtyRaw) && rowQtyRaw > 0 ? rowQtyRaw : 1;
+
+  if (rowUnit && PACK_CONTAINER_UNITS.has(rowUnit)) {
+    const unitsPerPack = resolveUnitsPerPack(structured);
+    if (unitsPerPack != null && unitsPerPack > 0) return unitsPerPack;
+    return 1;
+  }
+
+  if (
+    rowUnit === "un" ||
+    rowUnit === "uni" ||
+    rowUnit === "unid" ||
+    rowUnit === "unit" ||
+    rowUnit === "units" ||
+    rowUnit === "pc" ||
+    rowUnit === "pcs"
+  ) {
+    return rowQty;
+  }
+
+  if (structured.kind === "unit_count") {
+    const count = structured.purchaseContainerCount;
+    if (count != null && count > 0) return count;
+  }
+
+  if (!rowUnit) return 1;
+  return rowQty;
+}
+
+/**
+ * Single bottle/jar (1 un) with ml/g in the name — cost per ml/g, not €/un.
+ * Skips buns, cans, burgers (discrete count products) via {@link detectObviousCountableUsage}.
+ */
+function packMeasureCostFieldsFromSingleCountable(
+  metadata: InvoicePurchasePriceMetadata,
+  structured: StructuredPurchaseFormat,
+  unitPrice: number,
+  purchaseQty: number,
+): RecipeOperationalCostFields | null {
+  if (purchaseQty !== 1) return null;
+  if (detectObviousCountableUsage(String(metadata.name ?? ""))) return null;
+
+  const perUnit = resolveUsablePerPricedUnit(metadata, structured);
+  if (!perUnit || perUnit.unit !== "ml" || perUnit.amount <= 0) return null;
+
+  return {
+    current_price: unitPrice,
+    purchase_quantity: perUnit.amount,
+    cost_base_unit: "ml",
+  };
+}
+
 /**
  * Ingredient `current_price` / `purchase_quantity` for recipe costing from an invoice line.
- * Recipe ingredient quantities are stored in base units (g, ml, un); `unit_price` on kg rows is €/kg.
+ * Weight rows: denominator in g (kg invoice → purchase_quantity 1000). Countable rows: un/cx/pack count.
  */
 export function recipeOperationalCostFieldsFromInvoiceLine(
   metadata: InvoicePurchasePriceMetadata,
-): { current_price: number; purchase_quantity: number } | null {
+): RecipeOperationalCostFields | null {
   const unitPrice = metadata.unit_price == null ? null : Number(metadata.unit_price);
   if (!Number.isFinite(unitPrice) || unitPrice < 0) return null;
 
   const rowUnit = metadata.unit?.trim().toLowerCase();
   if (rowUnit === "kg") {
-    return { current_price: unitPrice, purchase_quantity: 1000 };
+    return { current_price: unitPrice, purchase_quantity: 1000, cost_base_unit: "g" };
   }
 
   const structured = resolveInvoiceLinePurchaseFormat(metadata);
+  const family = inferUnitFamily(rowUnit, {
+    usableQuantityUnit: structured.usableQuantityUnit,
+    purchaseFormatKind: structured.kind,
+  });
+
+  if (family === "countable") {
+    const purchaseQty = resolveCountablePurchaseQuantityForCost(metadata, structured);
+    if (purchaseQty == null || purchaseQty <= 0) return null;
+
+    const packMeasure = packMeasureCostFieldsFromSingleCountable(
+      metadata,
+      structured,
+      unitPrice,
+      purchaseQty,
+    );
+    if (packMeasure) return packMeasure;
+
+    const usableMeasure = resolveCountableUsableMeasure(metadata, structured);
+    return {
+      current_price: unitPrice,
+      purchase_quantity: purchaseQty,
+      cost_base_unit: "un",
+      ...(usableMeasure.usableWeightGrams != null
+        ? { usable_weight_grams: usableMeasure.usableWeightGrams }
+        : {}),
+      ...(usableMeasure.usableVolumeMl != null
+        ? { usable_volume_ml: usableMeasure.usableVolumeMl }
+        : {}),
+    };
+  }
+
   const usable = resolveUsablePerPricedUnit(metadata, structured);
   if (!usable || usable.amount <= 0) return null;
 
-  return { current_price: unitPrice, purchase_quantity: usable.amount };
+  if (family === "volume" || usable.unit === "ml") {
+    return {
+      current_price: unitPrice,
+      purchase_quantity: usable.amount,
+      cost_base_unit: "ml",
+    };
+  }
+
+  return {
+    current_price: unitPrice,
+    purchase_quantity: usable.amount,
+    cost_base_unit: "g",
+  };
 }
 
 /** Units-per-pack from metadata (not invoice row quantity). */
-function resolveUnitsPerPack(structured: StructuredPurchaseFormat): number | null {
+export function resolveUnitsPerPack(structured: StructuredPurchaseFormat): number | null {
   if (
     structured.kind === "multi_unit_pack" ||
     (structured.purchaseContainerUnit === "un" && (structured.purchaseContainerCount ?? 0) > 1)

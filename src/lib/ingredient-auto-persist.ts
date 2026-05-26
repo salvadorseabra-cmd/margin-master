@@ -27,6 +27,7 @@ import {
   type StructuredPurchaseFormat,
 } from "@/lib/invoice-purchase-format";
 import { recipeOperationalCostFieldsFromInvoiceLine } from "@/lib/invoice-purchase-price-semantics";
+import type { BaseUnit } from "@/lib/recipe-unit-normalization";
 import { findInvoiceItemIngredientMatch } from "@/lib/invoice-ingredient-match-propagation";
 import { INGREDIENT_KIND_CANONICAL, looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
 import { shouldBlockCanonicalNameOnCreate } from "@/lib/canonical-ingredient-operational-name";
@@ -57,6 +58,13 @@ export type AutoPersistInvoiceItem = {
 export type OperationalIngredientCostFields = {
   current_price: number | null;
   purchase_quantity: number | null;
+  cost_base_unit?: BaseUnit | null;
+  usable_weight_grams?: number | null;
+  usable_volume_ml?: number | null;
+  reference_weight_grams?: number | null;
+  reference_volume_ml?: number | null;
+  grams_per_ml?: number | null;
+  gramsPerMl?: number | null;
 };
 
 /** Maps a matched invoice line to catalog `current_price` / `purchase_quantity` fields. */
@@ -76,6 +84,13 @@ export function operationalCostFieldsFromInvoiceLine(
   return {
     current_price: recipeFields.current_price,
     purchase_quantity: recipeFields.purchase_quantity,
+    cost_base_unit: recipeFields.cost_base_unit,
+    ...(recipeFields.usable_weight_grams != null
+      ? { usable_weight_grams: recipeFields.usable_weight_grams }
+      : {}),
+    ...(recipeFields.usable_volume_ml != null
+      ? { usable_volume_ml: recipeFields.usable_volume_ml }
+      : {}),
   };
 }
 
@@ -341,6 +356,7 @@ export function buildIngredientInsertPayload(
     extractedUnit,
     isGenericUnit,
   );
+  const operational = operationalCostFieldsFromInvoiceLine(item, { isGenericUnit });
   const stockUnit =
     structured.inferred.base_unit && isGenericUnit(extractedUnit)
       ? structured.inferred.base_unit
@@ -350,16 +366,17 @@ export function buildIngredientInsertPayload(
         purchaseFields.base_unit);
   const detectedPrice = Number(item.unit_price);
   const currentPrice = Number.isFinite(detectedPrice) && detectedPrice >= 0 ? detectedPrice : 0;
+  const costBase = operational?.cost_base_unit ?? purchaseFields.base_unit;
 
   return {
     user_id: userId,
     name,
     normalized_name: normalizedName,
-    unit: stockUnit,
+    unit: operational?.cost_base_unit ?? stockUnit,
     current_price: currentPrice,
-    purchase_quantity: purchaseFields.purchase_quantity,
-    purchase_unit: purchaseFields.purchase_unit,
-    base_unit: purchaseFields.base_unit,
+    purchase_quantity: operational?.purchase_quantity ?? purchaseFields.purchase_quantity,
+    purchase_unit: costBase,
+    base_unit: costBase,
     ingredient_kind: INGREDIENT_KIND_CANONICAL,
   };
 }

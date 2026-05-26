@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
+import {
+  effectiveIngredientUnitCostEur,
+  isOperationalPricingResolved,
+  MISSING_OPERATIONAL_PRICING_LABEL,
+  resolvedOperationalUnitCostEur,
+} from "@/lib/ingredient-unit-cost";
 import { resolveInvoiceLinePurchaseFormat } from "./invoice-purchase-format";
+import { ingredientLineCostEur } from "@/lib/recipe-prep-cost";
 import {
   deriveInvoiceRowInlineChips,
   formatInvoicePurchasePriceLabel,
@@ -9,8 +16,131 @@ import {
   formatRowPurchaseQuantityLabel,
   groupInvoiceLineBadges,
   INVOICE_PRICE_SPIKE_THRESHOLD_PERCENT,
+  recipeOperationalCostFieldsFromInvoiceLine,
   resolveInvoiceLinePricingPresentation,
 } from "./invoice-purchase-price-semantics";
+
+describe("recipeOperationalCostFieldsFromInvoiceLine", () => {
+  it("maps Novilho 10 kg @ €11.40/kg to per-gram denominator (260g ≈ €2.96)", () => {
+    const fields = recipeOperationalCostFieldsFromInvoiceLine({
+      name: "Novilho Acém",
+      quantity: 10,
+      unit: "kg",
+      unit_price: 11.4,
+    });
+    expect(fields).toEqual({
+      current_price: 11.4,
+      purchase_quantity: 1000,
+      cost_base_unit: "g",
+    });
+    expect(effectiveIngredientUnitCostEur(fields!)).toBeCloseTo(0.0114, 4);
+    expect(ingredientLineCostEur(260, fields!, { recipeUnit: "g" })).toBeCloseTo(2.96, 2);
+  });
+
+  it("maps sesame bun 1 un @ €0.21 to €/un not €/g from embedded 80g", () => {
+    const fields = recipeOperationalCostFieldsFromInvoiceLine({
+      name: "Pão de Hambúrguer Sésamo 80g",
+      quantity: 1,
+      unit: "un",
+      unit_price: 0.21,
+    });
+    expect(fields).toMatchObject({
+      current_price: 0.21,
+      purchase_quantity: 1,
+      cost_base_unit: "un",
+      usable_weight_grams: 80,
+    });
+    expect(effectiveIngredientUnitCostEur(fields!)).toBeCloseTo(0.21, 2);
+    expect(effectiveIngredientUnitCostEur(fields!)).toBeGreaterThan(0.01);
+    expect(ingredientLineCostEur(1, fields!, { recipeUnit: "un" })).toBeCloseTo(0.21, 2);
+    expect(ingredientLineCostEur(80, fields!, { recipeUnit: "g" })).toBeCloseTo(0.21, 2);
+  });
+
+  it("maps Alface 1 un @ €1.39 with 500g usable for gram recipes", () => {
+    const fields = recipeOperationalCostFieldsFromInvoiceLine({
+      name: "ALFACE ICEBERG 1 un",
+      quantity: 1,
+      unit: "un",
+      unit_price: 1.39,
+    });
+    expect(fields?.cost_base_unit).toBe("un");
+    expect(fields?.usable_weight_grams).toBe(500);
+    expect(ingredientLineCostEur(30, fields!, { recipeUnit: "g" })).toBeCloseTo(0.0834, 3);
+  });
+
+  it("maps Coca-Cola 33cl pack to 330 ml per can (not 33 ml → €296/L)", () => {
+    const meta = {
+      name: "Coca-Cola lata 33cl (Pack 24)",
+      quantity: 1,
+      unit: "cx",
+      unit_price: 9.84,
+    };
+    const structured = resolveInvoiceLinePurchaseFormat(meta);
+    expect(structured.packageQuantity).toBe(330);
+    expect(structured.packageMeasurementUnit).toBe("ml");
+
+    const fields = recipeOperationalCostFieldsFromInvoiceLine(meta);
+    expect(fields?.cost_base_unit).toBe("un");
+    expect(fields?.purchase_quantity).toBe(24);
+    expect(fields?.purchase_quantity).not.toBe(33);
+    const perCan = effectiveIngredientUnitCostEur(fields!);
+    expect(perCan).toBeCloseTo(9.84 / 24, 2);
+    const perLiterIfMisreadAs33ml = (9.84 / 33) * 1000;
+    expect(perLiterIfMisreadAs33ml).toBeGreaterThan(200);
+    const perLiterIfCorrect330ml = (9.84 / 330) * 1000;
+    expect(perLiterIfCorrect330ml).toBeLessThan(50);
+  });
+
+  it("maps 24x33cl phrase to 7920 ml usable stock", () => {
+    const structured = resolveInvoiceLinePurchaseFormat({ name: "24x33cl" });
+    expect(structured.normalizedUsableQuantity).toBe(7920);
+    expect(structured.usableQuantityUnit).toBe("ml");
+  });
+
+  it("maps Hellmann's 450ml @ €4.59 (1 un Continente) to €/ml not €/ml pack price", () => {
+    const fields = recipeOperationalCostFieldsFromInvoiceLine({
+      name: "MAIONESE HELLMANN'S 450ML",
+      quantity: 1,
+      unit: "un",
+      unit_price: 4.59,
+    });
+    expect(fields).toEqual({
+      current_price: 4.59,
+      purchase_quantity: 450,
+      cost_base_unit: "ml",
+    });
+    expect(effectiveIngredientUnitCostEur(fields!)).toBeCloseTo(0.0102, 3);
+    expect(effectiveIngredientUnitCostEur(fields!)).not.toBeCloseTo(4.59, 2);
+    expect(ingredientLineCostEur(30, fields!, { recipeUnit: "ml" })).toBeCloseTo(0.306, 2);
+  });
+
+  it("maps supermarket 450ml row qty (450 ml OCR) without dividing usable twice", () => {
+    const fields = recipeOperationalCostFieldsFromInvoiceLine({
+      name: "MAIONESE CALVE TOP DOWN 450ML",
+      quantity: 450,
+      unit: "ml",
+      unit_price: 4.59,
+    });
+    expect(fields?.purchase_quantity).toBe(450);
+    expect(fields?.cost_base_unit).toBe("ml");
+    expect(effectiveIngredientUnitCostEur(fields!)).toBeCloseTo(0.0102, 3);
+  });
+
+  it("maps Angus case price to per-patty denominator inside the case", () => {
+    const fields = recipeOperationalCostFieldsFromInvoiceLine({
+      name: "Burger Angus 180gr (Caixa 40 un)",
+      quantity: 1,
+      unit: "cx",
+      unit_price: 46,
+    });
+    expect(fields).toMatchObject({
+      current_price: 46,
+      purchase_quantity: 40,
+      cost_base_unit: "un",
+    });
+    expect(ingredientLineCostEur(1, fields!, { recipeUnit: "un" })).toBeCloseTo(1.15, 2);
+  });
+});
 
 describe("formatInvoicePurchasePriceLabel", () => {
   it.each([
@@ -349,5 +479,23 @@ describe("groupInvoiceLineBadges", () => {
         badges: ["In 3 recipes"],
       },
     ]);
+  });
+});
+
+describe("missing operational pricing", () => {
+  it("returns null unit cost for empty catalog fields (not €0)", () => {
+    expect(
+      isOperationalPricingResolved({ current_price: null, purchase_quantity: null }),
+    ).toBe(false);
+    expect(
+      resolvedOperationalUnitCostEur({ current_price: null, purchase_quantity: null }),
+    ).toBeNull();
+    expect(
+      ingredientLineCostEur(1, { current_price: null, purchase_quantity: null }, { recipeUnit: "un" }),
+    ).toBeNull();
+  });
+
+  it("surfaces missing label constant for UI/PDF", () => {
+    expect(MISSING_OPERATIONAL_PRICING_LABEL).toMatch(/missing operational pricing/i);
   });
 });

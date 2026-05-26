@@ -1,10 +1,44 @@
-import { effectiveIngredientUnitCostEur } from "@/lib/ingredient-unit-cost";
+import {
+  effectiveIngredientUnitCostEur,
+  inferIngredientCostBaseUnit,
+  isOperationalPricingResolved,
+  MISSING_OPERATIONAL_PRICING_LABEL,
+  purchaseQuantityDenom,
+  resolveIngredientGramsPerMl,
+  resolvedOperationalUnitCostEur,
+} from "@/lib/ingredient-unit-cost";
+import {
+  ingredientLineCostEur,
+  recipeLineOperationalUnitCostEur,
+  type IngredientLineCostContext,
+} from "@/lib/recipe-prep-cost";
+import { catalogVsOperationalUnitCosts, logPricingAudit } from "@/lib/pricing-audit";
+import { isRecipeLineCostUnresolved } from "@/lib/recipe-pricing-state";
+import {
+  extractEmbeddedMeasureFromIngredientName,
+  repairCountableEmbeddedWeightDenominator,
+} from "@/lib/ingredient-unit-integrity-audit";
+import {
+  logIngredientUnitAudit,
+  logPriceResolutionTrace,
+  logPricingResolverTrace,
+  shouldLogUnitAudit,
+  type IngredientUnitAuditMismatchReason,
+} from "@/lib/pricing-trace";
+import { normalizeToBaseUnit, unitFamilyForBaseUnit } from "@/lib/recipe-unit-normalization";
 import type { OperationalInvoiceCostEntry } from "@/lib/ingredient-operational-intelligence";
 import type { RecipeIngredientLineForCost } from "@/lib/recipe-prep-cost";
 
 export type OperationalIngredientCostFields = {
   current_price: number | null;
   purchase_quantity: number | null;
+  cost_base_unit?: import("@/lib/recipe-unit-normalization").BaseUnit | null;
+  usable_weight_grams?: number | null;
+  usable_volume_ml?: number | null;
+  reference_weight_grams?: number | null;
+  reference_volume_ml?: number | null;
+  grams_per_ml?: number | null;
+  gramsPerMl?: number | null;
 };
 
 export type OperationalIngredientCostSource =
@@ -23,7 +57,18 @@ const RECIPE_COST_OVERWRITE_PREFIX = "[RECIPE_COST_OVERWRITE]";
 const RECIPE_HYDRATE_PREFIX = "[RECIPE_HYDRATE]";
 
 export function buildOperationalIngredientCostById(
-  catalog: readonly { id: string; current_price?: number | null; purchase_quantity?: number | null }[],
+  catalog: readonly {
+    id: string;
+    current_price?: number | null;
+    purchase_quantity?: number | null;
+    cost_base_unit?: OperationalIngredientCostFields["cost_base_unit"];
+    usable_weight_grams?: number | null;
+    usable_volume_ml?: number | null;
+    reference_weight_grams?: number | null;
+    reference_volume_ml?: number | null;
+    grams_per_ml?: number | null;
+    gramsPerMl?: number | null;
+  }[],
 ): Map<string, OperationalIngredientCostFields> {
   const map = new Map<string, OperationalIngredientCostFields>();
   for (const row of catalog) {
@@ -32,6 +77,15 @@ export function buildOperationalIngredientCostById(
     map.set(id, {
       current_price: row.current_price ?? null,
       purchase_quantity: row.purchase_quantity ?? null,
+      ...(row.cost_base_unit ? { cost_base_unit: row.cost_base_unit } : {}),
+      ...(row.usable_weight_grams != null ? { usable_weight_grams: row.usable_weight_grams } : {}),
+      ...(row.usable_volume_ml != null ? { usable_volume_ml: row.usable_volume_ml } : {}),
+      ...(row.reference_weight_grams != null
+        ? { reference_weight_grams: row.reference_weight_grams }
+        : {}),
+      ...(row.reference_volume_ml != null ? { reference_volume_ml: row.reference_volume_ml } : {}),
+      ...(row.grams_per_ml != null ? { grams_per_ml: row.grams_per_ml } : {}),
+      ...(row.gramsPerMl != null ? { gramsPerMl: row.gramsPerMl } : {}),
     });
   }
   return map;
@@ -47,8 +101,13 @@ export type ResolveOperationalIngredientCostResult = {
 function shouldLogOperationalCostResolve(): boolean {
   if (import.meta.env.DEV) return true;
   if (typeof window === "undefined") return false;
-  const w = window as Window & { __MARGINLY_RECIPE_CANONICAL_TRACE__?: boolean };
-  return w.__MARGINLY_RECIPE_CANONICAL_TRACE__ === true;
+  const w = window as Window & {
+    __MARGINLY_RECIPE_CANONICAL_TRACE__?: boolean;
+    __MARGINLY_PRICING_TRACE__?: boolean;
+  };
+  return (
+    w.__MARGINLY_RECIPE_CANONICAL_TRACE__ === true || w.__MARGINLY_PRICING_TRACE__ === true
+  );
 }
 
 /** Temporary structured diagnostics for operational cost source selection. */
@@ -94,6 +153,82 @@ export function logRecipeHydrate(input: {
 }
 
 /**
+ * Invoice overlay sometimes carries a legacy mass `cost_base_unit` while pack size is countable (`un`).
+ * Prefer countable invoice semantics without changing pack price / quantity normalization.
+ */
+export function preferInvoiceCountableOverlayFields(
+  fields: OperationalIngredientCostFields,
+): OperationalIngredientCostFields {
+  if (fields.cost_base_unit !== "g" && fields.cost_base_unit !== "ml") {
+    return fields;
+  }
+  // Pack-volume ml (e.g. 450 ml jar) — not legacy g/un mis-tags.
+  if (fields.cost_base_unit === "ml") {
+    const pq = purchaseQuantityDenom(fields.purchase_quantity);
+    if (pq > 1 && pq < 1000) {
+      return fields;
+    }
+  }
+  const { cost_base_unit: _legacyBase, ...withoutExplicitBase } = fields;
+  if (inferIngredientCostBaseUnit(withoutExplicitBase) === "un") {
+    return { ...withoutExplicitBase, cost_base_unit: "un" };
+  }
+  return fields;
+}
+
+function normalizeCountableOperationalCostFields(
+  fields: OperationalIngredientCostFields,
+  context?: { ingredientName?: string | null },
+): OperationalIngredientCostFields {
+  const withCountableBase = preferInvoiceCountableOverlayFields(fields);
+  return repairCountableEmbeddedWeightDenominator(withCountableBase, context);
+}
+
+/**
+ * Invoice/catalog price fields win per resolve order; ingredient-specific conversion metadata
+ * (density, usable per unit) is merged from catalog/embed when absent on the chosen overlay.
+ */
+export function mergeOperationalCostMetadata(
+  fields: OperationalIngredientCostFields,
+  ...fallbacks: (OperationalIngredientCostFields | null | undefined)[]
+): OperationalIngredientCostFields {
+  let merged: OperationalIngredientCostFields = { ...fields };
+  for (const fallback of fallbacks) {
+    if (!fallback) continue;
+    if (merged.usable_weight_grams == null && fallback.usable_weight_grams != null) {
+      merged = { ...merged, usable_weight_grams: fallback.usable_weight_grams };
+    }
+    if (merged.usable_volume_ml == null && fallback.usable_volume_ml != null) {
+      merged = { ...merged, usable_volume_ml: fallback.usable_volume_ml };
+    }
+    if (merged.reference_weight_grams == null && fallback.reference_weight_grams != null) {
+      merged = { ...merged, reference_weight_grams: fallback.reference_weight_grams };
+    }
+    if (merged.reference_volume_ml == null && fallback.reference_volume_ml != null) {
+      merged = { ...merged, reference_volume_ml: fallback.reference_volume_ml };
+    }
+    if (merged.grams_per_ml == null && fallback.grams_per_ml != null) {
+      merged = { ...merged, grams_per_ml: fallback.grams_per_ml };
+    }
+    if (merged.gramsPerMl == null && fallback.gramsPerMl != null) {
+      merged = { ...merged, gramsPerMl: fallback.gramsPerMl };
+    }
+  }
+  return merged;
+}
+
+function shouldPreferEmbedOverLegacyCatalogMassBase(
+  catalog: OperationalIngredientCostFields,
+  embed: OperationalIngredientCostFields,
+): boolean {
+  if (!isOperationalPricingResolved(embed)) return false;
+  const catalogBase = catalog.cost_base_unit ?? inferIngredientCostBaseUnit(catalog);
+  const embedBase = embed.cost_base_unit ?? inferIngredientCostBaseUnit(embed);
+  if (catalogBase !== "g" && catalogBase !== "ml") return false;
+  return embedBase === "un";
+}
+
+/**
  * Latest matched invoice operational price wins over stale catalog / recipe embed snapshots.
  */
 export function resolveOperationalIngredientCostFields(
@@ -101,7 +236,7 @@ export function resolveOperationalIngredientCostFields(
   catalogById: Map<string, OperationalIngredientCostFields>,
   embed?: OperationalIngredientCostFields | null,
   invoiceById?: ReadonlyMap<string, OperationalInvoiceCostEntry>,
-  logContext?: { trigger?: string },
+  logContext?: { trigger?: string; ingredientName?: string | null },
 ): ResolveOperationalIngredientCostResult {
   const id = ingredientId.trim();
   const invoice = id ? invoiceById?.get(id) : undefined;
@@ -110,10 +245,19 @@ export function resolveOperationalIngredientCostFields(
   let result: ResolveOperationalIngredientCostResult;
   if (invoice?.fields) {
     result = {
-      fields: invoice.fields,
+      fields: normalizeCountableOperationalCostFields(invoice.fields, {
+        ingredientName: logContext?.ingredientName,
+      }),
       source: "invoice",
       chosenDate: invoice.invoiceDate ?? null,
       latestInvoiceUnitCost: invoice.latestInvoiceUnitCost ?? null,
+    };
+  } else if (catalog && embed && shouldPreferEmbedOverLegacyCatalogMassBase(catalog, embed)) {
+    result = {
+      fields: embed,
+      source: "embed",
+      chosenDate: null,
+      latestInvoiceUnitCost: null,
     };
   } else if (catalog) {
     result = {
@@ -138,15 +282,46 @@ export function resolveOperationalIngredientCostFields(
     };
   }
 
+  result = {
+    ...result,
+    fields: normalizeCountableOperationalCostFields(
+      mergeOperationalCostMetadata(result.fields, catalog, embed),
+      { ingredientName: logContext?.ingredientName },
+    ),
+  };
+
   if (id && logContext?.trigger) {
+    const operationalUnitCostEur = effectiveIngredientUnitCostEur(result.fields);
     logOperationalCostResolve({
       ingredientId: id,
       latestInvoiceUnitCost: result.latestInvoiceUnitCost,
-      operationalUnitCostEur: effectiveIngredientUnitCostEur(result.fields),
+      operationalUnitCostEur,
       source: result.source,
       chosenDate: result.chosenDate,
       resolvedPrice: result.fields.current_price,
       purchaseQuantity: result.fields.purchase_quantity,
+      trigger: logContext.trigger,
+    });
+    const comparison = catalog
+      ? catalogVsOperationalUnitCosts({
+          catalogPrice: catalog.current_price,
+          catalogPurchaseQuantity: catalog.purchase_quantity,
+          operationalPrice: result.fields.current_price,
+          operationalPurchaseQuantity: result.fields.purchase_quantity,
+        })
+      : null;
+    logPricingAudit({
+      surface: logContext.trigger,
+      ingredientId: id,
+      source: result.source,
+      unitPriceEur: operationalUnitCostEur,
+      resolvedPrice: result.fields.current_price,
+      purchaseQuantity: result.fields.purchase_quantity,
+      invoiceDate: result.chosenDate,
+      fallbackFromInvoice: result.source !== "invoice",
+      catalogUnitPriceEur: comparison?.catalogUnitPriceEur ?? null,
+      operationalUnitPriceEur: comparison?.operationalUnitPriceEur ?? operationalUnitCostEur,
+      catalogVsOperationalDeltaEur: comparison?.catalogVsOperationalDeltaEur ?? null,
       trigger: logContext.trigger,
     });
   }
@@ -159,14 +334,195 @@ export function resolveOperationalIngredientUnitCostEur(
   catalogById: Map<string, OperationalIngredientCostFields>,
   embed?: OperationalIngredientCostFields | null,
   invoiceById?: ReadonlyMap<string, OperationalInvoiceCostEntry>,
-): number {
-  const { fields } = resolveOperationalIngredientCostFields(
+  logContext?: { trigger?: string },
+): number | null {
+  const resolved = resolveOperationalIngredientCostFields(
     ingredientId,
     catalogById,
     embed,
     invoiceById,
+    logContext,
   );
-  return effectiveIngredientUnitCostEur(fields);
+  const unitCostEur = resolvedOperationalUnitCostEur(resolved.fields);
+  if (logContext?.trigger) {
+    logPricingResolverTrace({
+      ingredientId,
+      source: resolved.source,
+      resolved: unitCostEur != null,
+      unitCostEur,
+      unresolvedReason:
+        unitCostEur == null ? MISSING_OPERATIONAL_PRICING_LABEL : null,
+      trigger: logContext.trigger,
+    });
+  }
+  return unitCostEur;
+}
+
+export type ResolveRecipeLineOperationalCostResult = ResolveOperationalIngredientCostResult & {
+  unitCostEur: number | null;
+  lineCostEur: number | null;
+  pricingResolved: boolean;
+  unresolvedReason: string | null;
+};
+
+function priceResolutionAuditBranch(
+  resolved: ResolveOperationalIngredientCostResult,
+  lineContext: IngredientLineCostContext,
+  pricingResolved: boolean,
+  unresolvedReason: string | null,
+): string {
+  if (pricingResolved) return "resolved";
+  if (resolved.source === "missing" || !isOperationalPricingResolved(resolved.fields)) {
+    return "missing_operational_price";
+  }
+  if (unresolvedReason === "HYBRID_CONVERSION_MISSING") {
+    const costBase = inferIngredientCostBaseUnit(resolved.fields, {
+      ingredientName: lineContext.ingredientName,
+    });
+    const recipeNorm = normalizeToBaseUnit(1, lineContext.recipeUnit);
+    if (
+      recipeNorm?.baseUnit === "ml" &&
+      costBase === "g" &&
+      resolveIngredientGramsPerMl(resolved.fields) == null
+    ) {
+      return "density_missing_ml_recipe_weight_invoice";
+    }
+    if (recipeNorm?.baseUnit === "g" && costBase === "ml") {
+      return "density_missing_g_recipe_volume_invoice";
+    }
+    return "hybrid_conversion_missing";
+  }
+  return unresolvedReason ?? "unresolved";
+}
+
+/**
+ * Canonical recipe-line costing: invoice overlay → catalog → embed; never silent €0.
+ */
+export function resolveRecipeLineOperationalCost(
+  ingredientId: string,
+  quantity: number | null | undefined,
+  catalogById: Map<string, OperationalIngredientCostFields>,
+  embed?: OperationalIngredientCostFields | null,
+  invoiceById?: ReadonlyMap<string, OperationalInvoiceCostEntry>,
+  lineContext: IngredientLineCostContext & { trigger?: string } = {},
+): ResolveRecipeLineOperationalCostResult {
+  const resolved = resolveOperationalIngredientCostFields(
+    ingredientId,
+    catalogById,
+    embed,
+    invoiceById,
+    {
+      trigger: lineContext.trigger,
+      ingredientName: lineContext.ingredientName,
+    },
+  );
+  const lineCostEur = ingredientLineCostEur(quantity, resolved.fields, {
+    ...lineContext,
+    source: resolved.source,
+    invoiceDate: resolved.chosenDate,
+  });
+  const unitCostEur =
+    recipeLineOperationalUnitCostEur(lineCostEur, quantity, lineContext.recipeUnit) ??
+    resolvedOperationalUnitCostEur(resolved.fields);
+  const pricingResolved = !isRecipeLineCostUnresolved(lineCostEur);
+  const unresolvedReason = pricingResolved
+    ? null
+    : resolved.source === "missing" || !isOperationalPricingResolved(resolved.fields)
+      ? MISSING_OPERATIONAL_PRICING_LABEL
+      : lineCostEur == null && unitCostEur != null
+        ? "HYBRID_CONVERSION_MISSING"
+        : MISSING_OPERATIONAL_PRICING_LABEL;
+  if (lineContext.trigger) {
+    logPricingResolverTrace({
+      ingredientId,
+      ingredientName: lineContext.ingredientName,
+      source: resolved.source,
+      resolved: pricingResolved,
+      unitCostEur,
+      unresolvedReason,
+      trigger: lineContext.trigger,
+    });
+  }
+
+  logPriceResolutionTrace({
+    kind: "ingredient_line",
+    ingredientId,
+    ingredientName: lineContext.ingredientName,
+    source: resolved.source,
+    pricingResolved,
+    unresolvedReason,
+    resolutionBranch: priceResolutionAuditBranch(
+      resolved,
+      lineContext,
+      pricingResolved,
+      unresolvedReason,
+    ),
+    recipeQuantity: quantity ?? null,
+    recipeUnit: lineContext.recipeUnit ?? null,
+    current_price: resolved.fields.current_price,
+    purchase_quantity: resolved.fields.purchase_quantity,
+    cost_base_unit: resolved.fields.cost_base_unit ?? inferIngredientCostBaseUnit(resolved.fields),
+    grams_per_ml: resolveIngredientGramsPerMl(resolved.fields),
+    usable_volume_ml: resolved.fields.usable_volume_ml ?? null,
+    unitCostEur,
+    lineCostEur,
+    trigger: lineContext.trigger ?? null,
+  });
+
+  if (shouldLogUnitAudit()) {
+    const canonicalUnit = inferIngredientCostBaseUnit(resolved.fields);
+    const embedded = extractEmbeddedMeasureFromIngredientName(lineContext.ingredientName ?? "");
+    const pq = Number(resolved.fields.purchase_quantity);
+    let mismatchReason: IngredientUnitAuditMismatchReason = null;
+    if (!pricingResolved) {
+      if (unresolvedReason === "HYBRID_CONVERSION_MISSING") {
+        mismatchReason = "HYBRID_CONVERSION_MISSING";
+      } else if (unresolvedReason === MISSING_OPERATIONAL_PRICING_LABEL) {
+        mismatchReason = null;
+      } else {
+        mismatchReason = "UNIT_FAMILY_MISMATCH";
+      }
+    }
+    if (
+      embedded.referenceWeightG != null &&
+      Number.isFinite(pq) &&
+      Math.abs(pq - embedded.referenceWeightG) < 0.01 &&
+      canonicalUnit === "un"
+    ) {
+      mismatchReason = "GRAM_DENOMINATOR_ON_COUNTABLE";
+    } else if (
+      canonicalUnit === "g" &&
+      unitFamilyForBaseUnit(canonicalUnit) === "weight" &&
+      /\b(bun|brioche|pão|pao|lata)\b/i.test(lineContext.ingredientName ?? "")
+    ) {
+      mismatchReason = "INFERRED_MASS_BASE_ON_COUNTABLE";
+    }
+    if (!pricingResolved || mismatchReason != null) {
+      logIngredientUnitAudit({
+        ingredientId,
+        ingredientName: lineContext.ingredientName,
+        recipeUnit: lineContext.recipeUnit,
+        canonicalUnit,
+        unitFamily: unitFamilyForBaseUnit(canonicalUnit),
+        pricingSource: resolved.source,
+        referenceWeightG: embedded.referenceWeightG,
+        referenceVolumeMl: embedded.referenceVolumeMl,
+        purchaseQuantity: resolved.fields.purchase_quantity,
+        purchaseUnit: lineContext.purchaseUnit ?? null,
+        mismatchReason,
+        pricingResolved,
+        trigger: lineContext.trigger,
+      });
+    }
+  }
+
+  return {
+    ...resolved,
+    unitCostEur,
+    lineCostEur,
+    pricingResolved,
+    unresolvedReason,
+  };
 }
 
 /** DEV/trace: log when async operational pricing overwrites embed/catalog line cost. */
@@ -305,11 +661,7 @@ export type CostPropLogInput = {
 
 /** Temporary structured diagnostics for cost propagation (DEV / trace flag). */
 export function logCostProp(input: CostPropLogInput): void {
-  if (!import.meta.env.DEV) {
-    if (typeof window === "undefined") return;
-    const w = window as Window & { __MARGINLY_RECIPE_CANONICAL_TRACE__?: boolean };
-    if (w.__MARGINLY_RECIPE_CANONICAL_TRACE__ !== true) return;
-  }
+  if (!shouldLogOperationalCostResolve()) return;
   console.info(COST_PROP_PREFIX, {
     trigger: input.trigger,
     ingredientId: input.ingredientId ?? null,

@@ -89,9 +89,68 @@ describe("ingredient-operational-intelligence", () => {
       "PALHA AUCHAN 2KG",
     ]);
     expect(result.products[0]?.invoiceDate).toBe("2026-02-10");
+    expect(result.products[0]?.chronologySourceType).toBe("invoice_issue_date");
     expect(result.products[0]?.matchBucket).toBeTruthy();
     expect(result.products[0]?.matchSourceHeadline).toBeTruthy();
     expect(result.canonicalName).toBe("Batata palha");
+  });
+
+  it("uses invoice issue date instead of invoice_items.created_at when issue date is set", () => {
+    const result = buildMatchedInvoiceProductsFromScan(
+      "bat-palha",
+      palhaCatalog,
+      {},
+      [
+        {
+          id: "line-continente",
+          invoice_id: "inv-continente",
+          name: "BATATA PALHA CONTINENTE 2KG",
+          quantity: 1,
+          unit: "un",
+          unit_price: 3.5,
+          total: 3.5,
+          created_at: "2026-05-18T09:00:00.000Z",
+          invoices: {
+            invoice_date: "13/05/2026",
+            created_at: "2026-05-18T08:00:00.000Z",
+            supplier_name: "Continente",
+          },
+        },
+      ],
+    );
+
+    expect(result.products).toHaveLength(1);
+    expect(result.products[0]?.invoiceDate).toBe("2026-05-13");
+    expect(result.products[0]?.chronologySourceType).toBe("invoice_issue_date");
+    expect(result.products[0]?.itemCreatedAt).toBe("2026-05-18T09:00:00.000Z");
+  });
+
+  it("falls back to invoices.created_at when invoice_date is missing", () => {
+    const result = buildMatchedInvoiceProductsFromScan(
+      "bat-palha",
+      palhaCatalog,
+      {},
+      [
+        {
+          id: "line-upload",
+          invoice_id: "inv-upload",
+          name: "BATATA PALHA CONTINENTE 2KG",
+          quantity: 1,
+          unit: "un",
+          unit_price: 3.5,
+          total: 3.5,
+          created_at: "2026-05-18T09:00:00.000Z",
+          invoices: {
+            invoice_date: null,
+            created_at: "2026-05-13T08:00:00.000Z",
+            supplier_name: "Continente",
+          },
+        },
+      ],
+    );
+
+    expect(result.products[0]?.invoiceDate).toBe("2026-05-13");
+    expect(result.products[0]?.chronologySourceType).toBe("invoice_uploaded_at");
   });
 
   it("buildMatchedInvoiceProductsFromScan excludes lines resolving to another ingredient", () => {

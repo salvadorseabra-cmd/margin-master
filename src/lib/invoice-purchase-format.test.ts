@@ -363,6 +363,17 @@ describe("supermarket and OCR purchase phrases", () => {
     expect(resolved.normalizedUsableQuantity).toBe(2000);
     expect(formatStructuredPurchaseDisplay(resolved)).toBe("2 kg");
   });
+
+  it("parses embedded 33cl as 330 ml (not 33 ml) in product name", () => {
+    const resolved = resolveInvoiceLinePurchaseFormat({
+      name: "Coca-Cola lata 33cl (Pack 24)",
+      quantity: 1,
+      unit: "cx",
+    });
+    expect(resolved.packageQuantity).toBe(330);
+    expect(resolved.packageMeasurementUnit).toBe("ml");
+    expect(resolved.inferred.purchase_unit_count).toBe(24);
+  });
 });
 
 describe("fallback and meaningless usable guards", () => {
@@ -550,6 +561,22 @@ describe("structuredPurchaseToIngredientFields", () => {
     expect(fields.purchase_quantity).toBe(1000);
     expect(fields.purchase_unit).toBe("g");
     expect(fields.base_unit).toBe("g");
+  });
+
+  it("does not let embedded per-piece weight override countable base unit for buns", () => {
+    const structured = resolveInvoiceLinePurchaseFormat({
+      name: "Pão brioche 80g",
+      quantity: 120,
+      unit: "un",
+    });
+    const fields = structuredPurchaseToIngredientFields(structured, "un", isGeneric);
+    expect(fields).toMatchObject({
+      purchase_quantity: 120,
+      purchase_unit: "un",
+      base_unit: "un",
+    });
+    expect(fields.purchase_quantity).not.toBe(80);
+    expect(fields.purchase_quantity).not.toBe(9600);
   });
 
   it("uses structured usable quantity for explicit weight lines", () => {

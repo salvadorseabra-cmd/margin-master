@@ -16,13 +16,13 @@ import type { FormEvent } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { downloadRecipeTechnicalSheet } from "@/lib/recipe-technical-sheet";
 import {
-  formatCurrency,
-  formatPercent,
-  formatQuantityWithUnit,
-  formatUnitCostCurrency,
-} from "@/lib/display-format";
+  buildTechnicalSheetIngredientsFromCostLines,
+  downloadRecipeTechnicalSheet,
+} from "@/lib/recipe-technical-sheet";
+import { formatCurrency, formatPercent } from "@/lib/display-format";
+import { formatDisplayUnitCostForContext } from "@/lib/display-unit-cost";
+import { formatPackagedLiquidContextFromCostFields } from "@/lib/packaged-liquid-context";
 import { Button } from "@/components/ui/button";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
@@ -44,6 +44,10 @@ import {
 import { traceFoodCostRecalculationSource } from "@/lib/recipe-canonical-graph-trace";
 import { formatRecipeQuantityDisplay, parseRecipeQuantityInput } from "@/lib/recipe-quantity-input";
 import {
+  convertRecipeQuantityBetweenUnits,
+  repairRecipeQuantityDoubleNormalization,
+} from "@/lib/recipe-unit-normalization";
+import {
   normalizeRecipeUsageUnitOption,
   RECIPE_USAGE_UNIT_OPTIONS,
   rememberRecipeUsageUnit,
@@ -62,20 +66,45 @@ import {
 import {
   buildLinesByRecipeId,
   buildRecipesById,
-  computePrepLineCost,
   computePrepUnitCost,
-  computeRecipeLineCostEur,
-  logPrepPropagation,
-  logPrepUnitCost,
-  logResolvedLineCost,
-  computeRecipeTotalCostEur,
+  computeRecipeTotalCostEurOrZero,
   formatPrepUnitCostLabel,
+  recipeLineDisplayUnitCostEur,
+  recipeLineDisplayUnitCostLabel,
   recipeLineContributionPct,
+  resolvePrepUsageLineOperationalCost,
+  sumResolvedRecipeFoodCostEur,
 } from "@/lib/recipe-prep-cost";
 import {
-  computePrepServingsPerBatch,
-  formatPrepServingHint,
-} from "@/lib/recipe-prep-servings";
+  computeRecipePricingSummaryFromRecipe,
+  deriveRecipePricingSummary,
+  deriveRecipePricingSummaryFromCostLines,
+  formatContributionFooterLabel,
+  formatPartialMarginDisplay,
+  formatRecipeFoodCostDisplay,
+  formatRecipeMarginDisplay,
+  isRecipeLineCostUnresolved,
+  logRecipePricingState,
+  logSurfacePriceState,
+  logSurfaceRecipePricingMismatch,
+  recipeFoodCostForMargin,
+  recipeLineCostDisplayCell,
+  resolvedContributionSumPct,
+} from "@/lib/recipe-pricing-state";
+import { computePrepServingsPerBatch, formatPrepServingHint } from "@/lib/recipe-prep-servings";
+import {
+  rememberPrepServingSize,
+  getRememberedPrepServingSize,
+  readPrepServingSizeMemory,
+} from "@/lib/recipe-prep-serving-memory";
+import {
+  buildPrepYieldIntelligence,
+  deriveCostPerServing,
+  formatCostPerServingLabel,
+  formatPrepYieldPickerSubtitle,
+  inferPrepServingFromMenuUsage,
+  type PrepUsageLine,
+} from "@/lib/recipe-prep-yield";
 import { cn } from "@/lib/utils";
 import {
   computeFoodCostPct,
@@ -90,6 +119,20 @@ import {
   type RecipeHealth,
 } from "@/lib/recipe-selling-price";
 import {
+  inferIngredientCostBaseUnit,
+  isOperationalPricingResolved,
+  MISSING_OPERATIONAL_PRICING_LABEL,
+  UNRESOLVED_COST_CELL,
+  type IngredientCostFields,
+} from "@/lib/ingredient-unit-cost";
+import {
+  formatIngredientPriceMetadataHierarchy,
+  formatOperationalPriceContext,
+  shouldShowPricingSourceDebug,
+  type FormattedOperationalPriceContext,
+} from "@/lib/pricing-source-presentation";
+import { logSurfacePricingMismatch, pricingConfidenceFromResolve } from "@/lib/pricing-trace";
+import {
   buildOperationalIngredientCostById,
   enrichRecipeLinesForOperationalCost,
   logCostProp,
@@ -98,6 +141,9 @@ import {
   operationalIngredientCostFieldsForLine,
   resolveOperationalIngredientCostFields,
   resolveOperationalIngredientUnitCostEur,
+  resolveRecipeLineOperationalCost,
+  type OperationalIngredientCostFields,
+  type OperationalIngredientCostSource,
 } from "@/lib/resolve-operational-ingredient-cost";
 
 export const Route = createFileRoute("/recipes")({
@@ -170,6 +216,9 @@ type RecipeForm = {
   selling_price: string;
   output_quantity: string;
   output_unit: string;
+  /** Prep serving size (local memory until a DB column exists). */
+  serving_quantity: string;
+  serving_unit: string;
   lines: RecipeLineForm[];
 };
 
@@ -182,12 +231,18 @@ type RecipeCostLine = {
   isPrepLine: boolean;
   displayName: string;
   quantity: number;
-  unitCost: number;
+  usageUnit: string | null;
+  ingredientCostFields: IngredientCostFields | null;
+  unitCost: number | null;
   unitCostLabel: string | null;
+  packagedLiquidSubtitle: string | null;
   unitCostWarning: string | null;
   prepServingHint: string | null;
-  lineCost: number;
+  lineCost: number | null;
+  pricingUnresolved: boolean;
   contribution: number;
+  /** Human pricing provenance (supplier, invoice date, original pack price). */
+  pricePresentation: FormattedOperationalPriceContext | null;
 };
 
 const emptyRecipeForm: RecipeForm = {
@@ -196,8 +251,61 @@ const emptyRecipeForm: RecipeForm = {
   selling_price: "",
   output_quantity: "",
   output_unit: "",
+  serving_quantity: "",
+  serving_unit: "",
   lines: [],
 };
+
+function flattenMenuPrepUsageLines(
+  recipeRows: RecipeRow[],
+  activeRecipeId: string | null | undefined,
+  activeFormLines: RecipeLineForm[],
+): PrepUsageLine[] {
+  const lines: PrepUsageLine[] = [];
+  for (const recipe of recipeRows) {
+    if (recipe.id === activeRecipeId) {
+      for (const line of activeFormLines) {
+        if (!line.sub_recipe_id) continue;
+        lines.push({
+          sub_recipe_id: line.sub_recipe_id,
+          quantity: parseRecipeQuantityInput(line.quantity),
+          unit: line.unit || null,
+        });
+      }
+      continue;
+    }
+    for (const line of recipe.recipe_ingredients ?? []) {
+      if (!line.sub_recipe_id) continue;
+      lines.push({
+        sub_recipe_id: line.sub_recipe_id,
+        quantity: line.quantity,
+        unit: line.unit,
+      });
+    }
+  }
+  return lines;
+}
+
+function resolvePrepServingFormFields(
+  recipe: RecipeRow,
+  userId: string | undefined,
+  menuLines: PrepUsageLine[],
+): Pick<RecipeForm, "serving_quantity" | "serving_unit"> {
+  const remembered = getRememberedPrepServingSize(userId, recipe.id);
+  const inferred = inferPrepServingFromMenuUsage(recipe.id, menuLines);
+  const source = remembered ?? inferred;
+  if (!source?.quantity || !source.unit) {
+    return { serving_quantity: "", serving_unit: "" };
+  }
+  return {
+    serving_quantity: formatRecipeQuantityDisplay(Number(source.quantity)),
+    serving_unit: normalizeRecipeUsageUnitOption(source.unit) ?? source.unit,
+  };
+}
+
+function prepYieldDisplayValue(label: string | null | undefined): string {
+  return label?.trim() ? label : "—";
+}
 
 function recipeLinePickerValueFromForm(line: RecipeLineForm): string {
   if (line.sub_recipe_id) return recipeLinePickerValue("prep", line.sub_recipe_id);
@@ -211,16 +319,23 @@ function recipeToForm(recipe: RecipeRow): RecipeForm {
     type: recipe.type ?? "dish",
     selling_price: recipeSellingPriceToFormValue(recipe.selling_price, recipe.type),
     output_quantity:
-      recipe.output_quantity != null ? formatRecipeQuantityDisplay(Number(recipe.output_quantity)) : "",
+      recipe.output_quantity != null
+        ? formatRecipeQuantityDisplay(Number(recipe.output_quantity))
+        : "",
     output_unit: isPrepRecipe(recipe.type ?? "dish")
       ? prepOutputUnitSelectValue(recipe.output_unit ?? "")
-      : normalizeRecipeUsageUnitOption(recipe.output_unit) ?? "",
+      : (normalizeRecipeUsageUnitOption(recipe.output_unit) ?? ""),
     lines:
       recipe.recipe_ingredients?.map((line) => ({
         id: line.id,
         ingredient_id: line.ingredient_id ?? "",
         sub_recipe_id: line.sub_recipe_id ?? "",
-        quantity: formatRecipeQuantityDisplay(Number(line.quantity ?? 0)),
+        quantity: formatRecipeQuantityDisplay(
+          repairRecipeQuantityDoubleNormalization(
+            Number(line.quantity ?? 0),
+            normalizeRecipeUsageUnitOption(line.unit) ?? line.unit,
+          ),
+        ),
         unit:
           normalizeRecipeUsageUnitOption(line.unit) ??
           normalizeRecipeUsageUnitOption(line.ingredients?.unit) ??
@@ -247,8 +362,9 @@ function RecipesIndexPage() {
 
   const [recipes, setRecipes] = useState<RecipeRow[]>([]);
   const [ingredientOptions, setIngredientOptions] = useState<IngredientOption[]>([]);
-  const [invoiceOperationalCostByIngredientId, setInvoiceOperationalCostByIngredientId] =
-    useState<Map<string, OperationalInvoiceCostEntry>>(() => new Map());
+  const [invoiceOperationalCostByIngredientId, setInvoiceOperationalCostByIngredientId] = useState<
+    Map<string, OperationalInvoiceCostEntry>
+  >(() => new Map());
   /** Bumped on operational cost events so list cards recompute even if recipe rows are unchanged. */
   const [operationalCostEpoch, setOperationalCostEpoch] = useState(0);
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeRow | null>(null);
@@ -268,7 +384,11 @@ function RecipesIndexPage() {
     setFormMode("edit");
     setEditingRecipeId(recipe.id);
     setSelectedRecipe(recipe);
-    setRecipeForm(recipeToForm(recipe));
+    const menuLines = flattenMenuPrepUsageLines(recipes, recipe.id, recipeToForm(recipe).lines);
+    setRecipeForm({
+      ...recipeToForm(recipe),
+      ...resolvePrepServingFormFields(recipe, user?.id, menuLines),
+    });
     setDeletedLineIds([]);
     setError(null);
     setDetailOpen(true);
@@ -319,11 +439,12 @@ function RecipesIndexPage() {
     async (activeRecipeId?: string) => {
       if (!user) return;
 
-      const [{ data: recipesData, error }, ingredientCatalog, confirmedAliases] = await Promise.all([
-        supabase
-          .from("recipes")
-          .select(
-            `
+      const [{ data: recipesData, error }, ingredientCatalog, confirmedAliases] = await Promise.all(
+        [
+          supabase
+            .from("recipes")
+            .select(
+              `
           id,
           name,
           selling_price,
@@ -354,11 +475,12 @@ function RecipesIndexPage() {
             )
           )
         `,
-          )
-          .order("name", { ascending: true }),
-        loadCanonicalIngredientCatalog(supabase, "current_price, purchase_quantity"),
-        loadConfirmedIngredientAliasMap(supabase),
-      ]);
+            )
+            .order("name", { ascending: true }),
+          loadCanonicalIngredientCatalog(supabase, "current_price, purchase_quantity"),
+          loadConfirmedIngredientAliasMap(supabase),
+        ],
+      );
 
       console.log(error);
 
@@ -689,6 +811,14 @@ function RecipesIndexPage() {
       return;
     }
 
+    if (isPrepRecipe(recipeType)) {
+      const servingQty = parseRecipeQuantityInput(recipeForm.serving_quantity);
+      const servingUnit = normalizeRecipeUsageUnitOption(recipeForm.serving_unit);
+      if (servingQty != null && servingQty > 0 && servingUnit) {
+        rememberPrepServingSize(user.id, recipeId, servingQty, servingUnit);
+      }
+    }
+
     const deleteRequests = deletedLineIds.map((lineId) =>
       supabase.from("recipe_ingredients").delete().eq("id", lineId),
     );
@@ -712,31 +842,33 @@ function RecipesIndexPage() {
 
     const updateRequests = editableLines
       .filter((line) => line.id)
-      .map((line) =>
-        supabase
+      .map((line) => {
+        const lineUnit = line.unit || getLineDefaultUnit(line, ingredientOptions, recipes, user.id);
+        const rawQty = parseRecipeQuantityInput(line.quantity) ?? 0;
+        return supabase
           .from("recipe_ingredients")
           .update({
             ingredient_id: line.sub_recipe_id ? null : line.ingredient_id,
             sub_recipe_id: line.sub_recipe_id || null,
-            quantity: parseRecipeQuantityInput(line.quantity) ?? 0,
-            unit:
-              line.unit ||
-              getLineDefaultUnit(line, ingredientOptions, recipes, user.id),
+            quantity: repairRecipeQuantityDoubleNormalization(rawQty, lineUnit),
+            unit: lineUnit,
           })
-          .eq("id", line.id),
-      );
+          .eq("id", line.id);
+      });
 
     const newLines = editableLines
       .filter((line) => !line.id)
-      .map((line) => ({
-        recipe_id: recipeId,
-        ingredient_id: line.sub_recipe_id ? null : line.ingredient_id,
-        sub_recipe_id: line.sub_recipe_id || null,
-        quantity: parseRecipeQuantityInput(line.quantity) ?? 0,
-        unit:
-          line.unit ||
-          getLineDefaultUnit(line, ingredientOptions, recipes, user.id),
-      }));
+      .map((line) => {
+        const lineUnit = line.unit || getLineDefaultUnit(line, ingredientOptions, recipes, user.id);
+        const rawQty = parseRecipeQuantityInput(line.quantity) ?? 0;
+        return {
+          recipe_id: recipeId,
+          ingredient_id: line.sub_recipe_id ? null : line.ingredient_id,
+          sub_recipe_id: line.sub_recipe_id || null,
+          quantity: repairRecipeQuantityDoubleNormalization(rawQty, lineUnit),
+          unit: lineUnit,
+        };
+      });
 
     const lineResults = await Promise.all([...deleteRequests, ...updateRequests]);
     const lineError = lineResults.find((result) => result.error)?.error;
@@ -779,8 +911,9 @@ function RecipesIndexPage() {
     [ingredientOptions],
   );
 
-  const liveRecipeCosts = useMemo(() => {
-    if (recipes.length === 0) return {} as Record<string, number>;
+  const liveRecipePricingById = useMemo(() => {
+    if (recipes.length === 0)
+      return {} as Record<string, ReturnType<typeof deriveRecipePricingSummary>>;
 
     const linesByRecipe = buildLinesByRecipeId(
       recipes.map((recipe) => ({
@@ -806,13 +939,19 @@ function RecipesIndexPage() {
         output_unit: recipe.output_unit,
       })),
     );
-    const costs: Record<string, number> = {};
+    const pricingById: Record<string, ReturnType<typeof deriveRecipePricingSummary>> = {};
     for (const recipe of recipes) {
-      const path = new Set<string>();
-      const memo = new Map<string, number>();
-      costs[recipe.id] =
-        computeRecipeTotalCostEur(recipe.id, linesByRecipe, recipesById, path, memo) ?? 0;
-      const topIngredientLine = (recipe.recipe_ingredients ?? []).find((line) => line.ingredient_id);
+      const summary = computeRecipePricingSummaryFromRecipe(recipe.id, linesByRecipe, recipesById);
+      pricingById[recipe.id] = summary;
+      logRecipePricingState({
+        surface: "recipes.list_cards",
+        recipeId: recipe.id,
+        summary,
+        trigger: "list_recalc",
+      });
+      const topIngredientLine = (recipe.recipe_ingredients ?? []).find(
+        (line) => line.ingredient_id,
+      );
       if (topIngredientLine?.ingredient_id) {
         const { fields, source, chosenDate, latestInvoiceUnitCost } =
           resolveOperationalIngredientCostFields(
@@ -826,7 +965,7 @@ function RecipesIndexPage() {
           trigger: "list_recalc",
           recipeId: recipe.id,
           ingredientId: topIngredientLine.ingredient_id,
-          totalFoodCost: costs[recipe.id],
+          totalFoodCost: summary.resolvedFoodCostEur,
           unitCostEur: resolveOperationalIngredientUnitCostEur(
             topIngredientLine.ingredient_id,
             operationalCostByIngredientId,
@@ -843,7 +982,7 @@ function RecipesIndexPage() {
         logCostProp({
           trigger: "list_recalc",
           recipeId: recipe.id,
-          totalFoodCost: costs[recipe.id],
+          totalFoodCost: summary.resolvedFoodCostEur,
         });
       }
     }
@@ -852,7 +991,7 @@ function RecipesIndexPage() {
       recipeCount: recipes.length,
       operationalCostEpoch,
     });
-    return costs;
+    return pricingById;
   }, [
     operationalCostByIngredientId,
     invoiceOperationalCostByIngredientId,
@@ -891,7 +1030,7 @@ function RecipesIndexPage() {
     [recipeForm.output_quantity, recipeForm.output_unit, recipeForm.type],
   );
 
-  const prepUnitCostById = useMemo(() => {
+  const { prepUnitCostById, prepBatchCostById } = useMemo(() => {
     const linesByRecipe = buildLinesByRecipeId(
       recipes.map((recipe) => ({
         id: recipe.id,
@@ -948,15 +1087,18 @@ function RecipesIndexPage() {
             : recipe.output_unit,
       })),
     );
-    const map = new Map<string, number>();
+    const unitCostMap = new Map<string, number | null>();
+    const batchCostMap = new Map<string, number | null>();
     for (const recipe of recipes) {
       if (!isPrepRecipe(recipe.type)) continue;
-      map.set(
+      const batchTotal = computeRecipeTotalCostEurOrZero(recipe.id, linesByRecipe, recipesById);
+      batchCostMap.set(recipe.id, batchTotal > 0 ? batchTotal : null);
+      unitCostMap.set(
         recipe.id,
         computePrepUnitCost(recipe.id, linesByRecipe, recipesById, { trigger: "prepUnitCostById" }),
       );
     }
-    return map;
+    return { prepUnitCostById: unitCostMap, prepBatchCostById: batchCostMap };
   }, [
     ingredientOptions,
     invoiceOperationalCostByIngredientId,
@@ -965,6 +1107,116 @@ function RecipesIndexPage() {
     recipeForm.lines,
     recipes,
     selectedRecipe,
+  ]);
+
+  const menuPrepUsageLines = useMemo(
+    () => flattenMenuPrepUsageLines(recipes, selectedRecipe?.id ?? null, recipeForm.lines),
+    [recipeForm.lines, recipes, selectedRecipe?.id],
+  );
+
+  const prepYieldSubtitleById = useMemo(() => {
+    const memory = readPrepServingSizeMemory(user?.id);
+    const map = new Map<string, string>();
+    for (const recipe of recipes) {
+      if (!isPrepRecipe(recipe.type)) continue;
+      const outputQty =
+        recipe.id === selectedRecipe?.id && prepOutputOverride
+          ? prepOutputOverride.output_quantity
+          : recipe.output_quantity;
+      const outputUnit =
+        recipe.id === selectedRecipe?.id && prepOutputOverride
+          ? prepOutputOverride.output_unit
+          : recipe.output_unit;
+      const serving =
+        recipe.id === selectedRecipe?.id
+          ? {
+              quantity: parseRecipeQuantityInput(recipeForm.serving_quantity),
+              unit:
+                normalizeRecipeUsageUnitOption(recipeForm.serving_unit) ?? recipeForm.serving_unit,
+            }
+          : (memory[recipe.id] ?? inferPrepServingFromMenuUsage(recipe.id, menuPrepUsageLines));
+      const intel = buildPrepYieldIntelligence({
+        batchOutputQty: outputQty,
+        batchOutputUnit: outputUnit,
+        servingQty: serving?.quantity,
+        servingUnit: serving?.unit,
+        batchCostEur: prepBatchCostById.get(recipe.id),
+      });
+      const subtitle = formatPrepYieldPickerSubtitle(intel);
+      if (subtitle) map.set(recipe.id, subtitle);
+    }
+    return map;
+  }, [
+    menuPrepUsageLines,
+    prepBatchCostById,
+    prepOutputOverride,
+    recipeForm.serving_quantity,
+    recipeForm.serving_unit,
+    recipes,
+    selectedRecipe?.id,
+    user?.id,
+  ]);
+
+  const packagedLiquidSubtitleById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const ing of ingredientOptions) {
+      const resolved = resolveOperationalIngredientCostFields(
+        ing.id,
+        operationalCostByIngredientId,
+        null,
+        invoiceOperationalCostByIngredientId,
+      );
+      const invoiceEntry = invoiceOperationalCostByIngredientId.get(ing.id);
+      const subtitle = formatPackagedLiquidContextFromCostFields(resolved.fields, {
+        purchaseDate: resolved.chosenDate ?? invoiceEntry?.invoiceDate ?? null,
+      });
+      if (subtitle) map.set(ing.id, subtitle);
+    }
+    return map;
+  }, [
+    ingredientOptions,
+    invoiceOperationalCostByIngredientId,
+    operationalCostByIngredientId,
+    operationalCostEpoch,
+  ]);
+
+  const operationalPriceSubtitleById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const ing of ingredientOptions) {
+      const resolved = resolveOperationalIngredientCostFields(
+        ing.id,
+        operationalCostByIngredientId,
+        null,
+        invoiceOperationalCostByIngredientId,
+      );
+      const invoiceEntry = invoiceOperationalCostByIngredientId.get(ing.id);
+      const unitCostEur = recipeLineDisplayUnitCostEur({
+        lineCostEur: null,
+        quantity: 1,
+        recipeUsageUnit: ing.unit,
+        resolvedUnitCostEur: null,
+        costFields: resolved.fields,
+      });
+      const presentation = formatOperationalPriceContext({
+        source: pricingConfidenceFromResolve({
+          source: resolved.source,
+          pricingResolved: isOperationalPricingResolved(resolved.fields),
+        }),
+        costSource: resolved.source,
+        supplier: invoiceEntry?.supplierLabel ?? null,
+        date: resolved.chosenDate ?? invoiceEntry?.invoiceDate ?? null,
+        unitCostEur,
+        costFields: resolved.fields,
+        costBaseUnit: inferIngredientCostBaseUnit(resolved.fields),
+      });
+      if (presentation.compactLine) map.set(ing.id, presentation.compactLine);
+    }
+    return map;
+  }, [
+    ingredientOptions,
+    invoiceOperationalCostByIngredientId,
+    operationalCostByIngredientId,
+    operationalCostEpoch,
   ]);
 
   const recipeCostLines = useMemo(
@@ -994,21 +1246,43 @@ function RecipesIndexPage() {
       user?.id,
     ],
   );
-  const recipeTotalCost = recipeCostLines.reduce((sum, line) => sum + line.lineCost, 0);
+  const recipePricingSummary = useMemo(
+    () => deriveRecipePricingSummaryFromCostLines(recipeCostLines),
+    [recipeCostLines],
+  );
+  const recipeTotalCost = recipePricingSummary.resolvedFoodCostEur ?? 0;
+  const recipeCostIncomplete = recipePricingSummary.costIncomplete;
 
   useEffect(() => {
     if (!detailOpen || !selectedRecipe) return;
     logCostProp({
       trigger: "form_recalc",
       recipeId: selectedRecipe.id,
-      totalFoodCost: recipeTotalCost,
+      totalFoodCost: recipePricingSummary.resolvedFoodCostEur,
     });
     traceFoodCostRecalculationSource("recipe_form_recalc", {
       recipeId: selectedRecipe.id,
       surface: "recipes.modal",
-      totalFoodCost: recipeTotalCost,
+      totalFoodCost: recipePricingSummary.resolvedFoodCostEur,
     });
-  }, [detailOpen, recipeTotalCost, selectedRecipe]);
+    logRecipePricingState({
+      surface: "recipes.modal",
+      recipeId: selectedRecipe.id,
+      summary: recipePricingSummary,
+      trigger: "form_recalc",
+    });
+    const cardSummary = liveRecipePricingById[selectedRecipe.id];
+    if (cardSummary) {
+      logSurfaceRecipePricingMismatch({
+        recipeId: selectedRecipe.id,
+        surfaceA: "recipes.list_cards",
+        summaryA: cardSummary,
+        surfaceB: "recipes.modal",
+        summaryB: recipePricingSummary,
+        trigger: "form_recalc",
+      });
+    }
+  }, [detailOpen, liveRecipePricingById, recipePricingSummary, selectedRecipe]);
   const sellingPriceOrNull = recipeSellingPriceForSave(recipeForm.selling_price, recipeForm.type);
   const sellingPrice = sellingPriceOrNull ?? 0;
   const grossProfit = hasRecipeSellingPrice(sellingPriceOrNull)
@@ -1018,48 +1292,112 @@ function RecipesIndexPage() {
   const foodCostPercentage = computeFoodCostPct(sellingPriceOrNull, recipeTotalCost);
   const isPrepWithoutPrice =
     isPrepRecipe(recipeForm.type) && !hasRecipeSellingPrice(sellingPriceOrNull);
+  const isPrepWorkspace = isPrepRecipe(recipeForm.type);
+  const prepYieldIntelligence = useMemo(() => {
+    if (!isPrepRecipe(recipeForm.type)) return null;
+    return buildPrepYieldIntelligence({
+      batchOutputQty: parseRecipeQuantityInput(recipeForm.output_quantity),
+      batchOutputUnit: prepOutputOverride?.output_unit ?? recipeForm.output_unit,
+      servingQty: parseRecipeQuantityInput(recipeForm.serving_quantity),
+      servingUnit:
+        normalizeRecipeUsageUnitOption(recipeForm.serving_unit) ?? recipeForm.serving_unit,
+      batchCostEur: recipeTotalCost,
+    });
+  }, [
+    prepOutputOverride?.output_unit,
+    recipeForm.output_quantity,
+    recipeForm.output_unit,
+    recipeForm.serving_quantity,
+    recipeForm.serving_unit,
+    recipeForm.type,
+    recipeTotalCost,
+  ]);
   const activeIngredientCount = recipeCostLines.filter(
     (line) => line.line.ingredient_id || line.line.sub_recipe_id,
   ).length;
-  const topCostDrivers = [...recipeCostLines]
-    .filter((line) => line.lineCost > 0)
-    .sort((a, b) => b.lineCost - a.lineCost)
-    .slice(0, 3);
-  const highestCostDriver = topCostDrivers[0] ?? null;
+  const topCostDrivers = useMemo(
+    () =>
+      [...recipeCostLines]
+        .filter(
+          (line) =>
+            (line.line.ingredient_id || line.line.sub_recipe_id) &&
+            line.lineCost != null &&
+            line.lineCost > 0 &&
+            !isRecipeLineCostUnresolved(line.lineCost),
+        )
+        .sort((a, b) => (b.lineCost ?? 0) - (a.lineCost ?? 0))
+        .slice(0, 5),
+    [recipeCostLines],
+  );
   const recipeHealth = getRecipeHealth(
     sellingPriceOrNull,
     recipeTotalCost,
     foodCostPercentage,
-    highestCostDriver?.contribution ?? 0,
+    topCostDrivers[0]?.contribution ?? 0,
     activeIngredientCount,
     recipeForm.type,
   );
-  const recipeActivityNote = getRecipeActivityNote(
-    selectedRecipe,
-    highestCostDriver?.contribution ?? 0,
-    activeIngredientCount,
-  );
-  const highestCostDriverDetail = getHighestCostDriverDetail(highestCostDriver);
-  const concentrationDetail = getConcentrationDetail(
-    highestCostDriver?.contribution ?? 0,
-    activeIngredientCount,
-  );
   const downloadTechnicalSheet = () => {
+    const sheetIngredients = buildTechnicalSheetIngredientsFromCostLines(recipeCostLines);
+
+    for (const line of recipeCostLines.filter(
+      (row) => row.line.ingredient_id || row.line.sub_recipe_id,
+    )) {
+      const lineKey =
+        line.line.sub_recipe_id || line.line.ingredient_id || line.displayName || "line";
+      logSurfacePricingMismatch({
+        recipeId: selectedRecipe?.id,
+        lineKey,
+        surfaceA: "recipes.modal",
+        surfaceB: "technical_sheet_pdf",
+        modalLineCost: line.lineCost,
+        pdfLineCost: line.lineCost,
+        modalUnitCost: line.unitCost,
+        pdfUnitCost: line.unitCost,
+        resolver: line.isPrepLine
+          ? "resolvePrepUsageLineOperationalCost"
+          : "resolveRecipeLineOperationalCost",
+        trigger: "downloadTechnicalSheet",
+      });
+      if (import.meta.env.DEV) {
+        logSurfacePriceState({
+          recipeId: selectedRecipe?.id,
+          lineId: lineKey,
+          lineCost: line.lineCost,
+          pricingResolved: !line.pricingUnresolved,
+          displayCell: recipeLineCostDisplayCell(line.lineCost),
+          source: line.pricePresentation?.debugResolutionCode ?? null,
+          unresolvedReason: line.unitCostWarning,
+          path: "pdf",
+          trigger: "downloadTechnicalSheet",
+        });
+      }
+    }
+
+    const prepYieldSheet =
+      prepYieldIntelligence?.batchYieldLabel &&
+      prepYieldIntelligence.servingSizeLabel &&
+      prepYieldIntelligence.estimatedServingsLabel &&
+      prepYieldIntelligence.costPerServingLabel
+        ? {
+            batchYield: prepYieldIntelligence.batchYieldLabel,
+            servingSize: prepYieldIntelligence.servingSizeLabel,
+            estimatedServings: prepYieldIntelligence.estimatedServingsLabel,
+            costPerServing: prepYieldIntelligence.costPerServingLabel,
+          }
+        : null;
+
     void downloadRecipeTechnicalSheet({
       recipeName: recipeForm.name,
       category: recipeForm.type,
-      ingredients: recipeCostLines
-        .filter((line) => line.line.ingredient_id || line.line.sub_recipe_id)
-        .map((line) => ({
-          name: line.displayName || "Unnamed line",
-          quantity: line.quantity,
-          unit: line.line.unit || line.ingredient?.unit || "",
-          unitCost: line.unitCost,
-          lineCost: line.lineCost,
-        })),
+      yield: prepYieldSheet ? null : prepYieldIntelligence?.batchYieldLabel,
+      portionSize: prepYieldSheet ? null : prepYieldIntelligence?.servingSizeLabel,
+      prepYield: prepYieldSheet,
+      ingredients: sheetIngredients,
       totalFoodCost: recipeTotalCost,
       sellingPrice: sellingPriceOrNull,
       grossMargin,
+      costIncomplete: recipeCostIncomplete,
     });
   };
 
@@ -1091,9 +1429,13 @@ function RecipesIndexPage() {
       <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {(recipes ?? []).map((r) => {
           const priceOrNull = hasRecipeSellingPrice(r.selling_price) ? r.selling_price : null;
-          const cost = Number(liveRecipeCosts[r.id] ?? 0);
-          const margin = computeGrossMarginPct(priceOrNull, cost);
-          const fc = computeFoodCostPct(priceOrNull, cost);
+          const pricing = liveRecipePricingById[r.id] ?? deriveRecipePricingSummary([]);
+          const marginFoodCost = recipeFoodCostForMargin(pricing);
+          const margin =
+            marginFoodCost != null ? computeGrossMarginPct(priceOrNull, marginFoodCost) : null;
+          const fc =
+            marginFoodCost != null ? computeFoodCostPct(priceOrNull, marginFoodCost) : null;
+          const marginDisplay = formatPartialMarginDisplay(margin, pricing.status === "partial");
           const prepWithoutPrice = isPrepRecipe(r.type) && priceOrNull == null;
           const healthy = margin != null && margin >= 65;
 
@@ -1142,7 +1484,7 @@ function RecipesIndexPage() {
                             ) : (
                               <TrendingDown className="h-3.5 w-3.5" />
                             )}
-                            Gross Margin {formatOptionalMarginPercent(margin)}
+                            Gross Margin {marginDisplay}
                           </>
                         )}
                       </div>
@@ -1155,7 +1497,7 @@ function RecipesIndexPage() {
                       value={prepWithoutPrice ? "—" : formatCurrency(Number(priceOrNull ?? 0))}
                     />
 
-                    <Mini label="Food Cost" value={formatCurrency(cost)} />
+                    <Mini label="Food Cost" value={formatRecipeFoodCostDisplay(pricing)} />
                   </div>
 
                   {fc != null ? (
@@ -1197,18 +1539,18 @@ function RecipesIndexPage() {
           <form
             onSubmit={saveRecipe}
             onClick={(event) => event.stopPropagation()}
-            className="flex max-h-[92vh] w-full max-w-[960px] flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl"
+            className="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl"
           >
-            <div className="border-b border-border px-5 py-5 sm:px-6">
+            <div className="border-b border-border px-5 py-4 sm:px-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
                     Recipe workspace
                   </div>
-                  <div className="mt-1 text-2xl font-semibold tracking-tight">
+                  <div className="mt-1 text-xl font-semibold tracking-tight">
                     {formMode === "create" ? "Build a protected margin recipe" : recipeForm.name}
                   </div>
-                  <div className="mt-2 max-w-xl text-sm text-muted-foreground">
+                  <div className="mt-1 max-w-xl text-sm text-muted-foreground">
                     Review cost, concentration, and margin before service.
                   </div>
                 </div>
@@ -1248,18 +1590,11 @@ function RecipesIndexPage() {
               </div>
             </div>
 
-            <div className="flex-1 space-y-6 overflow-y-auto px-5 py-5 sm:px-6">
-              <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-                <div className="rounded-2xl border border-border bg-card/40 p-4 sm:p-5">
-                  <div className="mb-4">
-                    <div className="text-base font-semibold">Recipe setup</div>
-                    <div className="mt-1 text-sm text-muted-foreground">
-                      Essentials stay editable as margin updates.
-                    </div>
-                  </div>
-
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    <label className="text-sm font-medium text-muted-foreground sm:col-span-3">
+            <div className={cn("flex-1 overflow-y-auto space-y-4 px-5 py-4 sm:px-6")}>
+              <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(12rem,17rem)]">
+                <div className="min-w-0 rounded-2xl border border-border bg-card/40 p-4 sm:p-5">
+                  <div className="grid gap-3">
+                    <label className="text-sm font-medium text-muted-foreground">
                       Recipe name
                       <input
                         required
@@ -1271,57 +1606,58 @@ function RecipesIndexPage() {
                       />
                     </label>
 
-                    <label className="text-sm font-medium text-muted-foreground">
-                      Type
-                      <select
-                        value={recipeForm.type}
-                        onChange={(event) => {
-                          const type = event.target.value;
-                          setRecipeForm({
-                            ...recipeForm,
-                            type,
-                            output_unit:
-                              isPrepRecipe(type) && !normalizeRecipeUsageUnitOption(recipeForm.output_unit)
-                                ? "g"
-                                : recipeForm.output_unit,
-                          });
-                        }}
-                        className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
-                      >
-                        <option value="dish">Dish</option>
-                        <option value="prep">Prep</option>
-                      </select>
-                    </label>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Type
+                        <select
+                          value={recipeForm.type}
+                          onChange={(event) => {
+                            const type = event.target.value;
+                            setRecipeForm({
+                              ...recipeForm,
+                              type,
+                              output_unit:
+                                isPrepRecipe(type) &&
+                                !normalizeRecipeUsageUnitOption(recipeForm.output_unit)
+                                  ? "g"
+                                  : recipeForm.output_unit,
+                            });
+                          }}
+                          className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
+                        >
+                          <option value="dish">Dish</option>
+                          <option value="prep">Prep</option>
+                        </select>
+                      </label>
 
-                    <label className="text-sm font-medium text-muted-foreground sm:col-span-2">
-                      Selling price (€)
-                      {isPrepRecipe(recipeForm.type) ? (
-                        <span className="ml-1 text-xs font-normal text-muted-foreground">
-                          Optional
-                        </span>
-                      ) : null}
-                      <input
-                        required={!isPrepRecipe(recipeForm.type)}
-                        type="number"
-                        step="0.01"
-                        min={isPrepRecipe(recipeForm.type) ? undefined : "0.01"}
-                        placeholder={
-                          isPrepRecipe(recipeForm.type) ? "Leave empty if not sold" : undefined
-                        }
-                        value={recipeForm.selling_price}
-                        onChange={(event) =>
-                          setRecipeForm({
-                            ...recipeForm,
-                            selling_price: event.target.value,
-                          })
-                        }
-                        className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
-                      />
-                    </label>
+                      <label className="text-sm font-medium text-muted-foreground">
+                        Selling price (€)
+                        {isPrepWorkspace ? (
+                          <span className="ml-1 text-xs font-normal text-muted-foreground">
+                            Optional
+                          </span>
+                        ) : null}
+                        <input
+                          required={!isPrepWorkspace}
+                          type="number"
+                          step="0.01"
+                          min={isPrepWorkspace ? undefined : "0.01"}
+                          placeholder={isPrepWorkspace ? "Leave empty if not sold" : undefined}
+                          value={recipeForm.selling_price}
+                          onChange={(event) =>
+                            setRecipeForm({
+                              ...recipeForm,
+                              selling_price: event.target.value,
+                            })
+                          }
+                          className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
+                        />
+                      </label>
+                    </div>
 
-                    {isPrepRecipe(recipeForm.type) ? (
-                      <>
-                        <label className="text-sm font-medium text-muted-foreground sm:col-span-2">
+                    {isPrepWorkspace ? (
+                      <div className="grid gap-3 border-t border-border/60 pt-3 sm:grid-cols-2">
+                        <label className="text-sm font-medium text-muted-foreground">
                           Batch output quantity
                           <div className="mt-1 flex items-center gap-2">
                             <RecipeQuantityInput
@@ -1347,73 +1683,59 @@ function RecipesIndexPage() {
                             </select>
                           </div>
                         </label>
-                      </>
+                        <label className="text-sm font-medium text-muted-foreground">
+                          Serving size (per use)
+                          <p className="mt-0.5 text-xs font-normal text-muted-foreground">
+                            Typical portion when used in a dish.
+                          </p>
+                          <div className="mt-1 flex items-center gap-2">
+                            <RecipeQuantityInput
+                              value={recipeForm.serving_quantity}
+                              onChange={(serving_quantity) =>
+                                setRecipeForm({ ...recipeForm, serving_quantity })
+                              }
+                              className="min-w-0 flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
+                            />
+                            <select
+                              value={prepOutputUnitSelectValue(recipeForm.serving_unit)}
+                              onChange={(event) =>
+                                setRecipeForm({ ...recipeForm, serving_unit: event.target.value })
+                              }
+                              aria-label="Serving unit"
+                              className="w-[3.25rem] shrink-0 rounded-lg border border-input bg-background px-1 py-2 text-left text-xs text-foreground outline-none transition-colors focus:border-foreground/30"
+                            >
+                              {RECIPE_USAGE_UNIT_OPTIONS.map((unitOption) => (
+                                <option key={unitOption} value={unitOption}>
+                                  {unitOption}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </label>
+                      </div>
                     ) : null}
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-border bg-muted/20 p-4 sm:p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="text-base font-semibold">Margin intelligence</div>
-                      <div className="mt-1 text-sm text-muted-foreground">
-                        {recipeHealth.helper}
-                      </div>
-                    </div>
-                    <div
-                      className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                        isPrepWithoutPrice
-                          ? "bg-muted text-muted-foreground"
-                          : recipeHealth.tone === "success"
-                            ? "bg-success/10 text-success"
-                            : recipeHealth.tone === "warning"
-                              ? "bg-warning/10 text-warning"
-                              : "bg-destructive/10 text-destructive"
-                      }`}
-                    >
-                      {isPrepWithoutPrice
-                        ? "Operational prep"
-                        : `${formatPercent(foodCostPercentage ?? 0)} food cost`}
-                    </div>
-                  </div>
-
-                  <div className="mt-5 grid gap-3">
-                    {recipeActivityNote && <OperationalNote text={recipeActivityNote} />}
-                    <InsightRow
-                      label="Primary margin exposure"
-                      value={
-                        highestCostDriver?.displayName
-                          ? highestCostDriver.displayName
-                          : "Add ingredients"
-                      }
-                      detail={highestCostDriverDetail}
-                    />
-                    <InsightRow
-                      label="Cost concentration"
-                      value={
-                        highestCostDriver
-                          ? `${formatPercent(highestCostDriver.contribution)} of recipe cost in one ingredient`
-                          : "No concentration yet"
-                      }
-                      detail={concentrationDetail}
-                    />
-                  </div>
-                </div>
+                <RecipeTopCostDrivers drivers={topCostDrivers} />
               </div>
 
-              <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
                 <KpiCard
                   label="Selling price"
                   value={isPrepWithoutPrice ? "—" : formatCurrency(sellingPrice)}
                 />
-                <KpiCard label="Food cost" value={formatCurrency(recipeTotalCost)} />
+                <KpiCard
+                  label="Food cost"
+                  value={formatRecipeFoodCostDisplay(recipePricingSummary)}
+                />
                 <KpiCard
                   label="Gross profit"
                   value={grossProfit == null ? "—" : formatCurrency(grossProfit)}
                 />
                 <KpiCard
                   label="Gross margin"
-                  value={formatOptionalMarginPercent(grossMargin)}
+                  value={formatRecipeMarginDisplay(recipePricingSummary, sellingPriceOrNull)}
                   tone={
                     grossMargin == null
                       ? undefined
@@ -1426,281 +1748,261 @@ function RecipesIndexPage() {
                 />
                 <KpiCard label="Ingredients" value={String(activeIngredientCount)} />
               </div>
-
-              <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.6fr)]">
-                <div className="rounded-2xl border border-border p-4 sm:p-5">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <div className="font-semibold">Top cost drivers</div>
-                      <div className="mt-1 text-sm text-muted-foreground">
-                        Primary inputs behind recipe margin.
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 space-y-3">
-                    {topCostDrivers.length > 0 ? (
-                      topCostDrivers.map((driver, index) => (
-                        <div
-                          key={`${driver.line.id ?? driver.line.ingredient_id}-${index}`}
-                          className="rounded-xl border border-border bg-card/40 p-3"
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <div className="flex min-w-0 items-center gap-2">
-                                <div className="truncate text-sm font-medium">
-                                  {driver.displayName || "Unnamed line"}
-                                </div>
-                                {driver.isPrepLine ? (
-                                  <span className="shrink-0 rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                                    Prep
-                                  </span>
-                                ) : null}
-                              </div>
-                              <div className="mt-1 text-xs text-muted-foreground">
-                                {formatQuantityWithUnit(driver.quantity, driver.line.unit)}
-                                {driver.unitCostLabel ? (
-                                  <span className="ml-1 tabular-nums">· {driver.unitCostLabel}</span>
-                                ) : null}
-                              </div>
-                              {getCostDriverNote(
-                                index,
-                                driver.contribution,
-                                activeIngredientCount,
-                                driver.line.id,
-                                selectedRecipe,
-                              ) && (
-                                <div className="mt-1 text-[11px] text-muted-foreground">
-                                  {getCostDriverNote(
-                                    index,
-                                    driver.contribution,
-                                    activeIngredientCount,
-                                    driver.line.id,
-                                    selectedRecipe,
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                            <div className="text-right">
-                              <div className="text-sm font-semibold tabular-nums">
-                                {formatCurrency(driver.lineCost)}
-                              </div>
-                              <div className="text-xs text-muted-foreground tabular-nums">
-                                {formatPercent(driver.contribution)}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
-                        Add ingredient quantities to reveal recipe cost drivers.
-                      </div>
-                    )}
+              {isPrepWorkspace ? (
+                <div className="rounded-xl border border-border bg-muted/20 px-3 py-2">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <MetadataChip
+                      label="Batch output"
+                      value={prepYieldDisplayValue(prepYieldIntelligence?.batchYieldLabel)}
+                    />
+                    <MetadataChip
+                      label="Serving size"
+                      value={prepYieldDisplayValue(prepYieldIntelligence?.servingSizeLabel)}
+                    />
+                    <MetadataChip
+                      label="Estimated servings"
+                      value={prepYieldDisplayValue(prepYieldIntelligence?.estimatedServingsLabel)}
+                    />
+                    <MetadataChip
+                      label="Cost/serving"
+                      value={prepYieldDisplayValue(prepYieldIntelligence?.costPerServingLabel)}
+                    />
                   </div>
                 </div>
-
-                <div className="overflow-hidden rounded-2xl border border-border">
-                  <div className="flex items-start justify-between gap-3 border-b border-border px-5 py-4">
-                    <div>
-                      <div className="font-semibold">Ingredient contribution</div>
-                      <div className="mt-1 text-sm text-muted-foreground">
-                        Edit quantities and scan cost share.
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={addRecipeLine}
-                      className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                      <Plus className="h-3.5 w-3.5" />
-                      Add line
-                    </button>
+              ) : (
+                <div className="rounded-xl border border-border bg-muted/20 px-3 py-2">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <MetadataChip label="Category" value={recipeForm.type || "dish"} />
+                    <MetadataChip label="Prep time" value="Not set" />
                   </div>
+                </div>
+              )}
 
-                  <div className="overflow-x-auto">
-                    <table className="w-full min-w-[760px] text-sm">
-                      <thead className="bg-muted/30 text-xs uppercase tracking-wide text-muted-foreground">
-                        <tr>
-                          <th className="px-4 py-3 text-left font-medium">Ingredient</th>
-                          <th className="px-4 py-3 text-right font-medium">Quantity</th>
-                          <th className="px-4 py-3 text-right font-medium">Unit cost</th>
-                          <th className="px-4 py-3 text-right font-medium">Cost</th>
-                          <th className="px-4 py-3 text-right font-medium">Contribution</th>
-                          <th className="px-4 py-3"></th>
-                        </tr>
-                      </thead>
+              <div className="overflow-x-hidden rounded-2xl border border-border">
+                <div className="flex items-start justify-between gap-3 border-b border-border px-4 py-3">
+                  <div>
+                    <div className="font-semibold">Ingredient contribution</div>
+                    <div className="mt-1 text-sm text-muted-foreground">
+                      Edit quantities and scan cost share.
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addRecipeLine}
+                    className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Add line
+                  </button>
+                </div>
 
-                      <tbody className="divide-y divide-border">
-                        {recipeForm.lines.map((line, idx) => {
-                          const costLine = recipeCostLines[idx];
-                          const unitCost = costLine?.unitCost ?? 0;
-                          const lineCost = costLine?.lineCost ?? 0;
-                          const contribution = costLine?.contribution ?? 0;
+                <table className="w-full table-fixed text-sm">
+                    <thead className="bg-muted/30 text-xs uppercase tracking-wide text-muted-foreground">
+                      <tr>
+                        <th className="px-3 py-2 text-left font-medium">Ingredient</th>
+                        <th className="w-[7.5rem] px-3 py-2 text-right font-medium">Quantity</th>
+                        <th className="w-[11rem] px-3 py-2 text-right font-medium">Unit cost</th>
+                        <th className="w-[4.5rem] px-3 py-2 text-right font-medium">Cost</th>
+                        <th className="w-[5.5rem] px-3 py-2 text-right font-medium">Contribution</th>
+                        <th className="w-10 px-3 py-2"></th>
+                      </tr>
+                    </thead>
 
-                          const isPrepRow = Boolean(line.sub_recipe_id);
+                    <tbody className="divide-y divide-border">
+                      {recipeForm.lines.map((line, idx) => {
+                        const costLine = recipeCostLines[idx];
+                        const lineCost = costLine?.lineCost ?? null;
+                        const lineCostUnresolved = isRecipeLineCostUnresolved(lineCost);
+                        const contribution = costLine?.contribution ?? 0;
 
-                          return (
-                            <tr
-                              key={line.id ?? `new-${idx}`}
-                              className={cn(
-                                "align-middle transition-colors",
-                                isPrepRow
-                                  ? "border-l-2 border-l-border/70 bg-muted/20 hover:bg-muted/30 focus-within:bg-muted/30"
-                                  : "hover:bg-muted/25 focus-within:bg-muted/25",
-                              )}
-                            >
-                              <td className="px-4 py-3.5">
-                                <div className="min-w-0 space-y-1">
-                                  <RecipeLinePicker
-                                    options={linePickerOptions}
-                                    value={recipeLinePickerValueFromForm(line)}
-                                    prepUnitCostById={prepUnitCostById}
-                                    onOpenChange={handleLinePickerOpenChange}
-                                    onChange={(pickerValue) => {
-                                      const parsed = parseRecipeLinePickerValue(pickerValue);
-                                      if (!parsed) {
-                                        updateRecipeLine(idx, {
-                                          ingredient_id: "",
-                                          sub_recipe_id: "",
-                                          unit: "",
-                                          unitManuallySet: false,
-                                        });
-                                        return;
-                                      }
-                                      if (parsed.kind === "prep") {
-                                        const prep = linePickerOptions.find(
-                                          (option) =>
-                                            option.kind === "prep" && option.id === parsed.id,
-                                        );
-                                        updateRecipeLine(idx, {
-                                          ingredient_id: "",
-                                          sub_recipe_id: parsed.id,
-                                          ...(line.unitManuallySet
-                                            ? {}
-                                            : { unit: prep?.unit ?? "" }),
-                                        });
-                                        return;
-                                      }
-                                      const ingredient = ingredientOptions.find(
-                                        (row) => row.id === parsed.id,
+                        const isPrepRow = Boolean(line.sub_recipe_id);
+
+                        return (
+                          <tr
+                            key={line.id ?? `new-${idx}`}
+                            className={cn(
+                              "align-middle transition-colors",
+                              isPrepRow
+                                ? "border-l-2 border-l-border/70 bg-muted/20 hover:bg-muted/30 focus-within:bg-muted/30"
+                                : "hover:bg-muted/25 focus-within:bg-muted/25",
+                            )}
+                          >
+                            <td className="px-3 py-1.5">
+                              <div className="min-w-0">
+                                <RecipeLinePicker
+                                  options={linePickerOptions}
+                                  value={recipeLinePickerValueFromForm(line)}
+                                  prepUnitCostById={prepUnitCostById}
+                                  prepYieldSubtitleById={prepYieldSubtitleById}
+                                  packagedLiquidSubtitleById={packagedLiquidSubtitleById}
+                                  operationalPriceSubtitleById={operationalPriceSubtitleById}
+                                  onOpenChange={handleLinePickerOpenChange}
+                                  onChange={(pickerValue) => {
+                                    const parsed = parseRecipeLinePickerValue(pickerValue);
+                                    if (!parsed) {
+                                      updateRecipeLine(idx, {
+                                        ingredient_id: "",
+                                        sub_recipe_id: "",
+                                        unit: "",
+                                        unitManuallySet: false,
+                                      });
+                                      return;
+                                    }
+                                    if (parsed.kind === "prep") {
+                                      const prep = linePickerOptions.find(
+                                        (option) =>
+                                          option.kind === "prep" && option.id === parsed.id,
                                       );
                                       updateRecipeLine(idx, {
-                                        ingredient_id: parsed.id,
-                                        sub_recipe_id: "",
-                                        ...(line.unitManuallySet || !ingredient
-                                          ? {}
-                                          : {
-                                              unit: resolveRecipeUsageUnitForIngredient(
-                                                user?.id,
-                                                parsed.id,
-                                                ingredient.name,
-                                                ingredient.unit,
-                                              ),
-                                            }),
+                                        ingredient_id: "",
+                                        sub_recipe_id: parsed.id,
+                                        ...(line.unitManuallySet ? {} : { unit: prep?.unit ?? "" }),
                                       });
-                                    }}
-                                  />
-                                  {isPrepRow ? (
-                                    <p className="text-[11px] text-muted-foreground">
-                                      Uses prep recipe
-                                    </p>
-                                  ) : null}
-                                </div>
-                              </td>
+                                      return;
+                                    }
+                                    const ingredient = ingredientOptions.find(
+                                      (row) => row.id === parsed.id,
+                                    );
+                                    updateRecipeLine(idx, {
+                                      ingredient_id: parsed.id,
+                                      sub_recipe_id: "",
+                                      ...(line.unitManuallySet || !ingredient
+                                        ? {}
+                                        : {
+                                            unit: resolveRecipeUsageUnitForIngredient(
+                                              user?.id,
+                                              parsed.id,
+                                              ingredient.name,
+                                              ingredient.unit,
+                                            ),
+                                          }),
+                                    });
+                                  }}
+                                />
+                                {isPrepRow ? (
+                                  <p className="text-[11px] text-muted-foreground">
+                                    Uses prep recipe
+                                  </p>
+                                ) : null}
+                              </div>
+                            </td>
 
-                              <td className="px-4 py-3.5 text-right">
-                                <div className="flex flex-col items-end gap-0.5">
-                                  <div className="flex items-center justify-end gap-2">
-                                    <RecipeQuantityInput
-                                      required
-                                      value={line.quantity}
-                                      onChange={(quantity) => updateRecipeLine(idx, { quantity })}
-                                      className="w-24 rounded-lg border border-input bg-background px-3 py-2 text-right text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
-                                    />
-                                    {line.ingredient_id || line.sub_recipe_id ? (
-                                      <select
-                                        value={recipeLineUsageUnitValue(
+                            <td className="px-3 py-1.5 text-right">
+                              <div className="flex flex-col items-end gap-0.5">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <RecipeQuantityInput
+                                    required
+                                    value={line.quantity}
+                                    onChange={(quantity) => updateRecipeLine(idx, { quantity })}
+                                    className="w-20 rounded-lg border border-input bg-background px-2 py-1.5 text-right text-sm text-foreground outline-none transition-colors focus:border-foreground/30"
+                                  />
+                                  {line.ingredient_id || line.sub_recipe_id ? (
+                                    <select
+                                      value={recipeLineUsageUnitValue(
+                                        line,
+                                        ingredientOptions,
+                                        recipes,
+                                        user?.id,
+                                      )}
+                                      onChange={(event) => {
+                                        const unit = event.target.value;
+                                        const prevUnit = recipeLineUsageUnitValue(
                                           line,
                                           ingredientOptions,
                                           recipes,
                                           user?.id,
-                                        )}
-                                        onChange={(event) => {
-                                          const unit = event.target.value;
-                                          updateRecipeLine(idx, {
+                                        );
+                                        const parsedQty = parseRecipeQuantityInput(line.quantity);
+                                        const convertedQty =
+                                          parsedQty != null
+                                            ? convertRecipeQuantityBetweenUnits(
+                                                parsedQty,
+                                                prevUnit,
+                                                unit,
+                                              )
+                                            : null;
+                                        updateRecipeLine(idx, {
+                                          unit,
+                                          unitManuallySet: true,
+                                          ...(convertedQty != null
+                                            ? {
+                                                quantity: formatRecipeQuantityDisplay(convertedQty),
+                                              }
+                                            : {}),
+                                        });
+                                        if (user?.id && line.ingredient_id) {
+                                          rememberRecipeUsageUnit(
+                                            user.id,
+                                            line.ingredient_id,
                                             unit,
-                                            unitManuallySet: true,
-                                          });
-                                          if (user?.id && line.ingredient_id) {
-                                            rememberRecipeUsageUnit(
-                                              user.id,
-                                              line.ingredient_id,
-                                              unit,
-                                            );
-                                          }
-                                        }}
-                                        aria-label="Usage unit"
-                                        className="w-[3.25rem] shrink-0 rounded-lg border border-input bg-background px-1 py-2 text-left text-xs text-foreground outline-none transition-colors focus:border-foreground/30"
-                                      >
-                                        {RECIPE_USAGE_UNIT_OPTIONS.map((unitOption) => (
-                                          <option key={unitOption} value={unitOption}>
-                                            {unitOption}
-                                          </option>
-                                        ))}
-                                      </select>
-                                    ) : null}
-                                  </div>
-                                  {costLine?.prepServingHint ? (
-                                    <p className="max-w-[12rem] text-[11px] leading-tight text-muted-foreground">
-                                      {costLine.prepServingHint}
-                                    </p>
+                                          );
+                                        }
+                                      }}
+                                      aria-label="Usage unit"
+                                      className="w-[3.25rem] shrink-0 rounded-lg border border-input bg-background px-1 py-1.5 text-left text-xs text-foreground outline-none transition-colors focus:border-foreground/30"
+                                    >
+                                      {RECIPE_USAGE_UNIT_OPTIONS.map((unitOption) => (
+                                        <option key={unitOption} value={unitOption}>
+                                          {unitOption}
+                                        </option>
+                                      ))}
+                                    </select>
                                   ) : null}
                                 </div>
-                              </td>
+                                {costLine?.prepServingHint ? (
+                                  <p className="max-w-[12rem] truncate text-xs text-muted-foreground">
+                                    {costLine.prepServingHint}
+                                  </p>
+                                ) : null}
+                              </div>
+                            </td>
 
-                              <td className="px-4 py-3.5 text-right tabular-nums text-muted-foreground">
-                                <div className="flex flex-col items-end gap-0.5">
-                                  <span>
-                                    {costLine?.unitCostLabel ?? formatUnitCostCurrency(unitCost)}
-                                  </span>
-                                  {costLine?.unitCostWarning ? (
-                                    <span className="max-w-[10rem] text-[10px] font-normal leading-tight text-muted-foreground/80">
-                                      {costLine.unitCostWarning}
-                                    </span>
-                                  ) : null}
-                                </div>
-                              </td>
+                            <td className="px-3 py-1.5 text-right align-top">
+                              <RecipeLineUnitCostCell costLine={costLine} />
+                            </td>
 
-                              <td className="px-4 py-3.5 text-right font-semibold tabular-nums">
-                                {formatCurrency(lineCost)}
-                              </td>
+                            <td className="px-3 py-1.5 text-right text-base font-semibold tabular-nums align-top">
+                              {recipeLineCostDisplayCell(lineCost)}
+                            </td>
 
-                              <td className="px-4 py-3.5 text-right">
-                                <span className="inline-flex min-w-16 justify-center rounded-full border border-border bg-background px-2.5 py-1 text-xs font-semibold tabular-nums text-foreground shadow-sm">
-                                  {formatPercent(contribution)}
-                                </span>
-                              </td>
+                            <td className="px-3 py-1.5 text-right align-top">
+                              <span className="inline-flex min-w-12 justify-end text-xs font-semibold tabular-nums text-foreground">
+                                {lineCostUnresolved
+                                  ? UNRESOLVED_COST_CELL
+                                  : formatPercent(contribution)}
+                              </span>
+                            </td>
 
-                              <td className="px-4 py-3.5 text-right">
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                                  onClick={() => removeRecipeLine(idx)}
-                                  aria-label="Remove recipe line"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </Button>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                            <td className="px-3 py-1.5 text-right align-top">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                                onClick={() => removeRecipeLine(idx)}
+                                aria-label="Remove recipe line"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    {recipePricingSummary.status === "partial" ? (
+                      <tfoot className="border-t border-border bg-muted/20 text-xs text-muted-foreground">
+                        <tr>
+                          <td colSpan={4} className="px-3 py-2 text-left">
+                            {formatContributionFooterLabel(recipePricingSummary)}
+                          </td>
+                          <td className="px-3 py-2 text-right font-medium tabular-nums text-foreground">
+                            {formatPercent(resolvedContributionSumPct(recipeCostLines))} resolved
+                          </td>
+                          <td />
+                        </tr>
+                      </tfoot>
+                    ) : null}
+                  </table>
               </div>
             </div>
 
@@ -1890,9 +2192,6 @@ function getRecipeCostLines(input: {
           : recipe.output_unit,
     })),
   );
-  const path = new Set<string>();
-  const memo = new Map<string, number>();
-
   const costLines = lines.map((line) => {
     const ingredient = line.ingredient_id
       ? getIngredientForLine(
@@ -1903,8 +2202,9 @@ function getRecipeCostLines(input: {
       : null;
     const subRecipe =
       line.sub_recipe_id != null && line.sub_recipe_id !== ""
-        ? (selectedRecipe?.recipe_ingredients?.find((row) => row.sub_recipe_id === line.sub_recipe_id)
-            ?.sub_recipe ??
+        ? (selectedRecipe?.recipe_ingredients?.find(
+            (row) => row.sub_recipe_id === line.sub_recipe_id,
+          )?.sub_recipe ??
           allRecipes.find((recipe) => recipe.id === line.sub_recipe_id) ??
           null)
         : null;
@@ -1914,7 +2214,7 @@ function getRecipeCostLines(input: {
         (option.kind === "ingredient" && option.id === line.ingredient_id),
     );
     const displayName = line.sub_recipe_id
-      ? subRecipe?.name ?? pickerOption?.name ?? "Prep"
+      ? (subRecipe?.name ?? pickerOption?.name ?? "Prep")
       : formatCanonicalIngredientDisplayName(ingredient?.name) ||
         pickerOption?.name ||
         "Unnamed ingredient";
@@ -1934,136 +2234,115 @@ function getRecipeCostLines(input: {
       });
     }
 
-    const quantity = parseRecipeQuantityInput(line.quantity) ?? 0;
-    const usageUnit = recipeLineUsageUnitValue(
-      line,
-      ingredientOptions,
-      allRecipes,
-      userId,
+    const usageUnit = recipeLineUsageUnitValue(line, ingredientOptions, allRecipes, userId);
+    const quantity = repairRecipeQuantityDoubleNormalization(
+      parseRecipeQuantityInput(line.quantity) ?? 0,
+      usageUnit,
     );
-    const costLine = {
-      ingredient_id: line.ingredient_id || null,
-      sub_recipe_id: line.sub_recipe_id || null,
-      quantity,
-      unit: usageUnit || null,
-      ingredients: line.ingredient_id
-        ? operationalIngredientCostFieldsForLine(
-            line.ingredient_id,
-            operationalCostByIngredientId,
-            recipeLineEmbedCostSnapshot(
-              line.ingredient_id,
-              selectedRecipe?.recipe_ingredients ?? null,
-            ),
-            invoiceOperationalCostByIngredientId,
-          )
-        : null,
-    };
     const isPrepUsageLine = line.sub_recipe_id != null && line.sub_recipe_id !== "";
     const prep = isPrepUsageLine ? recipesById.get(line.sub_recipe_id) : undefined;
-    let lineCost =
-      computeRecipeLineCostEur(costLine, linesByRecipe, recipesById, path, memo) ?? 0;
+    let lineCost: number | null = null;
+    let resolvedUnitCost: number | null = null;
+    let ingredientCostFields: IngredientCostFields | null = null;
     let unitCostWarning: string | null = null;
-    logResolvedLineCost({
-      recipeId: selectedRecipe?.id,
-      ingredientId: line.ingredient_id || null,
-      prepId: line.sub_recipe_id || null,
-      quantity,
-      unit: usageUnit || null,
-      lineCostEur: lineCost,
-      trigger: "getRecipeCostLines_initial",
-    });
+    let pricePresentation: RecipeCostLine["pricePresentation"] = null;
+    let pricingUnresolved = false;
+    let resolvedCostSource: OperationalIngredientCostSource | null = null;
+    let resolvedChosenDate: string | null = null;
     if (line.ingredient_id) {
-      const embed = recipeLineEmbedCostSnapshot(
+      const embedForResolve = recipeLineEmbedCostSnapshot(
         line.ingredient_id,
         selectedRecipe?.recipe_ingredients ?? null,
       );
-      const { fields, source, chosenDate, latestInvoiceUnitCost } =
-        resolveOperationalIngredientCostFields(
-          line.ingredient_id,
-          operationalCostByIngredientId,
-          embed,
-          invoiceOperationalCostByIngredientId,
-          { trigger: "line_cost" },
-        );
+      const resolved = resolveRecipeLineOperationalCost(
+        line.ingredient_id,
+        quantity,
+        operationalCostByIngredientId,
+        embedForResolve,
+        invoiceOperationalCostByIngredientId,
+        {
+          recipeUnit: usageUnit,
+          ingredientName: displayName,
+          trigger: "getRecipeCostLines",
+        },
+      );
+      lineCost = resolved.lineCostEur;
+      resolvedUnitCost = resolved.unitCostEur;
+      ingredientCostFields = resolved.fields;
+      const lineCostResolved = !isRecipeLineCostUnresolved(lineCost);
+      if (!lineCostResolved) {
+        unitCostWarning = resolved.unresolvedReason ?? MISSING_OPERATIONAL_PRICING_LABEL;
+      }
+      resolvedCostSource = resolved.source;
+      resolvedChosenDate = resolved.chosenDate;
       logCostProp({
         trigger: "line_cost",
         recipeId: selectedRecipe?.id,
         ingredientId: line.ingredient_id,
-        lineCost,
+        lineCost: lineCost ?? null,
         unitCostEur: resolveOperationalIngredientUnitCostEur(
           line.ingredient_id,
           operationalCostByIngredientId,
-          embed,
+          embedForResolve,
           invoiceOperationalCostByIngredientId,
+          { trigger: "line_cost" },
         ),
-        resolvedPrice: fields.current_price,
-        purchaseQuantity: fields.purchase_quantity,
-        source,
-        chosenDate,
-        latestInvoiceUnitCost,
+        resolvedPrice: resolved.fields.current_price,
+        purchaseQuantity: resolved.fields.purchase_quantity,
+        source: resolved.source,
+        chosenDate: resolved.chosenDate,
+        latestInvoiceUnitCost: resolved.latestInvoiceUnitCost,
       });
     }
+    let prepUnitCost: number | null = null;
     if (isPrepUsageLine) {
-      const prepPath = new Set<string>();
-      const prepMemo = new Map<string, number>();
-      const prepTotal = computeRecipeTotalCostEur(
+      const prepResolved = resolvePrepUsageLineOperationalCost(
         line.sub_recipe_id,
+        quantity,
+        usageUnit,
         linesByRecipe,
         recipesById,
-        prepPath,
-        prepMemo,
-      );
-      if (prepTotal != null) {
-        const prepLine = computePrepLineCost(
-          quantity,
-          usageUnit,
-          prepTotal,
-          prep?.output_quantity,
-          prep?.output_unit,
-        );
-        unitCostWarning = prepLine.warning ?? null;
-        lineCost = prepLine.cost ?? 0;
-        logPrepPropagation({
+        {
           parentRecipeId: selectedRecipe?.id,
-          prepId: line.sub_recipe_id,
-          usageQuantity: quantity,
-          usageUnit,
-          batchTotalEur: prepTotal,
-          lineCostEur: lineCost,
-          outputQuantity: prep?.output_quantity,
-          outputUnit: prep?.output_unit,
+          prepName: subRecipe?.name ?? null,
           trigger: "getRecipeCostLines",
-        });
-        logPrepUnitCost({
-          prepId: line.sub_recipe_id,
-          batchTotalEur: prepTotal,
-          outputQuantity: prep?.output_quantity,
-          outputUnit: prep?.output_unit,
-          unitCostEur:
-            quantity > 0 && lineCost != null ? lineCost / quantity : 0,
-          trigger: "getRecipeCostLines_usage_unit",
-        });
+        },
+      );
+      lineCost = prepResolved.lineCostEur;
+      prepUnitCost = prepResolved.unitCostEur;
+      if (isRecipeLineCostUnresolved(lineCost)) {
+        unitCostWarning =
+          prepResolved.warning ??
+          prepResolved.unresolvedReason ??
+          MISSING_OPERATIONAL_PRICING_LABEL;
       }
-      logResolvedLineCost({
-        recipeId: selectedRecipe?.id,
-        prepId: line.sub_recipe_id,
-        quantity,
-        unit: usageUnit || null,
-        lineCostEur: lineCost,
-        trigger: "getRecipeCostLines_prep",
-      });
       logCostProp({
         trigger: "prep_line_cost",
         recipeId: selectedRecipe?.id,
         prepId: line.sub_recipe_id,
-        lineCost,
+        lineCost: lineCost ?? null,
       });
     }
-    const unitCost = quantity > 0 ? lineCost / quantity : 0;
+    const unitCost = isPrepUsageLine
+      ? (prepUnitCost ?? (lineCost != null && quantity > 0 ? lineCost / quantity : null))
+      : recipeLineDisplayUnitCostEur({
+          lineCostEur: lineCost,
+          quantity,
+          recipeUsageUnit: usageUnit,
+          resolvedUnitCostEur: resolvedUnitCost,
+          costFields: ingredientCostFields,
+        });
     const unitCostLabel =
-      isPrepUsageLine && quantity > 0 && usageUnit
-        ? formatPrepUnitCostLabel(unitCost, usageUnit)
-        : null;
+      isRecipeLineCostUnresolved(lineCost) || unitCost == null
+        ? null
+        : isPrepUsageLine && quantity > 0 && usageUnit
+          ? formatPrepUnitCostLabel(unitCost, usageUnit)
+          : line.ingredient_id && quantity > 0 && usageUnit
+            ? recipeLineDisplayUnitCostLabel(unitCost, usageUnit, {
+                costFields: ingredientCostFields,
+                isPrepLine: false,
+              })
+            : null;
     const prepServings =
       isPrepUsageLine && quantity > 0 && usageUnit
         ? computePrepServingsPerBatch({
@@ -2073,8 +2352,66 @@ function getRecipeCostLines(input: {
             usageUnit,
           })
         : null;
+    const prepBatchTotalForHint =
+      isPrepUsageLine && line.sub_recipe_id
+        ? computeRecipeTotalCostEurOrZero(line.sub_recipe_id, linesByRecipe, recipesById)
+        : null;
+    const prepCostPerServingHint = deriveCostPerServing(prepBatchTotalForHint, prepServings);
     const prepServingHint =
-      prepServings != null ? formatPrepServingHint(quantity, usageUnit, prepServings) : null;
+      prepServings != null
+        ? [
+            formatPrepServingHint(quantity, usageUnit, prepServings),
+            prepCostPerServingHint != null
+              ? formatCostPerServingLabel(prepCostPerServingHint)
+              : null,
+          ]
+            .filter(Boolean)
+            .join(" · ")
+        : null;
+    const packagedLiquidSubtitle =
+      !isPrepUsageLine && ingredientCostFields
+        ? formatPackagedLiquidContextFromCostFields(ingredientCostFields, {
+            purchaseDate:
+              line.ingredient_id != null
+                ? (resolvedChosenDate ??
+                  invoiceOperationalCostByIngredientId.get(line.ingredient_id)?.invoiceDate ??
+                  null)
+                : null,
+          })
+        : null;
+
+    if (!isPrepUsageLine && line.ingredient_id) {
+      const invoiceEntry = invoiceOperationalCostByIngredientId.get(line.ingredient_id);
+      pricePresentation = formatOperationalPriceContext({
+        source: pricingConfidenceFromResolve({
+          source: resolvedCostSource ?? "missing",
+          pricingResolved: !isRecipeLineCostUnresolved(lineCost),
+        }),
+        costSource: resolvedCostSource ?? "missing",
+        supplier: invoiceEntry?.supplierLabel ?? null,
+        date: resolvedChosenDate ?? invoiceEntry?.invoiceDate ?? null,
+        unitCostEur: unitCost,
+        costFields: ingredientCostFields ?? { current_price: null, purchase_quantity: null },
+        costBaseUnit: inferIngredientCostBaseUnit(
+          ingredientCostFields ?? { current_price: null, purchase_quantity: null },
+        ),
+      });
+    }
+
+    pricingUnresolved = isRecipeLineCostUnresolved(lineCost);
+    if (import.meta.env.DEV && (line.ingredient_id || line.sub_recipe_id)) {
+      logSurfacePriceState({
+        recipeId: selectedRecipe?.id,
+        lineId: line.id ?? line.ingredient_id ?? line.sub_recipe_id,
+        lineCost,
+        pricingResolved: !pricingUnresolved,
+        displayCell: recipeLineCostDisplayCell(lineCost),
+        source: pricePresentation?.debugResolutionCode ?? null,
+        unresolvedReason: unitCostWarning,
+        path: "modal",
+        trigger: "getRecipeCostLines",
+      });
+    }
 
     return {
       line,
@@ -2083,110 +2420,50 @@ function getRecipeCostLines(input: {
       isPrepLine: Boolean(line.sub_recipe_id),
       displayName,
       quantity,
+      usageUnit,
+      ingredientCostFields,
       unitCost,
       unitCostLabel,
+      packagedLiquidSubtitle,
       unitCostWarning,
       prepServingHint,
       lineCost,
+      pricingUnresolved,
       contribution: 0,
+      pricePresentation,
     };
   });
 
-  const totalCost = costLines.reduce((sum, line) => sum + line.lineCost, 0);
+  const { resolvedTotal: totalCost } = sumResolvedRecipeFoodCostEur(costLines);
 
   return costLines.map((line) => ({
     ...line,
-    contribution: recipeLineContributionPct(line.lineCost, totalCost),
+    contribution: recipeLineContributionPct(line.lineCost ?? 0, totalCost),
   }));
-}
-
-function getRecipeActivityNote(
-  recipe: RecipeRow | null,
-  highestContribution: number,
-  ingredientCount: number,
-) {
-  const lines =
-    recipe?.recipe_ingredients?.filter((line) => line.ingredient_id || line.sub_recipe_id) ?? [];
-  const recentlyLinked = lines.some((line) => isRecentDate(line.created_at));
-
-  if (recentlyLinked) return "Recently updated ingredient links";
-  if (highestContribution >= 65 && ingredientCount > 1) {
-    return `${formatPercent(highestContribution)} of cost concentrated in one ingredient`;
-  }
-
-  return null;
-}
-
-function getHighestCostDriverDetail(driver: RecipeCostLine | null) {
-  if (!driver) return "Cost drivers appear once recipe lines are added.";
-
-  return `${formatCurrency(driver.lineCost)} · ${formatPercent(driver.contribution)} of cost · primary exposure if price or portion changes`;
-}
-
-function getConcentrationDetail(highestContribution: number, ingredientCount: number) {
-  if (ingredientCount === 0) return "Add ingredient quantities to assess concentration.";
-
-  if (ingredientCount === 1) {
-    return "Single-ingredient recipe; margin follows this input.";
-  }
-
-  if (highestContribution >= 65) {
-    return "High concentration; check price cover and portion control.";
-  }
-
-  if (highestContribution >= 45) {
-    return "Meaningful concentration; keep this input visible during costing.";
-  }
-
-  return "Cost is spread across ingredients with no dominant input.";
-}
-
-function getCostDriverNote(
-  index: number,
-  contribution: number,
-  ingredientCount: number,
-  lineId: string | null,
-  recipe: RecipeRow | null,
-) {
-  const activityNote = getRecipeLineActivityNote(lineId, recipe);
-  if (activityNote) return activityNote;
-
-  if (index !== 0 || ingredientCount <= 1) return null;
-  if (contribution >= 65) return "Primary margin exposure";
-  if (contribution >= 45) return "Main contributor to recipe volatility";
-
-  return "Leading cost contributor";
-}
-
-function getRecipeLineActivityNote(lineId: string | null, recipe: RecipeRow | null) {
-  if (!lineId) return null;
-
-  const line = recipe?.recipe_ingredients?.find((recipeLine) => recipeLine.id === lineId);
-
-  if (isRecentDate(line?.created_at)) return "Recently linked";
-
-  return null;
-}
-
-function isRecentDate(value: string | null | undefined, days = 14) {
-  if (!value) return false;
-
-  const timestamp = new Date(value).getTime();
-  if (!Number.isFinite(timestamp)) return false;
-
-  const ageMs = Date.now() - timestamp;
-  return ageMs >= 0 && ageMs <= days * 24 * 60 * 60 * 1000;
 }
 
 function recipeLineEmbedCostSnapshot(
   ingredientId: string,
   recipeIngredients: RecipeIngredient[] | null,
-) {
+): OperationalIngredientCostFields | null {
   const embed = recipeIngredients?.find((line) => line.ingredient_id === ingredientId)?.ingredients;
   if (!embed) return null;
   return {
     current_price: embed.current_price,
     purchase_quantity: embed.purchase_quantity,
+    ...(embed.cost_base_unit ? { cost_base_unit: embed.cost_base_unit } : {}),
+    ...(embed.usable_weight_grams != null
+      ? { usable_weight_grams: embed.usable_weight_grams }
+      : {}),
+    ...(embed.usable_volume_ml != null ? { usable_volume_ml: embed.usable_volume_ml } : {}),
+    ...(embed.reference_weight_grams != null
+      ? { reference_weight_grams: embed.reference_weight_grams }
+      : {}),
+    ...(embed.reference_volume_ml != null
+      ? { reference_volume_ml: embed.reference_volume_ml }
+      : {}),
+    ...(embed.grams_per_ml != null ? { grams_per_ml: embed.grams_per_ml } : {}),
+    ...(embed.gramsPerMl != null ? { gramsPerMl: embed.gramsPerMl } : {}),
   };
 }
 
@@ -2202,6 +2479,122 @@ function getIngredientForLine(
   );
 }
 
+function RecipeTopCostDrivers({ drivers }: { drivers: RecipeCostLine[] }) {
+  const maxContribution = drivers.reduce(
+    (peak, driver) => Math.max(peak, driver.contribution),
+    0,
+  );
+
+  return (
+    <div className="min-w-0 rounded-xl border border-border/80 bg-muted/15 px-3 py-2.5 lg:sticky lg:top-0">
+      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Top cost drivers
+      </div>
+      {drivers.length > 0 ? (
+        <ul className="mt-2 space-y-2.5" aria-label="Top recipe cost drivers">
+          {drivers.map((driver, index) => {
+            const barWidth =
+              maxContribution > 0 ? (driver.contribution / maxContribution) * 100 : 0;
+            return (
+              <li
+                key={`${driver.line.id ?? driver.line.ingredient_id ?? driver.line.sub_recipe_id}-${index}`}
+                className="min-w-0"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="flex min-w-0 items-center gap-1">
+                      <span className="truncate text-xs font-medium text-foreground">
+                        {driver.displayName || "Unnamed line"}
+                      </span>
+                      {driver.isPrepLine ? (
+                        <span className="shrink-0 text-[9px] font-medium uppercase tracking-wide text-muted-foreground">
+                          Prep
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="shrink-0 text-right leading-tight">
+                    <div className="text-xs font-semibold tabular-nums text-foreground">
+                      {recipeLineCostDisplayCell(driver.lineCost)}
+                    </div>
+                    <div className="text-[10px] tabular-nums text-muted-foreground">
+                      {formatPercent(driver.contribution)}
+                    </div>
+                  </div>
+                </div>
+                <div
+                  className="mt-1 h-1 overflow-hidden rounded-full bg-muted"
+                  role="presentation"
+                  aria-hidden
+                >
+                  <div
+                    className="h-full rounded-full bg-foreground/55 transition-[width] duration-300"
+                    style={{ width: `${Math.max(barWidth, driver.contribution > 0 ? 4 : 0)}%` }}
+                  />
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="mt-1.5 text-xs text-muted-foreground">
+          Add ingredient quantities to reveal recipe cost drivers.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function RecipeLineUnitCostCell({ costLine }: { costLine: RecipeCostLine | undefined }) {
+  const lineCostUnresolved = isRecipeLineCostUnresolved(costLine?.lineCost ?? null);
+  const unitCost = costLine?.unitCost ?? null;
+  const primaryLabel =
+    costLine?.unitCostLabel ??
+    (lineCostUnresolved || unitCost == null
+      ? UNRESOLVED_COST_CELL
+      : formatDisplayUnitCostForContext(
+          unitCost,
+          costLine?.usageUnit ?? costLine?.line.unit ?? costLine?.ingredient?.unit,
+          {
+            costFields: costLine?.ingredientCostFields,
+            preferUsageUnitSemantics: costLine?.isPrepLine,
+          },
+        ));
+
+  const metadata = formatIngredientPriceMetadataHierarchy({
+    provenanceLine: costLine?.pricePresentation?.compactLine ?? null,
+    packagedPackLine: costLine?.packagedLiquidSubtitle ?? null,
+  });
+
+  return (
+    <div className="flex flex-col items-end gap-0.5 text-right">
+      <span className="text-sm font-medium tabular-nums text-foreground">{primaryLabel}</span>
+      {metadata.secondaryLine ? (
+        <span className="text-[11px] leading-snug text-muted-foreground">{metadata.secondaryLine}</span>
+      ) : null}
+      {metadata.tertiaryLine ? (
+        <span className="text-[10px] leading-snug text-muted-foreground/75">
+          {metadata.tertiaryLine}
+        </span>
+      ) : null}
+      {costLine?.unitCostWarning ? (
+        <span className="text-[10px] leading-snug text-destructive">
+          ⚠ {costLine.unitCostWarning}
+        </span>
+      ) : null}
+      {shouldShowPricingSourceDebug() &&
+        costLine?.pricePresentation?.technicalDetailLines.map((detailLine) => (
+          <span
+            key={detailLine}
+            className="max-w-full text-[10px] leading-snug text-muted-foreground/70"
+          >
+            {detailLine}
+          </span>
+        ))}
+    </div>
+  );
+}
+
 function Mini({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0 rounded-lg border border-border bg-muted/50 py-2">
@@ -2210,6 +2603,17 @@ function Mini({ label, value }: { label: string; value: string }) {
       </div>
 
       <div className="truncate text-sm font-semibold tabular-nums">{value}</div>
+    </div>
+  );
+}
+
+function MetadataChip({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="inline-flex min-w-0 items-center gap-1.5 rounded-full border border-border/70 bg-background/40 px-2 py-1">
+      <span className="truncate text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </span>
+      <span className="truncate text-xs font-semibold tabular-nums text-foreground">{value}</span>
     </div>
   );
 }
@@ -2224,12 +2628,12 @@ function KpiCard({
   tone?: RecipeHealth["tone"];
 }) {
   return (
-    <div className="min-w-0 rounded-xl border border-border bg-card/30 px-3 py-3">
+    <div className="min-w-0 rounded-xl border border-border bg-card/30 px-3 py-2">
       <div className="truncate text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
         {label}
       </div>
       <div
-        className={`mt-1.5 truncate text-xl font-semibold tabular-nums ${
+        className={`mt-1 truncate text-lg font-semibold tabular-nums ${
           tone === "success"
             ? "text-success"
             : tone === "warning"
@@ -2241,26 +2645,6 @@ function KpiCard({
       >
         {value}
       </div>
-    </div>
-  );
-}
-
-function InsightRow({ label, value, detail }: { label: string; value: string; detail: string }) {
-  return (
-    <div className="min-w-0 rounded-xl border border-border bg-background/70 p-3">
-      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        {label}
-      </div>
-      <div className="mt-1 break-words text-sm font-semibold">{value}</div>
-      <div className="mt-1 text-xs text-muted-foreground">{detail}</div>
-    </div>
-  );
-}
-
-function OperationalNote({ text }: { text: string }) {
-  return (
-    <div className="rounded-xl border border-border/70 bg-background/50 px-3 py-2 text-xs text-muted-foreground">
-      {text}
     </div>
   );
 }

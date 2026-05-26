@@ -17,11 +17,15 @@ import {
   type RecipeLinePickerOption,
 } from "@/lib/recipe-line-picker-options";
 import { formatPrepUnitCostLabel } from "@/lib/recipe-prep-cost";
+import { formatIngredientPriceMetadataHierarchy } from "@/lib/pricing-source-presentation";
 
 type RecipeLinePickerProps = {
   options: RecipeLinePickerOption[];
   value: string;
-  prepUnitCostById?: Map<string, number>;
+  prepUnitCostById?: Map<string, number | null>;
+  prepYieldSubtitleById?: Map<string, string>;
+  packagedLiquidSubtitleById?: Map<string, string>;
+  operationalPriceSubtitleById?: Map<string, string>;
   onChange: (pickerValue: string) => void;
   onOpenChange?: (open: boolean) => void;
   disabled?: boolean;
@@ -32,6 +36,9 @@ export function RecipeLinePicker({
   options,
   value,
   prepUnitCostById,
+  prepYieldSubtitleById,
+  packagedLiquidSubtitleById,
+  operationalPriceSubtitleById,
   onChange,
   onOpenChange,
   disabled,
@@ -92,9 +99,21 @@ export function RecipeLinePicker({
                 const prepUnitCost =
                   option.kind === "prep" ? prepUnitCostById?.get(option.id) : undefined;
                 const prepCostLabel =
-                  prepUnitCost != null
+                  prepUnitCost != null && prepUnitCost > 0
                     ? formatPrepUnitCostLabel(prepUnitCost, option.unit)
                     : null;
+                const prepYieldSubtitle =
+                  option.kind === "prep"
+                    ? prepYieldSubtitleById?.get(option.id)
+                    : undefined;
+                const packagedLiquidSubtitle =
+                  option.kind === "ingredient"
+                    ? packagedLiquidSubtitleById?.get(option.id)
+                    : undefined;
+                const operationalPriceSubtitle =
+                  option.kind === "ingredient"
+                    ? operationalPriceSubtitleById?.get(option.id)
+                    : undefined;
 
                 return (
                   <CommandItem
@@ -131,15 +150,38 @@ export function RecipeLinePicker({
                           </span>
                         ) : null}
                       </div>
-                      {prepCostLabel ? (
-                        <span className="text-[11px] tabular-nums text-muted-foreground">
-                          {prepCostLabel}
-                        </span>
-                      ) : option.kind === "prep" ? (
-                        <span className="text-[11px] text-muted-foreground">
-                          Set batch output for unit cost
-                        </span>
-                      ) : null}
+                      {(() => {
+                        if (option.kind === "ingredient") {
+                          const metadata = formatIngredientPriceMetadataHierarchy({
+                            provenanceLine: operationalPriceSubtitle ?? null,
+                            packagedPackLine: packagedLiquidSubtitle ?? null,
+                          });
+                          if (!metadata.secondaryLine && !metadata.tertiaryLine) return null;
+                          return (
+                            <>
+                              {metadata.secondaryLine ? (
+                                <span className="max-w-full truncate text-xs tabular-nums text-muted-foreground">
+                                  {metadata.secondaryLine}
+                                </span>
+                              ) : null}
+                              {metadata.tertiaryLine ? (
+                                <span className="max-w-full truncate text-[11px] tabular-nums text-muted-foreground/70">
+                                  {metadata.tertiaryLine}
+                                </span>
+                              ) : null}
+                            </>
+                          );
+                        }
+                        const compactSubtitle =
+                          prepYieldSubtitle ??
+                          prepCostLabel ??
+                          (option.kind === "prep" ? "Set batch output for unit cost" : null);
+                        return compactSubtitle ? (
+                          <span className="max-w-full truncate text-xs tabular-nums text-muted-foreground">
+                            {compactSubtitle}
+                          </span>
+                        ) : null;
+                      })()}
                     </div>
                   </CommandItem>
                 );

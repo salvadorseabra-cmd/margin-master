@@ -33,6 +33,11 @@ import { normalizeInvoiceItemFields } from "@/lib/invoice-item-fields";
 import { isEligibleInvoiceIngredientRow } from "@/lib/invoice-unresolved-ingredient-count";
 import { resolveInvoiceLineStockPresentation } from "@/lib/invoice-purchase-format";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
+import {
+  compareInvoiceChronologyDesc,
+  resolveInvoiceChronology,
+  type ChronologySourceType,
+} from "@/lib/invoice-chronology";
 import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
 import {
   normalizePurchasedToUsableStock,
@@ -55,7 +60,13 @@ export type IngredientMatchedInvoiceProduct = {
   itemName: string;
   supplierName: string | null;
   invoiceDate: string | null;
+  chronologySourceType: ChronologySourceType;
   invoiceId: string;
+  /** `invoices.created_at` — audit / freshness only. */
+  invoiceCreatedAt: string | null;
+  invoiceIssueDateRaw: string | null;
+  /** `invoice_items.created_at` — audit only; never used for display. */
+  itemCreatedAt: string | null;
   unitPrice: number | null;
   lineTotal: number | null;
   matchBucket: "matched" | "suggested";
@@ -87,6 +98,7 @@ type MatchedInvoiceItemScanRow = {
   created_at: string;
   invoices: {
     invoice_date: string | null;
+    created_at: string | null;
     supplier_name: string | null;
   } | null;
 };
@@ -156,9 +168,16 @@ type InvoiceItemScanRow = {
   invoice_id?: string | null;
   invoices: {
     invoice_date: string | null;
+    created_at: string | null;
     supplier_name: string | null;
   } | null;
 };
+
+function resolveMatchedRowChronology(
+  invoice: MatchedInvoiceItemScanRow["invoices"] | InvoiceItemScanRow["invoices"],
+): ReturnType<typeof resolveInvoiceChronology> {
+  return resolveInvoiceChronology(invoice ?? undefined);
+}
 
 function logQueryFailure(label: string, message: string): void {
   console.error(`${LOG_PREFIX} ${label} failed: ${message}`);
@@ -278,12 +297,10 @@ function pickLatestInvoiceUsage(
     const invoiceSupplier = normalizeSupplierScope(item.invoices?.supplier_name ?? null);
     if (!invoiceLineMatchesAlias(alias, item.name, invoiceSupplier)) continue;
 
-    const candidate =
-      item.invoices?.invoice_date?.trim() ||
-      item.created_at?.trim() ||
-      null;
+    const chronology = resolveMatchedRowChronology(item.invoices);
+    const candidate = chronology.displayDateIso;
     if (!candidate) continue;
-    if (!bestDate || candidate > bestDate) {
+    if (!bestDate || compareInvoiceChronologyDesc(bestDate, candidate) > 0) {
       bestDate = candidate;
       bestSample = item;
     }
@@ -406,7 +423,7 @@ async function loadRecentInvoiceItemsForMatching(client: DbClient): Promise<Invo
   const { data, error } = await client
     .from("invoice_items")
     .select(
-      "name, quantity, unit, created_at, invoice_id, invoices!inner(invoice_date, supplier_name)",
+      "name, quantity, unit, created_at, invoice_id, invoices!inner(invoice_date, created_at, supplier_name)",
     )
     .order("created_at", { ascending: false })
     .limit(INVOICE_ITEM_SCAN_LIMIT);
@@ -581,15 +598,6 @@ export function filterMatchedInvoiceProductsForIngredient(
   return products.filter((row) => row.matchedIngredientId?.trim() === trimmedId);
 }
 
-function compareInvoiceDatesDesc(a: string | null, b: string | null): number {
-  const left = a?.trim() || "";
-  const right = b?.trim() || "";
-  if (!left && !right) return 0;
-  if (!left) return 1;
-  if (!right) return -1;
-  return right.localeCompare(left);
-}
-
 /**
  * Resolves live invoice lines to one catalog ingredient via the same ItemsTable matcher.
  * Read-only; does not mutate alias memory or matching rules.
@@ -677,16 +685,19 @@ export function buildMatchedInvoiceProductsFromScan(
     );
     const structure = parsePurchaseStructureFromText(normalized.name.trim());
 
+    const chronology = resolveMatchedRowChronology(source.invoices);
+
     products.push({
       matchedIngredientId: trimmedId,
       itemId: normalized.id,
       itemName: source.name.trim() || normalized.name,
       supplierName,
-      invoiceDate:
-        source.invoices?.invoice_date?.trim() ||
-        source.created_at?.trim()?.slice(0, 10) ||
-        null,
+      invoiceDate: chronology.displayDateIso,
+      chronologySourceType: chronology.chronologySourceType,
       invoiceId: source.invoice_id,
+      invoiceCreatedAt: chronology.rawInvoiceCreatedAt,
+      invoiceIssueDateRaw: chronology.rawIssueDate,
+      itemCreatedAt: source.created_at?.trim() || null,
       unitPrice: normalized.unit_price,
       lineTotal: normalized.total,
       matchBucket: bucket,
@@ -700,7 +711,7 @@ export function buildMatchedInvoiceProductsFromScan(
     });
   }
 
-  products.sort((a, b) => compareInvoiceDatesDesc(a.invoiceDate, b.invoiceDate));
+  products.sort((a, b) => compareInvoiceChronologyDesc(a.invoiceDate, b.invoiceDate));
 
   return {
     ingredientId: trimmedId,
@@ -783,14 +794,11 @@ export function buildLatestPurchaseGlanceByIngredientIdFromScan(
     if (bucket === "unmatched") continue;
 
     seenItemIds.add(normalized.id);
-    const invoiceDate =
-      source.invoices?.invoice_date?.trim() ||
-      source.created_at?.trim()?.slice(0, 10) ||
-      null;
+    const invoiceDate = resolveMatchedRowChronology(source.invoices).displayDateIso;
     if (!invoiceDate) continue;
 
     const previous = latest[matchedIngredientId]?.lastPurchaseAt ?? null;
-    if (!previous || compareInvoiceDatesDesc(previous, invoiceDate) > 0) {
+    if (!previous || compareInvoiceChronologyDesc(previous, invoiceDate) > 0) {
       latest[matchedIngredientId] = {
         lastPurchaseAt: invoiceDate,
         supplierLabel: supplierName,
@@ -875,10 +883,7 @@ export function buildLatestOperationalIngredientCostByIngredientIdFromScan(
     const bucket = invoiceRowMatchSummaryBucket(state.displayState);
     if (bucket === "unmatched") continue;
 
-    const invoiceDate =
-      source.invoices?.invoice_date?.trim() ||
-      source.created_at?.trim()?.slice(0, 10) ||
-      null;
+    const invoiceDate = resolveMatchedRowChronology(source.invoices).displayDateIso;
     if (!invoiceDate) continue;
 
     const fields = operationalCostFieldsFromInvoiceLine({
@@ -891,7 +896,7 @@ export function buildLatestOperationalIngredientCostByIngredientIdFromScan(
 
     seenItemIds.add(normalized.id);
     const previous = latest.get(matchedIngredientId)?.invoiceDate ?? null;
-    if (!previous || compareInvoiceDatesDesc(previous, invoiceDate) > 0) {
+    if (!previous || compareInvoiceChronologyDesc(previous, invoiceDate) > 0) {
       const unitPrice = normalized.unit_price == null ? null : Number(normalized.unit_price);
       latest.set(matchedIngredientId, {
         fields,
@@ -1007,7 +1012,7 @@ export async function loadInvoiceItemsForMatchedProductScan(
   const { data, error } = await client
     .from("invoice_items")
     .select(
-      "id, invoice_id, name, quantity, unit, unit_price, total, created_at, invoices!inner(invoice_date, supplier_name)",
+      "id, invoice_id, name, quantity, unit, unit_price, total, created_at, invoices!inner(invoice_date, created_at, supplier_name)",
     )
     .order("created_at", { ascending: false })
     .limit(MATCHED_INVOICE_PRODUCTS_SCAN_LIMIT);

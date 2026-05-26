@@ -1,6 +1,52 @@
 import type { Tables } from "@/integrations/supabase/types";
+import type { BaseUnit } from "@/lib/recipe-unit-normalization";
 
-type CostFields = Pick<Tables<"ingredients">, "current_price" | "purchase_quantity">;
+export type IngredientCostFields = Pick<
+  Tables<"ingredients">,
+  "current_price" | "purchase_quantity"
+> &
+  UsablePerUnitFields &
+  IngredientDensityMetadata & {
+    /** Internal costing base (g, ml, un) — set from invoice normalization, not persisted. */
+    cost_base_unit?: BaseUnit | null;
+  };
+
+/** Optional in-memory scaffolding for hybrid/countable-to-weighted ingredients. */
+export type IngredientUnitMetadata = {
+  purchaseUnit: string | null;
+  canonicalUnit: BaseUnit | null;
+  usableUnit: BaseUnit | null;
+  /** Grams of usable product per one countable purchase unit (e.g. 80g per bun). */
+  usableWeightGrams?: number | null;
+  /** Milliliters of usable product per one countable purchase unit. */
+  usableVolumeMl?: number | null;
+  referenceWeight?: number | null;
+  referenceVolume?: number | null;
+  referenceWeightGrams?: number | null;
+  referenceVolumeMl?: number | null;
+  edibleYieldPercent?: number | null;
+};
+
+/** Per-piece usable measure carried on invoice overlay / resolver (not always persisted). */
+export type UsablePerUnitFields = {
+  usable_weight_grams?: number | null;
+  usable_volume_ml?: number | null;
+  reference_weight_grams?: number | null;
+  reference_volume_ml?: number | null;
+};
+
+/** Optional ingredient-specific ml↔g bridge (never a global table). */
+export type IngredientDensityMetadata = {
+  grams_per_ml?: number | null;
+  gramsPerMl?: number | null;
+};
+
+export function resolveIngredientGramsPerMl(
+  ing: IngredientDensityMetadata,
+): number | null {
+  const n = Number(ing.grams_per_ml ?? ing.gramsPerMl);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
 
 /** Denominator for pack price → per–base-unit cost (never below 1). */
 export function purchaseQuantityDenom(purchase_quantity: number | null | undefined): number {
@@ -8,11 +54,41 @@ export function purchaseQuantityDenom(purchase_quantity: number | null | undefin
   return Number.isFinite(n) && n > 0 ? n : 1;
 }
 
-/** € per recipe `base_unit`: `current_price / max(purchase_quantity, 1)`. */
-export function effectiveIngredientUnitCostEur(ing: CostFields): number {
+/** Infer costing base when `cost_base_unit` was not set on overlay fields. */
+export function inferIngredientCostBaseUnit(
+  ing: IngredientCostFields,
+  _context?: { ingredientName?: string | null },
+): BaseUnit {
+  const explicit = ing.cost_base_unit;
+  if (explicit === "g" || explicit === "ml" || explicit === "un") return explicit;
+  const pq = purchaseQuantityDenom(ing.purchase_quantity);
+  if (pq === 1000) return "g";
+  if (pq >= 1000) return "ml";
+  return "un";
+}
+
+export const MISSING_OPERATIONAL_PRICING_LABEL = "Missing operational pricing";
+
+/** Compact table/PDF cell when operational pricing is missing (not the long label). */
+export const UNRESOLVED_COST_CELL = "—";
+
+/** True when pack price and denominator are present for recipe costing. */
+export function isOperationalPricingResolved(ing: IngredientCostFields): boolean {
   const pack = Number(ing.current_price);
-  const safePack = Number.isFinite(pack) ? pack : 0;
-  return safePack / purchaseQuantityDenom(ing.purchase_quantity);
+  const pq = Number(ing.purchase_quantity);
+  return Number.isFinite(pack) && pack > 0 && Number.isFinite(pq) && pq > 0;
+}
+
+/** € per base unit, or null when invoice/catalog fields are missing (never treat as €0). */
+export function resolvedOperationalUnitCostEur(ing: IngredientCostFields): number | null {
+  if (!isOperationalPricingResolved(ing)) return null;
+  const pack = Number(ing.current_price);
+  return pack / purchaseQuantityDenom(ing.purchase_quantity);
+}
+
+/** € per internal base unit (g, ml, or un): `current_price / max(purchase_quantity, 1)`. */
+export function effectiveIngredientUnitCostEur(ing: IngredientCostFields): number {
+  return resolvedOperationalUnitCostEur(ing) ?? 0;
 }
 
 export function ingredientDisplayBaseUnit(ing: Pick<Tables<"ingredients">, "base_unit" | "unit" | "purchase_unit">): string {

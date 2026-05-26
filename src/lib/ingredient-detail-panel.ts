@@ -1,5 +1,7 @@
 import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
-import { formatCurrency, formatPercent, formatUnitCostCurrency } from "@/lib/display-format";
+import { formatCurrency, formatPercent } from "@/lib/display-format";
+import { formatDisplayUnitCost } from "@/lib/display-unit-cost";
+import { formatPackagedLiquidContextFromCostFields } from "@/lib/packaged-liquid-context";
 import type { IngredientMergeCluster } from "@/lib/ingredient-merge-hooks";
 import {
   isAliasOnlyOperationalDependency,
@@ -8,7 +10,8 @@ import {
 } from "@/lib/ingredient-orphan-detection";
 import {
   effectiveIngredientUnitCostEur,
-  ingredientDisplayBaseUnit,
+  inferIngredientCostBaseUnit,
+  type IngredientCostFields,
 } from "@/lib/ingredient-unit-cost";
 import type { RecentPurchaseRow } from "@/lib/ingredient-purchase-memory";
 import {
@@ -65,6 +68,7 @@ export type IngredientPurchaseInsights = {
 export type IngredientDetailKpi = {
   label: string;
   value: string;
+  hint?: string | null;
 };
 
 export type IngredientDeltaLine = {
@@ -243,14 +247,9 @@ export function formatIngredientPackPrice(ingredient: IngredientRow): string {
 
 /** Compact unit cost for KPI tile. */
 export function formatIngredientUnitCostKpi(ingredient: IngredientRow): string {
-  const base = ingredientDisplayBaseUnit(ingredient);
-  const perBase = formatUnitCostCurrency(effectiveIngredientUnitCostEur(ingredient));
-  const normalized = base.trim().toLowerCase();
-  if (normalized === "kg" || normalized === "kilogram" || normalized === "kilograms") {
-    const perGram = effectiveIngredientUnitCostEur(ingredient) / 1000;
-    return `${perBase}/kg · ${formatUnitCostCurrency(perGram)}/g`;
-  }
-  return `${perBase}/${base}`;
+  const internalBase = inferIngredientCostBaseUnit(ingredient);
+  return formatDisplayUnitCost(effectiveIngredientUnitCostEur(ingredient), internalBase)
+    .formattedLabel;
 }
 
 export function formatRecipesLinkedKpi(recipeCount: number): string {
@@ -272,14 +271,26 @@ export function formatLastPurchaseDateKpi(purchases: readonly RecentPurchaseRow[
   return formatShortPurchaseDate(latest.dateLabel);
 }
 
+export function formatIngredientPackagedLiquidSubtitle(
+  costFields: IngredientCostFields | null | undefined,
+): string | null {
+  return formatPackagedLiquidContextFromCostFields(costFields);
+}
+
 export function buildIngredientDetailKpis(input: {
   ingredient: IngredientRow;
   recipeCount: number;
   recentPurchases: readonly RecentPurchaseRow[];
+  costFields?: IngredientCostFields | null;
 }): IngredientDetailKpi[] {
+  const packagedLiquidHint = formatIngredientPackagedLiquidSubtitle(input.costFields);
   return [
     { label: "Pack price", value: formatIngredientPackPrice(input.ingredient) },
-    { label: "Unit cost", value: formatIngredientUnitCostKpi(input.ingredient) },
+    {
+      label: "Unit cost",
+      value: formatIngredientUnitCostKpi(input.ingredient),
+      hint: packagedLiquidHint,
+    },
     { label: "Recipes linked", value: formatRecipesLinkedKpi(input.recipeCount) },
     {
       label: "Last purchase",
@@ -289,8 +300,14 @@ export function buildIngredientDetailKpis(input: {
 }
 
 /** €/base unit, plus €/g when the base unit is mass-based. */
-export function formatIngredientCostHeaderLine(ingredient: IngredientRow): string {
-  return formatIngredientUnitCostKpi(ingredient);
+export function formatIngredientCostHeaderLine(
+  ingredient: IngredientRow,
+  costFields?: IngredientCostFields | null,
+): string {
+  const primary = formatIngredientUnitCostKpi(ingredient);
+  const packContext = formatIngredientPackagedLiquidSubtitle(costFields);
+  if (!packContext) return primary;
+  return `${primary} · ${packContext}`;
 }
 
 export function formatRecentPurchaseLine(purchase: RecentPurchaseRow): string {

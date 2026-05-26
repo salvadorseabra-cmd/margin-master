@@ -1,22 +1,82 @@
 import type { jsPDF } from "jspdf";
+import { formatDisplayUnitCostForContext } from "@/lib/display-unit-cost";
+import {
+  formatIngredientPriceMetadataHierarchy,
+  formatOperationalPricePdfFootnote,
+  type FormattedOperationalPriceContext,
+} from "@/lib/pricing-source-presentation";
+import { isRecipeLineCostUnresolved, recipeLineCostDisplayCell } from "@/lib/recipe-pricing-state";
+import { logRendererPriceTrace } from "@/lib/pricing-trace";
 
 export type TechnicalSheetIngredient = {
   name: string;
   quantity: number;
   unit: string;
-  unitCost: number;
-  lineCost: number;
+  unitCost: number | null;
+  lineCost: number | null;
+  pricingUnresolved?: boolean;
+  /** Display-only pack context (e.g. `450ml · €4.59 pack`). */
+  packagedLiquidCompactLabel?: string | null;
+  /** Display-only supplier + invoice date (no resolver codes). */
+  priceSourceFootnote?: string | null;
+};
+
+/** Modal recipe cost lines → PDF ingredient rows (same lineCost / unitCost, no rebuild). */
+export type RecipeCostLineForTechnicalSheet = {
+  line: {
+    ingredient_id?: string;
+    sub_recipe_id?: string;
+    unit?: string;
+  };
+  ingredient?: { unit?: string | null } | null;
+  displayName: string;
+  quantity: number;
+  unitCost: number | null;
+  lineCost: number | null;
+  pricingUnresolved: boolean;
+  packagedLiquidSubtitle?: string | null;
+  pricePresentation?: FormattedOperationalPriceContext | null;
+};
+
+export function buildTechnicalSheetIngredientsFromCostLines(
+  costLines: readonly RecipeCostLineForTechnicalSheet[],
+): TechnicalSheetIngredient[] {
+  return costLines
+    .filter((line) => line.line.ingredient_id || line.line.sub_recipe_id)
+    .map((line) => ({
+      name: line.displayName || "Unnamed line",
+      quantity: line.quantity,
+      unit: line.line.unit || line.ingredient?.unit || "",
+      unitCost: line.unitCost,
+      lineCost: line.lineCost,
+      pricingUnresolved: line.pricingUnresolved,
+      packagedLiquidCompactLabel: line.packagedLiquidSubtitle ?? null,
+      priceSourceFootnote: line.pricePresentation
+        ? formatOperationalPricePdfFootnote(line.pricePresentation.context)
+        : null,
+    }));
+}
+
+/** Prep batch semantics for PDF (display only — batch food cost unchanged). */
+export type PrepYieldTechnicalSheet = {
+  batchYield: string;
+  servingSize: string;
+  estimatedServings: string;
+  costPerServing: string;
 };
 
 export type RecipeTechnicalSheet = {
   recipeName: string;
   yield?: string | null;
   portionSize?: string | null;
+  /** When set, renders a dedicated prep yield block and omits yield/portion from the metadata row. */
+  prepYield?: PrepYieldTechnicalSheet | null;
   category?: string | null;
   ingredients: TechnicalSheetIngredient[];
   totalFoodCost: number;
   sellingPrice?: number | null;
   grossMargin?: number | null;
+  costIncomplete?: boolean;
   notes?: string | null;
   preparationSteps?: string | null;
 };
@@ -53,8 +113,13 @@ export async function downloadRecipeTechnicalSheet(sheet: RecipeTechnicalSheet) 
   y = drawFinancialSummary(doc, sheet, y, generatedTimestamp);
   y += 4;
 
-  y = drawOperationalMetadata(doc, sheet, generatedAt, y, generatedTimestamp);
-  y += 6;
+  if (sheet.prepYield) {
+    y = drawPrepYieldSection(doc, sheet.prepYield, y, generatedTimestamp);
+    y += 4;
+  } else {
+    y = drawOperationalMetadata(doc, sheet, generatedAt, y, generatedTimestamp);
+    y += 4;
+  }
 
   y = drawSectionHeader(doc, "Ingredients", y, generatedTimestamp);
   y = drawIngredientsTable(doc, sheet.ingredients, sheet.totalFoodCost, y, generatedTimestamp);
@@ -116,8 +181,11 @@ function drawFinancialSummary(
 ) {
   y = ensurePageSpace(doc, y, 16, generatedTimestamp);
 
+  const foodCostLabel = sheet.costIncomplete
+    ? `${formatMoney(sheet.totalFoodCost)} (partial)`
+    : formatMoney(sheet.totalFoodCost);
   const columns = [
-    { label: "Food cost", value: formatMoney(sheet.totalFoodCost) },
+    { label: "Food cost", value: foodCostLabel },
     {
       label: "Selling price",
       value:
@@ -153,6 +221,50 @@ function drawFinancialSummary(
   });
 
   return y + blockHeight;
+}
+
+function drawPrepYieldSection(
+  doc: jsPDF,
+  prepYield: PrepYieldTechnicalSheet,
+  y: number,
+  generatedTimestamp: string,
+) {
+  y = ensurePageSpace(doc, y, 22, generatedTimestamp);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(82, 82, 91);
+  doc.text("PREP BATCH YIELD", MARGIN, y);
+  y += 5;
+
+  const columns = [
+    { label: "Batch output", value: prepYield.batchYield },
+    { label: "Serving size", value: prepYield.servingSize },
+    { label: "Est. servings", value: prepYield.estimatedServings },
+    { label: "Cost / serving", value: prepYield.costPerServing },
+  ];
+  const columnWidth = CONTENT_WIDTH / columns.length;
+
+  columns.forEach((column, index) => {
+    const x = MARGIN + index * columnWidth;
+    const textX = x + (index === 0 ? 0 : 3);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(6.6);
+    doc.setTextColor(113, 113, 122);
+    doc.text(column.label.toUpperCase(), textX, y);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(39, 39, 42);
+    const valueLines = doc.splitTextToSize(column.value, columnWidth - 5).slice(0, 1);
+    doc.text(valueLines, textX, y + 5);
+  });
+
+  doc.setDrawColor(228, 228, 231);
+  doc.line(MARGIN, y + 11, PAGE_WIDTH - MARGIN, y + 11);
+
+  return y + 14;
 }
 
 function drawOperationalMetadata(
@@ -194,6 +306,17 @@ function drawOperationalMetadata(
   doc.line(MARGIN, y + 9, PAGE_WIDTH - MARGIN, y + 9);
 
   return y + 12;
+}
+
+function ingredientPriceFootnote(ingredient: TechnicalSheetIngredient): string | null {
+  const metadata = formatIngredientPriceMetadataHierarchy({
+    provenanceLine: ingredient.priceSourceFootnote,
+    packagedPackLine: ingredient.packagedLiquidCompactLabel,
+  });
+  const parts = [metadata.secondaryLine, metadata.tertiaryLine].filter(
+    (part): part is string => Boolean(part?.trim()),
+  );
+  return parts.length > 0 ? parts.join(" · ") : null;
 }
 
 function drawSectionHeader(doc: jsPDF, title: string, y: number, generatedTimestamp: string) {
@@ -239,6 +362,16 @@ function drawIngredientsTable(
   }
 
   ingredients.forEach((ingredient, index) => {
+    const unresolved = isRecipeLineCostUnresolved(ingredient.lineCost);
+    logRendererPriceTrace({
+      surface: "technical_sheet_pdf",
+      ingredientName: ingredient.name,
+      unitCostEur: ingredient.unitCost,
+      lineCostEur: ingredient.lineCost,
+      unresolved,
+      trigger: "drawIngredientsTable",
+    });
+
     const nameLines = doc.splitTextToSize(ingredient.name || "Unnamed ingredient", 74);
     const rowHeight = Math.max(7, nameLines.length * 3.4 + 4);
     y = ensurePageSpace(doc, y, rowHeight + 8, generatedTimestamp);
@@ -258,17 +391,33 @@ function drawIngredientsTable(
     doc.setTextColor(63, 63, 70);
     doc.text(formatQuantity(ingredient.quantity), 101, y + 4.4, { align: "right" });
     doc.text(ingredient.unit || "-", 119, y + 4.4, { align: "right" });
-    doc.text(formatMoney(ingredient.unitCost), 146, y + 4.4, { align: "right" });
+    const unitCostSubLabel = ingredientPriceFootnote(ingredient);
+    const unitCostMainY = unitCostSubLabel ? y + 3.2 : y + 4.4;
+    doc.text(formatUnitCostCell(ingredient.unitCost, ingredient.unit, unresolved), 146, unitCostMainY, {
+      align: "right",
+    });
+    if (unitCostSubLabel) {
+      doc.setFontSize(6.5);
+      doc.setTextColor(113, 113, 122);
+      doc.text(unitCostSubLabel, 146, y + 6.8, { align: "right" });
+      doc.setFontSize(7.8);
+      doc.setTextColor(63, 63, 70);
+    }
 
     doc.setFont("helvetica", "bold");
     doc.setTextColor(24, 24, 27);
-    doc.text(formatMoney(ingredient.lineCost), 173, y + 4.4, { align: "right" });
+    doc.text(formatMoney(ingredient.lineCost, unresolved), 173, y + 4.4, { align: "right" });
 
     doc.setFont("helvetica", "normal");
     doc.setTextColor(113, 113, 122);
-    doc.text(formatContribution(ingredient.lineCost, totalFoodCost), rightEdge - 2, y + 4.4, {
-      align: "right",
-    });
+    doc.text(
+      formatContribution(ingredient.lineCost ?? 0, totalFoodCost, unresolved),
+      rightEdge - 2,
+      y + 4.4,
+      {
+        align: "right",
+      },
+    );
 
     doc.setDrawColor(228, 228, 231);
     doc.line(MARGIN, y + rowHeight, PAGE_WIDTH - MARGIN, y + rowHeight);
@@ -378,8 +527,24 @@ function drawFooter(doc: jsPDF, generatedTimestamp: string) {
   doc.text(`Page ${pageCount}`, PAGE_WIDTH - MARGIN, FOOTER_Y, { align: "right" });
 }
 
-function formatMoney(value: number) {
-  return `EUR ${Number(value || 0).toFixed(2)}`;
+function formatMoney(value: number | null, unresolved = false) {
+  if (unresolved || isRecipeLineCostUnresolved(value)) {
+    return "—";
+  }
+  const formatted = recipeLineCostDisplayCell(value).replace("€", "EUR ");
+  return formatted.startsWith("EUR ") ? formatted : `EUR ${formatted}`;
+}
+
+function formatUnitCostCell(
+  value: number | null,
+  usageUnit: string | null | undefined,
+  unresolved = false,
+) {
+  if (unresolved || value == null || !Number.isFinite(value)) {
+    return "—";
+  }
+  const label = formatDisplayUnitCostForContext(value, usageUnit);
+  return label.replace("€", "EUR ").replace("/", " / ");
 }
 
 function formatQuantity(value: number) {
@@ -388,7 +553,8 @@ function formatQuantity(value: number) {
   });
 }
 
-function formatContribution(lineCost: number, totalFoodCost: number) {
+function formatContribution(lineCost: number, totalFoodCost: number, unresolved = false) {
+  if (unresolved) return "-";
   if (totalFoodCost <= 0) return "-";
   const contribution = (Number(lineCost || 0) / totalFoodCost) * 100;
   if (contribution > 0 && contribution < 1) return "<1%";

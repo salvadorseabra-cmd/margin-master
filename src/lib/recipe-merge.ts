@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, Tables } from "@/integrations/supabase/types";
-import { effectiveIngredientUnitCostEur } from "@/lib/ingredient-unit-cost";
+import { resolvedOperationalUnitCostEur } from "@/lib/ingredient-unit-cost";
 import {
   computeRecipeLineCostEur,
   computeRecipeTotalCostEur,
@@ -161,12 +161,12 @@ export function lineIngredientCost(
   if (line.ingredient_id) {
     const ing = line.ingredients;
 
-    if (!ing) return 0;
+    if (!ing) return null;
 
-    const effective =
-      effectiveIngredientUnitCostEur(ing);
+    const unitCost = resolvedOperationalUnitCostEur(ing);
+    if (unitCost == null) return null;
 
-    return safeQty * effective;
+    return safeQty * unitCost;
   }
 
   if (line.sub_recipe_id) {

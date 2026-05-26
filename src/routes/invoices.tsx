@@ -1385,7 +1385,9 @@ function InvoicesPage() {
           total: number;
         } = {
           supplier_name: ext?.supplier?.slice(0, 120) ?? fallbackSupplier,
-          ...(ext?.invoiceDate ? { invoice_date: ext.invoiceDate } : {}),
+          ...(normalizeInvoiceDate(ext?.invoiceDate)
+            ? { invoice_date: normalizeInvoiceDate(ext?.invoiceDate)! }
+            : {}),
           total: typeof ext?.total === "number" && ext.total > 0 ? ext.total : 0,
         };
         const { data: updatedInvoice, error: invoiceUpdateError } = await supabase
@@ -2062,7 +2064,9 @@ function InvoicesPage() {
         total: number;
       } = {
         supplier_name: result.supplier?.slice(0, 120) ?? row.supplier,
-        ...(result.invoiceDate ? { invoice_date: result.invoiceDate } : {}),
+        ...(normalizeInvoiceDate(result.invoiceDate)
+          ? { invoice_date: normalizeInvoiceDate(result.invoiceDate)! }
+          : {}),
         total: typeof result?.total === "number" && result.total > 0 ? result.total : row.total,
       };
       const { data: updatedInvoice, error: invoiceUpdateError } = await supabase
