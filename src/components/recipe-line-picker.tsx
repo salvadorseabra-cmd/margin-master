@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import {
   recipeLinePickerCommandValue,
   recipeLinePickerSearchKeywords,
+  resolveRecipeLinePickerSelection,
   type RecipeLinePickerOption,
 } from "@/lib/recipe-line-picker-options";
 import { formatPrepUnitCostLabel } from "@/lib/recipe-prep-cost";
@@ -45,7 +46,7 @@ export function RecipeLinePicker({
   placeholder = "Choose ingredient or prep",
 }: RecipeLinePickerProps) {
   const [open, setOpen] = useState(false);
-  const selected = options.find((option) => option.pickerValue === value);
+  const selected = resolveRecipeLinePickerSelection(options, value);
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
@@ -103,9 +104,7 @@ export function RecipeLinePicker({
                     ? formatPrepUnitCostLabel(prepUnitCost, option.unit)
                     : null;
                 const prepYieldSubtitle =
-                  option.kind === "prep"
-                    ? prepYieldSubtitleById?.get(option.id)
-                    : undefined;
+                  option.kind === "prep" ? prepYieldSubtitleById?.get(option.id) : undefined;
                 const packagedLiquidSubtitle =
                   option.kind === "ingredient"
                     ? packagedLiquidSubtitleById?.get(option.id)
@@ -125,7 +124,8 @@ export function RecipeLinePicker({
                       setOpen(false);
                     }}
                     className={cn(
-                      option.kind === "prep" && "text-muted-foreground data-[selected=true]:text-foreground",
+                      option.kind === "prep" &&
+                        "text-muted-foreground data-[selected=true]:text-foreground",
                     )}
                   >
                     <Check

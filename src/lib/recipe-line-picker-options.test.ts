@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   buildRecipeLinePickerOptions,
+  mergeRecipeLinePickerSelections,
   parseRecipeLinePickerValue,
   recipeLinePickerLabel,
   recipeLinePickerValue,
+  resolveRecipeLinePickerSelection,
 } from "./recipe-line-picker-options";
 
 describe("recipe line picker", () => {
@@ -42,5 +44,36 @@ describe("recipe line picker", () => {
       id: "i1",
     });
     expect(parseRecipeLinePickerValue("")).toBeNull();
+  });
+
+  it("resolves selection by picker token or parsed id", () => {
+    const options = buildRecipeLinePickerOptions({
+      ingredients: [{ id: "i1", name: "Tomato", unit: "kg" }],
+      prepRecipes: [],
+    });
+    expect(
+      resolveRecipeLinePickerSelection(options, recipeLinePickerValue("ingredient", "i1"))?.name,
+    ).toBe("Tomato");
+    expect(resolveRecipeLinePickerSelection(options, "")).toBeUndefined();
+  });
+
+  it("merges selected lines missing from the catalog options", () => {
+    const base = buildRecipeLinePickerOptions({
+      ingredients: [{ id: "i1", name: "Tomato", unit: "kg" }],
+      prepRecipes: [],
+    });
+    const merged = mergeRecipeLinePickerSelections(base, [
+      {
+        kind: "ingredient",
+        id: "legacy-embed",
+        name: "Olive oil (legacy)",
+        unit: "ml",
+      },
+    ]);
+    expect(
+      resolveRecipeLinePickerSelection(merged, recipeLinePickerValue("ingredient", "legacy-embed"))
+        ?.name,
+    ).toBe("Olive oil (legacy)");
+    expect(merged.some((option) => option.id === "i1")).toBe(true);
   });
 });

@@ -73,10 +73,10 @@ describe("ingredient-purchase-memory", () => {
       ],
     );
 
-    expect(recognized.map((row) => row.name)).toEqual(["BAC STRK 1KG"]);
+    expect(recognized.map((row) => row.name).sort()).toEqual(["BAC STRK 1KG", "BAT SHOE 2.5KG"]);
   });
 
-  it("excludes invoice lines incompatible with canonical operational family", () => {
+  it("includes matched invoice lines even when line text differs from canonical family", () => {
     const recognized = buildRecognizedSupplierProducts(
       "ing-bacon",
       "Bacon streaky",
@@ -85,8 +85,9 @@ describe("ingredient-purchase-memory", () => {
     );
     const recent = buildRecentPurchases("ing-bacon", "Bacon streaky", [potatoProduct()]);
 
-    expect(recognized.map((row) => row.name)).toEqual(["BAC STRK 1KG"]);
-    expect(recent).toEqual([]);
+    expect(recognized.map((row) => row.name).sort()).toEqual(["BAC STRK 1KG", "BAT SHOE 2.5KG"]);
+    expect(recent).toHaveLength(1);
+    expect(recent[0]?.itemId).toBe("line-potato");
   });
 
   it("buildRecentPurchases display date follows invoice issue date not item created_at", () => {

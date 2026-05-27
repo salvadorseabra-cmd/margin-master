@@ -18,7 +18,6 @@ import {
 import { normalizeInvoiceItemFields } from "@/lib/invoice-item-fields";
 import { isEligibleInvoiceIngredientRow } from "@/lib/invoice-unresolved-ingredient-count";
 import type { AppSupabaseClient } from "@/lib/ingredient-alias-memory";
-import { shouldSkipByOperationalProductFamilyGate } from "@/lib/ingredient-operational-family-gate";
 import {
   buildMatchedInvoiceProductsFromScan,
   loadInvoiceItemsForMatchedProductScan,
@@ -97,15 +96,6 @@ export function buildCatalogReviewCurrentMatchCountsFromScan(
     [...catalog],
     eligibleRows.map((row) => ({ name: row.name })),
   );
-  const canonicalNameById = new Map(
-    catalog
-      .map((row) => {
-        const id = row.id?.trim() ?? "";
-        if (!id) return null;
-        return [id, canonicalDisplayNameForEntry(row, id)] as const;
-      })
-      .filter((entry): entry is [string, string | null] => entry != null),
-  );
   const sourceById = new Map(scanRows.map((row) => [row.id, row]));
   const seenItemIds = new Set<string>();
   const counts: Record<string, number> = {};
@@ -123,14 +113,6 @@ export function buildCatalogReviewCurrentMatchCountsFromScan(
     );
     const matchedIngredientId = match?.ingredient.id?.trim();
     if (!match || !matchedIngredientId || !catalogIds.has(matchedIngredientId)) continue;
-
-    const canonicalName = canonicalNameById.get(matchedIngredientId);
-    if (
-      canonicalName?.trim() &&
-      shouldSkipByOperationalProductFamilyGate(normalized.name, canonicalName)
-    ) {
-      continue;
-    }
 
     const bucket = invoiceRowMatchSummaryBucket(state.displayState);
     if (bucket === "unmatched") continue;

@@ -95,7 +95,7 @@ function AlertsPage() {
       ] = await Promise.all([
         loadCanonicalIngredientCatalog(
           supabase,
-          "current_price, purchase_quantity, purchase_unit, base_unit, created_at",
+          "current_price, purchase_quantity, purchase_unit, base_unit, created_at, density_g_per_ml",
         ),
         supabase
           .from("recipes")

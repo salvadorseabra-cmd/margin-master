@@ -1,6 +1,5 @@
 import { formatCurrency } from "@/lib/display-format";
 import { logChronologyAudit } from "@/lib/invoice-chronology";
-import { shouldSkipByOperationalProductFamilyGate } from "@/lib/ingredient-operational-family-gate";
 import {
   filterMatchedInvoiceProductsForIngredient,
   type IngredientMatchedInvoiceProduct,
@@ -39,17 +38,6 @@ function isIngredientScopedMatchedProduct(
   return product.matchedIngredientId?.trim() === ingredientId.trim();
 }
 
-function passesFamilyGateForIngredient(
-  lineText: string,
-  canonicalName: string | null | undefined,
-): boolean {
-  const canonical = canonicalName?.trim();
-  if (!canonical) return true;
-  const text = lineText.trim();
-  if (!text) return false;
-  return !shouldSkipByOperationalProductFamilyGate(text, canonical);
-}
-
 function formatPurchaseDate(value: string | null | undefined): string {
   if (!value?.trim()) return "—";
   const parsed = new Date(value.includes("T") ? value : `${value}T12:00:00`);
@@ -69,11 +57,11 @@ function formatPurchasePrice(product: IngredientMatchedInvoiceProduct): string {
 
 /**
  * Distinct supplier product names for one ingredient (aliases + matched invoice lines).
- * Scoped to ingredient id; drops cross-family invoice text vs canonical name.
+ * Scoped to ingredient id.
  */
 export function buildRecognizedSupplierProducts(
   ingredientId: string,
-  canonicalName: string | null | undefined,
+  _canonicalName: string | null | undefined,
   aliases: readonly IngredientOperationalAliasRow[],
   matchedProducts: readonly IngredientMatchedInvoiceProduct[],
 ): RecognizedSupplierProduct[] {
@@ -91,7 +79,6 @@ export function buildRecognizedSupplierProducts(
   const addName = (raw: string | null | undefined) => {
     const name = raw?.trim();
     if (!name) return;
-    if (!passesFamilyGateForIngredient(name, canonicalName)) return;
     const key = normalizeProductNameKey(name);
     if (seen.has(key)) return;
     seen.add(key);
@@ -117,7 +104,7 @@ export function buildRecognizedSupplierProducts(
  */
 export function buildRecentPurchases(
   ingredientId: string,
-  canonicalName: string | null | undefined,
+  _canonicalName: string | null | undefined,
   matchedProducts: readonly IngredientMatchedInvoiceProduct[],
 ): RecentPurchaseRow[] {
   const trimmedId = ingredientId.trim();
@@ -125,7 +112,6 @@ export function buildRecentPurchases(
 
   return filterMatchedInvoiceProductsForIngredient(matchedProducts, trimmedId)
     .filter((product) => isIngredientScopedMatchedProduct(product, trimmedId))
-    .filter((product) => passesFamilyGateForIngredient(product.itemName, canonicalName))
     .map((product) => {
       const row: RecentPurchaseRow = {
         itemId: product.itemId,

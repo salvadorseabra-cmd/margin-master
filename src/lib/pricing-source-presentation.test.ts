@@ -4,7 +4,9 @@ import {
   formatOperationalInvoiceDate,
   formatOperationalPriceContext,
   formatOperationalPricePdfFootnote,
+  hasIngredientPriceProvenance,
   pricingConfidenceHumanLabel,
+  resolveIngredientPriceProvenanceFields,
 } from "@/lib/pricing-source-presentation";
 
 describe("pricing-source-presentation", () => {
@@ -63,6 +65,45 @@ describe("pricing-source-presentation", () => {
       secondaryLine: "450ml pack · €4.59",
       tertiaryLine: null,
     });
+  });
+
+  it("resolveIngredientPriceProvenanceFields prefers resolver date then invoice then glance", () => {
+    expect(
+      resolveIngredientPriceProvenanceFields({
+        supplierLabel: "Recheio",
+        chosenDate: "2026-05-27",
+        invoiceDateIso: "2026-05-20",
+        purchaseGlance: { supplierLabel: "Makro", lastPurchaseAt: "2026-05-01" },
+      }),
+    ).toEqual({ supplier: "Recheio", date: "2026-05-27" });
+
+    expect(
+      resolveIngredientPriceProvenanceFields({
+        supplierLabel: null,
+        chosenDate: null,
+        invoiceDateIso: null,
+        purchaseGlance: { supplierLabel: "Continente", lastPurchaseAt: "2026-05-21" },
+      }),
+    ).toEqual({ supplier: "Continente", date: "2026-05-21" });
+  });
+
+  it("hasIngredientPriceProvenance is true when either supplier or date exists", () => {
+    expect(hasIngredientPriceProvenance({ supplierLabel: "Recheio" })).toBe(true);
+    expect(hasIngredientPriceProvenance({ chosenDate: "2026-05-27" })).toBe(true);
+    expect(hasIngredientPriceProvenance({})).toBe(false);
+  });
+
+  it("formatOperationalPriceContext shows provenance for catalog source when supplier and date provided", () => {
+    const result = formatOperationalPriceContext({
+      source: "catalog_fallback",
+      supplier: "Beverage Supplier",
+      date: "2026-05-21",
+      unitCostEur: 0.89,
+      costFields: { current_price: 10.68, purchase_quantity: 12, cost_base_unit: "un" },
+      costSource: "catalog",
+      costBaseUnit: "un",
+    });
+    expect(result.compactLine).toBe("Beverage Supplier · 21 May 2026");
   });
 
   it("keeps supplier/date provenance for resolved €/un rows with pack metadata", () => {

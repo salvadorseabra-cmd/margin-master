@@ -218,7 +218,7 @@ describe("ingredient-operational-intelligence", () => {
     );
   });
 
-  it("buildMatchedInvoiceProductsFromScan ignores confirmed aliases for other ingredients", () => {
+  it("buildMatchedInvoiceProductsFromScan uses full alias map but only returns target ingredient", () => {
     const catalog = [
       { id: "ing-alface", name: "ALFACE ICEBERG" },
       { id: "ing-oil", name: "OLEO GIRASSOL FULA 1L" },

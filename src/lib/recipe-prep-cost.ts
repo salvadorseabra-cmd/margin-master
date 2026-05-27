@@ -3,6 +3,7 @@ import {
   inferIngredientCostBaseUnit,
   isOperationalPricingResolved,
   MISSING_OPERATIONAL_PRICING_LABEL,
+  resolveIngredientDensityGPerMl,
   resolvedOperationalUnitCostEur,
   type IngredientCostFields,
 } from "@/lib/ingredient-unit-cost";
@@ -19,6 +20,7 @@ import {
 import {
   directCountableLineCostEur,
   recipeLineCostViaDensityConversion,
+  recipeLineCostViaPackagedLiquidConversion,
   recipeLineCostViaUsableConversion,
   resolveUsablePerCountableUnit,
 } from "@/lib/usable-unit-conversion";
@@ -256,7 +258,12 @@ export function ingredientLineCostEur(
     lineCost = directCountable;
   } else if (recipeNorm && recipeFamily != null && areUnitFamiliesCompatible(recipeFamily, costFamily)) {
     lineCost = recipeNorm.quantity * unitCost;
-  } else if (recipeNorm && costFamily === "countable") {
+  } else if (recipeNorm) {
+    const packagedLiquidConversion = recipeLineCostViaPackagedLiquidConversion(
+      qty,
+      recipeUnitExplicit,
+      ingredient,
+    );
     const usableConversion = recipeLineCostViaUsableConversion(
       qty,
       recipeUnitExplicit,
@@ -265,7 +272,25 @@ export function ingredientLineCostEur(
         ingredientName: context.ingredientName,
       },
     );
-    if (usableConversion.converted && usableConversion.lineCostEur != null) {
+    const densityConversion = recipeLineCostViaDensityConversion(
+      qty,
+      recipeUnitExplicit,
+      ingredient,
+    );
+
+    console.log("INGREDIENT DEBUG", {
+  ingredient: context.ingredientName,
+  recipeUnitExplicit,
+  costBase,
+  packaged: packagedLiquidConversion,
+  usable: usableConversion,
+  density: densityConversion,
+});
+
+    if (packagedLiquidConversion.converted && packagedLiquidConversion.lineCostEur != null) {
+      lineCost = packagedLiquidConversion.lineCostEur;
+      invoiceConverted = true;
+    } else if (usableConversion.converted && usableConversion.lineCostEur != null) {
       lineCost = usableConversion.lineCostEur;
       invoiceConverted = true;
       const resolvedUsable = resolveUsablePerCountableUnit(ingredient, {
@@ -283,27 +308,10 @@ export function ingredientLineCostEur(
         lineCostEur: lineCost,
         trigger: context.trigger,
       });
-    } else {
-      unitMismatch = true;
-      lineCost = null;
-      if (recipeNorm.baseUnit === "g" || recipeNorm.baseUnit === "ml") {
-        unitFamilyDiagnosticCode = "HYBRID_CONVERSION_MISSING";
-      } else {
-        unitFamilyDiagnosticCode = "COUNTABLE_TO_WEIGHTED";
-      }
-    }
-  } else if (recipeNorm) {
-    const densityConversion = recipeLineCostViaDensityConversion(
-      qty,
-      recipeUnitExplicit,
-      ingredient,
-    );
-    if (densityConversion.converted && densityConversion.lineCostEur != null) {
+    } else if (densityConversion.converted && densityConversion.lineCostEur != null) {
       lineCost = densityConversion.lineCostEur;
       invoiceConverted = true;
-      const gramsPerMl = Number(
-        ingredient.grams_per_ml ?? ingredient.gramsPerMl,
-      );
+      const gramsPerMl = resolveIngredientDensityGPerMl(ingredient);
       logDensityConversionTrace({
         ingredientName: context.ingredientName,
         recipeQuantity: qty,
@@ -330,9 +338,13 @@ export function ingredientLineCostEur(
       lineCost = null;
       if (recipeNorm.baseUnit === "ml" || recipeNorm.baseUnit === "g") {
         unitFamilyDiagnosticCode =
-          costFamily === "weight" || costFamily === "volume"
+          costFamily === "countable"
             ? "HYBRID_CONVERSION_MISSING"
-            : "UNIT_FAMILY_MISMATCH";
+            : costFamily === "weight" || costFamily === "volume"
+              ? "HYBRID_CONVERSION_MISSING"
+              : "UNIT_FAMILY_MISMATCH";
+      } else if (costFamily === "countable") {
+        unitFamilyDiagnosticCode = "COUNTABLE_TO_WEIGHTED";
       } else {
         unitFamilyDiagnosticCode = "UNIT_FAMILY_MISMATCH";
       }
@@ -390,7 +402,7 @@ export function ingredientLineCostEur(
       directCountable != null
         ? "direct_countable"
         : invoiceConverted
-          ? "usable_or_density_conversion"
+          ? "packaged_usable_or_density_conversion"
           : recipeNorm && recipeFamily != null && areUnitFamiliesCompatible(recipeFamily, costFamily)
             ? "compatible_base_multiply"
             : recipeUnitExplicit == null

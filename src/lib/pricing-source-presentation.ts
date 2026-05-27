@@ -1,9 +1,39 @@
 import { formatDisplayUnitCost } from "@/lib/display-unit-cost";
+import type { IngredientLatestPurchaseGlance } from "@/lib/ingredient-operational-intelligence";
 import { inferIngredientCostBaseUnit, type IngredientCostFields } from "@/lib/ingredient-unit-cost";
 import type { PricingConfidence } from "@/lib/pricing-trace";
 import type { OperationalIngredientCostSource } from "@/lib/resolve-operational-ingredient-cost";
 import type { BaseUnit } from "@/lib/recipe-unit-normalization";
 import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
+
+/** Invoice overlay + resolver date + optional purchase glance (recipe workspace metadata only). */
+export type IngredientPriceProvenanceInput = {
+  supplierLabel?: string | null;
+  chosenDate?: string | null;
+  invoiceDateIso?: string | null;
+  purchaseGlance?: Pick<IngredientLatestPurchaseGlance, "supplierLabel" | "lastPurchaseAt"> | null;
+};
+
+/** Supplier + invoice date for display — independent of operational pricing source. */
+export function resolveIngredientPriceProvenanceFields(
+  input: IngredientPriceProvenanceInput,
+): { supplier: string | null; date: string | null } {
+  const supplier =
+    input.supplierLabel?.trim() || input.purchaseGlance?.supplierLabel?.trim() || null;
+  const date =
+    input.chosenDate?.trim() ||
+    input.invoiceDateIso?.trim() ||
+    input.purchaseGlance?.lastPurchaseAt?.trim() ||
+    null;
+  return { supplier, date };
+}
+
+export function hasIngredientPriceProvenance(
+  provenance: Pick<IngredientPriceProvenanceInput, "supplierLabel" | "chosenDate" | "invoiceDateIso" | "purchaseGlance">,
+): boolean {
+  const { supplier, date } = resolveIngredientPriceProvenanceFields(provenance);
+  return Boolean(supplier || date);
+}
 
 export type OperationalPriceContext = {
   supplier: string | null;

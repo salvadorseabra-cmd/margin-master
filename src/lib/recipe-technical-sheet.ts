@@ -1,10 +1,5 @@
 import type { jsPDF } from "jspdf";
 import { formatDisplayUnitCostForContext } from "@/lib/display-unit-cost";
-import {
-  formatIngredientPriceMetadataHierarchy,
-  formatOperationalPricePdfFootnote,
-  type FormattedOperationalPriceContext,
-} from "@/lib/pricing-source-presentation";
 import { isRecipeLineCostUnresolved, recipeLineCostDisplayCell } from "@/lib/recipe-pricing-state";
 import { logRendererPriceTrace } from "@/lib/pricing-trace";
 
@@ -15,10 +10,6 @@ export type TechnicalSheetIngredient = {
   unitCost: number | null;
   lineCost: number | null;
   pricingUnresolved?: boolean;
-  /** Display-only pack context (e.g. `450ml · €4.59 pack`). */
-  packagedLiquidCompactLabel?: string | null;
-  /** Display-only supplier + invoice date (no resolver codes). */
-  priceSourceFootnote?: string | null;
 };
 
 /** Modal recipe cost lines → PDF ingredient rows (same lineCost / unitCost, no rebuild). */
@@ -34,8 +25,6 @@ export type RecipeCostLineForTechnicalSheet = {
   unitCost: number | null;
   lineCost: number | null;
   pricingUnresolved: boolean;
-  packagedLiquidSubtitle?: string | null;
-  pricePresentation?: FormattedOperationalPriceContext | null;
 };
 
 export function buildTechnicalSheetIngredientsFromCostLines(
@@ -50,10 +39,6 @@ export function buildTechnicalSheetIngredientsFromCostLines(
       unitCost: line.unitCost,
       lineCost: line.lineCost,
       pricingUnresolved: line.pricingUnresolved,
-      packagedLiquidCompactLabel: line.packagedLiquidSubtitle ?? null,
-      priceSourceFootnote: line.pricePresentation
-        ? formatOperationalPricePdfFootnote(line.pricePresentation.context)
-        : null,
     }));
 }
 
@@ -308,17 +293,6 @@ function drawOperationalMetadata(
   return y + 12;
 }
 
-function ingredientPriceFootnote(ingredient: TechnicalSheetIngredient): string | null {
-  const metadata = formatIngredientPriceMetadataHierarchy({
-    provenanceLine: ingredient.priceSourceFootnote,
-    packagedPackLine: ingredient.packagedLiquidCompactLabel,
-  });
-  const parts = [metadata.secondaryLine, metadata.tertiaryLine].filter(
-    (part): part is string => Boolean(part?.trim()),
-  );
-  return parts.length > 0 ? parts.join(" · ") : null;
-}
-
 function drawSectionHeader(doc: jsPDF, title: string, y: number, generatedTimestamp: string) {
   y = ensurePageSpace(doc, y, 12, generatedTimestamp);
   doc.setFont("helvetica", "bold");
@@ -391,18 +365,9 @@ function drawIngredientsTable(
     doc.setTextColor(63, 63, 70);
     doc.text(formatQuantity(ingredient.quantity), 101, y + 4.4, { align: "right" });
     doc.text(ingredient.unit || "-", 119, y + 4.4, { align: "right" });
-    const unitCostSubLabel = ingredientPriceFootnote(ingredient);
-    const unitCostMainY = unitCostSubLabel ? y + 3.2 : y + 4.4;
-    doc.text(formatUnitCostCell(ingredient.unitCost, ingredient.unit, unresolved), 146, unitCostMainY, {
+    doc.text(formatUnitCostCell(ingredient.unitCost, ingredient.unit, unresolved), 146, y + 4.4, {
       align: "right",
     });
-    if (unitCostSubLabel) {
-      doc.setFontSize(6.5);
-      doc.setTextColor(113, 113, 122);
-      doc.text(unitCostSubLabel, 146, y + 6.8, { align: "right" });
-      doc.setFontSize(7.8);
-      doc.setTextColor(63, 63, 70);
-    }
 
     doc.setFont("helvetica", "bold");
     doc.setTextColor(24, 24, 27);

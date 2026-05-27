@@ -63,6 +63,7 @@ export type OperationalIngredientCostFields = {
   usable_volume_ml?: number | null;
   reference_weight_grams?: number | null;
   reference_volume_ml?: number | null;
+  density_g_per_ml?: number | null;
   grams_per_ml?: number | null;
   gramsPerMl?: number | null;
 };

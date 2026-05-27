@@ -8,6 +8,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { loadConfirmedIngredientAliasMap } from "@/lib/ingredient-alias-memory";
 import { loadMatchingIngredientCatalog } from "@/lib/ingredient-catalog-load";
+import { readLocalInvoiceIngredientAliases } from "@/lib/operational-review-queue";
 import {
   buildRecentPurchases,
   buildRecognizedSupplierProducts,
@@ -63,11 +64,15 @@ export function PurchaseMemorySection({
 
     void (async () => {
       try {
-        const [{ rows: catalog }, confirmedAliases, profileResult] = await Promise.all([
+        const [{ rows: catalog }, dbAliases, profileResult] = await Promise.all([
           loadMatchingIngredientCatalog(supabase),
           loadConfirmedIngredientAliasMap(supabase),
           loadIngredientOperationalProfile(supabase, ingredientId, userId),
         ]);
+        const confirmedAliases = {
+          ...readLocalInvoiceIngredientAliases(userId),
+          ...dbAliases,
+        };
         const matchedResult = await loadIngredientMatchedInvoiceProducts(
           supabase,
           userId,

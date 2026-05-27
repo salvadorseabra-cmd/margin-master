@@ -37,15 +37,28 @@ export type UsablePerUnitFields = {
 
 /** Optional ingredient-specific ml↔g bridge (never a global table). */
 export type IngredientDensityMetadata = {
+  /** Canonical persisted field: grams per milliliter (g/ml). */
+  density_g_per_ml?: number | null;
+  /** Legacy aliases — prefer {@link density_g_per_ml}. */
   grams_per_ml?: number | null;
   gramsPerMl?: number | null;
 };
 
+/** Resolves explicit ingredient density (g/ml); never guesses or defaults. */
+export function resolveIngredientDensityGPerMl(
+  ing: IngredientDensityMetadata,
+): number | null {
+  const n = Number(
+    ing.density_g_per_ml ?? ing.grams_per_ml ?? ing.gramsPerMl,
+  );
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+/** @deprecated Use {@link resolveIngredientDensityGPerMl}. */
 export function resolveIngredientGramsPerMl(
   ing: IngredientDensityMetadata,
 ): number | null {
-  const n = Number(ing.grams_per_ml ?? ing.gramsPerMl);
-  return Number.isFinite(n) && n > 0 ? n : null;
+  return resolveIngredientDensityGPerMl(ing);
 }
 
 /** Denominator for pack price → per–base-unit cost (never below 1). */

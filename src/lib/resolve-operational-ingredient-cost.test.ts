@@ -566,7 +566,117 @@ describe("resolveOperationalIngredientCostFields", () => {
     expect(prep.lineCostEur).toBeNull();
   });
 
-  it("merges catalog grams_per_ml onto invoice overlay for ml recipe lines", () => {
+  it("merges catalog density_g_per_ml onto invoice overlay for ml recipe lines", () => {
+    const catalogById = buildOperationalIngredientCostById([
+      {
+        id: "bbq",
+        current_price: 4,
+        purchase_quantity: 1,
+        density_g_per_ml: 1.15,
+      },
+    ]);
+    const invoiceById = new Map([
+      [
+        "bbq",
+        {
+          fields: operationalCostFieldsFromInvoiceLine({
+            name: "Molho BBQ",
+            quantity: 1,
+            unit: "kg",
+            unit_price: 5,
+          })!,
+          invoiceDate: "2026-05-20",
+          latestInvoiceUnitCost: 5,
+        },
+      ],
+    ]);
+    const resolved = resolveRecipeLineOperationalCost(
+      "bbq",
+      350,
+      catalogById,
+      undefined,
+      invoiceById,
+      { recipeUnit: "ml", ingredientName: "Molho BBQ" },
+    );
+    expect(resolved.source).toBe("invoice");
+    expect(resolved.fields.density_g_per_ml).toBe(1.15);
+    // 350 × 1.15 = 402.5 g × €0.005/g
+    expect(resolved.lineCostEur).toBeCloseTo(2.0125, 4);
+    expect(resolved.pricingResolved).toBe(true);
+  });
+
+  it("Molho Casa ketchup: 350 ml recipe resolves with catalog density 1.15", () => {
+    const invoiceFields = operationalCostFieldsFromInvoiceLine({
+      name: "KETCHUP GULOSO 1KG",
+      quantity: 1,
+      unit: "kg",
+      unit_price: 5,
+    })!;
+    const catalogById = buildOperationalIngredientCostById([
+      {
+        id: "ketchup-1",
+        current_price: 5,
+        purchase_quantity: 1000,
+        density_g_per_ml: 1.15,
+      },
+    ]);
+    const resolved = resolveRecipeLineOperationalCost(
+      "ketchup-1",
+      350,
+      catalogById,
+      undefined,
+      new Map([
+        [
+          "ketchup-1",
+          {
+            fields: invoiceFields,
+            invoiceDate: "2026-05-20",
+            latestInvoiceUnitCost: 5,
+          },
+        ],
+      ]),
+      { recipeUnit: "ml", ingredientName: "Molho Casa Ketchup" },
+    );
+    expect(resolved.pricingResolved).toBe(true);
+    expect(resolved.lineCostEur).toBeCloseTo(2.0125, 4);
+  });
+
+  it("Smash Menu Cola Molho BBQ: 15 ml with density 1.12 on kg invoice", () => {
+    const invoiceFields = operationalCostFieldsFromInvoiceLine({
+      name: "MOLHO BBQ 1KG",
+      quantity: 1,
+      unit: "kg",
+      unit_price: 8,
+    })!;
+    const catalogById = buildOperationalIngredientCostById([
+      {
+        id: "bbq-ing",
+        density_g_per_ml: 1.12,
+      },
+    ]);
+    const resolved = resolveRecipeLineOperationalCost(
+      "bbq-ing",
+      15,
+      catalogById,
+      undefined,
+      new Map([
+        [
+          "bbq-ing",
+          {
+            fields: invoiceFields,
+            invoiceDate: "2026-05-20",
+            latestInvoiceUnitCost: 8,
+          },
+        ],
+      ]),
+      { recipeUnit: "ml", ingredientName: "Cola Molho BBQ" },
+    );
+    expect(resolved.pricingResolved).toBe(true);
+    // 15 ml × 1.12 g/ml = 16.8 g × €0.008/g = €0.1344
+    expect(resolved.lineCostEur).toBeCloseTo(0.1344, 4);
+  });
+
+  it("merges catalog grams_per_ml onto invoice overlay for ml recipe lines (legacy alias)", () => {
     const catalogById = buildOperationalIngredientCostById([
       {
         id: "bbq",

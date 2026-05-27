@@ -37,6 +37,7 @@ export type OperationalIngredientCostFields = {
   usable_volume_ml?: number | null;
   reference_weight_grams?: number | null;
   reference_volume_ml?: number | null;
+  density_g_per_ml?: number | null;
   grams_per_ml?: number | null;
   gramsPerMl?: number | null;
 };
@@ -66,6 +67,7 @@ export function buildOperationalIngredientCostById(
     usable_volume_ml?: number | null;
     reference_weight_grams?: number | null;
     reference_volume_ml?: number | null;
+    density_g_per_ml?: number | null;
     grams_per_ml?: number | null;
     gramsPerMl?: number | null;
   }[],
@@ -84,6 +86,7 @@ export function buildOperationalIngredientCostById(
         ? { reference_weight_grams: row.reference_weight_grams }
         : {}),
       ...(row.reference_volume_ml != null ? { reference_volume_ml: row.reference_volume_ml } : {}),
+      ...(row.density_g_per_ml != null ? { density_g_per_ml: row.density_g_per_ml } : {}),
       ...(row.grams_per_ml != null ? { grams_per_ml: row.grams_per_ml } : {}),
       ...(row.gramsPerMl != null ? { gramsPerMl: row.gramsPerMl } : {}),
     });
@@ -206,6 +209,9 @@ export function mergeOperationalCostMetadata(
     }
     if (merged.reference_volume_ml == null && fallback.reference_volume_ml != null) {
       merged = { ...merged, reference_volume_ml: fallback.reference_volume_ml };
+    }
+    if (merged.density_g_per_ml == null && fallback.density_g_per_ml != null) {
+      merged = { ...merged, density_g_per_ml: fallback.density_g_per_ml };
     }
     if (merged.grams_per_ml == null && fallback.grams_per_ml != null) {
       merged = { ...merged, grams_per_ml: fallback.grams_per_ml };
@@ -343,7 +349,17 @@ export function resolveOperationalIngredientUnitCostEur(
     invoiceById,
     logContext,
   );
-  const unitCostEur = resolvedOperationalUnitCostEur(resolved.fields);
+  const unitCostEur =
+  resolved.fields
+    ? ingredientLineCostEur(
+        1,
+        resolved.fields as NonNullable<RecipeIngredientLineForCost["ingredients"]>,
+        {
+          recipeUnit: resolved.fields.cost_base_unit ?? undefined,
+          ingredientName: ingredientId,
+        }
+      )
+    : null;
   if (logContext?.trigger) {
     logPricingResolverTrace({
       ingredientId,

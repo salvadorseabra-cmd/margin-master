@@ -71,7 +71,10 @@ import {
 } from "@/lib/ingredient-orphan-detection";
 import type { IngredientMergeCluster } from "@/lib/ingredient-merge-hooks";
 import type { InitialOperationalBrief } from "@/lib/buildInitialOperationalBrief";
-import type { OperationalListFilter } from "@/lib/operational-review-queue";
+import {
+  readLocalInvoiceIngredientAliases,
+  type OperationalListFilter,
+} from "@/lib/operational-review-queue";
 import { loadConfirmedIngredientAliasMap } from "@/lib/ingredient-alias-memory";
 import { loadMatchingIngredientCatalog } from "@/lib/ingredient-catalog-load";
 import { buildRecentPurchases, type RecentPurchaseRow } from "@/lib/ingredient-purchase-memory";
@@ -440,11 +443,15 @@ function IngredientDetailContent({
 
     void (async () => {
       try {
-        const [{ rows: matchCatalog }, confirmedAliases, profile] = await Promise.all([
+        const [{ rows: matchCatalog }, dbAliases, profile] = await Promise.all([
           loadMatchingIngredientCatalog(supabase),
           loadConfirmedIngredientAliasMap(supabase),
           loadIngredientOperationalProfile(supabase, ingredient.id, userId),
         ]);
+        const confirmedAliases = {
+          ...readLocalInvoiceIngredientAliases(userId),
+          ...dbAliases,
+        };
         const matched = await loadIngredientMatchedInvoiceProducts(
           supabase,
           userId,

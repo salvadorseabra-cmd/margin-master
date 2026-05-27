@@ -5,13 +5,15 @@ import {
   inferIngredientCostBaseUnit,
   isOperationalPricingResolved,
   purchaseQuantityDenom,
-  resolveIngredientGramsPerMl,
+  resolveIngredientDensityGPerMl,
   resolvedOperationalUnitCostEur,
   type IngredientCostFields,
   type IngredientDensityMetadata,
 } from "@/lib/ingredient-unit-cost";
+import { resolvePackagedLiquidPackMl } from "@/lib/packaged-liquid-context";
 import type { BaseUnit } from "@/lib/recipe-unit-normalization";
 import { normalizeToBaseUnit } from "@/lib/recipe-unit-normalization";
+import { logCrossDomainConversion } from "@/lib/pricing-trace";
 
 /** Per countable purchase unit (one bun, one head of lettuce). */
 export type UsablePerUnitMetadata = {
@@ -180,6 +182,48 @@ export type RecipeLineCostViaDensityConversionResult = {
   conversionKind: "volume_to_weight" | "weight_to_volume" | null;
 };
 
+export type RecipeLineCostViaPackagedLiquidConversionResult = {
+  lineCostEur: number | null;
+  converted: boolean;
+  packMl: number | null;
+};
+
+/**
+ * Retail volume packs (e.g. 450 ml jar @ pack price): recipe ml × (pack € / pack ml).
+ * Runs before density when pack volume is known from operational fields.
+ */
+export function recipeLineCostViaPackagedLiquidConversion(
+  recipeQty: number,
+  recipeUnit: string | null | undefined,
+  ing: IngredientCostWithUsable,
+): RecipeLineCostViaPackagedLiquidConversionResult {
+  const empty: RecipeLineCostViaPackagedLiquidConversionResult = {
+    lineCostEur: null,
+    converted: false,
+    packMl: null,
+  };
+
+  if (!isOperationalPricingResolved(ing)) return empty;
+
+  const recipeNorm = normalizeToBaseUnit(recipeQty, recipeUnit);
+  if (!recipeNorm || recipeNorm.baseUnit !== "ml") return empty;
+
+  const packMl = resolvePackagedLiquidPackMl(ing);
+  if (packMl == null) return empty;
+
+  const packPrice = Number(ing.current_price);
+  if (!Number.isFinite(packPrice) || packPrice <= 0) return empty;
+
+  const lineCostEur = recipeNorm.quantity * (packPrice / packMl);
+  if (!Number.isFinite(lineCostEur) || lineCostEur < 0) return empty;
+
+  return {
+    lineCostEur,
+    converted: true,
+    packMl,
+  };
+}
+
 /**
  * Cross weight/volume families only when explicit ingredient density is set (no global defaults).
  */
@@ -194,8 +238,8 @@ export function recipeLineCostViaDensityConversion(
     conversionKind: null,
   };
 
-  const gramsPerMl = resolveIngredientGramsPerMl(ing);
-  if (gramsPerMl == null || !isOperationalPricingResolved(ing)) return empty;
+  const densityGPerMl = resolveIngredientDensityGPerMl(ing);
+  if (densityGPerMl == null || !isOperationalPricingResolved(ing)) return empty;
 
   const recipeNorm = normalizeToBaseUnit(recipeQty, recipeUnit);
   if (!recipeNorm) return empty;
@@ -205,20 +249,50 @@ export function recipeLineCostViaDensityConversion(
   if (pricePerBase == null) return empty;
 
   if (recipeNorm.baseUnit === "ml" && costBase === "g") {
-    const recipeGrams = recipeNorm.quantity * gramsPerMl;
+    const recipeGrams = recipeNorm.quantity * densityGPerMl;
     if (!Number.isFinite(recipeGrams) || recipeGrams < 0) return empty;
+    const lineCostEur = recipeGrams * pricePerBase;
+    logCrossDomainConversion({
+      sourceUnit: recipeUnit ?? "ml",
+      targetUnit: costBase,
+      densityGPerMl,
+      recipeQuantity: recipeQty,
+      recipeNormalizedQuantity: recipeNorm.quantity,
+      recipeNormalizedUnit: recipeNorm.baseUnit,
+      intermediateGrams: recipeGrams,
+      intermediateMl: recipeNorm.quantity,
+      operationalQuantity: recipeGrams,
+      operationalUnit: "g",
+      lineCostEur,
+      conversionKind: "volume_to_weight",
+    });
     return {
-      lineCostEur: recipeGrams * pricePerBase,
+      lineCostEur,
       converted: true,
       conversionKind: "volume_to_weight",
     };
   }
 
   if (recipeNorm.baseUnit === "g" && costBase === "ml") {
-    const recipeMl = recipeNorm.quantity / gramsPerMl;
+    const recipeMl = recipeNorm.quantity / densityGPerMl;
     if (!Number.isFinite(recipeMl) || recipeMl < 0) return empty;
+    const lineCostEur = recipeMl * pricePerBase;
+    logCrossDomainConversion({
+      sourceUnit: recipeUnit ?? "g",
+      targetUnit: costBase,
+      densityGPerMl,
+      recipeQuantity: recipeQty,
+      recipeNormalizedQuantity: recipeNorm.quantity,
+      recipeNormalizedUnit: recipeNorm.baseUnit,
+      intermediateGrams: recipeNorm.quantity,
+      intermediateMl: recipeMl,
+      operationalQuantity: recipeMl,
+      operationalUnit: "ml",
+      lineCostEur,
+      conversionKind: "weight_to_volume",
+    });
     return {
-      lineCostEur: recipeMl * pricePerBase,
+      lineCostEur,
       converted: true,
       conversionKind: "weight_to_volume",
     };

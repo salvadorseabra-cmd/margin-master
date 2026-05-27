@@ -4,6 +4,7 @@ import type { OperationalIngredientCostSource } from "@/lib/resolve-operational-
 const LOG_PREFIX = "[PRICING_TRACE]";
 const USABLE_CONVERSION_PREFIX = "[USABLE_CONVERSION_TRACE]";
 const DENSITY_CONVERSION_PREFIX = "[DENSITY_CONVERSION_TRACE]";
+export const CROSS_DOMAIN_CONVERSION_PREFIX = "[CROSS_DOMAIN_CONVERSION]";
 const UNIT_AUDIT_PREFIX = "[INGREDIENT_UNIT_AUDIT]";
 const UNIT_NORMALIZATION_PREFIX = "[UNIT_NORMALIZATION_TRACE]";
 const PRICING_RESOLVER_PREFIX = "[PRICING_RESOLVER_TRACE]";
@@ -183,6 +184,55 @@ export function pricingConfidenceFromResolve(input: {
   if (input.source === "catalog") return "catalog_fallback";
   if (input.source === "embed") return "stale_price";
   return "catalog_fallback";
+}
+
+export function shouldLogCrossDomainConversion(): boolean {
+  if (import.meta.env.DEV) return true;
+  if (typeof import.meta.env.VITE_CROSS_DOMAIN_CONVERSION_TRACE === "string") {
+    return import.meta.env.VITE_CROSS_DOMAIN_CONVERSION_TRACE === "true";
+  }
+  if (typeof window === "undefined") return false;
+  const w = window as Window & {
+    __MARGINLY_CROSS_DOMAIN_CONVERSION__?: boolean;
+    __MARGINLY_PRICING_TRACE__?: boolean;
+  };
+  return (
+    w.__MARGINLY_CROSS_DOMAIN_CONVERSION__ === true ||
+    w.__MARGINLY_PRICING_TRACE__ === true
+  );
+}
+
+export function logCrossDomainConversion(input: {
+  sourceUnit: string;
+  targetUnit: string;
+  densityGPerMl: number;
+  recipeQuantity: number;
+  recipeNormalizedQuantity: number;
+  recipeNormalizedUnit: BaseUnit;
+  intermediateGrams: number;
+  intermediateMl: number;
+  operationalQuantity: number;
+  operationalUnit: BaseUnit;
+  lineCostEur: number;
+  conversionKind: "volume_to_weight" | "weight_to_volume";
+  trigger?: string;
+}): void {
+  if (!shouldLogCrossDomainConversion()) return;
+  console.info(CROSS_DOMAIN_CONVERSION_PREFIX, {
+    sourceUnit: input.sourceUnit,
+    targetUnit: input.targetUnit,
+    densityGPerMl: input.densityGPerMl,
+    recipeQuantity: input.recipeQuantity,
+    recipeNormalizedQuantity: input.recipeNormalizedQuantity,
+    recipeNormalizedUnit: input.recipeNormalizedUnit,
+    intermediateGrams: input.intermediateGrams,
+    intermediateMl: input.intermediateMl,
+    operationalQuantity: input.operationalQuantity,
+    operationalUnit: input.operationalUnit,
+    lineCostEur: input.lineCostEur,
+    conversionKind: input.conversionKind,
+    trigger: input.trigger ?? null,
+  });
 }
 
 export function logDensityConversionTrace(input: {

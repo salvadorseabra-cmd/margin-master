@@ -13,7 +13,6 @@ import type {
   IngredientCanonicalInput,
   IngredientCanonicalMatchKind,
 } from "@/lib/ingredient-canonical";
-import { shouldSkipByOperationalProductFamilyGate } from "@/lib/ingredient-operational-family-gate";
 import { buildInvoiceMatchCatalog } from "@/lib/ingredient-canonical-synthesis";
 import {
   buildMatchExplanation,
@@ -23,6 +22,7 @@ import {
   invoiceRowMatchSummaryBucket,
   resolveInvoiceTableRowIngredientMatch,
 } from "@/lib/invoice-ingredient-row-display";
+import { readLocalInvoiceIngredientAliases } from "@/lib/operational-review-queue";
 import {
   defaultIsGenericUnit,
   operationalCostFieldsFromInvoiceLine,
@@ -619,8 +619,6 @@ export function buildMatchedInvoiceProductsFromScan(
   };
   if (!trimmedId) return empty;
 
-  const scopedAliases = filterConfirmedAliasesForIngredientId(confirmedAliases, trimmedId);
-
   const eligibleRows = scanRows
     .map((row) =>
       normalizeInvoiceItemFields({
@@ -654,17 +652,11 @@ export function buildMatchedInvoiceProductsFromScan(
     const { match, state } = resolveInvoiceTableRowIngredientMatch(
       normalized.name,
       matchCatalog,
-      scopedAliases,
+      confirmedAliases,
       supplierName,
     );
     const matchedIngredientId = match?.ingredient.id?.trim();
     if (!match || !matchedIngredientId || matchedIngredientId !== trimmedId) continue;
-    if (
-      canonicalName?.trim() &&
-      shouldSkipByOperationalProductFamilyGate(normalized.name, canonicalName)
-    ) {
-      continue;
-    }
 
     const bucket = invoiceRowMatchSummaryBucket(state.displayState);
     if (bucket === "unmatched") continue;
@@ -759,11 +751,6 @@ export function buildLatestPurchaseGlanceByIngredientIdFromScan(
     [...catalog],
     eligibleRows.map((row) => ({ name: row.name })),
   );
-  const canonicalNameById = new Map(
-    catalog
-      .map((row) => [row.id?.trim() ?? "", resolveCanonicalNameForIngredient(row.id ?? "", catalog)] as const)
-      .filter(([id]) => Boolean(id)),
-  );
   const sourceById = new Map(scanRows.map((row) => [row.id, row]));
   const seenItemIds = new Set<string>();
   const latest: Record<string, IngredientLatestPurchaseGlance> = {};
@@ -781,14 +768,6 @@ export function buildLatestPurchaseGlanceByIngredientIdFromScan(
     );
     const matchedIngredientId = match?.ingredient.id?.trim();
     if (!match || !matchedIngredientId || !catalogIds.has(matchedIngredientId)) continue;
-
-    const canonicalName = canonicalNameById.get(matchedIngredientId);
-    if (
-      canonicalName?.trim() &&
-      shouldSkipByOperationalProductFamilyGate(normalized.name, canonicalName)
-    ) {
-      continue;
-    }
 
     const bucket = invoiceRowMatchSummaryBucket(state.displayState);
     if (bucket === "unmatched") continue;
@@ -850,11 +829,6 @@ export function buildLatestOperationalIngredientCostByIngredientIdFromScan(
     [...catalog],
     eligibleRows.map((row) => ({ name: row.name })),
   );
-  const canonicalNameById = new Map(
-    catalog
-      .map((row) => [row.id?.trim() ?? "", resolveCanonicalNameForIngredient(row.id ?? "", catalog)] as const)
-      .filter(([id]) => Boolean(id)),
-  );
   const sourceById = new Map(scanRows.map((row) => [row.id, row]));
   const seenItemIds = new Set<string>();
 
@@ -871,14 +845,6 @@ export function buildLatestOperationalIngredientCostByIngredientIdFromScan(
     );
     const matchedIngredientId = match?.ingredient.id?.trim();
     if (!match || !matchedIngredientId || !catalogIds.has(matchedIngredientId)) continue;
-
-    const canonicalName = canonicalNameById.get(matchedIngredientId);
-    if (
-      canonicalName?.trim() &&
-      shouldSkipByOperationalProductFamilyGate(normalized.name, canonicalName)
-    ) {
-      continue;
-    }
 
     const bucket = invoiceRowMatchSummaryBucket(state.displayState);
     if (bucket === "unmatched") continue;
@@ -1070,10 +1036,14 @@ export async function loadIngredientMatchedInvoiceProducts(
     if (!owned) return empty;
 
     const { rows, truncated } = await loadInvoiceItemsForMatchedProductScan(client);
+    const mergedConfirmedAliases: IngredientAliasMap = {
+      ...readLocalInvoiceIngredientAliases(trimmedUser),
+      ...confirmedAliases,
+    };
     const result = buildMatchedInvoiceProductsFromScan(
       trimmedId,
       catalog,
-      confirmedAliases,
+      mergedConfirmedAliases,
       rows,
       { truncated, scanLimit: MATCHED_INVOICE_PRODUCTS_SCAN_LIMIT },
     );

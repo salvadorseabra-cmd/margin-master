@@ -133,7 +133,22 @@ describe("invoice overlay usable fields", () => {
 });
 
 describe("recipeLineCostViaDensityConversion", () => {
-  it("ketchup with density 1.0: 350 ml vs 1 kg @ €5 resolves", () => {
+  it("350 ml recipe + €/kg pricing with density 1.15 resolves to correct line cost", () => {
+    const ing = {
+      current_price: 5,
+      purchase_quantity: 1000,
+      cost_base_unit: "g" as const,
+      density_g_per_ml: 1.15,
+    };
+    const result = recipeLineCostViaDensityConversion(350, "ml", ing);
+    expect(result.converted).toBe(true);
+    expect(result.conversionKind).toBe("volume_to_weight");
+    // 350 ml × 1.15 g/ml = 402.5 g × €0.005/g = €2.0125
+    expect(result.lineCostEur).toBeCloseTo(2.0125, 4);
+    expect(ingredientLineCostEur(350, ing, { recipeUnit: "ml" })).toBeCloseTo(2.0125, 4);
+  });
+
+  it("ketchup with legacy grams_per_ml alias still resolves", () => {
     const ing = {
       current_price: 5,
       purchase_quantity: 1000,
@@ -144,6 +159,20 @@ describe("recipeLineCostViaDensityConversion", () => {
     expect(result.converted).toBe(true);
     expect(result.lineCostEur).toBeCloseTo(1.75, 2);
     expect(ingredientLineCostEur(350, ing, { recipeUnit: "ml" })).toBeCloseTo(1.75, 2);
+  });
+
+  it("inverse: g recipe vs ml invoice with density bridges to volume", () => {
+    const ing = {
+      current_price: 5,
+      purchase_quantity: 1000,
+      cost_base_unit: "ml" as const,
+      density_g_per_ml: 1.15,
+    };
+    const result = recipeLineCostViaDensityConversion(402.5, "g", ing);
+    expect(result.converted).toBe(true);
+    expect(result.conversionKind).toBe("weight_to_volume");
+    // 402.5 g / 1.15 = 350 ml × €0.005/ml = €1.75
+    expect(result.lineCostEur).toBeCloseTo(1.75, 4);
   });
 
   it("ketchup without density stays unresolved", () => {
@@ -185,7 +214,7 @@ describe("recipeLineCostViaDensityConversion", () => {
       current_price: 3.25,
       purchase_quantity: 1000,
       cost_base_unit: "g" as const,
-      grams_per_ml: 1,
+      density_g_per_ml: 1,
     };
     const lineCost = ingredientLineCostEur(0.015, ing, {
       recipeUnit: "ml",

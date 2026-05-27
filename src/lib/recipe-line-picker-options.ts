@@ -53,9 +53,59 @@ export function buildRecipeLinePickerOptions(input: {
       pickerValue: recipeLinePickerValue("prep", row.id),
     }));
 
-  return [...ingredientOptions, ...prepOptions].sort((a, b) =>
+  return sortRecipeLinePickerOptions([...ingredientOptions, ...prepOptions]);
+}
+
+function sortRecipeLinePickerOptions(options: RecipeLinePickerOption[]): RecipeLinePickerOption[] {
+  return [...options].sort((a, b) =>
     a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
   );
+}
+
+/** Resolve the selected row by picker token or parsed kind/id. */
+export function resolveRecipeLinePickerSelection(
+  options: RecipeLinePickerOption[],
+  value: string,
+): RecipeLinePickerOption | undefined {
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+
+  const direct = options.find((option) => option.pickerValue === trimmed);
+  if (direct) return direct;
+
+  const parsed = parseRecipeLinePickerValue(trimmed);
+  if (!parsed) return undefined;
+
+  return options.find((option) => option.kind === parsed.kind && option.id === parsed.id);
+}
+
+/** Keep catalog/prep options and add any currently selected lines missing from the list. */
+export function mergeRecipeLinePickerSelections(
+  baseOptions: RecipeLinePickerOption[],
+  selections: Array<{
+    kind: RecipeLinePickerKind;
+    id: string;
+    name: string;
+    unit?: string | null;
+  }>,
+): RecipeLinePickerOption[] {
+  const byPickerValue = new Map(baseOptions.map((option) => [option.pickerValue, option]));
+
+  for (const selection of selections) {
+    const id = selection.id.trim();
+    if (!id) continue;
+    const pickerValue = recipeLinePickerValue(selection.kind, id);
+    if (byPickerValue.has(pickerValue)) continue;
+    byPickerValue.set(pickerValue, {
+      kind: selection.kind,
+      id,
+      name: selection.name.trim() || (selection.kind === "prep" ? "Prep" : "Unnamed ingredient"),
+      unit: selection.unit ?? null,
+      pickerValue,
+    });
+  }
+
+  return sortRecipeLinePickerOptions([...byPickerValue.values()]);
 }
 
 export function recipeLinePickerLabel(option: RecipeLinePickerOption): string {
