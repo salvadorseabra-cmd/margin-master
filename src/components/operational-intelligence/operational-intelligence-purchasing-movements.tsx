@@ -4,37 +4,52 @@ import { ArrowDownRight, ArrowRight, ArrowUpRight, Minus, Sparkles } from "lucid
 
 type OperationalIntelligencePurchasingMovementsProps = {
   items: PurchasingMovementItem[];
+  compact?: boolean;
 };
 
 export function OperationalIntelligencePurchasingMovements({
   items,
+  compact = false,
 }: OperationalIntelligencePurchasingMovementsProps) {
   const calmOnly = items.length === 1 && items[0]?.tone === "calm";
+  const displayItems = compact
+    ? items.filter((item) => item.tone !== "calm" && item.tone !== "stable").slice(0, 3)
+    : items;
+
+  if (compact && displayItems.length === 0) return null;
 
   return (
     <section aria-labelledby="purchasing-movements-heading">
       <h2
         id="purchasing-movements-heading"
-        className="text-sm font-semibold tracking-tight text-foreground"
+        className={
+          compact
+            ? "text-xs font-semibold tracking-tight text-foreground/90"
+            : "text-sm font-semibold tracking-tight text-foreground"
+        }
       >
         Purchasing movements
       </h2>
-      <p className="mt-0.5 text-xs text-muted-foreground">
-        Supplier and ingredient inflation vs recent averages — stabilization and recovery signals.
-      </p>
-
-      {items.length === 0 ? (
-        <p className="mt-3 text-sm text-muted-foreground">
-          No material purchasing moves in recent invoices.
+      {!compact ? (
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          Supplier and ingredient inflation vs recent averages — stabilization and recovery signals.
         </p>
-      ) : calmOnly ? (
+      ) : null}
+
+      {displayItems.length === 0 ? (
+        !compact ? (
+          <p className="mt-3 text-sm text-muted-foreground">
+            No material purchasing moves in recent invoices.
+          </p>
+        ) : null
+      ) : calmOnly && !compact ? (
         <p className="mt-3 text-sm text-muted-foreground">{items[0]?.detail}</p>
       ) : (
-        <ul className="mt-4 space-y-2">
-          {items.map((item) => (
+        <ul className={`${compact ? "mt-2" : "mt-4"} space-y-1.5`}>
+          {displayItems.map((item) => (
             <li
               key={item.id}
-              className="flex flex-wrap items-start justify-between gap-2 rounded-xl bg-muted/20 px-3.5 py-2.5 text-sm"
+              className={`flex flex-wrap items-start justify-between gap-2 rounded-lg bg-muted/15 px-3 py-2 ${compact ? "text-xs" : "text-sm"}`}
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
