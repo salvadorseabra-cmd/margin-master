@@ -17,30 +17,40 @@ import { loadEnvFiles } from "./load-env.mts";
 loadEnvFiles();
 
 const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
-const key =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.SUPABASE_SERVICE_ROLE ||
-  process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  process.env.SUPABASE_PUBLISHABLE_KEY ||
-  "";
+const serviceRoleKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE || "";
 
-if (!url || !key) {
+if (!url) {
   console.error(
     JSON.stringify({
-      error: "Missing VITE_SUPABASE_URL and a Supabase key (service role or publishable).",
+      error: "Missing VITE_SUPABASE_URL (or SUPABASE_URL). Set it in .env or .env.local.",
     }),
   );
   process.exit(1);
 }
 
-try {
-  const host = new URL(url).hostname;
-  console.log(`[backfill-report] supabase host: ${host}`);
-} catch {
-  console.log("[backfill-report] supabase url: (invalid)");
+if (!serviceRoleKey) {
+  console.error(
+    [
+      "Missing SUPABASE_SERVICE_ROLE_KEY.",
+      "Backfill must use the service_role key so invoice_items and ingredient_price_history are not blocked by RLS.",
+      "Add to .env.local (never commit):",
+      "  SUPABASE_SERVICE_ROLE_KEY=<service_role secret>",
+      "From Supabase Dashboard → Settings → API → service_role.",
+    ].join("\n"),
+  );
+  process.exit(1);
 }
 
-const supabase = createClient<Database>(url, key, {
+let hostname = "(invalid url)";
+try {
+  hostname = new URL(url).hostname;
+} catch {
+  /* keep placeholder */
+}
+console.log(JSON.stringify({ keyKind: "service_role", hostname }));
+
+const supabase = createClient<Database>(url, serviceRoleKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
 
@@ -154,11 +164,6 @@ async function loadMarginData() {
 }
 
 async function main() {
-  const keyKind =
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE
-      ? "service_role"
-      : "publishable";
-
   const before = await countHistoryRows();
   const backfill = await backfillIngredientPriceHistoryFromInvoices(supabase);
   const after = await countHistoryRows();
@@ -199,12 +204,16 @@ async function main() {
   console.log(
     JSON.stringify(
       {
-        keyKind,
+        keyKind: "service_role",
+        hostname,
         before,
         after,
         delta: after - before,
         ingredientsWithTwoPlusPoints: ingredientsTwoPlus,
         backfill,
+        suppliersToWatchCount: (oi as { suppliersToWatchCount?: number }).suppliersToWatchCount,
+        opportunitiesCount: (oi as { opportunitiesCount?: number }).opportunitiesCount,
+        affectedRecipesCount: (oi as { affectedRecipesCount?: number }).affectedRecipesCount,
         oi,
       },
       null,
