@@ -1,3 +1,7 @@
+/**
+ * Retained orphan: date-range selector and Filters were removed from /alerts (fixed 90-day
+ * synthesis window). Re-export when header controls return.
+ */
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -25,9 +29,9 @@ export function OperationalIntelligenceHeaderControls({
           <SelectValue placeholder="Date range" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="7">Last 7 days</SelectItem>
           <SelectItem value="30">Last 30 days</SelectItem>
           <SelectItem value="90">Last 90 days</SelectItem>
+          <SelectItem value="180">Last 6 months</SelectItem>
         </SelectContent>
       </Select>
       <Button variant="outline" size="sm" className="h-9 gap-1.5" type="button">

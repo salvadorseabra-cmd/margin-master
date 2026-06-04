@@ -11,6 +11,9 @@ import { buildSynthesisViewModel } from "@/lib/operational-intelligence-synthesi
 import type { MarginVisitDelta } from "@/lib/margin-alert-visit";
 import { useMemo } from "react";
 
+/** Fixed synthesis window (last 90 days → last_3_months). */
+const OPERATIONAL_INTELLIGENCE_DATE_RANGE = "90";
+
 export type OperationalIntelligencePageProps = {
   data: MarginAlertData;
   alerts: MarginAlertItem[];
@@ -24,7 +27,13 @@ export function OperationalIntelligencePage({
   health,
 }: OperationalIntelligencePageProps) {
   const synthesis = useMemo(
-    () => buildSynthesisViewModel({ data, alerts, health }),
+    () =>
+      buildSynthesisViewModel({
+        data,
+        alerts,
+        health,
+        dateRange: OPERATIONAL_INTELLIGENCE_DATE_RANGE,
+      }),
     [data, alerts, health],
   );
 
@@ -53,7 +62,10 @@ export function OperationalIntelligencePage({
             Highest-impact negative changes — sorted by estimated monthly cost.
           </p>
         </header>
-        <OperationalIntelligenceFinancialRisks rows={ownerReview.financialRisks} />
+        <OperationalIntelligenceFinancialRisks
+          rows={ownerReview.financialRisks}
+          periodPhrase={ownerReview.periodPhrase}
+        />
       </section>
 
       <section className={operationalSectionLayout.section} aria-labelledby="oi-opportunities">
@@ -65,7 +77,10 @@ export function OperationalIntelligencePage({
             Price decreases, margin recovery, and measured savings already in your data.
           </p>
         </header>
-        <OperationalIntelligenceOpportunities rows={ownerReview.opportunities} />
+        <OperationalIntelligenceOpportunities
+          rows={ownerReview.opportunities}
+          periodPhrase={ownerReview.periodPhrase}
+        />
       </section>
 
       <section className={operationalSectionLayout.section} aria-labelledby="oi-suppliers-watch">
@@ -77,7 +92,10 @@ export function OperationalIntelligencePage({
             Supplier direction and ingredient-level price movement from invoices.
           </p>
         </header>
-        <OperationalIntelligenceSuppliersWatch rows={ownerReview.suppliersToWatch} />
+        <OperationalIntelligenceSuppliersWatch
+          rows={ownerReview.suppliersToWatch}
+          periodPhrase={ownerReview.periodPhrase}
+        />
       </section>
 
       <section className={operationalSectionLayout.section} aria-labelledby="oi-affected-recipes">
@@ -89,7 +107,10 @@ export function OperationalIntelligencePage({
             Menu items with margin deterioration or linked ingredient cost increases.
           </p>
         </header>
-        <OperationalIntelligenceAffectedRecipes rows={ownerReview.affectedRecipes} />
+        <OperationalIntelligenceAffectedRecipes
+          rows={ownerReview.affectedRecipes}
+          periodPhrase={ownerReview.periodPhrase}
+        />
       </section>
 
       <section className={operationalSectionLayout.section} aria-labelledby="oi-attention-needed">

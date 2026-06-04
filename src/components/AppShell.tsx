@@ -134,7 +134,9 @@ export function AppShell({
                 <h1 className="text-2xl lg:text-3xl font-semibold tracking-tight text-foreground">
                   {title}
                 </h1>
-                {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+                {subtitle && (
+                  <p className="mt-1 whitespace-pre-line text-sm text-muted-foreground">{subtitle}</p>
+                )}
               </div>
               {action}
             </div>

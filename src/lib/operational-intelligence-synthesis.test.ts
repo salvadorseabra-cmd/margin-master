@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   buildConsequenceLine,
   buildCuratedOperationalExposures,
@@ -28,6 +28,7 @@ import {
   buildSupplierSwitchNarrative,
   buildSynthesisViewModel,
   buildOwnerReviewViewModel,
+  mapDateRangeToWindowKey,
   classifyRecipeMarginTrend,
   classifySupplierMovementSignal,
   classifySupplierSwitchType,
@@ -1429,6 +1430,7 @@ describe("operational-intelligence-synthesis", () => {
       operationalSynthesisGroups: synthesis.operationalSynthesisGroups,
       monitorInsights: synthesis.monitorInsights,
       operationalWindows: windows,
+      selectedWindowKey: "last_3_months",
     });
 
     expect(ownerReview.weeklySnapshot.supplierIncreases).toBeGreaterThanOrEqual(1);
@@ -1513,6 +1515,7 @@ describe("operational-intelligence-synthesis", () => {
       operationalSynthesisGroups: synthesis.operationalSynthesisGroups,
       monitorInsights: synthesis.monitorInsights,
       operationalWindows: windows,
+      selectedWindowKey: "last_3_months",
     });
 
     expect(ownerReview.financialRisks.length).toBeGreaterThan(0);
@@ -1634,6 +1637,7 @@ describe("operational-intelligence-synthesis", () => {
       operationalSynthesisGroups: synthesis.operationalSynthesisGroups,
       monitorInsights: synthesis.monitorInsights,
       operationalWindows: windows,
+      selectedWindowKey: "last_3_months",
     });
 
     expect(ownerReview.attentionNeeded.some((row) => row.kind === "stale_price")).toBe(true);
@@ -1642,5 +1646,147 @@ describe("operational-intelligence-synthesis", () => {
     expect(
       ownerReview.attentionNeeded.find((row) => row.kind === "stale_price")?.title,
     ).toMatch(/Novilho Vazia · catalog not confirmed/i);
+  });
+
+  it("mapDateRangeToWindowKey maps UI selector values to operational windows", () => {
+    expect(mapDateRangeToWindowKey("30")).toBe("last_30_days");
+    expect(mapDateRangeToWindowKey("90")).toBe("last_3_months");
+    expect(mapDateRangeToWindowKey("180")).toBe("last_6_months");
+    expect(mapDateRangeToWindowKey(undefined)).toBe("last_3_months");
+  });
+
+  it("owner review respects selected date range without cross-window fallback", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-03T12:00:00.000Z"));
+
+    const data = {
+      ingredients: [
+        { id: "beef-1", name: "Novilho Vazia", unit: "kg", current_price: 12, purchase_quantity: 1 },
+        { id: "veg-1", name: "Salad mix", unit: "kg", current_price: 4, purchase_quantity: 1 },
+        { id: "oil-1", name: "Olive oil", unit: "L", current_price: 8, purchase_quantity: 1 },
+      ],
+      recipes: [beefRecipe("r1", "Burger A", 0.25)],
+      invoices: [
+        { id: "inv-recent", supplier_name: "Recent Lane", total: 100, created_at: "2026-05-20T00:00:00.000Z" },
+        { id: "inv-mid", supplier_name: "Mid Lane", total: 80, created_at: "2026-04-01T00:00:00.000Z" },
+        { id: "inv-old", supplier_name: "Legacy Lane", total: 60, created_at: "2026-01-15T00:00:00.000Z" },
+      ],
+      priceHistory: [
+        {
+          id: "h-recent",
+          ingredient_id: "beef-1",
+          invoice_id: "inv-recent",
+          ingredient_name: "Novilho Vazia",
+          supplier_name: "Recent Lane",
+          ingredient_unit: "kg",
+          previous_price: 10,
+          new_price: 12,
+          delta: 2,
+          delta_percent: 20,
+          created_at: "2026-05-20T00:00:00.000Z",
+        },
+        {
+          id: "h-mid",
+          ingredient_id: "veg-1",
+          invoice_id: "inv-mid",
+          ingredient_name: "Salad mix",
+          supplier_name: "Mid Lane",
+          ingredient_unit: "kg",
+          previous_price: 5,
+          new_price: 6,
+          delta: 1,
+          delta_percent: 20,
+          created_at: "2026-04-01T00:00:00.000Z",
+        },
+        {
+          id: "h-old",
+          ingredient_id: "oil-1",
+          invoice_id: "inv-old",
+          ingredient_name: "Olive oil",
+          supplier_name: "Legacy Lane",
+          ingredient_unit: "L",
+          previous_price: 7,
+          new_price: 8.5,
+          delta: 1.5,
+          delta_percent: 21.4,
+          created_at: "2026-01-15T00:00:00.000Z",
+        },
+      ],
+    };
+
+    const view30 = buildSynthesisViewModel({ data, alerts: [], dateRange: "30" });
+    const view90 = buildSynthesisViewModel({ data, alerts: [], dateRange: "90" });
+    const view180 = buildSynthesisViewModel({ data, alerts: [], dateRange: "180" });
+
+    expect(view30.ownerReview.selectedWindowKey).toBe("last_30_days");
+    expect(view90.ownerReview.selectedWindowKey).toBe("last_3_months");
+    expect(view180.ownerReview.selectedWindowKey).toBe("last_6_months");
+
+    expect(view30.ownerReview.weeklySnapshot.supplierIncreases).toBe(1);
+    expect(view90.ownerReview.weeklySnapshot.supplierIncreases).toBe(2);
+    expect(view180.ownerReview.weeklySnapshot.supplierIncreases).toBe(3);
+
+    const suppliers30 = view30.ownerReview.suppliersToWatch.map((row) => row.supplierName);
+    const suppliers90 = view90.ownerReview.suppliersToWatch.map((row) => row.supplierName);
+    const suppliers180 = view180.ownerReview.suppliersToWatch.map((row) => row.supplierName);
+
+    expect(suppliers30).toContain("Recent Lane");
+    expect(suppliers30).not.toContain("Mid Lane");
+    expect(suppliers30).not.toContain("Legacy Lane");
+
+    expect(suppliers90).toEqual(expect.arrayContaining(["Recent Lane", "Mid Lane"]));
+    expect(suppliers90).not.toContain("Legacy Lane");
+
+    expect(suppliers180).toEqual(
+      expect.arrayContaining(["Recent Lane", "Mid Lane", "Legacy Lane"]),
+    );
+
+    vi.useRealTimers();
+  });
+
+  it("does not fall back to all-time supplier aggregates when selected window is empty", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-03T12:00:00.000Z"));
+
+    const data = {
+      ingredients: [
+        { id: "oil-1", name: "Olive oil", unit: "L", current_price: 8, purchase_quantity: 1 },
+      ],
+      recipes: [beefRecipe("r1", "Burger A", 0.25)],
+      invoices: [
+        { id: "inv-old", supplier_name: "Legacy Lane", total: 60, created_at: "2026-01-15T00:00:00.000Z" },
+      ],
+      priceHistory: [
+        {
+          id: "h-old",
+          ingredient_id: "oil-1",
+          invoice_id: "inv-old",
+          ingredient_name: "Olive oil",
+          supplier_name: "Legacy Lane",
+          ingredient_unit: "L",
+          previous_price: 7,
+          new_price: 8.5,
+          delta: 1.5,
+          delta_percent: 21.4,
+          created_at: "2026-01-15T00:00:00.000Z",
+        },
+      ],
+    };
+
+    const view30 = buildSynthesisViewModel({ data, alerts: [], dateRange: "30" });
+    const view90 = buildSynthesisViewModel({ data, alerts: [], dateRange: "90" });
+
+    expect(view30.ownerReview.weeklySnapshot.supplierIncreases).toBe(0);
+    expect(view30.ownerReview.suppliersToWatch).toHaveLength(0);
+    expect(view90.ownerReview.weeklySnapshot.supplierIncreases).toBe(0);
+    expect(view90.ownerReview.suppliersToWatch).toHaveLength(0);
+
+    const view180 = buildSynthesisViewModel({ data, alerts: [], dateRange: "180" });
+    expect(view180.ownerReview.weeklySnapshot.supplierIncreases).toBe(1);
+    expect(view180.ownerReview.suppliersToWatch.map((row) => row.supplierName)).toContain(
+      "Legacy Lane",
+    );
+
+    vi.useRealTimers();
   });
 });

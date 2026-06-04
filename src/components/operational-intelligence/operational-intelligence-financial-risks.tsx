@@ -4,15 +4,17 @@ import type { OwnerReviewRow } from "@/lib/operational-intelligence-synthesis";
 
 type OperationalIntelligenceFinancialRisksProps = {
   rows: OwnerReviewRow[];
+  periodPhrase: string;
 };
 
 export function OperationalIntelligenceFinancialRisks({
   rows,
+  periodPhrase,
 }: OperationalIntelligenceFinancialRisksProps) {
   if (rows.length === 0) {
     return (
       <p className="rounded-xl border border-border/60 bg-muted/[0.03] px-3 py-2.5 text-xs text-muted-foreground">
-        No material negative cost changes detected this period.
+        No material negative cost changes in {periodPhrase}.
       </p>
     );
   }

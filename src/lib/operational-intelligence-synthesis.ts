@@ -288,6 +288,9 @@ export type AttentionRow = {
 
 export type OwnerReviewViewModel = {
   weeklySnapshot: OwnerReviewWeeklySnapshot;
+  /** Human phrase for empty states, e.g. "the last 30 days". */
+  periodPhrase: string;
+  selectedWindowKey: OperationalWindowKey;
   financialRisks: OwnerReviewRow[];
   opportunities: OwnerReviewRow[];
   suppliersToWatch: SupplierWatchRow[];
@@ -1033,6 +1036,22 @@ export function buildOperationalWindows(now = new Date()): OperationalWindow[] {
     ...windowDef,
     startsAtIso: new Date(nowMs - windowDef.days * 86_400_000).toISOString(),
   }));
+}
+
+/** Maps UI date-range selector values to operational window keys. */
+export function mapDateRangeToWindowKey(dateRange?: string): OperationalWindowKey {
+  if (dateRange === "30") return "last_30_days";
+  if (dateRange === "180") return "last_6_months";
+  if (dateRange === "90") return "last_3_months";
+  return "last_3_months";
+}
+
+export function operationalPeriodPhrase(
+  windowKey: OperationalWindowKey,
+  windows: OperationalWindow[],
+): string {
+  const label = windows.find((w) => w.key === windowKey)?.label ?? "this period";
+  return windowPhraseForNarrative(label);
 }
 
 function resolveWindowFromDate(value: string | null | undefined, windows: OperationalWindow[]): OperationalWindowKey {
@@ -3836,8 +3855,10 @@ export function buildSynthesisViewModel(input: {
   data: MarginAlertData;
   alerts: MarginAlertItem[];
   health?: OperationalHealthPanel;
+  dateRange?: string;
 }) {
   const windows = buildOperationalWindows();
+  const selectedWindowKey = mapDateRangeToWindowKey(input.dateRange);
   const fullExposure = buildPortfolioCostExposure(input.data, 50);
   const categorySlices = buildCostCategorySlices(fullExposure, { homepageOnly: true });
   const categoryPressure = enrichCategoryPressureRows(
@@ -3958,6 +3979,7 @@ export function buildSynthesisViewModel(input: {
     operationalSynthesisGroups,
     monitorInsights,
     operationalWindows: windows,
+    selectedWindowKey,
   });
 
   return {
@@ -4811,10 +4833,11 @@ function lookupIngredientPctChange(
   ingredientName: string,
   data: MarginAlertData,
   windows: OperationalWindow[],
+  windowKey: OperationalWindowKey,
 ): string | null {
   const normalized = ingredientName.trim().toLowerCase();
   const movement = rankIngredientPriceMovements({
-    windowKey: "last_3_months",
+    windowKey,
     data,
     windows,
   }).find((entry) => entry.name.trim().toLowerCase() === normalized);
@@ -4826,14 +4849,15 @@ function recipeIngredientFactTitle(
   entry: RecipeMarginMovementInsight,
   data: MarginAlertData,
   windows: OperationalWindow[],
+  windowKey: OperationalWindowKey,
 ): string | null {
   const fromReason = entry.reason.match(/Cost increase on (.+?)(?:\.|$)/i);
   if (fromReason?.[1]) {
-    return lookupIngredientPctChange(fromReason[1].trim(), data, windows);
+    return lookupIngredientPctChange(fromReason[1].trim(), data, windows, windowKey);
   }
   const spike = entry.reason.match(/(.+?) price (?:rose|increased|up)/i);
   if (spike?.[1]) {
-    return lookupIngredientPctChange(spike[1].trim(), data, windows);
+    return lookupIngredientPctChange(spike[1].trim(), data, windows, windowKey);
   }
   return null;
 }
@@ -4877,15 +4901,13 @@ function formatRecipeWhatChangedLine(entry: RecipeMarginMovementInsight): string
 function countSupplierMovementDirections(
   data: MarginAlertData,
   windows: OperationalWindow[],
+  windowKey: OperationalWindowKey,
 ): { increases: number; decreases: number } {
-  let aggregates = aggregateSuppliersInWindow({
-    windowKey: "last_3_months",
+  const aggregates = aggregateSuppliersInWindow({
+    windowKey,
     data,
     windows,
   });
-  if (aggregates.length === 0) {
-    aggregates = aggregateSuppliersAllTime(data);
-  }
   return {
     increases: aggregates.filter((entry) => entry.avgPct >= MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT).length,
     decreases: aggregates.filter((entry) => entry.avgPct <= -MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT).length,
@@ -4929,10 +4951,13 @@ function supplierWatchDirection(avgPct: number): SupplierWatchDirection {
 function supplierImpactFromSwitches(
   supplierName: string,
   groups: OperationalSynthesisGroups,
+  windowKey?: OperationalWindowKey,
 ): number {
   return groups.supplierSwitchImpacts.badSwitches
     .filter(
-      (entry) => entry.fromSupplier === supplierName || entry.toSupplier === supplierName,
+      (entry) =>
+        (windowKey == null || entry.window === windowKey) &&
+        (entry.fromSupplier === supplierName || entry.toSupplier === supplierName),
     )
     .reduce((sum, entry) => sum + entry.estimatedMonthlyImpactEur, 0);
 }
@@ -4962,6 +4987,7 @@ function buildOwnerReviewFinancialRisks(input: {
   concentrationGroups: GroupedConcentrationInsight[];
   groups: OperationalSynthesisGroups;
   operationalWindows: OperationalWindow[];
+  selectedWindowKey: OperationalWindowKey;
 }): OwnerReviewRow[] {
   const rows: OwnerReviewRow[] = [];
   const seen = new Set<string>();
@@ -4973,11 +4999,13 @@ function buildOwnerReviewFinancialRisks(input: {
   };
 
   for (const entry of input.groups.recipeMarginMovements.worsening) {
+    if (entry.window !== input.selectedWindowKey) continue;
     if (!isMeaningfulRecipeMarginMovement(entry)) continue;
     const factTitle = recipeIngredientFactTitle(
       entry,
       input.data,
       input.operationalWindows,
+      input.selectedWindowKey,
     );
     const impact = ownerReviewImpactLine(entry.estimatedMonthlyImpactEur);
     const marginLine = formatRecipeMarginImpactLine(entry.marginFromPct, entry.marginToPct);
@@ -4995,6 +5023,7 @@ function buildOwnerReviewFinancialRisks(input: {
   }
 
   for (const entry of input.groups.supplierSwitchImpacts.badSwitches) {
+    if (entry.window !== input.selectedWindowKey) continue;
     if (entry.estimatedMonthlyImpactEur < MIN_VISIBLE_IMPACT_EUR) continue;
     push({
       id: `risk-switch:${entry.ingredientId}:${entry.switchedAt}`,
@@ -5021,7 +5050,7 @@ function buildOwnerReviewFinancialRisks(input: {
   }
 
   const ingredientIncreases = rankIngredientPriceMovements({
-    windowKey: "last_3_months",
+    windowKey: input.selectedWindowKey,
     data: input.data,
     windows: input.operationalWindows,
   }).filter((entry) => entry.pct >= MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT);
@@ -5064,6 +5093,7 @@ function buildOwnerReviewOpportunities(input: {
   data: MarginAlertData;
   groups: OperationalSynthesisGroups;
   operationalWindows: OperationalWindow[];
+  selectedWindowKey: OperationalWindowKey;
 }): OwnerReviewRow[] {
   const rows: OwnerReviewRow[] = [];
   const seen = new Set<string>();
@@ -5075,6 +5105,7 @@ function buildOwnerReviewOpportunities(input: {
   };
 
   for (const entry of input.groups.supplierSwitchImpacts.goodSwitches) {
+    if (entry.window !== input.selectedWindowKey) continue;
     if (entry.estimatedMonthlyImpactEur < MIN_VISIBLE_IMPACT_EUR) continue;
     push({
       id: `opp-switch:${entry.ingredientId}:${entry.switchedAt}`,
@@ -5089,7 +5120,7 @@ function buildOwnerReviewOpportunities(input: {
   }
 
   const ingredientDecreases = rankIngredientPriceMovements({
-    windowKey: "last_3_months",
+    windowKey: input.selectedWindowKey,
     data: input.data,
     windows: input.operationalWindows,
   }).filter((entry) => entry.pct <= -MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT);
@@ -5139,20 +5170,26 @@ function buildOwnerReviewSuppliersToWatch(input: {
   data: MarginAlertData;
   groups: OperationalSynthesisGroups;
   operationalWindows: OperationalWindow[];
+  selectedWindowKey: OperationalWindowKey;
 }): SupplierWatchRow[] {
-  let aggregates = aggregateSuppliersInWindow({
-    windowKey: "last_3_months",
+  const aggregates = aggregateSuppliersInWindow({
+    windowKey: input.selectedWindowKey,
     data: input.data,
     windows: input.operationalWindows,
   });
-  if (aggregates.length === 0) {
-    aggregates = aggregateSuppliersAllTime(input.data);
-  }
+
+  const inSelectedWindow = (entry: SupplierMovementInsight) =>
+    entry.dominantWindow === input.selectedWindowKey ||
+    entry.windowHits[input.selectedWindowKey] > 0;
 
   const supplierNames = new Set<string>([
     ...aggregates.map((entry) => entry.supplierName),
-    ...input.groups.supplierMovements.largestIncreases.map((entry) => entry.supplierName),
-    ...input.groups.supplierMovements.stablePricing.map((entry) => entry.supplierName),
+    ...input.groups.supplierMovements.largestIncreases
+      .filter(inSelectedWindow)
+      .map((entry) => entry.supplierName),
+    ...input.groups.supplierMovements.stablePricing
+      .filter(inSelectedWindow)
+      .map((entry) => entry.supplierName),
   ]);
 
   const rows: SupplierWatchRow[] = [];
@@ -5160,11 +5197,15 @@ function buildOwnerReviewSuppliersToWatch(input: {
     const stats = aggregates.find((entry) => entry.supplierName === supplierName);
     const avgPct = stats?.avgPct ?? 0;
     const direction = supplierWatchDirection(avgPct);
-    const switchImpact = supplierImpactFromSwitches(supplierName, input.groups);
+    const switchImpact = supplierImpactFromSwitches(
+      supplierName,
+      input.groups,
+      input.selectedWindowKey,
+    );
     const ingredientChanges = collectSupplierIngredientChanges(
       supplierName,
       input.data,
-      "last_3_months",
+      input.selectedWindowKey,
       input.operationalWindows,
     );
     if (
@@ -5172,7 +5213,8 @@ function buildOwnerReviewSuppliersToWatch(input: {
       switchImpact < 1 &&
       ingredientChanges.length === 0 &&
       !input.groups.supplierMovements.largestIncreases.some(
-        (entry) => entry.supplierName === supplierName,
+        (entry) =>
+          entry.supplierName === supplierName && inSelectedWindow(entry),
       )
     ) {
       continue;
@@ -5210,17 +5252,24 @@ function buildOwnerReviewAffectedRecipes(input: {
   alerts: MarginAlertItem[];
   groups: OperationalSynthesisGroups;
   operationalWindows: OperationalWindow[];
+  selectedWindowKey: OperationalWindowKey;
 }): AffectedRecipeRow[] {
   const rows: AffectedRecipeRow[] = [];
   const seen = new Set<string>();
 
   for (const entry of input.groups.recipeMarginMovements.worsening) {
+    if (entry.window !== input.selectedWindowKey) continue;
     if (!isMeaningfulRecipeMarginMovement(entry)) continue;
     if (entry.trendStatus === "stabilizing" && entry.estimatedMonthlyImpactEur < MIN_RECIPE_MARGIN_MOVEMENT_EUR) {
       continue;
     }
     const recipeId = recipeIdForName(input.data, entry.recipeName);
-    const factChange = recipeIngredientFactTitle(entry, input.data, input.operationalWindows);
+    const factChange = recipeIngredientFactTitle(
+      entry,
+      input.data,
+      input.operationalWindows,
+      input.selectedWindowKey,
+    );
     rows.push({
       id: `affected-recipe:${entry.recipeName}`,
       recipeName: entry.recipeName,
@@ -5298,10 +5347,15 @@ export function buildOwnerReviewViewModel(input: {
   operationalSynthesisGroups: OperationalSynthesisGroups;
   monitorInsights: PrioritizedOperationalInsight[];
   operationalWindows: OperationalWindow[];
+  selectedWindowKey: OperationalWindowKey;
 }): OwnerReviewViewModel {
-  // Owner review uses fixed windows (90-day supplier/ingredient movement via last_3_months) — not user-selectable.
-  const supplierCounts = countSupplierMovementDirections(input.data, input.operationalWindows);
+  const supplierCounts = countSupplierMovementDirections(
+    input.data,
+    input.operationalWindows,
+    input.selectedWindowKey,
+  );
   const staleCount = input.alerts.filter((alert) => alert.kind === "stale_price").length;
+  const periodPhrase = operationalPeriodPhrase(input.selectedWindowKey, input.operationalWindows);
 
   return {
     weeklySnapshot: {
@@ -5310,28 +5364,34 @@ export function buildOwnerReviewViewModel(input: {
       supplierDecreases: supplierCounts.decreases,
       pricesNeedingRefresh: staleCount,
     },
+    periodPhrase,
+    selectedWindowKey: input.selectedWindowKey,
     financialRisks: buildOwnerReviewFinancialRisks({
       data: input.data,
       prioritizedInsights: input.prioritizedInsights,
       concentrationGroups: input.concentrationGroups,
       groups: input.operationalSynthesisGroups,
       operationalWindows: input.operationalWindows,
+      selectedWindowKey: input.selectedWindowKey,
     }),
     opportunities: buildOwnerReviewOpportunities({
       data: input.data,
       groups: input.operationalSynthesisGroups,
       operationalWindows: input.operationalWindows,
+      selectedWindowKey: input.selectedWindowKey,
     }),
     suppliersToWatch: buildOwnerReviewSuppliersToWatch({
       data: input.data,
       groups: input.operationalSynthesisGroups,
       operationalWindows: input.operationalWindows,
+      selectedWindowKey: input.selectedWindowKey,
     }),
     affectedRecipes: buildOwnerReviewAffectedRecipes({
       data: input.data,
       alerts: input.alerts,
       groups: input.operationalSynthesisGroups,
       operationalWindows: input.operationalWindows,
+      selectedWindowKey: input.selectedWindowKey,
     }),
     attentionNeeded: buildOwnerReviewAttentionNeeded({
       alerts: input.alerts,

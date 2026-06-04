@@ -3,15 +3,17 @@ import type { AffectedRecipeRow } from "@/lib/operational-intelligence-synthesis
 
 type OperationalIntelligenceAffectedRecipesProps = {
   rows: AffectedRecipeRow[];
+  periodPhrase: string;
 };
 
 export function OperationalIntelligenceAffectedRecipes({
   rows,
+  periodPhrase,
 }: OperationalIntelligenceAffectedRecipesProps) {
   if (rows.length === 0) {
     return (
       <p className="rounded-xl border border-border/60 bg-muted/[0.03] px-3 py-2.5 text-xs text-muted-foreground">
-        No recipes with margin deterioration linked to ingredient increases.
+        No recipes with margin deterioration linked to ingredient increases in {periodPhrase}.
       </p>
     );
   }

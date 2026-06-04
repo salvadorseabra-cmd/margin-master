@@ -4,15 +4,17 @@ import type { OwnerReviewRow } from "@/lib/operational-intelligence-synthesis";
 
 type OperationalIntelligenceOpportunitiesProps = {
   rows: OwnerReviewRow[];
+  periodPhrase: string;
 };
 
 export function OperationalIntelligenceOpportunities({
   rows,
+  periodPhrase,
 }: OperationalIntelligenceOpportunitiesProps) {
   if (rows.length === 0) {
     return (
       <p className="rounded-xl border border-border/60 bg-muted/[0.03] px-3 py-2.5 text-xs text-muted-foreground">
-        No positive price or margin movements to highlight this period.
+        No positive price or margin movements in {periodPhrase}.
       </p>
     );
   }

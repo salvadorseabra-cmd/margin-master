@@ -11,6 +11,7 @@ import { ChevronDown } from "lucide-react";
 
 type OperationalIntelligenceSuppliersWatchProps = {
   rows: SupplierWatchRow[];
+  periodPhrase: string;
 };
 
 const changeTone = {
@@ -100,11 +101,12 @@ function SupplierWatchRowItem({ row }: { row: SupplierWatchRow }) {
 
 export function OperationalIntelligenceSuppliersWatch({
   rows,
+  periodPhrase,
 }: OperationalIntelligenceSuppliersWatchProps) {
   if (rows.length === 0) {
     return (
       <p className="rounded-xl border border-border/60 bg-muted/[0.03] px-3 py-2.5 text-xs text-muted-foreground">
-        No supplier price movement to watch this period.
+        No supplier price movement to watch in {periodPhrase}.
       </p>
     );
   }

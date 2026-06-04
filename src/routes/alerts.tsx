@@ -202,7 +202,9 @@ function AlertsPage() {
   return (
     <AppShell
       title="Operational Intelligence"
-      subtitle="Daily margin signals from invoices, recipe costs, and supplier activity."
+      subtitle={
+        "Daily margin signals from invoices, recipe costs, and supplier activity.\nOperational review based on the last 90 days of supplier and pricing activity."
+      }
     >
       {loading && (
         <div className="rounded-xl border border-border bg-muted/20 p-8 text-center text-sm text-muted-foreground">
