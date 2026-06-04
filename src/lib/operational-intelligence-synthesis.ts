@@ -2308,6 +2308,23 @@ function priceHistoryDeltaPct(row: MarginAlertData["priceHistory"][number]): num
   );
 }
 
+/** Rows still linked to an invoice; orphans (invoice_id SET NULL on invoice delete) are excluded from OI. */
+export function linkedIngredientPriceHistoryRows(
+  rows: MarginAlertData["priceHistory"],
+): MarginAlertData["priceHistory"] {
+  return rows.filter((row) => {
+    const invoiceId = row.invoice_id;
+    return invoiceId != null && String(invoiceId).trim() !== "";
+  });
+}
+
+function marginAlertDataForOperationalIntelligence(data: MarginAlertData): MarginAlertData {
+  return {
+    ...data,
+    priceHistory: linkedIngredientPriceHistoryRows(data.priceHistory),
+  };
+}
+
 function ingredientLabel(
   ingredientId: string,
   fallbackName: string | null | undefined,
@@ -3089,8 +3106,9 @@ export function buildIngredientMovementMetrics(input: {
   windows: OperationalWindow[];
   alerts?: MarginAlertItem[];
 }): OperationalTrendMetricSection {
+  const data = marginAlertDataForOperationalIntelligence(input.data);
   const rows: OperationalTrendMetricRow[] = [];
-  const ranked = rankIngredientPriceMovements(input);
+  const ranked = rankIngredientPriceMovements({ ...input, data });
   const usedIds = new Set<string>();
 
   const increases = ranked
@@ -3116,7 +3134,7 @@ export function buildIngredientMovementMetrics(input: {
         value: `+${formatPercent(Math.round(entry.pct))}`,
         secondary: priceLine ?? undefined,
         ingredientId: entry.ingredientId,
-        expandable: ingredientExpandable(entry, input.data),
+        expandable: ingredientExpandable(entry, data),
         badges: resolveOperationalTrendBadges({
           ingredientId: entry.ingredientId,
           monthlyExposureEur: exposure?.monthlyModeledExposureEur,
@@ -3128,7 +3146,7 @@ export function buildIngredientMovementMetrics(input: {
   } else {
     pushIngredientFallbackRows(rows, {
       windowKey: input.windowKey,
-      data: input.data,
+      data,
       alerts: input.alerts,
       mode: "spend",
       excludeIds: usedIds,
@@ -3150,7 +3168,7 @@ export function buildIngredientMovementMetrics(input: {
         value: formatPercent(Math.round(entry.pct)),
         secondary: priceLine ?? undefined,
         ingredientId: entry.ingredientId,
-        expandable: ingredientExpandable(entry, input.data),
+        expandable: ingredientExpandable(entry, data),
         badges: resolveOperationalTrendBadges({
           ingredientId: entry.ingredientId,
           monthlyExposureEur: exposure?.monthlyModeledExposureEur,
@@ -3162,7 +3180,7 @@ export function buildIngredientMovementMetrics(input: {
   } else {
     pushIngredientFallbackRows(rows, {
       windowKey: input.windowKey,
-      data: input.data,
+      data,
       alerts: input.alerts,
       mode: increases.length > 0 ? "purchased" : "exposure",
       excludeIds: usedIds,
@@ -3173,7 +3191,7 @@ export function buildIngredientMovementMetrics(input: {
     const before = rows.length;
     pushIngredientFallbackRows(rows, {
       windowKey: input.windowKey,
-      data: input.data,
+      data,
       alerts: input.alerts,
       mode: rows.length % 2 === 0 ? "purchased" : "exposure",
       excludeIds: new Set(
@@ -3894,19 +3912,20 @@ export function buildSynthesisViewModel(input: {
   health?: OperationalHealthPanel;
   dateRange?: string;
 }) {
+  const data = marginAlertDataForOperationalIntelligence(input.data);
   const windows = buildOperationalWindows();
   const selectedWindowKey = mapDateRangeToWindowKey(input.dateRange);
-  const fullExposure = buildPortfolioCostExposure(input.data, 50);
+  const fullExposure = buildPortfolioCostExposure(data, 50);
   const categorySlices = buildCostCategorySlices(fullExposure, { homepageOnly: true });
   const categoryPressure = enrichCategoryPressureRows(
-    buildCategoryPressureRows(input.data, fullExposure),
+    buildCategoryPressureRows(data, fullExposure),
     categorySlices,
   );
-  const marginRisks = buildTodaysMarginRisks(input.data, input.alerts, categorySlices, 6);
-  const concentrationGroups = buildGroupedConcentrationInsights(input.data, input.alerts, 4);
+  const marginRisks = buildTodaysMarginRisks(data, input.alerts, categorySlices, 6);
+  const concentrationGroups = buildGroupedConcentrationInsights(data, input.alerts, 4);
 
   const monthlyMarginPressure = buildMonthlyMarginPressureSummary({
-    data: input.data,
+    data,
     alerts: input.alerts,
     categorySlices,
     categoryPressure,
@@ -3915,7 +3934,7 @@ export function buildSynthesisViewModel(input: {
   });
 
   const prioritizedInsights = buildPrioritizedOperationalInsights({
-    data: input.data,
+    data,
     alerts: input.alerts,
     categorySlices,
     concentrationGroups,
@@ -3933,22 +3952,22 @@ export function buildSynthesisViewModel(input: {
   ];
 
   const groupedRecovery = buildGroupedRecoveryOpportunities(
-    input.data,
+    data,
     input.alerts,
     recoveryOpportunityTitles,
     5,
     insightStoryKeys,
   );
 
-  const curatedExposures = buildCuratedOperationalExposures(input.data, 5);
-  const supplierSwitchImpacts = buildSupplierSwitchImpactGroups(input.data, windows);
+  const curatedExposures = buildCuratedOperationalExposures(data, 5);
+  const supplierSwitchImpacts = buildSupplierSwitchImpactGroups(data, windows);
   const supplierMovements = buildSupplierMovementGroups(
-    input.data,
+    data,
     windows,
     suppliersWithExpensiveSwitches(supplierSwitchImpacts.badSwitches),
   );
   const recipeMarginMovements = buildRecipeMarginMovementGroups(
-    input.data,
+    data,
     input.alerts,
     windows,
   );
@@ -4002,13 +4021,13 @@ export function buildSynthesisViewModel(input: {
 
   const trendsPanels = buildOperationalTrendsPanels({
     operationalSynthesisGroups,
-    data: input.data,
+    data,
     operationalWindows: windows,
     alerts: input.alerts,
   });
 
   const ownerReview = buildOwnerReviewViewModel({
-    data: input.data,
+    data,
     alerts: input.alerts,
     monthlyMarginPressure,
     prioritizedInsights,
@@ -5387,8 +5406,9 @@ export function buildOwnerReviewViewModel(input: {
   operationalWindows: OperationalWindow[];
   selectedWindowKey: OperationalWindowKey;
 }): OwnerReviewViewModel {
+  const data = marginAlertDataForOperationalIntelligence(input.data);
   const supplierCounts = countSupplierMovementDirections(
-    input.data,
+    data,
     input.operationalWindows,
     input.selectedWindowKey,
   );
@@ -5405,7 +5425,7 @@ export function buildOwnerReviewViewModel(input: {
     periodPhrase,
     selectedWindowKey: input.selectedWindowKey,
     financialRisks: buildOwnerReviewFinancialRisks({
-      data: input.data,
+      data,
       prioritizedInsights: input.prioritizedInsights,
       concentrationGroups: input.concentrationGroups,
       groups: input.operationalSynthesisGroups,
@@ -5413,19 +5433,19 @@ export function buildOwnerReviewViewModel(input: {
       selectedWindowKey: input.selectedWindowKey,
     }),
     opportunities: buildOwnerReviewOpportunities({
-      data: input.data,
+      data,
       groups: input.operationalSynthesisGroups,
       operationalWindows: input.operationalWindows,
       selectedWindowKey: input.selectedWindowKey,
     }),
     suppliersToWatch: buildOwnerReviewSuppliersToWatch({
-      data: input.data,
+      data,
       groups: input.operationalSynthesisGroups,
       operationalWindows: input.operationalWindows,
       selectedWindowKey: input.selectedWindowKey,
     }),
     affectedRecipes: buildOwnerReviewAffectedRecipes({
-      data: input.data,
+      data,
       alerts: input.alerts,
       groups: input.operationalSynthesisGroups,
       operationalWindows: input.operationalWindows,

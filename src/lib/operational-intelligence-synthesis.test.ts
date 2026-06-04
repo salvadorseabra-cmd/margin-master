@@ -1858,4 +1858,79 @@ describe("operational-intelligence-synthesis", () => {
 
     vi.useRealTimers();
   });
+
+  it("excludes orphan price history (null or empty invoice_id) from OI movements and owner review", () => {
+    const windows = buildOperationalWindows(new Date("2026-06-03T12:00:00.000Z"));
+    const data = {
+      ingredients: [
+        { id: "beef-1", name: "Novilho Vazia", unit: "kg", current_price: 12, purchase_quantity: 1 },
+        { id: "ghost-1", name: "Ghost SKU", unit: "kg", current_price: 99, purchase_quantity: 1 },
+      ],
+      recipes: [beefRecipe("r1", "Burger A", 0.25)],
+      invoices: [
+        { id: "inv-1", supplier_name: "Alpha Foods", total: 120, created_at: "2026-05-01T00:00:00.000Z" },
+      ],
+      priceHistory: [
+        {
+          id: "h-linked",
+          ingredient_id: "beef-1",
+          invoice_id: "inv-1",
+          ingredient_name: "Novilho Vazia",
+          supplier_name: "Alpha Foods",
+          ingredient_unit: "kg",
+          previous_price: 10,
+          new_price: 12,
+          delta: 2,
+          delta_percent: 20,
+          created_at: "2026-05-01T00:00:00.000Z",
+        },
+        {
+          id: "h-orphan-null",
+          ingredient_id: "ghost-1",
+          invoice_id: null,
+          ingredient_name: "Ghost SKU",
+          supplier_name: "Orphan Supplier",
+          ingredient_unit: "kg",
+          previous_price: 10,
+          new_price: 90,
+          delta: 80,
+          delta_percent: 800,
+          created_at: "2026-05-02T00:00:00.000Z",
+        },
+        {
+          id: "h-orphan-empty",
+          ingredient_id: "ghost-1",
+          invoice_id: "",
+          ingredient_name: "Ghost SKU",
+          supplier_name: "Empty Invoice Supplier",
+          ingredient_unit: "kg",
+          previous_price: 90,
+          new_price: 95,
+          delta: 5,
+          delta_percent: 5.6,
+          created_at: "2026-05-03T00:00:00.000Z",
+        },
+      ],
+    };
+
+    const ingredientMetrics = buildIngredientMovementMetrics({
+      windowKey: "last_3_months",
+      data,
+      windows,
+    });
+    const ingredientNames = ingredientMetrics.rows.map((row) => row.name);
+    expect(ingredientNames).toContain("Novilho Vazia");
+    expect(ingredientNames).not.toContain("Ghost SKU");
+
+    const synthesis = buildSynthesisViewModel({ data, alerts: [], dateRange: "90" });
+    const supplierNames = synthesis.ownerReview.suppliersToWatch.map((row) => row.supplierName);
+    expect(supplierNames).toContain("Alpha Foods");
+    expect(supplierNames).not.toContain("Orphan Supplier");
+    expect(supplierNames).not.toContain("Empty Invoice Supplier");
+
+    const orphanRisk = synthesis.ownerReview.financialRisks.find((row) =>
+      row.title.toLowerCase().includes("ghost"),
+    );
+    expect(orphanRisk).toBeUndefined();
+  });
 });
