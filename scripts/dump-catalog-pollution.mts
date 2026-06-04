@@ -3,9 +3,8 @@
  *
  *   npx vite-node scripts/dump-catalog-pollution.mts
  */
-import { readFileSync, existsSync } from "node:fs";
-import { join } from "node:path";
 import { createClient } from "@supabase/supabase-js";
+import { loadEnvFiles } from "./load-env.mts";
 import type { Database } from "../src/integrations/supabase/types";
 import { filterActiveCatalogIngredients } from "../src/lib/ingredient-canonical";
 import {
@@ -14,27 +13,7 @@ import {
 } from "../src/lib/ingredient-catalog-diagnostics";
 import type { IngredientCanonicalInput } from "../src/lib/ingredient-canonical";
 
-function loadEnvFromDotenv() {
-  const envPath = join(process.cwd(), ".env");
-  if (!existsSync(envPath)) return;
-  for (const line of readFileSync(envPath, "utf8").split("\n")) {
-    const t = line.trim();
-    if (!t || t.startsWith("#")) continue;
-    const eq = t.indexOf("=");
-    if (eq < 0) continue;
-    const key = t.slice(0, eq).trim();
-    let val = t.slice(eq + 1).trim();
-    if (
-      (val.startsWith('"') && val.endsWith('"')) ||
-      (val.startsWith("'") && val.endsWith("'"))
-    ) {
-      val = val.slice(1, -1);
-    }
-    if (!process.env[key]) process.env[key] = val;
-  }
-}
-
-loadEnvFromDotenv();
+loadEnvFiles();
 const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const key =
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;

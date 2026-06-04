@@ -75,7 +75,10 @@ export async function backfillIngredientPriceHistoryFromInvoices(
   const [{ data: ingredients, error: ingErr }, { data: aliasRows, error: aliasErr }, itemsResult] =
     await Promise.all([
       client.from("ingredients").select("id,name,normalized_name,unit,current_price,purchase_quantity"),
-      client.from("ingredient_aliases").select("alias_lookup_key,ingredient_id,supplier_name"),
+      client
+        .from("ingredient_aliases")
+        .select("ingredient_id, alias_name, normalized_alias, supplier_name")
+        .eq("confirmed_by_user", true),
       client
         .from("invoice_items")
         .select(

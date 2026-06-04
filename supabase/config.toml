@@ -1,4 +1,4 @@
-project_id = "zmokrgczvjcoyqdzxhoi"
+project_id = "lhackrnlnrsiamorzmkb"
 
 [functions.extract-invoice]
 verify_jwt = true
