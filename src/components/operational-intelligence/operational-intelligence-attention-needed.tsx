@@ -6,12 +6,6 @@ type OperationalIntelligenceAttentionNeededProps = {
   rows: AttentionRow[];
 };
 
-const kindLabel = {
-  stale_price: "Stale price",
-  missing_confirmation: "Missing confirmation",
-  ingredient_review: "Needs review",
-} as const;
-
 export function OperationalIntelligenceAttentionNeeded({
   rows,
 }: OperationalIntelligenceAttentionNeededProps) {
@@ -32,17 +26,12 @@ export function OperationalIntelligenceAttentionNeeded({
           key={row.id}
           className={`rounded-lg border px-2.5 py-2 ${tone.surface} ${tone.border}`}
         >
-          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-            <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-              {kindLabel[row.kind]}
-            </span>
-            <OwnerRowLink
-              title={row.title}
-              target={row.target}
-              ingredientId={row.ingredientId}
-              className="text-xs"
-            />
-          </div>
+          <OwnerRowLink
+            title={row.title}
+            target={row.target}
+            ingredientId={row.ingredientId}
+            className="text-xs"
+          />
           <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">{row.detail}</p>
         </li>
       ))}

@@ -62,6 +62,7 @@ export type GroupedConcentrationInsight = {
   decisionTier: OperationalDecisionTier;
   groupKey: string;
   storyKey: string;
+  primaryIngredientName: string;
   title: string;
   detail: string;
   operatorInsightLine: string;
@@ -258,7 +259,9 @@ export type SupplierWatchRow = {
   id: string;
   supplierName: string;
   direction: SupplierWatchDirection;
-  estimatedImpactEur: number | null;
+  title: string;
+  secondary: string | null;
+  changeLine: string | null;
   impactLine: string | null;
   ingredientChanges: SupplierIngredientChange[];
 };
@@ -267,12 +270,12 @@ export type AffectedRecipeRow = {
   id: string;
   recipeName: string;
   recipeId?: string;
-  marginChange: string | null;
-  affectedByLine: string;
+  whatChanged: string;
+  impactLine: string | null;
   target: MarginAlertTarget;
 };
 
-export type AttentionNeededKind = "stale_price" | "missing_confirmation" | "ingredient_review";
+export type AttentionNeededKind = "stale_price" | "missing_confirmation" | "supplier_inactive";
 
 export type AttentionRow = {
   id: string;
@@ -1250,6 +1253,7 @@ export function buildGroupedConcentrationInsights(
       id: `concentration-story-${group.storyKey}`,
       groupKey: group.storyKey,
       storyKey: group.storyKey,
+      primaryIngredientName: group.representativeName,
       priority,
       decisionTier,
       title,
@@ -3630,6 +3634,16 @@ export function buildOperationalTrendsWindowMetrics(input: {
 export function parseRecipeMarginRangeFromAlert(
   alert: MarginAlertItem,
 ): { marginFromPct: number; marginToPct: number } | null {
+  const marginMeta = alert.meta.find((meta) => meta.label === "Margin")?.value;
+  const metaMatch = marginMeta?.match(/([\d.]+)%\s*(?:→|->)\s*([\d.]+)%/);
+  if (metaMatch?.[1] && metaMatch[2]) {
+    const marginFromPct = Number(metaMatch[1]);
+    const marginToPct = Number(metaMatch[2]);
+    if (Number.isFinite(marginFromPct) && Number.isFinite(marginToPct)) {
+      return { marginFromPct, marginToPct };
+    }
+  }
+
   const match =
     alert.context.match(/fell from about ([\d.]+)% to ([\d.]+)%/i) ??
     alert.context.match(/from ([\d.]+)% to ([\d.]+)%/i);
@@ -4711,17 +4725,153 @@ function buildStableOperationalAreas(
   return { categories, highOperationalExposureIngredients };
 }
 
-const NEGATIVE_INSIGHT_CATEGORIES = new Set<PrioritizedOperationalInsight["category"]>([
-  "price_inflation",
-  "concentration",
-  "recipe_spread",
-  "supplier_instability",
-  "operational_exposure",
-]);
-
 function ownerReviewImpactLine(monthlyImpactEur: number, prefix = "+"): string | null {
   if (monthlyImpactEur < 1) return null;
   return `${prefix}${formatCurrency(monthlyImpactEur)}/month`;
+}
+
+function formatIngredientPctChangeTitle(name: string, pct: number): string {
+  const rounded = Math.round(Math.abs(pct));
+  const sign = pct >= 0 ? "+" : "−";
+  return `${name} ${sign}${formatPercent(rounded)}`;
+}
+
+function buildIngredientMovementInterpretation(
+  ingredientId: string,
+  data: MarginAlertData,
+  monthlyImpactEur: number,
+): string {
+  const exposure = buildPortfolioCostExposure(data, 50).find(
+    (row) => row.ingredientId === ingredientId,
+  );
+  const parts: string[] = [];
+  if (exposure && exposure.recipeCount > 0) {
+    parts.push(
+      `Hits ${exposure.recipeCount} ${exposure.recipeCount === 1 ? "dish" : "dishes"}`,
+    );
+  }
+  if (monthlyImpactEur >= 1) {
+    parts.push(`~${formatCurrency(monthlyImpactEur)}/mo`);
+  }
+  return parts.join(" · ");
+}
+
+function buildFactualConcentrationTitle(group: GroupedConcentrationInsight): string {
+  const recipe = group.affectedRecipes[0] ?? "Menu";
+  return `${recipe} depends ${formatPercent(group.avgConcentrationPct)} on ${group.primaryIngredientName}`;
+}
+
+function buildConcentrationInterpretation(group: GroupedConcentrationInsight): string {
+  const recipeCount = group.affectedRecipes.length;
+  const parts = [
+    recipeCount > 0
+      ? `${recipeCount} ${recipeCount === 1 ? "dish" : "dishes"}`
+      : null,
+    group.estimatedImpactLine,
+  ].filter(Boolean);
+  return parts.length > 0 ? parts.join(" · ") : shortOperationalLine(group.detail, 72);
+}
+
+function buildSupplierWatchTitle(supplierName: string, avgPct: number): string {
+  if (Math.abs(avgPct) >= MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT) {
+    return formatIngredientPctChangeTitle(supplierName, avgPct);
+  }
+  return supplierName;
+}
+
+function buildSupplierWatchSecondary(
+  ingredientChanges: SupplierIngredientChange[],
+  direction: SupplierWatchDirection,
+): string | null {
+  if (ingredientChanges.length === 0) return null;
+  const names = ingredientChanges.slice(0, 3).map((change) => change.name);
+  const suffix =
+    direction === "down"
+      ? "lines easing on recent invoices"
+      : "lines on last invoices";
+  if (names.length === 1) return `${names[0]} ${suffix}`;
+  if (names.length === 2) return `${names[0]} and ${names[1]} ${suffix}`;
+  return `${names.slice(0, 2).join(", ")} +${names.length - 2} more ${suffix}`;
+}
+
+function ingredientNameFromAlertTitle(title: string): string {
+  return title
+    .replace(/\s+pricing is stale$/i, "")
+    .replace(/\s+price rose$/i, "")
+    .replace(/\s+price increased$/i, "")
+    .trim();
+}
+
+function formatStalePriceFactTitle(title: string): string {
+  const name = ingredientNameFromAlertTitle(title);
+  return `${name} · catalog not confirmed`;
+}
+
+function lookupIngredientPctChange(
+  ingredientName: string,
+  data: MarginAlertData,
+  windows: OperationalWindow[],
+): string | null {
+  const normalized = ingredientName.trim().toLowerCase();
+  const movement = rankIngredientPriceMovements({
+    windowKey: "last_3_months",
+    data,
+    windows,
+  }).find((entry) => entry.name.trim().toLowerCase() === normalized);
+  if (!movement || movement.pct < MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT) return null;
+  return formatIngredientPctChangeTitle(movement.name, movement.pct);
+}
+
+function recipeIngredientFactTitle(
+  entry: RecipeMarginMovementInsight,
+  data: MarginAlertData,
+  windows: OperationalWindow[],
+): string | null {
+  const fromReason = entry.reason.match(/Cost increase on (.+?)(?:\.|$)/i);
+  if (fromReason?.[1]) {
+    return lookupIngredientPctChange(fromReason[1].trim(), data, windows);
+  }
+  const spike = entry.reason.match(/(.+?) price (?:rose|increased|up)/i);
+  if (spike?.[1]) {
+    return lookupIngredientPctChange(spike[1].trim(), data, windows);
+  }
+  return null;
+}
+
+function ownerReviewRowIsMaterial(row: OwnerReviewRow): boolean {
+  return row.monthlyImpactEur >= MIN_VISIBLE_IMPACT_EUR;
+}
+
+function buildSupplierWatchChangeLine(
+  avgPct: number,
+  ingredientChanges: SupplierIngredientChange[],
+): string | null {
+  const top = ingredientChanges[0];
+  if (top) {
+    return `${top.name} ${top.changePct >= 0 ? "+" : ""}${formatPercent(top.changePct)}`;
+  }
+  if (Math.abs(avgPct) >= MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT) {
+    return `Avg ${avgPct >= 0 ? "+" : ""}${formatPercent(Math.round(avgPct))}`;
+  }
+  return null;
+}
+
+function formatRecipeMarginImpactLine(
+  marginFromPct?: number,
+  marginToPct?: number,
+): string | null {
+  if (marginFromPct == null || marginToPct == null) return null;
+  const deltaPp = marginToPct - marginFromPct;
+  if (!Number.isFinite(deltaPp) || Math.abs(deltaPp) < 0.05) return null;
+  const sign = deltaPp >= 0 ? "+" : "−";
+  return `Margin ${sign}${Math.abs(deltaPp).toFixed(1)}pp`;
+}
+
+function formatRecipeWhatChangedLine(entry: RecipeMarginMovementInsight): string {
+  const fromReason = ingredientIncreaseLineFromReason(entry.reason);
+  if (fromReason) return fromReason.replace(/^Affected by /i, "");
+  const headline = entry.headline.replace(new RegExp(`^${entry.recipeName}\\s+`, "i"), "").trim();
+  return shortOperationalLine(headline || entry.reason, 72);
 }
 
 function countSupplierMovementDirections(
@@ -4823,67 +4973,50 @@ function buildOwnerReviewFinancialRisks(input: {
   };
 
   for (const entry of input.groups.recipeMarginMovements.worsening) {
+    if (!isMeaningfulRecipeMarginMovement(entry)) continue;
+    const factTitle = recipeIngredientFactTitle(
+      entry,
+      input.data,
+      input.operationalWindows,
+    );
+    const impact = ownerReviewImpactLine(entry.estimatedMonthlyImpactEur);
+    const marginLine = formatRecipeMarginImpactLine(entry.marginFromPct, entry.marginToPct);
     push({
       id: `risk-recipe:${entry.recipeName}`,
       monthlyImpactEur: entry.estimatedMonthlyImpactEur,
-      impactLine: ownerReviewImpactLine(entry.estimatedMonthlyImpactEur),
-      title: entry.recipeName,
-      whatChanged: shortOperationalLine(entry.headline || entry.reason),
+      impactLine: impact,
+      title: factTitle ?? entry.recipeName,
+      whatChanged: factTitle
+        ? [entry.recipeName, impact, marginLine].filter(Boolean).join(" · ")
+        : formatRecipeWhatChangedLine(entry),
       target: "/recipes",
       recipeId: recipeIdForName(input.data, entry.recipeName),
     });
   }
 
   for (const entry of input.groups.supplierSwitchImpacts.badSwitches) {
+    if (entry.estimatedMonthlyImpactEur < MIN_VISIBLE_IMPACT_EUR) continue;
     push({
       id: `risk-switch:${entry.ingredientId}:${entry.switchedAt}`,
       monthlyImpactEur: entry.estimatedMonthlyImpactEur,
       impactLine: ownerReviewImpactLine(entry.estimatedMonthlyImpactEur),
-      title: entry.ingredientName,
-      whatChanged: shortOperationalLine(entry.narrative),
+      title: formatIngredientPctChangeTitle(entry.ingredientName, entry.changePct),
+      whatChanged: `${entry.fromSupplier} → ${entry.toSupplier}`,
       target: "/ingredients",
       ingredientId: entry.ingredientId,
       supplierName: entry.toSupplier,
     });
   }
 
-  for (const entry of input.groups.supplierMovements.largestIncreases) {
-    const switchImpact = supplierImpactFromSwitches(entry.supplierName, input.groups);
-    push({
-      id: `risk-supplier:${entry.supplierName}`,
-      monthlyImpactEur: switchImpact,
-      impactLine: switchImpact >= 1 ? ownerReviewImpactLine(switchImpact) : null,
-      title: entry.supplierName,
-      whatChanged: shortOperationalLine(entry.narrative),
-      target: "/invoices",
-      supplierName: entry.supplierName,
-    });
-  }
-
   for (const group of input.concentrationGroups) {
+    if (group.estimatedMonthlyImpactEur < MIN_VISIBLE_IMPACT_EUR) continue;
     push({
       id: `risk-concentration:${group.id}`,
       monthlyImpactEur: group.estimatedMonthlyImpactEur,
       impactLine: group.estimatedImpactLine,
-      title: group.title,
-      whatChanged: shortOperationalLine(group.detail),
+      title: buildFactualConcentrationTitle(group),
+      whatChanged: buildConcentrationInterpretation(group),
       target: group.target,
-    });
-  }
-
-  for (const insight of input.prioritizedInsights) {
-    if (!NEGATIVE_INSIGHT_CATEGORIES.has(insight.category)) continue;
-    if (insight.category === "concentration" && insight.storyKey) {
-      const covered = input.concentrationGroups.some((group) => group.storyKey === insight.storyKey);
-      if (covered) continue;
-    }
-    push({
-      id: `risk-insight:${insight.id}`,
-      monthlyImpactEur: insight.monthlyImpactEur,
-      impactLine: insight.impactLine,
-      title: insight.title,
-      whatChanged: shortOperationalLine(insight.detail || insight.operatorInsightLine),
-      target: insight.target,
     });
   }
 
@@ -4901,20 +5034,26 @@ function buildOwnerReviewFinancialRisks(input: {
       ? Math.round(exposure.monthlyModeledExposureEur * (entry.pct / 100))
       : 0;
     if (monthlyImpactEur < MIN_VISIBLE_IMPACT_EUR) continue;
+    const interpretation = buildIngredientMovementInterpretation(
+      entry.ingredientId,
+      input.data,
+      monthlyImpactEur,
+    );
     push({
       id: `risk-ingredient:${entry.ingredientId}`,
       monthlyImpactEur,
       impactLine: ownerReviewImpactLine(monthlyImpactEur),
-      title: entry.name,
+      title: formatIngredientPctChangeTitle(entry.name, entry.pct),
       whatChanged:
-        formatUnitPricePair(entry.previousPrice, entry.currentPrice, entry.unit) ??
+        interpretation ||
+        formatUnitPricePair(entry.previousPrice, entry.currentPrice, entry.unit) ||
         `Unit price up ${formatPercent(Math.round(entry.pct))}`,
       target: "/ingredients",
       ingredientId: entry.ingredientId,
     });
   }
 
-  return rows.sort(
+  return rows.filter(ownerReviewRowIsMaterial).sort(
     (a, b) =>
       b.monthlyImpactEur - a.monthlyImpactEur ||
       a.title.localeCompare(b.title),
@@ -4936,57 +5075,16 @@ function buildOwnerReviewOpportunities(input: {
   };
 
   for (const entry of input.groups.supplierSwitchImpacts.goodSwitches) {
+    if (entry.estimatedMonthlyImpactEur < MIN_VISIBLE_IMPACT_EUR) continue;
     push({
       id: `opp-switch:${entry.ingredientId}:${entry.switchedAt}`,
       monthlyImpactEur: entry.estimatedMonthlyImpactEur,
       impactLine: ownerReviewImpactLine(entry.estimatedMonthlyImpactEur, "−"),
-      title: entry.ingredientName,
-      whatChanged: shortOperationalLine(entry.narrative),
+      title: formatIngredientPctChangeTitle(entry.ingredientName, entry.changePct),
+      whatChanged: `${entry.fromSupplier} → ${entry.toSupplier}`,
       target: "/ingredients",
       ingredientId: entry.ingredientId,
       supplierName: entry.toSupplier,
-    });
-  }
-
-  for (const entry of input.groups.supplierSwitchImpacts.volatilityReductions) {
-    if (entry.estimatedMonthlyImpactEur < 1) continue;
-    push({
-      id: `opp-volatility:${entry.ingredientId}:${entry.switchedAt}`,
-      monthlyImpactEur: entry.estimatedMonthlyImpactEur,
-      impactLine: ownerReviewImpactLine(entry.estimatedMonthlyImpactEur, "−"),
-      title: entry.ingredientName,
-      whatChanged: shortOperationalLine(entry.narrative),
-      target: "/ingredients",
-      ingredientId: entry.ingredientId,
-      supplierName: entry.toSupplier,
-    });
-  }
-
-  for (const entry of input.groups.recipeMarginMovements.improving) {
-    if (entry.estimatedMonthlyImpactEur < 1 && entry.trendStatus !== "improving") continue;
-    push({
-      id: `opp-recipe:${entry.recipeName}`,
-      monthlyImpactEur: entry.estimatedMonthlyImpactEur,
-      impactLine:
-        entry.estimatedMonthlyImpactEur >= 1
-          ? ownerReviewImpactLine(entry.estimatedMonthlyImpactEur, "−")
-          : null,
-      title: entry.recipeName,
-      whatChanged: shortOperationalLine(entry.headline || entry.reason),
-      target: "/recipes",
-      recipeId: recipeIdForName(input.data, entry.recipeName),
-    });
-  }
-
-  for (const entry of input.groups.recoverySignals) {
-    if (entry.estimatedMonthlyRecoveryEur < 1) continue;
-    push({
-      id: `opp-recovery:${entry.id}`,
-      monthlyImpactEur: entry.estimatedMonthlyRecoveryEur,
-      impactLine: entry.savingsLine,
-      title: entry.title,
-      whatChanged: shortOperationalLine(entry.why),
-      target: entry.target,
     });
   }
 
@@ -5003,25 +5101,38 @@ function buildOwnerReviewOpportunities(input: {
     const monthlyImpactEur = exposure
       ? Math.round(exposure.monthlyModeledExposureEur * (Math.abs(entry.pct) / 100))
       : 0;
+    const interpretation = buildIngredientMovementInterpretation(
+      entry.ingredientId,
+      input.data,
+      monthlyImpactEur,
+    );
     push({
       id: `opp-ingredient:${entry.ingredientId}`,
       monthlyImpactEur,
       impactLine:
         monthlyImpactEur >= 1 ? ownerReviewImpactLine(monthlyImpactEur, "−") : null,
-      title: entry.name,
+      title: formatIngredientPctChangeTitle(entry.name, entry.pct),
       whatChanged:
-        formatUnitPricePair(entry.previousPrice, entry.currentPrice, entry.unit) ??
+        interpretation ||
+        formatUnitPricePair(entry.previousPrice, entry.currentPrice, entry.unit) ||
         `Unit price down ${formatPercent(Math.round(Math.abs(entry.pct)))}`,
       target: "/ingredients",
       ingredientId: entry.ingredientId,
     });
   }
 
-  return rows.sort(
-    (a, b) =>
-      b.monthlyImpactEur - a.monthlyImpactEur ||
-      a.title.localeCompare(b.title),
-  );
+  return rows
+    .filter(
+      (row) =>
+        row.monthlyImpactEur >= MIN_VISIBLE_IMPACT_EUR ||
+        /€[\d,.]/.test(row.whatChanged) ||
+        /unit price down/i.test(row.whatChanged),
+    )
+    .sort(
+      (a, b) =>
+        b.monthlyImpactEur - a.monthlyImpactEur ||
+        a.title.localeCompare(b.title),
+    );
 }
 
 function buildOwnerReviewSuppliersToWatch(input: {
@@ -5067,11 +5178,16 @@ function buildOwnerReviewSuppliersToWatch(input: {
       continue;
     }
 
+    const changeLine = buildSupplierWatchChangeLine(avgPct, ingredientChanges);
+    if (!changeLine && direction === "stable" && switchImpact < 1) continue;
+
     rows.push({
       id: `supplier-watch:${supplierName}`,
       supplierName,
       direction,
-      estimatedImpactEur: switchImpact >= 1 ? switchImpact : null,
+      title: buildSupplierWatchTitle(supplierName, avgPct),
+      secondary: buildSupplierWatchSecondary(ingredientChanges, direction),
+      changeLine,
       impactLine: switchImpact >= 1 ? ownerReviewImpactLine(switchImpact) : null,
       ingredientChanges,
     });
@@ -5079,9 +5195,11 @@ function buildOwnerReviewSuppliersToWatch(input: {
 
   return rows.sort((a, b) => {
     const directionRank = { up: 0, down: 1, stable: 2 };
+    const impactValue = (row: SupplierWatchRow) =>
+      row.impactLine ? 1 : 0;
     return (
       directionRank[a.direction] - directionRank[b.direction] ||
-      (b.estimatedImpactEur ?? 0) - (a.estimatedImpactEur ?? 0) ||
+      impactValue(b) - impactValue(a) ||
       a.supplierName.localeCompare(b.supplierName)
     );
   });
@@ -5091,49 +5209,27 @@ function buildOwnerReviewAffectedRecipes(input: {
   data: MarginAlertData;
   alerts: MarginAlertItem[];
   groups: OperationalSynthesisGroups;
+  operationalWindows: OperationalWindow[];
 }): AffectedRecipeRow[] {
   const rows: AffectedRecipeRow[] = [];
   const seen = new Set<string>();
 
   for (const entry of input.groups.recipeMarginMovements.worsening) {
+    if (!isMeaningfulRecipeMarginMovement(entry)) continue;
+    if (entry.trendStatus === "stabilizing" && entry.estimatedMonthlyImpactEur < MIN_RECIPE_MARGIN_MOVEMENT_EUR) {
+      continue;
+    }
     const recipeId = recipeIdForName(input.data, entry.recipeName);
-    const marginChange =
-      entry.marginFromPct != null && entry.marginToPct != null
-        ? `${Math.round(entry.marginFromPct)}% → ${Math.round(entry.marginToPct)}%`
-        : null;
-    const affectedByLine =
-      ingredientIncreaseLineFromReason(entry.reason) ??
-      shortOperationalLine(entry.reason, 72);
+    const factChange = recipeIngredientFactTitle(entry, input.data, input.operationalWindows);
     rows.push({
       id: `affected-recipe:${entry.recipeName}`,
       recipeName: entry.recipeName,
       recipeId,
-      marginChange,
-      affectedByLine,
+      whatChanged: factChange ?? formatRecipeWhatChangedLine(entry),
+      impactLine: formatRecipeMarginImpactLine(entry.marginFromPct, entry.marginToPct),
       target: "/recipes",
     });
     seen.add(entry.recipeName);
-  }
-
-  for (const alert of input.alerts) {
-    if (alert.kind !== "price_increase" && alert.kind !== "ingredient_inflation_spike") continue;
-    const ingredientId = extractIngredientIdFromAlert(alert);
-    const ingredientName =
-      input.data.ingredients.find((ingredient) => ingredient.id === ingredientId)?.name?.trim() ??
-      alert.title.replace(/\s+price (?:rose|increased).*$/i, "").trim();
-    const recipeMeta = alert.meta.find((meta) => meta.label === "Recipe")?.value;
-    if (!recipeMeta) continue;
-    const recipeId = input.data.recipes.find((recipe) => recipe.name?.trim() === recipeMeta)?.id;
-    if (seen.has(recipeMeta)) continue;
-    rows.push({
-      id: `affected-recipe-alert:${alert.id}`,
-      recipeName: recipeMeta,
-      recipeId,
-      marginChange: null,
-      affectedByLine: `Affected by ${ingredientName} increase`,
-      target: "/recipes",
-    });
-    seen.add(recipeMeta);
   }
 
   return rows.sort((a, b) => a.recipeName.localeCompare(b.recipeName));
@@ -5157,7 +5253,7 @@ function buildOwnerReviewAttentionNeeded(input: {
     push({
       id: `attention-stale:${alert.id}`,
       kind: "stale_price",
-      title: alert.title,
+      title: formatStalePriceFactTitle(alert.title),
       detail: shortOperationalLine(alert.context || "Pricing not confirmed by a recent invoice."),
       target: alert.target,
       ingredientId: ingredientId ?? undefined,
@@ -5170,24 +5266,23 @@ function buildOwnerReviewAttentionNeeded(input: {
     push({
       id: `attention-monitor:${insight.id}`,
       kind: "missing_confirmation",
-      title: insight.title,
+      title: isGenericOperationalTitle(insight.title)
+        ? formatStalePriceFactTitle(insight.detail)
+        : formatStalePriceFactTitle(insight.title),
       detail: shortOperationalLine(insight.detail),
       target: insight.target,
     });
   }
 
-  for (const alert of input.alerts.filter(
-    (entry) => entry.kind === "price_increase" || entry.kind === "ingredient_inflation_spike",
+  for (const insight of input.monitorInsights.filter(
+    (entry) => entry.category === "supplier_instability",
   )) {
-    if (alert.severity !== "watch" && alert.severity !== "high") continue;
-    const ingredientId = extractIngredientIdFromAlert(alert);
     push({
-      id: `attention-review:${alert.id}`,
-      kind: "ingredient_review",
-      title: alert.title,
-      detail: shortOperationalLine(alert.context),
-      target: alert.target,
-      ingredientId: ingredientId ?? undefined,
+      id: `attention-supplier:${insight.id}`,
+      kind: "supplier_inactive",
+      title: insight.detail.split(".")[0]?.trim() || insight.title,
+      detail: shortOperationalLine(insight.operatorInsightLine || insight.detail),
+      target: insight.target,
     });
   }
 
@@ -5204,6 +5299,7 @@ export function buildOwnerReviewViewModel(input: {
   monitorInsights: PrioritizedOperationalInsight[];
   operationalWindows: OperationalWindow[];
 }): OwnerReviewViewModel {
+  // Owner review uses fixed windows (90-day supplier/ingredient movement via last_3_months) — not user-selectable.
   const supplierCounts = countSupplierMovementDirections(input.data, input.operationalWindows);
   const staleCount = input.alerts.filter((alert) => alert.kind === "stale_price").length;
 
@@ -5235,6 +5331,7 @@ export function buildOwnerReviewViewModel(input: {
       data: input.data,
       alerts: input.alerts,
       groups: input.operationalSynthesisGroups,
+      operationalWindows: input.operationalWindows,
     }),
     attentionNeeded: buildOwnerReviewAttentionNeeded({
       alerts: input.alerts,

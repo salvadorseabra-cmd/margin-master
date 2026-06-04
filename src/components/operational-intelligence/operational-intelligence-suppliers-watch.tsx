@@ -13,13 +13,7 @@ type OperationalIntelligenceSuppliersWatchProps = {
   rows: SupplierWatchRow[];
 };
 
-const directionLabel = {
-  up: "Prices rising",
-  down: "Prices easing",
-  stable: "Stable",
-} as const;
-
-const directionTone = {
+const changeTone = {
   up: operationalMovementTones.risk.label,
   down: operationalMovementTones.recovery.label,
   stable: operationalMovementTones.stable.label,
@@ -39,17 +33,22 @@ function SupplierWatchRowItem({ row }: { row: SupplierWatchRow }) {
           className="min-w-0 truncate font-medium text-foreground/90 underline-offset-2 hover:text-foreground hover:underline"
           onClick={(event) => event.stopPropagation()}
         >
-          {row.supplierName}
+          {row.title}
         </Link>
-        <div className="flex shrink-0 flex-col items-end gap-0.5">
-          <span className={`text-[11px] font-medium ${directionTone[row.direction]}`}>
-            {directionLabel[row.direction]}
-          </span>
+        <div className="flex shrink-0 flex-col items-end gap-0.5 text-right">
+          {row.changeLine && row.changeLine !== row.title ? (
+            <span className={`text-[11px] font-medium tabular-nums ${changeTone[row.direction]}`}>
+              {row.changeLine}
+            </span>
+          ) : null}
           {row.impactLine ? (
             <span className="text-[11px] tabular-nums text-foreground/80">{row.impactLine}</span>
           ) : null}
         </div>
       </div>
+      {row.secondary ? (
+        <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">{row.secondary}</p>
+      ) : null}
     </>
   );
 

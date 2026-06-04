@@ -1440,13 +1440,30 @@ describe("operational-intelligence-synthesis", () => {
   });
 
   it("buildOwnerReviewViewModel sorts financial risks by impact and dedupes rows", () => {
+    const windows = buildOperationalWindows(new Date("2026-06-03T12:00:00.000Z"));
     const data = {
       ingredients: [
         { id: "beef-1", name: "Novilho Vazia", unit: "kg", current_price: 12, purchase_quantity: 1 },
       ],
       recipes: [beefRecipe("r1", "Burger A", 0.25)],
-      invoices: [],
-      priceHistory: [],
+      invoices: [
+        { id: "inv-1", supplier_name: "Alpha Foods", total: 120, created_at: "2026-05-01T00:00:00.000Z" },
+      ],
+      priceHistory: [
+        {
+          id: "h-up",
+          ingredient_id: "beef-1",
+          invoice_id: "inv-1",
+          ingredient_name: "Novilho Vazia",
+          supplier_name: "Alpha Foods",
+          ingredient_unit: "kg",
+          previous_price: 10,
+          new_price: 12,
+          delta: 2,
+          delta_percent: 20,
+          created_at: "2026-05-01T00:00:00.000Z",
+        },
+      ],
     };
 
     const alerts: MarginAlertItem[] = [
@@ -1487,7 +1504,16 @@ describe("operational-intelligence-synthesis", () => {
     ];
 
     const synthesis = buildSynthesisViewModel({ data, alerts });
-    const ownerReview = synthesis.ownerReview;
+    const ownerReview = buildOwnerReviewViewModel({
+      data,
+      alerts,
+      monthlyMarginPressure: synthesis.monthlyMarginPressure,
+      prioritizedInsights: synthesis.prioritizedInsights,
+      concentrationGroups: synthesis.concentrationGroups,
+      operationalSynthesisGroups: synthesis.operationalSynthesisGroups,
+      monitorInsights: synthesis.monitorInsights,
+      operationalWindows: windows,
+    });
 
     expect(ownerReview.financialRisks.length).toBeGreaterThan(0);
     const impactValues = ownerReview.financialRisks.map((row) => row.monthlyImpactEur);
@@ -1497,8 +1523,22 @@ describe("operational-intelligence-synthesis", () => {
     const riskIds = ownerReview.financialRisks.map((row) => row.id);
     expect(new Set(riskIds).size).toBe(riskIds.length);
 
-    expect(ownerReview.affectedRecipes.some((row) => row.recipeName === "Burger A")).toBe(true);
-    expect(ownerReview.attentionNeeded.filter((row) => row.kind === "stale_price").length).toBe(0);
+    const burgerRecipe = ownerReview.affectedRecipes.find((row) => row.recipeName === "Burger A");
+    expect(burgerRecipe).toBeDefined();
+    expect(burgerRecipe?.impactLine).toMatch(/Margin/);
+    expect(burgerRecipe?.whatChanged.length).toBeGreaterThan(0);
+    expect(ownerReview.attentionNeeded.every((row) => row.kind !== "ingredient_review")).toBe(true);
+    expect(ownerReview.financialRisks.every((row) => row.monthlyImpactEur >= 10)).toBe(true);
+
+    expect(
+      ownerReview.financialRisks.some((row) => /Novilho Vazia/i.test(row.title)),
+    ).toBe(true);
+    expect(
+      ownerReview.financialRisks.every(
+        (row) => !/margin compression|menu exposure concentration|supplier lane/i.test(row.title),
+      ),
+    ).toBe(true);
+    expect(burgerRecipe?.whatChanged).toMatch(/Novilho Vazia/i);
   });
 
   it("buildOwnerReviewViewModel exposes supplier ingredient changes without invoice metadata", () => {
@@ -1531,10 +1571,76 @@ describe("operational-intelligence-synthesis", () => {
     const ownerReview = buildSynthesisViewModel({ data, alerts: [] }).ownerReview;
     const alpha = ownerReview.suppliersToWatch.find((row) => row.supplierName === "Alpha Foods");
     expect(alpha?.direction).toBe("up");
+    expect(alpha?.title).toMatch(/Alpha Foods.*\+/);
+    expect(alpha?.changeLine).toMatch(/Novilho Vazia/);
+    expect(alpha?.secondary).toMatch(/Novilho Vazia/i);
     expect(alpha?.ingredientChanges.length).toBeGreaterThan(0);
     expect(alpha?.ingredientChanges[0]?.name).toBe("Novilho Vazia");
+    expect(alpha?.changeLine).not.toMatch(/invoice/i);
     expect(ownerReview.opportunities.every((row) => !/recommend|switch supplier/i.test(row.whatChanged))).toBe(
       true,
     );
+    expect(ownerReview.opportunities.every((row) => row.id.startsWith("opp-recovery:") === false)).toBe(true);
+  });
+
+  it("buildOwnerReviewViewModel keeps attention rows to objective follow-ups only", () => {
+    const windows = buildOperationalWindows(new Date("2026-06-03T12:00:00.000Z"));
+    const data = {
+      ingredients: [
+        { id: "beef-1", name: "Novilho Vazia", unit: "kg", current_price: 12, purchase_quantity: 1 },
+      ],
+      recipes: [beefRecipe("r1", "Burger A", 0.25)],
+      invoices: [],
+      priceHistory: [],
+    };
+    const alerts: MarginAlertItem[] = [
+      {
+        id: "stale-beef",
+        kind: "stale_price",
+        sectionId: "stale_price",
+        severity: "watch",
+        title: "Novilho Vazia pricing is stale",
+        context: "No invoice in 45 days",
+        suggestedAction: "Confirm price",
+        actionLabel: "Open ingredient",
+        target: "/ingredients",
+        meta: [{ label: "Ingredient", value: "beef-1" }],
+        signals: [],
+        priority: 100,
+      },
+      {
+        id: "spike-beef",
+        kind: "price_increase",
+        sectionId: "price_increase",
+        severity: "high",
+        title: "Novilho Vazia price rose",
+        context: "Up 20% vs prior invoice",
+        suggestedAction: "Review",
+        actionLabel: "Open",
+        target: "/ingredients",
+        meta: [{ label: "Ingredient", value: "beef-1" }],
+        signals: [],
+        priority: 2000,
+      },
+    ];
+
+    const synthesis = buildSynthesisViewModel({ data, alerts });
+    const ownerReview = buildOwnerReviewViewModel({
+      data,
+      alerts,
+      monthlyMarginPressure: synthesis.monthlyMarginPressure,
+      prioritizedInsights: synthesis.prioritizedInsights,
+      concentrationGroups: synthesis.concentrationGroups,
+      operationalSynthesisGroups: synthesis.operationalSynthesisGroups,
+      monitorInsights: synthesis.monitorInsights,
+      operationalWindows: windows,
+    });
+
+    expect(ownerReview.attentionNeeded.some((row) => row.kind === "stale_price")).toBe(true);
+    expect(ownerReview.attentionNeeded.every((row) => row.kind !== "ingredient_review")).toBe(true);
+    expect(ownerReview.attentionNeeded.every((row) => !/price rose/i.test(row.title))).toBe(true);
+    expect(
+      ownerReview.attentionNeeded.find((row) => row.kind === "stale_price")?.title,
+    ).toMatch(/Novilho Vazia · catalog not confirmed/i);
   });
 });

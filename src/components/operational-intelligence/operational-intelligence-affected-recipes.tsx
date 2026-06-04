@@ -29,11 +29,11 @@ export function OperationalIntelligenceAffectedRecipes({
               target={row.target}
               recipeId={row.recipeId}
             />
-            {row.marginChange ? (
-              <span className="shrink-0 tabular-nums text-foreground/80">{row.marginChange}</span>
+            {row.impactLine ? (
+              <span className="shrink-0 tabular-nums text-foreground/80">{row.impactLine}</span>
             ) : null}
           </div>
-          <p className="mt-0.5 text-[11px] text-muted-foreground">{row.affectedByLine}</p>
+          <p className="mt-0.5 text-[11px] text-muted-foreground">{row.whatChanged}</p>
         </li>
       ))}
     </ul>

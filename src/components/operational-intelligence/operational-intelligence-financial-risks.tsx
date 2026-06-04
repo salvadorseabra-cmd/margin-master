@@ -33,15 +33,14 @@ export function OperationalIntelligenceFinancialRisks({
               ingredientId={row.ingredientId}
               recipeId={row.recipeId}
               supplierName={row.supplierName}
-              className="min-w-0 truncate text-sm font-semibold text-foreground"
             />
             {row.impactLine ? (
-              <span className={`shrink-0 text-sm font-medium tabular-nums ${tone.label}`}>
+              <span className={`shrink-0 text-xs font-medium tabular-nums ${tone.label}`}>
                 {row.impactLine}
               </span>
             ) : null}
           </div>
-          <p className="mt-0.5 text-xs leading-snug text-muted-foreground">{row.whatChanged}</p>
+          <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">{row.whatChanged}</p>
         </li>
       ))}
     </ul>
