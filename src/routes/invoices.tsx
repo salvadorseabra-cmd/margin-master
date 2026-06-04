@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouterState } from "@tanstack/react-router";
 import { AppShell, Card } from "@/components/AppShell";
 import {
   UploadCloud,
@@ -1128,6 +1128,11 @@ function InvoicesPage() {
     return `${settledLabel} • ${awaitingLabel}${awaitingAmount}`;
   }, [rows, settlementByInvoice]);
 
+  const supplierHistoryFilter = useRouterState({
+    select: (state) =>
+      new URLSearchParams(state.location.searchStr).get("supplier")?.trim() || null,
+  });
+
   const sortedRows = useMemo(() => {
     return [...rows].sort((a, b) => {
       switch (sortBy) {
@@ -1154,6 +1159,14 @@ function InvoicesPage() {
       }
     });
   }, [rows, settlementByInvoice, sortBy]);
+
+  const invoiceRowsForDisplay = useMemo(() => {
+    if (!supplierHistoryFilter) return sortedRows;
+    const normalized = supplierHistoryFilter.toLowerCase();
+    return sortedRows.filter(
+      (row) => (row.supplier_name?.trim() || "").toLowerCase() === normalized,
+    );
+  }, [sortedRows, supplierHistoryFilter]);
 
   const toggleSettlement = async (invoiceId: string) => {
     invoiceLoadSeqRef.current += 1;
@@ -2306,7 +2319,7 @@ function InvoicesPage() {
                   </td>
                 </tr>
               )}
-              {sortedRows.map((r) => {
+              {invoiceRowsForDisplay.map((r) => {
                 const open = expanded === r.id;
                 const isImage = r.file_path
                   ? ["png", "jpg", "jpeg", "webp"].some((e) =>

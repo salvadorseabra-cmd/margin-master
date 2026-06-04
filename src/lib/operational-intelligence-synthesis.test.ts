@@ -14,11 +14,20 @@ import {
   buildOperationalActionQueue,
   buildOperationalSnapshotViewModel,
   buildOperationalTrendsPanels,
+  buildOperationalTrendsWindowMetrics,
+  buildSupplierMovementMetrics,
+  buildIngredientMovementMetrics,
+  buildRecipeMarginMovementMetrics,
+  buildExposureConcentrationMetrics,
+  mapExposureRiskLevel,
+  resolveOperationalTrendBadges,
+  TREND_INGREDIENT_TOP_N,
   parseRecipeMarginRangeFromAlert,
   buildRecipeMarginHeadline,
   buildSupplierMovementNarrative,
   buildSupplierSwitchNarrative,
   buildSynthesisViewModel,
+  buildOwnerReviewViewModel,
   classifyRecipeMarginTrend,
   classifySupplierMovementSignal,
   classifySupplierSwitchType,
@@ -630,7 +639,8 @@ describe("operational-intelligence-synthesis", () => {
     expect(view.snapshot.keyTakeaway.length).toBeGreaterThan(10);
     expect(view.trendsPanels.last90Days.label).toBe("Last 90 days");
     expect(view.trendsPanels.last6Months.label).toBe("Last 6 months");
-    expect(view.trendsPanels.last90Days.supplierMovement.bullets.length).toBeGreaterThan(0);
+    expect(view.trendsPanels.last90Days.metrics.supplierMovement.rows.length).toBe(3);
+    expect(view.trendsPanels.last90Days.metrics.exposureConcentration.rows.length).toBe(3);
     expect(view.actionQueue.every((c) => c.whatToDo.length > 0)).toBe(true);
   });
 
@@ -823,7 +833,7 @@ describe("operational-intelligence-synthesis", () => {
     expect(groups.recoverySignals.length).toBeGreaterThanOrEqual(0);
   });
 
-  it("builds operational trends panels with four subsections each", () => {
+  it("builds operational trends panels with four metric sections each", () => {
     const data = {
       ingredients: [
         { id: "beef-1", name: "Novilho Vazia", unit: "kg", current_price: 12, purchase_quantity: 1 },
@@ -849,21 +859,22 @@ describe("operational-intelligence-synthesis", () => {
     const view = buildSynthesisViewModel({ data, alerts: [] });
     const panels = buildOperationalTrendsPanels({
       operationalSynthesisGroups: view.operationalSynthesisGroups,
-      monthlyMarginPressure: view.monthlyMarginPressure,
-      prioritizedInsights: view.prioritizedInsights,
-      alerts: [],
-      categoryPressure: view.categoryPressure,
       data,
       operationalWindows: view.operationalWindows,
     });
 
     for (const panel of [panels.last90Days, panels.last6Months]) {
-      expect(panel.supplierMovement.bullets.length).toBeGreaterThan(0);
-      expect(panel.marginMovement.bullets.length).toBeGreaterThan(0);
-      expect(panel.procurementSignals.bullets.length).toBeGreaterThan(0);
-      expect(panel.operationalRecommendation.bullets.length).toBeGreaterThan(0);
-      expect(panel.supplierMovement.items.length).toBe(panel.supplierMovement.bullets.length);
+      expect(panel.windowKey).toBeDefined();
+      expect(panel.metrics.supplierMovement.rows).toHaveLength(3);
+      expect(panel.metrics.ingredientMovement.rows.length).toBeGreaterThanOrEqual(2);
+      expect(panel.metrics.ingredientMovement.rows.length).toBeLessThanOrEqual(
+        TREND_INGREDIENT_TOP_N * 2,
+      );
+      expect(panel.metrics.recipeMarginMovement.rows.length).toBeGreaterThanOrEqual(1);
+      expect(panel.metrics.exposureConcentration.rows).toHaveLength(3);
     }
+    expect(panels.last90Days.windowKey).toBe("last_3_months");
+    expect(panels.last6Months.windowKey).toBe("last_6_months");
   });
 
   it("emits real supplier names and margin ranges in trend panel items", () => {
@@ -934,27 +945,223 @@ describe("operational-intelligence-synthesis", () => {
 
     const panels = buildOperationalTrendsPanels({
       operationalSynthesisGroups: view.operationalSynthesisGroups,
-      monthlyMarginPressure: view.monthlyMarginPressure,
-      prioritizedInsights: view.prioritizedInsights,
-      alerts,
-      categoryPressure: view.categoryPressure,
       data,
       operationalWindows: view.operationalWindows,
     });
 
-    const supplierLabels = panels.last90Days.supplierMovement.items.map((item) => item.label).join(" ");
-    expect(supplierLabels).toMatch(/Alpha Foods|Beta Lane/i);
-
-    const marginItem = panels.last90Days.marginMovement.items.find((item) =>
-      /Steakhouse Burger/i.test(item.label),
+    const supplierIncrease = panels.last90Days.metrics.supplierMovement.rows.find((row) =>
+      /Alpha Foods/i.test(row.name),
     );
-    expect(marginItem?.label).toMatch(/71%.*66%.*90 days/i);
-    expect(marginItem?.expandable?.bullets.length).toBeGreaterThan(0);
+    expect(supplierIncrease?.value).toMatch(/\+/);
 
-    const switchItem = panels.last90Days.procurementSignals.items.find((item) =>
-      /Switch memory/i.test(item.label),
+    const ingredientIncrease = panels.last90Days.metrics.ingredientMovement.rows.find((row) =>
+      /Novilho Vazia/i.test(row.name),
     );
-    expect(switchItem?.label).toMatch(/Alpha Foods.*Beta Lane|Beta Lane.*Alpha Foods/i);
+    expect(ingredientIncrease?.value).toMatch(/\+15%|\+10%/);
+    expect(ingredientIncrease?.secondary).toMatch(/€10\.00 → €11\.50\/kg|10\.00 → 11\.50/i);
+
+    const marginLoser = panels.last90Days.metrics.recipeMarginMovement.rows.find((row) =>
+      /Steakhouse Burger/i.test(row.name),
+    );
+    expect(marginLoser?.value).toMatch(/71% → 66%/);
+    expect(marginLoser?.secondary).toMatch(/-5 pp/);
+
+    const alphaSupplier = panels.last90Days.metrics.supplierMovement.rows.find((row) =>
+      /Alpha Foods/i.test(row.name),
+    );
+    expect(alphaSupplier?.name).toMatch(/Alpha Foods/i);
+    expect(`${alphaSupplier?.value ?? ""} ${alphaSupplier?.secondary ?? ""}`).toMatch(
+      /\+|€120|spend/i,
+    );
+    expect(alphaSupplier?.expandable?.bullets.length).toBeGreaterThan(0);
+  });
+
+  it("emits structured metric rows from trend builders with fixture data", () => {
+    const windows = buildOperationalWindows(new Date("2026-06-03T12:00:00.000Z"));
+    const data = {
+      ingredients: [
+        { id: "beef-1", name: "Novilho Vazia", unit: "kg", current_price: 12, purchase_quantity: 1 },
+        { id: "veg-1", name: "Salad mix", unit: "kg", current_price: 4, purchase_quantity: 1 },
+      ],
+      recipes: [beefRecipe("r1", "Steakhouse Burger", 0.2)],
+      invoices: [
+        { id: "inv-1", supplier_name: "Alpha Foods", total: 120, created_at: "2026-04-01T00:00:00.000Z" },
+        { id: "inv-2", supplier_name: "Beta Lane", total: 45, created_at: "2026-05-10T00:00:00.000Z" },
+      ],
+      priceHistory: [
+        {
+          id: "h1",
+          ingredient_id: "beef-1",
+          invoice_id: "inv-1",
+          ingredient_name: "Novilho Vazia",
+          supplier_name: "Alpha Foods",
+          ingredient_unit: "kg",
+          previous_price: 10,
+          new_price: 11.5,
+          delta: 1.5,
+          delta_percent: 15,
+          created_at: "2026-04-01T00:00:00.000Z",
+        },
+        {
+          id: "h2",
+          ingredient_id: "veg-1",
+          invoice_id: "inv-2",
+          ingredient_name: "Salad mix",
+          supplier_name: "Beta Lane",
+          ingredient_unit: "kg",
+          previous_price: 4,
+          new_price: 3.2,
+          delta: -0.8,
+          delta_percent: -20,
+          created_at: "2026-05-10T00:00:00.000Z",
+        },
+      ],
+    };
+    const view = buildSynthesisViewModel({
+      data,
+      alerts: [
+        {
+          id: "recipe-margin-r1",
+          kind: "recipe_margin_deterioration",
+          sectionId: "critical_margin_risks",
+          severity: "high",
+          title: "Modeled margin slip — Steakhouse Burger",
+          context:
+            "After the latest invoice-driven unit costs, modeled gross margin fell from about 71% to 66%.",
+          suggestedAction: "Review",
+          actionLabel: "Open",
+          target: "/recipes",
+          meta: [{ label: "Detected", value: "2026-04-01T00:00:00.000Z" }],
+          signals: [],
+          priority: 6200,
+        },
+      ],
+    });
+
+    const metrics = buildOperationalTrendsWindowMetrics({
+      windowKey: "last_3_months",
+      data,
+      windows,
+      groups: view.operationalSynthesisGroups,
+    });
+
+    const supplierMetrics = buildSupplierMovementMetrics({ windowKey: "last_3_months", data, windows });
+    expect(supplierMetrics.rows[0]?.name).toBe("Alpha Foods");
+    expect(supplierMetrics.rows[0]?.value).toBe("+15%");
+    expect(supplierMetrics.rows[0]?.secondary).toMatch(/1 invoice.*€120/);
+
+    const ingredientMetrics = buildIngredientMovementMetrics({
+      windowKey: "last_3_months",
+      data,
+      windows,
+    });
+    expect(ingredientMetrics.rows.find((row) => row.name === "Salad mix")?.value).toBe("-20%");
+    expect(ingredientMetrics.rows.find((row) => row.name === "Novilho Vazia")?.secondary).toMatch(
+      /€10\.00 → €11\.50\/kg/,
+    );
+    expect(
+      buildRecipeMarginMovementMetrics({
+        windowKey: "last_3_months",
+        groups: view.operationalSynthesisGroups,
+        data,
+      }).rows.some((row) => row.value === "71% → 66%"),
+    ).toBe(true);
+
+    expect(metrics.exposureConcentration.rows[0]?.name).toBe("Novilho Vazia");
+    expect(metrics.exposureConcentration.rows[0]?.value).toMatch(/\/mo$/);
+    expect(metrics.exposureConcentration.rows[0]?.exposure?.riskLevel).toBeDefined();
+    expect(metrics.exposureConcentration.rows[0]?.exposure?.tenPercentImpactEur).toBeGreaterThan(0);
+    expect(metrics.supplierMovement.rows[0]?.expandable?.bullets.length).toBeGreaterThan(0);
+    const alphaSupplierRow = metrics.supplierMovement.rows.find((row) =>
+      /Alpha Foods/i.test(row.name),
+    );
+    expect(`${alphaSupplierRow?.value ?? ""} ${alphaSupplierRow?.secondary ?? ""}`).toMatch(
+      /€120|\+15%|spend/i,
+    );
+
+    const exposureMetrics = buildExposureConcentrationMetrics({
+      windowKey: "last_3_months",
+      data,
+      windows,
+    });
+    const recipeExposure = exposureMetrics.rows.find((row) => /Steakhouse Burger/i.test(row.name));
+    expect(recipeExposure?.secondary).toMatch(/largest:/i);
+  });
+
+  it("uses fallback rows instead of empty movement copy when window is calm", () => {
+    const windows = buildOperationalWindows(new Date("2026-06-03T12:00:00.000Z"));
+    const data = {
+      ingredients: [
+        { id: "beef-1", name: "Novilho Vazia", unit: "kg", current_price: 12, purchase_quantity: 1 },
+        { id: "veg-1", name: "Salad mix", unit: "kg", current_price: 4, purchase_quantity: 1 },
+      ],
+      recipes: [beefRecipe("r1", "Steakhouse Burger", 0.2)],
+      invoices: [
+        { id: "inv-1", supplier_name: "Alpha Foods", total: 1061, created_at: "2026-04-01T00:00:00.000Z" },
+      ],
+      priceHistory: [],
+    };
+    const view = buildSynthesisViewModel({ data, alerts: [] });
+    const metrics = buildOperationalTrendsWindowMetrics({
+      windowKey: "last_3_months",
+      data,
+      windows,
+      groups: view.operationalSynthesisGroups,
+    });
+
+    const emptyCopy = /No (supplier|ingredient|recipe|modeled)/i;
+    for (const section of [
+      metrics.supplierMovement,
+      metrics.ingredientMovement,
+      metrics.recipeMarginMovement,
+      metrics.exposureConcentration,
+    ]) {
+      expect(section.rows.length).toBeGreaterThan(0);
+      for (const row of section.rows) {
+        expect(row.value).not.toMatch(emptyCopy);
+        expect(row.name).not.toMatch(emptyCopy);
+      }
+    }
+
+    expect(metrics.supplierMovement.rows[0]?.secondary).toMatch(
+      /invoice.*spend.*ingredient.*top:/i,
+    );
+    expect(metrics.ingredientMovement.rows[0]?.name).toBe("Novilho Vazia");
+    expect(metrics.exposureConcentration.rows[0]?.exposure?.tenPercentImpactEur).toBeGreaterThan(0);
+    expect(metrics.supplierMovement.rows[0]?.expandable?.bullets.length).toBeGreaterThan(0);
+  });
+
+  it("maps exposure risk and trend badges deterministically", () => {
+    expect(mapExposureRiskLevel({ monthlyExposureEur: 100 })).toBe("HIGH");
+    expect(mapExposureRiskLevel({ monthlyExposureEur: 30 })).toBe("MEDIUM");
+    expect(mapExposureRiskLevel({ monthlyExposureEur: 5 })).toBe("LOW");
+
+    const badges = resolveOperationalTrendBadges({
+      ingredientId: "beef-1",
+      monthlyExposureEur: 90,
+      costSharePct: 58,
+      supplierSpendSharePct: 45,
+      alerts: [
+        {
+          id: "stale-price-beef-1",
+          kind: "stale_price",
+          sectionId: "stale",
+          severity: "info",
+          title: "Novilho Vazia pricing is stale",
+          context: "ctx",
+          suggestedAction: "Sync",
+          actionLabel: "Open",
+          target: "/ingredients",
+          meta: [],
+          signals: [],
+          priority: 100,
+        },
+      ],
+    });
+    expect(badges).toContain("HIGH EXPOSURE");
+    expect(badges).toContain("HIGH DEPENDENCY");
+    expect(badges).toContain("SUPPLIER CONCENTRATION");
+    expect(badges).toContain("STALE PRICE");
   });
 
   it("groups duplicate concentration insights in the action queue", () => {
@@ -1009,5 +1216,325 @@ describe("operational-intelligence-synthesis", () => {
     expect(view.actionQueue.length).toBeLessThanOrEqual(2);
     const beefCard = view.actionQueue.find((c) => /beef/i.test(c.title));
     expect(beefCard?.affectedScope).toMatch(/Burger/);
+  });
+
+  it("dedupes duplicate entities within each operational trends section", () => {
+    const windows = buildOperationalWindows(new Date("2026-06-03T12:00:00.000Z"));
+    const data = {
+      ingredients: [
+        { id: "beef-1", name: "Novilho Vazia", unit: "kg", current_price: 10, purchase_quantity: 1 },
+      ],
+      recipes: [beefRecipe("r1", "Steakhouse Burger", 0.2)],
+      invoices: [
+        { id: "inv-1", supplier_name: "Alpha Foods", total: 120, created_at: "2026-04-01T00:00:00.000Z" },
+        { id: "inv-2", supplier_name: "Alpha Foods", total: 80, created_at: "2026-05-01T00:00:00.000Z" },
+      ],
+      priceHistory: [
+        {
+          id: "h1",
+          ingredient_id: "beef-1",
+          invoice_id: "inv-1",
+          ingredient_name: "Novilho Vazia",
+          supplier_name: "Alpha Foods",
+          ingredient_unit: "kg",
+          previous_price: 10,
+          new_price: 12,
+          delta: 2,
+          delta_percent: 20,
+          created_at: "2026-04-01T00:00:00.000Z",
+        },
+        {
+          id: "h2",
+          ingredient_id: "beef-1",
+          invoice_id: "inv-2",
+          ingredient_name: "Novilho Vazia",
+          supplier_name: "Alpha Foods",
+          ingredient_unit: "kg",
+          previous_price: 12,
+          new_price: 10,
+          delta: -2,
+          delta_percent: -16.7,
+          created_at: "2026-05-01T00:00:00.000Z",
+        },
+      ],
+    };
+
+    const supplierMetrics = buildSupplierMovementMetrics({
+      windowKey: "last_3_months",
+      data,
+      windows,
+    });
+    const supplierNames = supplierMetrics.rows.map((row) => row.name);
+    expect(new Set(supplierNames).size).toBe(supplierNames.length);
+
+    const ingredientMetrics = buildIngredientMovementMetrics({
+      windowKey: "last_3_months",
+      data,
+      windows,
+    });
+    const ingredientIds = ingredientMetrics.rows.map((row) => row.ingredientId).filter(Boolean);
+    expect(new Set(ingredientIds).size).toBe(ingredientIds.length);
+  });
+
+  it("never uses ingredient catalog name as largest recipe on exposure rows", () => {
+    const windows = buildOperationalWindows(new Date("2026-06-03T12:00:00.000Z"));
+    const data = {
+      ingredients: [
+        {
+          id: "mayo-1",
+          name: "MAIONESE HELLMANN'S 450ML",
+          unit: "un",
+          current_price: 3,
+          purchase_quantity: 1,
+        },
+        { id: "beef-1", name: "Novilho Vazia", unit: "kg", current_price: 10, purchase_quantity: 1 },
+      ],
+      recipes: [
+        {
+          id: "r-tartar",
+          name: "Tartar Sauce Prep",
+          selling_price: 0,
+          type: "menu",
+          recipe_ingredients: [
+            {
+              id: "l1",
+              recipe_id: "r-tartar",
+              ingredient_id: "mayo-1",
+              quantity: 2,
+              unit: "un",
+              created_at: "",
+              ingredients: {
+                id: "mayo-1",
+                name: "MAIONESE HELLMANN'S 450ML",
+                unit: "un",
+                current_price: 3,
+                purchase_quantity: 1,
+              },
+            },
+          ],
+        },
+        beefRecipe("r-burger", "Steakhouse Burger", 0.2),
+      ],
+      invoices: [],
+      priceHistory: [
+        {
+          id: "h-mayo",
+          ingredient_id: "mayo-1",
+          invoice_id: null,
+          ingredient_name: "MAIONESE HELLMANN'S 450ML",
+          supplier_name: "Metro Cash",
+          ingredient_unit: "un",
+          previous_price: 2.8,
+          new_price: 3,
+          delta: 0.2,
+          delta_percent: 7,
+          created_at: "2026-05-01T00:00:00.000Z",
+        },
+      ],
+    };
+
+    const exposureMetrics = buildExposureConcentrationMetrics({
+      windowKey: "last_3_months",
+      data,
+      windows,
+    });
+    const mayoRow = exposureMetrics.rows.find((row) => row.ingredientId === "mayo-1");
+    expect(mayoRow?.exposure?.largestRecipeName).toBe("Tartar Sauce Prep");
+    expect(mayoRow?.exposure?.largestRecipeName).not.toBe("MAIONESE HELLMANN'S 450ML");
+    expect(mayoRow?.exposure?.currentSupplierName).toBe("Metro Cash");
+    expect(mayoRow?.exposure?.latestInvoiceDateLabel).toBeTruthy();
+    expect(mayoRow?.exposure?.latestUnitPriceLabel).toMatch(/€3\.00\/un/);
+  });
+
+  it("buildOwnerReviewViewModel maps weekly snapshot counts from existing synthesis data", () => {
+    const windows = buildOperationalWindows(new Date("2026-06-03T12:00:00.000Z"));
+    const data = {
+      ingredients: [
+        { id: "beef-1", name: "Novilho Vazia", unit: "kg", current_price: 12, purchase_quantity: 1 },
+        { id: "side-1", name: "Salad mix", unit: "kg", current_price: 4, purchase_quantity: 1 },
+      ],
+      recipes: [beefRecipe("r1", "Burger A", 0.25)],
+      invoices: [
+        { id: "inv-1", supplier_name: "Alpha Foods", total: 120, created_at: "2026-05-01T00:00:00.000Z" },
+        { id: "inv-2", supplier_name: "Beta Supply", total: 80, created_at: "2026-05-10T00:00:00.000Z" },
+      ],
+      priceHistory: [
+        {
+          id: "h-up",
+          ingredient_id: "beef-1",
+          invoice_id: "inv-1",
+          ingredient_name: "Novilho Vazia",
+          supplier_name: "Alpha Foods",
+          ingredient_unit: "kg",
+          previous_price: 10,
+          new_price: 12,
+          delta: 2,
+          delta_percent: 20,
+          created_at: "2026-05-01T00:00:00.000Z",
+        },
+        {
+          id: "h-down",
+          ingredient_id: "side-1",
+          invoice_id: "inv-2",
+          ingredient_name: "Salad mix",
+          supplier_name: "Beta Supply",
+          ingredient_unit: "kg",
+          previous_price: 5,
+          new_price: 4,
+          delta: -1,
+          delta_percent: -20,
+          created_at: "2026-05-10T00:00:00.000Z",
+        },
+      ],
+    };
+
+    const alerts: MarginAlertItem[] = [
+      {
+        id: "stale-side",
+        kind: "stale_price",
+        sectionId: "stale_price",
+        severity: "watch",
+        title: "Salad mix pricing is stale",
+        context: "No invoice in 45 days",
+        suggestedAction: "Confirm price",
+        actionLabel: "Open ingredient",
+        target: "/ingredients",
+        meta: [{ label: "Ingredient", value: "side-1" }],
+        signals: [],
+        priority: 100,
+      },
+      {
+        id: "stale-beef",
+        kind: "stale_price",
+        sectionId: "stale_price",
+        severity: "watch",
+        title: "Novilho Vazia pricing is stale",
+        context: "No invoice in 45 days",
+        suggestedAction: "Confirm price",
+        actionLabel: "Open ingredient",
+        target: "/ingredients",
+        meta: [{ label: "Ingredient", value: "beef-1" }],
+        signals: [],
+        priority: 100,
+      },
+    ];
+
+    const synthesis = buildSynthesisViewModel({ data, alerts });
+    const ownerReview = buildOwnerReviewViewModel({
+      data,
+      alerts,
+      monthlyMarginPressure: synthesis.monthlyMarginPressure,
+      prioritizedInsights: synthesis.prioritizedInsights,
+      concentrationGroups: synthesis.concentrationGroups,
+      operationalSynthesisGroups: synthesis.operationalSynthesisGroups,
+      monitorInsights: synthesis.monitorInsights,
+      operationalWindows: windows,
+    });
+
+    expect(ownerReview.weeklySnapshot.supplierIncreases).toBeGreaterThanOrEqual(1);
+    expect(ownerReview.weeklySnapshot.supplierDecreases).toBeGreaterThanOrEqual(1);
+    expect(ownerReview.weeklySnapshot.pricesNeedingRefresh).toBe(2);
+    expect(ownerReview.weeklySnapshot.monthlyImpactEur).toBe(
+      synthesis.monthlyMarginPressure.estimatedMarginPressureEur,
+    );
+  });
+
+  it("buildOwnerReviewViewModel sorts financial risks by impact and dedupes rows", () => {
+    const data = {
+      ingredients: [
+        { id: "beef-1", name: "Novilho Vazia", unit: "kg", current_price: 12, purchase_quantity: 1 },
+      ],
+      recipes: [beefRecipe("r1", "Burger A", 0.25)],
+      invoices: [],
+      priceHistory: [],
+    };
+
+    const alerts: MarginAlertItem[] = [
+      {
+        id: "high-contribution|r1|beef-1",
+        kind: "cost_concentration",
+        sectionId: "cost_concentration",
+        severity: "watch",
+        title: "Novilho Vazia is 80% of Burger A cost",
+        context: "ctx",
+        suggestedAction: "Review portion",
+        actionLabel: "Open",
+        target: "/recipes",
+        meta: [
+          { label: "Cost share", value: "80%" },
+          { label: "Recipe", value: "Burger A" },
+        ],
+        signals: [],
+        priority: 5000,
+      },
+      {
+        id: "recipe-margin-r1",
+        kind: "recipe_margin_deterioration",
+        sectionId: "recipe_margin",
+        severity: "high",
+        title: "Modeled margin slip — Burger A",
+        context: "Cost increase on Novilho Vazia",
+        suggestedAction: "Review recipe",
+        actionLabel: "Open recipe",
+        target: "/recipes",
+        meta: [
+          { label: "Margin", value: "58% → 52%" },
+          { label: "Detected", value: "2026-05-01" },
+        ],
+        signals: [],
+        priority: 2400,
+      },
+    ];
+
+    const synthesis = buildSynthesisViewModel({ data, alerts });
+    const ownerReview = synthesis.ownerReview;
+
+    expect(ownerReview.financialRisks.length).toBeGreaterThan(0);
+    const impactValues = ownerReview.financialRisks.map((row) => row.monthlyImpactEur);
+    const sorted = [...impactValues].sort((a, b) => b - a);
+    expect(impactValues).toEqual(sorted);
+
+    const riskIds = ownerReview.financialRisks.map((row) => row.id);
+    expect(new Set(riskIds).size).toBe(riskIds.length);
+
+    expect(ownerReview.affectedRecipes.some((row) => row.recipeName === "Burger A")).toBe(true);
+    expect(ownerReview.attentionNeeded.filter((row) => row.kind === "stale_price").length).toBe(0);
+  });
+
+  it("buildOwnerReviewViewModel exposes supplier ingredient changes without invoice metadata", () => {
+    const windows = buildOperationalWindows(new Date("2026-06-03T12:00:00.000Z"));
+    const data = {
+      ingredients: [
+        { id: "beef-1", name: "Novilho Vazia", unit: "kg", current_price: 12, purchase_quantity: 1 },
+      ],
+      recipes: [beefRecipe("r1", "Burger A", 0.25)],
+      invoices: [
+        { id: "inv-1", supplier_name: "Alpha Foods", total: 120, created_at: "2026-05-01T00:00:00.000Z" },
+      ],
+      priceHistory: [
+        {
+          id: "h-up",
+          ingredient_id: "beef-1",
+          invoice_id: "inv-1",
+          ingredient_name: "Novilho Vazia",
+          supplier_name: "Alpha Foods",
+          ingredient_unit: "kg",
+          previous_price: 10,
+          new_price: 12,
+          delta: 2,
+          delta_percent: 20,
+          created_at: "2026-05-01T00:00:00.000Z",
+        },
+      ],
+    };
+
+    const ownerReview = buildSynthesisViewModel({ data, alerts: [] }).ownerReview;
+    const alpha = ownerReview.suppliersToWatch.find((row) => row.supplierName === "Alpha Foods");
+    expect(alpha?.direction).toBe("up");
+    expect(alpha?.ingredientChanges.length).toBeGreaterThan(0);
+    expect(alpha?.ingredientChanges[0]?.name).toBe("Novilho Vazia");
+    expect(ownerReview.opportunities.every((row) => !/recommend|switch supplier/i.test(row.whatChanged))).toBe(
+      true,
+    );
   });
 });

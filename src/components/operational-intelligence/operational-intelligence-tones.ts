@@ -1,6 +1,7 @@
 import type {
   OperationalDecisionTier,
   OperationalInsightPriority,
+  OperationalTrendExposureDetail,
 } from "@/lib/operational-intelligence-synthesis";
 import { OPERATIONAL_DECISION_TIER_LABELS } from "@/lib/operational-intelligence-synthesis";
 
@@ -105,6 +106,24 @@ export const operationalDecisionTierTones: Record<
     text: "text-muted-foreground",
     emphasis: "",
   },
+};
+
+/** Compact operational fact badges on trend metric rows. */
+export const operationalTrendBadgeTones: Record<string, string> = {
+  "HIGH EXPOSURE": "bg-rose-500/8 text-rose-900/90 border-rose-500/15 dark:text-rose-200",
+  "HIGH DEPENDENCY": "bg-amber-500/8 text-amber-950/90 border-amber-500/15 dark:text-amber-200",
+  "STALE PRICE": "bg-violet-500/8 text-violet-950/90 border-violet-500/15 dark:text-violet-200",
+  "SUPPLIER CONCENTRATION": "bg-orange-500/8 text-orange-950/90 border-orange-500/15 dark:text-orange-200",
+  "PRICE CONFIDENCE LOW": "bg-slate-500/8 text-slate-800/90 border-slate-500/15 dark:text-slate-200",
+};
+
+export const operationalExposureRiskTones: Record<
+  OperationalTrendExposureDetail["riskLevel"],
+  string
+> = {
+  HIGH: "text-rose-900/90 dark:text-rose-200",
+  MEDIUM: "text-amber-950/90 dark:text-amber-200",
+  LOW: "text-muted-foreground",
 };
 
 export const operationalSectionLayout = {

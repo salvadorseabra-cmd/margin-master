@@ -108,8 +108,12 @@ function AlertsPage() {
         supabase
           .from("invoices")
           .select("id, supplier_name, total, created_at")
+          .gte(
+            "created_at",
+            new Date(Date.now() - PRICE_WINDOW_180_DAYS * 86_400_000).toISOString(),
+          )
           .order("created_at", { ascending: false })
-          .limit(25),
+          .limit(200),
         buildMarginAlertsFromSupabase(supabase).catch(() => []),
       ]);
 

@@ -16,6 +16,7 @@ import {
   buildPortfolioCostExposure,
   buildRecoveryOpportunities,
   buildTopOperationalExposures,
+  estimateTenPercentSensitivityEur,
   buildTodaysMarginRisks,
   collectOperationalRecommendations,
   extractIngredientIdFromAlert,
@@ -24,6 +25,7 @@ import {
   type CategoryPressureRow,
   type CostCategoryGroup,
   type CostCategorySlice,
+  type CostExposureRow,
   type OperationalExposureRow,
   type OperationalRecommendation,
   type OperationalRecommendationCategory,
@@ -148,35 +150,59 @@ export type OperationalSnapshotViewModel = {
   keyTakeaway: string;
 };
 
+export type OperationalTrendBadge =
+  | "HIGH EXPOSURE"
+  | "HIGH DEPENDENCY"
+  | "STALE PRICE"
+  | "SUPPLIER CONCENTRATION"
+  | "PRICE CONFIDENCE LOW";
+
 export type OperationalTrendExpandable = {
   bullets: string[];
-  sparklinePoints?: number[];
 };
 
-export type OperationalTrendItem = {
+export type OperationalTrendExposureDetail = {
+  ingredientName: string;
+  recipesAffected: number;
+  largestRecipeName: string;
+  monthlyExposureEur: number;
+  tenPercentImpactEur: number;
+  riskLevel: "LOW" | "MEDIUM" | "HIGH";
+  currentSupplierName?: string | null;
+  latestInvoiceDateLabel?: string | null;
+  latestUnitPriceLabel?: string | null;
+};
+
+export type OperationalTrendMetricRow = {
   id: string;
-  label: string;
-  detail?: string;
-  window?: OperationalWindowKey;
-  temporalTrend?: SupplierMovementInsight["temporalTrend"];
-  direction?: "up" | "down" | "flat";
+  name: string;
+  value: string;
+  secondary?: string;
+  badges?: OperationalTrendBadge[];
   expandable?: OperationalTrendExpandable;
+  exposure?: OperationalTrendExposureDetail;
+  /** Normalized supplier display name for invoice history deep links. */
+  supplierName?: string;
+  ingredientId?: string;
+  recipeId?: string;
 };
 
-export type OperationalTrendSubsection = {
+export type OperationalTrendMetricSection = {
   title: string;
-  /** Display labels — mirrors `items[].label` for tests and simple consumers. */
-  bullets: string[];
-  items: OperationalTrendItem[];
+  rows: OperationalTrendMetricRow[];
+};
+
+export type OperationalTrendsWindowMetrics = {
+  supplierMovement: OperationalTrendMetricSection;
+  ingredientMovement: OperationalTrendMetricSection;
+  recipeMarginMovement: OperationalTrendMetricSection;
+  exposureConcentration: OperationalTrendMetricSection;
 };
 
 export type OperationalTrendPanel = {
   label: string;
-  windowKeys: OperationalWindowKey[];
-  supplierMovement: OperationalTrendSubsection;
-  marginMovement: OperationalTrendSubsection;
-  procurementSignals: OperationalTrendSubsection;
-  operationalRecommendation: OperationalTrendSubsection;
+  windowKey: OperationalWindowKey;
+  metrics: OperationalTrendsWindowMetrics;
 };
 
 export type OperationalTrendsPanels = {
@@ -198,6 +224,72 @@ export type OperationalActionQueueCard = {
   estimatedImpact: string | null;
   target: MarginAlertTarget;
   actionLabel: string;
+};
+
+export type OwnerReviewWeeklySnapshot = {
+  supplierIncreases: number;
+  monthlyImpactEur: number;
+  supplierDecreases: number;
+  pricesNeedingRefresh: number;
+};
+
+export type OwnerReviewRow = {
+  id: string;
+  monthlyImpactEur: number;
+  impactLine: string | null;
+  title: string;
+  whatChanged: string;
+  target?: MarginAlertTarget;
+  ingredientId?: string;
+  recipeId?: string;
+  supplierName?: string;
+};
+
+export type SupplierWatchDirection = "up" | "down" | "stable";
+
+export type SupplierIngredientChange = {
+  ingredientId: string;
+  name: string;
+  changePct: number;
+  priceLine: string | null;
+};
+
+export type SupplierWatchRow = {
+  id: string;
+  supplierName: string;
+  direction: SupplierWatchDirection;
+  estimatedImpactEur: number | null;
+  impactLine: string | null;
+  ingredientChanges: SupplierIngredientChange[];
+};
+
+export type AffectedRecipeRow = {
+  id: string;
+  recipeName: string;
+  recipeId?: string;
+  marginChange: string | null;
+  affectedByLine: string;
+  target: MarginAlertTarget;
+};
+
+export type AttentionNeededKind = "stale_price" | "missing_confirmation" | "ingredient_review";
+
+export type AttentionRow = {
+  id: string;
+  kind: AttentionNeededKind;
+  title: string;
+  detail: string;
+  target: MarginAlertTarget;
+  ingredientId?: string;
+};
+
+export type OwnerReviewViewModel = {
+  weeklySnapshot: OwnerReviewWeeklySnapshot;
+  financialRisks: OwnerReviewRow[];
+  opportunities: OwnerReviewRow[];
+  suppliersToWatch: SupplierWatchRow[];
+  affectedRecipes: AffectedRecipeRow[];
+  attentionNeeded: AttentionRow[];
 };
 
 export type CalmOperationalSignal = {
@@ -396,6 +488,8 @@ export const MIN_CATEGORY_INFLATION_PCT = 3;
 export const MIN_TEMPORAL_WINDOW_SPREAD_PCT = 3;
 export const MAX_SUPPLIER_MOVEMENTS_VISIBLE = 5;
 export const MAX_RECIPE_MARGIN_MOVEMENTS_VISIBLE = 4;
+/** Top ingredient movers shown per direction in trend panels. */
+export const TREND_INGREDIENT_TOP_N = 2;
 
 const OPERATIONAL_WINDOWS: ReadonlyArray<{ key: OperationalWindowKey; label: string; days: number }> = [
   { key: "last_30_days", label: "Last 30 days", days: 30 },
@@ -2132,176 +2226,1405 @@ export function buildOperationalSnapshotViewModel(input: {
   };
 }
 
-function trendMatchesPanel(windowKey: OperationalWindowKey, panelKeys: OperationalWindowKey[]): boolean {
-  return panelKeys.includes(windowKey);
-}
-
-function trendSubsection(title: string, items: OperationalTrendItem[]): OperationalTrendSubsection {
-  return {
-    title,
-    items,
-    bullets: items.map((item) => item.label),
-  };
-}
-
-function supplierDirectionFromChange(
-  changePct: number,
-): OperationalTrendItem["direction"] {
-  if (changePct > 0.5) return "up";
-  if (changePct < -0.5) return "down";
-  return "flat";
-}
-
-function collectSupplierSparklinePoints(
-  supplierName: string,
-  priceHistory: MarginAlertData["priceHistory"],
-  panelKeys: OperationalWindowKey[],
+function isInOperationalWindow(
+  dateIso: string | null | undefined,
+  windowKey: OperationalWindowKey,
   windows: OperationalWindow[],
-): number[] {
-  const allowedStarts = panelKeys
-    .map((key) => windows.find((w) => w.key === key)?.startsAtIso)
-    .filter((iso): iso is string => Boolean(iso))
-    .map((iso) => new Date(iso).getTime());
-  const cutoff = allowedStarts.length > 0 ? Math.min(...allowedStarts) : null;
-
-  const points = priceHistory
-    .filter((row) => row.supplier_name?.trim() === supplierName)
-    .filter((row) => {
-      if (cutoff == null) return true;
-      const ms = new Date(row.created_at).getTime();
-      return Number.isFinite(ms) && ms >= cutoff;
-    })
-    .sort((a, b) => a.created_at.localeCompare(b.created_at))
-    .map(
-      (row) =>
-        row.delta_percent ??
-        ((row.new_price ?? 0) > 0 && (row.previous_price ?? 0) > 0
-          ? (((row.new_price ?? 0) - (row.previous_price ?? 0)) / (row.previous_price ?? 1)) * 100
-          : 0),
-    );
-
-  if (points.length <= 8) return points;
-  const step = Math.ceil(points.length / 8);
-  return points.filter((_, index) => index % step === 0).slice(-8);
+): boolean {
+  if (!dateIso) return false;
+  const eventMs = new Date(dateIso).getTime();
+  if (!Number.isFinite(eventMs)) return false;
+  const window = windows.find((w) => w.key === windowKey);
+  if (!window) return false;
+  return eventMs >= new Date(window.startsAtIso).getTime();
 }
 
-function supplierIncreaseToTrendItem(
-  entry: SupplierMovementInsight,
-  priceHistory: MarginAlertData["priceHistory"],
-  windows: OperationalWindow[],
-  panelKeys: OperationalWindowKey[],
-): OperationalTrendItem {
-  const sparklinePoints = collectSupplierSparklinePoints(
-    entry.supplierName,
-    priceHistory,
-    panelKeys,
-    windows,
+function priceHistoryDeltaPct(row: MarginAlertData["priceHistory"][number]): number {
+  return (
+    row.delta_percent ??
+    ((row.new_price ?? 0) > 0 && (row.previous_price ?? 0) > 0
+      ? (((row.new_price ?? 0) - (row.previous_price ?? 0)) / (row.previous_price ?? 1)) * 100
+      : 0)
   );
-  const expandableBullets = [
-    entry.operatorInsightLine,
-    entry.topIngredientLabels.length > 0
-      ? `Affected ingredients: ${entry.topIngredientLabels.join(", ")}`
-      : null,
-    entry.categoryHint ? `Lane: ${entry.categoryHint}` : null,
-    entry.consequence ? `If ignored: ${entry.consequence}` : null,
-    `Next step: ${entry.operatorAction}`,
-  ].filter((line): line is string => Boolean(line));
+}
+
+function ingredientLabel(
+  ingredientId: string,
+  fallbackName: string | null | undefined,
+  ingredients: MarginAlertData["ingredients"],
+): string {
+  return (
+    ingredients.find((i) => i.id === ingredientId)?.name?.trim() ||
+    fallbackName?.trim() ||
+    "Ingredient"
+  );
+}
+
+function formatUnitPricePair(
+  previous: number | null | undefined,
+  current: number | null | undefined,
+  unit: string | null | undefined,
+): string | null {
+  const prev = Number(previous ?? 0);
+  const next = Number(current ?? 0);
+  if (prev <= 0 && next <= 0) return null;
+  const unitLabel = unit?.trim() || "unit";
+  const prevLabel = prev > 0 ? formatCurrency(prev) : "—";
+  const nextLabel = next > 0 ? formatCurrency(next) : "—";
+  return `${prevLabel} → ${nextLabel}/${unitLabel}`;
+}
+
+function formatMarginPpDelta(marginFromPct: number, marginToPct: number): string {
+  const pp = Math.round(marginToPct - marginFromPct);
+  const sign = pp > 0 ? "+" : "";
+  return `${sign}${pp} pp`;
+}
+
+export function mapExposureRiskLevel(input: {
+  monthlyExposureEur: number;
+  costSharePct?: number;
+}): OperationalTrendExposureDetail["riskLevel"] {
+  const priority = mapToInsightPriority({
+    monthlyImpactEur: input.monthlyExposureEur,
+    contributionPct: input.costSharePct,
+  });
+  if (priority === "critical" || priority === "warning") return "HIGH";
+  if (priority === "monitor") return "MEDIUM";
+  return "LOW";
+}
+
+export function resolveOperationalTrendBadges(input: {
+  ingredientId?: string;
+  supplierName?: string;
+  monthlyExposureEur?: number;
+  costSharePct?: number;
+  supplierSpendSharePct?: number;
+  alerts?: MarginAlertItem[];
+}): OperationalTrendBadge[] {
+  const badges: OperationalTrendBadge[] = [];
+  const exposure = input.monthlyExposureEur ?? 0;
+  const share = input.costSharePct ?? 0;
+
+  if (exposure >= 75 || mapToInsightPriority({ monthlyImpactEur: exposure }) === "warning") {
+    badges.push("HIGH EXPOSURE");
+  }
+  if (share >= 55) {
+    badges.push("HIGH DEPENDENCY");
+  }
+  if ((input.supplierSpendSharePct ?? 0) >= 40) {
+    badges.push("SUPPLIER CONCENTRATION");
+  }
+
+  const alerts = input.alerts ?? [];
+  if (
+    input.ingredientId &&
+    alerts.some(
+      (alert) =>
+        alert.kind === "stale_price" &&
+        (extractIngredientIdFromAlert(alert) === input.ingredientId ||
+          alert.id.includes(input.ingredientId!)),
+    )
+  ) {
+    badges.push("STALE PRICE");
+    badges.push("PRICE CONFIDENCE LOW");
+  }
+
+  return [...new Set(badges)];
+}
+
+type SupplierWindowAggregate = {
+  supplierName: string;
+  avgPct: number;
+  changeEvents: number;
+  invoiceCount: number;
+  spendEur: number;
+  ingredientIds: Set<string>;
+  topIncreaseIngredient: { name: string; pct: number } | null;
+  topDecreaseIngredient: { name: string; pct: number } | null;
+};
+
+function formatSupplierMemorySecondary(stats: {
+  invoiceCount: number;
+  spendEur: number;
+  ingredientCount: number;
+  topIngredientName: string | null;
+}): string | undefined {
+  const parts: string[] = [];
+  if (stats.invoiceCount > 0) {
+    parts.push(`${stats.invoiceCount} invoice${stats.invoiceCount === 1 ? "" : "s"}`);
+  }
+  if (stats.spendEur > 0) {
+    parts.push(`${formatCurrency(stats.spendEur)} spend`);
+  }
+  if (stats.ingredientCount > 0) {
+    parts.push(`${stats.ingredientCount} ingredient${stats.ingredientCount === 1 ? "" : "s"}`);
+  }
+  if (stats.topIngredientName) {
+    parts.push(`top: ${stats.topIngredientName}`);
+  }
+  return parts.length > 0 ? parts.join(" · ") : undefined;
+}
+
+function resolveSupplierTopIngredientName(input: {
+  supplierName: string;
+  ingredientIds: Set<string>;
+  data: MarginAlertData;
+}): string | null {
+  const portfolio = buildPortfolioCostExposure(input.data, 50).filter((row) =>
+    input.ingredientIds.has(row.ingredientId),
+  );
+  if (portfolio.length > 0) {
+    return portfolio.sort((a, b) => b.monthlyModeledExposureEur - a.monthlyModeledExposureEur)[0]
+      ?.ingredientName;
+  }
+  const names = [...input.ingredientIds]
+    .map((id) => input.data.ingredients.find((i) => i.id === id)?.name?.trim())
+    .filter((name): name is string => Boolean(name));
+  if (names[0]) return names[0];
+  return buildPortfolioCostExposure(input.data, 1)[0]?.ingredientName ?? null;
+}
+
+function countSupplierIngredients(stats: SupplierWindowAggregate, data: MarginAlertData): number {
+  if (stats.ingredientIds.size > 0) return stats.ingredientIds.size;
+  if (stats.spendEur <= 0 && stats.invoiceCount <= 0) return 0;
+  const recipeIngredientIds = new Set<string>();
+  for (const recipe of data.recipes) {
+    for (const line of recipe.recipe_ingredients ?? []) {
+      if (line.ingredient_id) recipeIngredientIds.add(line.ingredient_id);
+    }
+  }
+  return recipeIngredientIds.size || data.ingredients.length;
+}
+
+function formatOperationalDateLabel(iso: string | null | undefined): string | null {
+  if (!iso) return null;
+  const ms = new Date(iso).getTime();
+  if (!Number.isFinite(ms)) return null;
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(ms));
+}
+
+function resolveIngredientSupplierContext(
+  data: MarginAlertData,
+  ingredientId: string,
+): Pick<
+  OperationalTrendExposureDetail,
+  "currentSupplierName" | "latestInvoiceDateLabel" | "latestUnitPriceLabel"
+> {
+  const history = data.priceHistory
+    .filter((row) => row.ingredient_id === ingredientId)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  const latest = history[0];
+  if (!latest) {
+    return {
+      currentSupplierName: null,
+      latestInvoiceDateLabel: null,
+      latestUnitPriceLabel: null,
+    };
+  }
+
+  const ingredient = data.ingredients.find((row) => row.id === ingredientId);
+  const unit =
+    latest.ingredient_unit?.trim() ||
+    ingredient?.unit?.trim() ||
+    ingredient?.purchase_unit?.trim() ||
+    "unit";
+  const unitPrice = latest.new_price ?? ingredient?.current_price ?? null;
+  const unitPriceLabel =
+    unitPrice != null && Number(unitPrice) > 0
+      ? `${formatCurrency(Number(unitPrice))}/${unit}`
+      : null;
 
   return {
-    id: `supplier-increase:${entry.supplierName}:${entry.dominantWindow}`,
-    label: entry.narrative,
-    detail:
-      entry.averageChangePct >= MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT
-        ? `${entry.averageChangePct > 0 ? "+" : ""}${formatPercent(Math.round(entry.averageChangePct))} avg · ${entry.changeEvents} invoice event${entry.changeEvents === 1 ? "" : "s"} · ${entry.dominantWindowLabel}`
-        : `${entry.changeEvents} invoice event${entry.changeEvents === 1 ? "" : "s"} · ${entry.dominantWindowLabel}`,
-    window: entry.dominantWindow,
-    temporalTrend: entry.temporalTrend,
-    direction: supplierDirectionFromChange(entry.averageChangePct),
-    expandable: {
-      bullets: expandableBullets,
-      sparklinePoints: sparklinePoints.length >= 2 ? sparklinePoints : undefined,
-    },
+    currentSupplierName: latest.supplier_name?.trim() || null,
+    latestInvoiceDateLabel: formatOperationalDateLabel(latest.created_at),
+    latestUnitPriceLabel: unitPriceLabel,
   };
 }
 
-function supplierSwitchToTrendItem(entry: SupplierSwitchImpactInsight): OperationalTrendItem {
-  const expandableBullets = [
-    entry.impactLine,
-    `Prior supplier: ${entry.fromSupplier}`,
-    `Current supplier: ${entry.toSupplier}`,
-    `If ignored: ${entry.consequence}`,
-    `Next step: ${entry.operatorAction}`,
-  ];
-
+function buildExposureDetailFromRow(
+  row: Pick<
+    CostExposureRow,
+    "ingredientId" | "ingredientName" | "recipeCount" | "monthlyModeledExposureEur" | "totalLineCost" | "costSharePct"
+  >,
+  largestRecipeName: string,
+  data: MarginAlertData,
+): OperationalTrendExposureDetail {
+  const tenPercentImpactEur = estimateTenPercentSensitivityEur(row.totalLineCost, row.recipeCount);
   return {
-    id: `supplier-switch:${entry.ingredientId}:${entry.fromSupplier}:${entry.toSupplier}:${entry.window}`,
-    label: entry.narrative,
-    detail: `${formatPercent(Math.round(Math.abs(entry.changePct)))} unit cost · ${entry.ingredientName}`,
-    window: entry.window,
-    direction: supplierDirectionFromChange(entry.changePct),
-    expandable: { bullets: expandableBullets },
+    ingredientName: row.ingredientName,
+    recipesAffected: row.recipeCount,
+    largestRecipeName,
+    monthlyExposureEur: row.monthlyModeledExposureEur,
+    tenPercentImpactEur,
+    riskLevel: mapExposureRiskLevel({
+      monthlyExposureEur: row.monthlyModeledExposureEur,
+      costSharePct: row.costSharePct,
+    }),
+    ...resolveIngredientSupplierContext(data, row.ingredientId),
   };
 }
 
-function buildTrendSupplierItems(input: {
-  groups: OperationalSynthesisGroups;
-  panelKeys: OperationalWindowKey[];
-  priceHistory: MarginAlertData["priceHistory"];
+function recipesUsingIngredient(data: MarginAlertData, ingredientId: string): string[] {
+  const names: string[] = [];
+  for (const recipe of data.recipes) {
+    if (recipe.type === "prep") continue;
+    const uses = (recipe.recipe_ingredients ?? []).some((line) => line.ingredient_id === ingredientId);
+    if (uses) names.push(recipe.name?.trim() || "Recipe");
+  }
+  return names;
+}
+
+function largestRecipeForIngredient(data: MarginAlertData, ingredientId: string): string {
+  const menuMetrics = getRecipeMetrics(data.recipes).filter((m) => m.recipe.type !== "prep");
+  let bestName = "—";
+  let bestLineCost = -1;
+
+  for (const metric of menuMetrics) {
+    const line = metric.recipe.recipe_ingredients?.find((entry) => entry.ingredient_id === ingredientId);
+    if (!line?.ingredients) continue;
+    const qty = Number(line.quantity ?? 0);
+    const unitCost = Number(line.ingredients.current_price ?? 0);
+    const lineCost = qty * unitCost;
+    if (lineCost > bestLineCost) {
+      bestLineCost = lineCost;
+      bestName = metric.recipe.name?.trim() || "Recipe";
+    }
+  }
+
+  return bestName;
+}
+
+function trendRowEntityKey(row: OperationalTrendMetricRow): string {
+  if (row.recipeId) return `recipe:${row.recipeId}`;
+  if (row.ingredientId) return `ingredient:${row.ingredientId}`;
+  if (row.supplierName) return `supplier:${row.supplierName.trim().toLowerCase()}`;
+
+  const tail = row.id.split(":").pop() ?? row.id;
+  if (row.id.startsWith("supplier-") && !row.id.includes("portfolio-fallback") && !row.id.includes("ingredient-fallback")) {
+    return `supplier:${tail.trim().toLowerCase()}`;
+  }
+  if (row.id.startsWith("ingredient-") || row.id.startsWith("exposure-ingredient")) {
+    return `ingredient:${tail}`;
+  }
+  if (row.id.startsWith("recipe-") || row.id.startsWith("exposure-recipe")) {
+    return `recipe:${tail}`;
+  }
+  return `row:${row.id}`;
+}
+
+function trendRowSignalPriority(row: OperationalTrendMetricRow): number {
+  if (/fallback|rank-|pad|portfolio/.test(row.id)) return 0;
+  if (/increase|decrease|winner|loser|exposure-ingredient:|exposure-supplier:|exposure-recipe:/.test(row.id)) {
+    return 2;
+  }
+  return 1;
+}
+
+function mergeTrendMetricRows(
+  primary: OperationalTrendMetricRow,
+  secondary: OperationalTrendMetricRow,
+): OperationalTrendMetricRow {
+  const preferred =
+    trendRowSignalPriority(primary) >= trendRowSignalPriority(secondary) ? primary : secondary;
+  const other = preferred === primary ? secondary : primary;
+
+  const secondaryParts = [preferred.secondary, other.secondary]
+    .filter((part): part is string => Boolean(part && part.trim()))
+    .filter((part, index, list) => list.indexOf(part) === index);
+
+  const monthlyExposureEur = Math.max(
+    preferred.exposure?.monthlyExposureEur ?? 0,
+    other.exposure?.monthlyExposureEur ?? 0,
+  );
+  const exposure =
+    preferred.exposure || other.exposure
+      ? {
+          ...(other.exposure ?? preferred.exposure)!,
+          ...(preferred.exposure ?? other.exposure)!,
+          monthlyExposureEur:
+            monthlyExposureEur > 0
+              ? monthlyExposureEur
+              : (preferred.exposure ?? other.exposure)!.monthlyExposureEur,
+          tenPercentImpactEur: Math.max(
+            preferred.exposure?.tenPercentImpactEur ?? 0,
+            other.exposure?.tenPercentImpactEur ?? 0,
+          ),
+        }
+      : undefined;
+
+  const badgeSet = new Set<OperationalTrendBadge>([
+    ...(preferred.badges ?? []),
+    ...(other.badges ?? []),
+  ]);
+
+  return {
+    ...preferred,
+    secondary: secondaryParts.length > 0 ? secondaryParts.join(" · ") : undefined,
+    badges: badgeSet.size > 0 ? [...badgeSet] : undefined,
+    exposure,
+    expandable: preferred.expandable ?? other.expandable,
+    ingredientId: preferred.ingredientId ?? other.ingredientId,
+    recipeId: preferred.recipeId ?? other.recipeId,
+    supplierName: preferred.supplierName ?? other.supplierName,
+  };
+}
+
+function dedupeTrendMetricRows(rows: OperationalTrendMetricRow[]): OperationalTrendMetricRow[] {
+  const merged = new Map<string, OperationalTrendMetricRow>();
+  for (const row of rows) {
+    const key = trendRowEntityKey(row);
+    const existing = merged.get(key);
+    merged.set(key, existing ? mergeTrendMetricRows(existing, row) : row);
+  }
+  return [...merged.values()];
+}
+
+function aggregateSuppliersInWindow(input: {
+  windowKey: OperationalWindowKey;
+  data: MarginAlertData;
   windows: OperationalWindow[];
-}): OperationalTrendItem[] {
-  const items: OperationalTrendItem[] = [];
+}): SupplierWindowAggregate[] {
+  const historyInWindow = input.data.priceHistory.filter((row) =>
+    isInOperationalWindow(row.created_at, input.windowKey, input.windows),
+  );
 
-  for (const entry of input.groups.supplierMovements.largestIncreases.filter((row) =>
-    trendMatchesPanel(row.dominantWindow, input.panelKeys),
-  ).slice(0, 3)) {
-    items.push(
-      supplierIncreaseToTrendItem(entry, input.priceHistory, input.windows, input.panelKeys),
-    );
+  const invoiceCountBySupplier = new Map<string, number>();
+  const spendBySupplier = new Map<string, number>();
+  for (const invoice of input.data.invoices) {
+    if (!isInOperationalWindow(invoice.created_at, input.windowKey, input.windows)) continue;
+    const supplier = invoice.supplier_name?.trim();
+    if (!supplier) continue;
+    invoiceCountBySupplier.set(supplier, (invoiceCountBySupplier.get(supplier) ?? 0) + 1);
+    spendBySupplier.set(supplier, (spendBySupplier.get(supplier) ?? 0) + Number(invoice.total ?? 0));
   }
 
-  const switches = [
-    ...input.groups.supplierSwitchImpacts.badSwitches,
-    ...input.groups.supplierSwitchImpacts.goodSwitches,
-    ...input.groups.supplierSwitchImpacts.volatilityReductions,
-  ]
-    .filter((entry) => trendMatchesPanel(entry.window, input.panelKeys))
-    .slice(0, 2);
+  const bySupplier = new Map<
+    string,
+    {
+      changes: number[];
+      ingredientIds: Set<string>;
+      ingredientDeltas: Map<string, { name: string; pct: number }>;
+    }
+  >();
 
-  for (const entry of switches) {
-    items.push(supplierSwitchToTrendItem(entry));
+  for (const row of historyInWindow) {
+    const supplier = row.supplier_name?.trim();
+    if (!supplier) continue;
+    const pct = priceHistoryDeltaPct(row);
+    const bucket = bySupplier.get(supplier) ?? {
+      changes: [],
+      ingredientIds: new Set<string>(),
+      ingredientDeltas: new Map(),
+    };
+    bucket.changes.push(pct);
+    bucket.ingredientIds.add(row.ingredient_id);
+    const label = ingredientLabel(row.ingredient_id, row.ingredient_name, input.data.ingredients);
+    const existing = bucket.ingredientDeltas.get(row.ingredient_id);
+    if (!existing || Math.abs(pct) > Math.abs(existing.pct)) {
+      bucket.ingredientDeltas.set(row.ingredient_id, { name: label, pct });
+    }
+    bySupplier.set(supplier, bucket);
   }
 
-  for (const entry of input.groups.supplierMovements.stablePricing
-    .filter((row) => trendMatchesPanel(row.dominantWindow, input.panelKeys))
-    .slice(0, 2)) {
-    items.push({
-      id: `supplier-stable:${entry.supplierName}:${entry.dominantWindow}`,
-      label: entry.narrative,
-      detail: `${entry.changeEvents} invoice event${entry.changeEvents === 1 ? "" : "s"} · ${entry.dominantWindowLabel}`,
-      window: entry.dominantWindow,
-      temporalTrend: entry.temporalTrend,
-      direction: "flat",
-      expandable: {
-        bullets: [
-          entry.operatorInsightLine,
-          entry.topIngredientLabels.length > 0
-            ? `Ingredients: ${entry.topIngredientLabels.join(", ")}`
-            : "No ingredient-level spikes in this lane.",
-        ],
-      },
+  const supplierNames = new Set([
+    ...bySupplier.keys(),
+    ...invoiceCountBySupplier.keys(),
+    ...spendBySupplier.keys(),
+  ]);
+
+  return [...supplierNames].map((supplierName) => {
+    const bucket = bySupplier.get(supplierName);
+    const changes = bucket?.changes ?? [];
+    const avgPct =
+      changes.length > 0 ? changes.reduce((sum, value) => sum + value, 0) / changes.length : 0;
+    const ingredientDeltas = [...(bucket?.ingredientDeltas.values() ?? [])];
+    const topIncreaseIngredient =
+      ingredientDeltas
+        .filter((entry) => entry.pct >= MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT)
+        .sort((a, b) => b.pct - a.pct)[0] ?? null;
+    const topDecreaseIngredient =
+      ingredientDeltas
+        .filter((entry) => entry.pct <= -MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT)
+        .sort((a, b) => a.pct - b.pct)[0] ?? null;
+
+    const ingredientIds = bucket?.ingredientIds ?? new Set<string>();
+    return {
+      supplierName,
+      avgPct,
+      changeEvents: changes.length,
+      invoiceCount: invoiceCountBySupplier.get(supplierName) ?? 0,
+      spendEur: spendBySupplier.get(supplierName) ?? 0,
+      ingredientIds,
+      topIncreaseIngredient,
+      topDecreaseIngredient,
+    };
+  });
+}
+
+function aggregateSuppliersAllTime(data: MarginAlertData): SupplierWindowAggregate[] {
+  const windows = buildOperationalWindows(new Date());
+  return aggregateSuppliersInWindow({
+    windowKey: "last_6_months",
+    data,
+    windows,
+  });
+}
+
+function supplierMemoryForAggregate(
+  stats: SupplierWindowAggregate,
+  data: MarginAlertData,
+): string | undefined {
+  return formatSupplierMemorySecondary({
+    invoiceCount: stats.invoiceCount,
+    spendEur: stats.spendEur,
+    ingredientCount: countSupplierIngredients(stats, data),
+    topIngredientName: resolveSupplierTopIngredientName({
+      supplierName: stats.supplierName,
+      ingredientIds: stats.ingredientIds,
+      data,
+    }),
+  });
+}
+
+function supplierExpandable(
+  stats: SupplierWindowAggregate,
+  data: MarginAlertData,
+): OperationalTrendExpandable {
+  const ingredientNames = [...stats.ingredientIds]
+    .map((id) => ingredientLabel(id, null, data.ingredients))
+    .slice(0, 8);
+  const bullets = [
+    `${stats.invoiceCount} invoice${stats.invoiceCount === 1 ? "" : "s"} in period`,
+    stats.spendEur > 0 ? `${formatCurrency(stats.spendEur)} spend in period` : "No invoice spend in period",
+    stats.changeEvents > 0
+      ? `${stats.changeEvents} invoice price change${stats.changeEvents === 1 ? "" : "s"} recorded`
+      : "No invoice price changes recorded in this period",
+    ingredientNames.length > 0
+      ? `Ingredients supplied: ${ingredientNames.join(", ")}`
+      : stats.invoiceCount > 0
+        ? "Awaiting additional invoice history"
+        : "No supplier price movement detected",
+  ];
+  return { bullets };
+}
+
+export function buildSupplierMovementMetrics(input: {
+  windowKey: OperationalWindowKey;
+  data: MarginAlertData;
+  windows: OperationalWindow[];
+  alerts?: MarginAlertItem[];
+}): OperationalTrendMetricSection {
+  const rows: OperationalTrendMetricRow[] = [];
+  let aggregates = aggregateSuppliersInWindow(input);
+  if (aggregates.length === 0) {
+    aggregates = aggregateSuppliersAllTime(input.data);
+  }
+  const totalSpend = aggregates.reduce((sum, entry) => sum + entry.spendEur, 0);
+  const ranked = [...aggregates].sort(
+    (a, b) =>
+      b.spendEur - a.spendEur ||
+      b.invoiceCount - a.invoiceCount ||
+      b.changeEvents - a.changeEvents ||
+      Math.abs(b.avgPct) - Math.abs(a.avgPct),
+  );
+  const usedNames = new Set<string>();
+
+  const pushSupplierRow = (
+    stats: SupplierWindowAggregate,
+    config: {
+      idSuffix: string;
+      value: string;
+      secondary?: string;
+    },
+  ) => {
+    if (rows.length >= 3 || usedNames.has(stats.supplierName)) return;
+    rows.push({
+      id: `supplier-${config.idSuffix}:${input.windowKey}:${stats.supplierName}`,
+      name: stats.supplierName,
+      value: config.value,
+      secondary: config.secondary ?? supplierMemoryForAggregate(stats, input.data),
+      expandable: supplierExpandable(stats, input.data),
+      supplierName: stats.supplierName,
+      badges: resolveOperationalTrendBadges({
+        supplierName: stats.supplierName,
+        supplierSpendSharePct: totalSpend > 0 ? (stats.spendEur / totalSpend) * 100 : undefined,
+        alerts: input.alerts,
+      }),
+    });
+    usedNames.add(stats.supplierName);
+  };
+
+  const topIncrease = aggregates
+    .filter((entry) => entry.avgPct >= MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT)
+    .sort((a, b) => b.avgPct - a.avgPct)[0];
+  const increaseSubject = topIncrease ?? ranked[0];
+  if (increaseSubject) {
+    const memory = supplierMemoryForAggregate(increaseSubject, input.data);
+    pushSupplierRow(increaseSubject, {
+      idSuffix: topIncrease ? "increase" : "fallback-spend",
+      value: topIncrease
+        ? `+${formatPercent(Math.round(topIncrease.avgPct))}`
+        : increaseSubject.spendEur > 0
+          ? formatCurrency(increaseSubject.spendEur)
+          : `${increaseSubject.changeEvents} price event${increaseSubject.changeEvents === 1 ? "" : "s"}`,
+      secondary: topIncrease
+        ? [
+            memory,
+            topIncrease.topIncreaseIngredient
+              ? `top ↑ ${topIncrease.topIncreaseIngredient.name} +${formatPercent(Math.round(topIncrease.topIncreaseIngredient.pct))}`
+              : null,
+          ]
+            .filter((part): part is string => Boolean(part))
+            .join(" · ")
+        : memory,
     });
   }
 
-  if (items.length === 0) {
-    return [
-      {
-        id: `supplier-empty:${input.panelKeys.join("-")}`,
-        label: "Supplier invoice lanes held steady in this window — no sustained increases or switches recorded.",
-      },
-    ];
+  const topDecrease = aggregates
+    .filter((entry) => entry.avgPct <= -MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT)
+    .sort((a, b) => a.avgPct - b.avgPct)[0];
+  const decreaseSubject =
+    topDecrease ??
+    ranked.find((entry) => !usedNames.has(entry.supplierName)) ??
+    ranked[0];
+  if (decreaseSubject) {
+    pushSupplierRow(decreaseSubject, {
+      idSuffix: topDecrease ? "decrease" : "fallback-memory",
+      value: topDecrease
+        ? formatPercent(Math.round(topDecrease.avgPct))
+        : decreaseSubject.invoiceCount > 0
+          ? `${decreaseSubject.invoiceCount} invoice${decreaseSubject.invoiceCount === 1 ? "" : "s"}`
+          : decreaseSubject.changeEvents > 0
+            ? `${decreaseSubject.changeEvents} price event${decreaseSubject.changeEvents === 1 ? "" : "s"}`
+            : formatCurrency(decreaseSubject.spendEur),
+      secondary: topDecrease
+        ? [
+            supplierMemoryForAggregate(decreaseSubject, input.data),
+            decreaseSubject.topDecreaseIngredient
+              ? `top ↓ ${decreaseSubject.topDecreaseIngredient.name} ${formatPercent(Math.round(decreaseSubject.topDecreaseIngredient.pct))}`
+              : null,
+          ]
+            .filter((part): part is string => Boolean(part))
+            .join(" · ")
+        : supplierMemoryForAggregate(decreaseSubject, input.data),
+    });
   }
 
-  return items.slice(0, 5);
+  const topSpend = [...aggregates]
+    .filter((entry) => entry.spendEur > 0)
+    .sort((a, b) => b.spendEur - a.spendEur)[0];
+  const spendSubject = topSpend ?? ranked.find((entry) => entry.spendEur > 0) ?? ranked[0];
+  if (spendSubject && rows.length < 3) {
+    pushSupplierRow(spendSubject, {
+      idSuffix: "spend",
+      value:
+        spendSubject.spendEur > 0
+          ? formatCurrency(spendSubject.spendEur)
+          : `${spendSubject.changeEvents} price event${spendSubject.changeEvents === 1 ? "" : "s"}`,
+      secondary: supplierMemoryForAggregate(spendSubject, input.data),
+    });
+  }
+
+  for (const stats of ranked) {
+    if (rows.length >= 3) break;
+    if (usedNames.has(stats.supplierName) && ranked.length > 1) continue;
+    pushSupplierRow(stats, {
+      idSuffix: `rank-${rows.length}`,
+      value:
+        stats.spendEur > 0
+          ? formatCurrency(stats.spendEur)
+          : stats.changeEvents > 0
+            ? `${stats.changeEvents} price events`
+            : formatPercent(Math.round(stats.avgPct)),
+    });
+  }
+
+  if (rows.length < 3) {
+    const portfolio = buildPortfolioCostExposure(input.data, 6);
+    for (const row of portfolio) {
+      if (rows.length >= 3) break;
+      if (rows.some((existing) => existing.id.includes(row.ingredientId))) continue;
+      rows.push({
+        id: `supplier-portfolio-fallback:${input.windowKey}:${row.ingredientId}`,
+        name: row.ingredientName,
+        value: `${formatCurrency(row.monthlyModeledExposureEur)}/mo`,
+        secondary: `${row.recipeCount} recipe${row.recipeCount === 1 ? "" : "s"} · ${formatPercent(Math.round(row.costSharePct))} cost share`,
+        ingredientId: row.ingredientId,
+        expandable: ingredientExpandable(
+          { ingredientId: row.ingredientId, name: row.ingredientName },
+          input.data,
+        ),
+        badges: resolveOperationalTrendBadges({
+          ingredientId: row.ingredientId,
+          monthlyExposureEur: row.monthlyModeledExposureEur,
+          costSharePct: row.costSharePct,
+          alerts: input.alerts,
+        }),
+      });
+    }
+    for (const ingredient of input.data.ingredients) {
+      if (rows.length >= 3) break;
+      if (rows.some((existing) => existing.id.includes(ingredient.id))) continue;
+      const exposure = buildPortfolioCostExposure(input.data, 50).find(
+        (row) => row.ingredientId === ingredient.id,
+      );
+      rows.push({
+        id: `supplier-ingredient-fallback:${input.windowKey}:${ingredient.id}`,
+        name: ingredient.name?.trim() || "Ingredient",
+        value: exposure
+          ? `${formatCurrency(exposure.monthlyModeledExposureEur)}/mo`
+          : formatCurrency(Number(ingredient.current_price ?? 0)),
+        secondary: exposure
+          ? `${exposure.recipeCount} recipes in menu`
+          : "No supplier price movement detected",
+        ingredientId: ingredient.id,
+        expandable: ingredientExpandable(
+          { ingredientId: ingredient.id, name: ingredient.name?.trim() || "Ingredient" },
+          input.data,
+        ),
+      });
+    }
+    const menuMetric = getRecipeMetrics(input.data.recipes).find((m) => m.recipe.type !== "prep");
+    if (rows.length < 3 && menuMetric) {
+      const recipeName = menuMetric.recipe.name?.trim() || "Recipe";
+      if (!rows.some((row) => row.name === recipeName)) {
+        rows.push({
+          id: `supplier-menu-fallback:${input.windowKey}:${menuMetric.recipe.id}`,
+          name: recipeName,
+          value: formatCurrency(menuMetric.foodCost),
+          secondary: `Menu food cost · ${menuMetric.ingredientCount} ingredients`,
+          recipeId: menuMetric.recipe.id,
+          expandable: recipeMetricExpandable(menuMetric),
+        });
+      }
+    }
+  }
+
+  return { title: "Supplier Movement", rows: dedupeTrendMetricRows(rows).slice(0, 3) };
+}
+
+type IngredientPriceMovement = {
+  ingredientId: string;
+  name: string;
+  pct: number;
+  previousPrice: number | null;
+  currentPrice: number | null;
+  unit: string | null;
+};
+
+function rankIngredientPriceMovements(input: {
+  windowKey: OperationalWindowKey;
+  data: MarginAlertData;
+  windows: OperationalWindow[];
+}): IngredientPriceMovement[] {
+  const historyInWindow = input.data.priceHistory.filter((row) =>
+    isInOperationalWindow(row.created_at, input.windowKey, input.windows),
+  );
+
+  const byIngredient = new Map<string, IngredientPriceMovement>();
+  for (const row of historyInWindow) {
+    const pct = priceHistoryDeltaPct(row);
+    if (Math.abs(pct) < MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT) continue;
+    const label = ingredientLabel(row.ingredient_id, row.ingredient_name, input.data.ingredients);
+    const existing = byIngredient.get(row.ingredient_id);
+    if (!existing || Math.abs(pct) > Math.abs(existing.pct)) {
+      byIngredient.set(row.ingredient_id, {
+        ingredientId: row.ingredient_id,
+        name: label,
+        pct,
+        previousPrice: row.previous_price,
+        currentPrice: row.new_price,
+        unit: row.ingredient_unit,
+      });
+    }
+  }
+
+  return [...byIngredient.values()];
+}
+
+function ingredientExpandable(
+  entry: { ingredientId: string; name: string },
+  data: MarginAlertData,
+): OperationalTrendExpandable {
+  const exposure = buildPortfolioCostExposure(data, 50).find(
+    (row) => row.ingredientId === entry.ingredientId,
+  );
+  const recipes = recipesUsingIngredient(data, entry.ingredientId);
+  const supplierContext = resolveIngredientSupplierContext(data, entry.ingredientId);
+  const catalogPrice =
+    data.ingredients.find((i) => i.id === entry.ingredientId)?.current_price ?? null;
+  const latestPrice =
+    supplierContext.latestUnitPriceLabel ??
+    (catalogPrice != null && catalogPrice > 0
+      ? `${formatCurrency(catalogPrice)}/${data.ingredients.find((i) => i.id === entry.ingredientId)?.unit?.trim() || "unit"}`
+      : "—");
+
+  return {
+    bullets: [
+      recipes.length > 0
+        ? `Recipes using: ${recipes.slice(0, 6).join(", ")}${recipes.length > 6 ? ` +${recipes.length - 6} more` : ""}`
+        : "No menu recipes linked",
+      supplierContext.currentSupplierName
+        ? `Current supplier: ${supplierContext.currentSupplierName}`
+        : "No supplier price movement detected",
+      supplierContext.latestInvoiceDateLabel
+        ? `Latest invoice: ${supplierContext.latestInvoiceDateLabel}`
+        : "Awaiting additional invoice history",
+      `Latest known price: ${latestPrice}`,
+      exposure
+        ? `Exposure: ${formatCurrency(exposure.monthlyModeledExposureEur)}/mo across ${exposure.recipeCount} recipe${exposure.recipeCount === 1 ? "" : "s"}`
+        : "Exposure not modeled for this line",
+    ],
+  };
+}
+
+function pushIngredientFallbackRows(
+  rows: OperationalTrendMetricRow[],
+  input: {
+    windowKey: OperationalWindowKey;
+    data: MarginAlertData;
+    alerts?: MarginAlertItem[];
+    mode: "spend" | "purchased" | "exposure";
+    excludeIds?: Set<string>;
+  },
+): void {
+  const portfolio = buildPortfolioCostExposure(input.data, 50);
+  const sorted =
+    input.mode === "purchased"
+      ? [...portfolio].sort((a, b) => b.recipeCount - a.recipeCount)
+      : input.mode === "exposure"
+        ? [...portfolio].sort(
+            (a, b) =>
+              b.monthlyModeledExposureEur - a.monthlyModeledExposureEur ||
+              b.recipeCount - a.recipeCount,
+          )
+        : [...portfolio].sort((a, b) => b.monthlyModeledExposureEur - a.monthlyModeledExposureEur);
+
+  const row = sorted.find((entry) => !input.excludeIds?.has(entry.ingredientId));
+  if (!row) return;
+
+  rows.push({
+    id: `ingredient-fallback-${input.mode}:${input.windowKey}:${row.ingredientId}`,
+    name: row.ingredientName,
+    value: `${formatCurrency(row.monthlyModeledExposureEur)}/mo`,
+    secondary: `${row.recipeCount} recipe${row.recipeCount === 1 ? "" : "s"} · ${formatPercent(Math.round(row.costSharePct))} cost share`,
+    ingredientId: row.ingredientId,
+    expandable: ingredientExpandable({ ingredientId: row.ingredientId, name: row.ingredientName }, input.data),
+    badges: resolveOperationalTrendBadges({
+      ingredientId: row.ingredientId,
+      monthlyExposureEur: row.monthlyModeledExposureEur,
+      costSharePct: row.costSharePct,
+      alerts: input.alerts,
+    }),
+  });
+}
+
+export function buildIngredientMovementMetrics(input: {
+  windowKey: OperationalWindowKey;
+  data: MarginAlertData;
+  windows: OperationalWindow[];
+  alerts?: MarginAlertItem[];
+}): OperationalTrendMetricSection {
+  const rows: OperationalTrendMetricRow[] = [];
+  const ranked = rankIngredientPriceMovements(input);
+  const usedIds = new Set<string>();
+
+  const increases = ranked
+    .filter((entry) => entry.pct >= MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT)
+    .sort((a, b) => b.pct - a.pct)
+    .slice(0, TREND_INGREDIENT_TOP_N);
+
+  const decreases = ranked
+    .filter((entry) => entry.pct <= -MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT)
+    .sort((a, b) => a.pct - b.pct)
+    .slice(0, TREND_INGREDIENT_TOP_N);
+
+  if (increases.length > 0) {
+    for (const entry of increases) {
+      usedIds.add(entry.ingredientId);
+      const priceLine = formatUnitPricePair(entry.previousPrice, entry.currentPrice, entry.unit);
+      const exposure = buildPortfolioCostExposure(input.data, 50).find(
+        (row) => row.ingredientId === entry.ingredientId,
+      );
+      rows.push({
+        id: `ingredient-increase:${input.windowKey}:${entry.ingredientId}`,
+        name: entry.name,
+        value: `+${formatPercent(Math.round(entry.pct))}`,
+        secondary: priceLine ?? undefined,
+        ingredientId: entry.ingredientId,
+        expandable: ingredientExpandable(entry, input.data),
+        badges: resolveOperationalTrendBadges({
+          ingredientId: entry.ingredientId,
+          monthlyExposureEur: exposure?.monthlyModeledExposureEur,
+          costSharePct: exposure?.costSharePct,
+          alerts: input.alerts,
+        }),
+      });
+    }
+  } else {
+    pushIngredientFallbackRows(rows, {
+      windowKey: input.windowKey,
+      data: input.data,
+      alerts: input.alerts,
+      mode: "spend",
+      excludeIds: usedIds,
+    });
+    const fallback = rows[rows.length - 1];
+    if (fallback) usedIds.add(fallback.id.split(":").pop() ?? "");
+  }
+
+  if (decreases.length > 0) {
+    for (const entry of decreases) {
+      usedIds.add(entry.ingredientId);
+      const priceLine = formatUnitPricePair(entry.previousPrice, entry.currentPrice, entry.unit);
+      const exposure = buildPortfolioCostExposure(input.data, 50).find(
+        (row) => row.ingredientId === entry.ingredientId,
+      );
+      rows.push({
+        id: `ingredient-decrease:${input.windowKey}:${entry.ingredientId}`,
+        name: entry.name,
+        value: formatPercent(Math.round(entry.pct)),
+        secondary: priceLine ?? undefined,
+        ingredientId: entry.ingredientId,
+        expandable: ingredientExpandable(entry, input.data),
+        badges: resolveOperationalTrendBadges({
+          ingredientId: entry.ingredientId,
+          monthlyExposureEur: exposure?.monthlyModeledExposureEur,
+          costSharePct: exposure?.costSharePct,
+          alerts: input.alerts,
+        }),
+      });
+    }
+  } else {
+    pushIngredientFallbackRows(rows, {
+      windowKey: input.windowKey,
+      data: input.data,
+      alerts: input.alerts,
+      mode: increases.length > 0 ? "purchased" : "exposure",
+      excludeIds: usedIds,
+    });
+  }
+
+  while (rows.length < TREND_INGREDIENT_TOP_N * 2) {
+    const before = rows.length;
+    pushIngredientFallbackRows(rows, {
+      windowKey: input.windowKey,
+      data: input.data,
+      alerts: input.alerts,
+      mode: rows.length % 2 === 0 ? "purchased" : "exposure",
+      excludeIds: new Set(
+        rows.flatMap((row) => {
+          const parts = row.id.split(":");
+          return parts[parts.length - 1] ? [parts[parts.length - 1]!] : [];
+        }),
+      ),
+    });
+    if (rows.length === before) break;
+  }
+
+  return {
+    title: "Ingredient Movement",
+    rows: dedupeTrendMetricRows(rows).slice(0, TREND_INGREDIENT_TOP_N * 2),
+  };
+}
+
+function recipeMetricExpandable(metric: RecipeMetric): OperationalTrendExpandable {
+  const driver = metric.topLine?.ingredientName ?? "Mixed ingredients";
+  const margin =
+    metric.grossMargin != null
+      ? `${formatPercent(Math.round(metric.grossMargin))} margin`
+      : "Margin n/a";
+  return {
+    bullets: [
+      `Top cost driver: ${driver}${metric.topLine?.contribution ? ` (${formatPercent(Math.round(metric.topLine.contribution))} of dish)` : ""}`,
+      `Food cost: ${formatCurrency(metric.foodCost)} per portion`,
+      margin,
+    ],
+  };
+}
+
+function recipeFallbackRow(
+  metric: RecipeMetric,
+  input: { windowKey: OperationalWindowKey; suffix: string },
+): OperationalTrendMetricRow {
+  const marginPct =
+    metric.grossMargin != null
+      ? formatPercent(Math.round(metric.grossMargin))
+      : formatCurrency(metric.foodCost);
+  return {
+    id: `recipe-fallback-${input.suffix}:${input.windowKey}:${metric.recipe.id}`,
+    name: metric.recipe.name?.trim() || "Recipe",
+    value: marginPct,
+    secondary: [
+      metric.topLine
+        ? `largest: ${metric.topLine.ingredientName} (${formatPercent(Math.round(metric.topLine.contribution))})`
+        : null,
+      `food cost ${formatCurrency(metric.foodCost)}`,
+    ]
+      .filter((part): part is string => Boolean(part))
+      .join(" · "),
+    recipeId: metric.recipe.id,
+    expandable: recipeMetricExpandable(metric),
+    badges: resolveOperationalTrendBadges({
+      ingredientId: metric.topLine?.ingredientId,
+      costSharePct: metric.topLine?.contribution,
+      monthlyExposureEur: estimateConcentrationMonthlyEur(metric),
+    }),
+  };
+}
+
+export function buildRecipeMarginMovementMetrics(input: {
+  windowKey: OperationalWindowKey;
+  groups: OperationalSynthesisGroups;
+  data: MarginAlertData;
+}): OperationalTrendMetricSection {
+  const rows: OperationalTrendMetricRow[] = [];
+  const menuMetrics = getRecipeMetrics(input.data.recipes).filter((m) => m.recipe.type !== "prep");
+  const winners = input.groups.recipeMarginMovements.improving
+    .filter((entry) => entry.window === input.windowKey)
+    .slice(0, 2);
+  const losers = input.groups.recipeMarginMovements.worsening
+    .filter((entry) => entry.window === input.windowKey)
+    .slice(0, 2);
+
+  if (winners.length > 0) {
+    for (const entry of winners) {
+      const marginValue =
+        entry.marginFromPct != null && entry.marginToPct != null
+          ? `${Math.round(entry.marginFromPct)}% → ${Math.round(entry.marginToPct)}%`
+          : entry.headline;
+      const ppLine =
+        entry.marginFromPct != null && entry.marginToPct != null
+          ? formatMarginPpDelta(entry.marginFromPct, entry.marginToPct)
+          : null;
+      const metric = menuMetrics.find((m) => m.recipe.name === entry.recipeName);
+      const secondaryParts = [
+        ppLine,
+        entry.estimatedMonthlyImpactEur > 0
+          ? `~${formatCurrency(entry.estimatedMonthlyImpactEur)}/mo`
+          : entry.marginFromPct == null
+            ? "Margin improved (no historical snapshot)"
+            : null,
+      ].filter((part): part is string => Boolean(part));
+      rows.push({
+        id: `recipe-winner:${input.windowKey}:${entry.recipeName}`,
+        name: entry.recipeName,
+        value: marginValue,
+        secondary: secondaryParts.length > 0 ? secondaryParts.join(" · ") : undefined,
+        recipeId: metric?.recipe.id,
+        expandable: metric ? recipeMetricExpandable(metric) : undefined,
+      });
+    }
+  } else {
+    const best = [...menuMetrics]
+      .filter((m) => m.grossMargin != null)
+      .sort((a, b) => (b.grossMargin ?? 0) - (a.grossMargin ?? 0))[0];
+    if (best) rows.push(recipeFallbackRow(best, { windowKey: input.windowKey, suffix: "high-margin" }));
+  }
+
+  if (losers.length > 0) {
+    for (const entry of losers) {
+      const marginValue =
+        entry.marginFromPct != null && entry.marginToPct != null
+          ? `${Math.round(entry.marginFromPct)}% → ${Math.round(entry.marginToPct)}%`
+          : entry.headline;
+      const ppLine =
+        entry.marginFromPct != null && entry.marginToPct != null
+          ? formatMarginPpDelta(entry.marginFromPct, entry.marginToPct)
+          : null;
+      const metric = menuMetrics.find((m) => m.recipe.name === entry.recipeName);
+      const secondaryParts = [
+        ppLine,
+        entry.estimatedMonthlyImpactEur > 0
+          ? `~${formatCurrency(entry.estimatedMonthlyImpactEur)}/mo`
+          : entry.marginFromPct == null
+            ? "Alert-only estimate (no margin snapshot)"
+            : null,
+      ].filter((part): part is string => Boolean(part));
+      rows.push({
+        id: `recipe-loser:${input.windowKey}:${entry.recipeName}`,
+        name: entry.recipeName,
+        value: marginValue,
+        secondary: secondaryParts.length > 0 ? secondaryParts.join(" · ") : undefined,
+        recipeId: metric?.recipe.id,
+        expandable: metric ? recipeMetricExpandable(metric) : undefined,
+      });
+    }
+  } else {
+    const worst = [...menuMetrics]
+      .filter((m) => m.grossMargin != null)
+      .sort((a, b) => (a.grossMargin ?? 0) - (b.grossMargin ?? 0))[0];
+    if (worst) rows.push(recipeFallbackRow(worst, { windowKey: input.windowKey, suffix: "low-margin" }));
+  }
+
+  if (rows.length < 2) {
+    const best = [...menuMetrics]
+      .filter((m) => m.grossMargin != null)
+      .sort((a, b) => (b.grossMargin ?? 0) - (a.grossMargin ?? 0))[0];
+    const worst = [...menuMetrics]
+      .filter((m) => m.grossMargin != null)
+      .sort((a, b) => (a.grossMargin ?? 0) - (b.grossMargin ?? 0))[0];
+    if (best && !rows.some((row) => row.name === best.recipe.name)) {
+      rows.push(recipeFallbackRow(best, { windowKey: input.windowKey, suffix: "high-margin" }));
+    }
+    if (worst && !rows.some((row) => row.name === worst.recipe.name)) {
+      rows.push(recipeFallbackRow(worst, { windowKey: input.windowKey, suffix: "low-margin" }));
+    }
+  }
+
+  if (rows.length < 2) {
+    const concentrated = [...menuMetrics].sort(
+      (a, b) => (b.topLine?.contribution ?? 0) - (a.topLine?.contribution ?? 0),
+    )[0];
+    if (concentrated) {
+      if (!rows.some((row) => row.id.includes("concentration"))) {
+        rows.push(
+          recipeFallbackRow(concentrated, {
+            windowKey: input.windowKey,
+            suffix: "concentration",
+          }),
+        );
+      }
+    }
+  }
+
+  if (rows.length < 2 && menuMetrics[0]) {
+    const metric = menuMetrics[0];
+    rows.push({
+      id: `recipe-fallback-food-cost:${input.windowKey}:${metric.recipe.id}`,
+      name: metric.recipe.name?.trim() || "Recipe",
+      value: formatCurrency(metric.foodCost),
+      secondary: [
+        metric.grossMargin != null
+          ? `${formatPercent(Math.round(metric.grossMargin))} margin`
+          : null,
+        metric.topLine ? `driver: ${metric.topLine.ingredientName}` : null,
+      ]
+        .filter((part): part is string => Boolean(part))
+        .join(" · "),
+      recipeId: metric.recipe.id,
+      expandable: recipeMetricExpandable(metric),
+    });
+  }
+
+  return { title: "Recipe Margin Movement", rows: dedupeTrendMetricRows(rows).slice(0, 4) };
+}
+
+function pickRecipeConcentrationFallback(data: MarginAlertData): {
+  recipeId: string;
+  recipeName: string;
+  dependencyName: string;
+  lineCost: number;
+  contributionPct: number;
+  foodCost: number;
+} | null {
+  let best: {
+    recipeId: string;
+    recipeName: string;
+    dependencyName: string;
+    lineCost: number;
+    contributionPct: number;
+    foodCost: number;
+  } | null = null;
+
+  for (const recipe of data.recipes) {
+    if (recipe.type === "prep") continue;
+    const lines: { name: string; lineCost: number }[] = [];
+    for (const line of recipe.recipe_ingredients ?? []) {
+      if (!line.ingredients) continue;
+      const qty = Number(line.quantity ?? 0);
+      const unitCost = Number(line.ingredients.current_price ?? 0);
+      if (qty <= 0 || unitCost <= 0) continue;
+      lines.push({
+        name: line.ingredients.name?.trim() || "Ingredient",
+        lineCost: qty * unitCost,
+      });
+    }
+    const foodCost = lines.reduce((sum, entry) => sum + entry.lineCost, 0);
+    if (foodCost <= 0) continue;
+    const topLine = [...lines].sort((a, b) => b.lineCost - a.lineCost)[0];
+    if (!topLine) continue;
+    const contributionPct = (topLine.lineCost / foodCost) * 100;
+    if (!best || topLine.lineCost > best.lineCost) {
+      best = {
+        recipeId: recipe.id,
+        recipeName: recipe.name?.trim() || "Recipe",
+        dependencyName: topLine.name,
+        lineCost: topLine.lineCost,
+        contributionPct,
+        foodCost,
+      };
+    }
+  }
+
+  return best;
+}
+
+export function buildExposureConcentrationMetrics(input: {
+  windowKey: OperationalWindowKey;
+  data: MarginAlertData;
+  windows: OperationalWindow[];
+  alerts?: MarginAlertItem[];
+}): OperationalTrendMetricSection {
+  const rows: OperationalTrendMetricRow[] = [];
+  const portfolioExposure = buildPortfolioCostExposure(input.data, 50);
+
+  const topIngredientExposure =
+    buildTopOperationalExposures(input.data, 1)[0] ?? portfolioExposure[0];
+  if (topIngredientExposure) {
+    const largestRecipeName = largestRecipeForIngredient(input.data, topIngredientExposure.ingredientId);
+    const exposure = buildExposureDetailFromRow(topIngredientExposure, largestRecipeName, input.data);
+    rows.push({
+      id: `exposure-ingredient:${input.windowKey}:${topIngredientExposure.ingredientId}`,
+      name: topIngredientExposure.ingredientName,
+      value: `${formatCurrency(exposure.monthlyExposureEur)}/mo`,
+      secondary: `${exposure.recipesAffected} recipe${exposure.recipesAffected === 1 ? "" : "s"} · largest: ${exposure.largestRecipeName} · 10% → +${formatCurrency(exposure.tenPercentImpactEur)}/mo · ${exposure.riskLevel}`,
+      exposure,
+      ingredientId: topIngredientExposure.ingredientId,
+      expandable: ingredientExpandable(
+        {
+          ingredientId: topIngredientExposure.ingredientId,
+          name: topIngredientExposure.ingredientName,
+        },
+        input.data,
+      ),
+      badges: resolveOperationalTrendBadges({
+        ingredientId: topIngredientExposure.ingredientId,
+        monthlyExposureEur: topIngredientExposure.monthlyModeledExposureEur,
+        costSharePct: topIngredientExposure.costSharePct,
+        alerts: input.alerts,
+      }),
+    });
+  } else if (portfolioExposure[0]) {
+    const row = portfolioExposure[0];
+    const exposure = buildExposureDetailFromRow(
+      row,
+      largestRecipeForIngredient(input.data, row.ingredientId),
+      input.data,
+    );
+    rows.push({
+      id: `exposure-ingredient-fallback:${input.windowKey}:${row.ingredientId}`,
+      name: row.ingredientName,
+      value: `${formatCurrency(exposure.monthlyExposureEur)}/mo`,
+      exposure,
+      ingredientId: row.ingredientId,
+      secondary: `${exposure.recipesAffected} recipes · ${exposure.riskLevel} risk`,
+      expandable: ingredientExpandable({ ingredientId: row.ingredientId, name: row.ingredientName }, input.data),
+    });
+  }
+
+  const aggregates = aggregateSuppliersInWindow(input);
+  const totalSpend = aggregates.reduce((sum, entry) => sum + entry.spendEur, 0);
+  const topSupplierSpend = aggregates
+    .filter((entry) => entry.spendEur > 0 || entry.invoiceCount > 0)
+    .sort((a, b) => b.spendEur - a.spendEur)[0];
+  if (topSupplierSpend) {
+    const historyInWindow = input.data.priceHistory.filter((row) =>
+      isInOperationalWindow(row.created_at, input.windowKey, input.windows),
+    );
+    const supplierIngredientIds = new Set(
+      historyInWindow
+        .filter((row) => row.supplier_name?.trim() === topSupplierSpend.supplierName)
+        .map((row) => row.ingredient_id),
+    );
+    const linkedExposure = portfolioExposure
+      .filter((row) => supplierIngredientIds.has(row.ingredientId))
+      .sort((a, b) => b.monthlyModeledExposureEur - a.monthlyModeledExposureEur)[0];
+
+    const impactEur = linkedExposure
+      ? estimateTenPercentSensitivityEur(linkedExposure.totalLineCost, linkedExposure.recipeCount)
+      : 0;
+    rows.push({
+      id: `exposure-supplier:${input.windowKey}:${topSupplierSpend.supplierName}`,
+      name: topSupplierSpend.supplierName,
+      value: linkedExposure
+        ? `${formatCurrency(linkedExposure.monthlyModeledExposureEur)}/mo`
+        : formatCurrency(topSupplierSpend.spendEur),
+      secondary: supplierMemoryForAggregate(topSupplierSpend, input.data),
+      supplierName: topSupplierSpend.supplierName,
+      expandable: supplierExpandable(topSupplierSpend, input.data),
+      badges: resolveOperationalTrendBadges({
+        supplierName: topSupplierSpend.supplierName,
+        monthlyExposureEur: linkedExposure?.monthlyModeledExposureEur,
+        supplierSpendSharePct:
+          totalSpend > 0 ? (topSupplierSpend.spendEur / totalSpend) * 100 : undefined,
+        alerts: input.alerts,
+      }),
+      exposure: linkedExposure
+        ? buildExposureDetailFromRow(
+            linkedExposure,
+            largestRecipeForIngredient(input.data, linkedExposure.ingredientId),
+            input.data,
+          )
+        : undefined,
+      ingredientId: linkedExposure?.ingredientId,
+    });
+    if (linkedExposure && impactEur > 0) {
+      const last = rows[rows.length - 1];
+      if (last) {
+        last.secondary = [
+          last.secondary,
+          `10% increase → +${formatCurrency(impactEur)}/mo`,
+          mapExposureRiskLevel({
+            monthlyExposureEur: linkedExposure.monthlyModeledExposureEur,
+            costSharePct: linkedExposure.costSharePct,
+          }),
+        ]
+          .filter(Boolean)
+          .join(" · ");
+      }
+    }
+  }
+
+  const menuMetrics = getRecipeMetrics(input.data.recipes).filter((m) => m.recipe.type !== "prep");
+  const topRecipe = menuMetrics
+    .filter((metric) => metric.foodCost > 0)
+    .sort((a, b) => {
+      const aShare = a.topLine?.contribution ?? 0;
+      const bShare = b.topLine?.contribution ?? 0;
+      return bShare - aShare || b.foodCost - a.foodCost;
+    })[0];
+  const recipeFallback = topRecipe ? null : pickRecipeConcentrationFallback(input.data);
+
+  if (topRecipe) {
+    const lineCost = topRecipe.topLine?.lineCost ?? topRecipe.foodCost;
+    const dependencyName = topRecipe.topLine?.ingredientName ?? "Mixed ingredients";
+    const contributionPct = topRecipe.topLine?.contribution ?? 0;
+    const monthlyEur = estimateConcentrationMonthlyEur(topRecipe);
+    const impactEur = estimateTenPercentSensitivityEur(lineCost, 1);
+    rows.push({
+      id: `exposure-recipe:${input.windowKey}:${topRecipe.recipe.id}`,
+      name: topRecipe.recipe.name?.trim() || "Recipe",
+      value:
+        monthlyEur > 0
+          ? `${formatCurrency(monthlyEur)}/mo`
+          : contributionPct > 0
+            ? formatPercent(Math.round(contributionPct))
+            : formatCurrency(lineCost),
+      secondary: [
+        "1 recipe",
+        `largest: ${dependencyName}`,
+        impactEur > 0 ? `10% → +${formatCurrency(impactEur)}/mo` : null,
+        mapExposureRiskLevel({ monthlyExposureEur: monthlyEur, costSharePct: contributionPct }),
+      ]
+        .filter((part): part is string => Boolean(part))
+        .join(" · "),
+      recipeId: topRecipe.recipe.id,
+      expandable: recipeMetricExpandable(topRecipe),
+      badges: resolveOperationalTrendBadges({
+        ingredientId: topRecipe.topLine?.ingredientId,
+        costSharePct: contributionPct,
+        monthlyExposureEur: monthlyEur,
+        alerts: input.alerts,
+      }),
+    });
+  } else if (recipeFallback) {
+    const monthlyEur = Math.round(recipeFallback.lineCost * 0.05 * ESTIMATED_COVERS_PER_MENU_RECIPE);
+    const impactEur = estimateTenPercentSensitivityEur(recipeFallback.lineCost, 1);
+    rows.push({
+      id: `exposure-recipe-fallback:${input.windowKey}:${recipeFallback.recipeId}`,
+      name: recipeFallback.recipeName,
+      value: monthlyEur > 0 ? `${formatCurrency(monthlyEur)}/mo` : formatCurrency(recipeFallback.lineCost),
+      recipeId: recipeFallback.recipeId,
+      secondary: [
+        "1 recipe",
+        `largest: ${recipeFallback.dependencyName}`,
+        impactEur > 0 ? `10% → +${formatCurrency(impactEur)}/mo` : null,
+        mapExposureRiskLevel({
+          monthlyExposureEur: monthlyEur,
+          costSharePct: recipeFallback.contributionPct,
+        }),
+      ]
+        .filter((part): part is string => Boolean(part))
+        .join(" · "),
+    });
+  }
+
+  if (rows.length < 3) {
+    const portfolio = portfolioExposure.slice(0, 6);
+    for (const row of portfolio) {
+      if (rows.length >= 3) break;
+      if (rows.some((existing) => existing.id.includes(row.ingredientId))) continue;
+      const largestRecipeName = largestRecipeForIngredient(input.data, row.ingredientId);
+      const exposure = buildExposureDetailFromRow(row, largestRecipeName, input.data);
+      rows.push({
+        id: `exposure-portfolio-fallback:${input.windowKey}:${row.ingredientId}`,
+        name: row.ingredientName,
+        value: `${formatCurrency(exposure.monthlyExposureEur)}/mo`,
+        exposure,
+        ingredientId: row.ingredientId,
+        secondary: `${exposure.recipesAffected} recipes · ${exposure.riskLevel}`,
+        expandable: ingredientExpandable(
+          { ingredientId: row.ingredientId, name: row.ingredientName },
+          input.data,
+        ),
+        badges: resolveOperationalTrendBadges({
+          ingredientId: row.ingredientId,
+          monthlyExposureEur: row.monthlyModeledExposureEur,
+          costSharePct: row.costSharePct,
+          alerts: input.alerts,
+        }),
+      });
+    }
+    const menuMetrics = getRecipeMetrics(input.data.recipes).filter((m) => m.recipe.type !== "prep");
+    const extraRecipe = menuMetrics.sort(
+      (a, b) => (b.topLine?.contribution ?? 0) - (a.topLine?.contribution ?? 0),
+    )[0];
+    if (rows.length < 3 && extraRecipe) {
+      const recipeName = extraRecipe.recipe.name?.trim() || "Recipe";
+      if (!rows.some((row) => row.name === recipeName)) {
+        const monthlyEur = estimateConcentrationMonthlyEur(extraRecipe);
+        rows.push({
+          id: `exposure-recipe-pad:${input.windowKey}:${extraRecipe.recipe.id}`,
+          name: recipeName,
+          value: monthlyEur > 0 ? `${formatCurrency(monthlyEur)}/mo` : formatCurrency(extraRecipe.foodCost),
+          recipeId: extraRecipe.recipe.id,
+          secondary: `1 recipe · ${extraRecipe.topLine?.ingredientName ?? "Mixed"}`,
+          expandable: recipeMetricExpandable(extraRecipe),
+        });
+      }
+    }
+  }
+
+  return { title: "Exposure & Concentration", rows: dedupeTrendMetricRows(rows).slice(0, 3) };
+}
+
+export function buildOperationalTrendsWindowMetrics(input: {
+  windowKey: OperationalWindowKey;
+  data: MarginAlertData;
+  windows: OperationalWindow[];
+  groups: OperationalSynthesisGroups;
+  alerts?: MarginAlertItem[];
+}): OperationalTrendsWindowMetrics {
+  return {
+    supplierMovement: buildSupplierMovementMetrics({
+      windowKey: input.windowKey,
+      data: input.data,
+      windows: input.windows,
+      alerts: input.alerts,
+    }),
+    ingredientMovement: buildIngredientMovementMetrics({
+      windowKey: input.windowKey,
+      data: input.data,
+      windows: input.windows,
+      alerts: input.alerts,
+    }),
+    recipeMarginMovement: buildRecipeMarginMovementMetrics({
+      windowKey: input.windowKey,
+      groups: input.groups,
+      data: input.data,
+    }),
+    exposureConcentration: buildExposureConcentrationMetrics({
+      windowKey: input.windowKey,
+      data: input.data,
+      windows: input.windows,
+      alerts: input.alerts,
+    }),
+  };
 }
 
 export function parseRecipeMarginRangeFromAlert(
@@ -2317,311 +3640,51 @@ export function parseRecipeMarginRangeFromAlert(
   return { marginFromPct, marginToPct };
 }
 
-function buildTrendMarginLabel(
-  entry: RecipeMarginMovementInsight,
-  panelLabel: string,
-): string {
-  if (entry.marginFromPct != null && entry.marginToPct != null) {
-    const windowPhrase = panelLabel === "Last 90 days" ? "90 days" : "6 months";
-    return `${entry.recipeName} margin ${Math.round(entry.marginFromPct)}% → ${Math.round(entry.marginToPct)}% over ${windowPhrase}`;
-  }
-  return entry.headline;
-}
-
-function recipeMarginToTrendItem(
-  entry: RecipeMarginMovementInsight,
-  panelLabel: string,
-): OperationalTrendItem {
-  const label = buildTrendMarginLabel(entry, panelLabel);
-  const expandableBullets = [
-    entry.reason.length > 8 ? `Cause: ${entry.reason}` : null,
-    entry.consequence ? `If ignored: ${entry.consequence}` : null,
-    `Next step: ${entry.operatorAction}`,
-  ].filter((line): line is string => Boolean(line));
-
-  return {
-    id: `recipe-margin:${entry.recipeName}:${entry.movement}:${entry.window}`,
-    label,
-    detail:
-      entry.estimatedMonthlyImpactEur > 0
-        ? `~${formatCurrency(entry.estimatedMonthlyImpactEur)}/mo modeled impact`
-        : undefined,
-    window: entry.window,
-    direction: entry.movement === "worsening" ? "down" : "up",
-    expandable: expandableBullets.length > 0 ? { bullets: expandableBullets } : undefined,
-  };
-}
-
-function buildTrendMarginItems(
-  groups: OperationalSynthesisGroups,
-  panelKeys: OperationalWindowKey[],
-  panelLabel: string,
-): OperationalTrendItem[] {
-  const items: OperationalTrendItem[] = [];
-
-  for (const entry of groups.recipeMarginMovements.worsening.filter((row) =>
-    trendMatchesPanel(row.window, panelKeys),
-  ).slice(0, 3)) {
-    items.push(recipeMarginToTrendItem(entry, panelLabel));
-  }
-
-  for (const entry of groups.recipeMarginMovements.improving.filter((row) =>
-    trendMatchesPanel(row.window, panelKeys),
-  ).slice(0, 2)) {
-    items.push(recipeMarginToTrendItem(entry, panelLabel));
-  }
-
-  if (items.length === 0) {
-    return [
-      {
-        id: `margin-empty:${panelKeys.join("-")}`,
-        label: "Recipe margins held in band — no modeled slips or recoveries flagged in this window.",
-      },
-    ];
-  }
-
-  return items.slice(0, 5);
-}
-
-function buildTrendProcurementItems(input: {
-  panelKeys: OperationalWindowKey[];
-  monthlyMarginPressure: MonthlyMarginPressureSummary;
-  groups: OperationalSynthesisGroups;
-  categoryPressure: SynthesizedCategoryPressureRow[];
-  alerts: MarginAlertItem[];
-}): OperationalTrendItem[] {
-  const items: OperationalTrendItem[] = [];
-
-  if (input.monthlyMarginPressure.biggestInflationDriver && input.panelKeys.includes("last_3_months")) {
-    items.push({
-      id: "procurement-inflation-driver",
-      label: `Invoice pressure: ${input.monthlyMarginPressure.biggestInflationDriver}`,
-      expandable: {
-        bullets: [
-          input.monthlyMarginPressure.estimatedMarginPressureLine,
-          input.monthlyMarginPressure.mostAffectedCategory
-            ? `Most affected category: ${input.monthlyMarginPressure.mostAffectedCategory}`
-            : "Review category mix on the next invoice cycle.",
-        ],
-      },
-    });
-  }
-
-  const materialIncreases = countMaterialIngredientIncreases(input.alerts);
-  if (materialIncreases > 0) {
-    items.push({
-      id: "procurement-material-increases",
-      label: `${materialIncreases} SKU${materialIncreases === 1 ? "" : "s"} with material invoice increases in the lookback.`,
-    });
-  }
-
-  for (const row of input.categoryPressure.filter((entry) => entry.trend === "up").slice(0, 2)) {
-    items.push({
-      id: `procurement-category-up:${row.group}`,
-      label: `${row.label}: ${row.pressureLine}`,
-      detail: shortOperationalLine(row.interpretiveLine, 72),
-      expandable: {
-        bullets: [row.operationalLine, row.interpretiveLine].filter(
-          (line) => line.trim().length > 0,
-        ),
-      },
-    });
-  }
-
-  const switchMemory = [
-    ...input.groups.supplierSwitchImpacts.badSwitches,
-    ...input.groups.supplierSwitchImpacts.goodSwitches,
-    ...input.groups.supplierSwitchImpacts.stableSwitches,
-  ]
-    .filter((entry) => trendMatchesPanel(entry.window, input.panelKeys))
-    .slice(0, 2);
-
-  for (const entry of switchMemory) {
-    items.push({
-      id: `procurement-switch-memory:${entry.ingredientId}:${entry.switchedAt}`,
-      label: `Switch memory — ${entry.ingredientName}: ${entry.fromSupplier} → ${entry.toSupplier}`,
-      detail: entry.impactLine,
-      window: entry.window,
-      direction: supplierDirectionFromChange(entry.changePct),
-      expandable: {
-        bullets: [entry.narrative, entry.consequence, entry.operatorAction],
-      },
-    });
-  }
-
-  for (const exposure of input.groups.stableOperationalAreas.highOperationalExposureIngredients.slice(
-    0,
-    2,
-  )) {
-    items.push({
-      id: `procurement-concentration:${exposure.ingredientId}`,
-      label: `${exposure.ingredientName} concentrated across ${exposure.recipeCount} recipe${exposure.recipeCount === 1 ? "" : "s"} (${formatPercent(Math.round(exposure.costSharePct))} cost share)`,
-      detail: `~${formatCurrency(exposure.monthlyModeledExposureEur)}/mo modeled exposure`,
-      expandable: {
-        bullets: [
-          "High plate concentration — portion and supplier discipline on this line moves menu margin.",
-        ],
-      },
-    });
-  }
-
-  for (const category of input.groups.stableOperationalAreas.categories
-    .filter((entry) => trendMatchesPanel(entry.window, input.panelKeys))
-    .slice(0, 2)) {
-    items.push({
-      id: `procurement-stable-category:${category.category}`,
-      label: `${category.label}: ${category.note}`,
-      window: category.window,
-      direction: category.trend === "down" ? "down" : "flat",
-    });
-  }
-
-  if (items.length === 0) {
-    return [
-      {
-        id: `procurement-empty:${input.panelKeys.join("-")}`,
-        label:
-          "Procurement basket steady — no dominant inflation, switch history, or concentration shifts in this window.",
-      },
-    ];
-  }
-
-  return items.slice(0, 5);
-}
-
-function buildTrendRecommendationItems(input: {
-  panelKeys: OperationalWindowKey[];
-  prioritizedInsights: PrioritizedOperationalInsight[];
-  recoverySignals: GroupedRecoveryOpportunity[];
-  monthlyMarginPressure: MonthlyMarginPressureSummary;
-}): OperationalTrendItem[] {
-  const items: OperationalTrendItem[] = [];
-
-  for (const insight of input.prioritizedInsights
-    .filter((row) => row.decisionTier === "now")
-    .slice(0, 2)) {
-    items.push({
-      id: `recommendation-insight:${insight.id}`,
-      label: insight.operatorAction,
-      detail: insight.title,
-      expandable: {
-        bullets: [
-          insight.operatorInsightLine,
-          insight.consequence ? `If ignored: ${insight.consequence}` : insight.impactLine,
-        ].filter((line) => line.length > 0),
-      },
-    });
-  }
-
-  for (const card of input.recoverySignals
-    .filter((row) => row.decisionTier === "now" || row.decisionTier === "monitor")
-    .slice(0, 2)) {
-    items.push({
-      id: `recommendation-recovery:${card.id}`,
-      label: card.operatorActions[0] ?? card.why,
-      detail: card.title,
-      expandable: {
-        bullets: [card.why, card.savingsLine].filter((line) => line.length > 0),
-      },
-    });
-  }
-
-  if (items.length === 0) {
-    if (input.monthlyMarginPressure.estimatedMarginPressureEur < 25) {
-      items.push({
-        id: "recommendation-hold-pricing",
-        label: "Hold menu pricing — validate next invoices before prep or spec changes.",
-      });
-    } else {
-      items.push({
-        id: "recommendation-watch-suppliers",
-        label: "Watch supplier lanes on the next two delivery cycles before repricing the menu.",
-      });
-    }
-  }
-
-  return items.slice(0, 3);
-}
-
 function buildOperationalTrendPanel(input: {
   label: string;
-  windowKeys: OperationalWindowKey[];
+  windowKey: OperationalWindowKey;
   groups: OperationalSynthesisGroups;
-  monthlyMarginPressure: MonthlyMarginPressureSummary;
-  prioritizedInsights: PrioritizedOperationalInsight[];
-  alerts: MarginAlertItem[];
-  categoryPressure: SynthesizedCategoryPressureRow[];
   data: MarginAlertData;
   windows: OperationalWindow[];
+  alerts?: MarginAlertItem[];
 }): OperationalTrendPanel {
   return {
     label: input.label,
-    windowKeys: input.windowKeys,
-    supplierMovement: trendSubsection(
-      "Supplier movement",
-      buildTrendSupplierItems({
-        groups: input.groups,
-        panelKeys: input.windowKeys,
-        priceHistory: input.data.priceHistory,
-        windows: input.windows,
-      }),
-    ),
-    marginMovement: trendSubsection(
-      "Margin movement",
-      buildTrendMarginItems(input.groups, input.windowKeys, input.label),
-    ),
-    procurementSignals: trendSubsection(
-      "Procurement memory",
-      buildTrendProcurementItems({
-        panelKeys: input.windowKeys,
-        monthlyMarginPressure: input.monthlyMarginPressure,
-        groups: input.groups,
-        categoryPressure: input.categoryPressure,
-        alerts: input.alerts,
-      }),
-    ),
-    operationalRecommendation: trendSubsection(
-      "Operational recommendation",
-      buildTrendRecommendationItems({
-        panelKeys: input.windowKeys,
-        prioritizedInsights: input.prioritizedInsights,
-        recoverySignals: input.groups.recoverySignals,
-        monthlyMarginPressure: input.monthlyMarginPressure,
-      }),
-    ),
+    windowKey: input.windowKey,
+    metrics: buildOperationalTrendsWindowMetrics({
+      windowKey: input.windowKey,
+      data: input.data,
+      windows: input.windows,
+      groups: input.groups,
+      alerts: input.alerts,
+    }),
   };
 }
 
-/** Side-by-side trend synthesis for 90-day and 6-month windows — deterministic copy only. */
+/** Side-by-side trend panels for 90-day and 6-month windows — structured metric rows only. */
 export function buildOperationalTrendsPanels(input: {
   operationalSynthesisGroups: OperationalSynthesisGroups;
-  monthlyMarginPressure: MonthlyMarginPressureSummary;
-  prioritizedInsights: PrioritizedOperationalInsight[];
-  alerts: MarginAlertItem[];
-  categoryPressure: SynthesizedCategoryPressureRow[];
   data: MarginAlertData;
   operationalWindows: OperationalWindow[];
+  alerts?: MarginAlertItem[];
 }): OperationalTrendsPanels {
   const base = {
     groups: input.operationalSynthesisGroups,
-    monthlyMarginPressure: input.monthlyMarginPressure,
-    prioritizedInsights: input.prioritizedInsights,
-    alerts: input.alerts,
-    categoryPressure: input.categoryPressure,
     data: input.data,
     windows: input.operationalWindows,
+    alerts: input.alerts,
   };
 
   return {
     last90Days: buildOperationalTrendPanel({
       ...base,
       label: "Last 90 days",
-      windowKeys: ["last_30_days", "last_3_months"],
+      windowKey: "last_3_months",
     }),
     last6Months: buildOperationalTrendPanel({
       ...base,
       label: "Last 6 months",
-      windowKeys: ["last_30_days", "last_3_months", "last_6_months"],
+      windowKey: "last_6_months",
     }),
   };
 }
@@ -2867,11 +3930,19 @@ export function buildSynthesisViewModel(input: {
 
   const trendsPanels = buildOperationalTrendsPanels({
     operationalSynthesisGroups,
+    data: input.data,
+    operationalWindows: windows,
+    alerts: input.alerts,
+  });
+
+  const ownerReview = buildOwnerReviewViewModel({
+    data: input.data,
+    alerts: input.alerts,
     monthlyMarginPressure,
     prioritizedInsights,
-    alerts: input.alerts,
-    categoryPressure,
-    data: input.data,
+    concentrationGroups,
+    operationalSynthesisGroups,
+    monitorInsights,
     operationalWindows: windows,
   });
 
@@ -2902,6 +3973,7 @@ export function buildSynthesisViewModel(input: {
       ...groupedRecovery.map((o) => o.title),
       ...marginRisks.map((c) => c.event),
     ],
+    ownerReview,
   };
 }
 
@@ -3637,4 +4709,536 @@ function buildStableOperationalAreas(
     }));
 
   return { categories, highOperationalExposureIngredients };
+}
+
+const NEGATIVE_INSIGHT_CATEGORIES = new Set<PrioritizedOperationalInsight["category"]>([
+  "price_inflation",
+  "concentration",
+  "recipe_spread",
+  "supplier_instability",
+  "operational_exposure",
+]);
+
+function ownerReviewImpactLine(monthlyImpactEur: number, prefix = "+"): string | null {
+  if (monthlyImpactEur < 1) return null;
+  return `${prefix}${formatCurrency(monthlyImpactEur)}/month`;
+}
+
+function countSupplierMovementDirections(
+  data: MarginAlertData,
+  windows: OperationalWindow[],
+): { increases: number; decreases: number } {
+  let aggregates = aggregateSuppliersInWindow({
+    windowKey: "last_3_months",
+    data,
+    windows,
+  });
+  if (aggregates.length === 0) {
+    aggregates = aggregateSuppliersAllTime(data);
+  }
+  return {
+    increases: aggregates.filter((entry) => entry.avgPct >= MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT).length,
+    decreases: aggregates.filter((entry) => entry.avgPct <= -MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT).length,
+  };
+}
+
+function collectSupplierIngredientChanges(
+  supplierName: string,
+  data: MarginAlertData,
+  windowKey: OperationalWindowKey,
+  windows: OperationalWindow[],
+): SupplierIngredientChange[] {
+  const byIngredient = new Map<string, SupplierIngredientChange>();
+  for (const row of data.priceHistory) {
+    if (row.supplier_name?.trim() !== supplierName) continue;
+    if (!isInOperationalWindow(row.created_at, windowKey, windows)) continue;
+    const pct = priceHistoryDeltaPct(row);
+    if (Math.abs(pct) < MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT) continue;
+    const name = ingredientLabel(row.ingredient_id, row.ingredient_name, data.ingredients);
+    const existing = byIngredient.get(row.ingredient_id);
+    if (!existing || Math.abs(pct) > Math.abs(existing.changePct)) {
+      byIngredient.set(row.ingredient_id, {
+        ingredientId: row.ingredient_id,
+        name,
+        changePct: Number(pct.toFixed(1)),
+        priceLine: formatUnitPricePair(row.previous_price, row.new_price, row.ingredient_unit),
+      });
+    }
+  }
+  return [...byIngredient.values()].sort(
+    (a, b) => Math.abs(b.changePct) - Math.abs(a.changePct) || b.changePct - a.changePct,
+  );
+}
+
+function supplierWatchDirection(avgPct: number): SupplierWatchDirection {
+  if (avgPct >= MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT) return "up";
+  if (avgPct <= -MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT) return "down";
+  return "stable";
+}
+
+function supplierImpactFromSwitches(
+  supplierName: string,
+  groups: OperationalSynthesisGroups,
+): number {
+  return groups.supplierSwitchImpacts.badSwitches
+    .filter(
+      (entry) => entry.fromSupplier === supplierName || entry.toSupplier === supplierName,
+    )
+    .reduce((sum, entry) => sum + entry.estimatedMonthlyImpactEur, 0);
+}
+
+function recipeIdForName(data: MarginAlertData, recipeName: string): string | undefined {
+  return getRecipeMetrics(data.recipes).find(
+    (metric) => metric.recipe.name?.trim() === recipeName.trim(),
+  )?.recipe.id;
+}
+
+function ingredientIncreaseLineFromReason(reason: string): string | null {
+  const trimmed = reason.trim();
+  if (!trimmed) return null;
+  const costIncrease = trimmed.match(/Cost increase on (.+?)(?:\.|$)/i);
+  if (costIncrease?.[1]) return `Affected by ${costIncrease[1].trim()} increase`;
+  const spike = trimmed.match(/(.+?) price (?:rose|increased|up)/i);
+  if (spike?.[1]) return `Affected by ${spike[1].trim()} increase`;
+  if (/ingredient|supplier|price/i.test(trimmed)) {
+    return shortOperationalLine(trimmed, 72);
+  }
+  return null;
+}
+
+function buildOwnerReviewFinancialRisks(input: {
+  data: MarginAlertData;
+  prioritizedInsights: PrioritizedOperationalInsight[];
+  concentrationGroups: GroupedConcentrationInsight[];
+  groups: OperationalSynthesisGroups;
+  operationalWindows: OperationalWindow[];
+}): OwnerReviewRow[] {
+  const rows: OwnerReviewRow[] = [];
+  const seen = new Set<string>();
+
+  const push = (row: OwnerReviewRow) => {
+    if (seen.has(row.id)) return;
+    seen.add(row.id);
+    rows.push(row);
+  };
+
+  for (const entry of input.groups.recipeMarginMovements.worsening) {
+    push({
+      id: `risk-recipe:${entry.recipeName}`,
+      monthlyImpactEur: entry.estimatedMonthlyImpactEur,
+      impactLine: ownerReviewImpactLine(entry.estimatedMonthlyImpactEur),
+      title: entry.recipeName,
+      whatChanged: shortOperationalLine(entry.headline || entry.reason),
+      target: "/recipes",
+      recipeId: recipeIdForName(input.data, entry.recipeName),
+    });
+  }
+
+  for (const entry of input.groups.supplierSwitchImpacts.badSwitches) {
+    push({
+      id: `risk-switch:${entry.ingredientId}:${entry.switchedAt}`,
+      monthlyImpactEur: entry.estimatedMonthlyImpactEur,
+      impactLine: ownerReviewImpactLine(entry.estimatedMonthlyImpactEur),
+      title: entry.ingredientName,
+      whatChanged: shortOperationalLine(entry.narrative),
+      target: "/ingredients",
+      ingredientId: entry.ingredientId,
+      supplierName: entry.toSupplier,
+    });
+  }
+
+  for (const entry of input.groups.supplierMovements.largestIncreases) {
+    const switchImpact = supplierImpactFromSwitches(entry.supplierName, input.groups);
+    push({
+      id: `risk-supplier:${entry.supplierName}`,
+      monthlyImpactEur: switchImpact,
+      impactLine: switchImpact >= 1 ? ownerReviewImpactLine(switchImpact) : null,
+      title: entry.supplierName,
+      whatChanged: shortOperationalLine(entry.narrative),
+      target: "/invoices",
+      supplierName: entry.supplierName,
+    });
+  }
+
+  for (const group of input.concentrationGroups) {
+    push({
+      id: `risk-concentration:${group.id}`,
+      monthlyImpactEur: group.estimatedMonthlyImpactEur,
+      impactLine: group.estimatedImpactLine,
+      title: group.title,
+      whatChanged: shortOperationalLine(group.detail),
+      target: group.target,
+    });
+  }
+
+  for (const insight of input.prioritizedInsights) {
+    if (!NEGATIVE_INSIGHT_CATEGORIES.has(insight.category)) continue;
+    if (insight.category === "concentration" && insight.storyKey) {
+      const covered = input.concentrationGroups.some((group) => group.storyKey === insight.storyKey);
+      if (covered) continue;
+    }
+    push({
+      id: `risk-insight:${insight.id}`,
+      monthlyImpactEur: insight.monthlyImpactEur,
+      impactLine: insight.impactLine,
+      title: insight.title,
+      whatChanged: shortOperationalLine(insight.detail || insight.operatorInsightLine),
+      target: insight.target,
+    });
+  }
+
+  const ingredientIncreases = rankIngredientPriceMovements({
+    windowKey: "last_3_months",
+    data: input.data,
+    windows: input.operationalWindows,
+  }).filter((entry) => entry.pct >= MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT);
+
+  for (const entry of ingredientIncreases.slice(0, 6)) {
+    const exposure = buildPortfolioCostExposure(input.data, 50).find(
+      (row) => row.ingredientId === entry.ingredientId,
+    );
+    const monthlyImpactEur = exposure
+      ? Math.round(exposure.monthlyModeledExposureEur * (entry.pct / 100))
+      : 0;
+    if (monthlyImpactEur < MIN_VISIBLE_IMPACT_EUR) continue;
+    push({
+      id: `risk-ingredient:${entry.ingredientId}`,
+      monthlyImpactEur,
+      impactLine: ownerReviewImpactLine(monthlyImpactEur),
+      title: entry.name,
+      whatChanged:
+        formatUnitPricePair(entry.previousPrice, entry.currentPrice, entry.unit) ??
+        `Unit price up ${formatPercent(Math.round(entry.pct))}`,
+      target: "/ingredients",
+      ingredientId: entry.ingredientId,
+    });
+  }
+
+  return rows.sort(
+    (a, b) =>
+      b.monthlyImpactEur - a.monthlyImpactEur ||
+      a.title.localeCompare(b.title),
+  );
+}
+
+function buildOwnerReviewOpportunities(input: {
+  data: MarginAlertData;
+  groups: OperationalSynthesisGroups;
+  operationalWindows: OperationalWindow[];
+}): OwnerReviewRow[] {
+  const rows: OwnerReviewRow[] = [];
+  const seen = new Set<string>();
+
+  const push = (row: OwnerReviewRow) => {
+    if (seen.has(row.id)) return;
+    seen.add(row.id);
+    rows.push(row);
+  };
+
+  for (const entry of input.groups.supplierSwitchImpacts.goodSwitches) {
+    push({
+      id: `opp-switch:${entry.ingredientId}:${entry.switchedAt}`,
+      monthlyImpactEur: entry.estimatedMonthlyImpactEur,
+      impactLine: ownerReviewImpactLine(entry.estimatedMonthlyImpactEur, "−"),
+      title: entry.ingredientName,
+      whatChanged: shortOperationalLine(entry.narrative),
+      target: "/ingredients",
+      ingredientId: entry.ingredientId,
+      supplierName: entry.toSupplier,
+    });
+  }
+
+  for (const entry of input.groups.supplierSwitchImpacts.volatilityReductions) {
+    if (entry.estimatedMonthlyImpactEur < 1) continue;
+    push({
+      id: `opp-volatility:${entry.ingredientId}:${entry.switchedAt}`,
+      monthlyImpactEur: entry.estimatedMonthlyImpactEur,
+      impactLine: ownerReviewImpactLine(entry.estimatedMonthlyImpactEur, "−"),
+      title: entry.ingredientName,
+      whatChanged: shortOperationalLine(entry.narrative),
+      target: "/ingredients",
+      ingredientId: entry.ingredientId,
+      supplierName: entry.toSupplier,
+    });
+  }
+
+  for (const entry of input.groups.recipeMarginMovements.improving) {
+    if (entry.estimatedMonthlyImpactEur < 1 && entry.trendStatus !== "improving") continue;
+    push({
+      id: `opp-recipe:${entry.recipeName}`,
+      monthlyImpactEur: entry.estimatedMonthlyImpactEur,
+      impactLine:
+        entry.estimatedMonthlyImpactEur >= 1
+          ? ownerReviewImpactLine(entry.estimatedMonthlyImpactEur, "−")
+          : null,
+      title: entry.recipeName,
+      whatChanged: shortOperationalLine(entry.headline || entry.reason),
+      target: "/recipes",
+      recipeId: recipeIdForName(input.data, entry.recipeName),
+    });
+  }
+
+  for (const entry of input.groups.recoverySignals) {
+    if (entry.estimatedMonthlyRecoveryEur < 1) continue;
+    push({
+      id: `opp-recovery:${entry.id}`,
+      monthlyImpactEur: entry.estimatedMonthlyRecoveryEur,
+      impactLine: entry.savingsLine,
+      title: entry.title,
+      whatChanged: shortOperationalLine(entry.why),
+      target: entry.target,
+    });
+  }
+
+  const ingredientDecreases = rankIngredientPriceMovements({
+    windowKey: "last_3_months",
+    data: input.data,
+    windows: input.operationalWindows,
+  }).filter((entry) => entry.pct <= -MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT);
+
+  for (const entry of ingredientDecreases.slice(0, 6)) {
+    const exposure = buildPortfolioCostExposure(input.data, 50).find(
+      (row) => row.ingredientId === entry.ingredientId,
+    );
+    const monthlyImpactEur = exposure
+      ? Math.round(exposure.monthlyModeledExposureEur * (Math.abs(entry.pct) / 100))
+      : 0;
+    push({
+      id: `opp-ingredient:${entry.ingredientId}`,
+      monthlyImpactEur,
+      impactLine:
+        monthlyImpactEur >= 1 ? ownerReviewImpactLine(monthlyImpactEur, "−") : null,
+      title: entry.name,
+      whatChanged:
+        formatUnitPricePair(entry.previousPrice, entry.currentPrice, entry.unit) ??
+        `Unit price down ${formatPercent(Math.round(Math.abs(entry.pct)))}`,
+      target: "/ingredients",
+      ingredientId: entry.ingredientId,
+    });
+  }
+
+  return rows.sort(
+    (a, b) =>
+      b.monthlyImpactEur - a.monthlyImpactEur ||
+      a.title.localeCompare(b.title),
+  );
+}
+
+function buildOwnerReviewSuppliersToWatch(input: {
+  data: MarginAlertData;
+  groups: OperationalSynthesisGroups;
+  operationalWindows: OperationalWindow[];
+}): SupplierWatchRow[] {
+  let aggregates = aggregateSuppliersInWindow({
+    windowKey: "last_3_months",
+    data: input.data,
+    windows: input.operationalWindows,
+  });
+  if (aggregates.length === 0) {
+    aggregates = aggregateSuppliersAllTime(input.data);
+  }
+
+  const supplierNames = new Set<string>([
+    ...aggregates.map((entry) => entry.supplierName),
+    ...input.groups.supplierMovements.largestIncreases.map((entry) => entry.supplierName),
+    ...input.groups.supplierMovements.stablePricing.map((entry) => entry.supplierName),
+  ]);
+
+  const rows: SupplierWatchRow[] = [];
+  for (const supplierName of supplierNames) {
+    const stats = aggregates.find((entry) => entry.supplierName === supplierName);
+    const avgPct = stats?.avgPct ?? 0;
+    const direction = supplierWatchDirection(avgPct);
+    const switchImpact = supplierImpactFromSwitches(supplierName, input.groups);
+    const ingredientChanges = collectSupplierIngredientChanges(
+      supplierName,
+      input.data,
+      "last_3_months",
+      input.operationalWindows,
+    );
+    if (
+      direction === "stable" &&
+      switchImpact < 1 &&
+      ingredientChanges.length === 0 &&
+      !input.groups.supplierMovements.largestIncreases.some(
+        (entry) => entry.supplierName === supplierName,
+      )
+    ) {
+      continue;
+    }
+
+    rows.push({
+      id: `supplier-watch:${supplierName}`,
+      supplierName,
+      direction,
+      estimatedImpactEur: switchImpact >= 1 ? switchImpact : null,
+      impactLine: switchImpact >= 1 ? ownerReviewImpactLine(switchImpact) : null,
+      ingredientChanges,
+    });
+  }
+
+  return rows.sort((a, b) => {
+    const directionRank = { up: 0, down: 1, stable: 2 };
+    return (
+      directionRank[a.direction] - directionRank[b.direction] ||
+      (b.estimatedImpactEur ?? 0) - (a.estimatedImpactEur ?? 0) ||
+      a.supplierName.localeCompare(b.supplierName)
+    );
+  });
+}
+
+function buildOwnerReviewAffectedRecipes(input: {
+  data: MarginAlertData;
+  alerts: MarginAlertItem[];
+  groups: OperationalSynthesisGroups;
+}): AffectedRecipeRow[] {
+  const rows: AffectedRecipeRow[] = [];
+  const seen = new Set<string>();
+
+  for (const entry of input.groups.recipeMarginMovements.worsening) {
+    const recipeId = recipeIdForName(input.data, entry.recipeName);
+    const marginChange =
+      entry.marginFromPct != null && entry.marginToPct != null
+        ? `${Math.round(entry.marginFromPct)}% → ${Math.round(entry.marginToPct)}%`
+        : null;
+    const affectedByLine =
+      ingredientIncreaseLineFromReason(entry.reason) ??
+      shortOperationalLine(entry.reason, 72);
+    rows.push({
+      id: `affected-recipe:${entry.recipeName}`,
+      recipeName: entry.recipeName,
+      recipeId,
+      marginChange,
+      affectedByLine,
+      target: "/recipes",
+    });
+    seen.add(entry.recipeName);
+  }
+
+  for (const alert of input.alerts) {
+    if (alert.kind !== "price_increase" && alert.kind !== "ingredient_inflation_spike") continue;
+    const ingredientId = extractIngredientIdFromAlert(alert);
+    const ingredientName =
+      input.data.ingredients.find((ingredient) => ingredient.id === ingredientId)?.name?.trim() ??
+      alert.title.replace(/\s+price (?:rose|increased).*$/i, "").trim();
+    const recipeMeta = alert.meta.find((meta) => meta.label === "Recipe")?.value;
+    if (!recipeMeta) continue;
+    const recipeId = input.data.recipes.find((recipe) => recipe.name?.trim() === recipeMeta)?.id;
+    if (seen.has(recipeMeta)) continue;
+    rows.push({
+      id: `affected-recipe-alert:${alert.id}`,
+      recipeName: recipeMeta,
+      recipeId,
+      marginChange: null,
+      affectedByLine: `Affected by ${ingredientName} increase`,
+      target: "/recipes",
+    });
+    seen.add(recipeMeta);
+  }
+
+  return rows.sort((a, b) => a.recipeName.localeCompare(b.recipeName));
+}
+
+function buildOwnerReviewAttentionNeeded(input: {
+  alerts: MarginAlertItem[];
+  monitorInsights: PrioritizedOperationalInsight[];
+}): AttentionRow[] {
+  const rows: AttentionRow[] = [];
+  const seen = new Set<string>();
+
+  const push = (row: AttentionRow) => {
+    if (seen.has(row.id)) return;
+    seen.add(row.id);
+    rows.push(row);
+  };
+
+  for (const alert of input.alerts.filter((entry) => entry.kind === "stale_price")) {
+    const ingredientId = extractIngredientIdFromAlert(alert);
+    push({
+      id: `attention-stale:${alert.id}`,
+      kind: "stale_price",
+      title: alert.title,
+      detail: shortOperationalLine(alert.context || "Pricing not confirmed by a recent invoice."),
+      target: alert.target,
+      ingredientId: ingredientId ?? undefined,
+    });
+  }
+
+  for (const insight of input.monitorInsights.filter(
+    (entry) => entry.category === "stale_pricing",
+  )) {
+    push({
+      id: `attention-monitor:${insight.id}`,
+      kind: "missing_confirmation",
+      title: insight.title,
+      detail: shortOperationalLine(insight.detail),
+      target: insight.target,
+    });
+  }
+
+  for (const alert of input.alerts.filter(
+    (entry) => entry.kind === "price_increase" || entry.kind === "ingredient_inflation_spike",
+  )) {
+    if (alert.severity !== "watch" && alert.severity !== "high") continue;
+    const ingredientId = extractIngredientIdFromAlert(alert);
+    push({
+      id: `attention-review:${alert.id}`,
+      kind: "ingredient_review",
+      title: alert.title,
+      detail: shortOperationalLine(alert.context),
+      target: alert.target,
+      ingredientId: ingredientId ?? undefined,
+    });
+  }
+
+  return rows;
+}
+
+export function buildOwnerReviewViewModel(input: {
+  data: MarginAlertData;
+  alerts: MarginAlertItem[];
+  monthlyMarginPressure: MonthlyMarginPressureSummary;
+  prioritizedInsights: PrioritizedOperationalInsight[];
+  concentrationGroups: GroupedConcentrationInsight[];
+  operationalSynthesisGroups: OperationalSynthesisGroups;
+  monitorInsights: PrioritizedOperationalInsight[];
+  operationalWindows: OperationalWindow[];
+}): OwnerReviewViewModel {
+  const supplierCounts = countSupplierMovementDirections(input.data, input.operationalWindows);
+  const staleCount = input.alerts.filter((alert) => alert.kind === "stale_price").length;
+
+  return {
+    weeklySnapshot: {
+      supplierIncreases: supplierCounts.increases,
+      monthlyImpactEur: input.monthlyMarginPressure.estimatedMarginPressureEur,
+      supplierDecreases: supplierCounts.decreases,
+      pricesNeedingRefresh: staleCount,
+    },
+    financialRisks: buildOwnerReviewFinancialRisks({
+      data: input.data,
+      prioritizedInsights: input.prioritizedInsights,
+      concentrationGroups: input.concentrationGroups,
+      groups: input.operationalSynthesisGroups,
+      operationalWindows: input.operationalWindows,
+    }),
+    opportunities: buildOwnerReviewOpportunities({
+      data: input.data,
+      groups: input.operationalSynthesisGroups,
+      operationalWindows: input.operationalWindows,
+    }),
+    suppliersToWatch: buildOwnerReviewSuppliersToWatch({
+      data: input.data,
+      groups: input.operationalSynthesisGroups,
+      operationalWindows: input.operationalWindows,
+    }),
+    affectedRecipes: buildOwnerReviewAffectedRecipes({
+      data: input.data,
+      alerts: input.alerts,
+      groups: input.operationalSynthesisGroups,
+    }),
+    attentionNeeded: buildOwnerReviewAttentionNeeded({
+      alerts: input.alerts,
+      monitorInsights: input.monitorInsights,
+    }),
+  };
 }

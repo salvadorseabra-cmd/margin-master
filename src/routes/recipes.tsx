@@ -617,6 +617,17 @@ function RecipesIndexPage() {
       );
   }, [load]);
 
+  const deepLinkedRecipeRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!user || recipes.length === 0) return;
+    const recipeId = new URLSearchParams(window.location.search).get("recipe")?.trim();
+    if (!recipeId || deepLinkedRecipeRef.current === recipeId) return;
+    const recipe = recipes.find((row) => row.id === recipeId);
+    if (!recipe) return;
+    deepLinkedRecipeRef.current = recipeId;
+    openRecipe(recipe);
+  }, [user, openRecipe, recipes]);
+
   useEffect(() => {
     if (!detailOpen) return;
 

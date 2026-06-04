@@ -364,6 +364,15 @@ function IngredientsIndexPage() {
     if (user) void load();
   }, [user, catalogListMode]);
 
+  useEffect(() => {
+    if (loading || catalogListMode !== "active") return;
+    const ingredientId = new URLSearchParams(window.location.search).get("ingredient")?.trim();
+    if (!ingredientId) return;
+    if (rows.some((row) => row.id === ingredientId)) {
+      setSelectedIngredientId(ingredientId);
+    }
+  }, [loading, catalogListMode, rows]);
+
   const switchCatalogListMode = useCallback(
     (mode: CatalogListMode) => {
       setCatalogListMode(mode);
