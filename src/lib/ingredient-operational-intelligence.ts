@@ -27,6 +27,7 @@ import {
   defaultIsGenericUnit,
   operationalCostFieldsFromInvoiceLine,
   persistOperationalIngredientCostFromInvoiceLine,
+  type InvoiceIngredientPriceHistoryContext,
   type OperationalIngredientCostFields,
 } from "@/lib/ingredient-auto-persist";
 import { normalizeInvoiceItemFields } from "@/lib/invoice-item-fields";
@@ -906,6 +907,7 @@ export async function syncOperationalIngredientCostsFromInvoiceLines(
   items: readonly InvoiceLineOperationalCostSyncInput[],
   options: {
     isGenericUnit?: (unit: string | null | undefined) => boolean;
+    priceHistory?: InvoiceIngredientPriceHistoryContext;
   } = {},
 ): Promise<{ updatedIngredientIds: string[] }> {
   if (catalog.length === 0 || items.length === 0) {
@@ -939,7 +941,7 @@ export async function syncOperationalIngredientCostsFromInvoiceLines(
         unit: item.unit,
         unit_price: item.unit_price,
       },
-      { isGenericUnit },
+      { isGenericUnit, priceHistory: options.priceHistory },
     );
     if (error) {
       logQueryFailure("syncOperationalIngredientCostsFromInvoiceLines", error.message);

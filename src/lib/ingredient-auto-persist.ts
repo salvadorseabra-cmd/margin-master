@@ -28,6 +28,13 @@ import {
 } from "@/lib/invoice-purchase-format";
 import { recipeOperationalCostFieldsFromInvoiceLine } from "@/lib/invoice-purchase-price-semantics";
 import type { BaseUnit } from "@/lib/recipe-unit-normalization";
+import {
+  appendIngredientPriceHistoryFromInvoiceLine,
+  fetchIngredientPriceSnapshot,
+  fetchLatestHistoryNewPrice,
+  resolvePreviousPackPriceForHistory,
+  type InvoiceIngredientPriceHistoryContext,
+} from "@/lib/ingredient-price-history";
 import { findInvoiceItemIngredientMatch } from "@/lib/invoice-ingredient-match-propagation";
 import { INGREDIENT_KIND_CANONICAL, looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
 import { shouldBlockCanonicalNameOnCreate } from "@/lib/canonical-ingredient-operational-name";
@@ -95,6 +102,8 @@ export function operationalCostFieldsFromInvoiceLine(
   };
 }
 
+export type { InvoiceIngredientPriceHistoryContext };
+
 /** Persists latest invoice operational pack price onto the canonical ingredient row. */
 export async function persistOperationalIngredientCostFromInvoiceLine(
   client: AppSupabaseClient,
@@ -102,12 +111,25 @@ export async function persistOperationalIngredientCostFromInvoiceLine(
   item: Pick<AutoPersistInvoiceItem, "name" | "quantity" | "unit" | "unit_price">,
   options: {
     isGenericUnit?: (unit: string | null | undefined) => boolean;
+    /** When set, appends `ingredient_price_history` after a successful ingredients update. */
+    priceHistory?: InvoiceIngredientPriceHistoryContext;
   } = {},
-): Promise<{ updated: boolean; error: PostgrestError | null }> {
+): Promise<{ updated: boolean; historyInserted?: boolean; error: PostgrestError | null }> {
   const id = ingredientId.trim();
   if (!id) return { updated: false, error: null };
   const fields = operationalCostFieldsFromInvoiceLine(item, options);
-  if (!fields) return { updated: false, error: null };
+  if (!fields || fields.current_price == null) return { updated: false, error: null };
+
+  const historyCtx = options.priceHistory;
+  let snapshot = null;
+  let latestHistoryNewPrice: number | null = null;
+  if (historyCtx?.invoiceId?.trim()) {
+    snapshot = await fetchIngredientPriceSnapshot(client, id);
+    if (snapshot) {
+      latestHistoryNewPrice = await fetchLatestHistoryNewPrice(client, id);
+    }
+  }
+
   const { error } = await client
     .from("ingredients")
     .update({
@@ -115,7 +137,34 @@ export async function persistOperationalIngredientCostFromInvoiceLine(
       purchase_quantity: fields.purchase_quantity,
     })
     .eq("id", id);
-  return { updated: !error, error: error ?? null };
+  if (error) return { updated: false, error };
+
+  let historyInserted = false;
+  if (historyCtx?.invoiceId?.trim() && snapshot) {
+    const previousPrice = resolvePreviousPackPriceForHistory(snapshot, latestHistoryNewPrice);
+    const historyResult = await appendIngredientPriceHistoryFromInvoiceLine(client, {
+      ingredientId: id,
+      invoiceId: historyCtx.invoiceId.trim(),
+      ingredientName: snapshot.name.trim() || item.name.trim(),
+      ingredientUnit: snapshot.unit,
+      supplierName: historyCtx.supplierName,
+      previousPrice,
+      newPrice: fields.current_price,
+      previousPurchaseQuantity: snapshot.purchase_quantity,
+      newPurchaseQuantity: fields.purchase_quantity,
+      invoiceDate: historyCtx.invoiceDate,
+      invoiceCreatedAt: historyCtx.invoiceCreatedAt,
+    });
+    historyInserted = historyResult.inserted;
+    if (historyResult.error) {
+      console.error(
+        `${LOG_PREFIX} ingredient_price_history append failed:`,
+        historyResult.error.message,
+      );
+    }
+  }
+
+  return { updated: true, historyInserted, error: null };
 }
 
 export type AutoPersistCatalogEntry = IngredientCanonicalInput;

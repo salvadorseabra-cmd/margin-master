@@ -830,6 +830,7 @@ function InvoicesPage() {
   const [canonicalCreateContext, setCanonicalCreateContext] = useState<{
     item: ItemRow;
     supplierName: string | null;
+    invoiceId: string;
   } | null>(null);
   const [canonicalCreateError, setCanonicalCreateError] = useState<string | null>(null);
   const [canonicalCreateSaving, setCanonicalCreateSaving] = useState(false);
@@ -1299,6 +1300,9 @@ function InvoicesPage() {
         if (insertError) throw insertError;
 
         const supplierForSync = normalizeSupplierDisplayName(data?.supplier);
+        const rawInvoiceDateForHistory = data?.invoice_date ?? data?.invoiceDate;
+        const invoiceDateForHistory = normalizeInvoiceDate(rawInvoiceDateForHistory);
+        const invoiceRowForHistory = rows.find((row) => row.id === invoiceId);
         const costSync = await syncOperationalIngredientCostsFromInvoiceLines(
           supabase,
           ingredientCatalog,
@@ -1310,7 +1314,15 @@ function InvoicesPage() {
             unit_price: it.unit_price ?? null,
             supplierName: supplierForSync,
           })),
-          { isGenericUnit },
+          {
+            isGenericUnit,
+            priceHistory: {
+              invoiceId,
+              supplierName: supplierForSync,
+              invoiceDate: invoiceDateForHistory,
+              invoiceCreatedAt: invoiceRowForHistory?.created_at ?? null,
+            },
+          },
         );
         if (costSync.updatedIngredientIds.length > 0) {
           clearIngredientMatchedInvoiceProductsCache();
@@ -1576,10 +1588,25 @@ function InvoicesPage() {
     });
   };
 
+  const resolveInvoicePriceHistoryContext = useCallback(
+    (invoiceId: string, supplierName?: string | null) => {
+      const row = rows.find((r) => r.id === invoiceId);
+      const identity = invoiceIdentitiesRef.current[invoiceId];
+      return {
+        invoiceId,
+        supplierName: supplierName ?? row?.supplier_name ?? identity?.supplierName ?? null,
+        invoiceDate: row?.invoiceDate ?? identity?.invoiceDate ?? null,
+        invoiceCreatedAt: row?.created_at ?? null,
+      };
+    },
+    [rows],
+  );
+
   const persistIngredientCorrectionForItem = (
     item: ItemRow,
     ingredientId: string,
     ingredientName: string,
+    invoiceId: string,
     supplierName?: string | null,
   ): Promise<{ ok: boolean; error?: string }> =>
     aliasPersistQueueRef.current.enqueue(async () => {
@@ -1664,7 +1691,10 @@ function InvoicesPage() {
           unit: item.unit,
           unit_price: item.unit_price,
         },
-        { isGenericUnit },
+        {
+          isGenericUnit,
+          priceHistory: resolveInvoicePriceHistoryContext(invoiceId, supplierName),
+        },
       );
       if (costSync.error) {
         console.error("[invoices] operational cost sync failed:", costSync.error.message);
@@ -1751,6 +1781,7 @@ function InvoicesPage() {
   const confirmIngredientMatch = async (
     item: ItemRow,
     match: IngredientCanonicalMatch,
+    invoiceId: string,
     supplierName?: string | null,
   ) => {
     traceCanonicalCreateAttempt({
@@ -1769,6 +1800,7 @@ function InvoicesPage() {
       item,
       match.ingredient.id,
       match.ingredient.name ?? match.ingredient.normalized_name ?? "",
+      invoiceId,
       supplierName,
     );
     if (aliasResult.ok) {
@@ -1788,6 +1820,7 @@ function InvoicesPage() {
   const selectIngredientForItem = async (
     item: ItemRow,
     ingredientId: string,
+    invoiceId: string,
     supplierName?: string | null,
   ): Promise<{ ok: boolean; error?: string }> => {
     const ingredient = ingredientCatalog.find((row) => row.id === ingredientId);
@@ -1808,6 +1841,7 @@ function InvoicesPage() {
       item,
       ingredientId,
       ingredient.name ?? ingredient.normalized_name ?? "",
+      invoiceId,
       supplierName,
     );
     if (result.ok) {
@@ -1833,7 +1867,11 @@ function InvoicesPage() {
     });
   }, [canonicalCreateContext]);
 
-  const openCanonicalIngredientCreate = (item: ItemRow, supplierName?: string | null) => {
+  const openCanonicalIngredientCreate = (
+    item: ItemRow,
+    supplierName: string | null | undefined,
+    invoiceId: string,
+  ) => {
     const name = item.name.trim();
     if (!name || isPlaceholderItemName(name)) {
       setIngredientCreationErrors((current) => ({
@@ -1844,7 +1882,11 @@ function InvoicesPage() {
     }
     setIngredientCreationErrors((current) => removeKey(current, item.id));
     setCanonicalCreateError(null);
-    setCanonicalCreateContext({ item, supplierName: supplierName?.trim() || null });
+    setCanonicalCreateContext({
+      item,
+      supplierName: supplierName?.trim() || null,
+      invoiceId,
+    });
   };
 
   const saveCanonicalIngredientFromInvoice = async (
@@ -1856,7 +1898,7 @@ function InvoicesPage() {
       });
       return;
     }
-    const { item, supplierName } = canonicalCreateContext;
+    const { item, supplierName, invoiceId: canonicalInvoiceId } = canonicalCreateContext;
 
     traceIngredientAliases("saveCanonicalIngredientFromInvoice:enter", {
       function: "saveCanonicalIngredientFromInvoice",
@@ -2006,6 +2048,7 @@ function InvoicesPage() {
         item,
         ingredientId,
         ingredientName,
+        canonicalInvoiceId,
         supplierName,
       );
       if (!aliasResult.ok) {
@@ -2427,13 +2470,13 @@ function InvoicesPage() {
                             extracting={!!extracting[r.id]}
                             onExtract={isImage ? () => reExtract(r) : undefined}
                             onCreateIngredient={(item) =>
-                              openCanonicalIngredientCreate(item, r.supplier_name)
+                              openCanonicalIngredientCreate(item, r.supplier_name, r.id)
                             }
                             onConfirmIngredientMatch={(item, match) =>
-                              confirmIngredientMatch(item, match, r.supplier_name)
+                              confirmIngredientMatch(item, match, r.id, r.supplier_name)
                             }
                             onSelectIngredientForItem={(item, ingredientId) =>
-                              selectIngredientForItem(item, ingredientId, r.supplier_name)
+                              selectIngredientForItem(item, ingredientId, r.id, r.supplier_name)
                             }
                             creatingIngredientByItem={creatingIngredientByItem}
                             ingredientCreationErrors={ingredientCreationErrors}
