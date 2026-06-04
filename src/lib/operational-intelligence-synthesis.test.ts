@@ -29,6 +29,7 @@ import {
   buildSynthesisViewModel,
   buildOwnerReviewViewModel,
   mapDateRangeToWindowKey,
+  resolveOperationalWindowKeyFromAlertMeta,
   classifyRecipeMarginTrend,
   classifySupplierMovementSignal,
   classifySupplierSwitchType,
@@ -1542,6 +1543,74 @@ describe("operational-intelligence-synthesis", () => {
       ),
     ).toBe(true);
     expect(burgerRecipe?.whatChanged).toMatch(/Novilho Vazia/i);
+  });
+
+  it("maps lib Window Last 14 days into last_3_months ownerReview.affectedRecipes (dateRange 90)", () => {
+    const windows = buildOperationalWindows(new Date("2026-06-03T12:00:00.000Z"));
+    const data = {
+      ingredients: [
+        { id: "beef-1", name: "Novilho Vazia", unit: "kg", current_price: 12, purchase_quantity: 1 },
+      ],
+      recipes: [
+        beefRecipe("r1", "BBQ Bacon Burger", 0.25),
+        beefRecipe("r2", "Steakhouse Burger", 0.25),
+      ],
+      invoices: [],
+      priceHistory: [],
+    };
+
+    const alerts: MarginAlertItem[] = [
+      {
+        id: "recipe-margin-r1",
+        kind: "recipe_margin_deterioration",
+        sectionId: "recipe_margin",
+        severity: "high",
+        title: "Modeled margin slip — BBQ Bacon Burger",
+        context: "Cost increase reduced gross margin materially.",
+        suggestedAction: "Review recipe",
+        actionLabel: "Open recipe",
+        target: "/recipes",
+        meta: [
+          { label: "Window", value: "Last 14 days" },
+          { label: "Margin", value: "58% → 52%" },
+        ],
+        signals: [],
+        priority: 2400,
+      },
+      {
+        id: "recipe-margin-r2",
+        kind: "recipe_margin_deterioration",
+        sectionId: "recipe_margin",
+        severity: "high",
+        title: "Modeled margin slip — Steakhouse Burger",
+        context: "Cost increase reduced gross margin materially.",
+        suggestedAction: "Review recipe",
+        actionLabel: "Open recipe",
+        target: "/recipes",
+        meta: [
+          { label: "Window", value: "Last 14 days" },
+          { label: "Margin", value: "55% → 49%" },
+        ],
+        signals: [],
+        priority: 2200,
+      },
+    ];
+
+    expect(
+      resolveOperationalWindowKeyFromAlertMeta("Last 14 days", undefined, windows),
+    ).toBe("last_3_months");
+
+    const synthesis = buildSynthesisViewModel({ data, alerts, dateRange: "90" });
+    const worsening = synthesis.operationalSynthesisGroups.recipeMarginMovements.worsening;
+
+    expect(worsening).toHaveLength(2);
+    expect(worsening.every((entry) => entry.window === "last_3_months")).toBe(true);
+    expect(synthesis.ownerReview.selectedWindowKey).toBe("last_3_months");
+    expect(synthesis.ownerReview.affectedRecipes).toHaveLength(2);
+    expect(synthesis.ownerReview.affectedRecipes.map((row) => row.recipeName).sort()).toEqual([
+      "BBQ Bacon Burger",
+      "Steakhouse Burger",
+    ]);
   });
 
   it("buildOwnerReviewViewModel exposes supplier ingredient changes without invoice metadata", () => {

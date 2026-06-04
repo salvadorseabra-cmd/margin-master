@@ -491,6 +491,7 @@ export const MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT = 2;
 export const MIN_SUPPLIER_SWITCH_IMPACT_PCT = 2;
 export const MIN_RECIPE_MARGIN_MOVEMENT_EUR = 10;
 export const MIN_CATEGORY_INFLATION_PCT = 3;
+
 export const MIN_TEMPORAL_WINDOW_SPREAD_PCT = 3;
 export const MAX_SUPPLIER_MOVEMENTS_VISIBLE = 5;
 export const MAX_RECIPE_MARGIN_MOVEMENTS_VISIBLE = 4;
@@ -1064,6 +1065,42 @@ function resolveWindowFromDate(value: string | null | undefined, windows: Operat
     }
   }
   return "last_6_months";
+}
+
+/** Lib margin alerts use shorter window labels than operational synthesis windows. */
+const LIB_ALERT_WINDOW_TO_OPERATIONAL_KEY: Readonly<Record<string, OperationalWindowKey>> = {
+  "Last 24 hours": "last_3_months",
+  "Last 14 days": "last_3_months",
+  "Last 30 days": "last_3_months",
+  "Last 3 months": "last_3_months",
+  "Last 6 months": "last_6_months",
+};
+
+/** Maps lib alert Window meta into keys used by OI owner review / trend panels. */
+export function resolveOperationalWindowKeyFromAlertMeta(
+  alertWindowLabel: string | undefined,
+  detectedAt: string | null | undefined,
+  windows: OperationalWindow[],
+): OperationalWindowKey {
+  if (alertWindowLabel) {
+    const exact = windows.find((w) => w.label === alertWindowLabel);
+    if (exact) return exact.key;
+
+    const mapped = LIB_ALERT_WINDOW_TO_OPERATIONAL_KEY[alertWindowLabel];
+    if (mapped) return mapped;
+
+    const daysMatch = alertWindowLabel.match(/^Last (\d+) days$/i);
+    if (daysMatch) {
+      const days = Number(daysMatch[1]);
+      if (Number.isFinite(days)) {
+        if (days <= 90) return "last_3_months";
+        if (days <= 180) return "last_6_months";
+      }
+    }
+
+    return "last_3_months";
+  }
+  return resolveWindowFromDate(detectedAt, windows);
 }
 
 function shortOperationalLine(input: string, maxLen = 110): string {
@@ -4662,10 +4699,7 @@ function buildRecipeMarginMovementGroups(
     const impact = Math.max(MIN_RECIPE_MARGIN_MOVEMENT_EUR, Math.round((alert.priority || 0) / 100));
     const detectedAt = alert.meta.find((m) => m.label === "Detected")?.value;
     const alertWindow = alert.meta.find((m) => m.label === "Window")?.value;
-    const window = alertWindow
-      ? (windows.find((w) => w.label === alertWindow)?.key ??
-        resolveWindowFromDate(detectedAt, windows))
-      : resolveWindowFromDate(detectedAt, windows);
+    const window = resolveOperationalWindowKeyFromAlertMeta(alertWindow, detectedAt, windows);
 
     const marginRange = parseRecipeMarginRangeFromAlert(alert);
     const movement = enrichRecipeMarginMovement({
@@ -5258,8 +5292,12 @@ function buildOwnerReviewAffectedRecipes(input: {
   const seen = new Set<string>();
 
   for (const entry of input.groups.recipeMarginMovements.worsening) {
-    if (entry.window !== input.selectedWindowKey) continue;
-    if (!isMeaningfulRecipeMarginMovement(entry)) continue;
+    if (entry.window !== input.selectedWindowKey) {
+      continue;
+    }
+    if (!isMeaningfulRecipeMarginMovement(entry)) {
+      continue;
+    }
     if (entry.trendStatus === "stabilizing" && entry.estimatedMonthlyImpactEur < MIN_RECIPE_MARGIN_MOVEMENT_EUR) {
       continue;
     }
