@@ -4,7 +4,6 @@ alter table if exists public.invoices
   add column if not exists supplier_name text;
 
 alter table if exists public.invoices
-  drop column if exists user_id,
   drop column if exists invoice_date,
   drop column if exists status,
   drop column if exists items_count,
