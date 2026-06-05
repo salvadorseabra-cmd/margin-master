@@ -1,15 +1,21 @@
 import type { Tables } from "@/integrations/supabase/types";
 import type { BaseUnit } from "@/lib/recipe-unit-normalization";
 
-export type IngredientCostFields = Pick<
-  Tables<"ingredients">,
-  "current_price" | "purchase_quantity"
-> &
+/** Pack price + purchase denominator used for operational €/base-unit costing. */
+export type IngredientPriceFields = {
+  current_price: number | null;
+  purchase_quantity: number | null;
+};
+
+export type IngredientCostFields = IngredientPriceFields &
   UsablePerUnitFields &
   IngredientDensityMetadata & {
     /** Internal costing base (g, ml, un) — set from invoice normalization, not persisted. */
     cost_base_unit?: BaseUnit | null;
   };
+
+/** Invoice overlay / catalog / embed operational cost shape (same fields as {@link IngredientCostFields}). */
+export type OperationalIngredientCostFields = IngredientCostFields;
 
 /** Optional in-memory scaffolding for hybrid/countable-to-weighted ingredients. */
 export type IngredientUnitMetadata = {

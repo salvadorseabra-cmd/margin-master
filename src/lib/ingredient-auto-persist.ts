@@ -27,7 +27,7 @@ import {
   type StructuredPurchaseFormat,
 } from "@/lib/invoice-purchase-format";
 import { recipeOperationalCostFieldsFromInvoiceLine } from "@/lib/invoice-purchase-price-semantics";
-import type { BaseUnit } from "@/lib/recipe-unit-normalization";
+import type { OperationalIngredientCostFields } from "@/lib/ingredient-unit-cost";
 import {
   appendIngredientPriceHistoryFromInvoiceLine,
   fetchIngredientPriceSnapshot,
@@ -62,18 +62,7 @@ export type AutoPersistInvoiceItem = {
   unit_price: number | null;
 };
 
-export type OperationalIngredientCostFields = {
-  current_price: number | null;
-  purchase_quantity: number | null;
-  cost_base_unit?: BaseUnit | null;
-  usable_weight_grams?: number | null;
-  usable_volume_ml?: number | null;
-  reference_weight_grams?: number | null;
-  reference_volume_ml?: number | null;
-  density_g_per_ml?: number | null;
-  grams_per_ml?: number | null;
-  gramsPerMl?: number | null;
-};
+export type { OperationalIngredientCostFields };
 
 /** Maps a matched invoice line to catalog `current_price` / `purchase_quantity` fields. */
 export function operationalCostFieldsFromInvoiceLine(

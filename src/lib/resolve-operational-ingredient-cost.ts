@@ -6,6 +6,7 @@ import {
   purchaseQuantityDenom,
   resolveIngredientGramsPerMl,
   resolvedOperationalUnitCostEur,
+  type OperationalIngredientCostFields,
 } from "@/lib/ingredient-unit-cost";
 import {
   ingredientLineCostEur,
@@ -29,18 +30,7 @@ import { normalizeToBaseUnit, unitFamilyForBaseUnit } from "@/lib/recipe-unit-no
 import type { OperationalInvoiceCostEntry } from "@/lib/ingredient-operational-intelligence";
 import type { RecipeIngredientLineForCost } from "@/lib/recipe-prep-cost";
 
-export type OperationalIngredientCostFields = {
-  current_price: number | null;
-  purchase_quantity: number | null;
-  cost_base_unit?: import("@/lib/recipe-unit-normalization").BaseUnit | null;
-  usable_weight_grams?: number | null;
-  usable_volume_ml?: number | null;
-  reference_weight_grams?: number | null;
-  reference_volume_ml?: number | null;
-  density_g_per_ml?: number | null;
-  grams_per_ml?: number | null;
-  gramsPerMl?: number | null;
-};
+export type { OperationalIngredientCostFields };
 
 export type OperationalIngredientCostSource =
   | "invoice"
