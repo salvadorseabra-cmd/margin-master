@@ -1,5 +1,9 @@
 import type { SupabaseClient, PostgrestError } from "@supabase/supabase-js";
 import type { Database, Tables } from "@/integrations/supabase/types";
+import {
+  purchaseQuantityDenom,
+  resolvedOperationalUnitCostEur,
+} from "@/lib/ingredient-unit-cost";
 import { resolveInvoiceChronology } from "@/lib/invoice-chronology";
 
 /** Supabase browser client shape used across the app. */
@@ -26,7 +30,10 @@ export type AppendIngredientPriceHistoryParams = {
   ingredientName: string;
   ingredientUnit?: string | null;
   supplierName?: string | null;
+  /** Pack/catalog price before the line — used for pack-level unchanged detection. */
   previousPrice: number | null;
+  /** When set, stored as `previous_price` directly (€/base-unit); skips re-normalization. */
+  previousOperationalPrice?: number | null;
   newPrice: number;
   previousPurchaseQuantity?: number | null;
   newPurchaseQuantity?: number | null;
@@ -98,16 +105,48 @@ export function resolveIngredientPriceHistoryCreatedAt(params: {
   return new Date().toISOString();
 }
 
+/** Pack/catalog price on the ingredient row before an invoice persist (skip detection only). */
 export function resolvePreviousPackPriceForHistory(
   snapshot: IngredientPriceSnapshot,
-  latestHistoryNewPrice: number | null,
 ): number | null {
   const current = snapshot.current_price == null ? null : Number(snapshot.current_price);
   if (current != null && Number.isFinite(current)) return current;
+  return null;
+}
+
+/**
+ * €/base-unit before an invoice persist — catalog pack normalized when present, else latest
+ * history `new_price` (already operational; do not divide again on insert).
+ */
+export function resolvePreviousOperationalPriceForHistory(
+  snapshot: IngredientPriceSnapshot,
+  latestHistoryNewPrice: number | null,
+): number | null {
+  const pack = resolvePreviousPackPriceForHistory(snapshot);
+  if (pack != null) {
+    return operationalUnitPriceForPriceHistory(pack, snapshot.purchase_quantity);
+  }
   if (latestHistoryNewPrice != null && Number.isFinite(latestHistoryNewPrice)) {
     return latestHistoryNewPrice;
   }
   return null;
+}
+
+/**
+ * €/base-unit for history rows — same as recipe costing and {@link resolvedOperationalUnitCostEur}.
+ * Callers pass invoice/catalog pack price + purchase_quantity; stored values are normalized only.
+ */
+export function operationalUnitPriceForPriceHistory(
+  packPrice: number | null | undefined,
+  purchaseQuantity: number | null | undefined,
+): number | null {
+  if (packPrice == null) return null;
+  const pack = Number(packPrice);
+  if (!Number.isFinite(pack)) return null;
+  return resolvedOperationalUnitCostEur({
+    current_price: pack,
+    purchase_quantity: purchaseQuantityDenom(purchaseQuantity),
+  });
 }
 
 export type IngredientPriceHistoryRow = Pick<
@@ -244,18 +283,25 @@ export async function appendIngredientPriceHistoryFromInvoiceLine(
   }
 
   const prevPack = params.previousPrice == null ? null : Number(params.previousPrice);
+  const storedNew =
+    operationalUnitPriceForPriceHistory(newPrice, params.newPurchaseQuantity) ?? newPrice;
+  const storedPrev =
+    params.previousOperationalPrice != null && Number.isFinite(Number(params.previousOperationalPrice))
+      ? Number(params.previousOperationalPrice)
+      : operationalUnitPriceForPriceHistory(params.previousPrice, params.previousPurchaseQuantity);
+
   if (
     invoiceLinePricesUnchanged(
       prevPack,
       params.previousPurchaseQuantity ?? null,
       newPrice,
       params.newPurchaseQuantity ?? null,
-    )
+    ) ||
+    (storedPrev != null && Math.abs(storedPrev - storedNew) <= INGREDIENT_PRICE_EQ_EPS)
   ) {
     return { inserted: false, skippedReason: "unchanged_price", error: null };
   }
-
-  const { delta, delta_percent } = computePriceHistoryDelta(params.previousPrice, newPrice);
+  const { delta, delta_percent } = computePriceHistoryDelta(storedPrev, storedNew);
   const created_at = resolveIngredientPriceHistoryCreatedAt({
     invoiceDate: params.invoiceDate,
     invoiceCreatedAt: params.invoiceCreatedAt,
@@ -267,8 +313,8 @@ export async function appendIngredientPriceHistoryFromInvoiceLine(
     ingredient_name: params.ingredientName,
     supplier_name: params.supplierName ?? null,
     ingredient_unit: params.ingredientUnit ?? null,
-    previous_price: params.previousPrice,
-    new_price: newPrice,
+    previous_price: storedPrev,
+    new_price: storedNew,
     delta,
     delta_percent,
     created_at,

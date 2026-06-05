@@ -227,7 +227,8 @@ async function generateIngredientInflationSpikeAlertsInner(
         ? 0
         : [...samples].sort((a, b) => a - b)[Math.floor(samples.length / 2)] ?? 0;
     const spikeVsBaseline = pct - baselineMed;
-    const strongAbsolute = pct >= 18 || Number(row.delta ?? 0) >= 0.75;
+    /** History `delta` is €/base-unit operational, not pack. */
+    const strongAbsolute = pct >= 18 || Number(row.delta ?? 0) >= 0.08;
     const strongVsHistory = samples.length >= 2 && spikeVsBaseline >= 10;
     const moderate = pct >= 12 && (samples.length === 0 || spikeVsBaseline >= 5);
     if (strongAbsolute || strongVsHistory || moderate) {
@@ -255,7 +256,7 @@ async function generateIngredientInflationSpikeAlertsInner(
         ? `${dp.toFixed(1)}%`
         : `≈${pct.toFixed(1)}% (from unit Δ)`;
     const severity: MarginAlert["severity"] =
-      pct >= 28 || Number(row.delta ?? 0) >= 1.5 ? "high" : pct >= 18 ? "medium" : "low";
+      pct >= 28 || Number(row.delta ?? 0) >= 0.2 ? "high" : pct >= 18 ? "medium" : "low";
     const eurDelta = row.delta != null && Number.isFinite(Number(row.delta)) ? Number(row.delta) : undefined;
 
     alerts.push({

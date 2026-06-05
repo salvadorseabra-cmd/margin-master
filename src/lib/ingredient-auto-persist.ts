@@ -32,6 +32,7 @@ import {
   appendIngredientPriceHistoryFromInvoiceLine,
   fetchIngredientPriceSnapshot,
   fetchLatestHistoryNewPrice,
+  resolvePreviousOperationalPriceForHistory,
   resolvePreviousPackPriceForHistory,
   type InvoiceIngredientPriceHistoryContext,
 } from "@/lib/ingredient-price-history";
@@ -130,7 +131,11 @@ export async function persistOperationalIngredientCostFromInvoiceLine(
 
   let historyInserted = false;
   if (historyCtx?.invoiceId?.trim() && snapshot) {
-    const previousPrice = resolvePreviousPackPriceForHistory(snapshot, latestHistoryNewPrice);
+    const previousPrice = resolvePreviousPackPriceForHistory(snapshot);
+    const previousOperationalPrice = resolvePreviousOperationalPriceForHistory(
+      snapshot,
+      latestHistoryNewPrice,
+    );
     const historyResult = await appendIngredientPriceHistoryFromInvoiceLine(client, {
       ingredientId: id,
       invoiceId: historyCtx.invoiceId.trim(),
@@ -138,6 +143,7 @@ export async function persistOperationalIngredientCostFromInvoiceLine(
       ingredientUnit: snapshot.unit,
       supplierName: historyCtx.supplierName,
       previousPrice,
+      previousOperationalPrice,
       newPrice: fields.current_price,
       previousPurchaseQuantity: snapshot.purchase_quantity,
       newPurchaseQuantity: fields.purchase_quantity,

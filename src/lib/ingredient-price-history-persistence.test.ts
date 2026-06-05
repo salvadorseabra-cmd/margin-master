@@ -3,8 +3,12 @@ import {
   appendIngredientPriceHistoryFromInvoiceLine,
   computePriceHistoryDelta,
   invoiceLinePricesUnchanged,
+  operationalUnitPriceForPriceHistory,
   resolveIngredientPriceHistoryCreatedAt,
+  resolvePreviousOperationalPriceForHistory,
+  resolvePreviousPackPriceForHistory,
 } from "@/lib/ingredient-price-history";
+import { resolvedOperationalUnitCostEur } from "@/lib/ingredient-unit-cost";
 import {
   operationalCostFieldsFromInvoiceLine,
   persistOperationalIngredientCostFromInvoiceLine,
@@ -117,6 +121,56 @@ function createPersistenceMockClient(options: {
   return { client, historyInserts, ingredient };
 }
 
+describe("resolvePreviousOperationalPriceForHistory", () => {
+  it("normalizes catalog pack price from snapshot", () => {
+    const operational = resolvePreviousOperationalPriceForHistory(
+      { name: "Bun", unit: "un", current_price: 5.4, purchase_quantity: 24 },
+      null,
+    );
+    expect(operational).toBeCloseTo(0.225, 4);
+  });
+
+  it("returns latest history new_price without re-normalizing", () => {
+    const operational = resolvePreviousOperationalPriceForHistory(
+      { name: "Bun", unit: "un", current_price: null, purchase_quantity: 24 },
+      0.2,
+    );
+    expect(operational).toBeCloseTo(0.2, 4);
+  });
+
+  it("prefers catalog pack over history fallback", () => {
+    expect(
+      resolvePreviousPackPriceForHistory({
+        name: "Bun",
+        unit: "un",
+        current_price: 4.8,
+        purchase_quantity: 24,
+      }),
+    ).toBe(4.8);
+    expect(
+      resolvePreviousOperationalPriceForHistory(
+        { name: "Bun", unit: "un", current_price: 4.8, purchase_quantity: 24 },
+        0.2,
+      ),
+    ).toBeCloseTo(0.2, 4);
+  });
+});
+
+describe("operationalUnitPriceForPriceHistory", () => {
+  it("matches resolvedOperationalUnitCostEur for pack + purchase_quantity", () => {
+    const fields = {
+      current_price: 5.4,
+      purchase_quantity: 24,
+      cost_base_unit: "un" as const,
+    };
+    expect(operationalUnitPriceForPriceHistory(5.4, 24)).toBeCloseTo(
+      resolvedOperationalUnitCostEur(fields)!,
+      6,
+    );
+    expect(operationalUnitPriceForPriceHistory(5.4, 24)).toBeCloseTo(0.225, 3);
+  });
+});
+
 describe("appendIngredientPriceHistoryFromInvoiceLine", () => {
   it("inserts first price with null previous and delta", async () => {
     const { client, historyInserts } = createPersistenceMockClient({
@@ -146,7 +200,7 @@ describe("appendIngredientPriceHistoryFromInvoiceLine", () => {
     expect(historyInserts[0].delta).toBeNull();
   });
 
-  it("records price increase with delta_percent", async () => {
+  it("records price increase with delta_percent on normalized unit prices", async () => {
     const { client, historyInserts } = createPersistenceMockClient({});
     const result = await appendIngredientPriceHistoryFromInvoiceLine(client as never, {
       ingredientId: "ing-1",
@@ -154,12 +208,48 @@ describe("appendIngredientPriceHistoryFromInvoiceLine", () => {
       ingredientName: "Tomato",
       previousPrice: 10,
       newPrice: 12,
+      previousPurchaseQuantity: 1,
+      newPurchaseQuantity: 1,
       invoiceDate: "2026-05-01",
     });
     expect(result.inserted).toBe(true);
+    expect(historyInserts[0].previous_price).toBe(10);
+    expect(historyInserts[0].new_price).toBe(12);
     expect(historyInserts[0].delta).toBe(2);
     expect(historyInserts[0].delta_percent).toBe(20);
     expect(computePriceHistoryDelta(10, 12)).toEqual({ delta: 2, delta_percent: 20 });
+  });
+
+  it("stores normalized €/un for brioche case line, not case pack price", async () => {
+    const { client, historyInserts } = createPersistenceMockClient({});
+    await appendIngredientPriceHistoryFromInvoiceLine(client as never, {
+      ingredientId: "bun-1",
+      invoiceId: "inv-brioche",
+      ingredientName: "Brioche Burger Bun 80g",
+      previousPrice: 0.2,
+      newPrice: 5.4,
+      previousPurchaseQuantity: 1,
+      newPurchaseQuantity: 24,
+    });
+    expect(historyInserts[0].new_price).toBeCloseTo(0.225, 4);
+    expect(historyInserts[0].previous_price).toBeCloseTo(0.2, 4);
+    expect(historyInserts[0].delta).toBeCloseTo(0.025, 4);
+  });
+
+  it("stores normalized €/un for hamburger case line, not case pack price", async () => {
+    const { client, historyInserts } = createPersistenceMockClient({});
+    await appendIngredientPriceHistoryFromInvoiceLine(client as never, {
+      ingredientId: "beef-1",
+      invoiceId: "inv-beef",
+      ingredientName: "Hambúrguer Bovino 180g",
+      previousPrice: 1.3,
+      newPrice: 55,
+      previousPurchaseQuantity: 1,
+      newPurchaseQuantity: 40,
+    });
+    expect(historyInserts[0].new_price).toBeCloseTo(1.375, 4);
+    expect(historyInserts[0].previous_price).toBeCloseTo(1.3, 4);
+    expect(historyInserts[0].delta).toBeCloseTo(0.075, 4);
   });
 
   it("records price decrease", async () => {
@@ -170,6 +260,8 @@ describe("appendIngredientPriceHistoryFromInvoiceLine", () => {
       ingredientName: "Tomato",
       previousPrice: 12,
       newPrice: 9,
+      previousPurchaseQuantity: 1,
+      newPurchaseQuantity: 1,
     });
     expect(historyInserts[0].delta).toBe(-3);
     expect(historyInserts[0].delta_percent).toBe(-25);
@@ -243,25 +335,82 @@ describe("appendIngredientPriceHistoryFromInvoiceLine", () => {
 });
 
 describe("persistOperationalIngredientCostFromInvoiceLine", () => {
-  it("appends history after successful ingredients update", async () => {
-    const { client, historyInserts, ingredient } = createPersistenceMockClient({
+  it("stores normalized unit price for brioche 24-pack case invoice line", async () => {
+    const line = {
+      name: "PAO BRIOCHE 24X80G",
+      quantity: 1,
+      unit: "cx",
+      unit_price: 5.4,
+    };
+    const fields = operationalCostFieldsFromInvoiceLine(line);
+    expect(fields?.purchase_quantity).toBe(24);
+    const { client, historyInserts } = createPersistenceMockClient({
       ingredient: {
-        name: "Mozzarella 1kg",
-        unit: "kg",
-        current_price: 8,
-        purchase_quantity: 1,
+        name: "Brioche Burger Bun 80g",
+        unit: "un",
+        current_price: 4.8,
+        purchase_quantity: fields!.purchase_quantity,
       },
     });
 
     const result = await persistOperationalIngredientCostFromInvoiceLine(
       client as never,
       "ing-1",
-      {
-        name: "QUEIJO MOZARELLA FATIADO 1KG",
-        quantity: 1,
-        unit: "kg",
-        unit_price: 9.5,
+      line,
+      { priceHistory: { invoiceId: "inv-brioche", supplierName: "Padaria" } },
+    );
+
+    expect(result.historyInserted).toBe(true);
+    expect(historyInserts[0].new_price).toBeCloseTo(0.225, 4);
+    expect(historyInserts[0].new_price).not.toBe(5.4);
+  });
+
+  it("stores per-patty normalized price for single-unit hamburger line", async () => {
+    const line = {
+      name: "Hambúrguer Bovino 180g",
+      quantity: 1,
+      unit: "un",
+      unit_price: 0.98,
+    };
+    const fields = operationalCostFieldsFromInvoiceLine(line);
+    const { client, historyInserts } = createPersistenceMockClient({
+      ingredient: {
+        name: "Hambúrguer Bovino 180g",
+        unit: "un",
+        current_price: 0.9,
+        purchase_quantity: 1,
       },
+    });
+
+    await persistOperationalIngredientCostFromInvoiceLine(client as never, "ing-1", line, {
+      priceHistory: { invoiceId: "inv-patty", supplierName: "Carnes" },
+    });
+
+    expect(historyInserts[0].new_price).toBeCloseTo(0.98, 4);
+    expect(fields?.purchase_quantity).toBe(1);
+  });
+
+  it("appends history after successful ingredients update", async () => {
+    const line = {
+      name: "QUEIJO MOZARELLA FATIADO 1KG",
+      quantity: 1,
+      unit: "kg",
+      unit_price: 9.5,
+    };
+    const fields = operationalCostFieldsFromInvoiceLine(line);
+    const { client, historyInserts, ingredient } = createPersistenceMockClient({
+      ingredient: {
+        name: "Mozzarella 1kg",
+        unit: "kg",
+        current_price: 8,
+        purchase_quantity: fields!.purchase_quantity,
+      },
+    });
+
+    const result = await persistOperationalIngredientCostFromInvoiceLine(
+      client as never,
+      "ing-1",
+      line,
       {
         priceHistory: {
           invoiceId: "inv-a",
@@ -277,10 +426,37 @@ describe("persistOperationalIngredientCostFromInvoiceLine", () => {
     expect(historyInserts).toHaveLength(1);
     expect(historyInserts[0]).toMatchObject({
       invoice_id: "inv-a",
-      previous_price: 8,
-      new_price: 9.5,
       supplier_name: "Continente",
     });
+    expect(historyInserts[0].previous_price).toBeCloseTo(0.008, 4);
+    expect(historyInserts[0].new_price).toBeCloseTo(0.0095, 4);
+  });
+
+  it("uses history fallback operational price without double normalization", async () => {
+    const line = {
+      name: "PAO BRIOCHE 24X80G",
+      quantity: 1,
+      unit: "cx",
+      unit_price: 5.4,
+    };
+    const fields = operationalCostFieldsFromInvoiceLine(line);
+    const { client, historyInserts } = createPersistenceMockClient({
+      ingredient: {
+        name: "Brioche Burger Bun 80g",
+        unit: "un",
+        current_price: null,
+        purchase_quantity: fields!.purchase_quantity,
+      },
+      latestHistoryNewPrice: 0.2,
+    });
+
+    await persistOperationalIngredientCostFromInvoiceLine(client as never, "ing-1", line, {
+      priceHistory: { invoiceId: "inv-brioche-2", supplierName: "Padaria" },
+    });
+
+    expect(historyInserts[0].previous_price).toBeCloseTo(0.2, 4);
+    expect(historyInserts[0].new_price).toBeCloseTo(0.225, 4);
+    expect(historyInserts[0].previous_price).not.toBeCloseTo(0.2 / 24, 6);
   });
 
   it("does not append history when price unchanged", async () => {

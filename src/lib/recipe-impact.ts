@@ -104,7 +104,9 @@ export type RecipeMarginDeltaLine = {
  * 2. Let **L** = newest row, **P** = second-newest row (if any).
  * 3. If `L.previous_price` is a finite number, use it as the previous unit price.
  * 4. Else if **P** exists, use `P.new_price` as the previous unit price.
- * 5. Else use the current **effective** €/base-unit price (same as line costing: pack price ÷ purchase quantity).
+ * 5. Else use the current **effective** €/base-unit price (pack price ÷ purchase quantity).
+ *
+ * History `previous_price` / `new_price` are stored as operational €/base-unit (not pack).
  *
  * **Margin %:** \((\text{selling} - \text{cost}) / \text{selling} \times 100\) when `selling > 0`, else `null`.
  *
@@ -155,20 +157,10 @@ function finiteOr(value: number | null | undefined, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
-/** Map pack-level history prices to € per base unit using a fixed purchase denominator. */
-function historyRowsAsEffectivePerBaseUnit(rows: HistoryRow[], purchaseDenom: number): HistoryRow[] {
-  const d = purchaseDenom > 0 ? purchaseDenom : 1;
-  return rows.map((r) => ({
-    ...r,
-    new_price: finiteOr(r.new_price, 0) / d,
-    previous_price: r.previous_price == null ? null : finiteOr(r.previous_price, 0) / d,
-  }));
-}
-
 /**
  * Resolves the modeled **previous** unit price before the latest invoice snapshot,
  * using only flat `ingredient_price_history` rows for one ingredient (`rows` must be
- * sorted by `created_at` descending).
+ * sorted by `created_at` descending). Row prices are already operational €/base-unit.
  *
  * @see {@link RecipeMarginDeltaResult} for the full precedence rule.
  */
@@ -410,8 +402,7 @@ export async function computeMarginDelta(
     const meta = metaById.get(id);
     if (!meta) continue;
     const currentUnit = meta.currentPack / meta.purchaseDenom;
-    const histRaw = histByIng.get(id) ?? [];
-    const hist = historyRowsAsEffectivePerBaseUnit(histRaw, meta.purchaseDenom);
+    const hist = histByIng.get(id) ?? [];
     const previousUnit = resolvePreviousUnitPriceEur(currentUnit, hist);
     previousUnitById.set(id, previousUnit);
   }
@@ -435,8 +426,7 @@ export async function computeMarginDelta(
     const qty = Number(line.quantity);
     const safeQty = Number.isFinite(qty) ? qty : 0;
     const currentUnit = meta.currentPack / meta.purchaseDenom;
-    const histRaw = histByIng.get(line.ingredient_id) ?? [];
-    const hist = historyRowsAsEffectivePerBaseUnit(histRaw, meta.purchaseDenom);
+    const hist = histByIng.get(line.ingredient_id) ?? [];
     const previousUnit = resolvePreviousUnitPriceEur(currentUnit, hist);
 
     const lineCur = safeQty * currentUnit;
@@ -718,8 +708,7 @@ export async function computeRecipeMarginImpactsForRecipeIds(
     const meta = priceById.get(id);
     if (!meta) continue;
     const newUnit = meta.current_price / meta.purchase_quantity;
-    const histRaw = histByIng.get(id) ?? [];
-    const hist = historyRowsAsEffectivePerBaseUnit(histRaw, meta.purchase_quantity);
+    const hist = histByIng.get(id) ?? [];
     const previousUnit = resolvePreviousUnitPriceEur(newUnit, hist);
     previousUnitById.set(id, previousUnit);
   }
@@ -762,8 +751,7 @@ export async function computeRecipeMarginImpactsForRecipeIds(
       const safeQty = Number.isFinite(qty) ? qty : 0;
       const pq = meta.purchase_quantity;
       const newUnit = meta.current_price / pq;
-      const histRaw = histByIng.get(line.ingredient_id) ?? [];
-      const hist = historyRowsAsEffectivePerBaseUnit(histRaw, pq);
+      const hist = histByIng.get(line.ingredient_id) ?? [];
       const previousUnit = resolvePreviousUnitPriceEur(newUnit, hist);
 
       if (Math.abs(previousUnit - newUnit) > COST_EPS) {
