@@ -12,15 +12,15 @@ create unique index if not exists recipe_ingredients_recipe_ingredient_uniq
   on public.recipe_ingredients (recipe_id, ingredient_id)
   where ingredient_id is not null;
 
+alter table public.recipe_ingredients
+  add column if not exists sub_recipe_id uuid references public.recipes (id) on delete restrict;
+
 create unique index if not exists recipe_ingredients_recipe_sub_recipe_uniq
   on public.recipe_ingredients (recipe_id, sub_recipe_id)
   where sub_recipe_id is not null;
 
 alter table public.recipe_ingredients
   alter column ingredient_id drop not null;
-
-alter table public.recipe_ingredients
-  add column if not exists sub_recipe_id uuid references public.recipes (id) on delete restrict;
 
 create index if not exists idx_recipe_ingredients_sub_recipe
   on public.recipe_ingredients (sub_recipe_id)

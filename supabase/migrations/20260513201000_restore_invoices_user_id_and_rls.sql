@@ -17,11 +17,28 @@ where inv.id = s.invoice_id
   and inv.user_id is null;
 
 -- App convention: storage object key is "<auth uid>/<filename>"
-update public.invoices
-set user_id = split_part(file_url, '/', 1)::uuid
-where user_id is null
-  and file_url is not null
-  and split_part(file_url, '/', 1) ~ '^[0-9a-fA-F-]{36}$';
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'invoices' and column_name = 'file_url'
+  ) then
+    update public.invoices
+    set user_id = split_part(file_url, '/', 1)::uuid
+    where user_id is null
+      and file_url is not null
+      and split_part(file_url, '/', 1) ~ '^[0-9a-fA-F-]{36}$';
+  elsif exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'invoices' and column_name = 'file_path'
+  ) then
+    update public.invoices
+    set user_id = split_part(file_path, '/', 1)::uuid
+    where user_id is null
+      and file_path is not null
+      and split_part(file_path, '/', 1) ~ '^[0-9a-fA-F-]{36}$';
+  end if;
+end $$;
 
 -- Remove orphaned lines then invoices with no resolvable owner.
 delete from public.invoice_items
