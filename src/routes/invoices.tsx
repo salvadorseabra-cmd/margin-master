@@ -198,6 +198,13 @@ type SettlementState = "pending" | "settled";
 const MAX_BYTES = 20 * 1024 * 1024;
 const ACCEPT = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
 
+function createPendingId(): string {
+  return (
+    globalThis.crypto?.randomUUID?.() ??
+    `${Date.now()}-${Math.random().toString(36).slice(2)}`
+  );
+}
+
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "newest", label: "Newest" },
   { value: "oldest", label: "Oldest" },
@@ -1217,6 +1224,7 @@ function InvoicesPage() {
   };
 
   const enqueue = (files: FileList | File[]) => {
+    console.log("[invoices] enqueue called with", files.length, "file(s)");
     setGlobalError(null);
     const arr = Array.from(files);
     const next: Pending[] = [];
@@ -1230,7 +1238,7 @@ function InvoicesPage() {
         continue;
       }
       next.push({
-        id: crypto.randomUUID(),
+        id: createPendingId(),
         file,
         previewUrl: URL.createObjectURL(file),
         progress: 0,
@@ -1238,6 +1246,7 @@ function InvoicesPage() {
       });
     }
     if (next.length) {
+      console.log("[invoices] enqueue queued", next.length, "file(s)");
       setPending((p) => [...next, ...p]);
       next.forEach(uploadOne);
     }
@@ -1261,13 +1270,37 @@ function InvoicesPage() {
     total?: number;
     itemsCount: number;
   } | null> => {
+    console.log("[invoice-ocr] stage=2 ocr-trigger", {
+      invoiceId,
+      dataUrlLength: dataUrl.length,
+      dataUrlPrefix: dataUrl.slice(0, 64),
+    });
     setExtracting((s) => ({ ...s, [invoiceId]: true }));
     try {
+      console.log("[invoice-ocr] stage=3 provider-request", {
+        invoiceId,
+        function: "extract-invoice",
+      });
       const { data, error } = await supabase.functions.invoke("extract-invoice", {
         body: { imageDataUrl: dataUrl },
       });
+      console.log("[invoice-ocr] stage=4 provider-response", {
+        invoiceId,
+        hasError: Boolean(error),
+        errorMessage: error?.message ?? null,
+        hasData: Boolean(data),
+        dataKeys: data && typeof data === "object" ? Object.keys(data) : [],
+      });
       if (error) throw error;
       const items = Array.isArray(data?.items) ? data.items : [];
+      console.log("[invoice-ocr] stage=5 raw-extraction-received", {
+        invoiceId,
+        rawItemsCount: items.length,
+        rawTextPreview: JSON.stringify(data).slice(0, 1000),
+        supplier: data?.supplier ?? null,
+        total: data?.total ?? null,
+        invoiceDate: data?.invoice_date ?? data?.invoiceDate ?? null,
+      });
       traceInvoiceQuantityStage("extract-response:first-item", items[0], { invoiceId });
       if (import.meta.env.DEV && items[0]) {
         const sample = normalizeInvoiceItemFields(items[0] as ItemRow);
@@ -1275,10 +1308,24 @@ function InvoicesPage() {
       }
       // wipe prior items then insert fresh
       await supabase.from("invoice_items").delete().eq("invoice_id", invoiceId);
+      const normalizedItems = items
+        .map((it: ItemRow) => normalizeInvoiceItemFields(it))
+        .filter((it: ItemRow) => !shouldRejectInvoiceIngredientRow(it));
+      const rejectedCount = items.length - normalizedItems.length;
+      console.log("[invoice-ocr] stage=6 table-detection", {
+        invoiceId,
+        method: "client-side shouldRejectInvoiceIngredientRow filter",
+        note: "deterministic parseContinente/parsePadaria not used in active pipeline",
+        rawItemsCount: items.length,
+        acceptedItemsCount: normalizedItems.length,
+        rejectedItemsCount: rejectedCount,
+      });
+      console.log("[invoice-ocr] stage=7 row-extraction", {
+        invoiceId,
+        parsedRowsCount: normalizedItems.length,
+        parsedRowsPreview: normalizedItems.slice(0, 5),
+      });
       if (items.length && user) {
-        const normalizedItems = items
-          .map((it: ItemRow) => normalizeInvoiceItemFields(it))
-          .filter((it: ItemRow) => !shouldRejectInvoiceIngredientRow(it));
         traceInvoiceQuantityStage("insert-normalized:first-item", normalizedItems[0], {
           invoiceId,
         });
@@ -1297,6 +1344,12 @@ function InvoicesPage() {
         });
         traceInvoiceQuantityStage("insert-payload:first-item", insertRows[0], { invoiceId });
         const { error: insertError } = await supabase.from("invoice_items").insert(insertRows);
+        console.log("[invoice-ocr] stage=9 persistence-result", {
+          invoiceId,
+          insertRowCount: insertRows.length,
+          success: !insertError,
+          error: insertError?.message ?? null,
+        });
         if (insertError) throw insertError;
 
         const supplierForSync = normalizeSupplierDisplayName(data?.supplier);
@@ -1330,6 +1383,12 @@ function InvoicesPage() {
             trigger: "invoice_extract_cost_sync",
           });
         }
+      } else {
+        console.log("[invoice-ocr] stage=9 persistence-skipped", {
+          invoiceId,
+          reason: !items.length ? "no items from extraction" : "no user session",
+          rawItemsCount: items.length,
+        });
       }
       const supplier = normalizeSupplierDisplayName(data?.supplier);
       const invoiceNumber = normalizeInvoiceNumber(data?.invoice_number);
@@ -1353,6 +1412,15 @@ function InvoicesPage() {
         rawInvoiceDate,
         itemsCount: items.length,
       });
+      console.log("[invoice-ocr] stage=10 final-summary", {
+        invoiceId,
+        supplier: supplier || null,
+        invoiceNumber,
+        invoiceDate,
+        total: typeof data?.total === "number" ? data.total : null,
+        rawItemsCount: items.length,
+        persistedItemsCount: normalizedItems.length,
+      });
       return {
         supplier: supplier || undefined,
         invoiceNumber,
@@ -1360,7 +1428,11 @@ function InvoicesPage() {
         total: typeof data?.total === "number" ? data.total : undefined,
         itemsCount: items.length,
       };
-    } catch {
+    } catch (err) {
+      console.error("[invoice-ocr] extraction-failed", {
+        invoiceId,
+        error: err instanceof Error ? err.message : String(err),
+      });
       return null;
     } finally {
       setExtracting((s) => ({ ...s, [invoiceId]: false }));
@@ -1381,6 +1453,13 @@ function InvoicesPage() {
         .upload(path, item.file, { contentType: item.file.type, upsert: false });
       if (upErr) throw upErr;
 
+      console.log("[invoice-ocr] stage=1 upload-complete", {
+        fileName: item.file.name,
+        fileType: item.file.type,
+        fileSize: item.file.size,
+        storagePath: path,
+      });
+
       setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 40 } : x)));
 
       const sourceFileName = item.file.name.replace(/\.[^.]+$/, "").slice(0, 120) || "Invoice";
@@ -1398,10 +1477,21 @@ function InvoicesPage() {
       if (insErr || !inserted) throw insErr ?? new Error("Insert failed");
       rememberInvoiceIdentity(inserted.id, { sourceFileName });
 
+      console.log("[invoice-ocr] stage=1 invoice-row-created", {
+        invoiceId: inserted.id,
+        fallbackSupplier,
+        storagePath: path,
+      });
+
       setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 65 } : x)));
 
       const isImage = item.file.type.startsWith("image/");
       if (isImage) {
+        console.log("[invoice-ocr] stage=2 ocr-will-run", {
+          invoiceId: inserted.id,
+          reason: "image file type",
+          fileType: item.file.type,
+        });
         const dataUrl = await fileToDataUrl(item.file);
         const ext = await runExtraction(inserted.id, dataUrl);
         const invoiceUpdatePayload: {
@@ -1442,6 +1532,19 @@ function InvoicesPage() {
           supplierName: ext?.supplier ?? null,
           invoiceNumber: ext?.invoiceNumber ?? null,
           invoiceDate: ext?.invoiceDate ?? null,
+        });
+        console.log("[invoice-ocr] stage=10 upload-summary-updated", {
+          invoiceId: inserted.id,
+          extractionSucceeded: ext !== null,
+          itemsCount: ext?.itemsCount ?? 0,
+          total: invoiceUpdatePayload.total,
+          supplier: invoiceUpdatePayload.supplier_name,
+        });
+      } else {
+        console.log("[invoice-ocr] stage=2 ocr-skipped", {
+          invoiceId: inserted.id,
+          reason: "non-image file (PDF or unknown type)",
+          fileType: item.file.type,
         });
       }
 

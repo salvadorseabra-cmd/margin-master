@@ -15,6 +15,13 @@ serve(async (req) => {
   try {
     const { imageDataUrl } = await req.json();
 
+    console.log("[invoice-ocr] stage=1 request-received", {
+      hasImageDataUrl: typeof imageDataUrl === "string",
+      imageDataUrlLength: typeof imageDataUrl === "string" ? imageDataUrl.length : 0,
+      imageDataUrlPrefix:
+        typeof imageDataUrl === "string" ? imageDataUrl.slice(0, 64) : null,
+    });
+
     if (!imageDataUrl || typeof imageDataUrl !== "string") {
       return new Response(
         JSON.stringify({ error: "imageDataUrl is required" }),
@@ -31,6 +38,9 @@ serve(async (req) => {
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 
     if (!OPENAI_API_KEY) {
+      console.error("[invoice-ocr] stage=2 ocr-aborted", {
+        reason: "OPENAI_API_KEY not configured",
+      });
       return new Response(
         JSON.stringify({ error: "OPENAI_API_KEY not configured" }),
         {
@@ -43,6 +53,13 @@ serve(async (req) => {
       );
     }
 
+    console.log("[invoice-ocr] stage=2 ocr-started", {
+      provider: "openai",
+      model: "gpt-4.1",
+      mode: "vision-json",
+      note: "deterministic OCR parsers (parseContinente/parsePadaria/stages.ts) not invoked",
+    });
+
     const response = await fetch(
       "https://api.openai.com/v1/chat/completions",
       {
@@ -52,7 +69,7 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gpt-4.1", 
+          model: "gpt-4.1",
           response_format: { type: "json_object" },
           messages: [
             {
@@ -172,8 +189,15 @@ Do not hallucinate.
       }
     );
 
+    console.log("[invoice-ocr] stage=3 provider-response", {
+      ok: response.ok,
+      status: response.status,
+      statusText: response.statusText,
+    });
+
     if (!response.ok) {
       if (response.status === 429) {
+        console.error("[invoice-ocr] stage=3 provider-error", { status: 429, reason: "rate_limit" });
         return json(
           { error: "Rate limit reached. Please try again shortly." },
           429
@@ -182,35 +206,55 @@ Do not hallucinate.
 
       const t = await response.text();
 
-      console.error("OpenAI error:", response.status, t);
+      console.error("[invoice-ocr] stage=3 provider-error", {
+        status: response.status,
+        bodyPreview: t.slice(0, 500),
+      });
 
       return json({ error: "AI extraction failed" }, 500);
     }
 
     const result = await response.json();
 
+    console.log("[invoice-ocr] stage=4 ocr-completed", {
+      finishReason: result?.choices?.[0]?.finish_reason ?? null,
+      usage: result?.usage ?? null,
+    });
+
     const content = result?.choices?.[0]?.message?.content;
 
     if (!content || typeof content !== "string") {
+      console.error("[invoice-ocr] stage=5 raw-text-missing", {
+        contentType: typeof content,
+        choicesLength: Array.isArray(result?.choices) ? result.choices.length : 0,
+      });
       return json({ error: "No structured output from model" }, 502);
     }
+
+    console.log("[invoice-ocr] stage=5 raw-ocr-text", {
+      rawTextLength: content.length,
+      rawTextPreview: content.slice(0, 1000),
+    });
 
     let parsed;
 
     try {
       parsed = JSON.parse(content);
     } catch (e) {
-      console.error("JSON parse error", e);
+      console.error("[invoice-ocr] stage=5 json-parse-error", {
+        error: e instanceof Error ? e.message : String(e),
+        contentPreview: content.slice(0, 500),
+      });
 
       return json({ error: "Invalid JSON from model" }, 502);
     }
 
-    console.log("RAW MODEL RESPONSE", parsed);
-
-console.log(
-  "RAW MODEL ITEMS",
-  JSON.stringify(parsed?.items, null, 2)
-);
+    console.log("[invoice-ocr] stage=6 table-detection", {
+      method: "vision-model-structured-json",
+      deterministicTableDetection: "skipped",
+      parsedKeys: parsed && typeof parsed === "object" ? Object.keys(parsed) : [],
+      rawItemsArrayLength: Array.isArray(parsed?.items) ? parsed.items.length : null,
+    });
 
     const fallbackInvoiceDate =
       typeof parsed?.invoice_date === "string"
@@ -268,11 +312,22 @@ console.log(
         : [],
     };
 
-    console.log("NORMALIZED EXTRACTION", normalized);
+    console.log("[invoice-ocr] stage=7 row-extraction", {
+      parsedRowsCount: normalized.items.length,
+      parsedRowsPreview: normalized.items.slice(0, 5),
+      supplier: normalized.supplier,
+      invoice_date: normalized.invoice_date,
+      total: normalized.total,
+    });
+
+    console.log("[invoice-ocr] stage=8 persistence-handoff", {
+      note: "invoice_items insert happens in client (src/routes/invoices.tsx runExtraction)",
+      itemsToPersist: normalized.items.length,
+    });
 
     return json(normalized, 200);
   } catch (e) {
-    console.error("extract-invoice error", e);
+    console.error("[invoice-ocr] extract-invoice error", e);
 
     return json(
       {
