@@ -175,6 +175,77 @@ const BARE_UNIT_COUNT_RE = new RegExp(
   "iu",
 );
 
+const PACK_CONTAINER_ROW_UNITS = new Set([
+  "pack",
+  "packs",
+  "caixa",
+  "caixas",
+  "cx",
+  "case",
+  "cases",
+  "box",
+  "boxes",
+  "emb",
+  "embalagem",
+  "embalagens",
+  "tray",
+  "trays",
+  "bandeja",
+  "bandejas",
+  "bundle",
+  "bundles",
+]);
+
+function hasExplicitCaseUnitCountInName(name: string): boolean {
+  return (
+    /\b(?:caixa|caixas|cx)\s*\d+/i.test(name) ||
+    /\b\d+\s*(?:un|uni|und|unds|unid|unids|unit|units)\b/i.test(name) ||
+    /\b\d+\s*(?:x|×|\*|X)\s*\d+/i.test(name)
+  );
+}
+
+/**
+ * Invoice row is a case/pack container but the product name only embeds per-piece weight
+ * (e.g. `ANGUS 180G` @ 1 cx) — not total case weight for display.
+ */
+export function isCaseRowWithEmbeddedPieceWeightOnly(
+  name: string,
+  rowUnit: string | null | undefined,
+): boolean {
+  const normalizedRowUnit = rowUnit?.trim().toLowerCase();
+  if (!normalizedRowUnit || !PACK_CONTAINER_ROW_UNITS.has(normalizedRowUnit)) {
+    return false;
+  }
+  const structure = parsePurchaseStructureFromText(name.trim());
+  if (!structure || structure.tier !== "bare_measure") return false;
+  if (hasExplicitCaseUnitCountInName(name)) return false;
+  return true;
+}
+
+function adjustCasePieceWeightDisplay(
+  structured: StructuredPurchaseFormat,
+  item: InvoiceLinePurchaseInput,
+): StructuredPurchaseFormat {
+  const name = String(item.name ?? "").trim();
+  const rowUnit = item.unit?.trim() || null;
+  if (!isCaseRowWithEmbeddedPieceWeightOnly(name, rowUnit)) return structured;
+
+  return {
+    ...structured,
+    purchaseContainerUnit: rowUnit!.trim().toLowerCase(),
+    normalizedUsableQuantity: null,
+    usableQuantityUnit: null,
+    reason: `${structured.reason}; case row piece-weight-only display`,
+  };
+}
+
+/** Display-only wrapper — does not alter persistence / costing resolution. */
+export function resolveStructuredPurchaseForDisplay(
+  item: InvoiceLinePurchaseInput,
+): StructuredPurchaseFormat {
+  return adjustCasePieceWeightDisplay(resolveInvoiceLinePurchaseFormat(item), item);
+}
+
 const PACKAGE_TYPE_BY_CONTAINER: Record<string, PackageType> = {
   pack: "pack",
   packs: "pack",
@@ -1138,7 +1209,7 @@ export function formatStructuredPurchaseDisplay(structured: StructuredPurchaseFo
  * Best-effort purchase label: structured format first, then raw invoice text when parsing is weak.
  */
 export function resolveInvoicePurchaseDisplayLabel(item: InvoiceLinePurchaseInput): string | null {
-  const structured = resolveInvoiceLinePurchaseFormat(item);
+  const structured = resolveStructuredPurchaseForDisplay(item);
   const display = formatStructuredPurchaseDisplay(structured);
   if (display && !isCollapsedMeaninglessPurchaseLabel(display)) return display;
 
@@ -1165,7 +1236,7 @@ export function resolveInvoiceLineStockPresentation(
   item: InvoiceLinePurchaseInput,
   rowKey?: string,
 ): InvoiceLineStockPresentation {
-  const structured = resolveInvoiceLinePurchaseFormat(item);
+  const structured = resolveStructuredPurchaseForDisplay(item);
   const inferred = structured.inferred;
   const totalUsableAmount = structured.normalizedUsableQuantity;
   const usableUnit = structured.usableQuantityUnit;

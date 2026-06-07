@@ -6,8 +6,10 @@
 import { formatCurrency, formatUnitCostCurrency } from "@/lib/display-format";
 import type { PackageType } from "@/lib/ingredient-unit-inference";
 import {
+  isCaseRowWithEmbeddedPieceWeightOnly,
   resolveInvoiceLinePurchaseFormat,
   resolveInvoiceLineStockPresentation,
+  resolveStructuredPurchaseForDisplay,
   type InvoiceLinePurchaseInput,
   type StructuredPurchaseFormat,
 } from "@/lib/invoice-purchase-format";
@@ -206,7 +208,16 @@ export function formatInvoicePurchasePriceLabel(metadata: InvoicePurchasePriceMe
 function resolvePriceSuffix(
   structured: StructuredPurchaseFormat,
   rowUnit: string | null | undefined,
+  name: string,
 ): string | null {
+  if (isCaseRowWithEmbeddedPieceWeightOnly(name, rowUnit)) {
+    const normalizedRowUnit = normalizeToken(rowUnit);
+    if (normalizedRowUnit && ROW_UNIT_PRICE_SUFFIX[normalizedRowUnit]) {
+      return ROW_UNIT_PRICE_SUFFIX[normalizedRowUnit];
+    }
+    return "case";
+  }
+
   if (structured.packageType) {
     return PACKAGE_TYPE_PRICE_SUFFIX[structured.packageType];
   }
@@ -335,6 +346,10 @@ export function computeEffectiveUsableCost(
   structured: StructuredPurchaseFormat,
   name: string,
 ): { cost: number; unit: string } | null {
+  if (isCaseRowWithEmbeddedPieceWeightOnly(name, metadata.unit)) {
+    return { cost: unitPrice, unit: "case" };
+  }
+
   const usable = resolveUsablePerPricedUnit(metadata, structured);
   if (!usable || usable.amount <= 0) return null;
 
@@ -939,7 +954,7 @@ export function invoicePricingBadgeUiTone(
 export function resolveInvoiceLinePricingPresentation(
   metadata: InvoicePurchasePriceMetadata,
 ): InvoiceLinePricingPresentation {
-  const structured = resolveInvoiceLinePurchaseFormat(metadata);
+  const structured = resolveStructuredPurchaseForDisplay(metadata);
   const stock = resolveInvoiceLineStockPresentation(metadata);
   const name = String(metadata.name ?? "");
   const unitPrice = metadata.unit_price == null ? null : Number(metadata.unit_price);
@@ -951,7 +966,7 @@ export function resolveInvoiceLinePricingPresentation(
   let priceDisplay: string | null = null;
   let effectiveUnit: string | null = null;
   if (unitPrice != null && Number.isFinite(unitPrice)) {
-    const suffix = resolvePriceSuffix(structured, metadata.unit);
+    const suffix = resolvePriceSuffix(structured, metadata.unit, name);
     priceDisplay = suffix
       ? `${formatUnitCostCurrency(unitPrice)} / ${suffix}`
       : formatUnitCostCurrency(unitPrice);

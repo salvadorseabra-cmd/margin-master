@@ -5,6 +5,7 @@ import {
   formatCanonicalUsableStockLabel,
   formatUsableStockQuantityLabel,
   hasRichPackageSemantics,
+  isCaseRowWithEmbeddedPieceWeightOnly,
   isCollapsedMeaninglessPurchaseLabel,
   isCollapsedMeaninglessUsable,
   isMeaninglessUsableStockLabel,
@@ -12,6 +13,7 @@ import {
   resolveInvoiceLinePurchaseFormat,
   resolveInvoiceLineStockPresentation,
   resolveInvoicePurchaseDisplayLabel,
+  resolveStructuredPurchaseForDisplay,
   structuredPurchaseToIngredientFields,
   USABLE_STOCK_MIN_CONFIDENCE,
 } from "./invoice-purchase-format";
@@ -548,6 +550,41 @@ describe("resolveInvoiceLineStockPresentation", () => {
     expect(presentation.quantityLabel).toMatch(/1\s*kg\s+usable/i);
     expect(presentation.quantityLabel).not.toMatch(/^\s*2\s*g\s+usable/i);
     expect(presentation.renderSource).toBe("unified");
+  });
+});
+
+describe("isCaseRowWithEmbeddedPieceWeightOnly", () => {
+  it("detects cx row with only per-piece weight in the name", () => {
+    expect(
+      isCaseRowWithEmbeddedPieceWeightOnly("CARNE HAMBURGUER ANGUS 180G", "cx"),
+    ).toBe(true);
+  });
+
+  it("does not flag explicit multi-unit case structures", () => {
+    expect(
+      isCaseRowWithEmbeddedPieceWeightOnly("Burger Angus 180gr (Caixa 40 un)", "cx"),
+    ).toBe(false);
+  });
+});
+
+describe("case row piece-weight display", () => {
+  it("keeps persistence usable but suppresses misleading display for Angus 1 cx", () => {
+    const item = {
+      name: "CARNE HAMBURGUER ANGUS 180G",
+      quantity: 1,
+      unit: "cx",
+    };
+    const persisted = resolveInvoiceLinePurchaseFormat(item);
+    expect(persisted.normalizedUsableQuantity).toBe(180);
+    expect(persisted.usableQuantityUnit).toBe("g");
+
+    const displayed = resolveStructuredPurchaseForDisplay(item);
+    expect(displayed.normalizedUsableQuantity).toBeNull();
+    expect(displayed.usableQuantityUnit).toBeNull();
+    expect(displayed.purchaseContainerUnit).toBe("cx");
+
+    const presentation = resolveInvoiceLineStockPresentation(item);
+    expect(presentation.quantityLabel).toBeNull();
   });
 });
 

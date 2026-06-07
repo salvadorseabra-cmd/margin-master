@@ -1587,14 +1587,14 @@ export function extractCanonicalIngredientStructure(
     if (isCarton) {
       return {
         unitType: perItem.base,
-        unitSize: structure.unitSize,
+        unitSize: perItem.amount,
         usableQuantity: perItem.amount,
         confidence: 0.94,
       };
     }
     return {
       unitType: perItem.base,
-      unitSize: structure.unitSize,
+      unitSize: perItem.amount,
       usableQuantity: perItem.amount,
       confidence: 0.97,
     };
@@ -1668,7 +1668,7 @@ export function inferSemanticPackStructure(input: {
 
   if (canonicalStructure) {
     return semanticPackFromMeasure(
-      canonicalStructure.unitSize,
+      canonicalStructure.usableQuantity,
       canonicalStructure.unitType,
       outerPurchaseQty,
       canonicalStructure.confidence,

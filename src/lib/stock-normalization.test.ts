@@ -813,10 +813,27 @@ describe("extractCanonicalIngredientStructure", () => {
     { name: "Pão hambúrguer brioche 80g", unitSize: 80, unitType: "g" as const },
     { name: "Hambúrguer bovino 180g", unitSize: 180, unitType: "g" as const },
     { name: "Smash Burger Patty 90g", unitSize: 90, unitType: "g" as const },
+    { name: "Bacon Burger Premium Fatiado 1kg", unitSize: 1000, unitType: "g" as const },
   ])("parses $name", ({ name, unitSize, unitType }) => {
     const structure = extractCanonicalIngredientStructure(name);
     expect(structure).toMatchObject({ unitSize, unitType, usableQuantity: unitSize });
     expect(structure?.confidence).toBeGreaterThanOrEqual(0.9);
+  });
+
+  it("maps BAC STRK + 1kg canonical match to kg-based semantic usable", () => {
+    const inferred = inferSemanticPackStructure({
+      lineName: "BAC STRK",
+      rowQuantity: 6,
+      rowUnit: "un",
+      matchedIngredientName: "Bacon Burger Premium Fatiado 1kg",
+    });
+    expect(inferred).toMatchObject({
+      perUnitSize: 1000,
+      usableUnit: "g",
+      outerPurchaseQty: 6,
+      totalUsable: 6000,
+      source: "matched_ingredient_structure",
+    });
   });
 });
 

@@ -316,6 +316,38 @@ describe("resolveInvoiceLinePricingPresentation", () => {
     expect(presentation.badges).toEqual([]);
     expect(presentation.card.usableCostLine).toBeNull();
   });
+
+  it("formats BAC STRK with 1kg canonical match in kg-based units", () => {
+    const presentation = resolveInvoiceLinePricingPresentation({
+      name: "BAC STRK",
+      quantity: 6,
+      unit: "un",
+      unit_price: 8.95,
+      matchedIngredientName: "Bacon Burger Premium Fatiado 1kg",
+    });
+
+    expect(presentation.purchasedPackDetail).toBe("6 × 1 kg");
+    expect(presentation.purchasedPackDetail).not.toMatch(/1\s*g/i);
+    expect(presentation.usableStockLabel).toMatch(/6\s*kg\s+usable/i);
+    expect(presentation.effectiveUsableCostLabel).toBe("€8.95 / kg");
+    expect(presentation.card.usableCostLine).not.toMatch(/8,?950/i);
+  });
+
+  it("formats Angus case with embedded piece weight as per-case not per-180g", () => {
+    const presentation = resolveInvoiceLinePricingPresentation({
+      name: "CARNE HAMBURGUER ANGUS 180G",
+      quantity: 1,
+      unit: "cx",
+      unit_price: 24.9,
+    });
+
+    expect(presentation.card.purchaseQuantityLine).toBe("1 case");
+    expect(presentation.card.purchasePriceLine).toBe("€24.90 / case");
+    expect(presentation.card.normalizedLine).toBeNull();
+    expect(presentation.usableStockLabel).toBeNull();
+    expect(presentation.card.usableCostLine).toBe("€24.90 / case usable");
+    expect(presentation.effectiveUsableCostLabel).not.toMatch(/138/i);
+  });
 });
 
 describe("formatInvoiceRowReviewWarning", () => {
