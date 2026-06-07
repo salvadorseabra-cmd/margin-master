@@ -112,13 +112,16 @@ import {
   type CanonicalIngredientCreateSubmitValues,
 } from "@/components/canonical-ingredient-create-dialog";
 import {
-  buildCanonicalIngredientCreateDefaults,
-  buildExplicitCanonicalInsertPayload,
-  traceCanonicalConfirmedName,
-  traceCanonicalCreate,
-  traceCanonicalCreateFailure,
-  validateCanonicalIngredientName,
-} from "@/lib/canonical-ingredient-create";
+  BulkCanonicalIngredientCreateSheet,
+  type BulkCanonicalIngredientCreateSubmitRow,
+} from "@/components/bulk-canonical-ingredient-create-sheet";
+import { buildCanonicalIngredientCreateDefaults } from "@/lib/canonical-ingredient-create";
+import {
+  buildBulkSubmitValuesFromDefaults,
+  collectUnmatchedRowsForBulkCreate,
+  executeBulkCanonicalIngredientCreate,
+  saveCanonicalIngredientFromInvoiceRow,
+} from "@/lib/bulk-canonical-ingredient-create";
 import { buildIngredientPickerOptionsForInvoice } from "@/lib/ingredient-picker-options";
 import {
   isIngredientPickerTraceEnabled,
@@ -127,7 +130,6 @@ import {
 } from "@/lib/ingredient-picker-trace";
 import {
   autoPersistUnmatchedInvoiceItems,
-  persistIngredientFromInvoiceItem,
   persistOperationalIngredientCostFromInvoiceLine,
 } from "@/lib/ingredient-auto-persist";
 import { traceCanonicalCreateAttempt } from "@/lib/ingredient-catalog-diagnostics";
@@ -137,7 +139,6 @@ import {
   syncOperationalIngredientCostsFromInvoiceLines,
 } from "@/lib/ingredient-operational-intelligence";
 import { dispatchOperationalIngredientCostChanged } from "@/lib/resolve-operational-ingredient-cost";
-import { guardIngredientCreation } from "@/lib/ingredient-operational-identity";
 import {
   fileNameFromInvoicePath,
   looksLikeUploadedFileName,
@@ -200,8 +201,7 @@ const ACCEPT = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
 
 function createPendingId(): string {
   return (
-    globalThis.crypto?.randomUUID?.() ??
-    `${Date.now()}-${Math.random().toString(36).slice(2)}`
+    globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`
   );
 }
 
@@ -1874,9 +1874,13 @@ function InvoicesPage() {
           JSON.stringify(mergedAfterDb),
         );
       } catch (localStorageErr) {
-        traceIngredientAliasesCatch("persistIngredientCorrectionForItem:localStorage", localStorageErr, {
-          itemName: item.name,
-        });
+        traceIngredientAliasesCatch(
+          "persistIngredientCorrectionForItem:localStorage",
+          localStorageErr,
+          {
+            itemName: item.name,
+          },
+        );
       }
       return { ok: true };
     });
@@ -2003,186 +2007,34 @@ function InvoicesPage() {
     }
     const { item, supplierName, invoiceId: canonicalInvoiceId } = canonicalCreateContext;
 
-    traceIngredientAliases("saveCanonicalIngredientFromInvoice:enter", {
-      function: "saveCanonicalIngredientFromInvoice",
-      itemId: item.id,
-      invoiceAlias: item.name,
-      compareBucket: getAliasTraceCompareBucket(item.name),
-      canonicalName: values.canonicalName,
-      supplierName,
-    });
-    traceCanonicalCreateAttempt({
-      flowFunction: "saveCanonicalIngredientFromInvoice",
-      flowOrigin: "explicit_user",
-      stage: "submit",
-      rawInvoiceText: item.name,
-      normalized: values.canonicalName,
-      finalCanonicalName: values.canonicalName,
-      nameSource: "user_canonical",
-      insertAttempted: false,
-    });
-
-    const nameValidation = validateCanonicalIngredientName(values.canonicalName, {
-      invoiceAlias: item.name,
-    });
-    if (!nameValidation.ok) {
-      traceIngredientAliases("saveCanonicalIngredientFromInvoice:early-return", {
-        branch: "canonical_name_validation_failed",
-        invoiceAlias: item.name,
-        message: nameValidation.message,
-      });
-      setCanonicalCreateError(nameValidation.message);
-      return;
-    }
-
-    traceCanonicalConfirmedName({ confirmedName: values.canonicalName.trim() });
-
-    const payload = buildExplicitCanonicalInsertPayload({
-      canonicalName: values.canonicalName,
-      item,
-      userId: user.id,
-      unit: values.unit,
-      current_price: values.current_price,
-      purchase_quantity: values.purchase_quantity,
-      purchase_unit: values.purchase_unit,
-      base_unit: values.base_unit,
-      isGenericUnit,
-    });
-    if (!payload) {
-      traceIngredientAliases("saveCanonicalIngredientFromInvoice:early-return", {
-        branch: "buildExplicitCanonicalInsertPayload_null",
-        invoiceAlias: item.name,
-      });
-      setCanonicalCreateError("Could not build ingredient from this invoice line.");
-      return;
-    }
-
     setCanonicalCreateSaving(true);
     setCanonicalCreateError(null);
     setCreatingIngredientByItem((current) => ({ ...current, [item.id]: true }));
-    traceCanonicalCreate("submit-start", {
-      itemId: item.id,
-      invoiceAlias: item.name,
-      canonicalName: values.canonicalName,
-      supplierName,
-    });
     try {
-      const guard = guardIngredientCreation(values.canonicalName, ingredientCatalog, {
-        flowFunction: "saveCanonicalIngredientFromInvoice",
-        flowOrigin: "explicit_user",
-        rawInvoiceText: item.name,
-      });
-      let ingredientId: string;
-      let ingredientName: string;
-      let ingredientReused = false;
-
-      traceCanonicalCreate("guard-resolved", {
-        action: guard.action,
-        operationalKey: guard.operationalKey,
-        existingId: guard.action === "reuse" ? guard.existing.id : null,
-        reason: guard.action === "reuse" ? guard.reason : null,
-      });
-
-      if (guard.action === "reuse") {
-        ingredientReused = true;
-        ingredientId = guard.existing.id;
-        ingredientName =
-          guard.existing.name ?? guard.existing.normalized_name ?? values.canonicalName;
-        traceCanonicalCreate("ingredient-reuse", {
-          ingredientId,
-          ingredientName,
-          reason: guard.reason,
-          proposedCanonicalName: values.canonicalName,
-        });
-        const existing = guard.existing as IngredientMatchRow;
-        setIngredientCatalog((current) =>
-          current.some((row) => row.id === existing.id) ? current : [...current, existing],
-        );
-      } else {
-        const { data, error, blocked, blockReason } = await persistIngredientFromInvoiceItem(
+      const result = await saveCanonicalIngredientFromInvoiceRow(
+        {
           supabase,
-          payload,
-          {
-            catalog: ingredientCatalog,
-            source: "explicit_user",
-          },
-        );
-        if (error) throw error;
-        if (blocked) {
-          traceCanonicalCreateFailure("ingredient-blocked", {
-            blockReason,
-            canonicalName: values.canonicalName,
-          });
-          setCanonicalCreateError(
-            blockReason === "archived_ingredient_resurrection"
-              ? "This name was merged/archived. Use the canonical ingredient instead."
-              : blockReason === "invoice_shorthand_not_canonical"
-                ? "Use a full product name for the catalog. Invoice shorthand belongs in alias memory."
-                : "Could not create ingredient from this invoice line.",
-          );
-          return;
-        }
-        if (!data?.id) {
-          traceCanonicalCreateFailure("ingredient-missing-id", {
-            canonicalName: values.canonicalName,
-          });
-          setCanonicalCreateError("Could not create ingredient.");
-          return;
-        }
-        ingredientId = data.id;
-        ingredientName = data.name ?? values.canonicalName;
-        traceCanonicalCreate("ingredient-create-ok", {
-          ingredientId,
-          ingredientName,
-          normalizedName: data.normalized_name,
-        });
-        const row = data as IngredientMatchRow;
-        setIngredientCatalog((current) =>
-          current.some((r) => r.id === row.id) ? current : [...current, row],
-        );
-      }
-
-      traceIngredientAliases("saveCanonicalIngredientFromInvoice:alias-persist-call", {
-        invoiceAlias: item.name,
-        ingredientId,
-        ingredientReused,
-      });
-      const aliasResult = await persistIngredientCorrectionForItem(
-        item,
-        ingredientId,
-        ingredientName,
-        canonicalInvoiceId,
-        supplierName,
+          userId: user.id,
+          catalog: ingredientCatalog,
+          isGenericUnit,
+          persistIngredientCorrection: persistIngredientCorrectionForItem,
+        },
+        { item, supplierName, invoiceId: canonicalInvoiceId },
+        values,
       );
-      if (!aliasResult.ok) {
-        traceIngredientAliases("saveCanonicalIngredientFromInvoice:alias-failed", {
-          invoiceAlias: item.name,
-          error: aliasResult.error,
-          insertAttempted: true,
-        });
-        traceCanonicalCreateFailure("alias-link-failed", {
-          itemId: item.id,
-          invoiceAlias: item.name,
-          ingredientId,
-          ingredientReused,
-          error: aliasResult.error,
-        });
-        setCanonicalCreateError(
-          aliasResult.error ??
-            "Ingredient saved but invoice alias could not be linked. Try choosing the ingredient manually.",
-        );
+      if (!result.ok) {
+        setCanonicalCreateError(result.error);
         return;
       }
 
-      traceCanonicalCreate("complete", {
-        itemId: item.id,
-        invoiceAlias: item.name,
-        ingredientId,
-        ingredientReused,
-      });
+      setIngredientCatalog((current) =>
+        current.some((row) => row.id === result.catalogRow.id)
+          ? current
+          : [...current, result.catalogRow as IngredientMatchRow],
+      );
       dispatchOperationalIngredientCostChanged({
         trigger: "invoice_canonical_save",
-        ingredientId,
+        ingredientId: result.ingredientId,
       });
       void load();
       setCanonicalCreateContext(null);
@@ -2192,13 +2044,81 @@ function InvoicesPage() {
       traceIngredientAliasesCatch("saveCanonicalIngredientFromInvoice", err, {
         invoiceAlias: canonicalCreateContext?.item.name,
       });
-      setCanonicalCreateError(
-        err instanceof Error ? err.message : "Could not create ingredient.",
-      );
+      setCanonicalCreateError(err instanceof Error ? err.message : "Could not create ingredient.");
     } finally {
       setCanonicalCreateSaving(false);
       setCreatingIngredientByItem((current) => removeKey(current, item.id));
     }
+  };
+
+  const saveBulkCanonicalIngredientsFromInvoice = async (
+    invoiceId: string,
+    supplierName: string | null | undefined,
+    submissions: BulkCanonicalIngredientCreateSubmitRow[],
+    candidates: ReturnType<typeof collectUnmatchedRowsForBulkCreate>,
+  ) => {
+    if (!user || submissions.length === 0) return { ok: false as const };
+
+    const submissionByItemId = new Map(submissions.map((row) => [row.itemId, row]));
+    const rows = candidates
+      .filter((candidate) => submissionByItemId.has(candidate.item.id))
+      .map((candidate) => {
+        const submission = submissionByItemId.get(candidate.item.id)!;
+        return {
+          context: {
+            item: candidate.item,
+            supplierName: supplierName?.trim() || null,
+            invoiceId,
+          },
+          values: buildBulkSubmitValuesFromDefaults(candidate.defaults, submission.canonicalName),
+        };
+      });
+
+    setCreatingIngredientByItem((current) => {
+      const next = { ...current };
+      for (const row of rows) next[row.context.item.id] = true;
+      return next;
+    });
+
+    const result = await executeBulkCanonicalIngredientCreate(
+      {
+        supabase,
+        userId: user.id,
+        catalog: ingredientCatalog,
+        isGenericUnit,
+        persistIngredientCorrection: persistIngredientCorrectionForItem,
+        onCatalogRow: (row) => {
+          setIngredientCatalog((current) =>
+            current.some((entry) => entry.id === row.id)
+              ? current
+              : [...current, row as IngredientMatchRow],
+          );
+        },
+      },
+      rows,
+    );
+
+    setCreatingIngredientByItem((current) => {
+      const next = { ...current };
+      for (const row of rows) delete next[row.context.item.id];
+      return next;
+    });
+
+    for (const outcome of result.outcomes) {
+      if (outcome.result.ok) {
+        dispatchOperationalIngredientCostChanged({
+          trigger: "invoice_canonical_save",
+          ingredientId: outcome.result.ingredientId,
+        });
+        setIngredientCreationErrors((current) => removeKey(current, outcome.itemId));
+      }
+    }
+
+    if (result.succeeded > 0) {
+      void load();
+    }
+
+    return result;
   };
 
   const reExtract = async (row: InvoiceRow) => {
@@ -2297,327 +2217,339 @@ function InvoicesPage() {
             Upload supplier invoices — your files stay private and are extracted automatically.
           </p>
         </div>
-      {/* Operational snapshot */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-        {operationalSummaryCards.map((card) => (
-          <Stat key={card.label} {...card} />
-        ))}
-      </div>
-
-      <div className="grid lg:grid-cols-3 gap-4">
-        {/* Dropzone */}
-        <Card className="lg:col-span-2">
-          <div
-            onDragOver={(e) => {
-              e.preventDefault();
-              setDrop(true);
-            }}
-            onDragLeave={() => setDrop(false)}
-            onDrop={(e) => {
-              e.preventDefault();
-              setDrop(false);
-              if (e.dataTransfer.files?.length) enqueue(e.dataTransfer.files);
-            }}
-            onClick={() => inputRef.current?.click()}
-            className={`cursor-pointer border-2 border-dashed rounded-2xl p-8 sm:p-12 text-center transition ${
-              drop
-                ? "border-primary bg-primary/5"
-                : "border-border hover:border-foreground/30 hover:bg-muted/40"
-            }`}
-          >
-            <input
-              ref={inputRef}
-              type="file"
-              multiple
-              className="hidden"
-              accept=".pdf,.jpg,.jpeg,.png,.webp"
-              onChange={(e) => {
-                if (e.target.files) enqueue(e.target.files);
-                e.target.value = "";
-              }}
-            />
-            <div className="mx-auto h-14 w-14 rounded-2xl bg-foreground text-background grid place-items-center shadow-sm">
-              <UploadCloud className="h-6 w-6" />
-            </div>
-            <div className="mt-4 text-base font-semibold">Drop invoices here</div>
-            <div className="text-xs text-muted-foreground mt-1">
-              or click to browse · PDF, JPG, PNG, WEBP · up to 20 MB each
-            </div>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                inputRef.current?.click();
-              }}
-              className="mt-5 inline-flex items-center gap-2 bg-foreground text-background rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90"
-            >
-              Choose files
-            </button>
-          </div>
-
-          {globalError && (
-            <div className="mt-3 text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
-              {globalError}
-            </div>
-          )}
-
-          {/* Pending uploads */}
-          {pending.length > 0 && (
-            <div className="mt-5 space-y-2">
-              {pending.map((p) => (
-                <PendingItem key={p.id} item={p} />
-              ))}
-            </div>
-          )}
-        </Card>
-
-        {/* Invoice reading side card */}
-        <Card>
-          <div className="flex items-start gap-3">
-            <div className="h-9 w-9 rounded-lg bg-foreground text-background grid place-items-center shrink-0">
-              <Sparkles className="h-4 w-4" />
-            </div>
-            <div>
-              <div className="text-sm font-medium">Invoice reading</div>
-              <div className="text-xs text-muted-foreground">What happens next</div>
-            </div>
-          </div>
-          <ul className="mt-4 space-y-2.5 text-sm">
-            {[
-              "Files are uploaded to your private vault",
-              "Supplier and invoice rows are prepared for review",
-              "Quantities, units, and totals are separated when clear",
-              "Prices compared with previous invoices",
-              "Ingredient matches are shown separately",
-            ].map((t) => (
-              <li key={t} className="flex items-start gap-2">
-                <Check className="h-4 w-4 text-success mt-0.5 shrink-0" />
-                <span>{t}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      </div>
-
-      {/* Table */}
-      <Card className="mt-4 p-0 overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-border">
-          <div>
-            <div className="text-sm font-semibold">Your invoices</div>
-            <div className="text-xs text-muted-foreground">All files are stored privately</div>
-            {settlementOverview && (
-              <div className="mt-1 text-[11px] text-muted-foreground/75">{settlementOverview}</div>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-              Sort
-              <select
-                value={sortBy}
-                onChange={(event) => setSortBy(event.target.value as SortOption)}
-                className="h-8 rounded-md border border-border bg-background px-2 text-xs text-foreground shadow-sm outline-none hover:bg-muted/40 focus:border-foreground/30"
-              >
-                {SORT_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <span className="text-xs text-muted-foreground tabular-nums">{rows.length} total</span>
-          </div>
+        {/* Operational snapshot */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+          {operationalSummaryCards.map((card) => (
+            <Stat key={card.label} {...card} />
+          ))}
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/40">
-              <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
-                <th className="py-3 px-5 font-medium w-8"></th>
-                <th className="py-3 px-5 font-medium">Source</th>
-                <th className="py-3 px-5 font-medium">Invoice</th>
-                <th className="py-3 px-5 font-medium hidden sm:table-cell">Date</th>
-                <th className="py-3 px-5 font-medium text-right hidden md:table-cell">Items</th>
-                <th className="py-3 px-5 font-medium text-right">Total</th>
-                <th className="py-3 px-5 font-medium hidden sm:table-cell">Status</th>
-                <th className="py-3 px-5 font-medium w-28"></th>
-              </tr>
-            </thead>
-            <tbody
-              className={`divide-y divide-border${invoicesLoading && rows.length > 0 ? " opacity-60" : ""}`}
+
+        <div className="grid lg:grid-cols-3 gap-4">
+          {/* Dropzone */}
+          <Card className="lg:col-span-2">
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDrop(true);
+              }}
+              onDragLeave={() => setDrop(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDrop(false);
+                if (e.dataTransfer.files?.length) enqueue(e.dataTransfer.files);
+              }}
+              onClick={() => inputRef.current?.click()}
+              className={`cursor-pointer border-2 border-dashed rounded-2xl p-8 sm:p-12 text-center transition ${
+                drop
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-foreground/30 hover:bg-muted/40"
+              }`}
             >
-              {showInvoiceTableLoading && (
-                <tr>
-                  <td colSpan={8} className="py-12 text-center text-sm text-muted-foreground">
-                    <Loader2 className="mr-2 inline h-4 w-4 animate-spin" />
-                    Loading invoices…
-                  </td>
-                </tr>
+              <input
+                ref={inputRef}
+                type="file"
+                multiple
+                className="hidden"
+                accept=".pdf,.jpg,.jpeg,.png,.webp"
+                onChange={(e) => {
+                  if (e.target.files) enqueue(e.target.files);
+                  e.target.value = "";
+                }}
+              />
+              <div className="mx-auto h-14 w-14 rounded-2xl bg-foreground text-background grid place-items-center shadow-sm">
+                <UploadCloud className="h-6 w-6" />
+              </div>
+              <div className="mt-4 text-base font-semibold">Drop invoices here</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                or click to browse · PDF, JPG, PNG, WEBP · up to 20 MB each
+              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  inputRef.current?.click();
+                }}
+                className="mt-5 inline-flex items-center gap-2 bg-foreground text-background rounded-lg px-4 py-2 text-sm font-medium hover:opacity-90"
+              >
+                Choose files
+              </button>
+            </div>
+
+            {globalError && (
+              <div className="mt-3 text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
+                {globalError}
+              </div>
+            )}
+
+            {/* Pending uploads */}
+            {pending.length > 0 && (
+              <div className="mt-5 space-y-2">
+                {pending.map((p) => (
+                  <PendingItem key={p.id} item={p} />
+                ))}
+              </div>
+            )}
+          </Card>
+
+          {/* Invoice reading side card */}
+          <Card>
+            <div className="flex items-start gap-3">
+              <div className="h-9 w-9 rounded-lg bg-foreground text-background grid place-items-center shrink-0">
+                <Sparkles className="h-4 w-4" />
+              </div>
+              <div>
+                <div className="text-sm font-medium">Invoice reading</div>
+                <div className="text-xs text-muted-foreground">What happens next</div>
+              </div>
+            </div>
+            <ul className="mt-4 space-y-2.5 text-sm">
+              {[
+                "Files are uploaded to your private vault",
+                "Supplier and invoice rows are prepared for review",
+                "Quantities, units, and totals are separated when clear",
+                "Prices compared with previous invoices",
+                "Ingredient matches are shown separately",
+              ].map((t) => (
+                <li key={t} className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-success mt-0.5 shrink-0" />
+                  <span>{t}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </div>
+
+        {/* Table */}
+        <Card className="mt-4 p-0 overflow-hidden">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-border">
+            <div>
+              <div className="text-sm font-semibold">Your invoices</div>
+              <div className="text-xs text-muted-foreground">All files are stored privately</div>
+              {settlementOverview && (
+                <div className="mt-1 text-[11px] text-muted-foreground/75">
+                  {settlementOverview}
+                </div>
               )}
-              {showInvoiceTableEmpty && (
-                <tr>
-                  <td colSpan={8} className="py-16 text-center">
-                    <div className="mx-auto h-10 w-10 rounded-full bg-muted grid place-items-center mb-3">
-                      <FileText className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <div className="text-sm font-medium">No invoices yet</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Drop your first invoice above to get started.
-                    </div>
-                  </td>
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                Sort
+                <select
+                  value={sortBy}
+                  onChange={(event) => setSortBy(event.target.value as SortOption)}
+                  className="h-8 rounded-md border border-border bg-background px-2 text-xs text-foreground shadow-sm outline-none hover:bg-muted/40 focus:border-foreground/30"
+                >
+                  {SORT_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <span className="text-xs text-muted-foreground tabular-nums">
+                {rows.length} total
+              </span>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40">
+                <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <th className="py-3 px-5 font-medium w-8"></th>
+                  <th className="py-3 px-5 font-medium">Source</th>
+                  <th className="py-3 px-5 font-medium">Invoice</th>
+                  <th className="py-3 px-5 font-medium hidden sm:table-cell">Date</th>
+                  <th className="py-3 px-5 font-medium text-right hidden md:table-cell">Items</th>
+                  <th className="py-3 px-5 font-medium text-right">Total</th>
+                  <th className="py-3 px-5 font-medium hidden sm:table-cell">Status</th>
+                  <th className="py-3 px-5 font-medium w-28"></th>
                 </tr>
-              )}
-              {invoiceRowsForDisplay.map((r) => {
-                const open = expanded === r.id;
-                const isImage = r.file_path
-                  ? ["png", "jpg", "jpeg", "webp"].some((e) =>
-                      r.file_path!.toLowerCase().endsWith(e),
-                    )
-                  : false;
-                const items = itemsByInvoice[r.id] ?? [];
-                const settlementState = getSettlementState(r.id, settlementByInvoice);
-                const subtitle = invoiceSubtitle(r);
-                const unmatchedIngredientCount =
-                  unresolvedIngredientCountByInvoice[r.id] ?? 0;
-                return (
-                  <Fragment key={r.id}>
-                    <tr
-                      className="hover:bg-muted/30 cursor-pointer"
-                      onClick={() => toggleExpand(r)}
-                    >
-                      <td className="py-3 px-5 text-muted-foreground">
-                        {open ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
-                        )}
-                      </td>
-                      <td className="py-3 px-5">
-                        <FileBadge path={r.file_url} />
-                      </td>
-                      <td className="py-3 px-5">
-                        <div className="font-medium leading-tight">{r.supplier_name}</div>
-                        {subtitle && (
-                          <div className="mt-0.5 text-xs text-muted-foreground">
-                            {r.supplierIsFallback ? subtitle : `Invoice ${subtitle}`}
-                          </div>
-                        )}
-                      </td>
-                      <td className="py-3 px-5 text-muted-foreground hidden sm:table-cell">
-                        {r.displayDate}
-                      </td>
-                      <td className="py-3 px-5 text-right tabular-nums hidden md:table-cell">
-                        {r.items_count}
-                      </td>
-                      <td className="py-3 px-5 text-right tabular-nums font-medium">
-                        €{Number(r.total).toFixed(2)}
-                      </td>
-                      <td className="py-3 px-5 hidden sm:table-cell">
-                        <div className="flex flex-col items-start gap-1">
-                          <InvoiceListIngredientStatusBadge
-                            baseStatus={r.status}
-                            unmatchedCount={unmatchedIngredientCount}
-                          />
-                          <SettlementBadge
-                            state={settlementState}
-                            onToggle={() => toggleSettlement(r.id)}
-                          />
-                        </div>
-                      </td>
-                      <td
-                        className="py-3 px-5 text-right whitespace-nowrap"
-                        onClick={(e) => e.stopPropagation()}
+              </thead>
+              <tbody
+                className={`divide-y divide-border${invoicesLoading && rows.length > 0 ? " opacity-60" : ""}`}
+              >
+                {showInvoiceTableLoading && (
+                  <tr>
+                    <td colSpan={8} className="py-12 text-center text-sm text-muted-foreground">
+                      <Loader2 className="mr-2 inline h-4 w-4 animate-spin" />
+                      Loading invoices…
+                    </td>
+                  </tr>
+                )}
+                {showInvoiceTableEmpty && (
+                  <tr>
+                    <td colSpan={8} className="py-16 text-center">
+                      <div className="mx-auto h-10 w-10 rounded-full bg-muted grid place-items-center mb-3">
+                        <FileText className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div className="text-sm font-medium">No invoices yet</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Drop your first invoice above to get started.
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {invoiceRowsForDisplay.map((r) => {
+                  const open = expanded === r.id;
+                  const isImage = r.file_path
+                    ? ["png", "jpg", "jpeg", "webp"].some((e) =>
+                        r.file_path!.toLowerCase().endsWith(e),
+                      )
+                    : false;
+                  const items = itemsByInvoice[r.id] ?? [];
+                  const settlementState = getSettlementState(r.id, settlementByInvoice);
+                  const subtitle = invoiceSubtitle(r);
+                  const unmatchedIngredientCount = unresolvedIngredientCountByInvoice[r.id] ?? 0;
+                  return (
+                    <Fragment key={r.id}>
+                      <tr
+                        className="hover:bg-muted/30 cursor-pointer"
+                        onClick={() => toggleExpand(r)}
                       >
-                        {isImage && (
+                        <td className="py-3 px-5 text-muted-foreground">
+                          {open ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
+                        </td>
+                        <td className="py-3 px-5">
+                          <FileBadge path={r.file_url} />
+                        </td>
+                        <td className="py-3 px-5">
+                          <div className="font-medium leading-tight">{r.supplier_name}</div>
+                          {subtitle && (
+                            <div className="mt-0.5 text-xs text-muted-foreground">
+                              {r.supplierIsFallback ? subtitle : `Invoice ${subtitle}`}
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-3 px-5 text-muted-foreground hidden sm:table-cell">
+                          {r.displayDate}
+                        </td>
+                        <td className="py-3 px-5 text-right tabular-nums hidden md:table-cell">
+                          {r.items_count}
+                        </td>
+                        <td className="py-3 px-5 text-right tabular-nums font-medium">
+                          €{Number(r.total).toFixed(2)}
+                        </td>
+                        <td className="py-3 px-5 hidden sm:table-cell">
+                          <div className="flex flex-col items-start gap-1">
+                            <InvoiceListIngredientStatusBadge
+                              baseStatus={r.status}
+                              unmatchedCount={unmatchedIngredientCount}
+                            />
+                            <SettlementBadge
+                              state={settlementState}
+                              onToggle={() => toggleSettlement(r.id)}
+                            />
+                          </div>
+                        </td>
+                        <td
+                          className="py-3 px-5 text-right whitespace-nowrap"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {isImage && (
+                            <button
+                              onClick={() => reExtract(r)}
+                              disabled={!!extracting[r.id]}
+                              className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
+                              title="Re-read invoice"
+                            >
+                              {extracting[r.id] ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Wand2 className="h-4 w-4" />
+                              )}
+                            </button>
+                          )}
                           <button
-                            onClick={() => reExtract(r)}
-                            disabled={!!extracting[r.id]}
+                            onClick={() => openPreview(r)}
+                            disabled={!r.file_path}
                             className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
-                            title="Re-read invoice"
+                            title="Preview"
                           >
-                            {extracting[r.id] ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Wand2 className="h-4 w-4" />
-                            )}
+                            <Eye className="h-4 w-4" />
                           </button>
-                        )}
-                        <button
-                          onClick={() => openPreview(r)}
-                          disabled={!r.file_path}
-                          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
-                          title="Preview"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => setPendingDeleteRow(r)}
-                          className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-muted"
-                          title="Delete"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </td>
-                    </tr>
-                    {open && (
-                      <tr className="bg-muted/20">
-                        <td colSpan={8} className="px-5 py-4">
-                          <ItemsTable
-                            items={items}
-                            priceComparisons={priceComparisonsByInvoice[r.id] ?? {}}
-                            ingredientCatalog={ingredientCatalog}
-                            operationalMetadata={invoiceOperationalMetadata}
-                            allInvoiceSupplierNames={rows.map((row) => row.supplier_name)}
-                            confirmedIngredientAliases={confirmedIngredientAliases}
-                            supplierName={r.supplier_name}
-                            userId={user?.id}
-                            loading={itemsByInvoice[r.id] === undefined}
-                            extracting={!!extracting[r.id]}
-                            onExtract={isImage ? () => reExtract(r) : undefined}
-                            onCreateIngredient={(item) =>
-                              openCanonicalIngredientCreate(item, r.supplier_name, r.id)
-                            }
-                            onConfirmIngredientMatch={(item, match) =>
-                              confirmIngredientMatch(item, match, r.id, r.supplier_name)
-                            }
-                            onSelectIngredientForItem={(item, ingredientId) =>
-                              selectIngredientForItem(item, ingredientId, r.id, r.supplier_name)
-                            }
-                            creatingIngredientByItem={creatingIngredientByItem}
-                            ingredientCreationErrors={ingredientCreationErrors}
-                            rejectedMatchItemIds={rejectedMatchItemIds}
-                            onRejectedMatchItemIdsChange={setRejectedMatchItemIds}
-                          />
+                          <button
+                            onClick={() => setPendingDeleteRow(r)}
+                            className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-muted"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
                         </td>
                       </tr>
-                    )}
-                  </Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+                      {open && (
+                        <tr className="bg-muted/20">
+                          <td colSpan={8} className="px-5 py-4">
+                            <ItemsTable
+                              invoiceId={r.id}
+                              items={items}
+                              priceComparisons={priceComparisonsByInvoice[r.id] ?? {}}
+                              ingredientCatalog={ingredientCatalog}
+                              operationalMetadata={invoiceOperationalMetadata}
+                              allInvoiceSupplierNames={rows.map((row) => row.supplier_name)}
+                              confirmedIngredientAliases={confirmedIngredientAliases}
+                              supplierName={r.supplier_name}
+                              userId={user?.id}
+                              loading={itemsByInvoice[r.id] === undefined}
+                              extracting={!!extracting[r.id]}
+                              onExtract={isImage ? () => reExtract(r) : undefined}
+                              onCreateIngredient={(item) =>
+                                openCanonicalIngredientCreate(item, r.supplier_name, r.id)
+                              }
+                              onConfirmIngredientMatch={(item, match) =>
+                                confirmIngredientMatch(item, match, r.id, r.supplier_name)
+                              }
+                              onSelectIngredientForItem={(item, ingredientId) =>
+                                selectIngredientForItem(item, ingredientId, r.id, r.supplier_name)
+                              }
+                              onBulkCreateIngredients={(submissions, candidates) =>
+                                saveBulkCanonicalIngredientsFromInvoice(
+                                  r.id,
+                                  r.supplier_name,
+                                  submissions,
+                                  candidates,
+                                )
+                              }
+                              creatingIngredientByItem={creatingIngredientByItem}
+                              ingredientCreationErrors={ingredientCreationErrors}
+                              rejectedMatchItemIds={rejectedMatchItemIds}
+                              onRejectedMatchItemIdsChange={setRejectedMatchItemIds}
+                            />
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
 
-      {preview && <PreviewModal preview={preview} onClose={() => setPreview(null)} />}
-      <CanonicalIngredientCreateDialog
-        open={canonicalCreateContext !== null}
-        onOpenChange={(open) => {
-          if (!open) {
-            setCanonicalCreateContext(null);
-            setCanonicalCreateError(null);
-          }
-        }}
-        defaults={canonicalCreateDefaults}
-        saving={canonicalCreateSaving}
-        error={canonicalCreateError}
-        onSubmit={(values) => void saveCanonicalIngredientFromInvoice(values)}
-      />
-      <ConfirmDeleteDialog
-        open={pendingDeleteRow !== null}
-        onOpenChange={(open) => {
-          if (!open) setPendingDeleteRow(null);
-        }}
-        onConfirm={() => void confirmDeleteRow()}
-      />
+        {preview && <PreviewModal preview={preview} onClose={() => setPreview(null)} />}
+        <CanonicalIngredientCreateDialog
+          open={canonicalCreateContext !== null}
+          onOpenChange={(open) => {
+            if (!open) {
+              setCanonicalCreateContext(null);
+              setCanonicalCreateError(null);
+            }
+          }}
+          defaults={canonicalCreateDefaults}
+          saving={canonicalCreateSaving}
+          error={canonicalCreateError}
+          onSubmit={(values) => void saveCanonicalIngredientFromInvoice(values)}
+        />
+        <ConfirmDeleteDialog
+          open={pendingDeleteRow !== null}
+          onOpenChange={(open) => {
+            if (!open) setPendingDeleteRow(null);
+          }}
+          onConfirm={() => void confirmDeleteRow()}
+        />
       </div>
     </AppShell>
   );
@@ -2872,6 +2804,7 @@ function InvoiceNormalizationCardCell({ card }: { card: InvoiceLineNormalization
 }
 
 function ItemsTable({
+  invoiceId,
   items,
   priceComparisons,
   ingredientCatalog,
@@ -2888,9 +2821,11 @@ function ItemsTable({
   onCreateIngredient,
   onConfirmIngredientMatch,
   onSelectIngredientForItem,
+  onBulkCreateIngredients,
   rejectedMatchItemIds,
   onRejectedMatchItemIdsChange,
 }: {
+  invoiceId: string;
   items: ItemRow[];
   priceComparisons: PriceComparisonMap;
   ingredientCatalog: IngredientMatchRow[];
@@ -2912,9 +2847,27 @@ function ItemsTable({
     item: ItemRow,
     ingredientId: string,
   ) => Promise<{ ok: boolean; error?: string }>;
+  onBulkCreateIngredients: (
+    submissions: BulkCanonicalIngredientCreateSubmitRow[],
+    candidates: ReturnType<typeof collectUnmatchedRowsForBulkCreate>,
+  ) => Promise<
+    | { ok: false }
+    | {
+        outcomes: Array<{
+          itemId: string;
+          invoiceAlias: string;
+          result: { ok: boolean; error?: string };
+        }>;
+        succeeded: number;
+        failed: number;
+      }
+  >;
 }) {
   const [editingMatchRowId, setEditingMatchRowId] = useState<string | null>(null);
   const [savingCorrectionLineId, setSavingCorrectionLineId] = useState<string | null>(null);
+  const [bulkCreateSheetOpen, setBulkCreateSheetOpen] = useState(false);
+  const [bulkCreateSaving, setBulkCreateSaving] = useState(false);
+  const [bulkCreateError, setBulkCreateError] = useState<string | null>(null);
   const correctionSnapshotRef = useRef<Map<string, string | null>>(new Map());
 
   const ingredientPickerOptions = useMemo(() => {
@@ -3059,6 +3012,46 @@ function ItemsTable({
   const hasPossibleIngredientMatches = operationalSummary.possibleIngredientMatches > 0;
   const priceMovementCount = operationalSummary.priceIncreases + operationalSummary.priceDecreases;
 
+  const bulkCreateCandidates = useMemo(
+    () =>
+      collectUnmatchedRowsForBulkCreate({
+        items,
+        ingredientCatalog,
+        confirmedAliases: confirmedIngredientAliases,
+        supplierName,
+        isGenericUnit,
+      }),
+    [items, ingredientCatalog, confirmedIngredientAliases, supplierName],
+  );
+
+  const handleBulkCreateSubmit = async (submissions: BulkCanonicalIngredientCreateSubmitRow[]) => {
+    setBulkCreateSaving(true);
+    setBulkCreateError(null);
+    try {
+      const result = await onBulkCreateIngredients(submissions, bulkCreateCandidates);
+      if ("ok" in result && result.ok === false) {
+        setBulkCreateError("Could not create ingredients.");
+        return;
+      }
+      if (result.failed > 0 && result.succeeded === 0) {
+        const firstError = result.outcomes.find((outcome) => !outcome.result.ok)?.result.error;
+        setBulkCreateError(firstError ?? "Could not create ingredients.");
+        return;
+      }
+      if (result.failed > 0) {
+        toast.error(
+          `Created ${result.succeeded} ingredient${result.succeeded === 1 ? "" : "s"}; ${result.failed} failed.`,
+        );
+      } else {
+        toast(`Created ${result.succeeded} ingredient${result.succeeded === 1 ? "" : "s"}`);
+      }
+      setBulkCreateSheetOpen(false);
+      setBulkCreateError(null);
+    } finally {
+      setBulkCreateSaving(false);
+    }
+  };
+
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-b border-border">
@@ -3126,6 +3119,35 @@ function ItemsTable({
           </button>
         )}
       </div>
+      {hasUnmatchedIngredients && !loading && !extracting && bulkCreateCandidates.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-amber-500/[0.06] px-4 py-3">
+          <p className="text-sm">
+            <span className="font-medium">{bulkCreateCandidates.length}</span> new ingredient
+            {bulkCreateCandidates.length === 1 ? "" : "s"} detected
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setBulkCreateError(null);
+              setBulkCreateSheetOpen(true);
+            }}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted"
+          >
+            Review &amp; Create
+          </button>
+        </div>
+      )}
+      <BulkCanonicalIngredientCreateSheet
+        open={bulkCreateSheetOpen}
+        onOpenChange={(open) => {
+          if (!open) setBulkCreateError(null);
+          setBulkCreateSheetOpen(open);
+        }}
+        candidates={bulkCreateCandidates}
+        saving={bulkCreateSaving}
+        error={bulkCreateError}
+        onSubmit={(rows) => void handleBulkCreateSubmit(rows)}
+      />
       {loading || extracting ? (
         <div className="py-8 text-center text-xs text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin inline mr-2" /> Reading invoice…
