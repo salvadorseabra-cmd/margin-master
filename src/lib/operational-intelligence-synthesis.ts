@@ -1,4 +1,5 @@
 import { formatCurrency, formatPercent } from "@/lib/display-format";
+import { linkedIngredientPriceHistoryRows } from "@/lib/ingredient-price-history";
 import { detectOperationalFamily } from "@/lib/ingredient-operational-families";
 import {
   getRecipeMetrics,
@@ -2306,16 +2307,6 @@ function priceHistoryDeltaPct(row: MarginAlertData["priceHistory"][number]): num
       ? (((row.new_price ?? 0) - (row.previous_price ?? 0)) / (row.previous_price ?? 1)) * 100
       : 0)
   );
-}
-
-/** Rows still linked to an invoice; orphans (invoice_id SET NULL on invoice delete) are excluded from OI. */
-export function linkedIngredientPriceHistoryRows(
-  rows: MarginAlertData["priceHistory"],
-): MarginAlertData["priceHistory"] {
-  return rows.filter((row) => {
-    const invoiceId = row.invoice_id;
-    return invoiceId != null && String(invoiceId).trim() !== "";
-  });
 }
 
 function marginAlertDataForOperationalIntelligence(data: MarginAlertData): MarginAlertData {

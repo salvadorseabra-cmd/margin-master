@@ -164,6 +164,22 @@ export type IngredientPriceHistoryRow = Pick<
   | "created_at"
 >;
 
+/** Minimal shape for invoice-link checks on price history rows. */
+export type PriceHistoryInvoiceLink = Pick<IngredientPriceHistoryRow, "invoice_id">;
+
+/** True when a history row is still tied to an invoice (not orphan SET NULL). */
+export function isLinkedPriceHistoryRow(row: PriceHistoryInvoiceLink): boolean {
+  const invoiceId = row.invoice_id;
+  return invoiceId != null && String(invoiceId).trim() !== "";
+}
+
+/** Rows still linked to an invoice; orphans are excluded from intelligence surfaces. */
+export function linkedIngredientPriceHistoryRows<T extends PriceHistoryInvoiceLink>(
+  rows: readonly T[],
+): T[] {
+  return rows.filter(isLinkedPriceHistoryRow);
+}
+
 /**
  * Log a Supabase error with a stable, secret-free prefix. Treats the table as
  * optional: callers should fall back to empty results instead of throwing.

@@ -21,6 +21,7 @@ import {
   resolvePricingRecency,
   type PricingFreshnessLevel,
 } from "@/lib/ingredient-pricing-freshness";
+import { isLinkedPriceHistoryRow } from "@/lib/ingredient-price-history";
 import {
   buildLinesByRecipeId,
   buildRecipesById,
@@ -410,6 +411,7 @@ export function getPrepUsageBySubRecipe(recipes: RecipeRecord[]) {
 export function getLatestHistoryByIngredient(history: PriceHistoryRecord[]) {
   const latest = new Map<string, PriceHistoryRecord>();
   for (const row of history) {
+    if (!isLinkedPriceHistoryRow(row)) continue;
     const current = latest.get(row.ingredient_id);
     if (!current || row.created_at.localeCompare(current.created_at) > 0) {
       latest.set(row.ingredient_id, row);

@@ -1,5 +1,6 @@
 import { marginAlertSeverityLabel } from "@/lib/margin-alert-severity";
 import { formatCurrency, formatPercent } from "@/lib/display-format";
+import { linkedIngredientPriceHistoryRows } from "@/lib/ingredient-price-history";
 import { resolvedOperationalUnitCostEur } from "@/lib/ingredient-unit-cost";
 import {
   getLatestHistoryByIngredient,
@@ -894,7 +895,7 @@ export function buildSupplierWatchlist(
     supplierMap.set(key, current);
   }
 
-  for (const row of data.priceHistory) {
+  for (const row of linkedIngredientPriceHistoryRows(data.priceHistory)) {
     const supplier = row.supplier_name?.trim();
     if (!supplier) continue;
     const key = supplier.toLowerCase();

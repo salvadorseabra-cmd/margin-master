@@ -59,7 +59,7 @@ import {
   restoreIngredient,
   sortOperationallyArchivedIngredients,
 } from "@/lib/ingredient-archive";
-import { getVolatileIngredients } from "@/lib/ingredient-price-history";
+import { getVolatileIngredients, isLinkedPriceHistoryRow } from "@/lib/ingredient-price-history";
 import {
   formatIngredientListLastPurchaseColumn,
   formatIngredientListRowSubline,
@@ -94,7 +94,7 @@ type CatalogListMode = "active" | "archived";
 
 type PriceActivity = Pick<
   Tables<"ingredient_price_history">,
-  "created_at" | "delta" | "delta_percent" | "ingredient_id"
+  "created_at" | "delta" | "delta_percent" | "ingredient_id" | "invoice_id"
 >;
 
 type RecipeLinkActivity = {
@@ -304,7 +304,7 @@ function IngredientsIndexPage() {
         ] = await Promise.all([
           supabase
             .from("ingredient_price_history")
-            .select("ingredient_id, created_at, delta, delta_percent")
+            .select("ingredient_id, invoice_id, created_at, delta, delta_percent")
             .in("ingredient_id", ingredientIds)
             .order("created_at", { ascending: false }),
           supabase
@@ -329,6 +329,7 @@ function IngredientsIndexPage() {
 
         const latestActivity: Record<string, PriceActivity> = {};
         (historyData ?? []).forEach((activity) => {
+          if (!isLinkedPriceHistoryRow(activity)) return;
           if (!latestActivity[activity.ingredient_id]) {
             latestActivity[activity.ingredient_id] = activity;
           }
