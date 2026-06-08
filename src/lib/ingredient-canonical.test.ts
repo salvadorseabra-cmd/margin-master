@@ -274,6 +274,7 @@ describe("findCanonicalIngredientMatch (weighted semantic)", () => {
   describe("family-aware semantic identity (regression)", () => {
     it("exports ingredient family ids for semantic grouping", () => {
       expect([...FAMILY_INGREDIENT_MATCH_TOKENS].sort()).toEqual([
+        "beverage",
         "cheese",
         "oil",
         "potato",

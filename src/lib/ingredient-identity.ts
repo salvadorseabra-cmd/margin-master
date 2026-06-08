@@ -11,6 +11,7 @@ import {
 import { operationalFamiliesIncompatibleFromRaw } from "@/lib/ingredient-operational-families";
 import { scoreTokenFamilyCompatibility } from "@/lib/ingredient-token-families";
 import { scoreWeightCompatibility } from "@/lib/ingredient-weight-match";
+import { VOCABULARY_PILOT_FAMILY_TOKEN_TO_ID } from "@/lib/ingredient-vocabulary-pilot";
 
 const DIACRITIC_RE = /\p{M}/gu;
 
@@ -64,7 +65,6 @@ const COMMERCIAL_NOISE_TOKENS = new Set([
   "restauracao",
   "profissional",
   "professional",
-  "queijo",
 ]);
 
 const FAMILY_TOKEN_TO_ID: Record<string, string> = {
@@ -95,6 +95,8 @@ const FAMILY_TOKEN_TO_ID: Record<string, string> = {
   girassol: "girassol",
   alface: "alface",
   iceberg: "alface",
+  // --- Vocabulary Pilot (15 tokens; remove block + ingredient-vocabulary-pilot.ts to rollback) ---
+  ...VOCABULARY_PILOT_FAMILY_TOKEN_TO_ID,
 };
 
 const FORM_PHRASE_PATTERNS: { pattern: RegExp; form: string }[] = [

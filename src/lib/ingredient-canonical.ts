@@ -181,6 +181,10 @@ import {
   shareOperationalAliasCluster,
   type MatchScoreBreakdown,
 } from "@/lib/ingredient-identity";
+import {
+  VOCABULARY_PILOT_CORE_TOKENS,
+  VOCABULARY_PILOT_TOKEN_TO_INGREDIENT_FAMILY,
+} from "@/lib/ingredient-vocabulary-pilot";
 import { shouldSkipByOperationalProductFamilyGate } from "@/lib/ingredient-operational-family-gate";
 import { resolveParentFormHierarchyMatch } from "@/lib/ingredient-parent-form";
 import { inferCoarseIngredientFamily } from "@/lib/ingredient-token-families";
@@ -285,6 +289,8 @@ export const CORE_INGREDIENT_MATCH_TOKENS = new Set([
   "breaded",
   "shoestring",
   "palha",
+  // --- Vocabulary Pilot (15 tokens; remove block + ingredient-vocabulary-pilot.ts to rollback) ---
+  ...VOCABULARY_PILOT_CORE_TOKENS,
 ]);
 
 /**
@@ -331,6 +337,7 @@ export const FAMILY_INGREDIENT_MATCH_TOKENS = new Set([
   "tomato",
   "sauce",
   "oil",
+  "beverage",
 ]);
 
 /** Maps product tokens to a family id (semantic boost / inference only). */
@@ -367,6 +374,8 @@ const TOKEN_TO_INGREDIENT_FAMILY: Record<string, string> = {
   maionese: "sauce",
   oleo: "oil",
   girassol: "oil",
+  // --- Vocabulary Pilot (see ingredient-vocabulary-pilot.ts) ---
+  ...VOCABULARY_PILOT_TOKEN_TO_INGREDIENT_FAMILY,
 };
 
 const FORM_PHRASE_TO_FAMILY: { pattern: RegExp; family: string }[] = [
