@@ -13,6 +13,7 @@ import {
   resolveInvoiceLinePurchaseFormat,
   resolveInvoiceLineStockPresentation,
   resolveInvoicePurchaseDisplayLabel,
+  preserveCountableExtractedUnit,
   resolveStructuredPurchaseForDisplay,
   structuredPurchaseToIngredientFields,
   USABLE_STOCK_MIN_CONFIDENCE,
@@ -621,5 +622,46 @@ describe("structuredPurchaseToIngredientFields", () => {
     const fields = structuredPurchaseToIngredientFields(structured, "g", isGeneric);
     expect(fields.purchase_quantity).toBe(250);
     expect(fields.purchase_unit).toBe("g");
+  });
+
+  it("preserves generic un for embedded-weight cheese sold by unit count", () => {
+    const structured = resolveInvoiceLinePurchaseFormat({
+      name: "QUEIJO CHEDDAR 1KG",
+      quantity: 2,
+      unit: "un",
+    });
+    expect(preserveCountableExtractedUnit("un", structured, isGeneric)).toBe("un");
+    const fields = structuredPurchaseToIngredientFields(structured, "un", isGeneric);
+    expect(fields).toMatchObject({
+      purchase_quantity: 2,
+      purchase_unit: "un",
+      base_unit: "un",
+    });
+    expect(fields.base_unit).not.toBe("g");
+  });
+
+  it("preserves generic un for mozzarella sold by unit count", () => {
+    const structured = resolveInvoiceLinePurchaseFormat({
+      name: "MOZZARELLA FIOR DI LATTE 2KG",
+      quantity: 3,
+      unit: "un",
+    });
+    expect(preserveCountableExtractedUnit("un", structured, isGeneric)).toBe("un");
+    const fields = structuredPurchaseToIngredientFields(structured, "un", isGeneric);
+    expect(fields).toMatchObject({
+      purchase_quantity: 3,
+      purchase_unit: "un",
+      base_unit: "un",
+    });
+    expect(fields.base_unit).not.toBe("g");
+  });
+
+  it("still infers weight for name-only bulk products without OCR unit", () => {
+    const structured = resolveInvoiceLinePurchaseFormat({ name: "ARROZ CAROLINO 2 KG" });
+    expect(preserveCountableExtractedUnit(null, structured, isGeneric)).toBeNull();
+    const fields = structuredPurchaseToIngredientFields(structured, null, isGeneric);
+    expect(fields.base_unit).toBe("g");
+    expect(fields.purchase_unit).toBe("g");
+    expect(fields.purchase_quantity).toBe(2000);
   });
 });

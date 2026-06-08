@@ -160,6 +160,19 @@ describe("buildIngredientInsertPayload", () => {
     expect(payload?.purchase_quantity).toBeGreaterThan(0);
     expect(payload?.base_unit).toBeTruthy();
   });
+
+  it("keeps unit and base_unit consistent for countable OCR un rows", () => {
+    const payload = buildIngredientInsertPayload(
+      item("QUEIJO CHEDDAR 1KG", { quantity: 2, unit: "un" }),
+      "user-1",
+    );
+    expect(payload).not.toBeNull();
+    expect(payload?.unit).toBe("un");
+    expect(payload?.base_unit).toBe("un");
+    expect(payload?.purchase_unit).toBe("un");
+    expect(payload?.unit).not.toBe("g");
+    expect(payload?.base_unit).not.toBe("g");
+  });
 });
 
 describe("autoPersistUnmatchedInvoiceItems", () => {

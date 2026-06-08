@@ -1359,6 +1359,35 @@ export type IngredientPurchaseFields = {
   base_unit: string;
 };
 
+/**
+ * When OCR supplies a generic countable unit (e.g. `un`) on a unit-count or multi-pack row,
+ * keep that unit instead of replacing it with embedded per-item weight from the name.
+ */
+export function preserveCountableExtractedUnit(
+  extractedUnit: string | null,
+  structured: StructuredPurchaseFormat,
+  isGenericUnit: (unit: string | null | undefined) => boolean,
+): string | null {
+  if (!extractedUnit || !isGenericUnit(extractedUnit)) return null;
+
+  const familyOpts = {
+    usableQuantityUnit: structured.usableQuantityUnit,
+    purchaseFormatKind: structured.kind,
+  };
+  if (inferUnitFamily(extractedUnit, familyOpts) !== "countable") return null;
+
+  const structuredCountable =
+    structured.kind === "unit_count" || structured.kind === "multi_unit_pack";
+  const inferredBase = structured.inferred.base_unit;
+  const embeddedMeasureConflictsWithRow =
+    inferredBase != null && inferUnitFamily(inferredBase, familyOpts) !== "countable";
+
+  if (structuredCountable || embeddedMeasureConflictsWithRow) {
+    return extractedUnit;
+  }
+  return null;
+}
+
 /** Maps structured purchase data to ingredient insert fields (matching prior invoice behavior). */
 export function structuredPurchaseToIngredientFields(
   structured: StructuredPurchaseFormat,
@@ -1368,10 +1397,12 @@ export function structuredPurchaseToIngredientFields(
   const inferred = structured.inferred;
   const conversionHint = inferred.conversion_hint;
 
+  const preservedUnit = preserveCountableExtractedUnit(extractedUnit, structured, isGenericUnit);
   const stockUnit =
-    inferred.base_unit && isGenericUnit(extractedUnit)
+    preservedUnit ??
+    (inferred.base_unit && isGenericUnit(extractedUnit)
       ? inferred.base_unit
-      : (extractedUnit ?? inferred.base_unit ?? conversionHint?.purchase_unit ?? "kg");
+      : (extractedUnit ?? inferred.base_unit ?? conversionHint?.purchase_unit ?? "kg"));
 
   const familyOpts = {
     usableQuantityUnit: structured.usableQuantityUnit,

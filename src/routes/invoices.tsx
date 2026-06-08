@@ -24,6 +24,7 @@ import {
   formatStructuredPurchaseDisplay,
   hasRichPackageSemantics,
   isCollapsedMeaninglessPurchaseLabel,
+  preserveCountableExtractedUnit,
   resolveInvoiceLinePurchaseFormat,
   resolveInvoiceLineStockPresentation,
   resolveInvoicePurchaseDisplayLabel,
@@ -684,7 +685,10 @@ const formatPackSize = (inferred: UnitInferenceResult) => {
 
 const resolveInvoiceItemUnit = (item: Pick<ItemRow, "name" | "unit">) => {
   const extractedUnit = item.unit?.trim() || null;
-  const inferred = resolveItemPurchaseFormat(item).inferred;
+  const structured = resolveItemPurchaseFormat(item);
+  const preservedUnit = preserveCountableExtractedUnit(extractedUnit, structured, isGenericUnit);
+  if (preservedUnit) return preservedUnit;
+  const inferred = structured.inferred;
   if (inferred.base_unit && isGenericUnit(extractedUnit)) return inferred.base_unit;
   return extractedUnit ?? inferred.base_unit ?? inferred.conversion_hint?.purchase_unit;
 };

@@ -22,6 +22,7 @@ import {
 } from "@/lib/ingredient-operational-families";
 import {
   hasRichPackageSemantics,
+  preserveCountableExtractedUnit,
   resolveInvoiceLinePurchaseFormat,
   structuredPurchaseToIngredientFields,
   type StructuredPurchaseFormat,
@@ -402,13 +403,15 @@ export function buildIngredientInsertPayload(
     isGenericUnit,
   );
   const operational = operationalCostFieldsFromInvoiceLine(item, { isGenericUnit });
+  const preservedUnit = preserveCountableExtractedUnit(extractedUnit, structured, isGenericUnit);
   const stockUnit =
-    structured.inferred.base_unit && isGenericUnit(extractedUnit)
+    preservedUnit ??
+    (structured.inferred.base_unit && isGenericUnit(extractedUnit)
       ? structured.inferred.base_unit
       : (extractedUnit ??
         structured.inferred.base_unit ??
         structured.inferred.conversion_hint?.purchase_unit ??
-        purchaseFields.base_unit);
+        purchaseFields.base_unit));
   const detectedPrice = Number(item.unit_price);
   const currentPrice = Number.isFinite(detectedPrice) && detectedPrice >= 0 ? detectedPrice : 0;
   const costBase = operational?.cost_base_unit ?? purchaseFields.base_unit;
