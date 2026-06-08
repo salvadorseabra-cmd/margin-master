@@ -693,6 +693,54 @@ const resolveInvoiceItemUnit = (item: Pick<ItemRow, "name" | "unit">) => {
   return extractedUnit ?? inferred.base_unit ?? inferred.conversion_hint?.purchase_unit;
 };
 
+const pickUnitTracePayload = (item: {
+  name?: unknown;
+  quantity?: unknown;
+  unit?: unknown;
+}) => ({
+  name: String(item.name ?? ""),
+  quantity:
+    typeof item.quantity === "number"
+      ? item.quantity
+      : item.quantity == null
+        ? null
+        : Number.isFinite(Number(item.quantity))
+          ? Number(item.quantity)
+          : null,
+  unit: item.unit == null || item.unit === "" ? null : String(item.unit),
+});
+
+const traceUnitForAllItems = (
+  stage: "OCR" | "NORMALIZED" | "RESOLVE_INPUT" | "RESOLVE_OUTPUT" | "INSERT",
+  items: Array<{ name?: unknown; quantity?: unknown; unit?: unknown }>,
+  extra?: Record<string, unknown>,
+) => {
+  if (!import.meta.env.DEV) return;
+  items.forEach((item, index) => {
+    console.debug(`[UNIT_TRACE] ${stage}`, {
+      index,
+      ...pickUnitTracePayload(item),
+      ...extra,
+    });
+  });
+};
+
+const traceUnitResolveForAllItems = (items: ItemRow[], extra?: Record<string, unknown>) => {
+  if (!import.meta.env.DEV) return;
+  items.forEach((it, index) => {
+    const name = String(it.name ?? "Unknown");
+    const fields = pickUnitTracePayload({ name, quantity: it.quantity, unit: it.unit });
+    console.debug("[UNIT_TRACE] RESOLVE_INPUT", { index, ...fields, ...extra });
+    const resolvedUnit = resolveInvoiceItemUnit({ name, unit: it.unit });
+    console.debug("[UNIT_TRACE] RESOLVE_OUTPUT", {
+      index,
+      ...fields,
+      unit: resolvedUnit,
+      ...extra,
+    });
+  });
+};
+
 const getInvoiceItemPurchaseLabel = (item: InvoicePurchaseContext) => {
   const structured = resolveItemPurchaseFormat(item);
   const structuredLabel = resolveInvoicePurchaseDisplayLabel({
@@ -1306,6 +1354,7 @@ function InvoicesPage() {
         invoiceDate: data?.invoice_date ?? data?.invoiceDate ?? null,
       });
       traceInvoiceQuantityStage("extract-response:first-item", items[0], { invoiceId });
+      traceUnitForAllItems("OCR", items, { invoiceId });
       if (import.meta.env.DEV && items[0]) {
         const sample = normalizeInvoiceItemFields(items[0] as ItemRow);
         console.debug("[invoice-purchase]", resolveInvoiceLinePurchaseFormat(sample));
@@ -1329,10 +1378,12 @@ function InvoicesPage() {
         parsedRowsCount: normalizedItems.length,
         parsedRowsPreview: normalizedItems.slice(0, 5),
       });
+      traceUnitForAllItems("NORMALIZED", normalizedItems, { invoiceId });
       if (items.length && user) {
         traceInvoiceQuantityStage("insert-normalized:first-item", normalizedItems[0], {
           invoiceId,
         });
+        traceUnitResolveForAllItems(normalizedItems, { invoiceId });
         const insertRows = normalizedItems.map((it: ItemRow) => {
           const name = String(it.name ?? "Unknown");
           const unit = resolveInvoiceItemUnit({ name, unit: it.unit });
@@ -1347,6 +1398,7 @@ function InvoicesPage() {
           };
         });
         traceInvoiceQuantityStage("insert-payload:first-item", insertRows[0], { invoiceId });
+        traceUnitForAllItems("INSERT", insertRows, { invoiceId });
         const { error: insertError } = await supabase.from("invoice_items").insert(insertRows);
         console.log("[invoice-ocr] stage=9 persistence-result", {
           invoiceId,
