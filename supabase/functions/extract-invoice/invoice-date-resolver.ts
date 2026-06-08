@@ -2,6 +2,7 @@ type DateCandidate = {
   value: string;
   label: string;
   normalizedLabel: string;
+  region: string | null;
   order: number;
   proximity: number;
 };
@@ -19,6 +20,26 @@ const DUE_LABELS = new Set<string>([
   "due date",
   "payment due",
   "pagamento",
+]);
+
+const IGNORED_LABEL_FRAGMENTS = [
+  "talao de controlo",
+  "controlo",
+  "compliance",
+  "certificado",
+  "certificacao",
+  "validade",
+  "stamp",
+  "selo",
+  "legal",
+  "transporte",
+  "transport",
+];
+
+const REGION_PRIORITY = new Map<string, number>([
+  ["header", 0],
+  ["body", 1],
+  ["footer", 2],
 ]);
 
 const DATE_PATTERN = /\b(\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{4}-\d{2}-\d{2})\b/;
@@ -45,6 +66,16 @@ function readDateValue(value: unknown): string | null {
   return match ? match[1] : null;
 }
 
+function readRegion(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const normalized = normalizeLabel(value);
+  return REGION_PRIORITY.has(normalized) ? normalized : null;
+}
+
+function isIgnoredLabel(normalizedLabel: string): boolean {
+  return IGNORED_LABEL_FRAGMENTS.some((fragment) => normalizedLabel.includes(fragment));
+}
+
 function computeProximity(label: string, source: string, date: string): number {
   const normalizedSource = normalizeLabel(source);
   const li = normalizedSource.indexOf(label);
@@ -59,15 +90,17 @@ function pushCandidate(
   rawValue: unknown,
   order: number,
   sourceForProximity?: string,
+  region?: unknown,
 ) {
   const value = readDateValue(rawValue);
   if (!value) return;
   const normalizedLabel = normalizeLabel(label);
-  if (!normalizedLabel) return;
+  if (!normalizedLabel || isIgnoredLabel(normalizedLabel)) return;
   out.push({
     value,
     label,
     normalizedLabel,
+    region: readRegion(region),
     order,
     proximity: sourceForProximity
       ? computeProximity(normalizedLabel, sourceForProximity, value)
@@ -93,7 +126,14 @@ function collectDateCandidates(payload: Record<string, unknown>): DateCandidate[
           (typeof record.key === "string" && record.key);
         const dateValue = record.value ?? record.date ?? record.text;
         if (label && dateValue != null) {
-          pushCandidate(out, label, dateValue, order++, typeof dateValue === "string" ? dateValue : undefined);
+          pushCandidate(
+            out,
+            label,
+            dateValue,
+            order++,
+            typeof dateValue === "string" ? dateValue : undefined,
+            record.region,
+          );
         }
       }
       continue;
@@ -116,6 +156,19 @@ function collectDateCandidates(payload: Record<string, unknown>): DateCandidate[
   return out;
 }
 
+function compareCandidates(a: DateCandidate, b: DateCandidate): number {
+  const pa = ISSUE_LABEL_PRIORITY.get(a.normalizedLabel) ?? Number.MAX_SAFE_INTEGER;
+  const pb = ISSUE_LABEL_PRIORITY.get(b.normalizedLabel) ?? Number.MAX_SAFE_INTEGER;
+  if (pa !== pb) return pa - pb;
+
+  const ra = a.region ? REGION_PRIORITY.get(a.region) ?? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER;
+  const rb = b.region ? REGION_PRIORITY.get(b.region) ?? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER;
+  if (ra !== rb) return ra - rb;
+
+  if (a.proximity !== b.proximity) return a.proximity - b.proximity;
+  return a.order - b.order;
+}
+
 export function resolveIssueDateFromExtraction(
   payload: Record<string, unknown>,
   fallback: string | null,
@@ -124,16 +177,18 @@ export function resolveIssueDateFromExtraction(
 
   const issueCandidates = candidates
     .filter((candidate) => ISSUE_LABEL_PRIORITY.has(candidate.normalizedLabel))
-    .sort((a, b) => {
-      const pa = ISSUE_LABEL_PRIORITY.get(a.normalizedLabel) ?? Number.MAX_SAFE_INTEGER;
-      const pb = ISSUE_LABEL_PRIORITY.get(b.normalizedLabel) ?? Number.MAX_SAFE_INTEGER;
-      if (pa !== pb) return pa - pb;
-      if (a.proximity !== b.proximity) return a.proximity - b.proximity;
-      return a.order - b.order;
-    });
+    .sort(compareCandidates);
 
   if (issueCandidates.length > 0) {
     return issueCandidates[0].value;
+  }
+
+  const dueCandidates = candidates
+    .filter((candidate) => DUE_LABELS.has(candidate.normalizedLabel))
+    .sort(compareCandidates);
+
+  if (dueCandidates.length > 0) {
+    return dueCandidates[0].value;
   }
 
   const blockedFallback = candidates.some(

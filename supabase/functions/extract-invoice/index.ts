@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { extractIssueDateFromImage } from "./invoice-date-extraction.ts";
 import { resolveIssueDateFromExtraction } from "./invoice-date-resolver.ts";
 
 const corsHeaders = {
@@ -56,9 +57,28 @@ serve(async (req) => {
     console.log("[invoice-ocr] stage=2 ocr-started", {
       provider: "openai",
       model: "gpt-4.1",
-      mode: "vision-json",
+      mode: "vision-json-two-pass",
       note: "deterministic OCR parsers (parseContinente/parsePadaria/stages.ts) not invoked",
     });
+
+    let issueDateFromHeaderPass: string | null = null;
+    try {
+      issueDateFromHeaderPass = await extractIssueDateFromImage(
+        imageDataUrl,
+        OPENAI_API_KEY,
+      );
+      console.log("[invoice-ocr] stage=2a issue-date-pass", {
+        issueDate: issueDateFromHeaderPass,
+        strategy: "top-portion-crop",
+      });
+    } catch (datePassError) {
+      console.error("[invoice-ocr] stage=2a issue-date-pass-failed", {
+        error:
+          datePassError instanceof Error
+            ? datePassError.message
+            : String(datePassError),
+      });
+    }
 
     const response = await fetch(
       "https://api.openai.com/v1/chat/completions",
@@ -167,6 +187,13 @@ If quantity truly cannot be determined:
 - unit = null
 
 Do not hallucinate.
+
+INVOICE DATE RULES (for invoice_date field):
+
+- invoice_date must be the document ISSUE date (DATA / Data Emissão / Data Documento).
+- Prefer header issue dates over due dates (Vencimento).
+- IGNORE footer compliance stamps, TALÃO DE CONTROLO dates, and certification references.
+- If multiple dates are visible, return the issue date only in invoice_date.
               `,
             },
             {
@@ -262,12 +289,19 @@ Do not hallucinate.
         : typeof parsed?.invoiceDate === "string"
           ? parsed.invoiceDate
           : null;
-    const invoiceDate =
+    const invoiceDateFromFullPass =
       parsed && typeof parsed === "object"
         ? resolveIssueDateFromExtraction(parsed as Record<string, unknown>, fallbackInvoiceDate)
         : fallbackInvoiceDate;
 
-    const normalizedInvoiceDate = invoiceDate;
+    const normalizedInvoiceDate =
+      issueDateFromHeaderPass ?? invoiceDateFromFullPass;
+
+    console.log("[invoice-ocr] stage=6b date-reconciliation", {
+      issueDateFromHeaderPass,
+      invoiceDateFromFullPass,
+      chosenInvoiceDate: normalizedInvoiceDate,
+    });
 
     const normalized = {
       supplier:
