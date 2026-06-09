@@ -16,6 +16,20 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  buildInvoiceKpiSummaryCards,
+  collectAvailableInvoiceMonths,
+  formatInvoiceMonthLabel,
+  resolveDefaultInvoiceKpiMonth,
+  type InvoiceKpiSummaryCard,
+} from "@/lib/invoice-kpi-summary";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
@@ -270,13 +284,6 @@ type PriceDeltaDetails = {
   percentLabel: string;
   previousLabel: string;
 };
-type OperationalSummaryTone = "muted" | "increase" | "decrease" | "steady";
-type OperationalSummaryCard = {
-  label: string;
-  value: string;
-  detail: string;
-  tone?: OperationalSummaryTone;
-};
 const traceInvoiceIdentity = (stage: string, details: InvoiceIdentityTrace) => {
   if (!import.meta.env.DEV) return;
   console.debug("[invoice-list]", stage, details);
@@ -354,138 +361,6 @@ const invoiceSubtitle = (row: InvoiceRow) => {
   if (row.invoiceNumber) return row.invoiceNumber;
   if (row.supplierIsFallback && row.sourceFileName) return "Uploaded file";
   return null;
-};
-
-const getMonthlyBucketDate = (row: InvoiceRow) => {
-  const value = row.invoiceDate ?? row.created_at;
-  if (!value) return null;
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date;
-};
-
-const isInMonth = (row: InvoiceRow, monthStart: Date) => {
-  const date = getMonthlyBucketDate(row);
-  if (!date) return false;
-  return (
-    date.getFullYear() === monthStart.getFullYear() && date.getMonth() === monthStart.getMonth()
-  );
-};
-
-const formatMoney = (value: number) => `€${value.toFixed(2)}`;
-
-const formatPercentDelta = (current: number, previous: number) => {
-  if (previous <= 0) return null;
-  const percent = Math.round(((current - previous) / previous) * 100);
-  if (percent === 0) return "0% vs last month";
-  return `${percent > 0 ? "+" : ""}${percent}% vs last month`;
-};
-
-const deltaTone = (current: number, previous: number): OperationalSummaryTone => {
-  if (previous <= 0 || current === previous) return "steady";
-  return current > previous ? "increase" : "decrease";
-};
-
-const summarizeSupplierSpend = (rows: InvoiceRow[]) => {
-  const totals = rows.reduce<Record<string, number>>((acc, row) => {
-    const supplier = row.supplier_name || "Unknown supplier";
-    acc[supplier] = (acc[supplier] ?? 0) + Number(row.total ?? 0);
-    return acc;
-  }, {});
-
-  return Object.entries(totals).sort(([, a], [, b]) => b - a)[0] ?? null;
-};
-
-const buildOperationalSummaryCards = (rows: InvoiceRow[]): OperationalSummaryCard[] => {
-  const now = new Date();
-  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const currentRows = rows.filter((row) => isInMonth(row, currentMonthStart));
-  const previousRows = rows.filter((row) => isInMonth(row, previousMonthStart));
-  const currentSpend = currentRows.reduce((sum, row) => sum + Number(row.total ?? 0), 0);
-  const previousSpend = previousRows.reduce((sum, row) => sum + Number(row.total ?? 0), 0);
-  const activeSuppliers = new Set(currentRows.map((row) => row.supplier_name).filter(Boolean)).size;
-  const topSupplier = summarizeSupplierSpend(currentRows);
-  const missingSupplierCount = currentRows.filter((row) => row.supplierIsFallback).length;
-  const spendDelta = formatPercentDelta(currentSpend, previousSpend);
-
-  let insight: OperationalSummaryCard = {
-    label: "Purchasing movement",
-    value: currentRows.length > 0 ? "Monthly baseline" : "No activity yet",
-    detail:
-      rows.length > 0
-        ? "Upload this month's invoices to compare movement"
-        : "Your purchasing snapshot will appear here",
-    tone: "muted",
-  };
-
-  if (missingSupplierCount > 0) {
-    insight = {
-      label: "Purchasing movement",
-      value: `${missingSupplierCount} supplier ${missingSupplierCount === 1 ? "check" : "checks"}`,
-      detail: "Some invoices need cleaner supplier names",
-      tone: "increase",
-    };
-  } else if (topSupplier && previousRows.length > 0) {
-    const [supplierName, supplierSpend] = topSupplier;
-    const previousSupplierSpend = previousRows
-      .filter((row) => row.supplier_name === supplierName)
-      .reduce((sum, row) => sum + Number(row.total ?? 0), 0);
-    const supplierDelta = formatPercentDelta(supplierSpend, previousSupplierSpend);
-
-    const supplierDeltaPercent = Math.round(
-      ((supplierSpend - previousSupplierSpend) / previousSupplierSpend) * 100,
-    );
-
-    if (supplierDelta && Math.abs(supplierDeltaPercent) >= 10) {
-      insight = {
-        label: "Purchasing movement",
-        value: `${supplierName} ${supplierSpend > previousSupplierSpend ? "up" : "down"}`,
-        detail: supplierDelta,
-        tone: deltaTone(supplierSpend, previousSupplierSpend),
-      };
-    } else {
-      insight = {
-        label: "Purchasing movement",
-        value: "No major volatility",
-        detail:
-          activeSuppliers > 0
-            ? `Across ${activeSuppliers} active ${activeSuppliers === 1 ? "supplier" : "suppliers"}`
-            : "Current month is quiet",
-        tone: "steady",
-      };
-    }
-  } else if (currentRows.length > 0) {
-    insight = {
-      label: "Purchasing movement",
-      value: "Month in progress",
-      detail: "Add another month to show movement",
-      tone: "steady",
-    };
-  }
-
-  return [
-    {
-      label: "Monthly purchasing",
-      value: `${formatMoney(currentSpend)} this month`,
-      detail: spendDelta ?? "No previous month baseline",
-      tone: spendDelta ? deltaTone(currentSpend, previousSpend) : "muted",
-    },
-    {
-      label: "Invoices processed",
-      value: `${currentRows.length} ${currentRows.length === 1 ? "invoice" : "invoices"}`,
-      detail: `${activeSuppliers} active ${activeSuppliers === 1 ? "supplier" : "suppliers"}`,
-      tone: "muted",
-    },
-    {
-      label: "Top supplier this month",
-      value: topSupplier ? topSupplier[0] : "No supplier yet",
-      detail: topSupplier
-        ? `${formatMoney(topSupplier[1])} this month`
-        : "Upload invoices to begin",
-      tone: "muted",
-    },
-    insight,
-  ];
 };
 
 const toInvoiceRow = (
@@ -906,6 +781,7 @@ function InvoicesPage() {
   const [rejectedMatchItemIds, setRejectedMatchItemIds] = useState<Set<string>>(() => new Set());
   const [extracting, setExtracting] = useState<Record<string, boolean>>({});
   const [sortBy, setSortBy] = useState<SortOption>("newest");
+  const [selectedKpiMonth, setSelectedKpiMonth] = useState<string | null>(null);
   const [settlementByInvoice, setSettlementByInvoice] = useState<Record<string, SettlementState>>(
     {},
   );
@@ -1172,7 +1048,27 @@ function InvoicesPage() {
     [pending],
   );
 
-  const operationalSummaryCards = useMemo(() => buildOperationalSummaryCards(rows), [rows]);
+  const availableKpiMonths = useMemo(() => collectAvailableInvoiceMonths(rows), [rows]);
+  const defaultKpiMonth = useMemo(
+    () => resolveDefaultInvoiceKpiMonth(availableKpiMonths),
+    [availableKpiMonths],
+  );
+
+  useEffect(() => {
+    if (availableKpiMonths.length === 0) {
+      setSelectedKpiMonth(null);
+      return;
+    }
+    setSelectedKpiMonth((current) => {
+      if (current && availableKpiMonths.includes(current)) return current;
+      return defaultKpiMonth;
+    });
+  }, [availableKpiMonths, defaultKpiMonth]);
+
+  const operationalSummaryCards = useMemo(() => {
+    if (!selectedKpiMonth) return [];
+    return buildInvoiceKpiSummaryCards(rows, selectedKpiMonth);
+  }, [rows, selectedKpiMonth]);
 
   const settlementOverview = useMemo(() => {
     if (rows.length === 0) return null;
@@ -2288,10 +2184,29 @@ function InvoicesPage() {
           </p>
         </div>
         {/* Operational snapshot */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-          {operationalSummaryCards.map((card) => (
-            <Stat key={card.label} {...card} />
-          ))}
+        <div className="mb-4">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <h2 className="text-sm font-medium text-foreground">Purchasing Overview</h2>
+            {availableKpiMonths.length > 0 && selectedKpiMonth ? (
+              <Select value={selectedKpiMonth} onValueChange={setSelectedKpiMonth}>
+                <SelectTrigger className="h-8 w-auto min-w-[132px] border-border bg-background px-2.5 text-sm font-medium">
+                  <SelectValue>{formatInvoiceMonthLabel(selectedKpiMonth)}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {availableKpiMonths.map((monthKey) => (
+                    <SelectItem key={monthKey} value={monthKey}>
+                      {formatInvoiceMonthLabel(monthKey)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : null}
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {operationalSummaryCards.map((card) => (
+              <Stat key={card.label} {...card} />
+            ))}
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-4">
@@ -2621,7 +2536,7 @@ function InvoicesPage() {
   );
 }
 
-function Stat({ label, value, detail, tone = "muted" }: OperationalSummaryCard) {
+function Stat({ label, value, detail, tone = "muted" }: InvoiceKpiSummaryCard) {
   const detailClass =
     tone === "increase"
       ? "text-destructive/75"
