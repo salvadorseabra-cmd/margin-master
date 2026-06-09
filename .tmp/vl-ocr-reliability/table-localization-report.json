@@ -1,0 +1,79 @@
+{
+  "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+  "image": { "path": ".tmp/vl-date-rc/full.png", "width": 742, "height": 938 },
+  "supplier_on_document": "Aviludo (OCR/DB variants: Avijudo)",
+  "A_table_coords": {
+    "table_start_header_top_y": 228,
+    "header_row_y": [228, 248],
+    "first_item_row_y": [248, 270],
+    "last_item_row_y": [416, 438],
+    "all_rows_y": [228, 438],
+    "B_table_only_crop_y": [218, 448],
+    "B_table_only_note": "10px above header top; 10px below last row bottom",
+    "row_height_px": 22,
+    "inter_row_gap_px": 2,
+    "item_row_count": 8,
+    "confidence": "PROVEN"
+  },
+  "B_header_coords": {
+    "grey_band_y": [228, 247],
+    "detection_method": "mean row luminance < 175 for 20 consecutive rows",
+    "labels": ["ARTIGO", "QUANTIDADE", "EMBAL.", "DESIGNAÇÃO DO ARTIGO", "LOTE", "PREÇO UNITÁRIO", "% DESC.", "DESC. VALOR", "VALOR MERCADORIA", "% IVA"],
+    "horizontal_rule_above_header_y_approx": [220, 227],
+    "horizontal_rule_below_header_y": 257,
+    "column_x_from_layout_meta_v3": {
+      "artigo": [0, 58],
+      "quantidade": [58, 88],
+      "embal": [88, 128],
+      "designacao": [128, 395],
+      "lote": [395, 485],
+      "preco_unit": [485, 555],
+      "valor_merc": [615, 685],
+      "pct_iva": [685, 742]
+    },
+    "confidence": "PROVEN"
+  },
+  "C_footer_totals_coords": {
+    "last_item_row_bottom_y": 438,
+    "obs_text_band_y_approx": [439, 447],
+    "totals_section_start_y_approx": 449,
+    "strong_horizontal_edge_y": [454, 471],
+    "footer_start_y_experiment": 458,
+    "iva_start_y_experiment": 488,
+    "valores_a_pagar_band_y_approx": [470, 520],
+    "compliance_footer_y_approx": [700, 938],
+    "production_cropTopPortion_83pct_cut_y": 778,
+    "confidence": "PROVEN for edges; LIKELY for section labels without OCR"
+  },
+  "D_visual_anchors": [
+    "Grey shaded header bar with rounded ends (strongest table-start signal)",
+    "Thin horizontal rule immediately above grey header bar",
+    "White-on-grey header typography (ARTIGO, QUANTIDADE, …)",
+    "Repeating ~22px row rhythm with ~2px gaps (8 data rows)",
+    "Right-aligned numeric columns (PREÇO UNITÁRIO, VALOR MERCADORIA)",
+    "OBS: block after last row (text density y≈439-447)",
+    "Totals grid with horizontal rules y≈454+",
+    "Dark VALOR A PAGAR box in footer",
+    "Vertical Aviludo branding strip on right margin",
+    "No vertical column grid lines"
+  ],
+  "E_confidence_automatic_detection_before_ocr": {
+    "header_grey_band_top_bottom": "PROVEN",
+    "first_item_row_from_header_end": "PROVEN",
+    "last_item_row_bottom_simple_column_projection": "HYPOTHESIS — qty-column peaks detected 6/8 rows; missed acucar/nata",
+    "table_bottom_via_totals_horizontal_rule_y454": "LIKELY",
+    "B_table_only_top_y218_vs_header_y228": "HYPOTHESIS — 10px margin not uniquely identified by luminance scan; empirically required for OCR",
+    "column_x_boundaries_without_vertical_rules": "HYPOTHESIS",
+    "cross_supplier_tabular_invoices": "HYPOTHESIS — only this Aviludo FCL template measured",
+    "same_supplier_template_generalization": "LIKELY — grey header + fixed column set observed on this invoice family",
+    "overall_realistic_before_ocr_this_template": "LIKELY for coarse table envelope; PROVEN for header band alone; not PROVEN for exact B_table_only bounds via single heuristic"
+  },
+  "codebase_findings": {
+    "extract_invoice_items_path": "Full imageDataUrl sent to GPT-4.1 vision; no table crop",
+    "deterministic_table_detection": "skipped (logged stage=6)",
+    "invoice_image_crop_ts": "cropTopPortion(dataUrl, 0.83) — fixed height fraction only; used for issue-date pass",
+    "parseContinente_parsePadaria_stages": "Text line parsers; not invoked in vision-json path",
+    "client_invoices_tsx": "Passes full screenshot dataUrl unchanged to edge function",
+    "existing_region_detection_modules": "None for table segmentation"
+  }
+}

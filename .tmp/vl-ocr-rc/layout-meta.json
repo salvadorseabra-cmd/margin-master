@@ -1,0 +1,160 @@
+{
+  "size": [
+    742,
+    938
+  ],
+  "rows": {
+    "header": [
+      228,
+      256
+    ],
+    "anchovas": [
+      258,
+      282
+    ],
+    "gema": [
+      283,
+      307
+    ],
+    "pepino": [
+      308,
+      332
+    ],
+    "atum": [
+      333,
+      357
+    ],
+    "arroz": [
+      358,
+      382
+    ],
+    "chocolate": [
+      383,
+      407
+    ],
+    "acucar": [
+      408,
+      432
+    ],
+    "nata": [
+      433,
+      457
+    ]
+  },
+  "cols": {
+    "artigo": [
+      0,
+      58
+    ],
+    "quantidade": [
+      58,
+      88
+    ],
+    "embal": [
+      88,
+      128
+    ],
+    "designacao": [
+      128,
+      395
+    ],
+    "lote": [
+      395,
+      485
+    ],
+    "preco_unit": [
+      485,
+      555
+    ],
+    "pct_desc": [
+      555,
+      585
+    ],
+    "desc_valor": [
+      585,
+      615
+    ],
+    "valor_merc": [
+      615,
+      685
+    ],
+    "pct_iva": [
+      685,
+      742
+    ]
+  },
+  "pdf": {
+    "anchovas": {
+      "art": "16283",
+      "qty": 2,
+      "unit": "UN",
+      "up": 9.99,
+      "tot": 19.98,
+      "iva": 6,
+      "outcome": "success"
+    },
+    "gema": {
+      "art": "1501",
+      "qty": 6,
+      "unit": "UN",
+      "up": 10.49,
+      "tot": 62.94,
+      "iva": 6,
+      "outcome": "fail"
+    },
+    "pepino": {
+      "art": "17042",
+      "qty": 1,
+      "unit": "CX",
+      "up": 22.49,
+      "tot": 22.49,
+      "iva": 23,
+      "outcome": "success"
+    },
+    "atum": {
+      "art": "15493",
+      "qty": 2,
+      "unit": "UN",
+      "up": 6.55,
+      "tot": 13.1,
+      "iva": 6,
+      "outcome": "fail"
+    },
+    "arroz": {
+      "art": "16685",
+      "qty": 1,
+      "unit": "CX",
+      "up": 13.95,
+      "tot": 13.95,
+      "iva": 6,
+      "outcome": "fail"
+    },
+    "chocolate": {
+      "art": "16796",
+      "qty": 2,
+      "unit": "CX",
+      "up": 29.99,
+      "tot": 59.98,
+      "iva": 23,
+      "outcome": "fail"
+    },
+    "acucar": {
+      "art": "16847",
+      "qty": 1,
+      "unit": "CX",
+      "up": 9.99,
+      "tot": 9.99,
+      "iva": 23,
+      "outcome": "fail"
+    },
+    "nata": {
+      "art": "15371",
+      "qty": 5,
+      "unit": "CX",
+      "up": 18.89,
+      "tot": 94.45,
+      "iva": 6,
+      "outcome": "fail"
+    }
+  }
+}

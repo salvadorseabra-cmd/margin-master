@@ -1,0 +1,5325 @@
+[
+  {
+    "scope": "A_full_page",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 20.59,
+              "total": 20.59,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 19.95,
+              "total": 19.95,
+              "name": "Chocolate Culinaria Panatuger1 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 19.56,
+              "total": 19.56,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 44.45,
+              "total": 44.45,
+              "name": "Nata Culinária 22% Remy Picot 6x1 L"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 44.45,
+              "total": 44.45,
+              "name": "Nata Culinaria 22% Remy Picot 6x1 LI"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 44.45,
+              "total": 44.45,
+              "name": "Nata Culinaria 22% Remy Picot 6x1 LI"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 3,
+              "unit": "un",
+              "unit_price": 6.5,
+              "total": 19.5,
+              "name": "Ovo Líquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 2.19,
+              "total": 13.14,
+              "name": "Ovo Liquido Past.Gemo Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 3,
+              "unit": "un",
+              "unit_price": 8.33,
+              "total": 24.99,
+              "name": "Ovo Liquido Past.Gemo Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.0,
+      "mean_stability": 0.38888888888888884,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "B_table_only",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Remy Picot 6x1 L1"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Remy Picot 6x1 L"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinária 22% Remy Picot 6x1 L"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Líquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Líquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Líquido Past. Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 1.0,
+      "mean_stability": 0.611111111111111,
+      "all_correct_rate": 1.0
+    }
+  },
+  {
+    "scope": "C_header_table",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantaguel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 LI"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 LI"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Ll"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.6666666666666666,
+      "mean_stability": 0.6666666666666666,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "D_header_plus_chocolate",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 29.99,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 29.99,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 29.99,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": false
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.3333333333333333,
+      "mean_stability": 1.0,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "E_row_only_chocolate",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.0,
+      "mean_stability": 1.0,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "D_header_plus_nata",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinária Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Ll"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Lt"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinária 22% Reny Picot 6x1 Lt"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Líquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.6666666666666666,
+      "mean_stability": 0.4444444444444444,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "E_row_only_nata",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.0,
+      "mean_stability": 1.0,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "D_header_plus_gema",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.3333333333333333,
+      "mean_stability": 1.0,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "E_row_only_gema",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.3333333333333333,
+      "mean_stability": 1.0,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "min_header_through_chocolate",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past. Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.6666666666666666,
+      "mean_stability": 0.8333333333333334,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "min_header_plus_chocolate_row",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.6666666666666666,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 29.99,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": false
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.5555555555555555,
+      "mean_stability": 0.8333333333333334,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "min_chocolate_row_expanded",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 20,
+              "unit": "un",
+              "unit_price": 2.999,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": false,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 20,
+              "unit": "un",
+              "unit_price": 2.999,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": false,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 20,
+              "unit": "un",
+              "unit_price": 2.9995,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": false,
+              "unit_price": false,
+              "total": true
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 6,
+              "unit": "l",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Lt"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": false,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 30,
+              "unit": "l",
+              "unit_price": 3.15,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 L"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": false,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 30,
+              "unit": "l",
+              "unit_price": 3.15,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Lt"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": false,
+              "unit_price": false,
+              "total": true
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.0,
+      "mean_stability": 0.611111111111111,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "min_header_chocolate_neighbour",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1L"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Lt"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Lt"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.6666666666666666,
+      "mean_stability": 0.6666666666666666,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "min_price_cols_header_chocolate",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.0,
+      "mean_stability": 1.0,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "min_header_through_nata",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Lt"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 L"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 L"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.6666666666666666,
+      "mean_stability": 0.8333333333333334,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "min_header_through_gema",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.3333333333333333,
+      "mean_stability": 1.0,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "hdr_with_header_table",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 6,
+              "unit": "cx",
+              "unit_price": 9.99,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Ll"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Lt"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 LI"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.6666666666666666,
+      "mean_stability": 0.611111111111111,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "hdr_rows_only_no_header",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 29.99,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 29.99,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 29.99,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": false
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Remy Picot 6x1 L"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Remy Picot 6x1 Lt"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Lt"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Líquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.6666666666666666,
+      "mean_stability": 0.611111111111111,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "hdr_chocolate_with_header",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.3333333333333333,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 29.99,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": false
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 0.6666666666666666,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 5,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.3333333333333333,
+      "mean_stability": 0.611111111111111,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "hdr_chocolate_without_header",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.0,
+      "mean_stability": 1.0,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "hdr_header_band_only",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.0,
+      "mean_stability": 1.0,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "hdr_table_minus_header_band",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 29.99,
+              "name": "Chocolate Culinária Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 29.99,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 29.99,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": false
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinária 22% Reny Picot 6x1 L"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 L"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 L"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Líquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.6666666666666666,
+      "mean_stability": 0.5,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "cont_table_no_footer",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.95,
+              "total": 59.9,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.95,
+              "total": 59.9,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 L"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 LI"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Ll"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.6666666666666666,
+      "mean_stability": 0.611111111111111,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "cont_table_no_iva_footer",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.9,
+              "total": 59.8,
+              "name": "Chocolate Culinara Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.8,
+              "total": 59.8,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 L"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Lt"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Ll"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.6666666666666666,
+      "mean_stability": 0.5555555555555555,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "cont_full_with_footer",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 19.99,
+              "total": 19.99,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 19.95,
+              "total": 19.95,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 19.49,
+              "total": 19.49,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 44.45,
+              "total": 44.45,
+              "name": "Nata Culinaria 22% Remy Picot 6x1 LI"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 44.45,
+              "total": 44.45,
+              "name": "Nata Culinária 22% Reny Picot 6x1 LI"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 34.45,
+              "total": 34.45,
+              "name": "Nata Culinaria 22% Remy Picot 6x1 LI"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 3.75,
+              "total": 22.5,
+              "name": "Ovo Liquido Past.Gemo Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 5,
+              "unit": "un",
+              "unit_price": 4.5,
+              "total": 22.49,
+              "name": "Ovo Liquido Past. Gemo Dovo 1 kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 4.25,
+              "total": 25.5,
+              "name": "Ovo Liquido Past.Gemo Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.0,
+      "mean_stability": 0.3333333333333333,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "cont_footer_only",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.0,
+      "mean_stability": 1.0,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "cont_iva_totals_band",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 0.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 0,
+        "samples": [
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          },
+          {
+            "found": false,
+            "correct": false,
+            "fields": {}
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.0,
+      "mean_stability": 1.0,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "cont_trim_left_margin",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.88,
+              "total": 59.88,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": false
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Ll"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Ll"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 LI"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past. Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.6666666666666666,
+      "mean_stability": 0.5,
+      "all_correct_rate": 0.0
+    }
+  },
+  {
+    "scope": "cont_trim_right_margin",
+    "runs": 3,
+    "targets": {
+      "chocolate": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 1.0,
+        "consistent": true,
+        "unique_outputs": 1,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 1,
+              "unit": "cx",
+              "unit_price": 59.98,
+              "total": 59.98,
+              "name": "Chocolate Culinaria Pantagruel 10x200 g"
+            },
+            "expected": {
+              "quantity": 2,
+              "unit": "cx",
+              "unit_price": 29.99,
+              "total": 59.98
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": false,
+              "total": true
+            }
+          }
+        ]
+      },
+      "nata": {
+        "found_rate": 1.0,
+        "accuracy": 1.0,
+        "stability": 0.3333333333333333,
+        "consistent": false,
+        "unique_outputs": 3,
+        "samples": [
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 L1"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 L"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": true,
+            "fields": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45,
+              "name": "Nata Culinaria 22% Reny Picot 6x1 Ll"
+            },
+            "expected": {
+              "quantity": 5,
+              "unit": "cx",
+              "unit_price": 18.89,
+              "total": 94.45
+            },
+            "field_ok": {
+              "quantity": true,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      },
+      "gema": {
+        "found_rate": 1.0,
+        "accuracy": 0.0,
+        "stability": 0.5,
+        "consistent": false,
+        "unique_outputs": 2,
+        "samples": [
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 5,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Líquido Past. Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 5,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          },
+          {
+            "found": true,
+            "correct": false,
+            "fields": {
+              "quantity": 5,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94,
+              "name": "Ovo Liquido Past.Gema Dovo 1 Kg"
+            },
+            "expected": {
+              "quantity": 6,
+              "unit": "un",
+              "unit_price": 10.49,
+              "total": 62.94
+            },
+            "field_ok": {
+              "quantity": false,
+              "unit": true,
+              "unit_price": true,
+              "total": true
+            }
+          }
+        ]
+      }
+    },
+    "aggregate": {
+      "mean_accuracy": 0.3333333333333333,
+      "mean_stability": 0.611111111111111,
+      "all_correct_rate": 0.0
+    }
+  }
+]

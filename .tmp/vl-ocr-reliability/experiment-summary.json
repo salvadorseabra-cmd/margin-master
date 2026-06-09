@@ -1,0 +1,41 @@
+{
+  "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+  "runs_per_scope": 3,
+  "targets_ground_truth": {
+    "chocolate": { "qty": 2, "unit": "cx", "unit_price": 29.99, "total": 59.98 },
+    "nata": { "qty": 5, "unit": "cx", "unit_price": 18.89, "total": 94.45 },
+    "gema": { "qty": 6, "unit": "un", "unit_price": 10.49, "total": 62.94 }
+  },
+  "best_scope": {
+    "name": "B_table_only",
+    "crop_px": "742x230",
+    "crop_y": "218-448",
+    "all_three_correct_rate": 1.0,
+    "label": "PROVEN"
+  },
+  "worst_scope": {
+    "name": "A_full_page",
+    "all_three_correct_rate": 0.0,
+    "mean_accuracy": 0.0,
+    "label": "PROVEN"
+  },
+  "minimum_all_three_reliable": {
+    "name": "B_table_only",
+    "crop_px": "742x230",
+    "note": "Only scope achieving 100% accuracy on all three targets across 3/3 runs in this experiment",
+    "label": "PROVEN"
+  },
+  "minimum_chocolate_only": {
+    "name": "min_header_through_chocolate",
+    "crop_px": "742x166",
+    "chocolate_accuracy": 1.0,
+    "chocolate_stability": 1.0,
+    "label": "PROVEN"
+  },
+  "artifacts": [
+    ".tmp/vl-ocr-reliability/raw-runs.json",
+    ".tmp/vl-ocr-reliability/scope-summaries.json",
+    ".tmp/vl-ocr-reliability/reliability-scoring.json",
+    ".tmp/vl-ocr-reliability/crops/"
+  ]
+}

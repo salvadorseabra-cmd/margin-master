@@ -1,0 +1,4 @@
+project_id = "vl-metadata-pass-temp"
+
+[functions.vl-metadata-pass]
+verify_jwt = false
