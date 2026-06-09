@@ -1,0 +1,37 @@
+{
+  "D_impl_crop_png_via_edge_fn": {
+    "item_count": 8,
+    "chocolate": {
+      "name": "Chocolate Culinaria Pantagruel 10x200 g",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 29.99,
+      "total": 59.98
+    },
+    "nata": {
+      "name": "Nata Culinaria 22% Remy Picot 6x1 L",
+      "quantity": 5,
+      "unit": "cx",
+      "unit_price": 18.89,
+      "total": 94.45
+    },
+    "gema": {
+      "name": "Ovo Líquido Past.Gema Dovo 1 Kg",
+      "quantity": 6,
+      "unit": "un",
+      "unit_price": 10.49,
+      "total": 62.94
+    }
+  },
+  "effective_ocr_regions_full_y": {
+    "production_path": [
+      218,
+      448
+    ],
+    "pre_cropped_re_detect_path": [
+      235,
+      448
+    ],
+    "top_strip_only_in_production_px": 17
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+  "experiment": "prompt-compare-fixed-crop",
+  "fixed_conditions": {
+    "model": "gpt-4.1",
+    "crop": {"start_y": 218, "end_y": 448, "width": 742, "height": 230},
+    "image": ".tmp/vl-prompt-compare/crops/B_table_exact_218_448.png (stored invoice, identical to full.png crop)",
+    "recrop_confound_avoided": true,
+    "method": "temp vl-prompt-compare edge function sends imageDataUrl directly to OpenAI (no detectTableBounds)"
+  },
+  "prompts": {
+    "A": "TABLE_EXTRACTION_SYSTEM_PROMPT — Pass C table-only (invoice-table-extraction.ts)",
+    "B": "Pre-9f26c0a full-page extract-invoice system prompt (git 9f26c0a^)"
+  },
+  "runs_per_prompt": 3,
+  "stability": {
+    "A_table_only_items_correct": [5, 6, 5],
+    "B_full_page_items_correct": [5, 5, 5],
+    "A_chocolate_nata_gema_all_correct_runs": "3/3 (all three items correct in all 3 runs)",
+    "B_chocolate_nata_gema_all_correct_runs": "3/3"
+  },
+  "side_by_side_run1": {
+    "anchovas": {"GT": "2 un 9.99 19.98", "A": "✓ match", "B": "✓ match"},
+    "gema": {"GT": "6 un 10.49 62.94", "A": "✓ match", "B": "✓ match"},
+    "pepino": {"GT": "1 cx 22.49 22.49", "A": "✗ 6 un 22.49 22.49", "B": "✗ 6 un 22.49 22.49"},
+    "atum": {"GT": "2 un 6.55 13.10", "A": "✗ 1 kg 13.1 13.1", "B": "✗ 1 un 13.1 13.1"},
+    "arroz": {"GT": "1 cx 13.95 13.95", "A": "✓ match", "B": "✓ match"},
+    "chocolate": {"GT": "2 cx 29.99 59.98", "A": "✓ match", "B": "✓ match"},
+    "acucar": {"GT": "1 cx 9.99 9.99", "A": "✗ 2 cx 9.49 18.98", "B": "✗ 9 cx 9.99 89.91"},
+    "nata": {"GT": "5 cx 18.89 94.45", "A": "✓ match", "B": "✓ match"}
+  },
+  "conclusion": {
+    "does_prompt_alone_explain_vl_100_vs_pass_c_failures": false,
+    "confidence": "PROVEN",
+    "reasoning": [
+      "Same exact 218-448 crop, same model, no re-crop: A (table-only) and B (full-page) score 5-6/8 with nearly identical per-item errors on run1.",
+      "Chocolate, Nata, Gema correct under BOTH prompts on all 3 runs when crop is exact and re-crop avoided.",
+      "VL 100% (B_table_only) used full-page prompt B on same crop; current Pass C failures on production path occur with full-image + re-crop confounds, not because table-only prompt is inherently worse on this crop.",
+      "Shared failures (Pepino qty/unit, Atum, Açúcar) appear under both prompts — not prompt-specific."
+    ]
+  },
+  "confidence_labels": {
+    "PROVEN": [
+      "Prompt alone does not explain accuracy difference when crop is fixed",
+      "A and B produce equivalent C/N/G results (3/3 runs correct) on exact crop",
+      "Re-crop confound avoided via temp direct-to-OpenAI function"
+    ],
+    "LIKELY": [
+      "Production Pass C failures are driven by pipeline confounds (full-image detectTableBounds, re-crop on pre-cropped input) not prompt text",
+      "Remaining 5/8 ceiling reflects inherent OCR variance on this template even under ideal conditions"
+    ],
+    "HYPOTHESIS": [
+      "VL historical 8/8 on all items may reflect run-to-run luck or slightly different image bytes, not prompt superiority"
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "run": 1,
+    "all_three": false,
+    "per_item": {
+      "chocolate": {
+        "correct": false
+      },
+      "nata": {
+        "correct": false
+      },
+      "gema": {
+        "correct": false
+      }
+    }
+  },
+  {
+    "run": 2,
+    "all_three": false,
+    "per_item": {
+      "chocolate": {
+        "correct": false
+      },
+      "nata": {
+        "correct": false
+      },
+      "gema": {
+        "correct": false
+      }
+    }
+  },
+  {
+    "run": 3,
+    "all_three": false,
+    "per_item": {
+      "chocolate": {
+        "correct": false
+      },
+      "nata": {
+        "correct": false
+      },
+      "gema": {
+        "correct": false
+      }
+    }
+  }
+]

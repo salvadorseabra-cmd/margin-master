@@ -1,0 +1,52 @@
+{
+  "compare_size": [
+    742,
+    230
+  ],
+  "identical": true,
+  "changed_pixels": 0,
+  "total_pixels": 170660,
+  "changed_fraction": 0.0,
+  "rows_with_diff": 0,
+  "first_diff_row": null,
+  "last_diff_row": null,
+  "impl_bottom_vs_vl": 0,
+  "band_inclusion": {
+    "header_grey": {
+      "y_range": [
+        228,
+        247
+      ],
+      "in_vl": true,
+      "in_impl": true,
+      "partial_in_impl": true
+    },
+    "last_item_nata": {
+      "y_range": [
+        416,
+        438
+      ],
+      "in_vl": true,
+      "in_impl": true,
+      "partial_in_impl": true
+    },
+    "obs_band": {
+      "y_range": [
+        439,
+        447
+      ],
+      "in_vl": true,
+      "in_impl": true,
+      "partial_in_impl": true
+    },
+    "totals_edge": {
+      "y_range": [
+        454,
+        471
+      ],
+      "in_vl": false,
+      "in_impl": false,
+      "partial_in_impl": false
+    }
+  }
+}

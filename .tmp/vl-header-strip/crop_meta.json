@@ -1,0 +1,107 @@
+{
+  "note": "extract-invoice re-crops pre-cropped PNGs; using full-image variants where possible",
+  "variants": {
+    "A": {
+      "intended_top": 218,
+      "detect_bounds": {
+        "detected": true,
+        "top": 218,
+        "bottom": 448,
+        "headerTop": 228,
+        "headerBottom": 247,
+        "totalsStart": 424
+      },
+      "path": ".tmp/vl-header-strip/variant_A.png"
+    },
+    "B": {
+      "intended_top": 222,
+      "detect_bounds": {
+        "detected": true,
+        "top": 218,
+        "bottom": 448,
+        "headerTop": 228,
+        "headerBottom": 247,
+        "totalsStart": 424
+      },
+      "path": ".tmp/vl-header-strip/variant_B.png"
+    },
+    "C": {
+      "intended_top": 226,
+      "detect_bounds": {
+        "detected": true,
+        "top": 218,
+        "bottom": 448,
+        "headerTop": 228,
+        "headerBottom": 247,
+        "totalsStart": 424
+      },
+      "path": ".tmp/vl-header-strip/variant_C.png"
+    },
+    "D": {
+      "intended_top": 230,
+      "detect_bounds": {
+        "detected": true,
+        "top": 220,
+        "bottom": 448,
+        "headerTop": 230,
+        "headerBottom": 248,
+        "totalsStart": 424
+      },
+      "path": ".tmp/vl-header-strip/variant_D.png"
+    },
+    "E": {
+      "intended_top": 235,
+      "detect_bounds": {
+        "detected": true,
+        "top": 225,
+        "bottom": 448,
+        "headerTop": 235,
+        "headerBottom": 253,
+        "totalsStart": 424
+      },
+      "path": ".tmp/vl-header-strip/variant_E.png"
+    }
+  },
+  "exact_crop_redetect": {
+    "A": {
+      "detected": true,
+      "top": 17,
+      "bottom": 230,
+      "headerTop": 27,
+      "headerBottom": 45,
+      "totalsStart": null
+    },
+    "B": {
+      "detected": true,
+      "top": 17,
+      "bottom": 226,
+      "headerTop": 27,
+      "headerBottom": 63,
+      "totalsStart": null
+    },
+    "C": {
+      "detected": true,
+      "top": 47,
+      "bottom": 222,
+      "headerTop": 57,
+      "headerBottom": 93,
+      "totalsStart": null
+    },
+    "D": {
+      "detected": true,
+      "top": 43,
+      "bottom": 218,
+      "headerTop": 53,
+      "headerBottom": 89,
+      "totalsStart": null
+    },
+    "E": {
+      "detected": true,
+      "top": 38,
+      "bottom": 213,
+      "headerTop": 48,
+      "headerBottom": 84,
+      "totalsStart": null
+    }
+  }
+}

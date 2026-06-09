@@ -1,0 +1,135 @@
+{
+  "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+  "commit": "9f26c0a",
+  "investigation_date": "2026-06-09",
+  "methodology": "Read-only. Replicated detectTableBounds from invoice-image-crop.ts in Python on stored invoice PNG. OCR via deployed extract-invoice (table Pass C prompt). VL historical from raw-runs.json (pre-9f26c0a full-page prompt). Direct OpenAI table-only on identical PNGs not run (OPENAI_API_KEY unavailable locally).",
+  "A_crop_differences": {
+    "vl_reference": {
+      "start_y": 218,
+      "end_y": 448,
+      "width": 742,
+      "height": 230,
+      "source": "layout-meta PROVEN; regenerated from stored invoice",
+      "confidence": "PROVEN"
+    },
+    "implementation_detectTableBounds": {
+      "start_y": 218,
+      "end_y": 448,
+      "width": 742,
+      "height": 230,
+      "headerTop": 228,
+      "headerBottom": 247,
+      "totalsStart": 424,
+      "bestBandAverage": 160.67,
+      "peakEdge": 22.99,
+      "confidence": "PROVEN"
+    },
+    "delta": {
+      "top_px": 0,
+      "bottom_px": 0,
+      "height_px": 0,
+      "confidence": "PROVEN"
+    },
+    "pixel_compare": {
+      "identical": true,
+      "changed_fraction": 0.0,
+      "vl_existing_file_matches_regenerated": true,
+      "confidence": "PROVEN"
+    },
+    "content_inclusion": {
+      "grey_header_band_228_247": { "in_vl": true, "in_impl": true },
+      "all_8_item_rows_248_438": { "in_vl": true, "in_impl": true },
+      "obs_band_439_447": { "in_vl": false, "in_impl": false },
+      "totals_section_449_plus": { "in_vl": false, "in_impl": false },
+      "top_margin_strip_218_227": { "in_vl": true, "in_impl": true },
+      "full_width_columns_0_742": { "in_vl": true, "in_impl": true },
+      "confidence": "PROVEN"
+    },
+    "conclusion": "Implementation crop on stored invoice reproduces VL B_table_only exactly. Crop geometry is NOT the cause of 1/8 accuracy on production path.",
+    "confidence": "PROVEN"
+  },
+  "B_ocr_differences": {
+    "vl_historical_B_table_only_run1": {
+      "prompt": "OLD extract-invoice full-page (supplier, invoice_date, total, items)",
+      "input_crop": "218-448 PIL PNG, no re-crop",
+      "item_count": 8,
+      "chocolate": { "qty": 2, "unit": "cx", "unit_price": 29.99, "total": 59.98, "correct": true },
+      "nata": { "qty": 5, "unit": "cx", "unit_price": 18.89, "total": 94.45, "correct": true },
+      "gema": { "qty": 6, "unit": "un", "unit_price": 10.49, "total": 62.94, "correct": true },
+      "confidence": "PROVEN"
+    },
+    "production_full_stored_image": {
+      "prompt": "Table specialist Pass C only (via extract-invoice)",
+      "effective_crop_full_y": [218, 448],
+      "item_count": 8,
+      "stability_runs": 3,
+      "chocolate_correct_runs": 0,
+      "nata_correct_runs": 0,
+      "gema_correct_runs": 0,
+      "example_chocolate_run1": { "qty": 5, "unit_price": 13.8, "total": 69 },
+      "confidence": "PROVEN"
+    },
+    "pre_cropped_vl_or_impl_png_sent_to_edge_fn": {
+      "prompt": "Table specialist Pass C",
+      "effective_crop_full_y": [235, 448],
+      "note": "detectTableBounds re-runs on 230px input; drops top 17px vs production path",
+      "item_count": 8,
+      "chocolate": { "qty": 2, "unit": "cx", "unit_price": 29.99, "total": 59.98, "correct": true },
+      "nata": { "qty": 5, "unit": "cx", "unit_price": 18.89, "total": 94.45, "correct": true },
+      "gema": { "qty": 6, "unit": "un", "unit_price": 10.49, "total": 62.94, "correct": true },
+      "confidence": "PROVEN"
+    },
+    "prompt_difference": {
+      "vl_100_used_full_page_prompt": true,
+      "implementation_uses_table_only_prompt": true,
+      "confidence": "PROVEN"
+    },
+    "conclusion": "VL 100% and implementation are not comparable on prompt alone. With table-only prompt, production path (218-448) fails C/N/G; accidental re-crop path (235-448) succeeds C/N/G in single runs.",
+    "confidence": "PROVEN for measurements; LIKELY for causal interpretation"
+  },
+  "C_first_divergence_point": {
+    "crop_geometry": {
+      "diverges": false,
+      "confidence": "PROVEN"
+    },
+    "prompt_type": {
+      "diverges": true,
+      "detail": "VL 100% used full extraction prompt; Pass C uses items-only prompt",
+      "confidence": "PROVEN"
+    },
+    "effective_ocr_region_when_using_edge_fn": {
+      "diverges": true,
+      "detail": "Full-image path sends y=218-448 to table model; pre-cropped input re-detects to y=235-448 (excludes 17px header-margin strip)",
+      "confidence": "PROVEN"
+    },
+    "table_prompt_on_218_448_region": {
+      "diverges": true,
+      "detail": "Same bounds as VL but table-only prompt yields wrong qty/unit_price (reads inner-column/pack values not purchased qty)",
+      "first_wrong_field": "quantity and unit_price on Chocolate, Nata, Gema",
+      "confidence": "LIKELY"
+    },
+    "ocr_non_determinism": {
+      "diverges": true,
+      "detail": "3 consecutive full-image invocations gave different wrong Chocolate/Nata/Gema values",
+      "confidence": "PROVEN"
+    },
+    "ordered_divergence_chain": [
+      { "step": 1, "label": "Prompt change (full-page → table-only)", "confidence": "PROVEN" },
+      { "step": 2, "label": "Table prompt misreads numeric columns on 218-448 crop", "confidence": "LIKELY" },
+      { "step": 3, "label": "Run-to-run OCR variance amplifies failures", "confidence": "PROVEN" }
+    ]
+  },
+  "artifacts": {
+    "stored_invoice": ".tmp/vl-crop-compare/stored_invoice.png",
+    "implementation_crop": ".tmp/vl-crop-compare/implementation_crop.png",
+    "vl_crop_regenerated": ".tmp/vl-crop-compare/vl_crop_regenerated.png",
+    "overlay_full_boundaries": ".tmp/vl-crop-compare/overlay_full_boundaries.png",
+    "overlay_effective_ocr_regions": ".tmp/vl-crop-compare/overlay_effective_ocr_regions.png",
+    "side_by_side": ".tmp/vl-crop-compare/side_by_side.png",
+    "prod_only_top_strip": ".tmp/vl-crop-compare/prod_only_top_strip_218_235.png",
+    "crop_dimensions": ".tmp/vl-crop-compare/crop_dimensions.json",
+    "pixel_compare": ".tmp/vl-crop-compare/pixel_compare.json",
+    "ocr_comparison": ".tmp/vl-crop-compare/ocr_comparison.json",
+    "stability_runs": ".tmp/vl-crop-compare/stability_full_image_runs.json"
+  }
+}

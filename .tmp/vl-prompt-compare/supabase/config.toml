@@ -1,0 +1,4 @@
+project_id = "bjhnlrgodcqoyzddbpbd"
+
+[functions.vl-prompt-compare]
+verify_jwt = false

@@ -1,0 +1,35 @@
+{
+  "source_image": {
+    "width": 742,
+    "height": 938,
+    "bytes": 1148541
+  },
+  "vl_crop": {
+    "start_y": 218,
+    "end_y": 448,
+    "width": 742,
+    "height": 230
+  },
+  "implementation_crop": {
+    "start_y": 218,
+    "end_y": 448,
+    "width": 742,
+    "height": 230,
+    "bounds": {
+      "top": 218,
+      "bottom": 448,
+      "headerTop": 228,
+      "headerBottom": 247,
+      "totalsStart": 424,
+      "detected": true,
+      "bestBandAverage": 160.67,
+      "peakEdge": 22.99
+    }
+  },
+  "delta": {
+    "top_px": 0,
+    "bottom_px": 0,
+    "height_px": 0
+  },
+  "vl_existing_file_identical_to_regenerated": true
+}

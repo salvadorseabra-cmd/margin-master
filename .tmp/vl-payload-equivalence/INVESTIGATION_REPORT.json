@@ -1,0 +1,137 @@
+{
+  "field_table": [
+    {
+      "field": "openai_api_endpoint",
+      "production": "https://api.openai.com/v1/chat/completions",
+      "experiment": "https://api.openai.com/v1/chat/completions",
+      "same": true
+    },
+    {
+      "field": "uses_responses_create",
+      "production": false,
+      "experiment": false,
+      "same": true
+    },
+    {
+      "field": "model",
+      "production": "gpt-4.1",
+      "experiment": "gpt-4.1",
+      "same": true
+    },
+    {
+      "field": "response_format",
+      "production": {
+        "type": "json_object"
+      },
+      "experiment": {
+        "type": "json_object"
+      },
+      "same": true
+    },
+    {
+      "field": "system_prompt_sha256",
+      "production": "420970055072ffe8bdb3f97db8bf808b1517d5a6a4fb24ddf999b80e1334f231",
+      "experiment": "420970055072ffe8bdb3f97db8bf808b1517d5a6a4fb24ddf999b80e1334f231",
+      "same": true
+    },
+    {
+      "field": "system_prompt_length",
+      "production": 1511,
+      "experiment": 1511,
+      "same": true
+    },
+    {
+      "field": "user_text",
+      "production": "Extract all invoice line items from this restaurant invoice table image.",
+      "experiment": "Extract all invoice line items from this restaurant invoice table image.",
+      "same": true
+    },
+    {
+      "field": "messages_structure",
+      "production": "system + user[text, image_url]",
+      "experiment": "system + user[text, image_url]",
+      "same": true
+    },
+    {
+      "field": "cropTableRegionForLineItems",
+      "production": "attempted; THROWS (ImageScript 1-based coords, x=0 invalid)",
+      "experiment": "skipped (recrop: false)",
+      "same": false
+    },
+    {
+      "field": "image_sent_to_gpt",
+      "production": "FULL stored invoice 742x938 (fallback after crop throw)",
+      "experiment": "Exact crop 742x230 y=218-448",
+      "same": false
+    },
+    {
+      "field": "image_png_bytes",
+      "production": 1148541,
+      "experiment": 250683,
+      "same": false
+    },
+    {
+      "field": "image_sha256",
+      "production": "95d8f88906e00d5a564a508f0b900b0665da89bd37aadd25ea23ddbedb54b354",
+      "experiment": "33ce47a9202294e6a5434538df85be622fdfab1be8481ac80ba5ac74d506bbda",
+      "same": false
+    },
+    {
+      "field": "imageDataUrl_length",
+      "production": 1531410,
+      "experiment": 334266,
+      "same": false
+    },
+    {
+      "field": "image_mime",
+      "production": "image/png",
+      "experiment": "image/png",
+      "same": true
+    },
+    {
+      "field": "intended_crop_coords",
+      "production": "218-448 (never reached; crop throws)",
+      "experiment": "218-448",
+      "same": false
+    },
+    {
+      "field": "prior_passes_before_table",
+      "production": "Pass A date + Pass B metadata (same request)",
+      "experiment": "none (isolated Pass C)",
+      "same": false
+    }
+  ],
+  "image_equivalence": {
+    "production_bytes_sha256": "95d8f88906e00d5a564a508f0b900b0665da89bd37aadd25ea23ddbedb54b354",
+    "experiment_bytes_sha256": "33ce47a9202294e6a5434538df85be622fdfab1be8481ac80ba5ac74d506bbda",
+    "byte_for_byte_identical": false,
+    "pixel_geometry_production": [
+      742,
+      938
+    ],
+    "pixel_geometry_experiment": [
+      742,
+      230
+    ],
+    "note": "Production sends full page after cropTableRegionForLineItems throws; experiment sends pre-built 218-448 PNG"
+  },
+  "prompt_equivalence": {
+    "system_prompt_identical": true,
+    "user_text_identical": true,
+    "api_identical": true
+  },
+  "first_divergence": {
+    "point": "cropTableRegionForLineItems \u2192 detectTableBounds \u2192 rowMeanLuminance \u2192 image.getPixelAt(0, y)",
+    "reason": "ImageScript getPixelAt is 1-based; production loops use x=0,y=0 causing RangeError",
+    "effect": "extractTableItemsFromImage catch leaves croppedDataUrl = original full-image imageDataUrl",
+    "confidence": "PROVEN",
+    "verified_by": "deno eval reproducing invoice-image-crop.ts on stored_invoice.png"
+  },
+  "crop_throw_evidence": {
+    "crop_threw": true,
+    "crop_error": "Tried referencing a pixel outside of the images boundaries: (x=0)<1",
+    "sent_same_as_input": true,
+    "input_data_url_len": 1531410,
+    "experiment_data_url_len": 334266
+  }
+}
