@@ -4,6 +4,10 @@ import {
   type AppSupabaseClient,
   type IngredientPriceHistoryRow,
 } from "@/lib/ingredient-price-history";
+import {
+  compareInvoiceChronologyAsc,
+  resolveInvoiceChronology,
+} from "@/lib/invoice-chronology";
 
 const LOG_PREFIX = "[ingredient_price_history_reconcile]";
 
@@ -52,6 +56,27 @@ function chainFieldsMatch(
       : rowPct != null && delta_percent != null && Math.abs(rowPct - delta_percent) < 1e-9;
 
   return prevMatch && deltaMatch && pctMatch;
+}
+
+type LinkedHistoryFetchRow = IngredientPriceHistoryRow & {
+  invoices: { invoice_date: string | null; created_at: string | null } | null;
+};
+
+function sortLinkedHistoryByInvoiceChronology(
+  rows: LinkedHistoryFetchRow[],
+): IngredientPriceHistoryRow[] {
+  return [...rows]
+    .sort((a, b) => {
+      const dateCmp = compareInvoiceChronologyAsc(
+        resolveInvoiceChronology(a.invoices).displayDateIso,
+        resolveInvoiceChronology(b.invoices).displayDateIso,
+      );
+      if (dateCmp !== 0) return dateCmp;
+      const createdCmp = (a.created_at ?? "").localeCompare(b.created_at ?? "");
+      if (createdCmp !== 0) return createdCmp;
+      return a.id.localeCompare(b.id);
+    })
+    .map(({ invoices: _invoices, ...row }) => row);
 }
 
 /** Ingredient ids with history rows tied to an invoice (call before deleting the invoice). */
@@ -121,17 +146,18 @@ export async function reconcileIngredientPriceHistoryChain(
 
     const { data, error: fetchError } = await client
       .from("ingredient_price_history")
-      .select(CHAIN_SELECT)
+      .select(`${CHAIN_SELECT}, invoices(invoice_date, created_at)`)
       .eq("ingredient_id", id)
-      .not("invoice_id", "is", null)
-      .order("created_at", { ascending: true });
+      .not("invoice_id", "is", null);
     if (fetchError) {
       result.errors.push(`fetch linked: ${fetchError.message}`);
       console.error(`${LOG_PREFIX} fetch linked rows failed for ${id}: ${fetchError.message}`);
       return result;
     }
 
-    const linked = (data ?? []).filter(isLinkedPriceHistoryRow) as IngredientPriceHistoryRow[];
+    const linked = sortLinkedHistoryByInvoiceChronology(
+      (data ?? []).filter(isLinkedPriceHistoryRow) as LinkedHistoryFetchRow[],
+    );
     result.linkedRowCount = linked.length;
 
     let prevNew: number | null = null;

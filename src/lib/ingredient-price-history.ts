@@ -4,7 +4,10 @@ import {
   purchaseQuantityDenom,
   resolvedOperationalUnitCostEur,
 } from "@/lib/ingredient-unit-cost";
-import { resolveInvoiceChronology } from "@/lib/invoice-chronology";
+import {
+  compareInvoiceChronologyAsc,
+  resolveInvoiceChronology,
+} from "@/lib/invoice-chronology";
 
 /** Supabase browser client shape used across the app. */
 export type AppSupabaseClient = SupabaseClient<Database>;
@@ -234,18 +237,25 @@ export async function fetchPriorLinkedHistoryNewPrice(
   try {
     const { data, error } = await client
       .from("ingredient_price_history")
-      .select("new_price, invoice_id")
+      .select("new_price, invoice_id, created_at, id, invoices(invoice_date, created_at)")
       .eq("ingredient_id", id)
       .not("invoice_id", "is", null)
-      .neq("invoice_id", exclude)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .neq("invoice_id", exclude);
     if (error) {
       logSupabaseError("fetchPriorLinkedHistoryNewPrice", error);
       return null;
     }
-    const n = data?.new_price == null ? null : Number(data.new_price);
+    const rows = [...(data ?? [])].sort((a, b) => {
+      const dateCmp = compareInvoiceChronologyAsc(
+        resolveInvoiceChronology(a.invoices).displayDateIso,
+        resolveInvoiceChronology(b.invoices).displayDateIso,
+      );
+      if (dateCmp !== 0) return -dateCmp;
+      const createdCmp = String(b.created_at ?? "").localeCompare(String(a.created_at ?? ""));
+      if (createdCmp !== 0) return createdCmp;
+      return String(b.id ?? "").localeCompare(String(a.id ?? ""));
+    });
+    const n = rows[0]?.new_price == null ? null : Number(rows[0].new_price);
     return n != null && Number.isFinite(n) ? n : null;
   } catch (err) {
     console.error(

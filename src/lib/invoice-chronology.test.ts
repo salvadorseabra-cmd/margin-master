@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  compareInvoiceChronologyAsc,
   compareInvoiceChronologyDesc,
   resolveInvoiceChronology,
 } from "@/lib/invoice-chronology";
@@ -40,5 +41,12 @@ describe("compareInvoiceChronologyDesc", () => {
   it("orders ISO dates descending", () => {
     expect(compareInvoiceChronologyDesc("2026-05-13", "2026-05-18")).toBeGreaterThan(0);
     expect(compareInvoiceChronologyDesc("2026-05-18", "2026-05-13")).toBeLessThan(0);
+  });
+});
+
+describe("compareInvoiceChronologyAsc", () => {
+  it("orders ISO dates ascending", () => {
+    expect(compareInvoiceChronologyAsc("2026-04-17", "2026-05-19")).toBeLessThan(0);
+    expect(compareInvoiceChronologyAsc("2026-05-19", "2026-04-17")).toBeGreaterThan(0);
   });
 });

@@ -5,6 +5,11 @@ import {
   reconcileIngredientPriceHistoryChain,
 } from "@/lib/ingredient-price-history-reconcile";
 
+type InvoiceMeta = {
+  invoice_date: string | null;
+  created_at: string | null;
+};
+
 type HistoryRow = {
   id: string;
   ingredient_id: string;
@@ -14,7 +19,15 @@ type HistoryRow = {
   delta: number | null;
   delta_percent: number | null;
   created_at: string;
+  invoices?: InvoiceMeta | null;
 };
+
+function invoiceMetaForRow(row: HistoryRow): InvoiceMeta | null {
+  if (row.invoices) return row.invoices;
+  if (!row.invoice_id) return null;
+  const date = row.created_at.includes("T") ? row.created_at.slice(0, 10) : row.created_at;
+  return { invoice_date: date, created_at: row.created_at };
+}
 
 function createReconcileMockClient(seed: HistoryRow[]) {
   const rows = seed.map((row) => ({ ...row }));
@@ -88,7 +101,13 @@ function createReconcileMockClient(seed: HistoryRow[]) {
           );
         }
 
-        const result = { data: selected, error: null as const };
+        const result = {
+          data: selected.map((row) => ({
+            ...row,
+            invoices: invoiceMetaForRow(row),
+          })),
+          error: null as const,
+        };
         return resolve ? resolve(result) : result;
       },
     };
@@ -206,6 +225,58 @@ describe("reconcileIngredientPriceHistoryChain", () => {
     expect(rows[0]?.previous_price).toBeNull();
     expect(rows[1]?.previous_price).toBe(1.39);
     expect(rows[1]?.delta_percent).toBeCloseTo(((1.5 - 1.39) / 1.39) * 100, 4);
+  });
+
+  it("orders by invoice_date when created_at disagrees (Gema re-extract refresh)", async () => {
+    const { client, rows } = createReconcileMockClient([
+      {
+        id: "hist-may",
+        ingredient_id: "ing-gema",
+        invoice_id: "inv-may",
+        previous_price: 1.698333,
+        new_price: 1.748333,
+        delta: 0.05,
+        delta_percent: 2.94,
+        created_at: "2023-05-19T12:00:00.000Z",
+        invoices: {
+          invoice_date: "2026-05-19",
+          created_at: "2023-05-19T12:00:00.000Z",
+        },
+      },
+      {
+        id: "hist-april",
+        ingredient_id: "ing-gema",
+        invoice_id: "inv-april",
+        previous_price: 1.748333,
+        new_price: 1.698333,
+        delta: -0.05,
+        delta_percent: -2.86,
+        created_at: "2026-04-17T12:00:00.000Z",
+        invoices: {
+          invoice_date: "2026-04-17",
+          created_at: "2026-04-17T12:00:00.000Z",
+        },
+      },
+    ]);
+
+    const result = await reconcileIngredientPriceHistoryChain(client, "ing-gema");
+    expect(result.orphansDeleted).toBe(0);
+    expect(result.rowsUpdated).toBe(2);
+    expect(result.linkedRowCount).toBe(2);
+
+    const april = rows.find((row) => row.id === "hist-april");
+    const may = rows.find((row) => row.id === "hist-may");
+    expect(april).toMatchObject({
+      previous_price: null,
+      new_price: 1.698333,
+      delta: null,
+      delta_percent: null,
+    });
+    expect(may).toMatchObject({
+      previous_price: 1.698333,
+      new_price: 1.748333,
+    });
+    expect(may?.delta_percent).toBeCloseTo(((1.748333 - 1.698333) / 1.698333) * 100, 2);
   });
 });
 

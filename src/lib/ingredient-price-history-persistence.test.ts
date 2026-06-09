@@ -50,6 +50,16 @@ function createPersistenceMockClient(options: {
     );
   }
 
+  function invoiceMetaForHistoryRow(row: HistoryRow) {
+    const createdAt = String(row.created_at ?? "");
+    const invoiceDate = createdAt.includes("T") ? createdAt.slice(0, 10) : createdAt || null;
+    return { invoice_date: invoiceDate, created_at: createdAt || null };
+  }
+
+  function withInvoiceJoin(row: HistoryRow) {
+    return { ...row, invoices: invoiceMetaForHistoryRow(row) };
+  }
+
   const client = {
     from: (table: string) => {
       if (table === "ingredients") {
@@ -180,7 +190,10 @@ function createPersistenceMockClient(options: {
                 const result = { data: matched.map((entry) => ({ id: entry.id })), error: null as const };
                 return resolve ? resolve(result) : result;
               }
-              const result = { data: selected, error: null as const };
+              const result = {
+                data: selected.map((row) => withInvoiceJoin(row)),
+                error: null as const,
+              };
               return resolve ? resolve(result) : result;
             },
           };
@@ -216,7 +229,10 @@ function createPersistenceMockClient(options: {
                 }),
               };
             }
-            if (cols === "new_price, invoice_id") {
+            if (
+              cols === "new_price, invoice_id" ||
+              cols === "new_price, invoice_id, created_at, id, invoices(invoice_date, created_at)"
+            ) {
               return buildHistoryQuery("select");
             }
             if (cols === "new_price") {

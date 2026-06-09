@@ -102,3 +102,11 @@ export function compareInvoiceChronologyDesc(
   if (!right) return -1;
   return right.localeCompare(left);
 }
+
+/** Ascending sort for ISO purchase dates (`YYYY-MM-DD`). */
+export function compareInvoiceChronologyAsc(
+  a: string | null | undefined,
+  b: string | null | undefined,
+): number {
+  return -compareInvoiceChronologyDesc(a, b);
+}
