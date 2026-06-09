@@ -19,6 +19,7 @@ import {
 } from "@/lib/operational-intelligence-synthesis";
 
 type HistoryInsert = Record<string, unknown>;
+type HistoryRow = HistoryInsert & { id: string };
 
 function createPersistenceMockClient(options: {
   ingredient?: {
@@ -27,17 +28,27 @@ function createPersistenceMockClient(options: {
     current_price: number | null;
     purchase_quantity: number | null;
   };
-  existingHistoryKeys?: Set<string>;
+  existingHistoryRows?: HistoryRow[];
   latestHistoryNewPrice?: number | null;
 }) {
   const historyInserts: HistoryInsert[] = [];
-  const existing = options.existingHistoryKeys ?? new Set<string>();
+  const historyUpdates: Array<{ id: string; payload: HistoryInsert }> = [];
+  const historyRows: HistoryRow[] = (options.existingHistoryRows ?? []).map((row, index) => ({
+    id: String(row.id ?? `hist-${index}`),
+    ...row,
+  }));
   const ingredient = options.ingredient ?? {
     name: "Tomato passata",
     unit: "kg",
     current_price: 10,
     purchase_quantity: 1,
   };
+
+  function historyByInvoiceIngredient(invoiceId: string, ingredientId: string) {
+    return historyRows.find(
+      (row) => row.invoice_id === invoiceId && row.ingredient_id === ingredientId,
+    );
+  }
 
   const client = {
     from: (table: string) => {
@@ -62,31 +73,153 @@ function createPersistenceMockClient(options: {
         };
       }
       if (table === "ingredient_price_history") {
+        const buildHistoryQuery = (
+          mode: "select" | "delete" | "update",
+          updatePayload?: HistoryInsert,
+        ) => {
+          const filters: Array<(row: HistoryRow) => boolean> = [];
+          let orderAsc: boolean | null = null;
+          let excludesInvoice = false;
+
+          const builder = {
+            select(_cols: string) {
+              return builder;
+            },
+            delete() {
+              return buildHistoryQuery("delete");
+            },
+            update(payload: HistoryInsert) {
+              return buildHistoryQuery("update", payload);
+            },
+            eq(col: string, val: string) {
+              filters.push((row) => String(row[col as keyof HistoryRow]) === val);
+              return builder;
+            },
+            is(col: string, val: null) {
+              filters.push((row) => (row[col as keyof HistoryRow] ?? null) === val);
+              return builder;
+            },
+            not(col: string, _op: string, _val: null) {
+              filters.push((row) => row[col as keyof HistoryRow] != null);
+              return builder;
+            },
+            neq(col: string, val: string) {
+              excludesInvoice = true;
+              filters.push((row) => String(row[col as keyof HistoryRow]) !== val);
+              return builder;
+            },
+            order(_col: string, opts: { ascending: boolean }) {
+              orderAsc = opts.ascending;
+              return builder;
+            },
+            limit() {
+              return builder;
+            },
+            maybeSingle: async () => {
+              const matched = historyRows.filter((row) => filters.every((filter) => filter(row)));
+              let selected = [...matched];
+              if (orderAsc != null) {
+                selected = selected.sort((a, b) =>
+                  orderAsc
+                    ? String(a.created_at ?? "").localeCompare(String(b.created_at ?? ""))
+                    : String(b.created_at ?? "").localeCompare(String(a.created_at ?? "")),
+                );
+              }
+              const row = selected[0];
+              if (mode === "update" && updatePayload && row) {
+                Object.assign(row, updatePayload);
+                historyUpdates.push({ id: row.id, payload: updatePayload });
+                return { data: null, error: null };
+              }
+              if (mode === "delete") {
+                for (const entry of matched) {
+                  const index = historyRows.indexOf(entry);
+                  if (index >= 0) historyRows.splice(index, 1);
+                }
+                return { data: matched.map((entry) => ({ id: entry.id })), error: null };
+              }
+              if (
+                !row &&
+                !excludesInvoice &&
+                options.latestHistoryNewPrice != null &&
+                mode === "select"
+              ) {
+                return {
+                  data: {
+                    new_price: options.latestHistoryNewPrice,
+                    invoice_id: "inv-linked",
+                  },
+                  error: null,
+                };
+              }
+              return row ? { data: row, error: null } : { data: null, error: null };
+            },
+            then(resolve?: (value: { data: unknown; error: null }) => unknown) {
+              const matched = historyRows.filter((row) => filters.every((filter) => filter(row)));
+              let selected = [...matched];
+              if (orderAsc != null) {
+                selected = selected.sort((a, b) =>
+                  orderAsc
+                    ? String(a.created_at ?? "").localeCompare(String(b.created_at ?? ""))
+                    : String(b.created_at ?? "").localeCompare(String(a.created_at ?? "")),
+                );
+              }
+              if (mode === "update" && updatePayload) {
+                for (const row of matched) {
+                  Object.assign(row, updatePayload);
+                  historyUpdates.push({ id: row.id, payload: updatePayload });
+                }
+                const result = { error: null as const };
+                return resolve ? resolve(result as { data: unknown; error: null }) : result;
+              }
+              if (mode === "delete") {
+                for (const entry of matched) {
+                  const index = historyRows.indexOf(entry);
+                  if (index >= 0) historyRows.splice(index, 1);
+                }
+                const result = { data: matched.map((entry) => ({ id: entry.id })), error: null as const };
+                return resolve ? resolve(result) : result;
+              }
+              const result = { data: selected, error: null as const };
+              return resolve ? resolve(result) : result;
+            },
+          };
+          return builder;
+        };
+
         return {
           select: (cols: string) => {
-            if (cols === "id") {
+            if (cols === "id,created_at,previous_price,new_price") {
               return {
-                eq: (col: string, val: string) => {
-                  const chain = {
-                    eq: (col2: string, val2: string) => ({
-                      limit: () => ({
-                        maybeSingle: async () => {
-                          if (col === "invoice_id" && col2 === "ingredient_id") {
-                            const key = `${val}:${val2}`;
-                            return existing.has(key)
-                              ? { data: { id: "existing" }, error: null }
-                              : { data: null, error: null };
-                          }
-                          return { data: null, error: null };
-                        },
-                      }),
+                eq: (col: string, val: string) => ({
+                  eq: (col2: string, val2: string) => ({
+                    limit: () => ({
+                      maybeSingle: async () => {
+                        if (col === "invoice_id" && col2 === "ingredient_id") {
+                          const row = historyByInvoiceIngredient(val, val2);
+                          return row
+                            ? {
+                                data: {
+                                  id: row.id,
+                                  created_at: row.created_at,
+                                  previous_price: row.previous_price,
+                                  new_price: row.new_price,
+                                },
+                                error: null,
+                              }
+                            : { data: null, error: null };
+                        }
+                        return { data: null, error: null };
+                      },
                     }),
-                  };
-                  return chain;
-                },
+                  }),
+                }),
               };
             }
-            if (cols === "new_price" || cols === "new_price, invoice_id") {
+            if (cols === "new_price, invoice_id") {
+              return buildHistoryQuery("select");
+            }
+            if (cols === "new_price") {
               return {
                 eq: () => ({
                   not: () => ({
@@ -108,22 +241,25 @@ function createPersistenceMockClient(options: {
                 }),
               };
             }
+            if (cols.includes("ingredient_id") && cols.includes("invoice_id")) {
+              return buildHistoryQuery("select");
+            }
             throw new Error(`unexpected select ${cols}`);
           },
           insert: (row: HistoryInsert) => {
             historyInserts.push(row);
-            if (row.invoice_id && row.ingredient_id) {
-              existing.add(`${row.invoice_id}:${row.ingredient_id}`);
-            }
+            historyRows.push({ id: `insert-${historyRows.length}`, ...row });
             return Promise.resolve({ error: null });
           },
+          update: (payload: HistoryInsert) => buildHistoryQuery("update", payload),
+          delete: () => buildHistoryQuery("delete"),
         };
       }
       throw new Error(`unexpected table ${table}`);
     },
   };
 
-  return { client, historyInserts, ingredient };
+  return { client, historyInserts, historyUpdates, historyRows, ingredient };
 }
 
 describe("resolvePreviousOperationalPriceForHistory", () => {
@@ -272,19 +408,47 @@ describe("appendIngredientPriceHistoryFromInvoiceLine", () => {
     expect(historyInserts[0].delta_percent).toBe(-25);
   });
 
-  it("skips duplicate invoice_id + ingredient_id", async () => {
-    const existing = new Set(["inv-1:ing-1"]);
-    const { client, historyInserts } = createPersistenceMockClient({ existingHistoryKeys: existing });
+  it("refreshes existing invoice_id + ingredient_id on re-extract", async () => {
+    const { client, historyInserts, historyUpdates, historyRows } = createPersistenceMockClient({
+      existingHistoryRows: [
+        {
+          id: "hist-april",
+          ingredient_id: "ing-gema",
+          invoice_id: "inv-april",
+          previous_price: null,
+          new_price: 1.698,
+          created_at: "2026-04-17T12:00:00.000Z",
+        },
+        {
+          id: "e143080d",
+          ingredient_id: "ing-gema",
+          invoice_id: "inv-may",
+          previous_price: 1.698,
+          new_price: 0.9,
+          delta: -0.798,
+          delta_percent: -47,
+          created_at: "2026-05-19T12:00:00.000Z",
+        },
+      ],
+    });
     const result = await appendIngredientPriceHistoryFromInvoiceLine(client as never, {
-      ingredientId: "ing-1",
-      invoiceId: "inv-1",
-      ingredientName: "Tomato",
-      previousPrice: 10,
-      newPrice: 15,
+      ingredientId: "ing-gema",
+      invoiceId: "inv-may",
+      ingredientName: "Gema líquida",
+      previousPrice: 0.9,
+      newPrice: 10.49,
+      previousPurchaseQuantity: 6,
+      newPurchaseQuantity: 6,
     });
     expect(result.inserted).toBe(false);
-    expect(result.skippedReason).toBe("duplicate_invoice");
+    expect(result.updated).toBe(true);
     expect(historyInserts).toHaveLength(0);
+    expect(historyUpdates).toHaveLength(1);
+    expect(historyUpdates[0]?.id).toBe("e143080d");
+    expect(historyUpdates[0]?.payload.new_price).toBeCloseTo(10.49 / 6, 6);
+    expect(historyUpdates[0]?.payload.previous_price).toBeCloseTo(1.698, 4);
+    const mayRow = historyRows.find((row) => row.id === "e143080d");
+    expect(mayRow?.created_at).toBe("2026-05-19T12:00:00.000Z");
   });
 
   it("skips unchanged effective unit price", async () => {

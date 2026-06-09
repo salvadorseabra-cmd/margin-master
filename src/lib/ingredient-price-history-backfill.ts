@@ -199,15 +199,11 @@ export async function backfillIngredientPriceHistoryFromInvoices(
       result.errors.push(append.error.message);
       continue;
     }
-    if (append.skippedReason === "duplicate_invoice") {
-      result.skippedDuplicate += 1;
-      continue;
-    }
     if (append.skippedReason === "unchanged_price") {
       result.skippedUnchanged += 1;
       continue;
     }
-    if (append.inserted) {
+    if (append.inserted || append.updated) {
       result.historyRowsCreated += 1;
       lastPackByIngredient.set(ingredientId, newPrice);
       lastQtyByIngredient.set(ingredientId, fields.purchase_quantity ?? null);

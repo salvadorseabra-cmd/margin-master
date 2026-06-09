@@ -190,30 +190,123 @@ function logSupabaseError(label: string, error: PostgrestError | null | undefine
   console.error(`${LOG_PREFIX} ${label} failed: ${error.message}${code}`);
 }
 
-export async function historyExistsForInvoiceIngredient(
+export type InvoiceIngredientHistoryRow = Pick<
+  IngredientPriceHistoryRow,
+  "id" | "created_at" | "previous_price" | "new_price"
+>;
+
+export async function fetchHistoryRowForInvoiceIngredient(
   client: AppSupabaseClient,
   invoiceId: string,
   ingredientId: string,
-): Promise<boolean> {
+): Promise<InvoiceIngredientHistoryRow | null> {
   try {
     const { data, error } = await client
       .from("ingredient_price_history")
-      .select("id")
+      .select("id,created_at,previous_price,new_price")
       .eq("invoice_id", invoiceId)
       .eq("ingredient_id", ingredientId)
       .limit(1)
       .maybeSingle();
     if (error) {
-      logSupabaseError("historyExistsForInvoiceIngredient", error);
-      return false;
+      logSupabaseError("fetchHistoryRowForInvoiceIngredient", error);
+      return null;
     }
-    return Boolean(data?.id);
+    if (!data?.id) return null;
+    return data as InvoiceIngredientHistoryRow;
   } catch (err) {
     console.error(
-      `${LOG_PREFIX} historyExistsForInvoiceIngredient threw: ${err instanceof Error ? err.message : String(err)}`,
+      `${LOG_PREFIX} fetchHistoryRowForInvoiceIngredient threw: ${err instanceof Error ? err.message : String(err)}`,
     );
-    return false;
+    return null;
   }
+}
+
+/** Latest linked history `new_price` before a re-extract refresh (excludes the invoice being refreshed). */
+export async function fetchPriorLinkedHistoryNewPrice(
+  client: AppSupabaseClient,
+  ingredientId: string,
+  excludeInvoiceId: string,
+): Promise<number | null> {
+  const id = ingredientId.trim();
+  const exclude = excludeInvoiceId.trim();
+  if (!id || !exclude) return null;
+  try {
+    const { data, error } = await client
+      .from("ingredient_price_history")
+      .select("new_price, invoice_id")
+      .eq("ingredient_id", id)
+      .not("invoice_id", "is", null)
+      .neq("invoice_id", exclude)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) {
+      logSupabaseError("fetchPriorLinkedHistoryNewPrice", error);
+      return null;
+    }
+    const n = data?.new_price == null ? null : Number(data.new_price);
+    return n != null && Number.isFinite(n) ? n : null;
+  } catch (err) {
+    console.error(
+      `${LOG_PREFIX} fetchPriorLinkedHistoryNewPrice threw: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return null;
+  }
+}
+
+function storedPriceHistoryFieldsFromParams(
+  params: AppendIngredientPriceHistoryParams,
+  opts?: { priorLinkedNewPrice?: number | null; refreshExisting?: boolean },
+): {
+  storedPrev: number | null;
+  storedNew: number;
+  prevPack: number | null;
+} | null {
+  const newPrice = Number(params.newPrice);
+  if (!Number.isFinite(newPrice)) return null;
+
+  const prevPack = params.previousPrice == null ? null : Number(params.previousPrice);
+  const storedNew =
+    operationalUnitPriceForPriceHistory(newPrice, params.newPurchaseQuantity) ?? newPrice;
+
+  let storedPrev: number | null;
+  if (opts?.refreshExisting) {
+    if (opts.priorLinkedNewPrice != null && Number.isFinite(Number(opts.priorLinkedNewPrice))) {
+      storedPrev = Number(opts.priorLinkedNewPrice);
+    } else {
+      storedPrev = null;
+    }
+  } else if (
+    params.previousOperationalPrice != null &&
+    Number.isFinite(Number(params.previousOperationalPrice))
+  ) {
+    storedPrev = Number(params.previousOperationalPrice);
+  } else {
+    storedPrev = operationalUnitPriceForPriceHistory(
+      params.previousPrice,
+      params.previousPurchaseQuantity,
+    );
+  }
+
+  return { storedPrev, storedNew, prevPack };
+}
+
+function priceHistoryRowValuesMatch(
+  existing: InvoiceIngredientHistoryRow,
+  storedPrev: number | null,
+  storedNew: number,
+): boolean {
+  const rowPrev =
+    existing.previous_price == null ? null : Number(existing.previous_price);
+  const rowNew = Number(existing.new_price);
+  const prevMatch =
+    rowPrev == null && storedPrev == null
+      ? true
+      : rowPrev != null &&
+        storedPrev != null &&
+        Math.abs(rowPrev - storedPrev) <= INGREDIENT_PRICE_EQ_EPS;
+  return prevMatch && Math.abs(rowNew - storedNew) <= INGREDIENT_PRICE_EQ_EPS;
 }
 
 export async function fetchIngredientPriceSnapshot(
@@ -273,15 +366,17 @@ export async function fetchLatestHistoryNewPrice(
 }
 
 /**
- * Inserts one `ingredient_price_history` row for an invoice line price change.
- * Skips when duplicate `(invoice_id, ingredient_id)`, or effective unit price unchanged.
+ * Inserts or refreshes one `ingredient_price_history` row for an invoice line price change.
+ * When `(invoice_id, ingredient_id)` already exists (re-extract), recomputes stored prices
+ * and updates the row while preserving `created_at`. Skips when effective unit price unchanged.
  */
 export async function appendIngredientPriceHistoryFromInvoiceLine(
   client: AppSupabaseClient,
   params: AppendIngredientPriceHistoryParams,
 ): Promise<{
   inserted: boolean;
-  skippedReason?: "missing_ids" | "duplicate_invoice" | "invalid_new_price" | "unchanged_price";
+  updated?: boolean;
+  skippedReason?: "missing_ids" | "invalid_new_price" | "unchanged_price";
   error: PostgrestError | null;
 }> {
   const ingredientId = params.ingredientId.trim();
@@ -290,35 +385,70 @@ export async function appendIngredientPriceHistoryFromInvoiceLine(
     return { inserted: false, skippedReason: "missing_ids", error: null };
   }
 
-  if (await historyExistsForInvoiceIngredient(client, invoiceId, ingredientId)) {
-    return { inserted: false, skippedReason: "duplicate_invoice", error: null };
-  }
+  const existingRow = await fetchHistoryRowForInvoiceIngredient(client, invoiceId, ingredientId);
+  const refreshExisting = existingRow != null;
 
-  const newPrice = Number(params.newPrice);
-  if (!Number.isFinite(newPrice)) {
+  const priorLinkedNewPrice = refreshExisting
+    ? await fetchPriorLinkedHistoryNewPrice(client, ingredientId, invoiceId)
+    : null;
+
+  const computed = storedPriceHistoryFieldsFromParams(params, {
+    refreshExisting,
+    priorLinkedNewPrice,
+  });
+  if (!computed) {
     return { inserted: false, skippedReason: "invalid_new_price", error: null };
   }
 
-  const prevPack = params.previousPrice == null ? null : Number(params.previousPrice);
-  const storedNew =
-    operationalUnitPriceForPriceHistory(newPrice, params.newPurchaseQuantity) ?? newPrice;
-  const storedPrev =
-    params.previousOperationalPrice != null && Number.isFinite(Number(params.previousOperationalPrice))
-      ? Number(params.previousOperationalPrice)
-      : operationalUnitPriceForPriceHistory(params.previousPrice, params.previousPurchaseQuantity);
+  const { storedPrev, storedNew, prevPack } = computed;
+  const newPrice = Number(params.newPrice);
 
   if (
-    invoiceLinePricesUnchanged(
+    !refreshExisting &&
+    (invoiceLinePricesUnchanged(
       prevPack,
       params.previousPurchaseQuantity ?? null,
       newPrice,
       params.newPurchaseQuantity ?? null,
     ) ||
-    (storedPrev != null && Math.abs(storedPrev - storedNew) <= INGREDIENT_PRICE_EQ_EPS)
+      (storedPrev != null && Math.abs(storedPrev - storedNew) <= INGREDIENT_PRICE_EQ_EPS))
   ) {
     return { inserted: false, skippedReason: "unchanged_price", error: null };
   }
+
+  if (refreshExisting && priceHistoryRowValuesMatch(existingRow, storedPrev, storedNew)) {
+    return { inserted: false, skippedReason: "unchanged_price", error: null };
+  }
+
   const { delta, delta_percent } = computePriceHistoryDelta(storedPrev, storedNew);
+
+  if (refreshExisting) {
+    const { error } = await client
+      .from("ingredient_price_history")
+      .update({
+        ingredient_name: params.ingredientName,
+        supplier_name: params.supplierName ?? null,
+        ingredient_unit: params.ingredientUnit ?? null,
+        previous_price: storedPrev,
+        new_price: storedNew,
+        delta,
+        delta_percent,
+      })
+      .eq("id", existingRow.id);
+
+    if (error) {
+      logSupabaseError("appendIngredientPriceHistoryFromInvoiceLine refresh", error);
+      return { inserted: false, error };
+    }
+
+    const { reconcileIngredientPriceHistoryChain } = await import(
+      "@/lib/ingredient-price-history-reconcile"
+    );
+    await reconcileIngredientPriceHistoryChain(client, ingredientId);
+
+    return { inserted: false, updated: true, error: null };
+  }
+
   const created_at = resolveIngredientPriceHistoryCreatedAt({
     invoiceDate: params.invoiceDate,
     invoiceCreatedAt: params.invoiceCreatedAt,

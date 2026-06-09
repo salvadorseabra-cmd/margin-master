@@ -151,7 +151,7 @@ export async function persistOperationalIngredientCostFromInvoiceLine(
       invoiceDate: historyCtx.invoiceDate,
       invoiceCreatedAt: historyCtx.invoiceCreatedAt,
     });
-    historyInserted = historyResult.inserted;
+    historyInserted = historyResult.inserted || Boolean(historyResult.updated);
     if (historyResult.error) {
       console.error(
         `${LOG_PREFIX} ingredient_price_history append failed:`,
