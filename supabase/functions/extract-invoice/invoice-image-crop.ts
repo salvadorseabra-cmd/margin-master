@@ -115,6 +115,9 @@ export function detectTableBounds(image: Image): TableBounds {
 
   const searchStart = refinedBottom + MIN_TABLE_HEIGHT;
   const searchEnd = Math.min(refinedBottom + 350, Math.floor(height * 0.85));
+  const TOTALS_BOTTOM_PADDING = 24;
+  const SEARCH_BOUNDARY_SLACK = 20;
+  const BOUNDARY_BOTTOM_PADDING = 190;
   let totalsStart: number | null = null;
 
   if (searchStart < searchEnd) {
@@ -129,8 +132,18 @@ export function detectTableBounds(image: Image): TableBounds {
   }
 
   const top = Math.max(0, headerTop - TOP_MARGIN);
+  const nearSearchBoundary = totalsStart != null &&
+    searchEnd - totalsStart <= SEARCH_BOUNDARY_SLACK;
   const bottom = totalsStart != null
-    ? Math.min(height, Math.max(refinedBottom + 40, totalsStart + 24))
+    ? Math.min(
+      height,
+      Math.max(
+        refinedBottom + 40,
+        nearSearchBoundary
+          ? searchEnd + BOUNDARY_BOTTOM_PADDING
+          : totalsStart + TOTALS_BOTTOM_PADDING,
+      ),
+    )
     : Math.min(height, refinedBottom + 202);
 
   return {
