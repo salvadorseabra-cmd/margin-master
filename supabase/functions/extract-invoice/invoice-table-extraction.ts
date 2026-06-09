@@ -1,0 +1,165 @@
+import { cropTableRegionForLineItems } from "./invoice-image-crop.ts";
+import { callOpenAiJson } from "./invoice-date-extraction.ts";
+import type { TableBounds } from "./invoice-image-crop.ts";
+
+const TABLE_EXTRACTION_SYSTEM_PROMPT = `
+You extract ONLY invoice line items from restaurant invoice table images.
+
+Return ONLY valid JSON with this exact structure:
+
+{
+  "items": [
+    {
+      "name": string,
+      "quantity": number | null,
+      "unit": string | null,
+      "unit_price": number | null,
+      "total": number | null
+    }
+  ]
+}
+
+CRITICAL RULES:
+
+- Extract ALL invoice line items visible in the table.
+- quantity must represent the PURCHASED quantity.
+- unit must represent the PURCHASED unit.
+- NEVER invent values.
+- But DO infer quantity/unit when clearly present inside product names.
+- Screenshots may have messy OCR. Use contextual reasoning.
+
+IMPORTANT PATTERNS:
+
+Examples:
+
+"Acém Novilho Extra s/ osso 15kg"
+→ quantity: 15
+→ unit: "kg"
+
+"Bacon Burger Premium Fatiado 1kg"
+→ quantity: 1
+→ unit: "kg"
+
+"Peito de Frango Calibrado"
+with visible quantity column "10"
+→ quantity: 10
+→ unit: "kg"
+
+"Coca-Cola 33cl Pack 24"
+→ quantity: 24
+→ unit: "un"
+
+"Água 25cl Pack 24"
+→ quantity: 24
+→ unit: "un"
+
+"Hamburger Angus 180gr Caixa 40 un"
+→ quantity: 40
+→ unit: "un"
+
+"Pão Brioche 80g 120 un"
+→ quantity: 120
+→ unit: "un"
+
+If product size exists separately from purchased quantity:
+- purchased quantity = pack/case/unit count
+- NOT the per-item weight
+
+Examples:
+BAD:
+180g
+
+GOOD:
+40 un
+
+BAD:
+33cl
+
+GOOD:
+24 un
+
+Use these normalized units only when possible:
+kg
+g
+L
+ml
+un
+cx
+
+If quantity truly cannot be determined:
+- quantity = null
+- unit = null
+
+Do not hallucinate.
+Do NOT extract supplier, total, invoice_date, or invoice_number.
+`.trim();
+
+export type InvoiceLineItem = {
+  name: string;
+  quantity: number | null;
+  unit: string | null;
+  unit_price: number | null;
+  total: number | null;
+};
+
+export type TableExtractionResult = {
+  items: InvoiceLineItem[];
+  tableCrop: {
+    bounds: TableBounds | null;
+    fallbackUsed: boolean;
+  };
+};
+
+function normalizeItems(raw: unknown): InvoiceLineItem[] {
+  if (!Array.isArray(raw)) return [];
+
+  return raw.map((item) => ({
+    name: typeof item?.name === "string" ? item.name : "Unknown item",
+    quantity: typeof item?.quantity === "number" ? item.quantity : null,
+    unit: typeof item?.unit === "string" ? item.unit : null,
+    unit_price: typeof item?.unit_price === "number" ? item.unit_price : null,
+    total: typeof item?.total === "number" ? item.total : null,
+  }));
+}
+
+export async function extractTableItemsFromImage(
+  imageDataUrl: string,
+  apiKey: string,
+): Promise<TableExtractionResult> {
+  let croppedDataUrl = imageDataUrl;
+  let bounds = null;
+  let fallbackUsed = true;
+  try {
+    const cropResult = await cropTableRegionForLineItems(imageDataUrl);
+    croppedDataUrl = cropResult.croppedDataUrl;
+    bounds = cropResult.bounds;
+    fallbackUsed = cropResult.fallbackUsed;
+  } catch (cropError) {
+    console.error("[invoice-ocr] table-crop-failed", {
+      error:
+        cropError instanceof Error ? cropError.message : String(cropError),
+    });
+  }
+
+  const parsed = await callOpenAiJson(apiKey, [
+    { role: "system", content: TABLE_EXTRACTION_SYSTEM_PROMPT },
+    {
+      role: "user",
+      content: [
+        {
+          type: "text",
+          text: "Extract all invoice line items from this restaurant invoice table image.",
+        },
+        { type: "image_url", image_url: { url: croppedDataUrl } },
+      ],
+    },
+  ]);
+
+  return {
+    items: normalizeItems(parsed.items),
+    tableCrop: {
+      bounds,
+      fallbackUsed,
+    },
+  };
+}
