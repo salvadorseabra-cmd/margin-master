@@ -44,20 +44,22 @@ function pixelLuminance(pixel: number): number {
 
 function rowMeanLuminance(image: Image, y: number): number {
   let sum = 0;
-  for (let x = 0; x < image.width; x++) {
-    sum += pixelLuminance(image.getPixelAt(x, y));
+  const row = y + 1;
+  for (let x = 1; x <= image.width; x++) {
+    sum += pixelLuminance(image.getPixelAt(x, row));
   }
   return sum / image.width;
 }
 
 function rowEdgeScore(image: Image, y: number): number {
-  if (y <= 0 || y >= image.height - 1) return 0;
+  if (y < 0 || y >= image.height - 1) return 0;
   let score = 0;
   const step = Math.max(1, Math.floor(image.width / 120));
   let samples = 0;
-  for (let x = 0; x < image.width; x += step) {
-    const l1 = pixelLuminance(image.getPixelAt(x, y));
-    const l2 = pixelLuminance(image.getPixelAt(x, y + 1));
+  const row = y + 1;
+  for (let x = 1; x <= image.width; x += step) {
+    const l1 = pixelLuminance(image.getPixelAt(x, row));
+    const l2 = pixelLuminance(image.getPixelAt(x, row + 1));
     score += Math.abs(l1 - l2);
     samples++;
   }

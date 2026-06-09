@@ -134,8 +134,18 @@ export async function extractTableItemsFromImage(
     croppedDataUrl = cropResult.croppedDataUrl;
     bounds = cropResult.bounds;
     fallbackUsed = cropResult.fallbackUsed;
+    const cropHeight = bounds ? bounds.bottom - bounds.top : null;
+    console.log("[invoice-ocr] table-crop-result", {
+      cropSucceeded: !fallbackUsed,
+      fallbackUsed,
+      bounds,
+      cropHeight,
+      sentSameAsInput: croppedDataUrl === imageDataUrl,
+    });
   } catch (cropError) {
     console.error("[invoice-ocr] table-crop-failed", {
+      cropSucceeded: false,
+      fallbackUsed: true,
       error:
         cropError instanceof Error ? cropError.message : String(cropError),
     });
