@@ -117,6 +117,10 @@ const normalizeInvoiceRowNameForFilter = (name: string) =>
     .replace(/\p{M}/gu, "")
     .toLowerCase();
 
+/** Packaging labels like "(CARTÃO)" must not trip payment-metadata rejection for standalone cartao. */
+const stripParentheticalPackagingCartao = (normalized: string) =>
+  normalized.replace(/\(\s*cartao\s*\)/g, " ");
+
 /** Non-ingredient OCR rows (addresses, tax lines, payment metadata) excluded from normalization counts. */
 export function shouldRejectInvoiceIngredientRow(
   item: Pick<InvoiceItemRow, "name" | "quantity" | "unit" | "unit_price" | "total">,
@@ -125,9 +129,13 @@ export function shouldRejectInvoiceIngredientRow(
   if (!name || !/[A-Za-zÀ-ÿ]/u.test(name)) return true;
 
   const normalized = normalizeInvoiceRowNameForFilter(name);
+  const normalizedForPayment = stripParentheticalPackagingCartao(normalized);
   const hasParsedRowFields =
     item.quantity != null || item.unit != null || item.unit_price != null || item.total != null;
-  if (INVOICE_PAYMENT_METADATA_RE.test(normalized) || INVOICE_TAX_SUMMARY_RE.test(normalized)) {
+  if (
+    INVOICE_PAYMENT_METADATA_RE.test(normalizedForPayment) ||
+    INVOICE_TAX_SUMMARY_RE.test(normalized)
+  ) {
     return true;
   }
   if (INVOICE_ADDRESS_RE.test(normalized)) return true;
