@@ -114,7 +114,7 @@ export function detectTableBounds(image: Image): TableBounds {
   }
 
   const searchStart = refinedBottom + MIN_TABLE_HEIGHT;
-  const searchEnd = Math.min(refinedBottom + 220, Math.floor(height * 0.62));
+  const searchEnd = Math.min(refinedBottom + 350, Math.floor(height * 0.85));
   let totalsStart: number | null = null;
 
   if (searchStart < searchEnd) {
