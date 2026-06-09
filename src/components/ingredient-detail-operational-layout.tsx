@@ -542,7 +542,11 @@ function IngredientDetailContent({
       recentPurchases: sortedPurchases,
       priceActivity: priceActivity,
       recipeCount,
-      lastPriceUpdateAt: sortedPurchases[0]?.dateLabel ?? priceActivity?.created_at ?? null,
+      lastPriceUpdateAt:
+        sortedPurchases[0]?.dateIso ??
+        sortedPurchases[0]?.dateLabel ??
+        priceActivity?.created_at ??
+        null,
     });
     const marginExposureScore = deriveMarginExposureScore({
       recipeCount,

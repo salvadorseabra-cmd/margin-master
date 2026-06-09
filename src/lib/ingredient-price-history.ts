@@ -252,8 +252,9 @@ export async function fetchLatestHistoryNewPrice(
   try {
     const { data, error } = await client
       .from("ingredient_price_history")
-      .select("new_price")
+      .select("new_price, invoice_id")
       .eq("ingredient_id", ingredientId)
+      .not("invoice_id", "is", null)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();

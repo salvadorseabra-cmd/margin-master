@@ -86,17 +86,22 @@ function createPersistenceMockClient(options: {
                 },
               };
             }
-            if (cols === "new_price") {
+            if (cols === "new_price" || cols === "new_price, invoice_id") {
               return {
                 eq: () => ({
-                  order: () => ({
-                    limit: () => ({
-                      maybeSingle: async () => ({
-                        data:
-                          options.latestHistoryNewPrice != null
-                            ? { new_price: options.latestHistoryNewPrice }
-                            : null,
-                        error: null,
+                  not: () => ({
+                    order: () => ({
+                      limit: () => ({
+                        maybeSingle: async () => ({
+                          data:
+                            options.latestHistoryNewPrice != null
+                              ? {
+                                  new_price: options.latestHistoryNewPrice,
+                                  invoice_id: "inv-linked",
+                                }
+                              : null,
+                          error: null,
+                        }),
                       }),
                     }),
                   }),

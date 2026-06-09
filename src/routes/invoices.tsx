@@ -133,6 +133,10 @@ import {
   autoPersistUnmatchedInvoiceItems,
   persistOperationalIngredientCostFromInvoiceLine,
 } from "@/lib/ingredient-auto-persist";
+import {
+  collectIngredientIdsForInvoiceHistory,
+  reconcileAfterInvoiceDelete,
+} from "@/lib/ingredient-price-history-reconcile";
 import { traceCanonicalCreateAttempt } from "@/lib/ingredient-catalog-diagnostics";
 import { traceFoodCostRecalculationSource } from "@/lib/recipe-canonical-graph-trace";
 import {
@@ -2250,8 +2254,24 @@ function InvoicesPage() {
   };
 
   const removeRow = async (row: InvoiceRow) => {
+    const affectedIngredientIds = await collectIngredientIdsForInvoiceHistory(supabase, row.id);
     if (row.file_path) await supabase.storage.from("invoices").remove([row.file_path]);
-    await supabase.from("invoices").delete().eq("id", row.id);
+    const { error: deleteError } = await supabase.from("invoices").delete().eq("id", row.id);
+    if (deleteError) {
+      console.error("[invoices] delete failed:", deleteError.message);
+      return;
+    }
+    if (affectedIngredientIds.length > 0) {
+      const reconcileResult = await reconcileAfterInvoiceDelete(
+        supabase,
+        row.id,
+        affectedIngredientIds,
+      );
+      const reconcileErrors = reconcileResult.ingredients.flatMap((entry) => entry.errors);
+      if (reconcileErrors.length > 0) {
+        console.error("[invoices] price history reconcile had errors:", reconcileErrors);
+      }
+    }
     load();
   };
 

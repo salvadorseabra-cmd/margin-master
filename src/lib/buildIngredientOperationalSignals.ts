@@ -198,9 +198,30 @@ function numberOrNull(value: number | null | undefined): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+/** Parses ISO timestamps and pt-PT `dd/mm/yyyy` purchase labels for staleness checks. */
+export function parseOperationalRecencyDate(value: string): number | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  const isoCandidate = trimmed.includes("T") ? trimmed : `${trimmed}T12:00:00.000Z`;
+  const isoParsed = new Date(isoCandidate).getTime();
+  if (Number.isFinite(isoParsed)) return isoParsed;
+
+  const ptMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (ptMatch) {
+    const [, day, month, year] = ptMatch;
+    const ptParsed = new Date(
+      `${year}-${month!.padStart(2, "0")}-${day!.padStart(2, "0")}T12:00:00.000Z`,
+    ).getTime();
+    if (Number.isFinite(ptParsed)) return ptParsed;
+  }
+
+  return null;
+}
+
 function daysSince(value: string): number {
-  const timestamp = new Date(value).getTime();
-  if (!Number.isFinite(timestamp)) return DEFAULT_STALE_DAYS;
+  const timestamp = parseOperationalRecencyDate(value);
+  if (timestamp == null) return DEFAULT_STALE_DAYS;
   return Math.max(0, Math.floor((Date.now() - timestamp) / 86_400_000));
 }
 

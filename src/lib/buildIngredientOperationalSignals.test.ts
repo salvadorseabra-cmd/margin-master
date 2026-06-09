@@ -5,6 +5,7 @@ import {
   deriveMarginExposureScore,
   deriveOperationalMood,
   groupOperationalSignals,
+  parseOperationalRecencyDate,
   pickTopInsights,
   pickVisibleOperationalSignals,
 } from "@/lib/buildIngredientOperationalSignals";
@@ -71,6 +72,20 @@ describe("buildIngredientOperationalSignals", () => {
       staleThresholdDays: 45,
     });
     expect(signals.some((s) => s.id === "stale-invoice")).toBe(true);
+  });
+
+  it("parses pt-PT purchase dates for staleness instead of defaulting to 45 days", () => {
+    const recentPtDate = new Date(Date.now() - 10 * 86_400_000)
+      .toLocaleDateString("pt-PT")
+      .replace(/\./g, "/");
+    expect(parseOperationalRecencyDate(recentPtDate)).not.toBeNull();
+    const signals = buildIngredientOperationalSignals({
+      ingredientId: "ing-1",
+      recipeCount: 2,
+      lastPriceUpdateAt: recentPtDate,
+      staleThresholdDays: 45,
+    });
+    expect(signals.some((s) => s.id === "stale-invoice")).toBe(false);
   });
 
   it("detects single supplier without volatility when not on menu", () => {

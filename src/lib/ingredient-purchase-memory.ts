@@ -15,6 +15,8 @@ export type RecentPurchaseRow = {
   itemId: string;
   supplierLabel: string;
   dateLabel: string;
+  /** ISO issue date for operational recency (preferred over localized dateLabel). */
+  dateIso?: string | null;
   priceLabel: string;
   /** Short invoice line wording for timeline display (no ids or match metadata). */
   productHint?: string | null;
@@ -118,6 +120,7 @@ export function buildRecentPurchases(
         supplierLabel:
           normalizeSupplierDisplayName(product.supplierName) || "Unknown supplier",
         dateLabel: formatPurchaseDate(product.invoiceDate),
+        dateIso: product.invoiceIssueDateRaw ?? product.invoiceDate ?? null,
         priceLabel: formatPurchasePrice(product),
         productHint: product.itemName?.trim() || null,
       };

@@ -1,5 +1,6 @@
 import type { SupabaseClient, PostgrestError } from "@supabase/supabase-js";
 import type { Database, Tables } from "@/integrations/supabase/types";
+import { isLinkedPriceHistoryRow } from "@/lib/ingredient-price-history";
 import { effectiveIngredientUnitCostEur, purchaseQuantityDenom } from "@/lib/ingredient-unit-cost";
 import { loadRecipeLinesByRecipeMapForClosure } from "./recipe-impact-engine";
 import { recipeTotalCostEurForRecipe, recipeTotalCostWithIngredientUnitOverrides } from "./recipe-merge";
@@ -39,8 +40,12 @@ const SUGGEST_HIGH_LINE_COST_SHARE = 0.28;
 
 type HistoryRow = Pick<
   Tables<"ingredient_price_history">,
-  "ingredient_id" | "previous_price" | "new_price" | "created_at"
+  "ingredient_id" | "invoice_id" | "previous_price" | "new_price" | "created_at"
 >;
+
+function linkedHistoryRows(rows: readonly HistoryRow[]): HistoryRow[] {
+  return rows.filter(isLinkedPriceHistoryRow);
+}
 
 // --- Types (recipe cost / margin) ---
 
@@ -183,7 +188,7 @@ export function resolvePreviousUnitPriceEur(
 
 function groupHistoryByIngredient(rows: HistoryRow[]): Map<string, HistoryRow[]> {
   const map = new Map<string, HistoryRow[]>();
-  for (const row of rows) {
+  for (const row of linkedHistoryRows(rows)) {
     const list = map.get(row.ingredient_id) ?? [];
     list.push(row);
     map.set(row.ingredient_id, list);
@@ -376,8 +381,9 @@ export async function computeMarginDelta(
     client.from("ingredients").select("id,name,current_price,purchase_quantity").in("id", ingredientIds),
     client
       .from("ingredient_price_history")
-      .select("ingredient_id,previous_price,new_price,created_at")
-      .in("ingredient_id", ingredientIds),
+      .select("ingredient_id,invoice_id,previous_price,new_price,created_at")
+      .in("ingredient_id", ingredientIds)
+      .not("invoice_id", "is", null),
   ]);
   if (iErr) throw iErr;
   if (historyResult.error) {
@@ -573,6 +579,7 @@ export async function computeAffectedRecipes(
   const { data: hist, error: hErr } = await client
     .from("ingredient_price_history")
     .select("ingredient_id")
+    .not("invoice_id", "is", null)
     .gte("created_at", since);
   if (hErr) {
     logHistoryError("computeAffectedRecipes", hErr);
@@ -684,8 +691,9 @@ export async function computeRecipeMarginImpactsForRecipeIds(
       client.from("ingredients").select("id,name,current_price,purchase_quantity").in("id", ingList),
       client
         .from("ingredient_price_history")
-        .select("ingredient_id,previous_price,new_price,created_at")
-        .in("ingredient_id", ingList),
+        .select("ingredient_id,invoice_id,previous_price,new_price,created_at")
+        .in("ingredient_id", ingList)
+        .not("invoice_id", "is", null),
     ]);
     if (iErr) throw iErr;
     if (historyResult.error) {
