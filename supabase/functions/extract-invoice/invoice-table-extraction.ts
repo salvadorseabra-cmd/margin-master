@@ -1,5 +1,10 @@
 import { cropTableRegionForLineItems } from "./invoice-image-crop.ts";
 import { callOpenAiJson } from "./invoice-date-extraction.ts";
+import {
+  reconcileLineItemAmounts,
+  reconcileLineItemsToNetSubtotal,
+  type InvoiceLineItem as ReconciledLineItem,
+} from "./invoice-line-reconcile.ts";
 import type { TableBounds } from "./invoice-image-crop.ts";
 
 const TABLE_EXTRACTION_SYSTEM_PROMPT = `
@@ -92,15 +97,15 @@ If quantity truly cannot be determined:
 
 Do not hallucinate.
 Do NOT extract supplier, total, invoice_date, or invoice_number.
+
+PRICE ACCURACY (critical for Portuguese invoices):
+- Read PREÇO UNITÁRIO and VALOR DA MERCADORIA digit by digit.
+- Do not confuse 8 and 9 (e.g. 9,99 misread as 8,99 or 9,49).
+- When quantity is 1, unit_price must equal the line total column.
+- When both price columns exist: quantity × PREÇO UNITÁRIO must equal VALOR DA MERCADORIA.
 `.trim();
 
-export type InvoiceLineItem = {
-  name: string;
-  quantity: number | null;
-  unit: string | null;
-  unit_price: number | null;
-  total: number | null;
-};
+export type InvoiceLineItem = ReconciledLineItem;
 
 export type TableExtractionResult = {
   items: InvoiceLineItem[];
@@ -165,11 +170,20 @@ export async function extractTableItemsFromImage(
     },
   ]);
 
+  const items = reconcileLineItemAmounts(normalizeItems(parsed.items));
+
   return {
-    items: normalizeItems(parsed.items),
+    items,
     tableCrop: {
       bounds,
       fallbackUsed,
     },
   };
+}
+
+export function finalizeExtractedLineItems(
+  items: InvoiceLineItem[],
+  netSubtotal: number | null,
+): InvoiceLineItem[] {
+  return reconcileLineItemsToNetSubtotal(items, netSubtotal);
 }

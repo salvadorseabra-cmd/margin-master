@@ -1,7 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { extractIssueDateFromImage } from "./invoice-date-extraction.ts";
 import { extractMetadataFromImage } from "./invoice-metadata-extraction.ts";
-import { extractTableItemsFromImage } from "./invoice-table-extraction.ts";
+import {
+  extractTableItemsFromImage,
+  finalizeExtractedLineItems,
+} from "./invoice-table-extraction.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -82,9 +85,14 @@ serve(async (req) => {
       });
     }
 
-    let metadataFromPass: { supplier: string | null; total: number | null } = {
+    let metadataFromPass: {
+      supplier: string | null;
+      total: number | null;
+      net_subtotal: number | null;
+    } = {
       supplier: null,
       total: null,
+      net_subtotal: null,
     };
     try {
       metadataFromPass = await extractMetadataFromImage(
@@ -94,6 +102,7 @@ serve(async (req) => {
       console.log("[invoice-ocr] stage=2b metadata-pass", {
         supplier: metadataFromPass.supplier,
         total: metadataFromPass.total,
+        net_subtotal: metadataFromPass.net_subtotal,
         strategy: "top-83pct-crop",
       });
     } catch (metadataPassError) {
@@ -140,11 +149,23 @@ serve(async (req) => {
       note: "invoice_date owned by Pass A only; no fallback from metadata/table passes",
     });
 
+    const reconciledItems = finalizeExtractedLineItems(
+      tableFromPass.items,
+      metadataFromPass.net_subtotal,
+    );
+    if (reconciledItems !== tableFromPass.items) {
+      console.log("[invoice-ocr] stage=6c net-subtotal-reconcile", {
+        netSubtotal: metadataFromPass.net_subtotal,
+        beforeSum: tableFromPass.items.reduce((s, i) => s + (i.total ?? 0), 0),
+        afterSum: reconciledItems.reduce((s, i) => s + (i.total ?? 0), 0),
+      });
+    }
+
     const normalized = {
       supplier: metadataFromPass.supplier,
       invoice_date: issueDateFromHeaderPass,
       total: metadataFromPass.total,
-      items: tableFromPass.items,
+      items: reconciledItems,
     };
 
     console.log("[invoice-ocr] stage=7 row-extraction", {

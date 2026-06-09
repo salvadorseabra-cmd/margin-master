@@ -8,20 +8,23 @@ Return ONLY valid JSON with this exact structure:
 
 {
   "supplier": string | null,
-  "total": number | null
+  "total": number | null,
+  "net_subtotal": number | null
 }
 
 CRITICAL RULES:
 
 - supplier: legal supplier / issuer name on the document (company name near logo).
-- total: document amount to pay (VALOR A PAGAR / Total / Amount Due) — numeric only, no currency symbol.
+- total: document amount to pay (VALOR A PAGAR / TOTAL DO DOCUMENTO / Amount Due) — numeric only, no currency symbol.
+- net_subtotal: net merchandise value before tax (VALOR LÍQUIDO / Base incidência merchandise) when visible — numeric only.
 - NEVER invent values. If not visible, return null.
-- Do NOT extract invoice_date, invoice_number, VAT, or line items.
+- Do NOT extract invoice_date, invoice_number, VAT breakdown, or line items.
 `.trim();
 
 export type MetadataExtractionResult = {
   supplier: string | null;
   total: number | null;
+  net_subtotal: number | null;
 };
 
 export async function extractMetadataFromImage(
@@ -46,5 +49,7 @@ export async function extractMetadataFromImage(
   return {
     supplier: typeof parsed.supplier === "string" ? parsed.supplier : null,
     total: typeof parsed.total === "number" ? parsed.total : null,
+    net_subtotal:
+      typeof parsed.net_subtotal === "number" ? parsed.net_subtotal : null,
   };
 }
