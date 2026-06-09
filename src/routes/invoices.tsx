@@ -66,6 +66,12 @@ import {
   shouldRejectInvoiceIngredientRow,
 } from "@/lib/invoice-item-fields";
 import {
+  fileToExtractionDataUrl,
+  isExtractableFile,
+  isExtractableInvoicePath,
+  isPdfFile,
+} from "@/lib/invoice-extraction-input";
+import {
   countUnresolvedInvoiceIngredients,
   countUnresolvedInvoiceIngredientsByInvoice,
   deriveInvoiceListIngredientStatus,
@@ -1308,14 +1314,6 @@ function InvoicesPage() {
     }
   };
 
-  const fileToDataUrl = (file: File) =>
-    new Promise<string>((resolve, reject) => {
-      const r = new FileReader();
-      r.onload = () => resolve(r.result as string);
-      r.onerror = () => reject(r.error);
-      r.readAsDataURL(file);
-    });
-
   const runExtraction = async (
     invoiceId: string,
     dataUrl: string,
@@ -1545,14 +1543,14 @@ function InvoicesPage() {
 
       setPending((p) => p.map((x) => (x.id === item.id ? { ...x, progress: 65 } : x)));
 
-      const isImage = item.file.type.startsWith("image/");
-      if (isImage) {
+      const isExtractable = isExtractableFile(item.file);
+      if (isExtractable) {
         console.log("[invoice-ocr] stage=2 ocr-will-run", {
           invoiceId: inserted.id,
-          reason: "image file type",
+          reason: isPdfFile(item.file) ? "pdf rasterized to png" : "image file type",
           fileType: item.file.type,
         });
-        const dataUrl = await fileToDataUrl(item.file);
+        const dataUrl = await fileToExtractionDataUrl(item.file);
         const ext = await runExtraction(inserted.id, dataUrl);
         const invoiceUpdatePayload: {
           supplier_name: string;
@@ -1603,7 +1601,7 @@ function InvoicesPage() {
       } else {
         console.log("[invoice-ocr] stage=2 ocr-skipped", {
           invoiceId: inserted.id,
-          reason: "non-image file (PDF or unknown type)",
+          reason: "unsupported file type for extraction",
           fileType: item.file.type,
         });
       }
@@ -2183,18 +2181,14 @@ function InvoicesPage() {
 
   const reExtract = async (row: InvoiceRow) => {
     if (!row.file_path) return;
+    if (!isExtractableInvoicePath(row.file_path)) return;
     const ext = row.file_path.split(".").pop()?.toLowerCase() ?? "";
-    if (!["png", "jpg", "jpeg", "webp"].includes(ext)) return;
     const { data: signed } = await supabase.storage
       .from("invoices")
       .createSignedUrl(row.file_path, 120);
     if (!signed) return;
     const blob = await fetch(signed.signedUrl).then((r) => r.blob());
-    const dataUrl = await new Promise<string>((res) => {
-      const r = new FileReader();
-      r.onload = () => res(r.result as string);
-      r.readAsDataURL(blob);
-    });
+    const dataUrl = await fileToExtractionDataUrl(blob, row.file_path.split("/").pop() ?? `invoice.${ext}`);
     const result = await runExtraction(row.id, dataUrl);
     if (result) {
       const invoiceUpdatePayload: {
@@ -2467,11 +2461,7 @@ function InvoicesPage() {
                 )}
                 {invoiceRowsForDisplay.map((r) => {
                   const open = expanded === r.id;
-                  const isImage = r.file_path
-                    ? ["png", "jpg", "jpeg", "webp"].some((e) =>
-                        r.file_path!.toLowerCase().endsWith(e),
-                      )
-                    : false;
+                  const isExtractable = isExtractableInvoicePath(r.file_path);
                   const items = itemsByInvoice[r.id] ?? [];
                   const settlementState = getSettlementState(r.id, settlementByInvoice);
                   const subtitle = invoiceSubtitle(r);
@@ -2525,7 +2515,7 @@ function InvoicesPage() {
                           className="py-3 px-5 text-right whitespace-nowrap"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          {isImage && (
+                          {isExtractable && (
                             <button
                               onClick={() => reExtract(r)}
                               disabled={!!extracting[r.id]}
@@ -2571,7 +2561,7 @@ function InvoicesPage() {
                               userId={user?.id}
                               loading={itemsByInvoice[r.id] === undefined}
                               extracting={!!extracting[r.id]}
-                              onExtract={isImage ? () => reExtract(r) : undefined}
+                              onExtract={isExtractable ? () => reExtract(r) : undefined}
                               onCreateIngredient={(item) =>
                                 openCanonicalIngredientCreate(item, r.supplier_name, r.id)
                               }
