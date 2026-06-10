@@ -27,116 +27,6 @@ export type VolumeDetection = InferenceMeta & {
   milliliters: number;
 };
 
-export type DecimalClVolumeRepairResult = {
-  volumeMl: number;
-  repaired: boolean;
-  warning?: string;
-  reason?: string;
-};
-
-const DECIMAL_CL_SIZE_RE = /^0[.,]\d+$/i;
-
-const BEVERAGE_PRODUCT_TOKENS = [
-  "BEER",
-  "GINGER BEER",
-  "GINGER",
-  "ACQUA",
-  "WATER",
-  "COLA",
-  "COKE",
-  "TONIC",
-  "SODA",
-  "JUICE",
-  "BEBIDA",
-  "CERVEJA",
-  "CERVEZA",
-  "VINHO",
-  "WINE",
-  "SPUMANTE",
-  "PROSECCO",
-  "LIMONADA",
-  "LEMONADE",
-  "CHA",
-  "TEA",
-  "CAFE",
-  "COFFEE",
-  "LEITE",
-  "MILK",
-  "ENERGY",
-  "BALADIN",
-  "PELLEGRINO",
-  "SANPELLEGRINO",
-];
-
-/** Beverage lines where OCR prefixed a spurious `0.` before the real centilitre value. */
-export function isBeverageProduct(name: string): boolean {
-  const s = normalizeForUnitMatch(name);
-  return BEVERAGE_PRODUCT_TOKENS.some((token) => s.includes(token));
-}
-
-function isDecimalClSizeToken(sizeRaw: string): boolean {
-  return DECIMAL_CL_SIZE_RE.test(sizeRaw.trim());
-}
-
-function isDecimalClVolumeHit(hit: string): boolean {
-  return /0[.,]\d+\s*CL\b/i.test(hit);
-}
-
-/**
- * Extract centilitre hints embedded in supplier SKU tokens (e.g. GINGER33, COLA25).
- * Scans the full product string, including compound codes like BBB-GINGER33ITA.
- */
-export function extractSkuClueVolumeMl(name: string): { milliliters: number; clue: string } | null {
-  const s = normalizeForUnitMatch(name);
-  const re = /([A-Z]{3,})(\d{2,3})/g;
-  let match: RegExpExecArray | null;
-  let best: { milliliters: number; clue: string } | null = null;
-  while ((match = re.exec(s)) !== null) {
-    const cl = Number.parseInt(match[2] ?? "", 10);
-    if (!Number.isFinite(cl) || cl < 20 || cl > 150) continue;
-    const clue = `${match[1] ?? ""}${match[2] ?? ""}`;
-    const milliliters = cl * 10;
-    if (!best || milliliters > best.milliliters) {
-      best = { milliliters, clue };
-    }
-  }
-  return best;
-}
-
-/**
- * Repair suspicious `0.xxcl` beverage volumes when OCR decimal noise yields < 50 ml.
- * Prefers embedded SKU centilitre clues; otherwise leaves the parsed value unchanged.
- */
-export function repairDecimalClBeverageVolume(
-  name: string,
-  volumeMl: number,
-): DecimalClVolumeRepairResult {
-  if (!isBeverageProduct(name) || volumeMl >= 50) {
-    return { volumeMl, repaired: false };
-  }
-
-  const sku = extractSkuClueVolumeMl(name);
-  if (sku) {
-    console.warn(
-      `[volume-sanity] product=${name} rawVolume=${volumeMl}ml repairedVolume=${sku.milliliters}ml reason=sku-clue-${sku.clue}`,
-    );
-    return {
-      volumeMl: sku.milliliters,
-      repaired: true,
-      reason: `sku-clue-${sku.clue}`,
-    };
-  }
-
-  console.warn(
-    `[volume-sanity] product=${name} rawVolume=${volumeMl}ml reason=decimal-cl-beverage-anomaly`,
-  );
-  return {
-    volumeMl,
-    repaired: false,
-    warning: "decimal-cl-beverage-anomaly",
-  };
-}
-
 export type PackageType = "pack" | "caixa" | "garrafa" | "lata" | "saco";
 
 export type PackageDetection = InferenceMeta & {
@@ -252,20 +142,12 @@ export function detectVolume(name: string): VolumeDetection | null {
     while ((m = re.exec(s)) !== null) {
       const qty = parseQuantityToken(m[1] ?? "");
       if (qty == null) continue;
+      const ml = Math.max(1, Math.round(toMl(qty)));
       const hit = m[0] ?? "";
-      let ml = Math.max(1, Math.round(toMl(qty)));
-      let reason = `volume token "${hit.trim()}" (${label}) → ${ml}ml`;
-      if (label === "CL" && isDecimalClVolumeHit(hit)) {
-        const repair = repairDecimalClBeverageVolume(name, ml);
-        if (repair.repaired) {
-          ml = repair.volumeMl;
-          reason = `volume token "${hit.trim()}" (${label}) → ${ml}ml (${repair.reason})`;
-        }
-      }
       const det: VolumeDetection = {
         milliliters: ml,
         confidence: label === "L" && ml < 50 ? 0.75 : 0.92,
-        reason,
+        reason: `volume token "${hit.trim()}" (${label}) → ${ml}ml`,
       };
       if (
         !best ||

@@ -33,11 +33,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
-import {
-  detectVolume,
-  type UnitInferenceResult,
-  type PackageType,
-} from "@/lib/ingredient-unit-inference";
+import { type UnitInferenceResult, type PackageType } from "@/lib/ingredient-unit-inference";
 import {
   formatStructuredPurchaseDisplay,
   hasRichPackageSemantics,
@@ -1283,14 +1279,6 @@ function InvoicesPage() {
         parsedRowsPreview: normalizedItems.slice(0, 5),
       });
       traceUnitForAllItems("NORMALIZED", normalizedItems, { invoiceId });
-      for (const it of normalizedItems) {
-        const rawName = String(it.name ?? "");
-        const ocrName = String(
-          items.find((row: ItemRow) => cleanInvoiceItemDisplayName(row) === rawName)?.name ??
-            rawName,
-        );
-        detectVolume(ocrName || rawName);
-      }
       if (items.length && user) {
         traceInvoiceQuantityStage("insert-normalized:first-item", normalizedItems[0], {
           invoiceId,
