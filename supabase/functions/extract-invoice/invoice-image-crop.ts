@@ -2,6 +2,17 @@ import { Image } from "https://deno.land/x/imagescript@1.3.0/mod.ts";
 import {
   computeFooterCropStartY,
   DEFAULT_BOTTOM_CROP_FRACTION,
+  GREY_HEADER_LUMINANCE_THRESHOLD,
+  HEADER_BAND_ROWS,
+  HEADER_BAND_THRESHOLD_DELTA,
+  HEADER_RULE_MIN_EDGE,
+  HEADER_RULE_OFFSETS,
+  MIN_TABLE_HEIGHT,
+  TABLE_SCAN_END_FRACTION,
+  TABLE_SCAN_START_FRACTION,
+  TABLE_TOP_MARGIN,
+  TOTALS_SCAN_END_FRACTION,
+  WHITE_HEADER_MIN_RULE_FRACTION,
 } from "./invoice-crop-geometry.ts";
 
 export {
@@ -76,28 +87,95 @@ function rowEdgeScore(image: Image, y: number): number {
   return samples > 0 ? score / samples : 0;
 }
 
-/** Detect grey header band and totals-section start for tabular invoice crops. */
-export function detectTableBounds(image: Image): TableBounds {
-  const height = image.height;
-  const HEADER_BAND_ROWS = 18;
-  const TOP_MARGIN = 10;
-  const MIN_TABLE_HEIGHT = 170;
-  const scanStart = Math.floor(height * 0.12);
-  const scanEnd = Math.floor(height * 0.55);
+function rowDarkFraction(image: Image, y: number, threshold = 200): number {
+  let dark = 0;
+  const row = y + 1;
+  for (let x = 1; x <= image.width; x++) {
+    if (pixelLuminance(image.getPixelAt(x, row)) < threshold) dark++;
+  }
+  return dark / image.width;
+}
 
+function bandAverageLuminance(image: Image, y: number, rows = HEADER_BAND_ROWS): number {
+  let sum = 0;
+  for (let dy = 0; dy < rows; dy++) {
+    sum += rowMeanLuminance(image, y + dy);
+  }
+  return sum / rows;
+}
+
+/** White-background column headers: text stripes on paper, not a shaded grey band. */
+function isWhiteHeaderBand(image: Image, y: number): boolean {
+  let textRows = 0;
+  for (let dy = 0; dy < 6; dy++) {
+    const mean = rowMeanLuminance(image, y + dy);
+    const dark = rowDarkFraction(image, y + dy);
+    if (mean >= 165 && mean <= 215 && dark >= 0.30 && dark <= 0.75) textRows++;
+  }
+  const bandAverage = bandAverageLuminance(image, y);
+  return textRows >= 3 && bandAverage >= 168 && bandAverage <= 195;
+}
+
+function detectGreyHeaderTop(
+  image: Image,
+  scanStart: number,
+  scanEnd: number,
+): { headerTop: number; bestBandAverage: number } {
   let headerTop = scanStart;
   let bestBandAverage = Number.POSITIVE_INFINITY;
 
   for (let y = scanStart; y < scanEnd - HEADER_BAND_ROWS; y++) {
-    let bandSum = 0;
-    for (let dy = 0; dy < HEADER_BAND_ROWS; dy++) {
-      bandSum += rowMeanLuminance(image, y + dy);
-    }
-    const bandAverage = bandSum / HEADER_BAND_ROWS;
+    const bandAverage = bandAverageLuminance(image, y);
     if (bandAverage < bestBandAverage) {
       bestBandAverage = bandAverage;
       headerTop = y;
     }
+  }
+
+  return { headerTop, bestBandAverage };
+}
+
+/** Anchor on horizontal rules above column labels (Bocconcino-style layouts). */
+function detectWhiteHeaderTop(
+  image: Image,
+  scanStart: number,
+  scanEnd: number,
+): number | null {
+  const minRuleY = Math.floor(image.height * WHITE_HEADER_MIN_RULE_FRACTION);
+  const rules: number[] = [];
+
+  for (let y = Math.max(scanStart, minRuleY); y < scanEnd; y++) {
+    if (rowEdgeScore(image, y) >= HEADER_RULE_MIN_EDGE) rules.push(y);
+  }
+
+  rules.sort((a, b) => a - b);
+  for (const ruleY of rules) {
+    for (const offset of HEADER_RULE_OFFSETS) {
+      const candidateY = ruleY + offset;
+      if (candidateY >= scanEnd - HEADER_BAND_ROWS) continue;
+      if (isWhiteHeaderBand(image, candidateY)) return candidateY;
+    }
+  }
+
+  return null;
+}
+
+/** Detect header band and totals-section start for tabular invoice crops. */
+export function detectTableBounds(image: Image): TableBounds {
+  const height = image.height;
+  const scanStart = Math.floor(height * TABLE_SCAN_START_FRACTION);
+  const scanEnd = Math.floor(height * TABLE_SCAN_END_FRACTION);
+
+  const { headerTop: darkestHeaderTop, bestBandAverage } = detectGreyHeaderTop(
+    image,
+    scanStart,
+    scanEnd,
+  );
+
+  let headerTop = darkestHeaderTop;
+  if (bestBandAverage >= GREY_HEADER_LUMINANCE_THRESHOLD) {
+    const whiteHeaderTop = detectWhiteHeaderTop(image, scanStart, scanEnd);
+    if (whiteHeaderTop != null) headerTop = whiteHeaderTop;
   }
 
   if (!Number.isFinite(bestBandAverage)) {
@@ -112,7 +190,7 @@ export function detectTableBounds(image: Image): TableBounds {
   }
 
   const headerBottom = Math.min(height, headerTop + HEADER_BAND_ROWS);
-  const bandThreshold = bestBandAverage + 12;
+  const bandThreshold = bandAverageLuminance(image, headerTop) + HEADER_BAND_THRESHOLD_DELTA;
 
   let refinedBottom = headerBottom;
   while (
@@ -124,7 +202,7 @@ export function detectTableBounds(image: Image): TableBounds {
   }
 
   const searchStart = refinedBottom + MIN_TABLE_HEIGHT;
-  const searchEnd = Math.min(refinedBottom + 350, Math.floor(height * 0.85));
+  const searchEnd = Math.floor(height * TOTALS_SCAN_END_FRACTION);
   const TOTALS_BOTTOM_PADDING = 24;
   const SEARCH_BOUNDARY_SLACK = 20;
   const BOUNDARY_BOTTOM_PADDING = 190;
@@ -141,7 +219,7 @@ export function detectTableBounds(image: Image): TableBounds {
     }
   }
 
-  const top = Math.max(0, headerTop - TOP_MARGIN);
+  const top = Math.max(0, headerTop - TABLE_TOP_MARGIN);
   const nearSearchBoundary = totalsStart != null &&
     searchEnd - totalsStart <= SEARCH_BOUNDARY_SLACK;
   const bottom = totalsStart != null

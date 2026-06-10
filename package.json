@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
+    "test:extract-invoice-crop": "deno test -A supabase/functions/extract-invoice/invoice-image-crop.test.ts",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "backfill:price-history": "vite-node scripts/backfill-price-history-report.mts"
