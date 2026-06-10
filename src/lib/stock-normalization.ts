@@ -8,6 +8,10 @@
  */
 
 import { looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
+import {
+  isBeverageProduct,
+  repairDecimalClBeverageVolume,
+} from "@/lib/ingredient-unit-inference";
 import { extractLineWeightGrams } from "@/lib/ingredient-weight-match";
 
 export type UnitFamily = "mass" | "volume" | "count";
@@ -545,11 +549,22 @@ function normalizeInnerUnitType(raw: string | undefined): string | undefined {
 function parseSizeAndUnit(
   sizeRaw: string | undefined,
   unitRaw: string | undefined,
+  productName?: string,
 ): { unitSize: number | null; unitMeasurement: PackMeasureUnit | null } {
   let unitSize = parseQuantityToken(sizeRaw ?? "");
   let unitMeasurement = normalizeMeasureUnit(unitRaw ?? "");
   if (unitRaw?.toLowerCase() === "cl" && unitSize != null) {
-    unitSize = unitSize * 10;
+    let ml = Math.max(1, Math.round(unitSize * 10));
+    if (
+      productName &&
+      /^0[.,]\d+$/i.test((sizeRaw ?? "").trim()) &&
+      isBeverageProduct(productName) &&
+      ml < 50
+    ) {
+      const repair = repairDecimalClBeverageVolume(productName, ml);
+      ml = repair.volumeMl;
+    }
+    unitSize = ml;
     unitMeasurement = "ml";
   }
   if (unitSize == null || !unitMeasurement || unitMeasurement === "un") {
@@ -620,11 +635,12 @@ export function findBestContainerWithSizeMatch(text: string): RegExpMatchArray |
 export function parsePurchaseStructureFromText(text: string): PurchaseStructure | null {
   const trimmed = text.trim();
   if (!trimmed) return null;
+  const parseSize = (size?: string, unit?: string) => parseSizeAndUnit(size, unit, trimmed);
 
   const triple = findBestRegexMatch(trimmed, TRIPLE_NESTED_RE, scoreTripleNestedMatch);
   if (triple?.groups) {
     const purchaseQuantity = parseQuantityToken(triple.groups.purchase ?? "");
-    const { unitSize, unitMeasurement } = parseSizeAndUnit(triple.groups.size, triple.groups.unit);
+    const { unitSize, unitMeasurement } = parseSize(triple.groups.size, triple.groups.unit);
     const innerUnitCount = parseQuantityToken(triple.groups.inner ?? "");
     if (purchaseQuantity == null || unitSize == null || !unitMeasurement || innerUnitCount == null) {
       logPurchaseStructureParse(trimmed, null, "triple_nested");
@@ -647,7 +663,7 @@ export function parsePurchaseStructureFromText(text: string): PurchaseStructure 
   const caixa = findBestRegexMatch(trimmed, CAIXA_UNITS_SIZE_RE, scoreCaixaUnitsSizeMatch);
   if (caixa?.groups) {
     const innerUnitCount = parseQuantityToken(caixa.groups.inner ?? "");
-    const { unitSize, unitMeasurement } = parseSizeAndUnit(caixa.groups.size, caixa.groups.unit);
+    const { unitSize, unitMeasurement } = parseSize(caixa.groups.size, caixa.groups.unit);
     if (innerUnitCount == null || unitSize == null || !unitMeasurement) {
       logPurchaseStructureParse(trimmed, null, "caixa_units_size");
       return null;
@@ -667,7 +683,7 @@ export function parsePurchaseStructureFromText(text: string): PurchaseStructure 
   const caixaCompact = findBestRegexMatch(trimmed, CAIXA_COMPACT_SIZE_RE, scoreCaixaCompactSizeMatch);
   if (caixaCompact?.groups) {
     const innerUnitCount = parseQuantityToken(caixaCompact.groups.inner ?? "");
-    const { unitSize, unitMeasurement } = parseSizeAndUnit(caixaCompact.groups.size, caixaCompact.groups.unit);
+    const { unitSize, unitMeasurement } = parseSize(caixaCompact.groups.size, caixaCompact.groups.unit);
     if (innerUnitCount == null || unitSize == null || !unitMeasurement) {
       logPurchaseStructureParse(trimmed, null, "caixa_compact_size");
       return null;
@@ -687,7 +703,7 @@ export function parsePurchaseStructureFromText(text: string): PurchaseStructure 
   const unitsSize = findBestRegexMatch(trimmed, UNITS_SIZE_RE, scoreUnitsSizeMatch);
   if (unitsSize?.groups) {
     const innerUnitCount = parseQuantityToken(unitsSize.groups.inner ?? "");
-    const { unitSize, unitMeasurement } = parseSizeAndUnit(unitsSize.groups.size, unitsSize.groups.unit);
+    const { unitSize, unitMeasurement } = parseSize(unitsSize.groups.size, unitsSize.groups.unit);
     if (innerUnitCount == null || unitSize == null || !unitMeasurement) {
       logPurchaseStructureParse(trimmed, null, "units_size");
       return null;
@@ -735,7 +751,7 @@ export function parsePurchaseStructureFromText(text: string): PurchaseStructure 
   );
   if (containerLeading?.groups) {
     const purchaseQuantity = parseQuantityToken(containerLeading.groups.purchase ?? "");
-    const { unitSize, unitMeasurement } = parseSizeAndUnit(
+    const { unitSize, unitMeasurement } = parseSize(
       containerLeading.groups.size,
       containerLeading.groups.unit,
     );
@@ -758,7 +774,7 @@ export function parsePurchaseStructureFromText(text: string): PurchaseStructure 
   const container = findBestContainerWithSizeMatch(trimmed);
   if (container?.groups) {
     const purchaseQuantity = parseQuantityToken(container.groups.purchase ?? "");
-    const { unitSize, unitMeasurement } = parseSizeAndUnit(container.groups.size, container.groups.unit);
+    const { unitSize, unitMeasurement } = parseSize(container.groups.size, container.groups.unit);
     if (purchaseQuantity == null || unitSize == null || !unitMeasurement) {
       logPurchaseStructureParse(trimmed, null, "container_size");
       return null;
@@ -791,7 +807,7 @@ export function parsePurchaseStructureFromText(text: string): PurchaseStructure 
       return null;
     }
     const purchaseQuantity = parseQuantityToken(countSize.groups.purchase ?? "");
-    const { unitSize, unitMeasurement } = parseSizeAndUnit(countSize.groups.size, countSize.groups.unit);
+    const { unitSize, unitMeasurement } = parseSize(countSize.groups.size, countSize.groups.unit);
     if (purchaseQuantity == null || unitSize == null || !unitMeasurement) {
       logPurchaseStructureParse(trimmed, null, "count_size");
       return null;
@@ -814,7 +830,7 @@ export function parsePurchaseStructureFromText(text: string): PurchaseStructure 
     !hasPackCountInferenceSignal(trimmed)
   ) {
     const embeddedBare = findBestRegexMatch(trimmed, EMBEDDED_BARE_MEASURE_RE, (match) => {
-      const { unitSize, unitMeasurement } = parseSizeAndUnit(match.groups?.size, match.groups?.unit);
+      const { unitSize, unitMeasurement } = parseSize(match.groups?.size, match.groups?.unit);
       if (unitSize == null || !unitMeasurement) return -1;
       return measureToBase(unitSize, unitMeasurement).amount;
     });
@@ -824,7 +840,7 @@ export function parsePurchaseStructureFromText(text: string): PurchaseStructure 
       if (containerMatch?.[0]?.includes(hit)) {
         logPurchaseStructureParse(trimmed, null, "embedded_bare_skipped");
       } else {
-        const { unitSize, unitMeasurement } = parseSizeAndUnit(
+        const { unitSize, unitMeasurement } = parseSize(
           embeddedBare.groups.size,
           embeddedBare.groups.unit,
         );
@@ -846,7 +862,7 @@ export function parsePurchaseStructureFromText(text: string): PurchaseStructure 
 
   const bare = trimmed.match(BARE_MEASURE_RE);
   if (bare?.groups && !hasMultiplierStructureInText(trimmed)) {
-    const { unitSize, unitMeasurement } = parseSizeAndUnit(bare.groups.size, bare.groups.unit);
+    const { unitSize, unitMeasurement } = parseSize(bare.groups.size, bare.groups.unit);
     if (unitSize == null || !unitMeasurement) {
       logPurchaseStructureParse(trimmed, null, "bare_measure");
       return null;
