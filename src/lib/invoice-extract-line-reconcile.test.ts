@@ -71,4 +71,53 @@ describe("reconcileLineItemAmounts", () => {
     const result = reconcileLineItemAmounts(items);
     expect(result[0]?.unit_price).toBeCloseTo(10.49, 2);
   });
+
+  it("preserves Bidfood Courgettes discounted line (3.3 kg × 1.95 ≠ 5.15)", () => {
+    const items = [
+      {
+        name: "Courgettes",
+        quantity: 3.3,
+        unit: "kg",
+        unit_price: 1.95,
+        total: 5.15,
+      },
+    ];
+    const result = reconcileLineItemAmounts(items);
+    expect(result[0]).toEqual(items[0]);
+    expect(result[0]?.quantity).toBe(3.3);
+    expect(result[0]?.unit_price).toBe(1.95);
+    expect(result[0]?.total).toBe(5.15);
+  });
+
+  it("preserves Bidfood Hortelã discounted line (0.5 mo × 6.74 ≠ 2.70)", () => {
+    const items = [
+      {
+        name: "Hortelã",
+        quantity: 0.5,
+        unit: "mo",
+        unit_price: 6.74,
+        total: 2.7,
+      },
+    ];
+    const result = reconcileLineItemAmounts(items);
+    expect(result[0]).toEqual(items[0]);
+    expect(result[0]?.quantity).toBe(0.5);
+    expect(result[0]?.unit_price).toBe(6.74);
+    expect(result[0]?.total).toBe(2.7);
+  });
+
+  it("does not back-solve quantity when all three amounts are present", () => {
+    const backSolvedQty = Math.round((5.15 / 1.95) * 100) / 100;
+    const items = [
+      {
+        name: "Courgettes",
+        quantity: backSolvedQty,
+        unit: "kg",
+        unit_price: 1.95,
+        total: 5.15,
+      },
+    ];
+    const result = reconcileLineItemAmounts(items);
+    expect(result[0]?.quantity).toBe(backSolvedQty);
+  });
 });

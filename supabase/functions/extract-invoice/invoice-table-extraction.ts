@@ -117,10 +117,11 @@ Do not hallucinate.
 Do NOT extract supplier, total, invoice_date, or invoice_number.
 
 PRICE ACCURACY (critical for Portuguese invoices):
-- Read PREÇO UNITÁRIO and VALOR DA MERCADORIA digit by digit.
+- Read quantity, PREÇO UNITÁRIO, and VALOR DA MERCADORIA digit by digit from their respective columns.
 - Do not confuse 8 and 9 (e.g. 9,99 misread as 8,99 or 9,49).
-- When quantity is 1, unit_price must equal the line total column.
-- When both price columns exist: quantity × PREÇO UNITÁRIO must equal VALOR DA MERCADORIA.
+- quantity, unit_price, and total are each authoritative — copy each exactly from the invoice.
+- Discounted/promotional lines are common: quantity × unit_price may NOT equal total. Never alter quantity or unit_price to force arithmetic closure.
+- When quantity is 1, unit_price usually equals the line total column (unless a line discount applies).
 `.trim();
 
 export type InvoiceLineItem = ReconciledLineItem;

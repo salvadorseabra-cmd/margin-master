@@ -60,7 +60,11 @@ export function reconcileLineItemsToNetSubtotal(
   return corrected;
 }
 
-/** Prefer line total when quantity × unit_price drifts from the extracted total. */
+/**
+ * Fill missing unit_price or total when only one amount column was extracted.
+ * When all three fields are present, preserve them as printed — discounted lines
+ * often have quantity × unit_price ≠ total and must not be "fixed".
+ */
 export function reconcileLineItemAmounts(items: InvoiceLineItem[]): InvoiceLineItem[] {
   return items.map((item) => {
     const qty = item.quantity;
@@ -69,19 +73,12 @@ export function reconcileLineItemAmounts(items: InvoiceLineItem[]): InvoiceLineI
     if (qty == null || qty <= 0) return item;
 
     if (total != null && unitPrice != null) {
-      const impliedUnit = round2(total / qty);
-      const impliedTotal = round2(unitPrice * qty);
-      const unitMismatch = Math.abs(unitPrice - impliedUnit) > 0.02;
-      const totalMismatch = Math.abs(total - impliedTotal) > 0.02;
-      if (totalMismatch && !unitMismatch) {
-        return { ...item, total: impliedTotal };
-      }
-      if (unitMismatch && !totalMismatch) {
-        return { ...item, unit_price: impliedUnit };
-      }
-    } else if (total != null && unitPrice == null) {
+      return item;
+    }
+    if (total != null && unitPrice == null) {
       return { ...item, unit_price: round2(total / qty) };
-    } else if (unitPrice != null && total == null) {
+    }
+    if (unitPrice != null && total == null) {
       return { ...item, total: round2(unitPrice * qty) };
     }
     return item;
