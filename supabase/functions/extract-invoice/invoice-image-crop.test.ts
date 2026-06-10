@@ -48,6 +48,25 @@ Deno.test("detectTableBounds: Aviludo May preserves 8-row crop (headerTop=228)",
   assertEquals(bounds.detected, true);
 });
 
+Deno.test("detectTableBounds: Mammafiore anchors white header near y≈370, not footer y=632", async () => {
+  const image = await loadImage(".tmp/mammafiore-investigation/invoice-full.png");
+  const bounds = detectTableBounds(image);
+
+  // Before fix: headerTop=632, cropTop=622 — all 8 rows excluded
+  assertLess(bounds.top, 622);
+  assertLess(bounds.headerTop, 450);
+  assertGreater(bounds.headerTop, 340);
+
+  const firstRowY = 395;
+  const lastRowY = 655;
+  assertLess(bounds.top, firstRowY);
+  assertGreater(bounds.bottom, lastRowY);
+
+  const cropHeight = bounds.bottom - bounds.top;
+  assertGreater(cropHeight, 400);
+  assertEquals(bounds.detected, true);
+});
+
 Deno.test("detectTableBounds: Bocconcino anchors white header near y≈453, not y=571", async () => {
   const image = await loadImage(".tmp/bocconcino-investigation/invoice-full.png");
   const bounds = detectTableBounds(image);

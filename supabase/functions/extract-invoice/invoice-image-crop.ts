@@ -17,6 +17,8 @@ import {
   TABLE_SCAN_START_FRACTION,
   TABLE_TOP_MARGIN,
   TOTALS_SCAN_END_FRACTION,
+  FOOTER_GREY_HEADER_MAX_FRACTION,
+  WHITE_HEADER_EXPANDED_MIN_RULE_FRACTION,
   WHITE_HEADER_MIN_RULE_FRACTION,
 } from "./invoice-crop-geometry.ts";
 
@@ -145,8 +147,9 @@ function detectWhiteHeaderTop(
   image: Image,
   scanStart: number,
   scanEnd: number,
+  minRuleFraction = WHITE_HEADER_MIN_RULE_FRACTION,
 ): number | null {
-  const minRuleY = Math.floor(image.height * WHITE_HEADER_MIN_RULE_FRACTION);
+  const minRuleY = Math.floor(image.height * minRuleFraction);
   const rules: number[] = [];
 
   for (let y = Math.max(scanStart, minRuleY); y < scanEnd; y++) {
@@ -180,7 +183,19 @@ export function detectTableBounds(image: Image): TableBounds {
   let headerTop = darkestHeaderTop;
   if (bestBandAverage >= GREY_HEADER_LUMINANCE_THRESHOLD) {
     const whiteHeaderTop = detectWhiteHeaderTop(image, scanStart, scanEnd);
-    if (whiteHeaderTop != null) headerTop = whiteHeaderTop;
+    if (whiteHeaderTop != null) {
+      headerTop = whiteHeaderTop;
+    } else if (
+      darkestHeaderTop >= Math.floor(height * FOOTER_GREY_HEADER_MAX_FRACTION)
+    ) {
+      const fallbackWhiteTop = detectWhiteHeaderTop(
+        image,
+        scanStart,
+        scanEnd,
+        WHITE_HEADER_EXPANDED_MIN_RULE_FRACTION,
+      );
+      if (fallbackWhiteTop != null) headerTop = fallbackWhiteTop;
+    }
   }
 
   if (!Number.isFinite(bestBandAverage)) {

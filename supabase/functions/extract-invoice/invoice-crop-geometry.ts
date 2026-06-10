@@ -77,9 +77,14 @@ export const HEADER_BAND_THRESHOLD_DELTA = 12;
 /** Grey shaded headers (Bidfood, Aviludo) fall below this mean luminance. */
 export const GREY_HEADER_LUMINANCE_THRESHOLD = 163;
 
-/** White-background headers: anchor on horizontal rules in the lower table zone. */
+/** White-background headers: anchor on horizontal rules in the table zone. */
 export const WHITE_HEADER_MIN_RULE_FRACTION = 0.38;
+/** Expanded rule search when grey fallback lands in the footer summary band. */
+export const WHITE_HEADER_EXPANDED_MIN_RULE_FRACTION = 0.28;
 export const HEADER_RULE_MIN_EDGE = 28;
+
+/** Grey-band winners above this fraction are footer summary stripes, not column headers. */
+export const FOOTER_GREY_HEADER_MAX_FRACTION = 0.50;
 export const HEADER_RULE_OFFSETS = [12, 16, 20, 24] as const;
 
 /** Totals-band edge scan reaches the lower page even when the header sits higher. */
