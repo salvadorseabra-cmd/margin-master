@@ -8,6 +8,7 @@ import {
 import { resolveInvoiceLinePurchaseFormat } from "./invoice-purchase-format";
 import { ingredientLineCostEur } from "@/lib/recipe-prep-cost";
 import {
+  computeEffectiveUsableCost,
   deriveInvoiceRowInlineChips,
   formatInvoicePurchasePriceLabel,
   formatInvoiceRowMatchStatusLine,
@@ -18,6 +19,7 @@ import {
   INVOICE_PRICE_SPIKE_THRESHOLD_PERCENT,
   recipeOperationalCostFieldsFromInvoiceLine,
   resolveInvoiceLinePricingPresentation,
+  resolveUsablePerPricedUnit,
 } from "./invoice-purchase-price-semantics";
 
 describe("recipeOperationalCostFieldsFromInvoiceLine", () => {
@@ -305,8 +307,39 @@ describe("resolveInvoiceLinePricingPresentation", () => {
 
     expect(presentation.priceLabel).toBe("Purchase price");
     expect(presentation.priceDisplay).toBe("€14.50 / kg");
-    expect(presentation.effectiveUsableCostLabel).toMatch(/€[\d.]+\s\/\skg/);
-    expect(presentation.card.usableCostLine).toMatch(/€[\d.]+\s\/\skg usable/);
+    expect(presentation.effectiveUsableCostLabel).toBe("€14.50 / kg");
+    expect(presentation.card.usableCostLine).toBe("€14.50 / kg usable");
+  });
+
+  it.each([
+    { name: "PEPINO", quantity: 3.36, unit_price: 1.42 },
+    { name: "ALHO", quantity: 5.42, unit_price: 2.15 },
+    { name: "ABÓBORA", quantity: 5.64, unit_price: 0.89 },
+  ] as const)("formats Bidfood $name multi-kg row as €/kg not €/line-kg", ({ name, quantity, unit_price }) => {
+    const meta = { name, quantity, unit: "kg" as const, unit_price };
+    const structured = resolveInvoiceLinePurchaseFormat(meta);
+    const perUnit = resolveUsablePerPricedUnit(meta, structured);
+    expect(perUnit).toEqual({ amount: 1000, unit: "g" });
+
+    const effective = computeEffectiveUsableCost(unit_price, meta, structured, name);
+    expect(effective).toEqual({ cost: unit_price, unit: "kg" });
+
+    const presentation = resolveInvoiceLinePricingPresentation(meta);
+    expect(presentation.effectiveUsableCostLabel).toBe(`€${unit_price.toFixed(2)} / kg`);
+    expect(presentation.card.usableCostLine).toBe(`€${unit_price.toFixed(2)} / kg usable`);
+  });
+
+  it("formats Salada Ibérica EM pack without kg regression", () => {
+    const presentation = resolveInvoiceLinePricingPresentation({
+      name: "Salada Ibérica",
+      quantity: 1,
+      unit: "em",
+      unit_price: 4.25,
+    });
+
+    expect(presentation.priceLabel).toBe("Pack price");
+    expect(presentation.priceDisplay).toBe("€4.25 / pack");
+    expect(presentation.card.purchaseQuantityLine).toBe("1 pack");
   });
 
   it("formats liquid bottle lines with per-L usable cost", () => {

@@ -294,6 +294,9 @@ function isRowQuantityPackContentMeasure(
   if (!Number.isFinite(rowQuantity) || rowQuantity == null || rowQuantity <= 1) return false;
 
   const rowUnit = normalizeToken(metadata.unit);
+  // Bidfood kg rows: quantity is purchased weight @ €/kg — not pack inner measure (OCR g/ml path).
+  if (rowUnit === "kg" || rowUnit === "kgs") return false;
+
   if (usableUnit === "ml" && (rowUnit === "ml" || rowUnit === "l" || rowUnit === "lt" || rowUnit === "ltr")) {
     const rowMl = rowUnit === "ml" ? rowQuantity : rowQuantity * 1000;
     if (Math.abs(rowMl - totalUsable) < 0.01) return true;
@@ -321,6 +324,12 @@ export function resolveUsablePerPricedUnit(
   const totalUsable = structured.normalizedUsableQuantity;
   const usableUnit = structured.usableQuantityUnit;
   if (totalUsable == null || !usableUnit) return null;
+
+  const rowUnit = normalizeToken(metadata.unit);
+  // Invoice kg rows: unit_price is always €/kg (matches recipeOperationalCostFieldsFromInvoiceLine).
+  if (rowUnit === "kg" || rowUnit === "kgs") {
+    return { amount: 1000, unit: "g" };
+  }
 
   const rowQuantity = metadata.quantity == null ? null : Number(metadata.quantity);
   if (!Number.isFinite(rowQuantity) || rowQuantity == null || rowQuantity <= 1) {
