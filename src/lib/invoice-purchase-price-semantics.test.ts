@@ -213,6 +213,27 @@ describe("purchase phrasing", () => {
     const structured = resolveInvoiceLinePurchaseFormat(meta);
     expect(formatPurchasedPackDetail(structured, meta.name, meta.unit)).toBe("40 burgers × 180 g");
   });
+
+  it("labels Bidfood MO rows as bunches, not cases", () => {
+    expect(formatRowPurchaseQuantityLabel({ name: "Tomilho", quantity: 1, unit: "mo" })).toBe(
+      "1 bunch",
+    );
+    expect(formatRowPurchaseQuantityLabel({ name: "Manjericão", quantity: 2, unit: "mo" })).toBe(
+      "2 bunches",
+    );
+    expect(formatInvoicePurchasePriceLabel({ name: "Tomilho", quantity: 1, unit: "mo" })).toBe(
+      "Price",
+    );
+  });
+
+  it("labels Bidfood EM rows as packs", () => {
+    expect(formatRowPurchaseQuantityLabel({ name: "Salada", quantity: 1, unit: "em" })).toBe(
+      "1 pack",
+    );
+    expect(formatInvoicePurchasePriceLabel({ name: "Salada", quantity: 1, unit: "em" })).toBe(
+      "Pack price",
+    );
+  });
 });
 
 describe("resolveInvoiceLinePricingPresentation", () => {

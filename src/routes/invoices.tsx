@@ -457,6 +457,8 @@ const getDisplayPurchaseUnit = (unit: string | null | undefined) => {
   if (isGenericUnit(normalized)) return "units";
   if (normalized === "cx") return "cases";
   if (normalized === "dz") return "dozens";
+  if (normalized === "mo") return "bunches";
+  if (normalized === "em") return "packs";
   return normalized;
 };
 

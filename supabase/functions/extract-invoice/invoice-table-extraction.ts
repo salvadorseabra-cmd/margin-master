@@ -90,6 +90,24 @@ L
 ml
 un
 cx
+mo
+em
+
+Bidfood / Portuguese supplier abbreviations (preserve exactly — do NOT coerce to cx):
+- "MO" or "maço" = bunch of fresh herbs → unit: "mo"
+- "EM" or "embalagem" = retail pack → unit: "em"
+
+Examples:
+"Tomilho" with quantity column "1" and unit "MO"
+→ quantity: 1
+→ unit: "mo"
+
+"Manjericão" with unit "MO"
+→ unit: "mo"
+
+"Salada" with unit "EM"
+→ quantity: 1
+→ unit: "em"
 
 If quantity truly cannot be determined:
 - quantity = null

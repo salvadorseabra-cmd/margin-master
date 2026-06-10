@@ -88,6 +88,7 @@ const PACK_CONTAINER_UNITS = new Set([
   "bundles",
   "embalagem",
   "embalagens",
+  "em",
   "bottle",
   "bottles",
   "garrafa",
@@ -139,6 +140,8 @@ const ROW_UNIT_CONTAINER_LABEL: Record<string, { singular: string; plural: strin
   bandeja: { singular: "tray", plural: "trays" },
   bundle: { singular: "bundle", plural: "bundles" },
   embalagem: { singular: "pack", plural: "packs" },
+  em: { singular: "pack", plural: "packs" },
+  mo: { singular: "bunch", plural: "bunches" },
 };
 
 const ROW_UNIT_PRICE_SUFFIX: Record<string, string> = {
@@ -151,6 +154,8 @@ const ROW_UNIT_PRICE_SUFFIX: Record<string, string> = {
   bandeja: "tray",
   bundle: "bundle",
   embalagem: "pack",
+  em: "pack",
+  mo: "bunch",
   un: "unit",
   kg: "kg",
   g: "g",

@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { shouldRejectInvoiceIngredientRow } from "./invoice-item-fields";
+import {
+  normalizeInvoiceItemFields,
+  normalizeInvoiceUnitToken,
+  shouldRejectInvoiceIngredientRow,
+} from "./invoice-item-fields";
 
 const row = (
   name: string,
@@ -17,6 +21,63 @@ const row = (
   unit_price: 4.5,
   total: 9,
   ...overrides,
+});
+
+describe("normalizeInvoiceUnitToken", () => {
+  it.each([
+    ["MO", "mo"],
+    ["mo", "mo"],
+    ["maço", "mo"],
+    ["maco", "mo"],
+    ["EM", "em"],
+    ["em", "em"],
+    ["embalagem", "em"],
+    ["emb", "em"],
+    ["embalagens", "em"],
+    ["kg", "kg"],
+    ["g", "g"],
+    ["gr", "g"],
+    ["L", "L"],
+    ["l", "L"],
+    ["lt", "L"],
+    ["ml", "ml"],
+    ["un", "un"],
+    ["uni", "un"],
+    ["cx", "cx"],
+    ["caixa", "caixa"],
+    ["dz", "dz"],
+  ] as const)("maps %s to %s", (input, expected) => {
+    expect(normalizeInvoiceUnitToken(input)).toBe(expected);
+  });
+
+  it("returns null for empty input", () => {
+    expect(normalizeInvoiceUnitToken(null)).toBeNull();
+    expect(normalizeInvoiceUnitToken("")).toBeNull();
+  });
+});
+
+describe("normalizeInvoiceItemFields", () => {
+  it("preserves Bidfood MO/EM units from row fields", () => {
+    const tomilho = normalizeInvoiceItemFields({
+      id: "1",
+      name: "Tomilho 1 mo 1,50 € 1,50",
+      quantity: 1,
+      unit: "MO",
+      unit_price: 1.5,
+      total: 1.5,
+    });
+    expect(tomilho.unit).toBe("mo");
+
+    const salada = normalizeInvoiceItemFields({
+      id: "2",
+      name: "Salada 1 em 2,00 € 2,00",
+      quantity: 1,
+      unit: "EM",
+      unit_price: 2,
+      total: 2,
+    });
+    expect(salada.unit).toBe("em");
+  });
 });
 
 describe("shouldRejectInvoiceIngredientRow", () => {

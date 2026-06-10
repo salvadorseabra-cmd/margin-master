@@ -186,6 +186,7 @@ const PACK_CONTAINER_ROW_UNITS = new Set([
   "box",
   "boxes",
   "emb",
+  "em",
   "embalagem",
   "embalagens",
   "tray",

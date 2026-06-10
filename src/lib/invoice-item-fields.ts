@@ -15,7 +15,7 @@ type InvoiceRowTailFields = {
 };
 
 const INVOICE_NUMBER_TOKEN = String.raw`\d{1,3}(?:[.\s]\d{3})*(?:,\d+)?|\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+[.,]\d+|\d+`;
-const INVOICE_UNIT_TOKEN = String.raw`un|uni|und|unds|unid|unids|unidade|unidades|kg|g|gr|l|lt|ml|cl|cx|caixa|caixas|dz|pack|packs|pc|pcs`;
+const INVOICE_UNIT_TOKEN = String.raw`un|uni|und|unds|unid|unids|unidade|unidades|kg|g|gr|l|lt|ml|cl|cx|caixa|caixas|dz|pack|packs|pc|pcs|mo|maço|maco|em|emb|embalagem|embalagens`;
 const INVOICE_ROW_TAIL_RE = new RegExp(
   String.raw`\s+(?<quantity>${INVOICE_NUMBER_TOKEN})\s*(?<unit>${INVOICE_UNIT_TOKEN})\b\s+(?:€|EUR)?\s*${INVOICE_NUMBER_TOKEN}\s*(?:€|EUR)?\s*(?:\d{1,2}(?:[,.]\d+)?\s*%)?\s*$`,
   "iu",
@@ -44,11 +44,17 @@ const parseInvoiceNumberToken = (raw: string): number | null => {
 };
 
 export const normalizeInvoiceUnitToken = (raw: string | null | undefined) => {
-  const unit = raw?.trim().toLowerCase();
+  const unit = raw
+    ?.trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "");
   if (!unit) return null;
   if (["uni", "und", "unds", "unid", "unids", "unidade", "unidades", "pc", "pcs"].includes(unit)) {
     return "un";
   }
+  if (unit === "maco") return "mo";
+  if (["emb", "embalagem", "embalagens"].includes(unit)) return "em";
   if (unit === "lt") return "L";
   if (unit === "gr") return "g";
   return unit === "l" ? "L" : unit;
