@@ -2,7 +2,18 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { assert, assertEquals, assertLess, assertGreater } from "jsr:@std/assert@1";
 import { Image } from "https://deno.land/x/imagescript@1.3.0/mod.ts";
-import { detectTableBounds } from "./invoice-image-crop.ts";
+import {
+  computeBottomCropStartY,
+  computeFooterCropStartY,
+  DEFAULT_BOTTOM_CROP_FRACTION,
+  EMPORIO_FRACTION_START_Y,
+  EMPORIO_TABLE_BOTTOM_Y,
+  EMPORIO_TOTALS_BAND_Y,
+} from "./invoice-crop-geometry.ts";
+import {
+  detectSummaryTotalsBandTop,
+  detectTableBounds,
+} from "./invoice-image-crop.ts";
 
 const REPO_ROOT = join(new URL(".", import.meta.url).pathname, "../../..");
 
@@ -56,4 +67,80 @@ Deno.test("detectTableBounds: Bocconcino anchors white header near y≈453, not 
   assertLess(bounds.top, stracciatellaRowY);
   assertGreater(bounds.bottom, mozzarellaRowY);
   assertGreater(bounds.bottom, stracciatellaRowY);
+});
+
+Deno.test("footer crop: Emporio Italia includes grey totals box (Subtotal/Total)", async () => {
+  const image = await loadImage(".tmp/emporio-footer-audit/emporio/invoice-full.png");
+  const bounds = detectTableBounds(image);
+  const fractionStartY = computeBottomCropStartY(image.height, DEFAULT_BOTTOM_CROP_FRACTION);
+
+  assertEquals(bounds.bottom, EMPORIO_TABLE_BOTTOM_Y);
+  assertEquals(fractionStartY, EMPORIO_FRACTION_START_Y);
+
+  const summaryBandTop = detectSummaryTotalsBandTop(
+    image,
+    fractionStartY,
+    bounds.totalsStart!,
+  );
+  assert(summaryBandTop != null);
+  assertLess(summaryBandTop, EMPORIO_TOTALS_BAND_Y);
+
+  const cropStartY = computeFooterCropStartY(
+    image.height,
+    bounds.bottom,
+    DEFAULT_BOTTOM_CROP_FRACTION,
+    summaryBandTop,
+  );
+
+  assertLess(cropStartY, bounds.bottom);
+  assertEquals(cropStartY, EMPORIO_FRACTION_START_Y);
+  assertLess(cropStartY, EMPORIO_TOTALS_BAND_Y);
+  assertGreater(image.height - cropStartY, bounds.bottom - cropStartY);
+});
+
+Deno.test("footer crop: Bidfood keeps table-anchored start with TOTAL 292.70", async () => {
+  const image = await loadImage(".tmp/bidfood-ovo.png");
+  const bounds = detectTableBounds(image);
+  const fractionStartY = computeBottomCropStartY(image.height, DEFAULT_BOTTOM_CROP_FRACTION);
+  const summaryBandTop = bounds.totalsStart != null
+    ? detectSummaryTotalsBandTop(image, fractionStartY, bounds.totalsStart)
+    : null;
+
+  assertEquals(summaryBandTop, null);
+
+  const cropStartY = computeFooterCropStartY(
+    image.height,
+    bounds.bottom,
+    DEFAULT_BOTTOM_CROP_FRACTION,
+    summaryBandTop,
+  );
+
+  assertGreater(cropStartY, fractionStartY);
+  assertEquals(cropStartY, bounds.bottom);
+  assertGreater(cropStartY, 1000);
+  assertLess(cropStartY, 1132);
+});
+
+Deno.test("footer crop: Aviludo May keeps table-anchored start with 330.42 band", async () => {
+  const image = await loadImage(
+    ".tmp/aviludo-investigation/reference_3b4cb21f_scan.png",
+  );
+  const bounds = detectTableBounds(image);
+  const fractionStartY = computeBottomCropStartY(image.height, DEFAULT_BOTTOM_CROP_FRACTION);
+  const summaryBandTop = bounds.totalsStart != null
+    ? detectSummaryTotalsBandTop(image, fractionStartY, bounds.totalsStart)
+    : null;
+
+  assertEquals(summaryBandTop, null);
+
+  const cropStartY = computeFooterCropStartY(
+    image.height,
+    bounds.bottom,
+    DEFAULT_BOTTOM_CROP_FRACTION,
+    summaryBandTop,
+  );
+
+  assertEquals(cropStartY, bounds.bottom);
+  assertGreater(cropStartY, fractionStartY);
+  assertLess(cropStartY, 500);
 });

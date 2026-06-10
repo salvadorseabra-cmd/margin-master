@@ -9,11 +9,16 @@ export function computeBottomCropStartY(
 /**
  * Footer crop start: prefer the tighter of fraction-based or post-table boundary
  * so line-item rows are excluded while net/VAT/total bands stay visible.
+ *
+ * When a grey summary totals band sits above the detected table bottom (Emporio
+ * Italia layout), table anchoring would start below Subtotal/Total — pass
+ * `summaryBandTop` to fall back to the fraction crop instead.
  */
 export function computeFooterCropStartY(
   imageHeight: number,
   tableBoundsBottom: number | null,
   bottomFraction = DEFAULT_BOTTOM_CROP_FRACTION,
+  summaryBandTop: number | null = null,
 ): number {
   const fractionStartY = computeBottomCropStartY(imageHeight, bottomFraction);
 
@@ -25,6 +30,13 @@ export function computeFooterCropStartY(
     imageHeight - 1,
     Math.max(0, tableBoundsBottom),
   );
+
+  if (
+    summaryBandTop != null &&
+    tableAnchoredStartY > summaryBandTop
+  ) {
+    return fractionStartY;
+  }
 
   return Math.max(fractionStartY, tableAnchoredStartY);
 }
@@ -41,6 +53,18 @@ export const DEFAULT_BOTTOM_CROP_FRACTION = 0.55;
 export const AVILUDO_IMAGE_HEIGHT = 938;
 export const AVILUDO_TOTAL_BAND_Y = 500;
 export const AVILUDO_TABLE_BOTTOM_Y = 448;
+
+/** Emporio Italia (724×1124). Grey Subtotal/Total box y≈680–820; table bottom y≈851. */
+export const EMPORIO_IMAGE_HEIGHT = 1124;
+export const EMPORIO_TABLE_BOTTOM_Y = 851;
+export const EMPORIO_TOTALS_BAND_Y = 750;
+export const EMPORIO_FRACTION_START_Y = 506;
+
+/** Grey shaded summary box between line items and IVA breakdown (Emporio-style). */
+export const SUMMARY_BAND_MIN_ROWS = 15;
+export const SUMMARY_BAND_MIN_DARK_FRACTION = 0.88;
+export const SUMMARY_BAND_LUMINANCE_MIN = 155;
+export const SUMMARY_BAND_LUMINANCE_MAX = 188;
 
 /** Table header band scan geometry (detectTableBounds). */
 export const TABLE_SCAN_START_FRACTION = 0.12;

@@ -66,4 +66,16 @@ describe("computeFooterCropStartY", () => {
     expect(cropStartY).toBeLessThanOrEqual(AVILUDO_TOTAL_BAND_Y);
     expect(cropStartY).toBeGreaterThanOrEqual(AVILUDO_TABLE_BOTTOM_Y);
   });
+
+  it("falls back to fraction crop when table anchor excludes grey summary band", () => {
+    const cropStartY = computeFooterCropStartY(
+      1124,
+      851,
+      DEFAULT_BOTTOM_CROP_FRACTION,
+      710,
+    );
+
+    expect(cropStartY).toBe(506);
+    expect(cropStartY).toBeLessThan(851);
+  });
 });

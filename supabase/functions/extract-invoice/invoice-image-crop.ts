@@ -1,5 +1,6 @@
 import { Image } from "https://deno.land/x/imagescript@1.3.0/mod.ts";
 import {
+  computeBottomCropStartY,
   computeFooterCropStartY,
   DEFAULT_BOTTOM_CROP_FRACTION,
   GREY_HEADER_LUMINANCE_THRESHOLD,
@@ -8,6 +9,10 @@ import {
   HEADER_RULE_MIN_EDGE,
   HEADER_RULE_OFFSETS,
   MIN_TABLE_HEIGHT,
+  SUMMARY_BAND_LUMINANCE_MAX,
+  SUMMARY_BAND_LUMINANCE_MIN,
+  SUMMARY_BAND_MIN_DARK_FRACTION,
+  SUMMARY_BAND_MIN_ROWS,
   TABLE_SCAN_END_FRACTION,
   TABLE_SCAN_START_FRACTION,
   TABLE_TOP_MARGIN,
@@ -244,6 +249,39 @@ export function detectTableBounds(image: Image): TableBounds {
   };
 }
 
+function isSummaryTotalsRow(image: Image, y: number): boolean {
+  const mean = rowMeanLuminance(image, y);
+  const dark = rowDarkFraction(image, y);
+  return dark >= SUMMARY_BAND_MIN_DARK_FRACTION &&
+    mean >= SUMMARY_BAND_LUMINANCE_MIN &&
+    mean <= SUMMARY_BAND_LUMINANCE_MAX;
+}
+
+/** Grey Subtotal/Total box above the IVA breakdown (Emporio Italia-style layouts). */
+export function detectSummaryTotalsBandTop(
+  image: Image,
+  scanStartY: number,
+  scanEndY: number,
+): number | null {
+  if (scanEndY - scanStartY < SUMMARY_BAND_MIN_ROWS) return null;
+
+  let runStart: number | null = null;
+  let runLen = 0;
+
+  for (let y = scanStartY; y < scanEndY; y++) {
+    if (isSummaryTotalsRow(image, y)) {
+      if (runStart == null) runStart = y;
+      runLen++;
+      if (runLen >= SUMMARY_BAND_MIN_ROWS) return runStart;
+    } else {
+      runStart = null;
+      runLen = 0;
+    }
+  }
+
+  return null;
+}
+
 /** Keep the top portion of the invoice (header + line items), excluding footer compliance blocks. */
 export async function cropTopPortion(
   dataUrl: string,
@@ -265,10 +303,15 @@ export async function cropBottomPortion(
   const { bytes } = parseImageDataUrl(dataUrl);
   const image = await Image.decode(bytes);
   const bounds = detectTableBounds(image);
+  const fractionStartY = computeBottomCropStartY(image.height, bottomFraction);
+  const summaryBandTop = bounds.detected && bounds.totalsStart != null
+    ? detectSummaryTotalsBandTop(image, fractionStartY, bounds.totalsStart)
+    : null;
   const cropStartY = computeFooterCropStartY(
     image.height,
     bounds.detected ? bounds.bottom : null,
     bottomFraction,
+    summaryBandTop,
   );
   const cropHeight = Math.max(1, image.height - cropStartY);
   const cropped = image.crop(0, cropStartY, image.width, cropHeight);
