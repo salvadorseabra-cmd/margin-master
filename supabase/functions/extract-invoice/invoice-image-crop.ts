@@ -1,7 +1,14 @@
 import { Image } from "https://deno.land/x/imagescript@1.3.0/mod.ts";
-import { computeBottomCropStartY } from "./invoice-crop-geometry.ts";
+import {
+  computeFooterCropStartY,
+  DEFAULT_BOTTOM_CROP_FRACTION,
+} from "./invoice-crop-geometry.ts";
 
-export { computeBottomCropStartY } from "./invoice-crop-geometry.ts";
+export {
+  computeBottomCropStartY,
+  computeFooterCropStartY,
+  DEFAULT_BOTTOM_CROP_FRACTION,
+} from "./invoice-crop-geometry.ts";
 
 const DATA_URL_PATTERN = /^data:([^;]+);base64,(.+)$/;
 
@@ -175,11 +182,16 @@ export async function cropTopPortion(
 /** Keep the bottom portion of the invoice (totals + amount due), excluding header/line items. */
 export async function cropBottomPortion(
   dataUrl: string,
-  bottomFraction = 0.48,
+  bottomFraction = DEFAULT_BOTTOM_CROP_FRACTION,
 ): Promise<string> {
   const { bytes } = parseImageDataUrl(dataUrl);
   const image = await Image.decode(bytes);
-  const cropStartY = computeBottomCropStartY(image.height, bottomFraction);
+  const bounds = detectTableBounds(image);
+  const cropStartY = computeFooterCropStartY(
+    image.height,
+    bounds.detected ? bounds.bottom : null,
+    bottomFraction,
+  );
   const cropHeight = Math.max(1, image.height - cropStartY);
   const cropped = image.crop(0, cropStartY, image.width, cropHeight);
   const encoded = await cropped.encode();

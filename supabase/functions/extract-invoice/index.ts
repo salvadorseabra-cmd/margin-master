@@ -125,7 +125,9 @@ serve(async (req) => {
         total: footerFromPass.total,
         net_subtotal: footerFromPass.net_subtotal,
         vat: footerFromPass.vat,
-        strategy: "bottom-48pct-crop",
+        confidence: footerFromPass.confidence,
+        validation_warning: footerFromPass.validation_warning,
+        strategy: "footer-table-anchored-crop",
       });
     } catch (footerPassError) {
       console.error("[invoice-ocr] stage=2c footer-totals-pass-failed", {
