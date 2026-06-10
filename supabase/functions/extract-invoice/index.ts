@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { extractIssueDateFromImage } from "./invoice-date-extraction.ts";
+import { extractFooterMetadataFromImage } from "./invoice-footer-metadata-extraction.ts";
 import { extractMetadataFromImage } from "./invoice-metadata-extraction.ts";
 import {
   extractTableItemsFromImage,
@@ -61,8 +62,8 @@ serve(async (req) => {
     console.log("[invoice-ocr] stage=2 ocr-started", {
       provider: "openai",
       model: "gpt-4.1",
-      mode: "vision-json-three-pass",
-      passes: ["date-specialist", "metadata-specialist", "table-specialist"],
+      mode: "vision-json-four-pass",
+      passes: ["date-specialist", "supplier-specialist", "footer-totals-specialist", "table-specialist"],
       note: "deterministic OCR parsers (parseContinente/parsePadaria/stages.ts) not invoked",
     });
 
@@ -85,32 +86,53 @@ serve(async (req) => {
       });
     }
 
-    let metadataFromPass: {
-      supplier: string | null;
-      total: number | null;
-      net_subtotal: number | null;
-    } = {
+    let metadataFromPass: { supplier: string | null } = {
       supplier: null,
-      total: null,
-      net_subtotal: null,
     };
     try {
       metadataFromPass = await extractMetadataFromImage(
         imageDataUrl,
         OPENAI_API_KEY,
       );
-      console.log("[invoice-ocr] stage=2b metadata-pass", {
+      console.log("[invoice-ocr] stage=2b supplier-pass", {
         supplier: metadataFromPass.supplier,
-        total: metadataFromPass.total,
-        net_subtotal: metadataFromPass.net_subtotal,
         strategy: "top-83pct-crop",
       });
     } catch (metadataPassError) {
-      console.error("[invoice-ocr] stage=2b metadata-pass-failed", {
+      console.error("[invoice-ocr] stage=2b supplier-pass-failed", {
         error:
           metadataPassError instanceof Error
             ? metadataPassError.message
             : String(metadataPassError),
+      });
+    }
+
+    let footerFromPass: {
+      total: number | null;
+      net_subtotal: number | null;
+      vat: number | null;
+    } = {
+      total: null,
+      net_subtotal: null,
+      vat: null,
+    };
+    try {
+      footerFromPass = await extractFooterMetadataFromImage(
+        imageDataUrl,
+        OPENAI_API_KEY,
+      );
+      console.log("[invoice-ocr] stage=2c footer-totals-pass", {
+        total: footerFromPass.total,
+        net_subtotal: footerFromPass.net_subtotal,
+        vat: footerFromPass.vat,
+        strategy: "bottom-48pct-crop",
+      });
+    } catch (footerPassError) {
+      console.error("[invoice-ocr] stage=2c footer-totals-pass-failed", {
+        error:
+          footerPassError instanceof Error
+            ? footerPassError.message
+            : String(footerPassError),
       });
     }
 
@@ -123,12 +145,12 @@ serve(async (req) => {
         imageDataUrl,
         OPENAI_API_KEY,
       );
-      console.log("[invoice-ocr] stage=2c table-pass", {
+      console.log("[invoice-ocr] stage=2d table-pass", {
         itemCount: tableFromPass.items.length,
         tableCrop: tableFromPass.tableCrop,
       });
     } catch (tablePassError) {
-      console.error("[invoice-ocr] stage=2c table-pass-failed", {
+      console.error("[invoice-ocr] stage=2d table-pass-failed", {
         error:
           tablePassError instanceof Error
             ? tablePassError.message
@@ -151,11 +173,11 @@ serve(async (req) => {
 
     const reconciledItems = finalizeExtractedLineItems(
       tableFromPass.items,
-      metadataFromPass.net_subtotal,
+      footerFromPass.net_subtotal,
     );
     if (reconciledItems !== tableFromPass.items) {
       console.log("[invoice-ocr] stage=6c net-subtotal-reconcile", {
-        netSubtotal: metadataFromPass.net_subtotal,
+        netSubtotal: footerFromPass.net_subtotal,
         beforeSum: tableFromPass.items.reduce((s, i) => s + (i.total ?? 0), 0),
         afterSum: reconciledItems.reduce((s, i) => s + (i.total ?? 0), 0),
       });
@@ -164,7 +186,7 @@ serve(async (req) => {
     const normalized = {
       supplier: metadataFromPass.supplier,
       invoice_date: issueDateFromHeaderPass,
-      total: metadataFromPass.total,
+      total: footerFromPass.total,
       items: reconciledItems,
     };
 
