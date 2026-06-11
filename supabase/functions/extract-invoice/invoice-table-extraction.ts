@@ -51,6 +51,24 @@ case contents, or unit weight — NOT the purchased quantity unless the quantity
 
 When quantity column AND description disagree → ALWAYS trust the quantity column.
 
+QUANTITY COLUMN ISOLATION (never bleed from other columns):
+- Quantity may ONLY come from the quantity column cell — never from PREÇO UNITÁRIO, VALOR, or description.
+- Description pack metadata (10x1, 12x1, 5l*2, 1kg*2, CX6, Pack24, 33cl*24) is NOT purchased quantity.
+- Do not take the leading digit of a price (e.g. 9,99) as quantity.
+
+"Açúcar Branco METRO Chef 10x1 Kg" with quantity column "1" and PREÇO UNITÁRIO "9,99"
+→ quantity: 1 (NOT 9 from 9,99, NOT 10 from 10x1)
+→ unit_price: 9.99, total: from VALOR column
+
+FRACTIONAL QUANTITIES (copy decimals exactly — never round):
+- If the quantity column shows 0,5 / 0.5 / 1,5 / 1.5 — copy the exact decimal value.
+- Read the unit column to disambiguate: MO herbs and KG weight rows coexist on the same invoice.
+- Do NOT round 0,5 to 1 even when adjacent rows use MO (maço) units.
+
+"Hortelã" with quantity column "0,5" and unit "KG"
+→ quantity: 0.5, unit: "kg" (NOT 1 — do not round; NOT "mo" unless unit column says MO)
+→ unit_price: from PREÇO UNITÁRIO (€/kg), total: from VALOR
+
 ═══════════════════════════════════════════════════════════════
 NEGATIVE EXAMPLES (common failures — do NOT repeat)
 ═══════════════════════════════════════════════════════════════
@@ -89,6 +107,9 @@ Bidfood — "Tomilho" with quantity column "1" and unit column "MO"
 Bidfood — "Manjericão" with quantity column "2" and unit "MO"
 → quantity: 2, unit: "mo" (from columns, not inferred from name)
 
+Bidfood — "Hortelã" with quantity column "0,5" and unit "KG"
+→ quantity: 0.5, unit: "kg", unit_price: from PREÇO UNITÁRIO, total: from VALOR
+
 Aviludo — "Birra Peroni 33cl*24" with quantity column "24"
 → quantity: 24, unit: "un"
 → *24 in description is metadata; column confirms purchased count of 24 bottles
@@ -120,9 +141,13 @@ PRICE ACCURACY
 
 - Read PREÇO UNITÁRIO and VALOR digit by digit from their respective columns.
 - Do not confuse 8 and 9 (e.g. 9,99 misread as 8,99).
-- quantity × unit_price may NOT equal total on discounted lines — never alter column values to force closure.
+- DISCOUNTED LINES: When quantity × unit_price ≠ total, copy total exactly from the VALOR column.
+  Never recompute total from qty × price. Re-read the VALOR column digit by digit.
 - When quantity is 1, unit_price usually equals line total (unless discount applies).
 - Do not read numerics from the description into price fields; weight ranges (4-4,25KG) are not prices.
+
+"Aceto balsamico di Modena IGP pet 5l*2 Toschi" with qty=1, unit_price=18,83, total=16,09
+→ total: 16.09 (from VALOR — discounted line; do not substitute qty×price)
 
 ═══════════════════════════════════════════════════════════════
 OUTPUT INTEGRITY
