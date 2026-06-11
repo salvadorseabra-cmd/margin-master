@@ -1,0 +1,213 @@
+{
+  "generated_at": "2026-06-11T00:00:00.000Z",
+  "source": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+  "promptConstant": "TABLE_EXTRACTION_SYSTEM_PROMPT",
+  "userMessage": "Extract all invoice line items from this restaurant invoice table image.",
+  "instructions": [
+    {
+      "id": "extract-all-rows",
+      "lines": "29",
+      "text": "Extract ALL invoice line items visible in the table.",
+      "capabilities": ["row_reconstruction", "hallucination_risk"],
+      "risk": "Enables over-extraction; no row-count ceiling or artigo-code anchor"
+    },
+    {
+      "id": "purchased-qty-semantics",
+      "lines": "30-31",
+      "text": "quantity must represent the PURCHASED quantity. unit must represent the PURCHASED unit.",
+      "capabilities": ["qty_inference", "unit_inference"],
+      "risk": "Ambiguous when description pack spec vs column disagree"
+    },
+    {
+      "id": "never-invent-but-infer",
+      "lines": "32-34",
+      "text": "NEVER invent values. But DO infer quantity/unit when clearly present inside product names. Screenshots may have messy OCR. Use contextual reasoning.",
+      "capabilities": ["qty_inference", "unit_inference", "missing_value_reconstruction", "name_reconstruction", "hallucination_risk"],
+      "risk": "CRITICAL — direct contradiction; 'clearly present' undefined; contextual reasoning on messy OCR invites guessing"
+    },
+    {
+      "id": "weight-in-name-qty",
+      "lines": "40-42",
+      "text": "\"Acém Novilho Extra s/ osso 15kg\" → quantity: 15, unit: \"kg\"",
+      "capabilities": ["qty_inference", "unit_inference", "pack_interpretation"],
+      "risk": "Teaches extracting embedded weight as purchased qty when column may differ"
+    },
+    {
+      "id": "weight-in-name-1kg",
+      "lines": "44-46",
+      "text": "\"Bacon Burger Premium Fatiado 1kg\" → quantity: 1, unit: \"kg\"",
+      "capabilities": ["qty_inference", "unit_inference", "pack_interpretation"],
+      "risk": "Same pattern — 1kg in name becomes qty=1"
+    },
+    {
+      "id": "column-qty-with-name",
+      "lines": "48-51",
+      "text": "\"Peito de Frango Calibrado\" with visible quantity column \"10\" → quantity: 10, unit: \"kg\"",
+      "capabilities": ["qty_inference", "unit_inference"],
+      "risk": "Unit inferred from product type (kg) not column — mixed column/name authority"
+    },
+    {
+      "id": "pack-24-bottles",
+      "lines": "53-55",
+      "text": "\"Coca-Cola 33cl Pack 24\" → quantity: 24, unit: \"un\"",
+      "capabilities": ["qty_inference", "unit_inference", "pack_interpretation"],
+      "risk": "HIGH — teaches *N pack count as purchased qty; correct for Birra Peroni, wrong for CX 2.5KG*6"
+    },
+    {
+      "id": "pack-24-water",
+      "lines": "57-59",
+      "text": "\"Água 25cl Pack 24\" → quantity: 24, unit: \"un\"",
+      "capabilities": ["qty_inference", "pack_interpretation"],
+      "risk": "Reinforces pack-count-as-qty pattern"
+    },
+    {
+      "id": "caixa-40-un",
+      "lines": "61-63",
+      "text": "\"Hamburger Angus 180gr Caixa 40 un\" → quantity: 40, unit: \"un\"",
+      "capabilities": ["qty_inference", "pack_interpretation"],
+      "risk": "Teaches ignoring per-item weight (180gr) in favor of case count"
+    },
+    {
+      "id": "brioche-120-un",
+      "lines": "65-67",
+      "text": "\"Pão Brioche 80g 120 un\" → quantity: 120, unit: \"un\"",
+      "capabilities": ["qty_inference", "pack_interpretation"],
+      "risk": "Same case-count pattern"
+    },
+    {
+      "id": "size-vs-purchased-qty",
+      "lines": "69-71",
+      "text": "If product size exists separately from purchased quantity: purchased quantity = pack/case/unit count, NOT the per-item weight",
+      "capabilities": ["pack_interpretation", "qty_inference"],
+      "risk": "Correct intent but examples only cover retail bottle/case; no wholesale CX*N case notation"
+    },
+    {
+      "id": "bad-good-180g",
+      "lines": "73-78",
+      "text": "BAD: 180g / GOOD: 40 un",
+      "capabilities": ["pack_interpretation", "unit_inference"],
+      "risk": "Binary heuristic; no rule for CX 2.5KG*6 where *6 is units-per-case not purchased qty"
+    },
+    {
+      "id": "bad-good-33cl",
+      "lines": "80-84",
+      "text": "BAD: 33cl / GOOD: 24 un",
+      "capabilities": ["pack_interpretation"],
+      "risk": "Reinforces bottle-count extraction — directly applicable to Ginger Beer error"
+    },
+    {
+      "id": "normalized-units",
+      "lines": "86-94",
+      "text": "Use these normalized units only when possible: kg, g, L, ml, un, cx, mo, em",
+      "capabilities": ["unit_inference"],
+      "risk": "LOW — may coerce visible column units"
+    },
+    {
+      "id": "bidfood-mo-em",
+      "lines": "96-98",
+      "text": "MO/maço → mo; EM/embalagem → em (preserve exactly — do NOT coerce to cx)",
+      "capabilities": ["unit_inference"],
+      "risk": "LOW — supplier-specific; not implicated in VL errors"
+    },
+    {
+      "id": "tomilho-mo-example",
+      "lines": "100-103",
+      "text": "\"Tomilho\" with quantity column \"1\" and unit \"MO\" → quantity: 1, unit: \"mo\"",
+      "capabilities": ["qty_inference", "unit_inference"],
+      "risk": "LOW — column-faithful example"
+    },
+    {
+      "id": "manjericao-mo-infer",
+      "lines": "105-106",
+      "text": "\"Manjericão\" with unit \"MO\" → unit: \"mo\"",
+      "capabilities": ["unit_inference", "missing_value_reconstruction"],
+      "risk": "MEDIUM — unit inferred from name/context without qty; encourages partial fill"
+    },
+    {
+      "id": "salada-em-default-qty",
+      "lines": "108-110",
+      "text": "\"Salada\" with unit \"EM\" → quantity: 1, unit: \"em\"",
+      "capabilities": ["qty_inference", "missing_value_reconstruction"],
+      "risk": "MEDIUM — implicit qty=1 when not visible in column"
+    },
+    {
+      "id": "null-when-unknown",
+      "lines": "112-114",
+      "text": "If quantity truly cannot be determined: quantity = null, unit = null",
+      "capabilities": ["missing_value_reconstruction"],
+      "risk": "Contradicted by infer-from-name rule; GPT rarely emits null per audits"
+    },
+    {
+      "id": "do-not-hallucinate",
+      "lines": "116",
+      "text": "Do not hallucinate.",
+      "capabilities": ["hallucination_risk"],
+      "risk": "Weak guard — no definition of hallucination; contradicted by infer + extract-all"
+    },
+    {
+      "id": "exclude-metadata-fields",
+      "lines": "117",
+      "text": "Do NOT extract supplier, total, invoice_date, or invoice_number.",
+      "capabilities": ["hallucination_risk"],
+      "risk": "LOW — field-scope guard; does not prevent phantom line items"
+    },
+    {
+      "id": "price-digit-by-digit",
+      "lines": "119-121",
+      "text": "Read quantity, PREÇO UNITÁRIO, and VALOR DA MERCADORIA digit by digit from their respective columns.",
+      "capabilities": ["missing_value_reconstruction"],
+      "risk": "MEDIUM — column-faithful intent; undermined by infer-from-name for qty"
+    },
+    {
+      "id": "digit-8-9-confusion",
+      "lines": "121",
+      "text": "Do not confuse 8 and 9 (e.g. 9,99 misread as 8,99 or 9,49).",
+      "capabilities": ["missing_value_reconstruction"],
+      "risk": "LOW — awareness only; Prosciutto 8.17→17.06 still occurs"
+    },
+    {
+      "id": "copy-exactly-authoritative",
+      "lines": "122",
+      "text": "quantity, unit_price, and total are each authoritative — copy each exactly from the invoice.",
+      "capabilities": ["missing_value_reconstruction"],
+      "risk": "CRITICAL contradiction with infer-from-name (lines 33-34, 40-67)"
+    },
+    {
+      "id": "no-arithmetic-closure",
+      "lines": "123-124",
+      "text": "quantity × unit_price may NOT equal total. Never alter quantity or unit_price to force arithmetic closure.",
+      "capabilities": ["missing_value_reconstruction", "hallucination_risk"],
+      "risk": "MEDIUM — allows semantically wrong triples (Ginger Beer 24×€0.85=€19.38)"
+    },
+    {
+      "id": "qty-1-price-equals-total",
+      "lines": "124",
+      "text": "When quantity is 1, unit_price usually equals the line total column (unless a line discount applies).",
+      "capabilities": ["missing_value_reconstruction"],
+      "risk": "LOW — heuristic for single-pack lines"
+    },
+    {
+      "id": "user-extract-all",
+      "lines": "185",
+      "text": "Extract all invoice line items from this restaurant invoice table image.",
+      "capabilities": ["row_reconstruction", "hallucination_risk"],
+      "risk": "Reinforces extract-all without precision guard"
+    }
+  ],
+  "capabilitySummary": {
+    "qty_inference": 15,
+    "unit_inference": 14,
+    "pack_interpretation": 10,
+    "missing_value_reconstruction": 9,
+    "row_reconstruction": 2,
+    "name_reconstruction": 1,
+    "hallucination_risk": 6
+  },
+  "absentGuards": [
+    "No rule distinguishing pack metadata (*N in CX 2.5KG*6) from purchased quantity column",
+    "No anti-phantom / row-count validation",
+    "No rejection of lot numbers (Lote, Nº, Data Exp) as standalone line items",
+    "No artigo/SKU column anchor requirement",
+    "No instruction to prefer column qty over description *N when both present"
+  ]
+}

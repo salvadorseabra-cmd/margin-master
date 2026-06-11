@@ -1,0 +1,338 @@
+{
+  "generated_at": "2026-06-11T01:39:40.952Z",
+  "ruleDefinitions": {
+    "A": "qty × unit_price ≈ total (±2% or €0.10)",
+    "B": "unit_price numerically matches visible discount % column (±0.75)",
+    "C": "unit_price matches VAT % (6/13/23)",
+    "D": "unit_price > total/qty × 1.08 on discounted line (list price as unit)",
+    "E": "unit_price equals neighbour row unit but qty×unit ≠ total",
+    "F": "invoice template has explicit discount column (context flag, not standalone detector)"
+  },
+  "evaluations": [
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "qty": 4,
+      "unit_price": 10.17,
+      "total": 36.54,
+      "run": 1,
+      "key": "prosciutto-run-1",
+      "candKey": "prosciutto",
+      "ctx": {
+        "hasDiscountColumn": true,
+        "neighbourUnits": [
+          9.92,
+          10.1,
+          16.6
+        ]
+      },
+      "rules": {
+        "A_qty_x_unit_approx_total": "FAIL",
+        "B_unit_matches_discount_pct": "PASS",
+        "C_unit_matches_vat_pct": "SKIP",
+        "D_unit_exceeds_plausible_net": "FAIL",
+        "E_inconsistent_with_neighbour": "PASS",
+        "F_invoice_has_discount_column": "PASS"
+      },
+      "anyFail": 2
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "qty": 4.3,
+      "unit_price": 8.2,
+      "total": 35.24,
+      "run": 2,
+      "key": "prosciutto-run-2",
+      "candKey": "prosciutto",
+      "ctx": {
+        "hasDiscountColumn": true,
+        "neighbourUnits": [
+          9.92,
+          10.1,
+          16.6
+        ]
+      },
+      "rules": {
+        "A_qty_x_unit_approx_total": "PASS",
+        "B_unit_matches_discount_pct": "PASS",
+        "C_unit_matches_vat_pct": "SKIP",
+        "D_unit_exceeds_plausible_net": "PASS",
+        "E_inconsistent_with_neighbour": "PASS",
+        "F_invoice_has_discount_column": "PASS"
+      },
+      "anyFail": 0
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "qty": 4.3,
+      "unit_price": 17,
+      "total": 36.54,
+      "run": 3,
+      "key": "prosciutto-run-3",
+      "candKey": "prosciutto",
+      "ctx": {
+        "hasDiscountColumn": true,
+        "neighbourUnits": [
+          9.92,
+          10.1,
+          16.6
+        ]
+      },
+      "rules": {
+        "A_qty_x_unit_approx_total": "FAIL",
+        "B_unit_matches_discount_pct": "FAIL",
+        "C_unit_matches_vat_pct": "SKIP",
+        "D_unit_exceeds_plausible_net": "FAIL",
+        "E_inconsistent_with_neighbour": "PASS",
+        "F_invoice_has_discount_column": "PASS"
+      },
+      "anyFail": 3
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "qty": 4.3,
+      "unit_price": 8.17,
+      "total": 36.54,
+      "run": 4,
+      "key": "prosciutto-run-4",
+      "candKey": "prosciutto",
+      "ctx": {
+        "hasDiscountColumn": true,
+        "neighbourUnits": [
+          9.92,
+          10.1,
+          16.6
+        ]
+      },
+      "rules": {
+        "A_qty_x_unit_approx_total": "FAIL",
+        "B_unit_matches_discount_pct": "PASS",
+        "C_unit_matches_vat_pct": "SKIP",
+        "D_unit_exceeds_plausible_net": "PASS",
+        "E_inconsistent_with_neighbour": "PASS",
+        "F_invoice_has_discount_column": "PASS"
+      },
+      "anyFail": 1
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "qty": 4.3,
+      "unit_price": 8.2,
+      "total": 36.54,
+      "run": 5,
+      "key": "prosciutto-run-5",
+      "candKey": "prosciutto",
+      "ctx": {
+        "hasDiscountColumn": true,
+        "neighbourUnits": [
+          9.92,
+          10.1,
+          16.6
+        ]
+      },
+      "rules": {
+        "A_qty_x_unit_approx_total": "FAIL",
+        "B_unit_matches_discount_pct": "PASS",
+        "C_unit_matches_vat_pct": "SKIP",
+        "D_unit_exceeds_plausible_net": "PASS",
+        "E_inconsistent_with_neighbour": "PASS",
+        "F_invoice_has_discount_column": "PASS"
+      },
+      "anyFail": 1
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "qty": 2,
+      "unit_price": 20,
+      "total": 40,
+      "run": 1,
+      "key": "pomodor-run-1",
+      "candKey": "pomodor",
+      "ctx": {
+        "hasDiscountColumn": true,
+        "neighbourUnits": [
+          27.56,
+          27.3,
+          20.295
+        ],
+        "lineNet": 22.05
+      },
+      "rules": {
+        "A_qty_x_unit_approx_total": "PASS",
+        "B_unit_matches_discount_pct": "FAIL",
+        "C_unit_matches_vat_pct": "PASS",
+        "D_unit_exceeds_plausible_net": "PASS",
+        "E_inconsistent_with_neighbour": "PASS",
+        "F_invoice_has_discount_column": "PASS"
+      },
+      "anyFail": 1
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "qty": 2,
+      "unit_price": 27.56,
+      "total": 54.2,
+      "run": 2,
+      "key": "pomodor-run-2",
+      "candKey": "pomodor",
+      "ctx": {
+        "hasDiscountColumn": true,
+        "neighbourUnits": [
+          27.56,
+          27.3,
+          20.295
+        ],
+        "lineNet": 22.05
+      },
+      "rules": {
+        "A_qty_x_unit_approx_total": "PASS",
+        "B_unit_matches_discount_pct": "PASS",
+        "C_unit_matches_vat_pct": "PASS",
+        "D_unit_exceeds_plausible_net": "PASS",
+        "E_inconsistent_with_neighbour": "PASS",
+        "F_invoice_has_discount_column": "PASS"
+      },
+      "anyFail": 0
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "qty": 2,
+      "unit_price": 25.9,
+      "total": 40,
+      "run": 3,
+      "key": "pomodor-run-3",
+      "candKey": "pomodor",
+      "ctx": {
+        "hasDiscountColumn": true,
+        "neighbourUnits": [
+          27.56,
+          27.3,
+          20.295
+        ],
+        "lineNet": 22.05
+      },
+      "rules": {
+        "A_qty_x_unit_approx_total": "FAIL",
+        "B_unit_matches_discount_pct": "PASS",
+        "C_unit_matches_vat_pct": "PASS",
+        "D_unit_exceeds_plausible_net": "FAIL",
+        "E_inconsistent_with_neighbour": "PASS",
+        "F_invoice_has_discount_column": "PASS"
+      },
+      "anyFail": 2
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "qty": 2,
+      "unit_price": 27.56,
+      "total": 42.2,
+      "run": 4,
+      "key": "pomodor-run-4",
+      "candKey": "pomodor",
+      "ctx": {
+        "hasDiscountColumn": true,
+        "neighbourUnits": [
+          27.56,
+          27.3,
+          20.295
+        ],
+        "lineNet": 22.05
+      },
+      "rules": {
+        "A_qty_x_unit_approx_total": "FAIL",
+        "B_unit_matches_discount_pct": "PASS",
+        "C_unit_matches_vat_pct": "PASS",
+        "D_unit_exceeds_plausible_net": "FAIL",
+        "E_inconsistent_with_neighbour": "FAIL",
+        "F_invoice_has_discount_column": "PASS"
+      },
+      "anyFail": 3
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "qty": 2,
+      "unit_price": 27.56,
+      "total": 20.02,
+      "run": 5,
+      "key": "pomodor-run-5",
+      "candKey": "pomodor",
+      "ctx": {
+        "hasDiscountColumn": true,
+        "neighbourUnits": [
+          27.56,
+          27.3,
+          20.295
+        ],
+        "lineNet": 22.05
+      },
+      "rules": {
+        "A_qty_x_unit_approx_total": "FAIL",
+        "B_unit_matches_discount_pct": "PASS",
+        "C_unit_matches_vat_pct": "PASS",
+        "D_unit_exceeds_plausible_net": "FAIL",
+        "E_inconsistent_with_neighbour": "FAIL",
+        "F_invoice_has_discount_column": "PASS"
+      },
+      "anyFail": 3
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Prosciutto",
+      "qty": 4,
+      "unit_price": 9.17,
+      "total": 36.54,
+      "key": "prosciutto-refined",
+      "candKey": "prosciutto",
+      "ctx": {
+        "hasDiscountColumn": true,
+        "neighbourUnits": [
+          9.92,
+          10.1
+        ]
+      },
+      "rules": {
+        "A_qty_x_unit_approx_total": "PASS",
+        "B_unit_matches_discount_pct": "PASS",
+        "C_unit_matches_vat_pct": "SKIP",
+        "D_unit_exceeds_plausible_net": "PASS",
+        "E_inconsistent_with_neighbour": "PASS",
+        "F_invoice_has_discount_column": "PASS"
+      },
+      "anyFail": 0
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR",
+      "qty": 2,
+      "unit_price": 20,
+      "total": 40,
+      "key": "pomodor-refined",
+      "candKey": "pomodor",
+      "ctx": {
+        "hasDiscountColumn": true,
+        "neighbourUnits": [
+          27.56
+        ],
+        "lineNet": 22.05
+      },
+      "rules": {
+        "A_qty_x_unit_approx_total": "PASS",
+        "B_unit_matches_discount_pct": "FAIL",
+        "C_unit_matches_vat_pct": "PASS",
+        "D_unit_exceeds_plausible_net": "PASS",
+        "E_inconsistent_with_neighbour": "PASS",
+        "F_invoice_has_discount_column": "PASS"
+      },
+      "anyFail": 1
+    }
+  ]
+}

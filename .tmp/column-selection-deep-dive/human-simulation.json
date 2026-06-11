@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-06-11T01:34:01.493Z",
+  "method": "Blind identification using row crop only (no headers), as worst-case Pass C context",
+  "emporio_prosciutto": {
+    "qty": {
+      "identified": "4,30",
+      "difficulty": "easy",
+      "cue": "leftmost numeric cluster after IVA23"
+    },
+    "unit_price": {
+      "identified": "10,30 €",
+      "difficulty": "moderate",
+      "cue": "first value with € after qty"
+    },
+    "discount": {
+      "identified": "17,50",
+      "difficulty": "hard",
+      "cue": "no % symbol; could be mistaken for price"
+    },
+    "total": {
+      "identified": "36,54 €",
+      "difficulty": "easy",
+      "cue": "rightmost € value"
+    },
+    "overallDifficulty": "moderate-hard",
+    "errorRisk": "High confusion between 17,50 (discount) and 10,30/36,54 (prices) without headers"
+  },
+  "bocconcino_pomodor": {
+    "qty": {
+      "identified": "1,000",
+      "difficulty": "easy",
+      "cue": "after description, before UNI"
+    },
+    "unit_price": {
+      "identified": "27,560 EUR",
+      "difficulty": "easy",
+      "cue": "first EUR value in price cluster"
+    },
+    "discount": {
+      "identified": "20,00%",
+      "difficulty": "easy",
+      "cue": "explicit % symbol"
+    },
+    "total": {
+      "identified": "22,05 EUR",
+      "difficulty": "easy",
+      "cue": "second EUR value after discount"
+    },
+    "overallDifficulty": "easy",
+    "errorRisk": "Low for human; math confirms 27.56×0.8≈22.05"
+  }
+}

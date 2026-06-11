@@ -1,0 +1,117 @@
+{
+  "generated_at": "2026-06-11T02:00:00.000Z",
+  "scope": "Pass C monetary column binding on dense discounted tables",
+  "excluded_families": ["Geometry", "Footer", "Hallucinations", "Persistence", "Reconcile", "Discount-line GPT variance (Mammafiore)"],
+  "target_residual_euro": 21.4,
+  "options": [
+    {
+      "id": "A",
+      "name": "Prompt-only refinement",
+      "description": "Expand TABLE_EXTRACTION_SYSTEM_PROMPT with more negative examples, EUR/% suffix rules, and corrected Pomodor example (qty 1, €27.56, €22.05).",
+      "accuracy_improvement": "LOW (5–15%)",
+      "accuracy_improvement_pct": 10,
+      "complexity": "LOW",
+      "false_positive_risk": "LOW",
+      "maintenance_burden": "MEDIUM — prompt drift per supplier",
+      "suitability_1000_plus": "POOR — non-deterministic; 5-run variance persists",
+      "evidence": "column-selection-deep-dive: prompt already mandates column-faithful; violations persist; POMODOR negative example mismatches visible row"
+    },
+    {
+      "id": "B",
+      "name": "Post-Pass-C validator only",
+      "description": "Deterministic rules A–F on GPT triple after extractTableItemsFromImage; flag or reject suspicious rows.",
+      "accuracy_improvement": "MEDIUM (detect 75%, fix 0%)",
+      "accuracy_improvement_pct": 40,
+      "complexity": "LOW–MEDIUM",
+      "false_positive_risk": "HIGH without discount exemption — Rule A 37.5% FP",
+      "maintenance_burden": "LOW",
+      "suitability_1000_plus": "PARTIAL — safety net only; 25% undetected self-consistent errors",
+      "evidence": "monetary-column-validation-audit: 9/12 detected, 3 NO (Prosciutto refined 9.17/36.54, Pomodor 27.56/54.20); Rule B 0 FP"
+    },
+    {
+      "id": "C",
+      "name": "Geometry header-anchored crop only",
+      "description": "Extend detectTableBounds / cropTableRegionForLineItems to always include header row (Emporio headers at y≈430, crop top y≈456).",
+      "accuracy_improvement": "MEDIUM on Emporio (20–35%)",
+      "accuracy_improvement_pct": 28,
+      "complexity": "LOW",
+      "false_positive_risk": "LOW",
+      "maintenance_burden": "LOW",
+      "suitability_1000_plus": "GOOD for header-clipped templates; insufficient alone for Bocconcino",
+      "evidence": "column-selection-deep-dive: Bocconcino crop NOT ambiguous but GPT still fails; Emporio headers clipped → MARGINAL"
+    },
+    {
+      "id": "D",
+      "name": "Dedicated monetary-column GPT pass (Pass C²)",
+      "description": "Second vision pass on same table crop (or per-row crops) returning column-labeled numerics: gross_unit, discount_pct, net_total.",
+      "accuracy_improvement": "HIGH (50–70% on stable residual)",
+      "accuracy_improvement_pct": 60,
+      "complexity": "MEDIUM",
+      "false_positive_risk": "LOW–MEDIUM — still GPT-bound",
+      "maintenance_burden": "MEDIUM",
+      "suitability_1000_plus": "GOOD — adds latency/cost (~1 extra GPT call per invoice)",
+      "evidence": "column-shift-audit: first divergence Pass C only; structured column labels address indistinguishable triples"
+    },
+    {
+      "id": "E",
+      "name": "OCR-first column extraction",
+      "description": "Tesseract or column-slice OCR on table crop; bind x-positions to headers; GPT fills names only.",
+      "accuracy_improvement": "MEDIUM–HIGH (40–60%)",
+      "accuracy_improvement_pct": 50,
+      "complexity": "HIGH",
+      "false_positive_risk": "MEDIUM — OCR digit errors on dense tables",
+      "maintenance_burden": "HIGH — new dependency, per-template tuning",
+      "suitability_1000_plus": "UNCERTAIN — layout diversity across 1000+ restaurants",
+      "evidence": "column-shift-audit: no OCR stage today; dense 286px 4-value rows challenge slice alignment"
+    },
+    {
+      "id": "F",
+      "name": "Retry / multi-run voting",
+      "description": "Re-run Pass C 3–5×; pick modal unit/total or lowest-variance answer.",
+      "accuracy_improvement": "LOW–MEDIUM (15–30%)",
+      "accuracy_improvement_pct": 22,
+      "complexity": "LOW",
+      "false_positive_risk": "MEDIUM — may converge on wrong self-consistent answer",
+      "maintenance_burden": "LOW",
+      "suitability_1000_plus": "POOR — 3–5× cost; discount-line audit 80% run consistency on different family",
+      "evidence": "column-shift-audit: 5-run variance — not deterministic; Pomodor run 1 stable wrong (€20); Prosciutto run 4 correct but not modal"
+    },
+    {
+      "id": "G",
+      "name": "Expanded Pass C schema (single pass)",
+      "description": "Change JSON schema to emit gross_unit_price, discount_pct, line_total_net per row; derive unit_price in code.",
+      "accuracy_improvement": "MEDIUM–HIGH (45–65%)",
+      "accuracy_improvement_pct": 55,
+      "complexity": "MEDIUM",
+      "false_positive_risk": "LOW–MEDIUM",
+      "maintenance_burden": "MEDIUM — schema + binder logic",
+      "suitability_1000_plus": "GOOD — one pass, explicit column binding in output",
+      "evidence": "validation audit: triple alone insufficient; column metadata enables Rule B without guessing"
+    },
+    {
+      "id": "H",
+      "name": "Hybrid: Header crop + structured monetary binding + validator gate (PREFERRED)",
+      "description": "Phase 1 geometry header inclusion; Phase 2 expanded schema or Pass C² for column-labeled numerics; Phase 3 deterministic bindMonetaryColumns + Rule B/E gate; Phase 4 targeted row retry on flagged rows only.",
+      "accuracy_improvement": "HIGH (70–85% on stable €21.4 residual)",
+      "accuracy_improvement_pct": 78,
+      "complexity": "MEDIUM–HIGH",
+      "false_positive_risk": "LOW — Rule B 0 FP; discount-line exemption preserves legitimate qty×unit≠total",
+      "maintenance_burden": "MEDIUM",
+      "suitability_1000_plus": "EXCELLENT — deterministic layers + bounded GPT retry",
+      "evidence": "Synthesizes all audits: fixes Emporio header clip, adds column metadata for indistinguishable triples, gates with 0-FP Rule B"
+    },
+    {
+      "id": "I",
+      "name": "Supplier template registry",
+      "description": "Detect supplier layout; hard-code column order maps (Emporio, Bocconcino, Mammafiore).",
+      "accuracy_improvement": "HIGH per known template (60–80%)",
+      "accuracy_improvement_pct": 70,
+      "complexity": "HIGH",
+      "false_positive_risk": "MEDIUM — misclassification breaks binding",
+      "maintenance_burden": "VERY HIGH — N templates × layout changes",
+      "suitability_1000_plus": "POOR at scale — unbounded template growth",
+      "evidence": "root-cause-consolidation: 1000+ invoice diversity; only 2 stable column-shift products audited"
+    }
+  ],
+  "preferred": "H"
+}

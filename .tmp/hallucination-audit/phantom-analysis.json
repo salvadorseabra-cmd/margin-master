@@ -1,0 +1,19 @@
+{
+  "phantoms": [
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice": "Mammafiore",
+      "phantomName": "Olio Nute 600g Dea",
+      "persistedName": "Olio Nuto 609 10lt",
+      "persistedTotal": 18.3,
+      "visibleOnSourceInvoice": false,
+      "firstAppearance": "GPT (Pass C raw JSON)",
+      "cause": "GPT",
+      "evidence": [
+        ".tmp/mammafiore-line-audit/pass-c-raw.json",
+        ".tmp/mammafiore-line-audit/phantom-item-trace.json"
+      ],
+      "hypothesis": "GPT fused Birra Peroni lot 6009 + Aceto pet 5l*2 into phantom olive oil SKU"
+    }
+  ]
+}

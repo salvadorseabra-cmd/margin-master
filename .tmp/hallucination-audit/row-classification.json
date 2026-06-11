@@ -1,0 +1,448 @@
+{
+  "da472b7f-0fd9-4a26-a37c-80ad335f7f7e": {
+    "invoice": "Bidfood Portugal",
+    "rows": [
+      {
+        "groundTruthItem": "Manteiga Coimbra s/ sal EMB 1 Kg",
+        "extractedItem": "Manteiga Coimbra s/Sal EMB 1 Kg",
+        "persistedItem": "Manteiga Coimbra s/ sal EMB 1 Kg",
+        "status": "MATCH",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice": "Bidfood Portugal"
+      },
+      {
+        "groundTruthItem": "Ovo MORENO Classe M Cx. 1.5 dúzias (CARTÃO)",
+        "extractedItem": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+        "persistedItem": "Ovo MORENO Classe M Cx. 1.5 dúzias (CARTÃO)",
+        "status": "MATCH",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice": "Bidfood Portugal"
+      },
+      {
+        "groundTruthItem": "Tomilho",
+        "extractedItem": "Tomilho",
+        "persistedItem": "Tomilho",
+        "status": "MATCH",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice": "Bidfood Portugal"
+      },
+      {
+        "groundTruthItem": "Salada Ibérica FSTK EMB. 250g",
+        "extractedItem": "Salada Ibérica FSTK EMB. 250g",
+        "persistedItem": "Salada Ibérica FSTK EMB. 250g",
+        "status": "MATCH",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice": "Bidfood Portugal"
+      },
+      {
+        "groundTruthItem": "Manjericão",
+        "extractedItem": "Manjericão",
+        "persistedItem": "Manjericão",
+        "status": "MATCH",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice": "Bidfood Portugal"
+      },
+      {
+        "groundTruthItem": "Hortelã",
+        "extractedItem": "Hortelã",
+        "persistedItem": "Hortelã",
+        "status": "MATCH",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice": "Bidfood Portugal"
+      },
+      {
+        "groundTruthItem": "Pepino",
+        "extractedItem": "Pepino",
+        "persistedItem": "Pepino",
+        "status": "MATCH",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice": "Bidfood Portugal"
+      },
+      {
+        "groundTruthItem": "Pêra Abacate Hasse",
+        "extractedItem": "Pêra Abacate Hasse",
+        "persistedItem": "Pêra Abacate Hasse",
+        "status": "MATCH",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice": "Bidfood Portugal"
+      },
+      {
+        "groundTruthItem": "Courgettes",
+        "extractedItem": "Courgettes",
+        "persistedItem": "Courgettes",
+        "status": "MATCH",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice": "Bidfood Portugal"
+      },
+      {
+        "groundTruthItem": "Alho Francês",
+        "extractedItem": "Alho Francês",
+        "persistedItem": "Alho Francês",
+        "status": "MATCH",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice": "Bidfood Portugal"
+      },
+      {
+        "groundTruthItem": "Abóbora Butternut",
+        "extractedItem": "Abóbora Butternut",
+        "persistedItem": "Abóbora Butternut",
+        "status": "MATCH",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice": "Bidfood Portugal"
+      }
+    ]
+  },
+  "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2": {
+    "invoice": "Aviludo May",
+    "rows": [
+      {
+        "groundTruthItem": "Filete de Anchoas Alcofinosa L4 495 g",
+        "extractedItem": "Filete de Anchovas Alconfirosa L4 495 g",
+        "persistedItem": "Filete de Anchoas Alconfirosa L4 495 g",
+        "status": "PARTIAL",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "invoice": "Aviludo May"
+      },
+      {
+        "groundTruthItem": "Ovo Líquido Past.Gema Dovo 1 Kg",
+        "extractedItem": "Ovo Líquido Past.Gema Dovo 1 Kg",
+        "persistedItem": "Ovo Liquido Past.Gema Dovo 1 Kg",
+        "status": "MATCH",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "invoice": "Aviludo May"
+      },
+      {
+        "groundTruthItem": "Pepinos Extra Uli Frasco 6x720 g",
+        "extractedItem": "Pepinos Extra Uji Frasco 6x720 g",
+        "persistedItem": "Pepinos Extra Uil Frasco 6x720 g",
+        "status": "MATCH",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "invoice": "Aviludo May"
+      },
+      {
+        "groundTruthItem": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+        "extractedItem": "Atum Óleo Bolsa Nau Cafriente 1 Kg",
+        "persistedItem": "Atum Oleo Bolsa Nau Cahirenta 1 Kg",
+        "status": "MATCH",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "invoice": "Aviludo May"
+      },
+      {
+        "groundTruthItem": "Arroz Agulha Metro Chef 12x1 kg",
+        "extractedItem": "Arroz Agulha Metro Chef 12x1 kg",
+        "persistedItem": "Arroz Agulha Metro Chef 12x1 kg",
+        "status": "MATCH",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "invoice": "Aviludo May"
+      },
+      {
+        "groundTruthItem": "Chocolate Culinaria Pantagruel 10x200 g",
+        "extractedItem": "Chocolate Culinaria Pantagruel 10x200 g",
+        "persistedItem": "Chocolate Culinaria Pantagruel 10x200 g",
+        "status": "MATCH",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "invoice": "Aviludo May"
+      },
+      {
+        "groundTruthItem": "Açucar Branco METRO Chef 10x1 Kg",
+        "extractedItem": "Acúcar Branco METRO Chef 10x1 Kg",
+        "persistedItem": "Acucar Branco METRO Chef 10x1 Kg",
+        "status": "MATCH",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "invoice": "Aviludo May"
+      },
+      {
+        "groundTruthItem": "Nata Culinária 22% Reny Picot 6x1 L",
+        "extractedItem": "Nata Culinaria 22% Reny Picot 6x1 L",
+        "persistedItem": "Nata Culinaria 22% Remy Picot 6x1 L",
+        "status": "MATCH",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "invoice": "Aviludo May"
+      }
+    ]
+  },
+  "c2f52357-0f80-491a-ba14-c97ff4837472": {
+    "invoice": "Aviludo April",
+    "rows": [
+      {
+        "groundTruthItem": "Mozzarella Flor di Latte 2Kg",
+        "extractedItem": "Mozzarella Fior di Latte 2Kg",
+        "persistedItem": "Mozzarella Flor di Latte 2Kg",
+        "status": "MATCH",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "invoice": "Aviludo April"
+      },
+      {
+        "groundTruthItem": "Açúcar Branco Metro Chef 10x1Kg",
+        "extractedItem": "Açúcar Branco Metro Chef 10x1Kg",
+        "persistedItem": "Açúcar Branco Metro Chef 10x1Kg",
+        "status": "MATCH",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "invoice": "Aviludo April"
+      },
+      {
+        "groundTruthItem": "Chocolate Pantagruel 10x200g",
+        "extractedItem": "Chocolate Pantagruel 10x200g",
+        "persistedItem": "Chocolate Pantagruel 10x200g",
+        "status": "PARTIAL",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "invoice": "Aviludo April"
+      },
+      {
+        "groundTruthItem": "Arroz Agulha Metro Chef 12x1kg",
+        "extractedItem": "Arroz Agulha Metro Chef 12x1kg",
+        "persistedItem": "Arroz Agulha Metro Chef 12x1kg",
+        "status": "MATCH",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "invoice": "Aviludo April"
+      },
+      {
+        "groundTruthItem": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "extractedItem": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "persistedItem": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "status": "PARTIAL",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "invoice": "Aviludo April"
+      },
+      {
+        "groundTruthItem": "Pepinos Extra II Frasco 6x720g",
+        "extractedItem": "Pepinos Extra II Frasco 6x720g",
+        "persistedItem": "Pepinos Extra II Frasco 6x720g",
+        "status": "MATCH",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "invoice": "Aviludo April"
+      },
+      {
+        "groundTruthItem": "Ovo Líquido Past.Gema Dovo 1kg",
+        "extractedItem": "Ovo Líquido Past.Gema Dovo 1kg",
+        "persistedItem": "Ovo Líquido Past.Gema Dovo 1kg",
+        "status": "PARTIAL",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "invoice": "Aviludo April"
+      },
+      {
+        "groundTruthItem": "Filete de Anchovas Alconfrisa Lt 495 g",
+        "extractedItem": "Filete de Anchovas Alconfrisa Lt 495 g",
+        "persistedItem": "Filete de Anchovas Alconfrisa Lt 495 g",
+        "status": "PARTIAL",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "invoice": "Aviludo April"
+      },
+      {
+        "groundTruthItem": "Nata Reny Picot 22% 6x1L",
+        "extractedItem": "Nata Reny Picot 22% 6x1L",
+        "persistedItem": "Nata Reny Picot 22% 6x1L",
+        "status": "PARTIAL",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "invoice": "Aviludo April"
+      }
+    ]
+  },
+  "17aa3591-ec98-4c21-89c9-5ae946bc97bb": {
+    "invoice": "Emporio Italia",
+    "rows": [
+      {
+        "groundTruthItem": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "extractedItem": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "persistedItem": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "status": "MATCH",
+        "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+        "invoice": "Emporio Italia"
+      },
+      {
+        "groundTruthItem": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+        "extractedItem": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+        "persistedItem": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castellone 1/8° - 1,5kg",
+        "status": "MATCH",
+        "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+        "invoice": "Emporio Italia"
+      },
+      {
+        "groundTruthItem": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+        "extractedItem": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+        "persistedItem": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg",
+        "status": "MATCH",
+        "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+        "invoice": "Emporio Italia"
+      },
+      {
+        "groundTruthItem": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+        "extractedItem": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+        "persistedItem": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in Vela 1/2 ~2,5Kg",
+        "status": "MATCH",
+        "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+        "invoice": "Emporio Italia"
+      },
+      {
+        "groundTruthItem": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "extractedItem": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "persistedItem": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "status": "MATCH",
+        "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+        "invoice": "Emporio Italia"
+      },
+      {
+        "groundTruthItem": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+        "extractedItem": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+        "persistedItem": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+        "status": "MATCH",
+        "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+        "invoice": "Emporio Italia"
+      },
+      {
+        "groundTruthItem": "Baladin - Ginger Beer 0.20cl",
+        "extractedItem": "Baladin - Ginger Beer 0.20cl",
+        "persistedItem": "Baladin - Ginger Beer 0.20cl",
+        "status": "MATCH",
+        "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+        "invoice": "Emporio Italia"
+      },
+      {
+        "groundTruthItem": "Rovagnati - Salame Ventricina 2,5 Kg",
+        "extractedItem": "Rovagnati - Salame Ventricina 2,5 Kg",
+        "persistedItem": "Rovagnati - Salame Ventricina 2,5 Kg",
+        "status": "MATCH",
+        "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+        "invoice": "Emporio Italia"
+      }
+    ]
+  },
+  "f0aa5a08-86a3-4938-99f0-711e86073968": {
+    "invoice": "IL Bocconcino",
+    "rows": [
+      {
+        "groundTruthItem": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "extractedItem": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "persistedItem": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "status": "MATCH",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "invoice": "IL Bocconcino"
+      },
+      {
+        "groundTruthItem": "STRACCIATELLA 250 GR",
+        "extractedItem": "STRACCIATELLA 250 GR",
+        "persistedItem": "STRACCIATELLA 250 GR",
+        "status": "MATCH",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "invoice": "IL Bocconcino"
+      },
+      {
+        "groundTruthItem": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "extractedItem": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "persistedItem": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "status": "MATCH",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "invoice": "IL Bocconcino"
+      },
+      {
+        "groundTruthItem": "POMODOR PELATI (CX 2.5KG*6)",
+        "extractedItem": "POMODOR PELATI (CX 2.5KG*6)",
+        "persistedItem": "POMODORINI pelati (CX 2.5KG*6)",
+        "status": "MATCH",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "invoice": "IL Bocconcino"
+      },
+      {
+        "groundTruthItem": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "extractedItem": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "persistedItem": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "status": "MATCH",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "invoice": "IL Bocconcino"
+      },
+      {
+        "groundTruthItem": "RICOTTA TREVIGIANA 1,5KG",
+        "extractedItem": "RICOTTA TREVIGIANA 1,5KG",
+        "persistedItem": "RICOTTA TREVIGIANA 1,5KG",
+        "status": "MATCH",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "invoice": "IL Bocconcino"
+      },
+      {
+        "groundTruthItem": "ROLO DE CABRA E VACA 1KG",
+        "extractedItem": "ROLO DE CABRA E VACA 1KG",
+        "persistedItem": "ROLO DE CABEÇA DE VACA 1KG",
+        "status": "MATCH",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "invoice": "IL Bocconcino"
+      }
+    ]
+  },
+  "36c99d19-6f9f-413f-8c2d-ae3526291a2d": {
+    "invoice": "Mammafiore",
+    "rows": [
+      {
+        "groundTruthItem": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "extractedItem": "Guanciale di suino stagionato +/- 1,5kg S7 Sorrentino",
+        "persistedItem": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "status": "MATCH",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "invoice": "Mammafiore"
+      },
+      {
+        "groundTruthItem": "Farina Speciale pizza 25kg Amoruso",
+        "extractedItem": "Farina Speciale pizza 25kg Amoruso",
+        "persistedItem": "Farina Speciale pizza 25kg Amoruso",
+        "status": "MATCH",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "invoice": "Mammafiore"
+      },
+      {
+        "groundTruthItem": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "extractedItem": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "persistedItem": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "status": "MATCH",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "invoice": "Mammafiore"
+      },
+      {
+        "groundTruthItem": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+        "extractedItem": "Aceto balsamico di modena IGP PET 5l*2 Toschi",
+        "persistedItem": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+        "status": "PARTIAL",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "invoice": "Mammafiore"
+      },
+      {
+        "groundTruthItem": "MOZZA Fior di Latte Expert Julienne 3kg Simonetta",
+        "extractedItem": "MOZZA Fioc di Latte Expet Julienne 3kg Simonetta",
+        "persistedItem": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+        "status": "PARTIAL",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "invoice": "Mammafiore"
+      },
+      {
+        "groundTruthItem": "Rulo Di Capra 1kg*2 Simonetta",
+        "extractedItem": "Rub Di Capra 1kg S2 Simonetta",
+        "persistedItem": "Rub Di Capra 1kg *2 Simonetta",
+        "status": "MATCH",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "invoice": "Mammafiore"
+      },
+      {
+        "groundTruthItem": "Recargo por combustible",
+        "extractedItem": "Recargo por combustibile",
+        "persistedItem": null,
+        "status": "PARTIAL",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "invoice": "Mammafiore"
+      },
+      {
+        "groundTruthItem": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+        "extractedItem": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+        "persistedItem": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+        "status": "MATCH",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "invoice": "Mammafiore"
+      },
+      {
+        "groundTruthItem": null,
+        "extractedItem": "Olio Nute 600g Dea",
+        "persistedItem": null,
+        "status": "PHANTOM",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "invoice": "Mammafiore"
+      }
+    ]
+  }
+}

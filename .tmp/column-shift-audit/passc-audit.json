@@ -1,0 +1,68 @@
+{
+  "generated_at": "2026-06-11T01:24:11.882Z",
+  "traces": [
+    {
+      "product": "Prosciutto Cotto",
+      "fields": [
+        {
+          "field": "quantity",
+          "groundTruthImage": 4.3,
+          "passCOld": 4.3,
+          "passCRefined": 4,
+          "neighbourColumn": null,
+          "verdict": "refined rounds 4.3→4"
+        },
+        {
+          "field": "unit_price",
+          "groundTruthImage": 10.3,
+          "groundTruthVlNet": 8.17,
+          "passCOld": 17.06,
+          "passCRefined": 9.17,
+          "neighbourColumn": "Desc.(%) 17,50 (old); calculated total÷qty (refined)",
+          "verdict": "column_shift_old; calculated_refined"
+        },
+        {
+          "field": "total",
+          "groundTruthImage": 36.54,
+          "groundTruthVl": 35.14,
+          "passCOld": 36.54,
+          "passCRefined": 36.54,
+          "neighbourColumn": "Preço Total column (correct vs image)",
+          "verdict": "matches_visible_total"
+        }
+      ]
+    },
+    {
+      "product": "POMODOR PELATI",
+      "fields": [
+        {
+          "field": "quantity",
+          "groundTruthImage": 1,
+          "groundTruthVl": 2,
+          "passCOld": 2,
+          "passCRefined": 2,
+          "neighbourColumn": "pack *6 in description (historical qty=6)",
+          "verdict": "pack_notation_historical; refined uses 2"
+        },
+        {
+          "field": "unit_price",
+          "groundTruthImage": 27.56,
+          "groundTruthVl": 25,
+          "passCOld": 20,
+          "passCRefined": 20,
+          "neighbourColumn": "DESC 20,00% column",
+          "verdict": "column_shift_discount_as_price"
+        },
+        {
+          "field": "total",
+          "groundTruthImage": 22.05,
+          "groundTruthVl": 50,
+          "passCOld": 40,
+          "passCRefined": 40,
+          "neighbourColumn": "qty×wrong_unit_price (2×20=40)",
+          "verdict": "derived_from_wrong_price"
+        }
+      ]
+    }
+  ]
+}

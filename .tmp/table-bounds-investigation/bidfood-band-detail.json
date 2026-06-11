@@ -1,0 +1,154 @@
+{
+  "winnerBandRows": [
+    {
+      "y": 447,
+      "luminance": 186.72
+    },
+    {
+      "y": 448,
+      "luminance": 175.99
+    },
+    {
+      "y": 449,
+      "luminance": 166.19
+    },
+    {
+      "y": 450,
+      "luminance": 147.97
+    },
+    {
+      "y": 451,
+      "luminance": 126.8
+    },
+    {
+      "y": 452,
+      "luminance": 151.1
+    },
+    {
+      "y": 453,
+      "luminance": 156.02
+    },
+    {
+      "y": 454,
+      "luminance": 150.55
+    },
+    {
+      "y": 455,
+      "luminance": 147.22
+    },
+    {
+      "y": 456,
+      "luminance": 143.49
+    },
+    {
+      "y": 457,
+      "luminance": 144.34
+    },
+    {
+      "y": 458,
+      "luminance": 145.07
+    },
+    {
+      "y": 459,
+      "luminance": 144.86
+    },
+    {
+      "y": 460,
+      "luminance": 148.82
+    },
+    {
+      "y": 461,
+      "luminance": 155.96
+    },
+    {
+      "y": 462,
+      "luminance": 163.46
+    },
+    {
+      "y": 463,
+      "luminance": 166.76
+    },
+    {
+      "y": 464,
+      "luminance": 181.93
+    }
+  ],
+  "expectedBandRows": [
+    {
+      "y": 280,
+      "luminance": 216.49
+    },
+    {
+      "y": 281,
+      "luminance": 218.91
+    },
+    {
+      "y": 282,
+      "luminance": 220.03
+    },
+    {
+      "y": 283,
+      "luminance": 219.58
+    },
+    {
+      "y": 284,
+      "luminance": 218.91
+    },
+    {
+      "y": 285,
+      "luminance": 217.6
+    },
+    {
+      "y": 286,
+      "luminance": 211.3
+    },
+    {
+      "y": 287,
+      "luminance": 211.06
+    },
+    {
+      "y": 288,
+      "luminance": 212.91
+    },
+    {
+      "y": 289,
+      "luminance": 211.77
+    },
+    {
+      "y": 290,
+      "luminance": 212.23
+    },
+    {
+      "y": 291,
+      "luminance": 209.86
+    },
+    {
+      "y": 292,
+      "luminance": 213.98
+    },
+    {
+      "y": 293,
+      "luminance": 222.6
+    },
+    {
+      "y": 294,
+      "luminance": 221.42
+    },
+    {
+      "y": 295,
+      "luminance": 221.36
+    },
+    {
+      "y": 296,
+      "luminance": 221.89
+    },
+    {
+      "y": 297,
+      "luminance": 221.91
+    }
+  ],
+  "totalsEdgePeak": {
+    "y": 799,
+    "edge": 13.84
+  }
+}

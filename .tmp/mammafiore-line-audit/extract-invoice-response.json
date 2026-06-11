@@ -1,0 +1,70 @@
+{
+  "supplier": "Mammafiore Portugal, Unipessoal Lda",
+  "invoice_date": "2026-05-19",
+  "total": 415.96,
+  "items": [
+    {
+      "name": "Guanciale di suino stagionato +/- 1,5kg S7 Sorrentino",
+      "quantity": 5.996,
+      "unit": "UN",
+      "unit_price": 16.922,
+      "total": 64.93
+    },
+    {
+      "name": "Farina Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 33.154,
+      "total": 26.52
+    },
+    {
+      "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "quantity": 24,
+      "unit": "UN",
+      "unit_price": 1.529,
+      "total": 25.69
+    },
+    {
+      "name": "Olio Nute 600g Dea",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 18.929,
+      "total": 15
+    },
+    {
+      "name": "Aceto balsamico di modena IGP PET 5l*2 Toschi",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 18.295,
+      "total": 15
+    },
+    {
+      "name": "MOZZA Fioc di Latte Expet Julienne 3kg Simonetta",
+      "quantity": 10,
+      "unit": "UN",
+      "unit_price": 24.728,
+      "total": 200.3
+    },
+    {
+      "name": "Rub Di Capra 1kg S2 Simonetta",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 15.192,
+      "total": 10.8
+    },
+    {
+      "name": "Recargo por combustibile",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 2,
+      "total": 2
+    },
+    {
+      "name": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 39.101,
+      "total": 30.11
+    }
+  ]
+}

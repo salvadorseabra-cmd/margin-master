@@ -1,0 +1,53 @@
+{
+  "invoice_ground_truth": {
+    "qty": 24,
+    "unit_price_eur": 0.85,
+    "line_total_eur": 19.38
+  },
+  "step1_extraction": {
+    "description": "Baladin - Ginger Beer 0.20cl",
+    "stored_volume_token": "0.20cl"
+  },
+  "step2_detectVolume": {
+    "regex": "/(\\\\d+(?:[.,]\\\\d+)?)\\\\s*CL\\\\b/",
+    "parsed_cl": 0.2,
+    "formula": "toMl(0.20) = 0.20 × 10",
+    "ml_per_priced_unit": 2
+  },
+  "step3_stock_normalization": {
+    "row_qty": 24,
+    "row_unit": "un",
+    "normalized_usable_quantity": 48,
+    "usable_quantity_unit": "ml",
+    "formula": "2 ml/unit × 24 units = 48 ml"
+  },
+  "step4_usable_per_priced_unit": {
+    "amount": 2,
+    "unit": "ml"
+  },
+  "step5_operational_cost": {
+    "unit_price": 0.85,
+    "liters_per_purchase_unit": 0.002,
+    "formula": "€0.85 / (2 ml / 1000) = €425/L",
+    "cost_per_liter": 425,
+    "unit": "L"
+  },
+  "counterfactuals": {
+    "if_33cl_sku": {
+      "ml_per_unit": 330,
+      "total_ml": 7920,
+      "cost_per_liter": 2.5757575757575757
+    },
+    "if_20cl_typo": {
+      "ml_per_unit": 200,
+      "total_ml": 4800,
+      "cost_per_liter": 4.25
+    },
+    "if_0_20L": {
+      "note": "If OCR meant 0.20L not 0.20cl",
+      "ml_per_unit": 200
+    }
+  },
+  "proof_48ml": "24 × 2 ml = 48 ml",
+  "proof_425_per_L": "€0.85 / (2/1000) L = €0.85 / 0.002 L = €425/L"
+}

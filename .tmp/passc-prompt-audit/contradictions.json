@@ -1,0 +1,146 @@
+{
+  "generated_at": "2026-06-11T00:00:00.000Z",
+  "source": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+  "contradictions": [
+    {
+      "id": "copy-vs-infer-qty",
+      "severity": "CRITICAL",
+      "sideA": {
+        "lines": "122",
+        "text": "quantity, unit_price, and total are each authoritative — copy each exactly from the invoice."
+      },
+      "sideB": {
+        "lines": "33-34",
+        "text": "But DO infer quantity/unit when clearly present inside product names."
+      },
+      "conflict": "Same field (quantity) has dual authority: column copy vs name inference. No precedence rule when they disagree.",
+      "vlEvidence": [
+        "Bocconcino POMODOR: column qty=2 vs inferred *6→6",
+        "Mammafiore Aceto: column qty=1 vs inferred *2→2",
+        "Emporio Ginger Beer: column qty=2 vs inferred pack→24"
+      ]
+    },
+    {
+      "id": "never-invent-vs-infer",
+      "severity": "CRITICAL",
+      "sideA": {
+        "lines": "32",
+        "text": "NEVER invent values."
+      },
+      "sideB": {
+        "lines": "33-34, 108-110",
+        "text": "DO infer quantity/unit when clearly present inside product names. / \"Salada\" with unit \"EM\" → quantity: 1"
+      },
+      "conflict": "Inference from partial name signals (unit only, pack *N) is indistinguishable from invention when column value differs or is ambiguous.",
+      "vlEvidence": [
+        "Mammafiore phantom Olio — invented row from fused cues",
+        "Salada EM example teaches default qty=1 without column evidence"
+      ]
+    },
+    {
+      "id": "no-hallucinate-vs-contextual-reasoning",
+      "severity": "HIGH",
+      "sideA": {
+        "lines": "116",
+        "text": "Do not hallucinate."
+      },
+      "sideB": {
+        "lines": "34",
+        "text": "Screenshots may have messy OCR. Use contextual reasoning."
+      },
+      "conflict": "Contextual reasoning on messy OCR encourages reconstructing values not visibly present — opposite of anti-hallucination.",
+      "vlEvidence": [
+        "Mammafiore phantom row — contextual fusion of lot 609 + 5l*2 + numerics"
+      ]
+    },
+    {
+      "id": "null-when-unknown-vs-always-infer",
+      "severity": "HIGH",
+      "sideA": {
+        "lines": "112-114",
+        "text": "If quantity truly cannot be determined: quantity = null, unit = null"
+      },
+      "sideB": {
+        "lines": "40-67, 105-110",
+        "text": "Seven worked examples all produce non-null qty/unit from name patterns; Manjericão/Salada infer without visible qty"
+      },
+      "conflict": "Examples overwhelmingly teach inference; null escape hatch is single line with no example. Model prefers guessing.",
+      "vlEvidence": [
+        "Aceto/Rulo raw runs: qty=2 from *2 rather than null or column=1",
+        "GPT rarely emits null in VL corpus per instruction-inventory audit"
+      ]
+    },
+    {
+      "id": "purchased-qty-vs-pack-metadata",
+      "severity": "HIGH",
+      "sideA": {
+        "lines": "30-31, 69-71",
+        "text": "quantity must represent the PURCHASED quantity. / purchased quantity = pack/case/unit count, NOT per-item weight"
+      },
+      "sideB": {
+        "lines": "53-67, 80-84",
+        "text": "Pack examples extract *24, *40, *120 from description as purchased qty"
+      },
+      "conflict": "Rule says purchased qty = case count, but examples only cover retail bottle packs. Wholesale CX 2.5KG*6 (*6 = units-per-case metadata) gets same treatment as 33cl*24 (where *24 IS purchased qty).",
+      "vlEvidence": [
+        "Bocconcino (CX 2.5KG*6): *6 misread as purchased qty",
+        "Birra Peroni 33cl*24: same rule correctly yields 24 — asymmetric outcomes from same instruction"
+      ]
+    },
+    {
+      "id": "extract-all-vs-precision",
+      "severity": "MEDIUM",
+      "sideA": {
+        "lines": "29, 185",
+        "text": "Extract ALL invoice line items visible in the table."
+      },
+      "sideB": {
+        "lines": "116-117",
+        "text": "Do not hallucinate. / Do NOT extract supplier, total, invoice_date, or invoice_number."
+      },
+      "conflict": "Completeness mandate with no row-count guard or artigo anchor; exclusion rules only cover header/footer metadata fields, not phantom product rows.",
+      "vlEvidence": [
+        "Mammafiore 9 rows vs 8 on invoice"
+      ]
+    },
+    {
+      "id": "no-arithmetic-fix-vs-missing-fill",
+      "severity": "MEDIUM",
+      "sideA": {
+        "lines": "123-124",
+        "text": "Never alter quantity or unit_price to force arithmetic closure."
+      },
+      "sideB": {
+        "lines": "124",
+        "text": "When quantity is 1, unit_price usually equals the line total column"
+      },
+      "conflict": "Post-prompt reconcileLineItemAmounts() fills missing fields via division (not in prompt but downstream). Prompt itself allows semantically wrong complete triples (Ginger Beer) while blocking arithmetic correction.",
+      "vlEvidence": [
+        "Ginger Beer 24×€0.85 with total €19.38 — wrong semantics pass unchecked"
+      ],
+      "note": "Post-prompt reconcile is outside Pass C prompt scope; included for completeness."
+    },
+    {
+      "id": "column-unit-vs-inferred-unit",
+      "severity": "MEDIUM",
+      "sideA": {
+        "lines": "122",
+        "text": "copy each exactly from the invoice"
+      },
+      "sideB": {
+        "lines": "48-51",
+        "text": "Peito de Frango with quantity column \"10\" → unit: \"kg\" (inferred from product type, not column)"
+      },
+      "conflict": "Example mixes column qty with name-inferred unit — teaches hybrid authority per field.",
+      "vlEvidence": [
+        "Mammafiore Rulo pass-c-raw: qty=2 kg (unit also inferred from 1kg in name)"
+      ]
+    }
+  ],
+  "summary": {
+    "critical": 2,
+    "high": 3,
+    "medium": 3,
+    "primaryConflict": "copy-exactly-authoritative (L122) vs infer-from-name (L33-34) with no column-precedence rule"
+  }
+}

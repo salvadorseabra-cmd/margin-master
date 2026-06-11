@@ -1,0 +1,130 @@
+{
+  "generated_at": "2026-06-10T23:38:43.657Z",
+  "rows": [
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "label": "IL Bocconcino",
+      "key": "pomodor",
+      "input": null,
+      "afterReconcileLineItemAmounts": null,
+      "afterFinalizeExtractedLineItems": null,
+      "reconcileLineItemAmountsModified": "NO",
+      "finalizeExtractedLineItemsModified": "NO",
+      "reconcileModifiedQtyPriceTotal": "NO"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "label": "Mammafiore",
+      "key": "phantom-olio",
+      "input": {
+        "name": "Olio Noc 609 Della O.P.",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 18.829,
+        "total": 18.83
+      },
+      "afterReconcileLineItemAmounts": {
+        "name": "Olio Noc 609 Della O.P.",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 18.829,
+        "total": 18.83
+      },
+      "afterFinalizeExtractedLineItems": null,
+      "reconcileLineItemAmountsModified": "NO",
+      "finalizeExtractedLineItemsModified": "NO",
+      "reconcileModifiedQtyPriceTotal": "NO"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "label": "Mammafiore",
+      "key": "aceto",
+      "input": {
+        "name": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 13.8,
+        "total": 15.96
+      },
+      "afterReconcileLineItemAmounts": {
+        "name": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 13.8,
+        "total": 15.96
+      },
+      "afterFinalizeExtractedLineItems": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 18.295,
+        "total": 15.9
+      },
+      "reconcileLineItemAmountsModified": "NO",
+      "finalizeExtractedLineItemsModified": "YES",
+      "reconcileModifiedQtyPriceTotal": "YES"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "label": "Mammafiore",
+      "key": "rulo",
+      "input": {
+        "name": "Rub Di Capra 1kg*2 Simonetta",
+        "quantity": 2,
+        "unit": "kg",
+        "unit_price": 15.192,
+        "total": 10.28
+      },
+      "afterReconcileLineItemAmounts": {
+        "name": "Rub Di Capra 1kg*2 Simonetta",
+        "quantity": 2,
+        "unit": "kg",
+        "unit_price": 15.192,
+        "total": 10.28
+      },
+      "afterFinalizeExtractedLineItems": {
+        "name": "Rub Di Capra 1kg *2 Simonetta",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 15.192,
+        "total": 10.38
+      },
+      "reconcileLineItemAmountsModified": "NO",
+      "finalizeExtractedLineItemsModified": "YES",
+      "reconcileModifiedQtyPriceTotal": "YES"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "label": "Emporio Italia",
+      "key": "prosciutto",
+      "input": null,
+      "afterReconcileLineItemAmounts": null,
+      "afterFinalizeExtractedLineItems": null,
+      "reconcileLineItemAmountsModified": "NO",
+      "finalizeExtractedLineItemsModified": "NO",
+      "reconcileModifiedQtyPriceTotal": "NO"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "label": "Emporio Italia",
+      "key": "pellegrino",
+      "input": null,
+      "afterReconcileLineItemAmounts": null,
+      "afterFinalizeExtractedLineItems": null,
+      "reconcileLineItemAmountsModified": "NO",
+      "finalizeExtractedLineItemsModified": "NO",
+      "reconcileModifiedQtyPriceTotal": "NO"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "label": "Emporio Italia",
+      "key": "ginger-beer",
+      "input": null,
+      "afterReconcileLineItemAmounts": null,
+      "afterFinalizeExtractedLineItems": null,
+      "reconcileLineItemAmountsModified": "NO",
+      "finalizeExtractedLineItemsModified": "NO",
+      "reconcileModifiedQtyPriceTotal": "NO"
+    }
+  ]
+}

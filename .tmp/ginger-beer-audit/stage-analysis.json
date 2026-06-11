@@ -1,0 +1,9 @@
+{
+  "ocr_extraction": "Table pass transcribed literal '0.20cl' in description; product code BBB-GINGER33ITA on PDF not persisted",
+  "gpt_extraction": "extract-invoice returned name='Baladin - Ginger Beer 0.20cl', qty=24, unit=un, unit_price=0.85 (matches DB)",
+  "package_parser": "parsePurchaseFormatPhrase → null (no 'x Nud' / container phrase); detectVolume matches 0.20CL → 2ml",
+  "unit_normalization": "inferBaseUnit → purchase_quantity=2, purchase_unit=ml; stock pipeline: 2ml×24=48ml usable",
+  "operational_pricing": "resolveUsablePerPricedUnit → 2ml/un; computeEffectiveUsableCost → €425/L",
+  "db_persistence": "invoice_items row 920fa990-36e5-48d3-82ce-a4499882e30e: name with 0.20cl, no volume columns; ingredient not found",
+  "ui_display": "No ginger ingredient in catalog"
+}

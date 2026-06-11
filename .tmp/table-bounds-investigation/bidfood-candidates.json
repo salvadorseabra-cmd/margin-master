@@ -1,0 +1,4244 @@
+{
+  "label": "Bidfood",
+  "scanStart": 152,
+  "scanEnd": 699,
+  "winnerY": 447,
+  "winnerBandAverage": 155.74,
+  "expectedHeaderTop": 280,
+  "expectedBandAverage": 216.88,
+  "expectedRank": 439,
+  "candidates": [
+    {
+      "y": 447,
+      "bandAverage": 155.74,
+      "isWinner": true,
+      "rank": 1,
+      "deltaFromWinner": 0,
+      "atExpected": false
+    },
+    {
+      "y": 448,
+      "bandAverage": 156.07,
+      "isWinner": false,
+      "rank": 2,
+      "deltaFromWinner": 0.33,
+      "atExpected": false
+    },
+    {
+      "y": 446,
+      "bandAverage": 156.32,
+      "isWinner": false,
+      "rank": 3,
+      "deltaFromWinner": 0.59,
+      "atExpected": false
+    },
+    {
+      "y": 449,
+      "bandAverage": 156.86,
+      "isWinner": false,
+      "rank": 4,
+      "deltaFromWinner": 1.12,
+      "atExpected": false
+    },
+    {
+      "y": 445,
+      "bandAverage": 157.86,
+      "isWinner": false,
+      "rank": 5,
+      "deltaFromWinner": 2.13,
+      "atExpected": false
+    },
+    {
+      "y": 450,
+      "bandAverage": 158.13,
+      "isWinner": false,
+      "rank": 6,
+      "deltaFromWinner": 2.39,
+      "atExpected": false
+    },
+    {
+      "y": 444,
+      "bandAverage": 159.31,
+      "isWinner": false,
+      "rank": 7,
+      "deltaFromWinner": 3.57,
+      "atExpected": false
+    },
+    {
+      "y": 451,
+      "bandAverage": 160.32,
+      "isWinner": false,
+      "rank": 8,
+      "deltaFromWinner": 4.59,
+      "atExpected": false
+    },
+    {
+      "y": 443,
+      "bandAverage": 161.11,
+      "isWinner": false,
+      "rank": 9,
+      "deltaFromWinner": 5.37,
+      "atExpected": false
+    },
+    {
+      "y": 452,
+      "bandAverage": 163.68,
+      "isWinner": false,
+      "rank": 10,
+      "deltaFromWinner": 7.94,
+      "atExpected": false
+    },
+    {
+      "y": 442,
+      "bandAverage": 163.7,
+      "isWinner": false,
+      "rank": 11,
+      "deltaFromWinner": 7.96,
+      "atExpected": false
+    },
+    {
+      "y": 453,
+      "bandAverage": 165.66,
+      "isWinner": false,
+      "rank": 12,
+      "deltaFromWinner": 9.92,
+      "atExpected": false
+    },
+    {
+      "y": 441,
+      "bandAverage": 166.41,
+      "isWinner": false,
+      "rank": 13,
+      "deltaFromWinner": 10.67,
+      "atExpected": false
+    },
+    {
+      "y": 454,
+      "bandAverage": 167.35,
+      "isWinner": false,
+      "rank": 14,
+      "deltaFromWinner": 11.61,
+      "atExpected": false
+    },
+    {
+      "y": 534,
+      "bandAverage": 167.53,
+      "isWinner": false,
+      "rank": 15,
+      "deltaFromWinner": 11.79,
+      "atExpected": false
+    },
+    {
+      "y": 535,
+      "bandAverage": 167.56,
+      "isWinner": false,
+      "rank": 16,
+      "deltaFromWinner": 11.82,
+      "atExpected": false
+    },
+    {
+      "y": 526,
+      "bandAverage": 167.63,
+      "isWinner": false,
+      "rank": 17,
+      "deltaFromWinner": 11.89,
+      "atExpected": false
+    },
+    {
+      "y": 533,
+      "bandAverage": 167.68,
+      "isWinner": false,
+      "rank": 18,
+      "deltaFromWinner": 11.94,
+      "atExpected": false
+    },
+    {
+      "y": 527,
+      "bandAverage": 167.79,
+      "isWinner": false,
+      "rank": 19,
+      "deltaFromWinner": 12.06,
+      "atExpected": false
+    },
+    {
+      "y": 532,
+      "bandAverage": 167.84,
+      "isWinner": false,
+      "rank": 20,
+      "deltaFromWinner": 12.11,
+      "atExpected": false
+    },
+    {
+      "y": 525,
+      "bandAverage": 167.96,
+      "isWinner": false,
+      "rank": 22,
+      "deltaFromWinner": 12.22,
+      "atExpected": false
+    },
+    {
+      "y": 528,
+      "bandAverage": 167.96,
+      "isWinner": false,
+      "rank": 21,
+      "deltaFromWinner": 12.22,
+      "atExpected": false
+    },
+    {
+      "y": 529,
+      "bandAverage": 167.98,
+      "isWinner": false,
+      "rank": 23,
+      "deltaFromWinner": 12.25,
+      "atExpected": false
+    },
+    {
+      "y": 530,
+      "bandAverage": 168.02,
+      "isWinner": false,
+      "rank": 25,
+      "deltaFromWinner": 12.29,
+      "atExpected": false
+    },
+    {
+      "y": 531,
+      "bandAverage": 168.02,
+      "isWinner": false,
+      "rank": 24,
+      "deltaFromWinner": 12.28,
+      "atExpected": false
+    },
+    {
+      "y": 536,
+      "bandAverage": 168.05,
+      "isWinner": false,
+      "rank": 26,
+      "deltaFromWinner": 12.31,
+      "atExpected": false
+    },
+    {
+      "y": 616,
+      "bandAverage": 168.69,
+      "isWinner": false,
+      "rank": 27,
+      "deltaFromWinner": 12.95,
+      "atExpected": false
+    },
+    {
+      "y": 524,
+      "bandAverage": 168.7,
+      "isWinner": false,
+      "rank": 28,
+      "deltaFromWinner": 12.96,
+      "atExpected": false
+    },
+    {
+      "y": 617,
+      "bandAverage": 168.74,
+      "isWinner": false,
+      "rank": 29,
+      "deltaFromWinner": 13.01,
+      "atExpected": false
+    },
+    {
+      "y": 440,
+      "bandAverage": 168.8,
+      "isWinner": false,
+      "rank": 30,
+      "deltaFromWinner": 13.07,
+      "atExpected": false
+    },
+    {
+      "y": 537,
+      "bandAverage": 168.9,
+      "isWinner": false,
+      "rank": 31,
+      "deltaFromWinner": 13.16,
+      "atExpected": false
+    },
+    {
+      "y": 607,
+      "bandAverage": 168.96,
+      "isWinner": false,
+      "rank": 32,
+      "deltaFromWinner": 13.22,
+      "atExpected": false
+    },
+    {
+      "y": 615,
+      "bandAverage": 169.04,
+      "isWinner": false,
+      "rank": 33,
+      "deltaFromWinner": 13.3,
+      "atExpected": false
+    },
+    {
+      "y": 608,
+      "bandAverage": 169.09,
+      "isWinner": false,
+      "rank": 34,
+      "deltaFromWinner": 13.36,
+      "atExpected": false
+    },
+    {
+      "y": 618,
+      "bandAverage": 169.17,
+      "isWinner": false,
+      "rank": 35,
+      "deltaFromWinner": 13.43,
+      "atExpected": false
+    },
+    {
+      "y": 614,
+      "bandAverage": 169.24,
+      "isWinner": false,
+      "rank": 36,
+      "deltaFromWinner": 13.5,
+      "atExpected": false
+    },
+    {
+      "y": 609,
+      "bandAverage": 169.25,
+      "isWinner": false,
+      "rank": 37,
+      "deltaFromWinner": 13.51,
+      "atExpected": false
+    },
+    {
+      "y": 606,
+      "bandAverage": 169.29,
+      "isWinner": false,
+      "rank": 38,
+      "deltaFromWinner": 13.55,
+      "atExpected": false
+    },
+    {
+      "y": 610,
+      "bandAverage": 169.29,
+      "isWinner": false,
+      "rank": 39,
+      "deltaFromWinner": 13.56,
+      "atExpected": false
+    },
+    {
+      "y": 455,
+      "bandAverage": 169.34,
+      "isWinner": false,
+      "rank": 40,
+      "deltaFromWinner": 13.61,
+      "atExpected": false
+    },
+    {
+      "y": 611,
+      "bandAverage": 169.39,
+      "isWinner": false,
+      "rank": 41,
+      "deltaFromWinner": 13.65,
+      "atExpected": false
+    },
+    {
+      "y": 613,
+      "bandAverage": 169.41,
+      "isWinner": false,
+      "rank": 42,
+      "deltaFromWinner": 13.67,
+      "atExpected": false
+    },
+    {
+      "y": 612,
+      "bandAverage": 169.52,
+      "isWinner": false,
+      "rank": 43,
+      "deltaFromWinner": 13.78,
+      "atExpected": false
+    },
+    {
+      "y": 523,
+      "bandAverage": 169.62,
+      "isWinner": false,
+      "rank": 44,
+      "deltaFromWinner": 13.88,
+      "atExpected": false
+    },
+    {
+      "y": 619,
+      "bandAverage": 169.63,
+      "isWinner": false,
+      "rank": 45,
+      "deltaFromWinner": 13.9,
+      "atExpected": false
+    },
+    {
+      "y": 605,
+      "bandAverage": 169.67,
+      "isWinner": false,
+      "rank": 46,
+      "deltaFromWinner": 13.93,
+      "atExpected": false
+    },
+    {
+      "y": 538,
+      "bandAverage": 169.81,
+      "isWinner": false,
+      "rank": 47,
+      "deltaFromWinner": 14.07,
+      "atExpected": false
+    },
+    {
+      "y": 604,
+      "bandAverage": 170.02,
+      "isWinner": false,
+      "rank": 48,
+      "deltaFromWinner": 14.29,
+      "atExpected": false
+    },
+    {
+      "y": 620,
+      "bandAverage": 170.13,
+      "isWinner": false,
+      "rank": 49,
+      "deltaFromWinner": 14.39,
+      "atExpected": false
+    },
+    {
+      "y": 603,
+      "bandAverage": 170.37,
+      "isWinner": false,
+      "rank": 50,
+      "deltaFromWinner": 14.63,
+      "atExpected": false
+    },
+    {
+      "y": 522,
+      "bandAverage": 170.59,
+      "isWinner": false,
+      "rank": 51,
+      "deltaFromWinner": 14.85,
+      "atExpected": false
+    },
+    {
+      "y": 539,
+      "bandAverage": 170.67,
+      "isWinner": false,
+      "rank": 52,
+      "deltaFromWinner": 14.93,
+      "atExpected": false
+    },
+    {
+      "y": 621,
+      "bandAverage": 170.68,
+      "isWinner": false,
+      "rank": 53,
+      "deltaFromWinner": 14.95,
+      "atExpected": false
+    },
+    {
+      "y": 602,
+      "bandAverage": 170.85,
+      "isWinner": false,
+      "rank": 54,
+      "deltaFromWinner": 15.11,
+      "atExpected": false
+    },
+    {
+      "y": 439,
+      "bandAverage": 171.23,
+      "isWinner": false,
+      "rank": 55,
+      "deltaFromWinner": 15.49,
+      "atExpected": false
+    },
+    {
+      "y": 503,
+      "bandAverage": 171.39,
+      "isWinner": false,
+      "rank": 56,
+      "deltaFromWinner": 15.65,
+      "atExpected": false
+    },
+    {
+      "y": 622,
+      "bandAverage": 171.4,
+      "isWinner": false,
+      "rank": 57,
+      "deltaFromWinner": 15.66,
+      "atExpected": false
+    },
+    {
+      "y": 601,
+      "bandAverage": 171.42,
+      "isWinner": false,
+      "rank": 58,
+      "deltaFromWinner": 15.69,
+      "atExpected": false
+    },
+    {
+      "y": 456,
+      "bandAverage": 171.52,
+      "isWinner": false,
+      "rank": 59,
+      "deltaFromWinner": 15.78,
+      "atExpected": false
+    },
+    {
+      "y": 502,
+      "bandAverage": 171.54,
+      "isWinner": false,
+      "rank": 60,
+      "deltaFromWinner": 15.8,
+      "atExpected": false
+    },
+    {
+      "y": 540,
+      "bandAverage": 171.56,
+      "isWinner": false,
+      "rank": 61,
+      "deltaFromWinner": 15.82,
+      "atExpected": false
+    },
+    {
+      "y": 521,
+      "bandAverage": 171.58,
+      "isWinner": false,
+      "rank": 62,
+      "deltaFromWinner": 15.84,
+      "atExpected": false
+    },
+    {
+      "y": 504,
+      "bandAverage": 171.66,
+      "isWinner": false,
+      "rank": 63,
+      "deltaFromWinner": 15.93,
+      "atExpected": false
+    },
+    {
+      "y": 494,
+      "bandAverage": 171.89,
+      "isWinner": false,
+      "rank": 65,
+      "deltaFromWinner": 16.16,
+      "atExpected": false
+    },
+    {
+      "y": 600,
+      "bandAverage": 171.89,
+      "isWinner": false,
+      "rank": 64,
+      "deltaFromWinner": 16.15,
+      "atExpected": false
+    },
+    {
+      "y": 505,
+      "bandAverage": 171.94,
+      "isWinner": false,
+      "rank": 66,
+      "deltaFromWinner": 16.21,
+      "atExpected": false
+    },
+    {
+      "y": 501,
+      "bandAverage": 171.97,
+      "isWinner": false,
+      "rank": 67,
+      "deltaFromWinner": 16.23,
+      "atExpected": false
+    },
+    {
+      "y": 623,
+      "bandAverage": 172.07,
+      "isWinner": false,
+      "rank": 68,
+      "deltaFromWinner": 16.33,
+      "atExpected": false
+    },
+    {
+      "y": 493,
+      "bandAverage": 172.23,
+      "isWinner": false,
+      "rank": 69,
+      "deltaFromWinner": 16.5,
+      "atExpected": false
+    },
+    {
+      "y": 495,
+      "bandAverage": 172.24,
+      "isWinner": false,
+      "rank": 70,
+      "deltaFromWinner": 16.51,
+      "atExpected": false
+    },
+    {
+      "y": 500,
+      "bandAverage": 172.3,
+      "isWinner": false,
+      "rank": 71,
+      "deltaFromWinner": 16.56,
+      "atExpected": false
+    },
+    {
+      "y": 506,
+      "bandAverage": 172.3,
+      "isWinner": false,
+      "rank": 72,
+      "deltaFromWinner": 16.56,
+      "atExpected": false
+    },
+    {
+      "y": 599,
+      "bandAverage": 172.33,
+      "isWinner": false,
+      "rank": 73,
+      "deltaFromWinner": 16.59,
+      "atExpected": false
+    },
+    {
+      "y": 520,
+      "bandAverage": 172.55,
+      "isWinner": false,
+      "rank": 74,
+      "deltaFromWinner": 16.82,
+      "atExpected": false
+    },
+    {
+      "y": 541,
+      "bandAverage": 172.58,
+      "isWinner": false,
+      "rank": 75,
+      "deltaFromWinner": 16.84,
+      "atExpected": false
+    },
+    {
+      "y": 499,
+      "bandAverage": 172.61,
+      "isWinner": false,
+      "rank": 76,
+      "deltaFromWinner": 16.88,
+      "atExpected": false
+    },
+    {
+      "y": 496,
+      "bandAverage": 172.71,
+      "isWinner": false,
+      "rank": 77,
+      "deltaFromWinner": 16.97,
+      "atExpected": false
+    },
+    {
+      "y": 498,
+      "bandAverage": 172.77,
+      "isWinner": false,
+      "rank": 78,
+      "deltaFromWinner": 17.03,
+      "atExpected": false
+    },
+    {
+      "y": 598,
+      "bandAverage": 172.77,
+      "isWinner": false,
+      "rank": 79,
+      "deltaFromWinner": 17.04,
+      "atExpected": false
+    },
+    {
+      "y": 497,
+      "bandAverage": 172.85,
+      "isWinner": false,
+      "rank": 80,
+      "deltaFromWinner": 17.11,
+      "atExpected": false
+    },
+    {
+      "y": 597,
+      "bandAverage": 172.87,
+      "isWinner": false,
+      "rank": 81,
+      "deltaFromWinner": 17.13,
+      "atExpected": false
+    },
+    {
+      "y": 507,
+      "bandAverage": 172.91,
+      "isWinner": false,
+      "rank": 82,
+      "deltaFromWinner": 17.17,
+      "atExpected": false
+    },
+    {
+      "y": 590,
+      "bandAverage": 172.92,
+      "isWinner": false,
+      "rank": 83,
+      "deltaFromWinner": 17.18,
+      "atExpected": false
+    },
+    {
+      "y": 492,
+      "bandAverage": 172.97,
+      "isWinner": false,
+      "rank": 84,
+      "deltaFromWinner": 17.23,
+      "atExpected": false
+    },
+    {
+      "y": 624,
+      "bandAverage": 172.99,
+      "isWinner": false,
+      "rank": 85,
+      "deltaFromWinner": 17.25,
+      "atExpected": false
+    },
+    {
+      "y": 596,
+      "bandAverage": 173.02,
+      "isWinner": false,
+      "rank": 86,
+      "deltaFromWinner": 17.29,
+      "atExpected": false
+    },
+    {
+      "y": 591,
+      "bandAverage": 173.07,
+      "isWinner": false,
+      "rank": 87,
+      "deltaFromWinner": 17.33,
+      "atExpected": false
+    },
+    {
+      "y": 595,
+      "bandAverage": 173.13,
+      "isWinner": false,
+      "rank": 88,
+      "deltaFromWinner": 17.39,
+      "atExpected": false
+    },
+    {
+      "y": 589,
+      "bandAverage": 173.19,
+      "isWinner": false,
+      "rank": 90,
+      "deltaFromWinner": 17.45,
+      "atExpected": false
+    },
+    {
+      "y": 594,
+      "bandAverage": 173.19,
+      "isWinner": false,
+      "rank": 89,
+      "deltaFromWinner": 17.45,
+      "atExpected": false
+    },
+    {
+      "y": 593,
+      "bandAverage": 173.31,
+      "isWinner": false,
+      "rank": 91,
+      "deltaFromWinner": 17.57,
+      "atExpected": false
+    },
+    {
+      "y": 592,
+      "bandAverage": 173.34,
+      "isWinner": false,
+      "rank": 92,
+      "deltaFromWinner": 17.6,
+      "atExpected": false
+    },
+    {
+      "y": 588,
+      "bandAverage": 173.48,
+      "isWinner": false,
+      "rank": 93,
+      "deltaFromWinner": 17.74,
+      "atExpected": false
+    },
+    {
+      "y": 519,
+      "bandAverage": 173.52,
+      "isWinner": false,
+      "rank": 94,
+      "deltaFromWinner": 17.78,
+      "atExpected": false
+    },
+    {
+      "y": 640,
+      "bandAverage": 173.54,
+      "isWinner": false,
+      "rank": 95,
+      "deltaFromWinner": 17.8,
+      "atExpected": false
+    },
+    {
+      "y": 508,
+      "bandAverage": 173.56,
+      "isWinner": false,
+      "rank": 96,
+      "deltaFromWinner": 17.82,
+      "atExpected": false
+    },
+    {
+      "y": 641,
+      "bandAverage": 173.59,
+      "isWinner": false,
+      "rank": 97,
+      "deltaFromWinner": 17.85,
+      "atExpected": false
+    },
+    {
+      "y": 642,
+      "bandAverage": 173.59,
+      "isWinner": false,
+      "rank": 98,
+      "deltaFromWinner": 17.85,
+      "atExpected": false
+    },
+    {
+      "y": 643,
+      "bandAverage": 173.6,
+      "isWinner": false,
+      "rank": 99,
+      "deltaFromWinner": 17.86,
+      "atExpected": false
+    },
+    {
+      "y": 637,
+      "bandAverage": 173.61,
+      "isWinner": false,
+      "rank": 100,
+      "deltaFromWinner": 17.88,
+      "atExpected": false
+    },
+    {
+      "y": 491,
+      "bandAverage": 173.62,
+      "isWinner": false,
+      "rank": 102,
+      "deltaFromWinner": 17.88,
+      "atExpected": false
+    },
+    {
+      "y": 650,
+      "bandAverage": 173.62,
+      "isWinner": false,
+      "rank": 101,
+      "deltaFromWinner": 17.88,
+      "atExpected": false
+    },
+    {
+      "y": 638,
+      "bandAverage": 173.63,
+      "isWinner": false,
+      "rank": 103,
+      "deltaFromWinner": 17.89,
+      "atExpected": false
+    },
+    {
+      "y": 438,
+      "bandAverage": 173.64,
+      "isWinner": false,
+      "rank": 104,
+      "deltaFromWinner": 17.9,
+      "atExpected": false
+    },
+    {
+      "y": 644,
+      "bandAverage": 173.64,
+      "isWinner": false,
+      "rank": 105,
+      "deltaFromWinner": 17.91,
+      "atExpected": false
+    },
+    {
+      "y": 649,
+      "bandAverage": 173.68,
+      "isWinner": false,
+      "rank": 106,
+      "deltaFromWinner": 17.95,
+      "atExpected": false
+    },
+    {
+      "y": 639,
+      "bandAverage": 173.7,
+      "isWinner": false,
+      "rank": 107,
+      "deltaFromWinner": 17.96,
+      "atExpected": false
+    },
+    {
+      "y": 651,
+      "bandAverage": 173.71,
+      "isWinner": false,
+      "rank": 108,
+      "deltaFromWinner": 17.97,
+      "atExpected": false
+    },
+    {
+      "y": 542,
+      "bandAverage": 173.72,
+      "isWinner": false,
+      "rank": 109,
+      "deltaFromWinner": 17.98,
+      "atExpected": false
+    },
+    {
+      "y": 587,
+      "bandAverage": 173.73,
+      "isWinner": false,
+      "rank": 110,
+      "deltaFromWinner": 17.99,
+      "atExpected": false
+    },
+    {
+      "y": 636,
+      "bandAverage": 173.74,
+      "isWinner": false,
+      "rank": 111,
+      "deltaFromWinner": 18,
+      "atExpected": false
+    },
+    {
+      "y": 645,
+      "bandAverage": 173.77,
+      "isWinner": false,
+      "rank": 112,
+      "deltaFromWinner": 18.04,
+      "atExpected": false
+    },
+    {
+      "y": 568,
+      "bandAverage": 173.79,
+      "isWinner": false,
+      "rank": 113,
+      "deltaFromWinner": 18.06,
+      "atExpected": false
+    },
+    {
+      "y": 648,
+      "bandAverage": 173.84,
+      "isWinner": false,
+      "rank": 114,
+      "deltaFromWinner": 18.1,
+      "atExpected": false
+    },
+    {
+      "y": 630,
+      "bandAverage": 173.86,
+      "isWinner": false,
+      "rank": 115,
+      "deltaFromWinner": 18.12,
+      "atExpected": false
+    },
+    {
+      "y": 646,
+      "bandAverage": 173.88,
+      "isWinner": false,
+      "rank": 116,
+      "deltaFromWinner": 18.15,
+      "atExpected": false
+    },
+    {
+      "y": 457,
+      "bandAverage": 173.9,
+      "isWinner": false,
+      "rank": 117,
+      "deltaFromWinner": 18.16,
+      "atExpected": false
+    },
+    {
+      "y": 635,
+      "bandAverage": 173.91,
+      "isWinner": false,
+      "rank": 118,
+      "deltaFromWinner": 18.17,
+      "atExpected": false
+    },
+    {
+      "y": 569,
+      "bandAverage": 173.93,
+      "isWinner": false,
+      "rank": 119,
+      "deltaFromWinner": 18.19,
+      "atExpected": false
+    },
+    {
+      "y": 647,
+      "bandAverage": 173.93,
+      "isWinner": false,
+      "rank": 120,
+      "deltaFromWinner": 18.2,
+      "atExpected": false
+    },
+    {
+      "y": 625,
+      "bandAverage": 173.95,
+      "isWinner": false,
+      "rank": 121,
+      "deltaFromWinner": 18.21,
+      "atExpected": false
+    },
+    {
+      "y": 631,
+      "bandAverage": 173.96,
+      "isWinner": false,
+      "rank": 122,
+      "deltaFromWinner": 18.22,
+      "atExpected": false
+    },
+    {
+      "y": 567,
+      "bandAverage": 173.97,
+      "isWinner": false,
+      "rank": 123,
+      "deltaFromWinner": 18.23,
+      "atExpected": false
+    },
+    {
+      "y": 559,
+      "bandAverage": 173.98,
+      "isWinner": false,
+      "rank": 124,
+      "deltaFromWinner": 18.24,
+      "atExpected": false
+    },
+    {
+      "y": 556,
+      "bandAverage": 173.99,
+      "isWinner": false,
+      "rank": 126,
+      "deltaFromWinner": 18.25,
+      "atExpected": false
+    },
+    {
+      "y": 652,
+      "bandAverage": 173.99,
+      "isWinner": false,
+      "rank": 125,
+      "deltaFromWinner": 18.25,
+      "atExpected": false
+    },
+    {
+      "y": 586,
+      "bandAverage": 174,
+      "isWinner": false,
+      "rank": 127,
+      "deltaFromWinner": 18.27,
+      "atExpected": false
+    },
+    {
+      "y": 629,
+      "bandAverage": 174.02,
+      "isWinner": false,
+      "rank": 128,
+      "deltaFromWinner": 18.29,
+      "atExpected": false
+    },
+    {
+      "y": 555,
+      "bandAverage": 174.04,
+      "isWinner": false,
+      "rank": 129,
+      "deltaFromWinner": 18.3,
+      "atExpected": false
+    },
+    {
+      "y": 558,
+      "bandAverage": 174.05,
+      "isWinner": false,
+      "rank": 130,
+      "deltaFromWinner": 18.31,
+      "atExpected": false
+    },
+    {
+      "y": 570,
+      "bandAverage": 174.06,
+      "isWinner": false,
+      "rank": 131,
+      "deltaFromWinner": 18.33,
+      "atExpected": false
+    },
+    {
+      "y": 557,
+      "bandAverage": 174.07,
+      "isWinner": false,
+      "rank": 132,
+      "deltaFromWinner": 18.33,
+      "atExpected": false
+    },
+    {
+      "y": 634,
+      "bandAverage": 174.11,
+      "isWinner": false,
+      "rank": 133,
+      "deltaFromWinner": 18.37,
+      "atExpected": false
+    },
+    {
+      "y": 560,
+      "bandAverage": 174.12,
+      "isWinner": false,
+      "rank": 135,
+      "deltaFromWinner": 18.39,
+      "atExpected": false
+    },
+    {
+      "y": 632,
+      "bandAverage": 174.12,
+      "isWinner": false,
+      "rank": 134,
+      "deltaFromWinner": 18.38,
+      "atExpected": false
+    },
+    {
+      "y": 561,
+      "bandAverage": 174.14,
+      "isWinner": false,
+      "rank": 136,
+      "deltaFromWinner": 18.41,
+      "atExpected": false
+    },
+    {
+      "y": 571,
+      "bandAverage": 174.15,
+      "isWinner": false,
+      "rank": 137,
+      "deltaFromWinner": 18.41,
+      "atExpected": false
+    },
+    {
+      "y": 633,
+      "bandAverage": 174.16,
+      "isWinner": false,
+      "rank": 138,
+      "deltaFromWinner": 18.42,
+      "atExpected": false
+    },
+    {
+      "y": 554,
+      "bandAverage": 174.2,
+      "isWinner": false,
+      "rank": 139,
+      "deltaFromWinner": 18.46,
+      "atExpected": false
+    },
+    {
+      "y": 562,
+      "bandAverage": 174.21,
+      "isWinner": false,
+      "rank": 140,
+      "deltaFromWinner": 18.47,
+      "atExpected": false
+    },
+    {
+      "y": 563,
+      "bandAverage": 174.23,
+      "isWinner": false,
+      "rank": 142,
+      "deltaFromWinner": 18.5,
+      "atExpected": false
+    },
+    {
+      "y": 628,
+      "bandAverage": 174.23,
+      "isWinner": false,
+      "rank": 141,
+      "deltaFromWinner": 18.5,
+      "atExpected": false
+    },
+    {
+      "y": 566,
+      "bandAverage": 174.25,
+      "isWinner": false,
+      "rank": 143,
+      "deltaFromWinner": 18.51,
+      "atExpected": false
+    },
+    {
+      "y": 564,
+      "bandAverage": 174.29,
+      "isWinner": false,
+      "rank": 144,
+      "deltaFromWinner": 18.55,
+      "atExpected": false
+    },
+    {
+      "y": 509,
+      "bandAverage": 174.34,
+      "isWinner": false,
+      "rank": 145,
+      "deltaFromWinner": 18.6,
+      "atExpected": false
+    },
+    {
+      "y": 490,
+      "bandAverage": 174.36,
+      "isWinner": false,
+      "rank": 146,
+      "deltaFromWinner": 18.63,
+      "atExpected": false
+    },
+    {
+      "y": 552,
+      "bandAverage": 174.37,
+      "isWinner": false,
+      "rank": 148,
+      "deltaFromWinner": 18.64,
+      "atExpected": false
+    },
+    {
+      "y": 565,
+      "bandAverage": 174.37,
+      "isWinner": false,
+      "rank": 150,
+      "deltaFromWinner": 18.64,
+      "atExpected": false
+    },
+    {
+      "y": 572,
+      "bandAverage": 174.37,
+      "isWinner": false,
+      "rank": 147,
+      "deltaFromWinner": 18.63,
+      "atExpected": false
+    },
+    {
+      "y": 585,
+      "bandAverage": 174.37,
+      "isWinner": false,
+      "rank": 149,
+      "deltaFromWinner": 18.64,
+      "atExpected": false
+    },
+    {
+      "y": 627,
+      "bandAverage": 174.39,
+      "isWinner": false,
+      "rank": 151,
+      "deltaFromWinner": 18.65,
+      "atExpected": false
+    },
+    {
+      "y": 553,
+      "bandAverage": 174.4,
+      "isWinner": false,
+      "rank": 152,
+      "deltaFromWinner": 18.66,
+      "atExpected": false
+    },
+    {
+      "y": 653,
+      "bandAverage": 174.4,
+      "isWinner": false,
+      "rank": 153,
+      "deltaFromWinner": 18.67,
+      "atExpected": false
+    },
+    {
+      "y": 626,
+      "bandAverage": 174.41,
+      "isWinner": false,
+      "rank": 154,
+      "deltaFromWinner": 18.68,
+      "atExpected": false
+    },
+    {
+      "y": 551,
+      "bandAverage": 174.48,
+      "isWinner": false,
+      "rank": 155,
+      "deltaFromWinner": 18.74,
+      "atExpected": false
+    },
+    {
+      "y": 573,
+      "bandAverage": 174.5,
+      "isWinner": false,
+      "rank": 156,
+      "deltaFromWinner": 18.76,
+      "atExpected": false
+    },
+    {
+      "y": 518,
+      "bandAverage": 174.51,
+      "isWinner": false,
+      "rank": 157,
+      "deltaFromWinner": 18.77,
+      "atExpected": false
+    },
+    {
+      "y": 584,
+      "bandAverage": 174.58,
+      "isWinner": false,
+      "rank": 158,
+      "deltaFromWinner": 18.84,
+      "atExpected": false
+    },
+    {
+      "y": 549,
+      "bandAverage": 174.61,
+      "isWinner": false,
+      "rank": 159,
+      "deltaFromWinner": 18.88,
+      "atExpected": false
+    },
+    {
+      "y": 574,
+      "bandAverage": 174.62,
+      "isWinner": false,
+      "rank": 160,
+      "deltaFromWinner": 18.88,
+      "atExpected": false
+    },
+    {
+      "y": 550,
+      "bandAverage": 174.66,
+      "isWinner": false,
+      "rank": 161,
+      "deltaFromWinner": 18.93,
+      "atExpected": false
+    },
+    {
+      "y": 583,
+      "bandAverage": 174.66,
+      "isWinner": false,
+      "rank": 162,
+      "deltaFromWinner": 18.93,
+      "atExpected": false
+    },
+    {
+      "y": 654,
+      "bandAverage": 174.69,
+      "isWinner": false,
+      "rank": 163,
+      "deltaFromWinner": 18.95,
+      "atExpected": false
+    },
+    {
+      "y": 548,
+      "bandAverage": 174.72,
+      "isWinner": false,
+      "rank": 164,
+      "deltaFromWinner": 18.98,
+      "atExpected": false
+    },
+    {
+      "y": 543,
+      "bandAverage": 174.91,
+      "isWinner": false,
+      "rank": 165,
+      "deltaFromWinner": 19.17,
+      "atExpected": false
+    },
+    {
+      "y": 575,
+      "bandAverage": 174.94,
+      "isWinner": false,
+      "rank": 166,
+      "deltaFromWinner": 19.2,
+      "atExpected": false
+    },
+    {
+      "y": 547,
+      "bandAverage": 174.97,
+      "isWinner": false,
+      "rank": 167,
+      "deltaFromWinner": 19.23,
+      "atExpected": false
+    },
+    {
+      "y": 582,
+      "bandAverage": 175.01,
+      "isWinner": false,
+      "rank": 168,
+      "deltaFromWinner": 19.28,
+      "atExpected": false
+    },
+    {
+      "y": 655,
+      "bandAverage": 175.02,
+      "isWinner": false,
+      "rank": 169,
+      "deltaFromWinner": 19.28,
+      "atExpected": false
+    },
+    {
+      "y": 671,
+      "bandAverage": 175.12,
+      "isWinner": false,
+      "rank": 170,
+      "deltaFromWinner": 19.38,
+      "atExpected": false
+    },
+    {
+      "y": 672,
+      "bandAverage": 175.14,
+      "isWinner": false,
+      "rank": 171,
+      "deltaFromWinner": 19.4,
+      "atExpected": false
+    },
+    {
+      "y": 510,
+      "bandAverage": 175.21,
+      "isWinner": false,
+      "rank": 173,
+      "deltaFromWinner": 19.48,
+      "atExpected": false
+    },
+    {
+      "y": 517,
+      "bandAverage": 175.21,
+      "isWinner": false,
+      "rank": 172,
+      "deltaFromWinner": 19.47,
+      "atExpected": false
+    },
+    {
+      "y": 546,
+      "bandAverage": 175.23,
+      "isWinner": false,
+      "rank": 174,
+      "deltaFromWinner": 19.49,
+      "atExpected": false
+    },
+    {
+      "y": 670,
+      "bandAverage": 175.29,
+      "isWinner": false,
+      "rank": 175,
+      "deltaFromWinner": 19.55,
+      "atExpected": false
+    },
+    {
+      "y": 576,
+      "bandAverage": 175.34,
+      "isWinner": false,
+      "rank": 176,
+      "deltaFromWinner": 19.61,
+      "atExpected": false
+    },
+    {
+      "y": 656,
+      "bandAverage": 175.37,
+      "isWinner": false,
+      "rank": 177,
+      "deltaFromWinner": 19.63,
+      "atExpected": false
+    },
+    {
+      "y": 581,
+      "bandAverage": 175.4,
+      "isWinner": false,
+      "rank": 178,
+      "deltaFromWinner": 19.66,
+      "atExpected": false
+    },
+    {
+      "y": 489,
+      "bandAverage": 175.41,
+      "isWinner": false,
+      "rank": 179,
+      "deltaFromWinner": 19.67,
+      "atExpected": false
+    },
+    {
+      "y": 545,
+      "bandAverage": 175.44,
+      "isWinner": false,
+      "rank": 180,
+      "deltaFromWinner": 19.7,
+      "atExpected": false
+    },
+    {
+      "y": 680,
+      "bandAverage": 175.46,
+      "isWinner": false,
+      "rank": 181,
+      "deltaFromWinner": 19.72,
+      "atExpected": false
+    },
+    {
+      "y": 580,
+      "bandAverage": 175.47,
+      "isWinner": false,
+      "rank": 183,
+      "deltaFromWinner": 19.74,
+      "atExpected": false
+    },
+    {
+      "y": 673,
+      "bandAverage": 175.47,
+      "isWinner": false,
+      "rank": 182,
+      "deltaFromWinner": 19.73,
+      "atExpected": false
+    },
+    {
+      "y": 544,
+      "bandAverage": 175.49,
+      "isWinner": false,
+      "rank": 184,
+      "deltaFromWinner": 19.76,
+      "atExpected": false
+    },
+    {
+      "y": 669,
+      "bandAverage": 175.49,
+      "isWinner": false,
+      "rank": 185,
+      "deltaFromWinner": 19.76,
+      "atExpected": false
+    },
+    {
+      "y": 579,
+      "bandAverage": 175.5,
+      "isWinner": false,
+      "rank": 186,
+      "deltaFromWinner": 19.76,
+      "atExpected": false
+    },
+    {
+      "y": 679,
+      "bandAverage": 175.53,
+      "isWinner": false,
+      "rank": 187,
+      "deltaFromWinner": 19.8,
+      "atExpected": false
+    },
+    {
+      "y": 578,
+      "bandAverage": 175.57,
+      "isWinner": false,
+      "rank": 188,
+      "deltaFromWinner": 19.83,
+      "atExpected": false
+    },
+    {
+      "y": 577,
+      "bandAverage": 175.64,
+      "isWinner": false,
+      "rank": 189,
+      "deltaFromWinner": 19.9,
+      "atExpected": false
+    },
+    {
+      "y": 668,
+      "bandAverage": 175.66,
+      "isWinner": false,
+      "rank": 190,
+      "deltaFromWinner": 19.92,
+      "atExpected": false
+    },
+    {
+      "y": 678,
+      "bandAverage": 175.67,
+      "isWinner": false,
+      "rank": 191,
+      "deltaFromWinner": 19.93,
+      "atExpected": false
+    },
+    {
+      "y": 674,
+      "bandAverage": 175.7,
+      "isWinner": false,
+      "rank": 192,
+      "deltaFromWinner": 19.97,
+      "atExpected": false
+    },
+    {
+      "y": 516,
+      "bandAverage": 175.72,
+      "isWinner": false,
+      "rank": 193,
+      "deltaFromWinner": 19.98,
+      "atExpected": false
+    },
+    {
+      "y": 677,
+      "bandAverage": 175.77,
+      "isWinner": false,
+      "rank": 194,
+      "deltaFromWinner": 20.03,
+      "atExpected": false
+    },
+    {
+      "y": 675,
+      "bandAverage": 175.78,
+      "isWinner": false,
+      "rank": 195,
+      "deltaFromWinner": 20.04,
+      "atExpected": false
+    },
+    {
+      "y": 676,
+      "bandAverage": 175.8,
+      "isWinner": false,
+      "rank": 196,
+      "deltaFromWinner": 20.06,
+      "atExpected": false
+    },
+    {
+      "y": 657,
+      "bandAverage": 175.86,
+      "isWinner": false,
+      "rank": 197,
+      "deltaFromWinner": 20.13,
+      "atExpected": false
+    },
+    {
+      "y": 667,
+      "bandAverage": 175.91,
+      "isWinner": false,
+      "rank": 198,
+      "deltaFromWinner": 20.17,
+      "atExpected": false
+    },
+    {
+      "y": 437,
+      "bandAverage": 176.1,
+      "isWinner": false,
+      "rank": 199,
+      "deltaFromWinner": 20.36,
+      "atExpected": false
+    },
+    {
+      "y": 515,
+      "bandAverage": 176.11,
+      "isWinner": false,
+      "rank": 200,
+      "deltaFromWinner": 20.38,
+      "atExpected": false
+    },
+    {
+      "y": 511,
+      "bandAverage": 176.2,
+      "isWinner": false,
+      "rank": 201,
+      "deltaFromWinner": 20.47,
+      "atExpected": false
+    },
+    {
+      "y": 666,
+      "bandAverage": 176.21,
+      "isWinner": false,
+      "rank": 202,
+      "deltaFromWinner": 20.47,
+      "atExpected": false
+    },
+    {
+      "y": 458,
+      "bandAverage": 176.22,
+      "isWinner": false,
+      "rank": 203,
+      "deltaFromWinner": 20.49,
+      "atExpected": false
+    },
+    {
+      "y": 665,
+      "bandAverage": 176.29,
+      "isWinner": false,
+      "rank": 204,
+      "deltaFromWinner": 20.56,
+      "atExpected": false
+    },
+    {
+      "y": 514,
+      "bandAverage": 176.38,
+      "isWinner": false,
+      "rank": 205,
+      "deltaFromWinner": 20.64,
+      "atExpected": false
+    },
+    {
+      "y": 658,
+      "bandAverage": 176.39,
+      "isWinner": false,
+      "rank": 206,
+      "deltaFromWinner": 20.66,
+      "atExpected": false
+    },
+    {
+      "y": 664,
+      "bandAverage": 176.41,
+      "isWinner": false,
+      "rank": 207,
+      "deltaFromWinner": 20.67,
+      "atExpected": false
+    },
+    {
+      "y": 488,
+      "bandAverage": 176.43,
+      "isWinner": false,
+      "rank": 208,
+      "deltaFromWinner": 20.69,
+      "atExpected": false
+    },
+    {
+      "y": 513,
+      "bandAverage": 176.6,
+      "isWinner": false,
+      "rank": 209,
+      "deltaFromWinner": 20.86,
+      "atExpected": false
+    },
+    {
+      "y": 659,
+      "bandAverage": 176.67,
+      "isWinner": false,
+      "rank": 210,
+      "deltaFromWinner": 20.94,
+      "atExpected": false
+    },
+    {
+      "y": 663,
+      "bandAverage": 176.73,
+      "isWinner": false,
+      "rank": 211,
+      "deltaFromWinner": 21,
+      "atExpected": false
+    },
+    {
+      "y": 512,
+      "bandAverage": 176.74,
+      "isWinner": false,
+      "rank": 212,
+      "deltaFromWinner": 21.01,
+      "atExpected": false
+    },
+    {
+      "y": 660,
+      "bandAverage": 176.8,
+      "isWinner": false,
+      "rank": 213,
+      "deltaFromWinner": 21.06,
+      "atExpected": false
+    },
+    {
+      "y": 661,
+      "bandAverage": 176.86,
+      "isWinner": false,
+      "rank": 214,
+      "deltaFromWinner": 21.12,
+      "atExpected": false
+    },
+    {
+      "y": 662,
+      "bandAverage": 176.91,
+      "isWinner": false,
+      "rank": 215,
+      "deltaFromWinner": 21.17,
+      "atExpected": false
+    },
+    {
+      "y": 487,
+      "bandAverage": 177.13,
+      "isWinner": false,
+      "rank": 216,
+      "deltaFromWinner": 21.39,
+      "atExpected": false
+    },
+    {
+      "y": 486,
+      "bandAverage": 177.99,
+      "isWinner": false,
+      "rank": 217,
+      "deltaFromWinner": 22.26,
+      "atExpected": false
+    },
+    {
+      "y": 459,
+      "bandAverage": 178.52,
+      "isWinner": false,
+      "rank": 218,
+      "deltaFromWinner": 22.78,
+      "atExpected": false
+    },
+    {
+      "y": 436,
+      "bandAverage": 178.55,
+      "isWinner": false,
+      "rank": 219,
+      "deltaFromWinner": 22.81,
+      "atExpected": false
+    },
+    {
+      "y": 485,
+      "bandAverage": 178.95,
+      "isWinner": false,
+      "rank": 220,
+      "deltaFromWinner": 23.22,
+      "atExpected": false
+    },
+    {
+      "y": 484,
+      "bandAverage": 179.52,
+      "isWinner": false,
+      "rank": 221,
+      "deltaFromWinner": 23.78,
+      "atExpected": false
+    },
+    {
+      "y": 483,
+      "bandAverage": 179.77,
+      "isWinner": false,
+      "rank": 222,
+      "deltaFromWinner": 24.04,
+      "atExpected": false
+    },
+    {
+      "y": 482,
+      "bandAverage": 180.05,
+      "isWinner": false,
+      "rank": 223,
+      "deltaFromWinner": 24.31,
+      "atExpected": false
+    },
+    {
+      "y": 481,
+      "bandAverage": 180.28,
+      "isWinner": false,
+      "rank": 224,
+      "deltaFromWinner": 24.54,
+      "atExpected": false
+    },
+    {
+      "y": 480,
+      "bandAverage": 180.49,
+      "isWinner": false,
+      "rank": 225,
+      "deltaFromWinner": 24.75,
+      "atExpected": false
+    },
+    {
+      "y": 479,
+      "bandAverage": 180.67,
+      "isWinner": false,
+      "rank": 226,
+      "deltaFromWinner": 24.93,
+      "atExpected": false
+    },
+    {
+      "y": 435,
+      "bandAverage": 180.71,
+      "isWinner": false,
+      "rank": 227,
+      "deltaFromWinner": 24.97,
+      "atExpected": false
+    },
+    {
+      "y": 460,
+      "bandAverage": 180.83,
+      "isWinner": false,
+      "rank": 228,
+      "deltaFromWinner": 25.1,
+      "atExpected": false
+    },
+    {
+      "y": 478,
+      "bandAverage": 181.08,
+      "isWinner": false,
+      "rank": 229,
+      "deltaFromWinner": 25.34,
+      "atExpected": false
+    },
+    {
+      "y": 477,
+      "bandAverage": 181.78,
+      "isWinner": false,
+      "rank": 230,
+      "deltaFromWinner": 26.04,
+      "atExpected": false
+    },
+    {
+      "y": 476,
+      "bandAverage": 182.4,
+      "isWinner": false,
+      "rank": 231,
+      "deltaFromWinner": 26.66,
+      "atExpected": false
+    },
+    {
+      "y": 461,
+      "bandAverage": 182.92,
+      "isWinner": false,
+      "rank": 232,
+      "deltaFromWinner": 27.19,
+      "atExpected": false
+    },
+    {
+      "y": 475,
+      "bandAverage": 182.99,
+      "isWinner": false,
+      "rank": 233,
+      "deltaFromWinner": 27.25,
+      "atExpected": false
+    },
+    {
+      "y": 434,
+      "bandAverage": 183.44,
+      "isWinner": false,
+      "rank": 234,
+      "deltaFromWinner": 27.71,
+      "atExpected": false
+    },
+    {
+      "y": 474,
+      "bandAverage": 183.62,
+      "isWinner": false,
+      "rank": 235,
+      "deltaFromWinner": 27.88,
+      "atExpected": false
+    },
+    {
+      "y": 473,
+      "bandAverage": 184.27,
+      "isWinner": false,
+      "rank": 236,
+      "deltaFromWinner": 28.53,
+      "atExpected": false
+    },
+    {
+      "y": 462,
+      "bandAverage": 184.61,
+      "isWinner": false,
+      "rank": 237,
+      "deltaFromWinner": 28.87,
+      "atExpected": false
+    },
+    {
+      "y": 472,
+      "bandAverage": 184.85,
+      "isWinner": false,
+      "rank": 238,
+      "deltaFromWinner": 29.12,
+      "atExpected": false
+    },
+    {
+      "y": 471,
+      "bandAverage": 185.19,
+      "isWinner": false,
+      "rank": 239,
+      "deltaFromWinner": 29.46,
+      "atExpected": false
+    },
+    {
+      "y": 470,
+      "bandAverage": 185.65,
+      "isWinner": false,
+      "rank": 240,
+      "deltaFromWinner": 29.91,
+      "atExpected": false
+    },
+    {
+      "y": 463,
+      "bandAverage": 185.86,
+      "isWinner": false,
+      "rank": 241,
+      "deltaFromWinner": 30.13,
+      "atExpected": false
+    },
+    {
+      "y": 469,
+      "bandAverage": 186.1,
+      "isWinner": false,
+      "rank": 242,
+      "deltaFromWinner": 30.37,
+      "atExpected": false
+    },
+    {
+      "y": 468,
+      "bandAverage": 186.31,
+      "isWinner": false,
+      "rank": 243,
+      "deltaFromWinner": 30.57,
+      "atExpected": false
+    },
+    {
+      "y": 467,
+      "bandAverage": 186.49,
+      "isWinner": false,
+      "rank": 244,
+      "deltaFromWinner": 30.76,
+      "atExpected": false
+    },
+    {
+      "y": 466,
+      "bandAverage": 186.75,
+      "isWinner": false,
+      "rank": 245,
+      "deltaFromWinner": 31.01,
+      "atExpected": false
+    },
+    {
+      "y": 464,
+      "bandAverage": 186.93,
+      "isWinner": false,
+      "rank": 246,
+      "deltaFromWinner": 31.2,
+      "atExpected": false
+    },
+    {
+      "y": 465,
+      "bandAverage": 187.15,
+      "isWinner": false,
+      "rank": 247,
+      "deltaFromWinner": 31.41,
+      "atExpected": false
+    },
+    {
+      "y": 433,
+      "bandAverage": 187.77,
+      "isWinner": false,
+      "rank": 248,
+      "deltaFromWinner": 32.04,
+      "atExpected": false
+    },
+    {
+      "y": 432,
+      "bandAverage": 191.09,
+      "isWinner": false,
+      "rank": 249,
+      "deltaFromWinner": 35.35,
+      "atExpected": false
+    },
+    {
+      "y": 168,
+      "bandAverage": 193.37,
+      "isWinner": false,
+      "rank": 250,
+      "deltaFromWinner": 37.64,
+      "atExpected": false
+    },
+    {
+      "y": 431,
+      "bandAverage": 193.47,
+      "isWinner": false,
+      "rank": 251,
+      "deltaFromWinner": 37.73,
+      "atExpected": false
+    },
+    {
+      "y": 172,
+      "bandAverage": 193.5,
+      "isWinner": false,
+      "rank": 252,
+      "deltaFromWinner": 37.77,
+      "atExpected": false
+    },
+    {
+      "y": 169,
+      "bandAverage": 193.61,
+      "isWinner": false,
+      "rank": 253,
+      "deltaFromWinner": 37.87,
+      "atExpected": false
+    },
+    {
+      "y": 173,
+      "bandAverage": 193.7,
+      "isWinner": false,
+      "rank": 254,
+      "deltaFromWinner": 37.96,
+      "atExpected": false
+    },
+    {
+      "y": 171,
+      "bandAverage": 193.78,
+      "isWinner": false,
+      "rank": 255,
+      "deltaFromWinner": 38.04,
+      "atExpected": false
+    },
+    {
+      "y": 167,
+      "bandAverage": 193.85,
+      "isWinner": false,
+      "rank": 256,
+      "deltaFromWinner": 38.11,
+      "atExpected": false
+    },
+    {
+      "y": 170,
+      "bandAverage": 193.87,
+      "isWinner": false,
+      "rank": 257,
+      "deltaFromWinner": 38.13,
+      "atExpected": false
+    },
+    {
+      "y": 156,
+      "bandAverage": 194.12,
+      "isWinner": false,
+      "rank": 258,
+      "deltaFromWinner": 38.38,
+      "atExpected": false
+    },
+    {
+      "y": 157,
+      "bandAverage": 194.31,
+      "isWinner": false,
+      "rank": 259,
+      "deltaFromWinner": 38.57,
+      "atExpected": false
+    },
+    {
+      "y": 174,
+      "bandAverage": 194.36,
+      "isWinner": false,
+      "rank": 260,
+      "deltaFromWinner": 38.62,
+      "atExpected": false
+    },
+    {
+      "y": 175,
+      "bandAverage": 194.76,
+      "isWinner": false,
+      "rank": 261,
+      "deltaFromWinner": 39.02,
+      "atExpected": false
+    },
+    {
+      "y": 166,
+      "bandAverage": 194.81,
+      "isWinner": false,
+      "rank": 262,
+      "deltaFromWinner": 39.08,
+      "atExpected": false
+    },
+    {
+      "y": 155,
+      "bandAverage": 194.83,
+      "isWinner": false,
+      "rank": 263,
+      "deltaFromWinner": 39.09,
+      "atExpected": false
+    },
+    {
+      "y": 176,
+      "bandAverage": 194.92,
+      "isWinner": false,
+      "rank": 264,
+      "deltaFromWinner": 39.18,
+      "atExpected": false
+    },
+    {
+      "y": 177,
+      "bandAverage": 195,
+      "isWinner": false,
+      "rank": 265,
+      "deltaFromWinner": 39.26,
+      "atExpected": false
+    },
+    {
+      "y": 158,
+      "bandAverage": 195.09,
+      "isWinner": false,
+      "rank": 266,
+      "deltaFromWinner": 39.36,
+      "atExpected": false
+    },
+    {
+      "y": 178,
+      "bandAverage": 195.14,
+      "isWinner": false,
+      "rank": 267,
+      "deltaFromWinner": 39.4,
+      "atExpected": false
+    },
+    {
+      "y": 179,
+      "bandAverage": 195.32,
+      "isWinner": false,
+      "rank": 268,
+      "deltaFromWinner": 39.59,
+      "atExpected": false
+    },
+    {
+      "y": 181,
+      "bandAverage": 195.35,
+      "isWinner": false,
+      "rank": 269,
+      "deltaFromWinner": 39.61,
+      "atExpected": false
+    },
+    {
+      "y": 430,
+      "bandAverage": 195.36,
+      "isWinner": false,
+      "rank": 270,
+      "deltaFromWinner": 39.62,
+      "atExpected": false
+    },
+    {
+      "y": 180,
+      "bandAverage": 195.37,
+      "isWinner": false,
+      "rank": 271,
+      "deltaFromWinner": 39.64,
+      "atExpected": false
+    },
+    {
+      "y": 182,
+      "bandAverage": 195.43,
+      "isWinner": false,
+      "rank": 272,
+      "deltaFromWinner": 39.7,
+      "atExpected": false
+    },
+    {
+      "y": 154,
+      "bandAverage": 195.47,
+      "isWinner": false,
+      "rank": 273,
+      "deltaFromWinner": 39.73,
+      "atExpected": false
+    },
+    {
+      "y": 165,
+      "bandAverage": 195.62,
+      "isWinner": false,
+      "rank": 274,
+      "deltaFromWinner": 39.89,
+      "atExpected": false
+    },
+    {
+      "y": 159,
+      "bandAverage": 195.75,
+      "isWinner": false,
+      "rank": 275,
+      "deltaFromWinner": 40.01,
+      "atExpected": false
+    },
+    {
+      "y": 183,
+      "bandAverage": 195.77,
+      "isWinner": false,
+      "rank": 276,
+      "deltaFromWinner": 40.04,
+      "atExpected": false
+    },
+    {
+      "y": 153,
+      "bandAverage": 195.86,
+      "isWinner": false,
+      "rank": 277,
+      "deltaFromWinner": 40.12,
+      "atExpected": false
+    },
+    {
+      "y": 164,
+      "bandAverage": 196.02,
+      "isWinner": false,
+      "rank": 278,
+      "deltaFromWinner": 40.29,
+      "atExpected": false
+    },
+    {
+      "y": 160,
+      "bandAverage": 196.21,
+      "isWinner": false,
+      "rank": 279,
+      "deltaFromWinner": 40.48,
+      "atExpected": false
+    },
+    {
+      "y": 184,
+      "bandAverage": 196.3,
+      "isWinner": false,
+      "rank": 280,
+      "deltaFromWinner": 40.57,
+      "atExpected": false
+    },
+    {
+      "y": 163,
+      "bandAverage": 196.37,
+      "isWinner": false,
+      "rank": 281,
+      "deltaFromWinner": 40.64,
+      "atExpected": false
+    },
+    {
+      "y": 188,
+      "bandAverage": 196.43,
+      "isWinner": false,
+      "rank": 282,
+      "deltaFromWinner": 40.69,
+      "atExpected": false
+    },
+    {
+      "y": 187,
+      "bandAverage": 196.51,
+      "isWinner": false,
+      "rank": 283,
+      "deltaFromWinner": 40.78,
+      "atExpected": false
+    },
+    {
+      "y": 152,
+      "bandAverage": 196.52,
+      "isWinner": false,
+      "rank": 284,
+      "deltaFromWinner": 40.78,
+      "atExpected": false
+    },
+    {
+      "y": 161,
+      "bandAverage": 196.58,
+      "isWinner": false,
+      "rank": 285,
+      "deltaFromWinner": 40.84,
+      "atExpected": false
+    },
+    {
+      "y": 189,
+      "bandAverage": 196.58,
+      "isWinner": false,
+      "rank": 286,
+      "deltaFromWinner": 40.84,
+      "atExpected": false
+    },
+    {
+      "y": 162,
+      "bandAverage": 196.65,
+      "isWinner": false,
+      "rank": 288,
+      "deltaFromWinner": 40.91,
+      "atExpected": false
+    },
+    {
+      "y": 185,
+      "bandAverage": 196.65,
+      "isWinner": false,
+      "rank": 287,
+      "deltaFromWinner": 40.91,
+      "atExpected": false
+    },
+    {
+      "y": 186,
+      "bandAverage": 196.69,
+      "isWinner": false,
+      "rank": 289,
+      "deltaFromWinner": 40.95,
+      "atExpected": false
+    },
+    {
+      "y": 429,
+      "bandAverage": 196.71,
+      "isWinner": false,
+      "rank": 290,
+      "deltaFromWinner": 40.97,
+      "atExpected": false
+    },
+    {
+      "y": 190,
+      "bandAverage": 196.95,
+      "isWinner": false,
+      "rank": 291,
+      "deltaFromWinner": 41.21,
+      "atExpected": false
+    },
+    {
+      "y": 199,
+      "bandAverage": 197.27,
+      "isWinner": false,
+      "rank": 292,
+      "deltaFromWinner": 41.54,
+      "atExpected": false
+    },
+    {
+      "y": 200,
+      "bandAverage": 197.33,
+      "isWinner": false,
+      "rank": 293,
+      "deltaFromWinner": 41.59,
+      "atExpected": false
+    },
+    {
+      "y": 198,
+      "bandAverage": 197.37,
+      "isWinner": false,
+      "rank": 294,
+      "deltaFromWinner": 41.64,
+      "atExpected": false
+    },
+    {
+      "y": 201,
+      "bandAverage": 197.43,
+      "isWinner": false,
+      "rank": 295,
+      "deltaFromWinner": 41.7,
+      "atExpected": false
+    },
+    {
+      "y": 191,
+      "bandAverage": 197.51,
+      "isWinner": false,
+      "rank": 296,
+      "deltaFromWinner": 41.78,
+      "atExpected": false
+    },
+    {
+      "y": 202,
+      "bandAverage": 197.6,
+      "isWinner": false,
+      "rank": 297,
+      "deltaFromWinner": 41.86,
+      "atExpected": false
+    },
+    {
+      "y": 197,
+      "bandAverage": 197.63,
+      "isWinner": false,
+      "rank": 298,
+      "deltaFromWinner": 41.89,
+      "atExpected": false
+    },
+    {
+      "y": 203,
+      "bandAverage": 197.73,
+      "isWinner": false,
+      "rank": 299,
+      "deltaFromWinner": 42,
+      "atExpected": false
+    },
+    {
+      "y": 428,
+      "bandAverage": 197.75,
+      "isWinner": false,
+      "rank": 300,
+      "deltaFromWinner": 42.01,
+      "atExpected": false
+    },
+    {
+      "y": 196,
+      "bandAverage": 197.86,
+      "isWinner": false,
+      "rank": 301,
+      "deltaFromWinner": 42.13,
+      "atExpected": false
+    },
+    {
+      "y": 195,
+      "bandAverage": 197.91,
+      "isWinner": false,
+      "rank": 302,
+      "deltaFromWinner": 42.18,
+      "atExpected": false
+    },
+    {
+      "y": 194,
+      "bandAverage": 197.94,
+      "isWinner": false,
+      "rank": 303,
+      "deltaFromWinner": 42.21,
+      "atExpected": false
+    },
+    {
+      "y": 192,
+      "bandAverage": 198.05,
+      "isWinner": false,
+      "rank": 304,
+      "deltaFromWinner": 42.31,
+      "atExpected": false
+    },
+    {
+      "y": 193,
+      "bandAverage": 198.1,
+      "isWinner": false,
+      "rank": 305,
+      "deltaFromWinner": 42.36,
+      "atExpected": false
+    },
+    {
+      "y": 204,
+      "bandAverage": 198.14,
+      "isWinner": false,
+      "rank": 306,
+      "deltaFromWinner": 42.4,
+      "atExpected": false
+    },
+    {
+      "y": 205,
+      "bandAverage": 198.58,
+      "isWinner": false,
+      "rank": 307,
+      "deltaFromWinner": 42.85,
+      "atExpected": false
+    },
+    {
+      "y": 427,
+      "bandAverage": 198.7,
+      "isWinner": false,
+      "rank": 308,
+      "deltaFromWinner": 42.96,
+      "atExpected": false
+    },
+    {
+      "y": 206,
+      "bandAverage": 199.01,
+      "isWinner": false,
+      "rank": 309,
+      "deltaFromWinner": 43.27,
+      "atExpected": false
+    },
+    {
+      "y": 219,
+      "bandAverage": 199.37,
+      "isWinner": false,
+      "rank": 310,
+      "deltaFromWinner": 43.64,
+      "atExpected": false
+    },
+    {
+      "y": 215,
+      "bandAverage": 199.41,
+      "isWinner": false,
+      "rank": 311,
+      "deltaFromWinner": 43.67,
+      "atExpected": false
+    },
+    {
+      "y": 216,
+      "bandAverage": 199.42,
+      "isWinner": false,
+      "rank": 312,
+      "deltaFromWinner": 43.68,
+      "atExpected": false
+    },
+    {
+      "y": 218,
+      "bandAverage": 199.44,
+      "isWinner": false,
+      "rank": 313,
+      "deltaFromWinner": 43.7,
+      "atExpected": false
+    },
+    {
+      "y": 217,
+      "bandAverage": 199.48,
+      "isWinner": false,
+      "rank": 314,
+      "deltaFromWinner": 43.74,
+      "atExpected": false
+    },
+    {
+      "y": 207,
+      "bandAverage": 199.5,
+      "isWinner": false,
+      "rank": 315,
+      "deltaFromWinner": 43.76,
+      "atExpected": false
+    },
+    {
+      "y": 214,
+      "bandAverage": 199.51,
+      "isWinner": false,
+      "rank": 316,
+      "deltaFromWinner": 43.78,
+      "atExpected": false
+    },
+    {
+      "y": 220,
+      "bandAverage": 199.62,
+      "isWinner": false,
+      "rank": 317,
+      "deltaFromWinner": 43.88,
+      "atExpected": false
+    },
+    {
+      "y": 213,
+      "bandAverage": 199.91,
+      "isWinner": false,
+      "rank": 318,
+      "deltaFromWinner": 44.17,
+      "atExpected": false
+    },
+    {
+      "y": 208,
+      "bandAverage": 199.94,
+      "isWinner": false,
+      "rank": 319,
+      "deltaFromWinner": 44.2,
+      "atExpected": false
+    },
+    {
+      "y": 426,
+      "bandAverage": 199.94,
+      "isWinner": false,
+      "rank": 320,
+      "deltaFromWinner": 44.2,
+      "atExpected": false
+    },
+    {
+      "y": 210,
+      "bandAverage": 200.01,
+      "isWinner": false,
+      "rank": 321,
+      "deltaFromWinner": 44.28,
+      "atExpected": false
+    },
+    {
+      "y": 211,
+      "bandAverage": 200.02,
+      "isWinner": false,
+      "rank": 322,
+      "deltaFromWinner": 44.29,
+      "atExpected": false
+    },
+    {
+      "y": 221,
+      "bandAverage": 200.07,
+      "isWinner": false,
+      "rank": 323,
+      "deltaFromWinner": 44.33,
+      "atExpected": false
+    },
+    {
+      "y": 212,
+      "bandAverage": 200.09,
+      "isWinner": false,
+      "rank": 324,
+      "deltaFromWinner": 44.36,
+      "atExpected": false
+    },
+    {
+      "y": 209,
+      "bandAverage": 200.11,
+      "isWinner": false,
+      "rank": 325,
+      "deltaFromWinner": 44.38,
+      "atExpected": false
+    },
+    {
+      "y": 222,
+      "bandAverage": 200.29,
+      "isWinner": false,
+      "rank": 326,
+      "deltaFromWinner": 44.55,
+      "atExpected": false
+    },
+    {
+      "y": 223,
+      "bandAverage": 201.19,
+      "isWinner": false,
+      "rank": 327,
+      "deltaFromWinner": 45.45,
+      "atExpected": false
+    },
+    {
+      "y": 425,
+      "bandAverage": 201.3,
+      "isWinner": false,
+      "rank": 328,
+      "deltaFromWinner": 45.56,
+      "atExpected": false
+    },
+    {
+      "y": 424,
+      "bandAverage": 202.1,
+      "isWinner": false,
+      "rank": 329,
+      "deltaFromWinner": 46.36,
+      "atExpected": false
+    },
+    {
+      "y": 224,
+      "bandAverage": 202.2,
+      "isWinner": false,
+      "rank": 330,
+      "deltaFromWinner": 46.46,
+      "atExpected": false
+    },
+    {
+      "y": 423,
+      "bandAverage": 202.8,
+      "isWinner": false,
+      "rank": 331,
+      "deltaFromWinner": 47.06,
+      "atExpected": false
+    },
+    {
+      "y": 225,
+      "bandAverage": 202.92,
+      "isWinner": false,
+      "rank": 332,
+      "deltaFromWinner": 47.19,
+      "atExpected": false
+    },
+    {
+      "y": 226,
+      "bandAverage": 203.49,
+      "isWinner": false,
+      "rank": 333,
+      "deltaFromWinner": 47.76,
+      "atExpected": false
+    },
+    {
+      "y": 422,
+      "bandAverage": 203.8,
+      "isWinner": false,
+      "rank": 334,
+      "deltaFromWinner": 48.06,
+      "atExpected": false
+    },
+    {
+      "y": 227,
+      "bandAverage": 203.99,
+      "isWinner": false,
+      "rank": 335,
+      "deltaFromWinner": 48.25,
+      "atExpected": false
+    },
+    {
+      "y": 228,
+      "bandAverage": 204.46,
+      "isWinner": false,
+      "rank": 336,
+      "deltaFromWinner": 48.73,
+      "atExpected": false
+    },
+    {
+      "y": 229,
+      "bandAverage": 204.78,
+      "isWinner": false,
+      "rank": 337,
+      "deltaFromWinner": 49.05,
+      "atExpected": false
+    },
+    {
+      "y": 421,
+      "bandAverage": 204.81,
+      "isWinner": false,
+      "rank": 338,
+      "deltaFromWinner": 49.08,
+      "atExpected": false
+    },
+    {
+      "y": 230,
+      "bandAverage": 205.39,
+      "isWinner": false,
+      "rank": 339,
+      "deltaFromWinner": 49.66,
+      "atExpected": false
+    },
+    {
+      "y": 408,
+      "bandAverage": 205.7,
+      "isWinner": false,
+      "rank": 340,
+      "deltaFromWinner": 49.97,
+      "atExpected": false
+    },
+    {
+      "y": 407,
+      "bandAverage": 205.79,
+      "isWinner": false,
+      "rank": 341,
+      "deltaFromWinner": 50.05,
+      "atExpected": false
+    },
+    {
+      "y": 420,
+      "bandAverage": 205.89,
+      "isWinner": false,
+      "rank": 342,
+      "deltaFromWinner": 50.16,
+      "atExpected": false
+    },
+    {
+      "y": 409,
+      "bandAverage": 206.08,
+      "isWinner": false,
+      "rank": 343,
+      "deltaFromWinner": 50.34,
+      "atExpected": false
+    },
+    {
+      "y": 406,
+      "bandAverage": 206.11,
+      "isWinner": false,
+      "rank": 344,
+      "deltaFromWinner": 50.37,
+      "atExpected": false
+    },
+    {
+      "y": 231,
+      "bandAverage": 206.3,
+      "isWinner": false,
+      "rank": 345,
+      "deltaFromWinner": 50.56,
+      "atExpected": false
+    },
+    {
+      "y": 410,
+      "bandAverage": 206.58,
+      "isWinner": false,
+      "rank": 346,
+      "deltaFromWinner": 50.85,
+      "atExpected": false
+    },
+    {
+      "y": 405,
+      "bandAverage": 206.63,
+      "isWinner": false,
+      "rank": 347,
+      "deltaFromWinner": 50.9,
+      "atExpected": false
+    },
+    {
+      "y": 399,
+      "bandAverage": 206.65,
+      "isWinner": false,
+      "rank": 348,
+      "deltaFromWinner": 50.91,
+      "atExpected": false
+    },
+    {
+      "y": 419,
+      "bandAverage": 206.66,
+      "isWinner": false,
+      "rank": 349,
+      "deltaFromWinner": 50.93,
+      "atExpected": false
+    },
+    {
+      "y": 400,
+      "bandAverage": 206.72,
+      "isWinner": false,
+      "rank": 350,
+      "deltaFromWinner": 50.98,
+      "atExpected": false
+    },
+    {
+      "y": 401,
+      "bandAverage": 206.88,
+      "isWinner": false,
+      "rank": 351,
+      "deltaFromWinner": 51.14,
+      "atExpected": false
+    },
+    {
+      "y": 411,
+      "bandAverage": 206.91,
+      "isWinner": false,
+      "rank": 352,
+      "deltaFromWinner": 51.18,
+      "atExpected": false
+    },
+    {
+      "y": 398,
+      "bandAverage": 207.01,
+      "isWinner": false,
+      "rank": 353,
+      "deltaFromWinner": 51.27,
+      "atExpected": false
+    },
+    {
+      "y": 397,
+      "bandAverage": 207.15,
+      "isWinner": false,
+      "rank": 354,
+      "deltaFromWinner": 51.41,
+      "atExpected": false
+    },
+    {
+      "y": 396,
+      "bandAverage": 207.21,
+      "isWinner": false,
+      "rank": 355,
+      "deltaFromWinner": 51.47,
+      "atExpected": false
+    },
+    {
+      "y": 404,
+      "bandAverage": 207.25,
+      "isWinner": false,
+      "rank": 356,
+      "deltaFromWinner": 51.51,
+      "atExpected": false
+    },
+    {
+      "y": 232,
+      "bandAverage": 207.28,
+      "isWinner": false,
+      "rank": 357,
+      "deltaFromWinner": 51.54,
+      "atExpected": false
+    },
+    {
+      "y": 412,
+      "bandAverage": 207.28,
+      "isWinner": false,
+      "rank": 358,
+      "deltaFromWinner": 51.54,
+      "atExpected": false
+    },
+    {
+      "y": 418,
+      "bandAverage": 207.36,
+      "isWinner": false,
+      "rank": 359,
+      "deltaFromWinner": 51.63,
+      "atExpected": false
+    },
+    {
+      "y": 395,
+      "bandAverage": 207.52,
+      "isWinner": false,
+      "rank": 360,
+      "deltaFromWinner": 51.78,
+      "atExpected": false
+    },
+    {
+      "y": 402,
+      "bandAverage": 207.61,
+      "isWinner": false,
+      "rank": 361,
+      "deltaFromWinner": 51.87,
+      "atExpected": false
+    },
+    {
+      "y": 413,
+      "bandAverage": 207.66,
+      "isWinner": false,
+      "rank": 362,
+      "deltaFromWinner": 51.92,
+      "atExpected": false
+    },
+    {
+      "y": 394,
+      "bandAverage": 207.7,
+      "isWinner": false,
+      "rank": 363,
+      "deltaFromWinner": 51.97,
+      "atExpected": false
+    },
+    {
+      "y": 403,
+      "bandAverage": 207.86,
+      "isWinner": false,
+      "rank": 364,
+      "deltaFromWinner": 52.12,
+      "atExpected": false
+    },
+    {
+      "y": 393,
+      "bandAverage": 207.92,
+      "isWinner": false,
+      "rank": 365,
+      "deltaFromWinner": 52.18,
+      "atExpected": false
+    },
+    {
+      "y": 414,
+      "bandAverage": 207.94,
+      "isWinner": false,
+      "rank": 366,
+      "deltaFromWinner": 52.2,
+      "atExpected": false
+    },
+    {
+      "y": 233,
+      "bandAverage": 208.1,
+      "isWinner": false,
+      "rank": 367,
+      "deltaFromWinner": 52.37,
+      "atExpected": false
+    },
+    {
+      "y": 392,
+      "bandAverage": 208.13,
+      "isWinner": false,
+      "rank": 369,
+      "deltaFromWinner": 52.39,
+      "atExpected": false
+    },
+    {
+      "y": 415,
+      "bandAverage": 208.13,
+      "isWinner": false,
+      "rank": 368,
+      "deltaFromWinner": 52.39,
+      "atExpected": false
+    },
+    {
+      "y": 417,
+      "bandAverage": 208.14,
+      "isWinner": false,
+      "rank": 370,
+      "deltaFromWinner": 52.41,
+      "atExpected": false
+    },
+    {
+      "y": 416,
+      "bandAverage": 208.29,
+      "isWinner": false,
+      "rank": 371,
+      "deltaFromWinner": 52.55,
+      "atExpected": false
+    },
+    {
+      "y": 391,
+      "bandAverage": 208.45,
+      "isWinner": false,
+      "rank": 372,
+      "deltaFromWinner": 52.71,
+      "atExpected": false
+    },
+    {
+      "y": 387,
+      "bandAverage": 208.56,
+      "isWinner": false,
+      "rank": 373,
+      "deltaFromWinner": 52.82,
+      "atExpected": false
+    },
+    {
+      "y": 388,
+      "bandAverage": 208.56,
+      "isWinner": false,
+      "rank": 374,
+      "deltaFromWinner": 52.82,
+      "atExpected": false
+    },
+    {
+      "y": 386,
+      "bandAverage": 208.61,
+      "isWinner": false,
+      "rank": 375,
+      "deltaFromWinner": 52.87,
+      "atExpected": false
+    },
+    {
+      "y": 385,
+      "bandAverage": 208.68,
+      "isWinner": false,
+      "rank": 376,
+      "deltaFromWinner": 52.95,
+      "atExpected": false
+    },
+    {
+      "y": 389,
+      "bandAverage": 208.76,
+      "isWinner": false,
+      "rank": 377,
+      "deltaFromWinner": 53.02,
+      "atExpected": false
+    },
+    {
+      "y": 390,
+      "bandAverage": 208.82,
+      "isWinner": false,
+      "rank": 378,
+      "deltaFromWinner": 53.08,
+      "atExpected": false
+    },
+    {
+      "y": 234,
+      "bandAverage": 208.92,
+      "isWinner": false,
+      "rank": 379,
+      "deltaFromWinner": 53.18,
+      "atExpected": false
+    },
+    {
+      "y": 235,
+      "bandAverage": 209.55,
+      "isWinner": false,
+      "rank": 380,
+      "deltaFromWinner": 53.81,
+      "atExpected": false
+    },
+    {
+      "y": 384,
+      "bandAverage": 209.72,
+      "isWinner": false,
+      "rank": 381,
+      "deltaFromWinner": 53.99,
+      "atExpected": false
+    },
+    {
+      "y": 236,
+      "bandAverage": 210.05,
+      "isWinner": false,
+      "rank": 382,
+      "deltaFromWinner": 54.31,
+      "atExpected": false
+    },
+    {
+      "y": 246,
+      "bandAverage": 210.21,
+      "isWinner": false,
+      "rank": 383,
+      "deltaFromWinner": 54.48,
+      "atExpected": false
+    },
+    {
+      "y": 248,
+      "bandAverage": 210.24,
+      "isWinner": false,
+      "rank": 385,
+      "deltaFromWinner": 54.5,
+      "atExpected": false
+    },
+    {
+      "y": 381,
+      "bandAverage": 210.24,
+      "isWinner": false,
+      "rank": 384,
+      "deltaFromWinner": 54.5,
+      "atExpected": false
+    },
+    {
+      "y": 247,
+      "bandAverage": 210.25,
+      "isWinner": false,
+      "rank": 386,
+      "deltaFromWinner": 54.51,
+      "atExpected": false
+    },
+    {
+      "y": 245,
+      "bandAverage": 210.26,
+      "isWinner": false,
+      "rank": 387,
+      "deltaFromWinner": 54.52,
+      "atExpected": false
+    },
+    {
+      "y": 380,
+      "bandAverage": 210.3,
+      "isWinner": false,
+      "rank": 388,
+      "deltaFromWinner": 54.56,
+      "atExpected": false
+    },
+    {
+      "y": 244,
+      "bandAverage": 210.35,
+      "isWinner": false,
+      "rank": 389,
+      "deltaFromWinner": 54.61,
+      "atExpected": false
+    },
+    {
+      "y": 249,
+      "bandAverage": 210.38,
+      "isWinner": false,
+      "rank": 390,
+      "deltaFromWinner": 54.65,
+      "atExpected": false
+    },
+    {
+      "y": 243,
+      "bandAverage": 210.43,
+      "isWinner": false,
+      "rank": 391,
+      "deltaFromWinner": 54.69,
+      "atExpected": false
+    },
+    {
+      "y": 237,
+      "bandAverage": 210.45,
+      "isWinner": false,
+      "rank": 392,
+      "deltaFromWinner": 54.71,
+      "atExpected": false
+    },
+    {
+      "y": 250,
+      "bandAverage": 210.62,
+      "isWinner": false,
+      "rank": 393,
+      "deltaFromWinner": 54.88,
+      "atExpected": false
+    },
+    {
+      "y": 379,
+      "bandAverage": 210.63,
+      "isWinner": false,
+      "rank": 394,
+      "deltaFromWinner": 54.89,
+      "atExpected": false
+    },
+    {
+      "y": 382,
+      "bandAverage": 210.7,
+      "isWinner": false,
+      "rank": 395,
+      "deltaFromWinner": 54.96,
+      "atExpected": false
+    },
+    {
+      "y": 242,
+      "bandAverage": 210.71,
+      "isWinner": false,
+      "rank": 396,
+      "deltaFromWinner": 54.97,
+      "atExpected": false
+    },
+    {
+      "y": 251,
+      "bandAverage": 210.9,
+      "isWinner": false,
+      "rank": 397,
+      "deltaFromWinner": 55.16,
+      "atExpected": false
+    },
+    {
+      "y": 238,
+      "bandAverage": 210.95,
+      "isWinner": false,
+      "rank": 398,
+      "deltaFromWinner": 55.21,
+      "atExpected": false
+    },
+    {
+      "y": 378,
+      "bandAverage": 211,
+      "isWinner": false,
+      "rank": 399,
+      "deltaFromWinner": 55.26,
+      "atExpected": false
+    },
+    {
+      "y": 366,
+      "bandAverage": 211.08,
+      "isWinner": false,
+      "rank": 401,
+      "deltaFromWinner": 55.35,
+      "atExpected": false
+    },
+    {
+      "y": 383,
+      "bandAverage": 211.08,
+      "isWinner": false,
+      "rank": 400,
+      "deltaFromWinner": 55.34,
+      "atExpected": false
+    },
+    {
+      "y": 367,
+      "bandAverage": 211.11,
+      "isWinner": false,
+      "rank": 402,
+      "deltaFromWinner": 55.37,
+      "atExpected": false
+    },
+    {
+      "y": 252,
+      "bandAverage": 211.21,
+      "isWinner": false,
+      "rank": 403,
+      "deltaFromWinner": 55.47,
+      "atExpected": false
+    },
+    {
+      "y": 241,
+      "bandAverage": 211.25,
+      "isWinner": false,
+      "rank": 404,
+      "deltaFromWinner": 55.51,
+      "atExpected": false
+    },
+    {
+      "y": 377,
+      "bandAverage": 211.26,
+      "isWinner": false,
+      "rank": 405,
+      "deltaFromWinner": 55.52,
+      "atExpected": false
+    },
+    {
+      "y": 368,
+      "bandAverage": 211.28,
+      "isWinner": false,
+      "rank": 406,
+      "deltaFromWinner": 55.54,
+      "atExpected": false
+    },
+    {
+      "y": 365,
+      "bandAverage": 211.29,
+      "isWinner": false,
+      "rank": 407,
+      "deltaFromWinner": 55.55,
+      "atExpected": false
+    },
+    {
+      "y": 239,
+      "bandAverage": 211.39,
+      "isWinner": false,
+      "rank": 408,
+      "deltaFromWinner": 55.65,
+      "atExpected": false
+    },
+    {
+      "y": 369,
+      "bandAverage": 211.46,
+      "isWinner": false,
+      "rank": 409,
+      "deltaFromWinner": 55.73,
+      "atExpected": false
+    },
+    {
+      "y": 370,
+      "bandAverage": 211.6,
+      "isWinner": false,
+      "rank": 410,
+      "deltaFromWinner": 55.86,
+      "atExpected": false
+    },
+    {
+      "y": 253,
+      "bandAverage": 211.63,
+      "isWinner": false,
+      "rank": 411,
+      "deltaFromWinner": 55.9,
+      "atExpected": false
+    },
+    {
+      "y": 240,
+      "bandAverage": 211.67,
+      "isWinner": false,
+      "rank": 412,
+      "deltaFromWinner": 55.94,
+      "atExpected": false
+    },
+    {
+      "y": 376,
+      "bandAverage": 211.76,
+      "isWinner": false,
+      "rank": 413,
+      "deltaFromWinner": 56.02,
+      "atExpected": false
+    },
+    {
+      "y": 375,
+      "bandAverage": 211.79,
+      "isWinner": false,
+      "rank": 414,
+      "deltaFromWinner": 56.06,
+      "atExpected": false
+    },
+    {
+      "y": 371,
+      "bandAverage": 211.82,
+      "isWinner": false,
+      "rank": 415,
+      "deltaFromWinner": 56.08,
+      "atExpected": false
+    },
+    {
+      "y": 374,
+      "bandAverage": 211.84,
+      "isWinner": false,
+      "rank": 416,
+      "deltaFromWinner": 56.1,
+      "atExpected": false
+    },
+    {
+      "y": 372,
+      "bandAverage": 211.98,
+      "isWinner": false,
+      "rank": 417,
+      "deltaFromWinner": 56.24,
+      "atExpected": false
+    },
+    {
+      "y": 373,
+      "bandAverage": 212.02,
+      "isWinner": false,
+      "rank": 418,
+      "deltaFromWinner": 56.28,
+      "atExpected": false
+    },
+    {
+      "y": 254,
+      "bandAverage": 212.18,
+      "isWinner": false,
+      "rank": 419,
+      "deltaFromWinner": 56.44,
+      "atExpected": false
+    },
+    {
+      "y": 364,
+      "bandAverage": 212.56,
+      "isWinner": false,
+      "rank": 420,
+      "deltaFromWinner": 56.83,
+      "atExpected": false
+    },
+    {
+      "y": 255,
+      "bandAverage": 212.75,
+      "isWinner": false,
+      "rank": 421,
+      "deltaFromWinner": 57.01,
+      "atExpected": false
+    },
+    {
+      "y": 256,
+      "bandAverage": 213.11,
+      "isWinner": false,
+      "rank": 422,
+      "deltaFromWinner": 57.37,
+      "atExpected": false
+    },
+    {
+      "y": 257,
+      "bandAverage": 213.48,
+      "isWinner": false,
+      "rank": 423,
+      "deltaFromWinner": 57.74,
+      "atExpected": false
+    },
+    {
+      "y": 363,
+      "bandAverage": 213.73,
+      "isWinner": false,
+      "rank": 424,
+      "deltaFromWinner": 58,
+      "atExpected": false
+    },
+    {
+      "y": 258,
+      "bandAverage": 214.17,
+      "isWinner": false,
+      "rank": 425,
+      "deltaFromWinner": 58.43,
+      "atExpected": false
+    },
+    {
+      "y": 362,
+      "bandAverage": 214.3,
+      "isWinner": false,
+      "rank": 426,
+      "deltaFromWinner": 58.56,
+      "atExpected": false
+    },
+    {
+      "y": 361,
+      "bandAverage": 214.89,
+      "isWinner": false,
+      "rank": 427,
+      "deltaFromWinner": 59.16,
+      "atExpected": false
+    },
+    {
+      "y": 259,
+      "bandAverage": 214.93,
+      "isWinner": false,
+      "rank": 428,
+      "deltaFromWinner": 59.2,
+      "atExpected": false
+    },
+    {
+      "y": 275,
+      "bandAverage": 215.19,
+      "isWinner": false,
+      "rank": 429,
+      "deltaFromWinner": 59.45,
+      "atExpected": false
+    },
+    {
+      "y": 274,
+      "bandAverage": 215.27,
+      "isWinner": false,
+      "rank": 430,
+      "deltaFromWinner": 59.53,
+      "atExpected": false
+    },
+    {
+      "y": 360,
+      "bandAverage": 215.41,
+      "isWinner": false,
+      "rank": 431,
+      "deltaFromWinner": 59.67,
+      "atExpected": false
+    },
+    {
+      "y": 276,
+      "bandAverage": 215.58,
+      "isWinner": false,
+      "rank": 432,
+      "deltaFromWinner": 59.85,
+      "atExpected": false
+    },
+    {
+      "y": 273,
+      "bandAverage": 215.63,
+      "isWinner": false,
+      "rank": 433,
+      "deltaFromWinner": 59.89,
+      "atExpected": false
+    },
+    {
+      "y": 260,
+      "bandAverage": 215.73,
+      "isWinner": false,
+      "rank": 434,
+      "deltaFromWinner": 59.99,
+      "atExpected": false
+    },
+    {
+      "y": 359,
+      "bandAverage": 215.81,
+      "isWinner": false,
+      "rank": 435,
+      "deltaFromWinner": 60.07,
+      "atExpected": false
+    },
+    {
+      "y": 277,
+      "bandAverage": 215.91,
+      "isWinner": false,
+      "rank": 436,
+      "deltaFromWinner": 60.18,
+      "atExpected": false
+    },
+    {
+      "y": 272,
+      "bandAverage": 215.97,
+      "isWinner": false,
+      "rank": 437,
+      "deltaFromWinner": 60.23,
+      "atExpected": false
+    },
+    {
+      "y": 358,
+      "bandAverage": 216.13,
+      "isWinner": false,
+      "rank": 438,
+      "deltaFromWinner": 60.39,
+      "atExpected": false
+    },
+    {
+      "y": 278,
+      "bandAverage": 216.2,
+      "isWinner": false,
+      "rank": 439,
+      "deltaFromWinner": 60.46,
+      "atExpected": true
+    },
+    {
+      "y": 261,
+      "bandAverage": 216.42,
+      "isWinner": false,
+      "rank": 440,
+      "deltaFromWinner": 60.69,
+      "atExpected": false
+    },
+    {
+      "y": 271,
+      "bandAverage": 216.45,
+      "isWinner": false,
+      "rank": 441,
+      "deltaFromWinner": 60.71,
+      "atExpected": false
+    },
+    {
+      "y": 279,
+      "bandAverage": 216.5,
+      "isWinner": false,
+      "rank": 442,
+      "deltaFromWinner": 60.77,
+      "atExpected": true
+    },
+    {
+      "y": 357,
+      "bandAverage": 216.83,
+      "isWinner": false,
+      "rank": 443,
+      "deltaFromWinner": 61.09,
+      "atExpected": false
+    },
+    {
+      "y": 280,
+      "bandAverage": 216.88,
+      "isWinner": false,
+      "rank": 444,
+      "deltaFromWinner": 61.14,
+      "atExpected": true
+    },
+    {
+      "y": 262,
+      "bandAverage": 216.89,
+      "isWinner": false,
+      "rank": 445,
+      "deltaFromWinner": 61.15,
+      "atExpected": false
+    },
+    {
+      "y": 270,
+      "bandAverage": 216.89,
+      "isWinner": false,
+      "rank": 446,
+      "deltaFromWinner": 61.16,
+      "atExpected": false
+    },
+    {
+      "y": 281,
+      "bandAverage": 217.18,
+      "isWinner": false,
+      "rank": 447,
+      "deltaFromWinner": 61.44,
+      "atExpected": true
+    },
+    {
+      "y": 263,
+      "bandAverage": 217.28,
+      "isWinner": false,
+      "rank": 448,
+      "deltaFromWinner": 61.54,
+      "atExpected": false
+    },
+    {
+      "y": 282,
+      "bandAverage": 217.35,
+      "isWinner": false,
+      "rank": 449,
+      "deltaFromWinner": 61.61,
+      "atExpected": true
+    },
+    {
+      "y": 269,
+      "bandAverage": 217.44,
+      "isWinner": false,
+      "rank": 450,
+      "deltaFromWinner": 61.7,
+      "atExpected": false
+    },
+    {
+      "y": 283,
+      "bandAverage": 217.45,
+      "isWinner": false,
+      "rank": 451,
+      "deltaFromWinner": 61.71,
+      "atExpected": false
+    },
+    {
+      "y": 356,
+      "bandAverage": 217.48,
+      "isWinner": false,
+      "rank": 452,
+      "deltaFromWinner": 61.74,
+      "atExpected": false
+    },
+    {
+      "y": 284,
+      "bandAverage": 217.57,
+      "isWinner": false,
+      "rank": 453,
+      "deltaFromWinner": 61.84,
+      "atExpected": false
+    },
+    {
+      "y": 264,
+      "bandAverage": 217.72,
+      "isWinner": false,
+      "rank": 454,
+      "deltaFromWinner": 61.99,
+      "atExpected": false
+    },
+    {
+      "y": 285,
+      "bandAverage": 217.74,
+      "isWinner": false,
+      "rank": 455,
+      "deltaFromWinner": 62,
+      "atExpected": false
+    },
+    {
+      "y": 268,
+      "bandAverage": 217.96,
+      "isWinner": false,
+      "rank": 456,
+      "deltaFromWinner": 62.22,
+      "atExpected": false
+    },
+    {
+      "y": 286,
+      "bandAverage": 217.98,
+      "isWinner": false,
+      "rank": 457,
+      "deltaFromWinner": 62.24,
+      "atExpected": false
+    },
+    {
+      "y": 355,
+      "bandAverage": 218.03,
+      "isWinner": false,
+      "rank": 458,
+      "deltaFromWinner": 62.3,
+      "atExpected": false
+    },
+    {
+      "y": 267,
+      "bandAverage": 218.15,
+      "isWinner": false,
+      "rank": 459,
+      "deltaFromWinner": 62.41,
+      "atExpected": false
+    },
+    {
+      "y": 317,
+      "bandAverage": 218.16,
+      "isWinner": false,
+      "rank": 460,
+      "deltaFromWinner": 62.43,
+      "atExpected": false
+    },
+    {
+      "y": 265,
+      "bandAverage": 218.2,
+      "isWinner": false,
+      "rank": 461,
+      "deltaFromWinner": 62.46,
+      "atExpected": false
+    },
+    {
+      "y": 318,
+      "bandAverage": 218.24,
+      "isWinner": false,
+      "rank": 462,
+      "deltaFromWinner": 62.5,
+      "atExpected": false
+    },
+    {
+      "y": 319,
+      "bandAverage": 218.28,
+      "isWinner": false,
+      "rank": 463,
+      "deltaFromWinner": 62.54,
+      "atExpected": false
+    },
+    {
+      "y": 320,
+      "bandAverage": 218.3,
+      "isWinner": false,
+      "rank": 464,
+      "deltaFromWinner": 62.56,
+      "atExpected": false
+    },
+    {
+      "y": 266,
+      "bandAverage": 218.31,
+      "isWinner": false,
+      "rank": 466,
+      "deltaFromWinner": 62.58,
+      "atExpected": false
+    },
+    {
+      "y": 324,
+      "bandAverage": 218.31,
+      "isWinner": false,
+      "rank": 465,
+      "deltaFromWinner": 62.57,
+      "atExpected": false
+    },
+    {
+      "y": 321,
+      "bandAverage": 218.32,
+      "isWinner": false,
+      "rank": 467,
+      "deltaFromWinner": 62.58,
+      "atExpected": false
+    },
+    {
+      "y": 322,
+      "bandAverage": 218.33,
+      "isWinner": false,
+      "rank": 468,
+      "deltaFromWinner": 62.59,
+      "atExpected": false
+    },
+    {
+      "y": 323,
+      "bandAverage": 218.33,
+      "isWinner": false,
+      "rank": 469,
+      "deltaFromWinner": 62.6,
+      "atExpected": false
+    },
+    {
+      "y": 316,
+      "bandAverage": 218.4,
+      "isWinner": false,
+      "rank": 470,
+      "deltaFromWinner": 62.66,
+      "atExpected": false
+    },
+    {
+      "y": 325,
+      "bandAverage": 218.45,
+      "isWinner": false,
+      "rank": 471,
+      "deltaFromWinner": 62.71,
+      "atExpected": false
+    },
+    {
+      "y": 287,
+      "bandAverage": 218.52,
+      "isWinner": false,
+      "rank": 472,
+      "deltaFromWinner": 62.78,
+      "atExpected": false
+    },
+    {
+      "y": 354,
+      "bandAverage": 218.64,
+      "isWinner": false,
+      "rank": 473,
+      "deltaFromWinner": 62.9,
+      "atExpected": false
+    },
+    {
+      "y": 326,
+      "bandAverage": 218.77,
+      "isWinner": false,
+      "rank": 474,
+      "deltaFromWinner": 63.03,
+      "atExpected": false
+    },
+    {
+      "y": 327,
+      "bandAverage": 218.89,
+      "isWinner": false,
+      "rank": 475,
+      "deltaFromWinner": 63.16,
+      "atExpected": false
+    },
+    {
+      "y": 315,
+      "bandAverage": 218.94,
+      "isWinner": false,
+      "rank": 476,
+      "deltaFromWinner": 63.21,
+      "atExpected": false
+    },
+    {
+      "y": 288,
+      "bandAverage": 219.05,
+      "isWinner": false,
+      "rank": 477,
+      "deltaFromWinner": 63.31,
+      "atExpected": false
+    },
+    {
+      "y": 328,
+      "bandAverage": 219.17,
+      "isWinner": false,
+      "rank": 478,
+      "deltaFromWinner": 63.43,
+      "atExpected": false
+    },
+    {
+      "y": 314,
+      "bandAverage": 219.28,
+      "isWinner": false,
+      "rank": 480,
+      "deltaFromWinner": 63.55,
+      "atExpected": false
+    },
+    {
+      "y": 353,
+      "bandAverage": 219.28,
+      "isWinner": false,
+      "rank": 479,
+      "deltaFromWinner": 63.54,
+      "atExpected": false
+    },
+    {
+      "y": 313,
+      "bandAverage": 219.5,
+      "isWinner": false,
+      "rank": 481,
+      "deltaFromWinner": 63.77,
+      "atExpected": false
+    },
+    {
+      "y": 289,
+      "bandAverage": 219.52,
+      "isWinner": false,
+      "rank": 482,
+      "deltaFromWinner": 63.78,
+      "atExpected": false
+    },
+    {
+      "y": 329,
+      "bandAverage": 219.56,
+      "isWinner": false,
+      "rank": 483,
+      "deltaFromWinner": 63.82,
+      "atExpected": false
+    },
+    {
+      "y": 312,
+      "bandAverage": 219.8,
+      "isWinner": false,
+      "rank": 484,
+      "deltaFromWinner": 64.06,
+      "atExpected": false
+    },
+    {
+      "y": 330,
+      "bandAverage": 219.86,
+      "isWinner": false,
+      "rank": 485,
+      "deltaFromWinner": 64.12,
+      "atExpected": false
+    },
+    {
+      "y": 290,
+      "bandAverage": 219.87,
+      "isWinner": false,
+      "rank": 486,
+      "deltaFromWinner": 64.13,
+      "atExpected": false
+    },
+    {
+      "y": 311,
+      "bandAverage": 220.04,
+      "isWinner": false,
+      "rank": 487,
+      "deltaFromWinner": 64.3,
+      "atExpected": false
+    },
+    {
+      "y": 352,
+      "bandAverage": 220.06,
+      "isWinner": false,
+      "rank": 488,
+      "deltaFromWinner": 64.32,
+      "atExpected": false
+    },
+    {
+      "y": 291,
+      "bandAverage": 220.16,
+      "isWinner": false,
+      "rank": 489,
+      "deltaFromWinner": 64.42,
+      "atExpected": false
+    },
+    {
+      "y": 331,
+      "bandAverage": 220.22,
+      "isWinner": false,
+      "rank": 490,
+      "deltaFromWinner": 64.48,
+      "atExpected": false
+    },
+    {
+      "y": 310,
+      "bandAverage": 220.34,
+      "isWinner": false,
+      "rank": 491,
+      "deltaFromWinner": 64.6,
+      "atExpected": false
+    },
+    {
+      "y": 297,
+      "bandAverage": 220.41,
+      "isWinner": false,
+      "rank": 492,
+      "deltaFromWinner": 64.67,
+      "atExpected": false
+    },
+    {
+      "y": 296,
+      "bandAverage": 220.45,
+      "isWinner": false,
+      "rank": 493,
+      "deltaFromWinner": 64.71,
+      "atExpected": false
+    },
+    {
+      "y": 298,
+      "bandAverage": 220.47,
+      "isWinner": false,
+      "rank": 494,
+      "deltaFromWinner": 64.73,
+      "atExpected": false
+    },
+    {
+      "y": 332,
+      "bandAverage": 220.5,
+      "isWinner": false,
+      "rank": 495,
+      "deltaFromWinner": 64.77,
+      "atExpected": false
+    },
+    {
+      "y": 299,
+      "bandAverage": 220.51,
+      "isWinner": false,
+      "rank": 496,
+      "deltaFromWinner": 64.78,
+      "atExpected": false
+    },
+    {
+      "y": 300,
+      "bandAverage": 220.55,
+      "isWinner": false,
+      "rank": 497,
+      "deltaFromWinner": 64.81,
+      "atExpected": false
+    },
+    {
+      "y": 309,
+      "bandAverage": 220.56,
+      "isWinner": false,
+      "rank": 499,
+      "deltaFromWinner": 64.82,
+      "atExpected": false
+    },
+    {
+      "y": 351,
+      "bandAverage": 220.56,
+      "isWinner": false,
+      "rank": 498,
+      "deltaFromWinner": 64.82,
+      "atExpected": false
+    },
+    {
+      "y": 308,
+      "bandAverage": 220.57,
+      "isWinner": false,
+      "rank": 500,
+      "deltaFromWinner": 64.83,
+      "atExpected": false
+    },
+    {
+      "y": 301,
+      "bandAverage": 220.58,
+      "isWinner": false,
+      "rank": 501,
+      "deltaFromWinner": 64.85,
+      "atExpected": false
+    },
+    {
+      "y": 295,
+      "bandAverage": 220.62,
+      "isWinner": false,
+      "rank": 502,
+      "deltaFromWinner": 64.88,
+      "atExpected": false
+    },
+    {
+      "y": 302,
+      "bandAverage": 220.62,
+      "isWinner": false,
+      "rank": 503,
+      "deltaFromWinner": 64.88,
+      "atExpected": false
+    },
+    {
+      "y": 303,
+      "bandAverage": 220.64,
+      "isWinner": false,
+      "rank": 504,
+      "deltaFromWinner": 64.91,
+      "atExpected": false
+    },
+    {
+      "y": 304,
+      "bandAverage": 220.66,
+      "isWinner": false,
+      "rank": 505,
+      "deltaFromWinner": 64.93,
+      "atExpected": false
+    },
+    {
+      "y": 292,
+      "bandAverage": 220.69,
+      "isWinner": false,
+      "rank": 506,
+      "deltaFromWinner": 64.95,
+      "atExpected": false
+    },
+    {
+      "y": 305,
+      "bandAverage": 220.73,
+      "isWinner": false,
+      "rank": 507,
+      "deltaFromWinner": 64.99,
+      "atExpected": false
+    },
+    {
+      "y": 307,
+      "bandAverage": 220.73,
+      "isWinner": false,
+      "rank": 508,
+      "deltaFromWinner": 64.99,
+      "atExpected": false
+    },
+    {
+      "y": 294,
+      "bandAverage": 220.74,
+      "isWinner": false,
+      "rank": 509,
+      "deltaFromWinner": 65.01,
+      "atExpected": false
+    },
+    {
+      "y": 333,
+      "bandAverage": 220.77,
+      "isWinner": false,
+      "rank": 510,
+      "deltaFromWinner": 65.03,
+      "atExpected": false
+    },
+    {
+      "y": 306,
+      "bandAverage": 220.83,
+      "isWinner": false,
+      "rank": 511,
+      "deltaFromWinner": 65.1,
+      "atExpected": false
+    },
+    {
+      "y": 350,
+      "bandAverage": 220.84,
+      "isWinner": false,
+      "rank": 512,
+      "deltaFromWinner": 65.1,
+      "atExpected": false
+    },
+    {
+      "y": 293,
+      "bandAverage": 220.94,
+      "isWinner": false,
+      "rank": 513,
+      "deltaFromWinner": 65.2,
+      "atExpected": false
+    },
+    {
+      "y": 343,
+      "bandAverage": 220.96,
+      "isWinner": false,
+      "rank": 514,
+      "deltaFromWinner": 65.23,
+      "atExpected": false
+    },
+    {
+      "y": 344,
+      "bandAverage": 220.96,
+      "isWinner": false,
+      "rank": 515,
+      "deltaFromWinner": 65.23,
+      "atExpected": false
+    },
+    {
+      "y": 342,
+      "bandAverage": 221.01,
+      "isWinner": false,
+      "rank": 516,
+      "deltaFromWinner": 65.27,
+      "atExpected": false
+    },
+    {
+      "y": 341,
+      "bandAverage": 221.04,
+      "isWinner": false,
+      "rank": 518,
+      "deltaFromWinner": 65.31,
+      "atExpected": false
+    },
+    {
+      "y": 345,
+      "bandAverage": 221.04,
+      "isWinner": false,
+      "rank": 517,
+      "deltaFromWinner": 65.3,
+      "atExpected": false
+    },
+    {
+      "y": 346,
+      "bandAverage": 221.05,
+      "isWinner": false,
+      "rank": 520,
+      "deltaFromWinner": 65.31,
+      "atExpected": false
+    },
+    {
+      "y": 347,
+      "bandAverage": 221.05,
+      "isWinner": false,
+      "rank": 521,
+      "deltaFromWinner": 65.32,
+      "atExpected": false
+    },
+    {
+      "y": 349,
+      "bandAverage": 221.05,
+      "isWinner": false,
+      "rank": 519,
+      "deltaFromWinner": 65.31,
+      "atExpected": false
+    },
+    {
+      "y": 348,
+      "bandAverage": 221.07,
+      "isWinner": false,
+      "rank": 522,
+      "deltaFromWinner": 65.33,
+      "atExpected": false
+    },
+    {
+      "y": 340,
+      "bandAverage": 221.09,
+      "isWinner": false,
+      "rank": 523,
+      "deltaFromWinner": 65.35,
+      "atExpected": false
+    },
+    {
+      "y": 339,
+      "bandAverage": 221.15,
+      "isWinner": false,
+      "rank": 524,
+      "deltaFromWinner": 65.41,
+      "atExpected": false
+    },
+    {
+      "y": 338,
+      "bandAverage": 221.21,
+      "isWinner": false,
+      "rank": 525,
+      "deltaFromWinner": 65.47,
+      "atExpected": false
+    },
+    {
+      "y": 334,
+      "bandAverage": 221.27,
+      "isWinner": false,
+      "rank": 526,
+      "deltaFromWinner": 65.53,
+      "atExpected": false
+    },
+    {
+      "y": 337,
+      "bandAverage": 221.28,
+      "isWinner": false,
+      "rank": 527,
+      "deltaFromWinner": 65.54,
+      "atExpected": false
+    },
+    {
+      "y": 336,
+      "bandAverage": 221.36,
+      "isWinner": false,
+      "rank": 528,
+      "deltaFromWinner": 65.62,
+      "atExpected": false
+    },
+    {
+      "y": 335,
+      "bandAverage": 221.47,
+      "isWinner": false,
+      "rank": 529,
+      "deltaFromWinner": 65.74,
+      "atExpected": false
+    }
+  ]
+}

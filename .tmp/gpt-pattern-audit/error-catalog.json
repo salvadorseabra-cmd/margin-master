@@ -1,0 +1,184 @@
+{
+  "generated_at": "2026-06-10T23:56:09.490Z",
+  "vl_project": "bjhnlrgodcqoyzddbpbd",
+  "rows": [
+    {
+      "invoice": "Aviludo May",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "groundTruth": "Filete de Anchoas Alcofinosa L4 495 g | qty=2 un | €9.99 | total €19.98",
+      "gptOutput": "Filete de Anchovas Alconfirosa L4 495 g | qty=2 un | €9.99 | total €19.98",
+      "gptSource": ".tmp/hallucination-audit/extract-3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "alignmentType": "matched"
+    },
+    {
+      "invoice": "Aviludo May",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "groundTruth": "Pepinos Extra Uli Frasco 6x720 g | qty=1 cx | €22.49 | total €22.49",
+      "gptOutput": "Pepinos Extra Uji Frasco 6x720 g | qty=1 cx | €22.49 | total €22.49",
+      "gptSource": ".tmp/hallucination-audit/extract-3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "alignmentType": "matched"
+    },
+    {
+      "invoice": "Aviludo May",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "groundTruth": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg | qty=2 un | €6.55 | total €13.1",
+      "gptOutput": "Atum Óleo Bolsa Nau Cafriente 1 Kg | qty=2 un | €6.55 | total €13.1",
+      "gptSource": ".tmp/hallucination-audit/extract-3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "alignmentType": "matched"
+    },
+    {
+      "invoice": "Aviludo May",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "groundTruth": "Nata Culinária 22% Reny Picot 6x1 L | qty=5 cx | €18.89 | total €94.45",
+      "gptOutput": "Nata Culinaria 22% Reny Picot 6x1 L | qty=5 cx | €18.89 | total €94.45",
+      "gptSource": ".tmp/hallucination-audit/extract-3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "alignmentType": "matched"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "groundTruth": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg | qty=1.35 kg | €9.92 | total €13.44",
+      "gptOutput": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castagna 1/8 ~1.5Kg | qty=1.35 kg | €9.82 | total €13.44",
+      "gptSource": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "alignmentType": "matched"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "groundTruth": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG | qty=4.3 kg | €8.17 | total €35.14",
+      "gptOutput": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4.4~4.25Kg | qty=4.3 kg | €17.06 | total €36.54",
+      "gptSource": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json",
+      "errorType": "Column Shift",
+      "wrongFields": [
+        "unit_price",
+        "line_total"
+      ],
+      "alignmentType": "matched"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "groundTruth": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg | qty=3.11 kg | €10.1 | total €31.07",
+      "gptOutput": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 ~2,5Kg | qty=3.11 kg | €10.1 | total €31.07",
+      "gptSource": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "alignmentType": "matched"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "groundTruth": "SanPellegrino - Acqua in vitro 75cl x 15ud | qty=2.56 cx | €15.06 | total €38.56",
+      "gptOutput": "SanPellegrino - Acqua in vitro 75cl x 15ud | qty=2 cx | €19.32 | total €38.65",
+      "gptSource": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json",
+      "errorType": "Column Shift",
+      "wrongFields": [
+        "quantity",
+        "unit_price"
+      ],
+      "alignmentType": "matched"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "groundTruth": "Baladin - Ginger Beer 0.20cl | qty=2 un | €9.69 | total €19.38",
+      "gptOutput": "Baladin - Ginger Beer 0.20cl | qty=24 un | €0.85 | total €19.38",
+      "gptSource": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json",
+      "errorType": "Pack Multiplier Confusion",
+      "wrongFields": [
+        "unit"
+      ],
+      "alignmentType": "matched"
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "groundTruth": "POMODOR PELATI (CX 2.5KG*6) | qty=2 un | €25 | total €50",
+      "gptOutput": "POMODORO PELATI (CX 2,5KG*6) | qty=2 un | €20 | total €40",
+      "gptSource": ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-extract-invoice.json",
+      "errorType": "Pack Multiplier Confusion; Column Shift",
+      "wrongFields": [
+        "quantity",
+        "unit_price",
+        "line_total"
+      ],
+      "alignmentType": "matched",
+      "passCRawNote": "pass-c-raw: POMODORINI pelati (CX 2,5KG*6) | qty=6 un | €20 | total €120"
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "groundTruth": "ROLO DE CABRA E VACA 1KG | qty=1 un | €12.71 | total €12.71",
+      "gptOutput": "ROLO DE CABRA E VACA 1KG | qty=1 un | €12.71 | total €12.71",
+      "gptSource": ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-extract-invoice.json",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "alignmentType": "matched"
+    },
+    {
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "groundTruth": "Aceto balsamico di Modena IGP pet 5l*2 Toschi | qty=1 un | €18.929 | total €16.09",
+      "gptOutput": "Aceto balsamico di modena IGP pet 5l*2 Toschi | qty=1 UN | €18.295 | total €15.9",
+      "gptSource": ".tmp/persistence-audit/pass-c-raw/36c99d19-6f9f-413f-8c2d-ae3526291a2d-extract-invoice.json",
+      "errorType": "Pack Multiplier Confusion",
+      "wrongFields": [
+        "quantity",
+        "line_total",
+        "unit_price"
+      ],
+      "alignmentType": "matched",
+      "passCRawNote": "pass-c-raw: Aceto balsamico di modena IGP pet 5lt*2 Toschi | qty=2 un | €13.8 | total €15.96"
+    },
+    {
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "groundTruth": "MOZZA Fior di Latte Expert Julienne 3kg Simonetta | qty=10 un | €24.728 | total €200.3",
+      "gptOutput": "MOZZA Fioc di Latte Expet Julienne 3kg Simonetta | qty=10 UN | €24.728 | total €200.3",
+      "gptSource": ".tmp/persistence-audit/pass-c-raw/36c99d19-6f9f-413f-8c2d-ae3526291a2d-extract-invoice.json",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "alignmentType": "matched"
+    },
+    {
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "groundTruth": "Rulo Di Capra 1kg*2 Simonetta | qty=1 un | €15.192 | total €10.86",
+      "gptOutput": "Rub Di Capra 1kg *2 Simonetta | qty=1 UN | €15.192 | total €10.38",
+      "gptSource": ".tmp/persistence-audit/pass-c-raw/36c99d19-6f9f-413f-8c2d-ae3526291a2d-extract-invoice.json",
+      "errorType": "Pack Multiplier Confusion",
+      "wrongFields": [
+        "quantity",
+        "line_total"
+      ],
+      "alignmentType": "matched",
+      "passCRawNote": "pass-c-raw: Rub Di Capra 1kg*2 Simonetta | qty=2 kg | €15.192 | total €10.28"
+    },
+    {
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "groundTruth": "(absent)",
+      "gptOutput": "Nui Lote 609 Data Exp. 20/07/2027 | qty=1 UN | €18.295 | total €15.9",
+      "gptSource": ".tmp/persistence-audit/pass-c-raw/36c99d19-6f9f-413f-8c2d-ae3526291a2d-extract-invoice.json",
+      "errorType": "Phantom Row; Lot Number Contamination",
+      "wrongFields": [
+        "description",
+        "quantity",
+        "unit",
+        "unit_price",
+        "line_total"
+      ],
+      "alignmentType": "phantom"
+    }
+  ]
+}

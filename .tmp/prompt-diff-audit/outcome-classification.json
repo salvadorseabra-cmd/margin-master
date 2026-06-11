@@ -1,0 +1,309 @@
+[
+  {
+    "Invoice": "Bidfood",
+    "Product": "Tomilho",
+    "Outcome": "IMPROVED",
+    "OldCorrect": false,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "unit_price"
+    ]
+  },
+  {
+    "Invoice": "Bidfood",
+    "Product": "Hortelã",
+    "Outcome": "REGRESSED",
+    "OldCorrect": true,
+    "NewCorrect": false,
+    "ChangedFields": [
+      "quantity",
+      "unit",
+      "unit_price"
+    ]
+  },
+  {
+    "Invoice": "Aviludo May",
+    "Product": "Pepinos Extra Uli Frasco 6x720 g",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": true,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "description"
+    ]
+  },
+  {
+    "Invoice": "Aviludo May",
+    "Product": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": true,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "description"
+    ]
+  },
+  {
+    "Invoice": "Aviludo May",
+    "Product": "Açucar Branco METRO Chef 10x1 Kg",
+    "Outcome": "REGRESSED",
+    "OldCorrect": true,
+    "NewCorrect": false,
+    "ChangedFields": [
+      "quantity",
+      "total"
+    ]
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Chocolate Pantagruel 10x200g",
+    "Outcome": "IMPROVED",
+    "OldCorrect": false,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "total"
+    ]
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+    "Outcome": "IMPROVED",
+    "OldCorrect": false,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "total"
+    ]
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Ovo Líquido Past.Gema Dovo 1kg",
+    "Outcome": "IMPROVED",
+    "OldCorrect": false,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "total"
+    ]
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Filete de Anchovas Alconfrisa Lt 495 g",
+    "Outcome": "IMPROVED",
+    "OldCorrect": false,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "total"
+    ]
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Nata Reny Picot 22% 6x1L",
+    "Outcome": "IMPROVED",
+    "OldCorrect": false,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "total"
+    ]
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": true,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "unit"
+    ]
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": true,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "description",
+      "unit"
+    ]
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": false,
+    "NewCorrect": false,
+    "ChangedFields": [
+      "unit",
+      "unit_price"
+    ]
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": true,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "unit"
+    ]
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": false,
+    "NewCorrect": false,
+    "ChangedFields": [
+      "unit",
+      "unit_price",
+      "total"
+    ]
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+    "Outcome": "PARTIAL IMPROVEMENT",
+    "OldCorrect": false,
+    "NewCorrect": false,
+    "ChangedFields": [
+      "quantity",
+      "unit",
+      "unit_price"
+    ]
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Baladin - Ginger Beer 0.20cl",
+    "Outcome": "IMPROVED",
+    "OldCorrect": false,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "quantity",
+      "unit",
+      "unit_price"
+    ]
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Rovagnati - Salame Ventricina 2,5 Kg",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": true,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "unit"
+    ]
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": true,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "unit"
+    ]
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "STRACCIATELLA 250 GR",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": true,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "unit"
+    ]
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": true,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "unit"
+    ]
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "POMODOR PELATI (CX 2.5KG*6)",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": false,
+    "NewCorrect": false,
+    "ChangedFields": [
+      "unit"
+    ]
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": false,
+    "NewCorrect": false,
+    "ChangedFields": [
+      "unit"
+    ]
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "RICOTTA TREVIGIANA 1,5KG",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": true,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "unit"
+    ]
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "ROLO DE CABRA E VACA 1KG",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": true,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "unit"
+    ]
+  },
+  {
+    "Invoice": "Mammafiore",
+    "Product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+    "Outcome": "REGRESSED",
+    "OldCorrect": false,
+    "NewCorrect": false,
+    "ChangedFields": [
+      "unit_price",
+      "total"
+    ]
+  },
+  {
+    "Invoice": "Mammafiore",
+    "Product": "Rulo Di Capra 1kg*2 Simonetta",
+    "Outcome": "IMPROVED",
+    "OldCorrect": false,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "description",
+      "total"
+    ]
+  },
+  {
+    "Invoice": "Mammafiore",
+    "Product": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+    "Outcome": "NO MATERIAL CHANGE",
+    "OldCorrect": true,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "description"
+    ]
+  },
+  {
+    "Invoice": "Mammafiore",
+    "Product": "[PHANTOM REMOVED] Nui Lote 609 Data Exp. 20/07/2027",
+    "Outcome": "IMPROVED",
+    "OldCorrect": false,
+    "NewCorrect": true,
+    "ChangedFields": [
+      "description",
+      "quantity",
+      "unit",
+      "unit_price",
+      "total"
+    ]
+  }
+]

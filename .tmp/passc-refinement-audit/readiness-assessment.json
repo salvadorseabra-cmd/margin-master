@@ -1,0 +1,22 @@
+{
+  "generated_at": "2026-06-11T00:57:42.177Z",
+  "verdict": "MOSTLY YES",
+  "evidence": {
+    "geometry": "100% row recall — fixed pre-c33a7f1",
+    "footer": "Fixed — validated across VL invoices",
+    "hallucinations": "0% post-c33a7f1 — Mammafiore phantom eliminated",
+    "financialError": "€92.35 post-c33a7f1 (down from €181.24); €79.92 is single-row Açúcar regression",
+    "remainingBlockers": [
+      "3 c33a7f1 regressions (Hortelã qty, Açúcar qty, Aceto total drift)",
+      "2 pre-existing residuals (Bocconcino POMODOR price, Emporio Prosciutto price)"
+    ],
+    "invoicesFullyClean": 4,
+    "invoicesWithResiduals": 2,
+    "invoicesNeedingRefinementOnly": 3
+  },
+  "afterRefinementProjection": {
+    "fieldAccuracy": "~95%",
+    "financialError": "~€12 (pre-existing column-shift only)",
+    "vlComplete": "YES for targeted regression set; Bocconcino/Emporio price columns may need separate pass"
+  }
+}

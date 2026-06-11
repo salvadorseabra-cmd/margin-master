@@ -1,0 +1,481 @@
+{
+  "vl_project": "bjhnlrgodcqoyzddbpbd",
+  "generated_at": "2026-06-10T21:59:31.697Z",
+  "note": "Per-row ground truth from prior audits; Aviludo April row detail is DB-circular (low confidence)",
+  "invoices": [
+    {
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "label": "Bidfood Portugal",
+      "rowsExpected": 11,
+      "totalExpected": 292.7,
+      "groundTruthSource": ".tmp/emporio-footer-audit/bidfood/db-record.json",
+      "groundTruthConfidence": "high",
+      "lineSumExpected": 170.57,
+      "rows": [
+        {
+          "description": "Manteiga Coimbra s/ sal EMB 1 Kg",
+          "qty": 8,
+          "unit": "kg",
+          "unit_price": 8.9,
+          "total": 71.2,
+          "source": "emporio-footer-audit/bidfood — validated 11/11 PASS"
+        },
+        {
+          "description": "Ovo MORENO Classe M Cx. 1.5 dúzias (CARTÃO)",
+          "qty": 1,
+          "unit": "cx",
+          "unit_price": 38.44,
+          "total": 38.44,
+          "source": "emporio-footer-audit/bidfood — validated 11/11 PASS"
+        },
+        {
+          "description": "Tomilho",
+          "qty": 1,
+          "unit": "mo",
+          "unit_price": 2.06,
+          "total": 2.06,
+          "source": "emporio-footer-audit/bidfood — validated 11/11 PASS"
+        },
+        {
+          "description": "Salada Ibérica FSTK EMB. 250g",
+          "qty": 4,
+          "unit": "em",
+          "unit_price": 2.33,
+          "total": 8.76,
+          "source": "emporio-footer-audit/bidfood — validated 11/11 PASS"
+        },
+        {
+          "description": "Manjericão",
+          "qty": 5,
+          "unit": "mo",
+          "unit_price": 2.06,
+          "total": 10.28,
+          "source": "emporio-footer-audit/bidfood — validated 11/11 PASS"
+        },
+        {
+          "description": "Hortelã",
+          "qty": 0.5,
+          "unit": "kg",
+          "unit_price": 6.74,
+          "total": 2.7,
+          "source": "emporio-footer-audit/bidfood — validated 11/11 PASS"
+        },
+        {
+          "description": "Pepino",
+          "qty": 3.36,
+          "unit": "kg",
+          "unit_price": 1.77,
+          "total": 4.76,
+          "source": "emporio-footer-audit/bidfood — validated 11/11 PASS"
+        },
+        {
+          "description": "Pêra Abacate Hasse",
+          "qty": 3.28,
+          "unit": "kg",
+          "unit_price": 5.32,
+          "total": 13.96,
+          "source": "emporio-footer-audit/bidfood — validated 11/11 PASS"
+        },
+        {
+          "description": "Courgettes",
+          "qty": 3.3,
+          "unit": "kg",
+          "unit_price": 1.95,
+          "total": 5.15,
+          "source": "emporio-footer-audit/bidfood — validated 11/11 PASS"
+        },
+        {
+          "description": "Alho Francês",
+          "qty": 5.42,
+          "unit": "kg",
+          "unit_price": 1.77,
+          "total": 7.67,
+          "source": "emporio-footer-audit/bidfood — validated 11/11 PASS"
+        },
+        {
+          "description": "Abóbora Butternut",
+          "qty": 5.64,
+          "unit": "kg",
+          "unit_price": 1.24,
+          "total": 5.59,
+          "source": "emporio-footer-audit/bidfood — validated 11/11 PASS"
+        }
+      ]
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "label": "Aviludo May",
+      "rowsExpected": 8,
+      "totalExpected": 330.42,
+      "groundTruthSource": ".tmp/vl-prompt-compare/results.json + per-item scores",
+      "groundTruthConfidence": "high",
+      "lineSumExpected": 296.88,
+      "rows": [
+        {
+          "description": "Filete de Anchoas Alcofinosa L4 495 g",
+          "qty": 2,
+          "unit": "un",
+          "unit_price": 9.99,
+          "total": 19.98,
+          "source": "vl-prompt-compare + per-item ground_truth scores"
+        },
+        {
+          "description": "Ovo Líquido Past.Gema Dovo 1 Kg",
+          "qty": 6,
+          "unit": "un",
+          "unit_price": 10.49,
+          "total": 62.94,
+          "source": "vl-prompt-compare + per-item ground_truth scores"
+        },
+        {
+          "description": "Pepinos Extra Uli Frasco 6x720 g",
+          "qty": 1,
+          "unit": "cx",
+          "unit_price": 22.49,
+          "total": 22.49,
+          "source": "vl-prompt-compare + per-item ground_truth scores"
+        },
+        {
+          "description": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+          "qty": 2,
+          "unit": "un",
+          "unit_price": 6.55,
+          "total": 13.1,
+          "source": "vl-prompt-compare + per-item ground_truth scores"
+        },
+        {
+          "description": "Arroz Agulha Metro Chef 12x1 kg",
+          "qty": 1,
+          "unit": "cx",
+          "unit_price": 13.95,
+          "total": 13.95,
+          "source": "vl-prompt-compare + per-item ground_truth scores"
+        },
+        {
+          "description": "Chocolate Culinaria Pantagruel 10x200 g",
+          "qty": 2,
+          "unit": "cx",
+          "unit_price": 29.99,
+          "total": 59.98,
+          "source": "vl-prompt-compare + per-item ground_truth scores"
+        },
+        {
+          "description": "Açucar Branco METRO Chef 10x1 Kg",
+          "qty": 1,
+          "unit": "cx",
+          "unit_price": 9.99,
+          "total": 9.99,
+          "source": "vl-prompt-compare + per-item ground_truth scores"
+        },
+        {
+          "description": "Nata Culinária 22% Reny Picot 6x1 L",
+          "qty": 5,
+          "unit": "cx",
+          "unit_price": 18.89,
+          "total": 94.45,
+          "source": "vl-prompt-compare + per-item ground_truth scores"
+        }
+      ]
+    },
+    {
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "label": "Aviludo April",
+      "rowsExpected": 9,
+      "totalExpected": 370.17,
+      "groundTruthSource": "geometry-audit validated; row detail from DB snapshot (no manual transcription)",
+      "groundTruthConfidence": "low",
+      "lineSumExpected": 300.95,
+      "rows": [
+        {
+          "description": "Mozzarella Flor di Latte 2Kg",
+          "qty": 1,
+          "unit": "un",
+          "unit_price": 13.69,
+          "total": 13.69,
+          "source": "DB snapshot — geometry-audit validated row count + invoice total only"
+        },
+        {
+          "description": "Açúcar Branco Metro Chef 10x1Kg",
+          "qty": 1,
+          "unit": "cx",
+          "unit_price": 9.29,
+          "total": 9.29,
+          "source": "DB snapshot — geometry-audit validated row count + invoice total only"
+        },
+        {
+          "description": "Chocolate Pantagruel 10x200g",
+          "qty": 2,
+          "unit": "cx",
+          "unit_price": 29.19,
+          "total": 58.38,
+          "source": "DB snapshot — geometry-audit validated row count + invoice total only"
+        },
+        {
+          "description": "Arroz Agulha Metro Chef 12x1kg",
+          "qty": 1,
+          "unit": "cx",
+          "unit_price": 13.45,
+          "total": 13.45,
+          "source": "DB snapshot — geometry-audit validated row count + invoice total only"
+        },
+        {
+          "description": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+          "qty": 2,
+          "unit": "un",
+          "unit_price": 6.29,
+          "total": 12.58,
+          "source": "DB snapshot — geometry-audit validated row count + invoice total only"
+        },
+        {
+          "description": "Pepinos Extra II Frasco 6x720g",
+          "qty": 1,
+          "unit": "cx",
+          "unit_price": 21.99,
+          "total": 21.99,
+          "source": "DB snapshot — geometry-audit validated row count + invoice total only"
+        },
+        {
+          "description": "Ovo Líquido Past.Gema Dovo 1kg",
+          "qty": 6,
+          "unit": "un",
+          "unit_price": 10.19,
+          "total": 61.14,
+          "source": "DB snapshot — geometry-audit validated row count + invoice total only"
+        },
+        {
+          "description": "Filete de Anchovas Alconfrisa Lt 495 g",
+          "qty": 2,
+          "unit": "un",
+          "unit_price": 9.49,
+          "total": 18.98,
+          "source": "DB snapshot — geometry-audit validated row count + invoice total only"
+        },
+        {
+          "description": "Nata Reny Picot 22% 6x1L",
+          "qty": 5,
+          "unit": "cx",
+          "unit_price": 18.29,
+          "total": 91.45,
+          "source": "DB snapshot — geometry-audit validated row count + invoice total only"
+        }
+      ]
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "label": "Emporio Italia",
+      "rowsExpected": 8,
+      "totalExpected": 327.46,
+      "groundTruthSource": ".tmp/emporio-footer-fix/emporio-italia-extract.json",
+      "groundTruthConfidence": "high",
+      "lineSumExpected": 276.76,
+      "rows": [
+        {
+          "description": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+          "qty": 24,
+          "unit": "un",
+          "unit_price": 2.35,
+          "total": 50.2,
+          "source": "emporio-footer-fix post-geometry validated"
+        },
+        {
+          "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+          "qty": 1.35,
+          "unit": "kg",
+          "unit_price": 9.92,
+          "total": 13.44,
+          "source": "emporio-footer-fix post-geometry validated"
+        },
+        {
+          "description": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+          "qty": 4.3,
+          "unit": "kg",
+          "unit_price": 8.17,
+          "total": 35.14,
+          "source": "emporio-footer-fix post-geometry validated"
+        },
+        {
+          "description": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+          "qty": 3.11,
+          "unit": "kg",
+          "unit_price": 10.1,
+          "total": 31.07,
+          "source": "emporio-footer-fix post-geometry validated"
+        },
+        {
+          "description": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "qty": 2.56,
+          "unit": "cx",
+          "unit_price": 15.06,
+          "total": 38.56,
+          "source": "emporio-footer-fix post-geometry validated"
+        },
+        {
+          "description": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+          "qty": 2.8,
+          "unit": "kg",
+          "unit_price": 17.68,
+          "total": 49.48,
+          "source": "emporio-footer-fix post-geometry validated"
+        },
+        {
+          "description": "Baladin - Ginger Beer 0.20cl",
+          "qty": 2,
+          "unit": "un",
+          "unit_price": 9.69,
+          "total": 19.38,
+          "source": "emporio-footer-fix post-geometry validated"
+        },
+        {
+          "description": "Rovagnati - Salame Ventricina 2,5 Kg",
+          "qty": 2.6,
+          "unit": "kg",
+          "unit_price": 16.6,
+          "total": 39.49,
+          "source": "emporio-footer-fix post-geometry validated"
+        }
+      ]
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "label": "IL Bocconcino",
+      "rowsExpected": 7,
+      "totalExpected": 290.64,
+      "groundTruthSource": ".tmp/mammafiore-fix/bocconcino-extract.json",
+      "groundTruthConfidence": "high",
+      "lineSumExpected": 295.82,
+      "rows": [
+        {
+          "description": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+          "qty": 10,
+          "unit": "un",
+          "unit_price": 9.5,
+          "total": 81.23,
+          "source": "bocconcino-investigation OCR + post-geometry re-extract"
+        },
+        {
+          "description": "STRACCIATELLA 250 GR",
+          "qty": 24,
+          "unit": "un",
+          "unit_price": 4.141,
+          "total": 74.54,
+          "source": "bocconcino-investigation OCR + post-geometry re-extract"
+        },
+        {
+          "description": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+          "qty": 1,
+          "unit": "un",
+          "unit_price": 27.56,
+          "total": 27.3,
+          "source": "bocconcino-investigation OCR + post-geometry re-extract"
+        },
+        {
+          "description": "POMODOR PELATI (CX 2.5KG*6)",
+          "qty": 2,
+          "unit": "un",
+          "unit_price": 25,
+          "total": 50,
+          "source": "bocconcino-investigation OCR + post-geometry re-extract"
+        },
+        {
+          "description": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+          "qty": 2,
+          "unit": "un",
+          "unit_price": 20.295,
+          "total": 42.07,
+          "source": "bocconcino-investigation OCR + post-geometry re-extract"
+        },
+        {
+          "description": "RICOTTA TREVIGIANA 1,5KG",
+          "qty": 1,
+          "unit": "un",
+          "unit_price": 7.97,
+          "total": 7.97,
+          "source": "bocconcino-investigation OCR + post-geometry re-extract"
+        },
+        {
+          "description": "ROLO DE CABRA E VACA 1KG",
+          "qty": 1,
+          "unit": "un",
+          "unit_price": 12.71,
+          "total": 12.71,
+          "source": "bocconcino-investigation OCR + post-geometry re-extract"
+        }
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "label": "Mammafiore",
+      "rowsExpected": 8,
+      "totalExpected": 415.96,
+      "groundTruthSource": ".tmp/mammafiore-line-audit/ground-truth.json",
+      "groundTruthConfidence": "high",
+      "lineSumExpected": 376.5,
+      "rows": [
+        {
+          "description": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+          "qty": 5.996,
+          "unit": "un",
+          "unit_price": 16.922,
+          "total": 64.93,
+          "source": "mammafiore-line-audit manual transcription"
+        },
+        {
+          "description": "Farina Speciale pizza 25kg Amoruso",
+          "qty": 1,
+          "unit": "un",
+          "unit_price": 33.154,
+          "total": 26.52,
+          "source": "mammafiore-line-audit manual transcription"
+        },
+        {
+          "description": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "qty": 24,
+          "unit": "un",
+          "unit_price": 1.529,
+          "total": 25.69,
+          "source": "mammafiore-line-audit manual transcription"
+        },
+        {
+          "description": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+          "qty": 1,
+          "unit": "un",
+          "unit_price": 18.929,
+          "total": 16.09,
+          "source": "mammafiore-line-audit manual transcription"
+        },
+        {
+          "description": "MOZZA Fior di Latte Expert Julienne 3kg Simonetta",
+          "qty": 10,
+          "unit": "un",
+          "unit_price": 24.728,
+          "total": 200.3,
+          "source": "mammafiore-line-audit manual transcription"
+        },
+        {
+          "description": "Rulo Di Capra 1kg*2 Simonetta",
+          "qty": 1,
+          "unit": "un",
+          "unit_price": 15.192,
+          "total": 10.86,
+          "source": "mammafiore-line-audit manual transcription"
+        },
+        {
+          "description": "Recargo por combustible",
+          "qty": 1,
+          "unit": "un",
+          "unit_price": 2,
+          "total": 2,
+          "source": "mammafiore-line-audit manual transcription"
+        },
+        {
+          "description": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+          "qty": 1,
+          "unit": "un",
+          "unit_price": 39.101,
+          "total": 30.11,
+          "source": "mammafiore-line-audit manual transcription"
+        }
+      ]
+    }
+  ]
+}

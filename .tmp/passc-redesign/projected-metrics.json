@@ -1,0 +1,104 @@
+{
+  "generated_at": "2026-06-11T12:00:00.000Z",
+  "baseline": {
+    "source": ".tmp/field-accuracy-audit/statistics.json, financial-accuracy.json, .tmp/hallucination-audit/reliability-score.json",
+    "vlProject": "bjhnlrgodcqoyzddbpbd",
+    "invoicesAudited": 6,
+    "totalAlignedRows": 51,
+    "rowsFullyCorrect": 37,
+    "rowsFullyCorrectPct": 72.55,
+    "fieldAccuracyLenient": {
+      "description": 100,
+      "quantity": 92,
+      "unit": 98,
+      "unit_price": 94,
+      "line_total": 92,
+      "overall": 95
+    },
+    "fieldAccuracyStrict": {
+      "description": 84,
+      "quantity": 92,
+      "unit": 98,
+      "unit_price": 94,
+      "line_total": 90,
+      "overall": 92
+    },
+    "financialAccuracy": {
+      "method": "lineSum vs groundTruthLineSum per invoice",
+      "invoicesExact": 3,
+      "invoicesWithDelta": 3,
+      "worstInvoice": "IL Bocconcino (76.34%)",
+      "aggregateLineSumAccuracyPct": 96.2,
+      "note": "Weighted: (170.57+296.88+300.95+276.76+295.82+376.5) vs extracted sums; Bocconcino +€70 and Mammafiore +€16.82 dominate deltas"
+    },
+    "hallucinationRate": {
+      "phantomRows": 1,
+      "totalExtractedRows": 52,
+      "ratePct": 1.92,
+      "source": ".tmp/hallucination-audit/reliability-score.json"
+    },
+    "rowRecall": 100
+  },
+  "projected": {
+    "methodology": "Simulated from error-prevention-analysis verdicts; assumes prompt deploy + re-extract (not stale DB)",
+    "assumptions": [
+      "Pack multiplier errors eliminated (4 classifications → 0)",
+      "Phantom row eliminated (9→8 rows on Mammafiore)",
+      "Column-shift errors reduced by 1 of 3 (POMODOR price may fix with cleaner qty context; Prosciutto/Pellegrino likely persist)",
+      "OCR description errors unchanged (8 rows)"
+    ],
+    "rowsFullyCorrect": 42,
+    "rowsFullyCorrectPct": 82.4,
+    "rowsFullyCorrectNote": "37 baseline + Ginger Beer (full) + Aceto qty + Rulo qty + phantom removed improves Mammafiore partials; POMODOR/Prosciutto/Pellegrino may remain partial",
+    "fieldAccuracyLenient": {
+      "description": 100,
+      "quantity": 100,
+      "unit": 100,
+      "unit_price": 96,
+      "line_total": 96,
+      "overall": 98
+    },
+    "fieldAccuracyStrict": {
+      "description": 84,
+      "quantity": 100,
+      "unit": 100,
+      "unit_price": 96,
+      "line_total": 94,
+      "overall": 95
+    },
+    "financialAccuracy": {
+      "invoicesExact": 5,
+      "invoicesWithDelta": 1,
+      "worstInvoice": "IL Bocconcino (projected ~93% if qty fixed, price residual)",
+      "aggregateLineSumAccuracyPct": 99.1,
+      "deltas": {
+        "Bocconcino": "€365.82 → ~€295.82 (qty fix -€80) or ~€285.82 (if price stays €20)",
+        "Mammafiore": "€393.32 → ~€376.5 (phantom -€18.30, qty fixes)",
+        "Emporio": "€278.76 → ~€276.76 (Ginger semantic fix; Prosciutto +€1.40 may persist)"
+      }
+    },
+    "hallucinationRate": {
+      "phantomRows": 0,
+      "totalExtractedRows": 51,
+      "ratePct": 0,
+      "note": "Mammafiore 9→8 rows"
+    },
+    "rowRecall": 100
+  },
+  "delta": {
+    "rowsFullyCorrectPct": "+9.8pp",
+    "fieldAccuracyStrictOverall": "+3pp",
+    "quantityStrict": "+8pp",
+    "unitStrict": "+2pp",
+    "financialAccuracyAggregate": "+2.9pp",
+    "hallucinationRate": "-1.92pp",
+    "descriptionStrict": "0pp (unchanged)"
+  },
+  "confidence": {
+    "overall": "MEDIUM-HIGH",
+    "quantityUnitFixes": "HIGH",
+    "phantomElimination": "HIGH",
+    "priceColumnFixes": "LOW-MEDIUM",
+    "descriptionOCR": "HIGH (no change expected)"
+  }
+}

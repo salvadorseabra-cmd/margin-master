@@ -1,0 +1,26 @@
+{
+  "invoice_image_product_code": "BBB-GINGER33ITA",
+  "product_code_persisted": false,
+  "schema_note": "invoice_items has no product_code column — SKU visible on PDF only",
+  "gpt_extract_invoice_response": {
+    "name": "Baladin - Ginger Beer 0.20cl",
+    "quantity": 24,
+    "unit": "un",
+    "unit_price": 0.85,
+    "total": 19.38,
+    "source": ".tmp/emporio-italia-investigation/extract-invoice-response.json"
+  },
+  "db_current_row": {
+    "name": "Baladin - Ginger Beer 0.20cl",
+    "quantity": 2,
+    "unit": "cx",
+    "unit_price": 9.69,
+    "total": 19.38
+  },
+  "volume_token_analysis": {
+    "stored_in_name": "0.20cl",
+    "not_stored_as": ["20cl", "200ml", "0.20L", "20ml", "33cl"],
+    "interpretation": "Literal decimal centilitre token; not normalized at extraction"
+  },
+  "qty_unit_drift": "Re-upload changed 24 un @ €0.85 → 2 cx @ €9.69 (same €19.38 line total; likely 2×12-pack representation)"
+}

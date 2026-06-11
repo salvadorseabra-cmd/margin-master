@@ -1,0 +1,27 @@
+{
+  "generated_at": "2026-06-11T01:39:40.951Z",
+  "source": ".tmp/column-selection-deep-dive/monetary-candidates.json",
+  "rows": [
+    {
+      "product": "Prosciutto Cotto",
+      "candidates": {
+        "qty": 4.3,
+        "unit_price_gross": 10.3,
+        "discount_pct": 17.5,
+        "line_total": 36.54
+      },
+      "note": "Discount column lacks % symbol on Emporio template"
+    },
+    {
+      "product": "POMODOR PELATI",
+      "candidates": {
+        "qty": 1,
+        "unit_price_gross": 27.56,
+        "discount_pct": 20,
+        "line_total": 22.05,
+        "vat_pct": 23
+      },
+      "note": "EUR vs % suffixes distinguish price columns"
+    }
+  ]
+}

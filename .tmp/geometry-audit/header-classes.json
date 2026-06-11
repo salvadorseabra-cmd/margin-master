@@ -1,0 +1,29 @@
+{
+  "A_grey_shaded": {
+    "invoices": [
+      "Aviludo May",
+      "Aviludo April",
+      "Bidfood Portugal"
+    ],
+    "detectionSuccessRate": 1,
+    "avgRowRecall": 1,
+    "avgFooterRecall": 1
+  },
+  "B_white_rule": {
+    "invoices": [
+      "IL Bocconcino",
+      "Mammafiore Portugal"
+    ],
+    "detectionSuccessRate": 0.5,
+    "avgRowRecall": 0.5,
+    "avgFooterRecall": 1
+  },
+  "C_other": {
+    "invoices": [
+      "Emporio Italia"
+    ],
+    "detectionSuccessRate": 1,
+    "avgRowRecall": 1,
+    "avgFooterRecall": 1
+  }
+}

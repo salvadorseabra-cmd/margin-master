@@ -1,0 +1,15 @@
+{
+  "one_line_root_cause": "OCR typo '0.20cl' parsed literally as 0.20 centilitres (2ml/bottle) instead of 33cl implied by SKU — yielding 48ml total and €425/L.",
+  "suspect_beverage_lines": 1,
+  "total_beverage_lines_scanned": 5,
+  "evidence_files": [
+    "db-record.json",
+    "extraction-trace.json",
+    "parsing-chain.json",
+    "math-audit.json",
+    "similar-beverages.json",
+    "stage-analysis.json",
+    "ui-display.json",
+    "REPORT.md"
+  ]
+}

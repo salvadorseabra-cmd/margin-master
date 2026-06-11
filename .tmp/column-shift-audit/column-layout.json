@@ -1,0 +1,58 @@
+{
+  "generated_at": "2026-06-11T01:30:00.000Z",
+  "emporio_prosciutto": {
+    "sourceImage": ".tmp/emporio-italia-investigation/invoice-full.png",
+    "rowCrop": "emporio-prosciutto-row-crop.png",
+    "annotated": "emporio-prosciutto-row-annotated.png",
+    "rowBounds": { "top": 518, "height": 40, "width": 724 },
+    "visibleValues": {
+      "codigo": "UO502",
+      "lotes": "03-12-2026",
+      "designacao": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC ~4,25KG",
+      "imposto": "IVA23",
+      "qty": "4,30",
+      "unit_price": "10,30 €",
+      "discount_pct": "17,50",
+      "line_total": "36,54 €"
+    },
+    "columns": [
+      { "name": "codigo", "x0": 0, "x1": 52 },
+      { "name": "lotes", "x0": 52, "x1": 108 },
+      { "name": "designacao", "x0": 108, "x1": 392 },
+      { "name": "imposto", "x0": 392, "x1": 438 },
+      { "name": "qty", "x0": 438, "x1": 478 },
+      { "name": "unit_price", "x0": 478, "x1": 548 },
+      { "name": "discount_pct", "x0": 548, "x1": 612 },
+      { "name": "line_total", "x0": 612, "x1": 724 }
+    ]
+  },
+  "bocconcino_pomodor": {
+    "sourceImage": ".tmp/bocconcino-investigation/invoice-full.png",
+    "rowCrop": "bocconcino-pomodor-row-crop.png",
+    "annotated": "bocconcino-pomodor-row-annotated.png",
+    "rowBounds": { "top": 612, "height": 42, "width": 752 },
+    "visibleValues": {
+      "referencia": "VG0026",
+      "descricao": "POMODORI PELATI (CX 2,5KG*6)",
+      "qty": "1,000",
+      "cxs": "(blank)",
+      "unit": "UNI",
+      "unit_price": "27,560 EUR",
+      "discount_pct": "20,00%",
+      "line_total": "22,05 EUR",
+      "vat": "23%"
+    },
+    "columns": [
+      { "name": "referencia", "x0": 0, "x1": 72 },
+      { "name": "descricao", "x0": 72, "x1": 292 },
+      { "name": "qty", "x0": 292, "x1": 358 },
+      { "name": "cxs", "x0": 358, "x1": 392 },
+      { "name": "unit", "x0": 392, "x1": 424 },
+      { "name": "unit_price", "x0": 424, "x1": 518 },
+      { "name": "discount_pct", "x0": 518, "x1": 578 },
+      { "name": "line_total", "x0": 578, "x1": 668 },
+      { "name": "vat", "x0": 668, "x1": 752 }
+    ],
+    "layoutNote": "Neighbour row (Mezzi Paccheri) has blank DESC column — sparse discount field increases shift risk"
+  }
+}

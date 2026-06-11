@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-06-11T00:52:43.017Z",
+  "commit": "c33a7f1",
+  "options": {
+    "KEEP": {
+      "scores": {
+        "Accuracy": 91.87,
+        "FinancialImpact": 94.82,
+        "HallucinationRisk": 100,
+        "OperationalReliability": 75
+      },
+      "composite": 91.85,
+      "pros": [
+        "Eliminates phantom rows (Mammafiore Olio/Lote)",
+        "Fixes Emporio Ginger Beer qty 24→2",
+        "Fixes Aviludo April financial accuracy 43.8%→100%",
+        "Zero hallucination rate across 6 invoices"
+      ],
+      "cons": [
+        "Field accuracy drops 95%→91.9%",
+        "Aviludo May Acúcar qty 1→9 regression",
+        "Bidfood Hortelã qty 0.5→1 regression",
+        "Emporio Bresaola qty drift"
+      ]
+    },
+    "REFINE": {
+      "scores": {
+        "Accuracy": 95.44,
+        "FinancialImpact": 96.01,
+        "HallucinationRisk": 95,
+        "OperationalReliability": 88
+      },
+      "composite": 94.41,
+      "pros": [
+        "Retain anti-phantom guards and column-first core",
+        "Re-introduce contextual reasoning for edge cases (Hortelã 0.5kg, Acúcar column)",
+        "Target projected 94%+ field accuracy per passc-redesign estimates"
+      ],
+      "cons": [
+        "Requires prompt iteration and re-validation",
+        "Risk of re-introducing multiplier inference if guards weakened"
+      ]
+    },
+    "REVERT": {
+      "scores": {
+        "Accuracy": 95,
+        "FinancialImpact": 95.19,
+        "HallucinationRisk": 98,
+        "OperationalReliability": 85
+      },
+      "composite": 94.16,
+      "pros": [
+        "Higher aggregate field accuracy (95%)",
+        "Fewer qty regressions on Bidfood/Aviludo May",
+        "Proven operational baseline"
+      ],
+      "cons": [
+        "Mammafiore phantom row returns (11% hallucination on that invoice)",
+        "Emporio Ginger Beer qty 24 error returns",
+        "Pack-multiplier errors on Aceto/Rulo persist in raw Pass C"
+      ]
+    }
+  },
+  "recommendation": "REFINE",
+  "confidencePct": 72,
+  "rationale": "c33a7f1 fixed high-severity hallucination and multiplier errors but traded them for column-reading regressions. Net row-level: more fixes than regressions on material fields, but aggregate accuracy dropped. Refining — not full revert — preserves anti-phantom gains while restoring contextual edge-case handling."
+}

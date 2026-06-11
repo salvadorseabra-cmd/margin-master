@@ -1,0 +1,21 @@
+{
+  "imageWidth": 848,
+  "imageHeight": 1200,
+  "bounds": {
+    "top": 184,
+    "bottom": 439,
+    "headerTop": 194,
+    "headerBottom": 212,
+    "totalsStart": 415,
+    "detected": true
+  },
+  "fractionStartY": 540,
+  "summaryBandTop": null,
+  "footerCropStartY": 540,
+  "footerCropHeight": 660,
+  "scanStart": 144,
+  "scanEnd": 660,
+  "greyHeaderThreshold": 163,
+  "imageSource": "local_fallback_pdf",
+  "isPdf": true
+}

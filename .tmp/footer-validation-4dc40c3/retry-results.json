@@ -1,0 +1,40 @@
+[
+  {
+    "label": "Bidfood",
+    "expected": 292.7,
+    "extractStatus": 200,
+    "extractError": null,
+    "extractedTotal": 292.7,
+    "dbTotal": 292.7,
+    "pass": "PASS",
+    "footerCropPath": ".tmp/footer-validation-4dc40c3/bidfood-footer-crop.png",
+    "footerPass": {
+      "skipped": true,
+      "reason": "OPENAI_API_KEY not set locally"
+    },
+    "edgeResponse": {
+      "total": 292.7,
+      "supplier": "Bidfood Portugal, SA",
+      "itemCount": 11
+    }
+  },
+  {
+    "label": "Aviludo Abril",
+    "expected": 370.17,
+    "note": "Storage file is 2.5KB PDF; extraction used local PNG fixture equivalent",
+    "extractStatus": 200,
+    "extractedTotal": 687.07,
+    "dbTotal": 687.07,
+    "pass": "FAIL",
+    "footerCropPath": ".tmp/footer-validation-4dc40c3/aviludo-abril-footer-crop.png",
+    "footerPass": {
+      "skipped": true,
+      "reason": "OPENAI_API_KEY not set locally"
+    },
+    "edgeResponse": {
+      "total": 687.07,
+      "supplier": "AVILUDO",
+      "itemCount": 9
+    }
+  }
+]

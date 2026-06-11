@@ -1,0 +1,259 @@
+[
+  {
+    "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "label": "Bidfood",
+    "status": 200,
+    "itemCount": 11,
+    "items": [
+      {
+        "name": "Manteiga Coimbra s/SAL EMB 1 Kg",
+        "quantity": 8,
+        "total": 71.2
+      },
+      {
+        "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+        "quantity": 1,
+        "total": 38.44
+      },
+      {
+        "name": "Tomilho",
+        "quantity": 1,
+        "total": 2.06
+      },
+      {
+        "name": "Salada Ibérica FSTK EMB. 250g",
+        "quantity": 4,
+        "total": 8.76
+      },
+      {
+        "name": "Manjericão",
+        "quantity": 5,
+        "total": 10.28
+      },
+      {
+        "name": "Hortelã",
+        "quantity": 0.5,
+        "total": 2.7
+      },
+      {
+        "name": "Pepino",
+        "quantity": 3.36,
+        "total": 4.76
+      },
+      {
+        "name": "Pêra Abacate Hasse",
+        "quantity": 3.28,
+        "total": 13.96
+      },
+      {
+        "name": "Courgettes",
+        "quantity": 3.3,
+        "total": 5.15
+      },
+      {
+        "name": "Alho Francês",
+        "quantity": 5.42,
+        "total": 7.67
+      },
+      {
+        "name": "Abóbora Butternut",
+        "quantity": 5.64,
+        "total": 5.59
+      }
+    ]
+  },
+  {
+    "id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+    "label": "Aviludo May",
+    "status": 200,
+    "itemCount": 8,
+    "items": [
+      {
+        "name": "Filete de Anchoivas Alcofiniosa Lt 495 g",
+        "quantity": 2,
+        "total": 19.98
+      },
+      {
+        "name": "Ovo Liquido Past.Gema Dovo 1 Kg",
+        "quantity": 6,
+        "total": 62.94
+      },
+      {
+        "name": "Pepinos Extra Uti Frasco 6x720 g",
+        "quantity": 1,
+        "total": 22.49
+      },
+      {
+        "name": "Atum Oleo Boisa Nau Ciafrinte 1 Kg",
+        "quantity": 2,
+        "total": 13.1
+      },
+      {
+        "name": "Arroz Agulha Metro Chef 12x1 kg",
+        "quantity": 1,
+        "total": 13.95
+      },
+      {
+        "name": "Chocolate Culinaria Pantaguer 10x200 g",
+        "quantity": 2,
+        "total": 59.98
+      },
+      {
+        "name": "Açucar Branco METRO Chef 10x1 Kg",
+        "quantity": 9,
+        "total": 85.41
+      },
+      {
+        "name": "Nata Culinaria 22% Remy Picot 6x1 Lt",
+        "quantity": 5,
+        "total": 94.45
+      }
+    ]
+  },
+  {
+    "id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+    "label": "Aviludo April",
+    "status": 200,
+    "itemCount": 0,
+    "items": []
+  },
+  {
+    "id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+    "label": "Emporio",
+    "status": 200,
+    "itemCount": 8,
+    "items": [
+      {
+        "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+        "quantity": 24,
+        "total": 50.2
+      },
+      {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Casaleggio 1/8 - 1,5Kg Produto de Stock",
+        "quantity": 1.35,
+        "total": 13.44
+      },
+      {
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4-4,25Kg Produto de Stock",
+        "quantity": 4,
+        "total": 36.54
+      },
+      {
+        "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5Kg Produto de Stock",
+        "quantity": 3.11,
+        "total": 31.07
+      },
+      {
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+        "quantity": 2,
+        "total": 38.56
+      },
+      {
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - Produto de Stock",
+        "quantity": 2.28,
+        "total": 49.64
+      },
+      {
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 2,
+        "total": 19.38
+      },
+      {
+        "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+        "quantity": 2.6,
+        "total": 39.49
+      }
+    ]
+  },
+  {
+    "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+    "label": "Bocconcino",
+    "status": 200,
+    "itemCount": 7,
+    "items": [
+      {
+        "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "quantity": 10,
+        "total": 81.23
+      },
+      {
+        "name": "STRACCIATELLA 250 GR",
+        "quantity": 24,
+        "total": 74.54
+      },
+      {
+        "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "quantity": 1,
+        "total": 27.3
+      },
+      {
+        "name": "POMODORO PELATI (CX 2.5KG*6)",
+        "quantity": 2,
+        "total": 40
+      },
+      {
+        "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "quantity": 2,
+        "total": 42.07
+      },
+      {
+        "name": "RICOTTA TREVIGIANA 1,5KG",
+        "quantity": 1,
+        "total": 7.97
+      },
+      {
+        "name": "ROLO DE CABRA E VACA 1KG",
+        "quantity": 1,
+        "total": 12.71
+      }
+    ]
+  },
+  {
+    "id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+    "label": "Mammafiore",
+    "status": 200,
+    "itemCount": 8,
+    "items": [
+      {
+        "name": "Guanciale di Suino stagionato +/-1.5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "total": 101.59
+      },
+      {
+        "name": "Farina Speciale pizza 25kg Amoruso",
+        "quantity": 1,
+        "total": 33.15
+      },
+      {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "total": 36.7
+      },
+      {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "total": 16.09
+      },
+      {
+        "name": "MOZZA Fiori di Latte Expet Julienne 3kg Simonetta",
+        "quantity": 10,
+        "total": 200.3
+      },
+      {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "total": 10.38
+      },
+      {
+        "name": "Recargo por combustible",
+        "quantity": 1,
+        "total": 2
+      },
+      {
+        "name": "Farina di pasta fresca e gnocchi25kg Caputo",
+        "quantity": 1,
+        "total": 30.11
+      }
+    ]
+  }
+]

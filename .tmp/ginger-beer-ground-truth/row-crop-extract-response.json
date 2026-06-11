@@ -1,0 +1,45 @@
+{
+  "status": 200,
+  "body": {
+    "supplier": "Warung Nasi Ampera",
+    "invoice_date": "2023-08-29",
+    "total": 292.7,
+    "items": [
+      {
+        "name": "Hamburger Angus 180gr Caixa 40 un",
+        "quantity": 40,
+        "unit": "un",
+        "unit_price": 1.49,
+        "total": 59.6
+      },
+      {
+        "name": "Pão Brioche 80g 120 un",
+        "quantity": 120,
+        "unit": "un",
+        "unit_price": 0.26,
+        "total": 31.2
+      },
+      {
+        "name": "Batata Frita Congelada 2.5kg",
+        "quantity": 3,
+        "unit": "em",
+        "unit_price": 3.78,
+        "total": 11.34
+      },
+      {
+        "name": "Coca-Cola 33cl Pack 24",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 0.89,
+        "total": 21.36
+      },
+      {
+        "name": "Água 25cl Pack 24",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 0.19,
+        "total": 4.56
+      }
+    ]
+  }
+}

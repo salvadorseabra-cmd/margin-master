@@ -1,0 +1,164 @@
+[
+  {
+    "key": "emporio",
+    "label": "Emporio Italia",
+    "id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+    "storagePath": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781116023680-Screenshot_2026-06-07_at_21.05.07.png",
+    "db": {
+      "total": 0,
+      "supplier": "Emporio Italia",
+      "invoice_date": "2026-05-19",
+      "itemsCount": 8,
+      "itemsSum": 272.15
+    },
+    "expected": {
+      "total": 327.46,
+      "net_subtotal": 278.16,
+      "vat": 49.3
+    },
+    "crop": {
+      "imageWidth": 724,
+      "imageHeight": 1124,
+      "tableBounds": {
+        "top": 456,
+        "bottom": 851,
+        "headerTop": 466,
+        "headerBottom": 502,
+        "totalsStart": 827,
+        "detected": true
+      },
+      "fractionStartY": 506,
+      "footerCropStartY": 851,
+      "footerCropHeight": 273,
+      "footerCropEndY": 1124,
+      "bottomFraction": 0.55,
+      "cropMethod": "max(fractionStartY, tableBoundsBottom)"
+    },
+    "containsTotals": {
+      "verdict": "NO",
+      "reason": "Footer crop starts at y=851 (at/after table bottom 851); Emporio-style totals sit above this edge"
+    },
+    "ocr": {
+      "skipped": true,
+      "reason": "OPENAI_API_KEY not set"
+    },
+    "footerPassLocal": {
+      "skipped": true,
+      "reason": "OPENAI_API_KEY not set locally"
+    },
+    "extract": {
+      "status": 200,
+      "total": null,
+      "supplier": "Emporio Italia, Lda.",
+      "itemCount": 8
+    }
+  },
+  {
+    "key": "bidfood",
+    "label": "Bidfood",
+    "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "storagePath": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781044599758-Screenshot_2026-06-07_at_21.04.40.png",
+    "db": {
+      "total": 292.7,
+      "supplier": "Bidfood Portugal",
+      "invoice_date": "2026-05-25",
+      "itemsCount": 11,
+      "itemsSum": 170.57
+    },
+    "expected": {
+      "total": 292.7,
+      "net_subtotal": 237.97,
+      "vat": 54.73
+    },
+    "crop": {
+      "imageWidth": 920,
+      "imageHeight": 1272,
+      "tableBounds": {
+        "top": 437,
+        "bottom": 1037,
+        "headerTop": 447,
+        "headerBottom": 465,
+        "totalsStart": 1013,
+        "detected": true
+      },
+      "fractionStartY": 572,
+      "footerCropStartY": 1037,
+      "footerCropHeight": 235,
+      "footerCropEndY": 1272,
+      "bottomFraction": 0.55,
+      "cropMethod": "max(fractionStartY, tableBoundsBottom)"
+    },
+    "containsTotals": {
+      "verdict": "NO",
+      "reason": "Footer crop starts at y=1037 (at/after table bottom 1037); Emporio-style totals sit above this edge"
+    },
+    "ocr": {
+      "skipped": true,
+      "reason": "OPENAI_API_KEY not set"
+    },
+    "footerPassLocal": {
+      "skipped": true,
+      "reason": "OPENAI_API_KEY not set locally"
+    },
+    "extract": {
+      "status": 546,
+      "total": null,
+      "supplier": null,
+      "itemCount": 0
+    }
+  },
+  {
+    "key": "aviludoMay",
+    "label": "Aviludo May",
+    "id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+    "storagePath": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1780870127518-Screenshot_2026-06-07_at_21.05.11.png",
+    "db": {
+      "total": 330.42,
+      "supplier": "Aviludo",
+      "invoice_date": "2026-05-19",
+      "itemsCount": 8,
+      "itemsSum": 296.88
+    },
+    "expected": {
+      "total": 330.42,
+      "net_subtotal": 268.63,
+      "vat": 61.79
+    },
+    "crop": {
+      "imageWidth": 742,
+      "imageHeight": 938,
+      "tableBounds": {
+        "top": 218,
+        "bottom": 448,
+        "headerTop": 228,
+        "headerBottom": 247,
+        "totalsStart": 424,
+        "detected": true
+      },
+      "fractionStartY": 422,
+      "footerCropStartY": 448,
+      "footerCropHeight": 490,
+      "footerCropEndY": 938,
+      "bottomFraction": 0.55,
+      "cropMethod": "max(fractionStartY, tableBoundsBottom)"
+    },
+    "containsTotals": {
+      "verdict": "NO",
+      "reason": "Footer crop starts at y=448 (at/after table bottom 448); Emporio-style totals sit above this edge"
+    },
+    "ocr": {
+      "skipped": true,
+      "reason": "OPENAI_API_KEY not set"
+    },
+    "footerPassLocal": {
+      "skipped": true,
+      "reason": "OPENAI_API_KEY not set locally"
+    },
+    "extract": {
+      "status": 200,
+      "total": 330.42,
+      "supplier": "Aviludo - Indústria e Comércio de Produtos Alimentares, S.A.",
+      "itemCount": 8
+    }
+  }
+]

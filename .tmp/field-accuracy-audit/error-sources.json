@@ -1,0 +1,241 @@
+{
+  "vl_project": "bjhnlrgodcqoyzddbpbd",
+  "generated_at": "2026-06-10T21:59:31.704Z",
+  "methodology": "WRONG fields traced via Pass C cache vs DB; Mammafiore uses line-trace.json stage diff",
+  "distribution": {
+    "OCR": 8,
+    "GPT Extraction": 3,
+    "Normalization": 0,
+    "Reconcile": 0,
+    "Persistence": 9,
+    "N/A": 0
+  },
+  "wrongFieldCount": 12,
+  "minorVariationCount": 8,
+  "errors": [
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoice": "Aviludo May",
+      "groundTruthDescription": "Filete de Anchoas Alcofinosa L4 495 g",
+      "extractedName": "Filete de Anchoas Alconfirosa L4 495 g",
+      "field": "description",
+      "status": "MINOR_VARIATION",
+      "source": "OCR",
+      "note": "Label spelling/OCR noise — numerics may still be correct"
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoice": "Aviludo May",
+      "groundTruthDescription": "Pepinos Extra Uli Frasco 6x720 g",
+      "extractedName": "Pepinos Extra Uil Frasco 6x720 g",
+      "field": "description",
+      "status": "MINOR_VARIATION",
+      "source": "OCR",
+      "note": "Label spelling/OCR noise — numerics may still be correct"
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoice": "Aviludo May",
+      "groundTruthDescription": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+      "extractedName": "Atum Oleo Bolsa Nau Cahirenta 1 Kg",
+      "field": "description",
+      "status": "MINOR_VARIATION",
+      "source": "OCR",
+      "note": "Label spelling/OCR noise — numerics may still be correct"
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoice": "Aviludo May",
+      "groundTruthDescription": "Nata Culinária 22% Reny Picot 6x1 L",
+      "extractedName": "Nata Culinaria 22% Remy Picot 6x1 L",
+      "field": "description",
+      "status": "MINOR_VARIATION",
+      "source": "OCR",
+      "note": "Label spelling/OCR noise — numerics may still be correct"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "invoice": "Emporio Italia",
+      "groundTruthDescription": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+      "extractedName": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castellone 1/8° - 1,5kg",
+      "field": "description",
+      "status": "MINOR_VARIATION",
+      "source": "OCR",
+      "note": "Label spelling/OCR noise — numerics may still be correct"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "invoice": "Emporio Italia",
+      "groundTruthDescription": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "extractedName": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg",
+      "field": "unit_price",
+      "status": "WRONG",
+      "groundTruth": 8.17,
+      "extracted": 17,
+      "source": "Persistence",
+      "evidence": ".tmp/emporio-footer-fix/emporio-italia-extract.json"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "invoice": "Emporio Italia",
+      "groundTruthDescription": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "extractedName": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg",
+      "field": "line_total",
+      "status": "WRONG",
+      "groundTruth": 35.14,
+      "extracted": 36.54,
+      "source": "Persistence",
+      "evidence": ".tmp/emporio-footer-fix/emporio-italia-extract.json"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "invoice": "Emporio Italia",
+      "groundTruthDescription": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "extractedName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "field": "quantity",
+      "status": "WRONG",
+      "groundTruth": 2.56,
+      "extracted": 2,
+      "source": "Persistence",
+      "evidence": ".tmp/emporio-footer-fix/emporio-italia-extract.json"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "invoice": "Emporio Italia",
+      "groundTruthDescription": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "extractedName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "field": "unit_price",
+      "status": "WRONG",
+      "groundTruth": 15.06,
+      "extracted": 19.3,
+      "source": "Persistence",
+      "evidence": ".tmp/emporio-footer-fix/emporio-italia-extract.json"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "invoice": "Emporio Italia",
+      "groundTruthDescription": "Baladin - Ginger Beer 0.20cl",
+      "extractedName": "Baladin - Ginger Beer 0.20cl",
+      "field": "unit",
+      "status": "WRONG",
+      "groundTruth": "un",
+      "extracted": "cx",
+      "source": "Persistence",
+      "evidence": ".tmp/emporio-footer-fix/emporio-italia-extract.json"
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice": "IL Bocconcino",
+      "groundTruthDescription": "POMODOR PELATI (CX 2.5KG*6)",
+      "extractedName": "POMODORINI pelati (CX 2.5KG*6)",
+      "field": "quantity",
+      "status": "WRONG",
+      "groundTruth": 2,
+      "extracted": 6,
+      "source": "Persistence",
+      "evidence": ".tmp/mammafiore-fix/bocconcino-extract.json"
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice": "IL Bocconcino",
+      "groundTruthDescription": "POMODOR PELATI (CX 2.5KG*6)",
+      "extractedName": "POMODORINI pelati (CX 2.5KG*6)",
+      "field": "unit_price",
+      "status": "WRONG",
+      "groundTruth": 25,
+      "extracted": 20,
+      "source": "Persistence",
+      "evidence": ".tmp/mammafiore-fix/bocconcino-extract.json"
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice": "IL Bocconcino",
+      "groundTruthDescription": "POMODOR PELATI (CX 2.5KG*6)",
+      "extractedName": "POMODORINI pelati (CX 2.5KG*6)",
+      "field": "line_total",
+      "status": "WRONG",
+      "groundTruth": 50,
+      "extracted": 120,
+      "source": "Persistence",
+      "evidence": ".tmp/mammafiore-fix/bocconcino-extract.json"
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice": "IL Bocconcino",
+      "groundTruthDescription": "ROLO DE CABRA E VACA 1KG",
+      "extractedName": "ROLO DE CABEÇA DE VACA 1KG",
+      "field": "description",
+      "status": "MINOR_VARIATION",
+      "source": "OCR",
+      "note": "Label spelling/OCR noise — numerics may still be correct"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice": "Mammafiore",
+      "groundTruthDescription": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "extractedName": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+      "field": "quantity",
+      "status": "WRONG",
+      "groundTruth": 1,
+      "extracted": 2,
+      "source": "GPT Extraction",
+      "evidence": ".tmp/mammafiore-line-audit/extract-invoice-response.json"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice": "Mammafiore",
+      "groundTruthDescription": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "extractedName": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+      "field": "line_total",
+      "status": "WRONG",
+      "groundTruth": 16.09,
+      "extracted": 15.09,
+      "source": "Persistence",
+      "evidence": ".tmp/mammafiore-line-audit/extract-invoice-response.json"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice": "Mammafiore",
+      "groundTruthDescription": "MOZZA Fior di Latte Expert Julienne 3kg Simonetta",
+      "extractedName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "field": "description",
+      "status": "MINOR_VARIATION",
+      "source": "OCR",
+      "note": "Label spelling/OCR noise — numerics may still be correct"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice": "Mammafiore",
+      "groundTruthDescription": "Rulo Di Capra 1kg*2 Simonetta",
+      "extractedName": "Rub Di Capra 1kg *2 Simonetta",
+      "field": "description",
+      "status": "MINOR_VARIATION",
+      "source": "OCR",
+      "note": "Label spelling/OCR noise — numerics may still be correct"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice": "Mammafiore",
+      "groundTruthDescription": "Rulo Di Capra 1kg*2 Simonetta",
+      "extractedName": "Rub Di Capra 1kg *2 Simonetta",
+      "field": "quantity",
+      "status": "WRONG",
+      "groundTruth": 1,
+      "extracted": 2,
+      "source": "GPT Extraction",
+      "evidence": ".tmp/mammafiore-line-audit/extract-invoice-response.json"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice": "Mammafiore",
+      "groundTruthDescription": "Rulo Di Capra 1kg*2 Simonetta",
+      "extractedName": "Rub Di Capra 1kg *2 Simonetta",
+      "field": "line_total",
+      "status": "WRONG",
+      "groundTruth": 10.86,
+      "extracted": 10.38,
+      "source": "GPT Extraction",
+      "evidence": ".tmp/mammafiore-line-audit/extract-invoice-response.json"
+    }
+  ]
+}

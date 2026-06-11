@@ -1,0 +1,78 @@
+{
+  "vl_project": "bjhnlrgodcqoyzddbpbd",
+  "generated_at": "2026-06-10T21:59:31.705Z",
+  "ranking": [
+    {
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice": "Bidfood Portugal",
+      "groundTruthConfidence": "high",
+      "financialAccuracyPct": 100,
+      "lineSumDelta": 0,
+      "overallFieldAccuracyLenient": 100,
+      "overallFieldAccuracyStrict": 100,
+      "rowsFullyCorrectPct": 100,
+      "phantomRows": 0,
+      "compositeScore": 100
+    },
+    {
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoice": "Aviludo April",
+      "groundTruthConfidence": "low",
+      "financialAccuracyPct": 100,
+      "lineSumDelta": 0,
+      "overallFieldAccuracyLenient": 100,
+      "overallFieldAccuracyStrict": 100,
+      "rowsFullyCorrectPct": 100,
+      "phantomRows": 0,
+      "compositeScore": 100
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoice": "Aviludo May",
+      "groundTruthConfidence": "high",
+      "financialAccuracyPct": 100,
+      "lineSumDelta": 0,
+      "overallFieldAccuracyLenient": 100,
+      "overallFieldAccuracyStrict": 90,
+      "rowsFullyCorrectPct": 50,
+      "phantomRows": 0,
+      "compositeScore": 83.33
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice": "Mammafiore",
+      "groundTruthConfidence": "high",
+      "financialAccuracyPct": 95.53,
+      "lineSumDelta": 16.82,
+      "overallFieldAccuracyLenient": 90,
+      "overallFieldAccuracyStrict": 85,
+      "rowsFullyCorrectPct": 62.5,
+      "phantomRows": 1,
+      "compositeScore": 82.68
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice": "IL Bocconcino",
+      "groundTruthConfidence": "high",
+      "financialAccuracyPct": 76.34,
+      "lineSumDelta": 70,
+      "overallFieldAccuracyLenient": 91,
+      "overallFieldAccuracyStrict": 89,
+      "rowsFullyCorrectPct": 71.43,
+      "phantomRows": 0,
+      "compositeScore": 79.59
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "invoice": "Emporio Italia",
+      "groundTruthConfidence": "high",
+      "financialAccuracyPct": 99.28,
+      "lineSumDelta": 2,
+      "overallFieldAccuracyLenient": 88,
+      "overallFieldAccuracyStrict": 83,
+      "rowsFullyCorrectPct": 37.5,
+      "phantomRows": 0,
+      "compositeScore": 74.93
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "generated_at": "2026-06-11T01:39:40.954Z",
+  "rowsTested": 32,
+  "flaggedCount": 12,
+  "falsePositiveRate": 37.5,
+  "byRule": {
+    "A": 12,
+    "B": 0,
+    "C": 0,
+    "D": 10,
+    "E": 0
+  },
+  "flaggedRows": [
+    {
+      "invoice": "Bidfood Portugal",
+      "product": "Salada Ibérica FSTK EMB. 250g",
+      "rules": [
+        "A_qty_x_unit_approx_total"
+      ]
+    },
+    {
+      "invoice": "Bidfood Portugal",
+      "product": "Hortelã",
+      "rules": [
+        "A_qty_x_unit_approx_total",
+        "D_unit_exceeds_plausible_net"
+      ]
+    },
+    {
+      "invoice": "Bidfood Portugal",
+      "product": "Pepino",
+      "rules": [
+        "A_qty_x_unit_approx_total",
+        "D_unit_exceeds_plausible_net"
+      ]
+    },
+    {
+      "invoice": "Bidfood Portugal",
+      "product": "Pêra Abacate Hasse",
+      "rules": [
+        "A_qty_x_unit_approx_total",
+        "D_unit_exceeds_plausible_net"
+      ]
+    },
+    {
+      "invoice": "Bidfood Portugal",
+      "product": "Courgettes",
+      "rules": [
+        "A_qty_x_unit_approx_total",
+        "D_unit_exceeds_plausible_net"
+      ]
+    },
+    {
+      "invoice": "Bidfood Portugal",
+      "product": "Alho Francês",
+      "rules": [
+        "A_qty_x_unit_approx_total",
+        "D_unit_exceeds_plausible_net"
+      ]
+    },
+    {
+      "invoice": "Bidfood Portugal",
+      "product": "Abóbora Butternut",
+      "rules": [
+        "A_qty_x_unit_approx_total",
+        "D_unit_exceeds_plausible_net"
+      ]
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "rules": [
+        "A_qty_x_unit_approx_total",
+        "D_unit_exceeds_plausible_net"
+      ]
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "rules": [
+        "A_qty_x_unit_approx_total",
+        "D_unit_exceeds_plausible_net"
+      ]
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\"",
+      "rules": [
+        "A_qty_x_unit_approx_total",
+        "D_unit_exceeds_plausible_net"
+      ]
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "STRACCIATELLA 250 GR",
+      "rules": [
+        "A_qty_x_unit_approx_total",
+        "D_unit_exceeds_plausible_net"
+      ]
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "rules": [
+        "A_qty_x_unit_approx_total"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "method": "manual visual transcription from saved crops — OPENAI_API_KEY unavailable locally",
+  "source_crops": [
+    ".tmp/ginger-beer-ground-truth/invoice-full.png",
+    ".tmp/ginger-beer-ground-truth/table-data-crop.png",
+    ".tmp/ginger-beer-ground-truth/ginger-beer-row-crop.png",
+    ".tmp/ginger-beer-ground-truth/ginger-beer-desc-zoom4x.png"
+  ],
+  "raw_text": "BBB-GINGER33ITA | 30-06-2027 | Baladin - Ginger Beer 0.20cl | IVA23 | 24,00 | 0,85 € | 5.00 | 19,38 €",
+  "volume_token_visible": "0.20cl",
+  "volume_token_alternate_readings": {
+    "portuguese_comma": "0,20cl (same numeric value; comma decimal separator on printed invoice)",
+    "rejected": ["33cl", "0.33cl", "20cl (only seen on over-zoomed/blurry desc crop; not supported by full-row or full-table views)"]
+  },
+  "product_code_visible": "BBB-GINGER33ITA",
+  "product_code_on_same_row": true,
+  "notes": "Product code embeds '33' (likely 33cl SKU) but Designação column explicitly prints 0.20cl. This mismatch is on the source document, not introduced by the pipeline."
+}

@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-06-11T01:30:00.000Z",
+  "overall": "HIGH",
+  "likelihoodAt1000RestaurantInvoices": "HIGH",
+  "rationale": [
+    "Emporio template: 8 columns, Desc.(%) sandwiched between Preço Unit and Preço Total",
+    "Bocconcino template: P.VENDA / DESC / VALOR cluster with blank discount cells on neighbour rows",
+    "Both target errors reproduce column-shift patterns in fresh 5-run audit (not one-off)",
+    "gpt-pattern-audit: 33% of financial errors attributed to vision column limitations",
+    "root-cause-consolidation rated Column Shift HIGH at 1000-invoice scale",
+    "Discount-line audit confirmed separate variance class; column shift is distinct stable/residual bucket (~€21)"
+  ],
+  "perInvoice": {
+    "emporio": {
+      "layout": "White Emporio template, 2-line rows, IVA column adjacent to Qty",
+      "columnSpacing": "Tight right-side numeric cluster (~60px per column)",
+      "risk": "HIGH"
+    },
+    "bocconcino": {
+      "layout": "Bocconcino 9-column grid, sparse CXs/DESC cells",
+      "columnSpacing": "P.VENDA→DESC→VALOR within ~160px",
+      "risk": "HIGH"
+    }
+  },
+  "stabilityNote": "5-run audit shows variance within column-shift class (not purely deterministic); recurrence risk remains HIGH because wrong-column reads occur on most runs"
+}

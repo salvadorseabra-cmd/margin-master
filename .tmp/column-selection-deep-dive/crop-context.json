@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-06-11T01:34:01.493Z",
+  "emporio_prosciutto": {
+    "passCInput": "Full-width table crop (~724×395px), horizontal context complete",
+    "headersInPassCCrop": false,
+    "rowCropHorizontal": "complete — all 8 columns visible",
+    "humanFromRowCropAlone": "MARGINAL",
+    "humanFromPassCTableCrop": "MARGINAL — headers clipped; € symbols distinguish price vs discount partially",
+    "humanFromFullInvoice": "YES",
+    "evidence": [
+      "emporio-table-crop-simulated.png lacks headers",
+      "emporio-probe-430.png shows headers at y≈430"
+    ]
+  },
+  "bocconcino_pomodor": {
+    "passCInput": "Full-width table crop (~752×448px), headers included",
+    "headersInPassCCrop": true,
+    "rowCropHorizontal": "complete — all 9 columns visible",
+    "humanFromRowCropAlone": "YES — EUR vs % symbols anchor columns",
+    "humanFromPassCTableCrop": "YES — headers + symbols",
+    "humanFromFullInvoice": "YES",
+    "evidence": [
+      "bocconcino-table-crop-simulated.png shows P.VENDA/DESC/VALOR headers"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "status": 200,
+  "body": {
+    "supplier": null,
+    "invoice_date": null,
+    "total": null,
+    "items": [
+      {
+        "name": "Rovagnati - Salame Ventricina 2.5 Kg Produto de Stock",
+        "quantity": 2.6,
+        "unit": "kg",
+        "unit_price": 16.6,
+        "total": 39.49
+      }
+    ]
+  }
+}

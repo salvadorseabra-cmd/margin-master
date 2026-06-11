@@ -1,0 +1,167 @@
+{
+  "generated_at": "2026-06-10T23:56:09.491Z",
+  "classifications": [
+    {
+      "invoice": "Aviludo May",
+      "row": "Filete de Anchoas Alcofinosa L4 495 g",
+      "errorTypes": [
+        "OCR Character Noise"
+      ],
+      "wrongFields": [],
+      "evidence": ".tmp/hallucination-audit/extract-3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json"
+    },
+    {
+      "invoice": "Aviludo May",
+      "row": "Pepinos Extra Uli Frasco 6x720 g",
+      "errorTypes": [
+        "OCR Character Noise"
+      ],
+      "wrongFields": [],
+      "evidence": ".tmp/hallucination-audit/extract-3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json"
+    },
+    {
+      "invoice": "Aviludo May",
+      "row": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+      "errorTypes": [
+        "OCR Character Noise"
+      ],
+      "wrongFields": [],
+      "evidence": ".tmp/hallucination-audit/extract-3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json"
+    },
+    {
+      "invoice": "Aviludo May",
+      "row": "Nata Culinária 22% Reny Picot 6x1 L",
+      "errorTypes": [
+        "OCR Character Noise"
+      ],
+      "wrongFields": [],
+      "evidence": ".tmp/hallucination-audit/extract-3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "row": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+      "errorTypes": [
+        "OCR Character Noise"
+      ],
+      "wrongFields": [],
+      "evidence": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "row": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "errorTypes": [
+        "Column Shift"
+      ],
+      "wrongFields": [
+        "unit_price",
+        "line_total"
+      ],
+      "evidence": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "row": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+      "errorTypes": [
+        "OCR Character Noise"
+      ],
+      "wrongFields": [],
+      "evidence": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "row": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "errorTypes": [
+        "Column Shift"
+      ],
+      "wrongFields": [
+        "quantity",
+        "unit_price"
+      ],
+      "evidence": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "row": "Baladin - Ginger Beer 0.20cl",
+      "errorTypes": [
+        "Pack Multiplier Confusion"
+      ],
+      "wrongFields": [
+        "unit"
+      ],
+      "evidence": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json"
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "row": "POMODOR PELATI (CX 2.5KG*6)",
+      "errorTypes": [
+        "Pack Multiplier Confusion",
+        "Column Shift"
+      ],
+      "wrongFields": [
+        "quantity",
+        "unit_price",
+        "line_total"
+      ],
+      "evidence": ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-gpt-raw-cache.json"
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "row": "ROLO DE CABRA E VACA 1KG",
+      "errorTypes": [
+        "OCR Character Noise"
+      ],
+      "wrongFields": [],
+      "evidence": ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-extract-invoice.json"
+    },
+    {
+      "invoice": "Mammafiore",
+      "row": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "errorTypes": [
+        "Pack Multiplier Confusion"
+      ],
+      "wrongFields": [
+        "quantity",
+        "line_total",
+        "unit_price"
+      ],
+      "evidence": ".tmp/persistence-audit/pass-c-raw/36c99d19-6f9f-413f-8c2d-ae3526291a2d-gpt-raw.json"
+    },
+    {
+      "invoice": "Mammafiore",
+      "row": "MOZZA Fior di Latte Expert Julienne 3kg Simonetta",
+      "errorTypes": [
+        "OCR Character Noise"
+      ],
+      "wrongFields": [],
+      "evidence": ".tmp/persistence-audit/pass-c-raw/36c99d19-6f9f-413f-8c2d-ae3526291a2d-extract-invoice.json"
+    },
+    {
+      "invoice": "Mammafiore",
+      "row": "Rulo Di Capra 1kg*2 Simonetta",
+      "errorTypes": [
+        "Pack Multiplier Confusion"
+      ],
+      "wrongFields": [
+        "quantity",
+        "line_total"
+      ],
+      "evidence": ".tmp/persistence-audit/pass-c-raw/36c99d19-6f9f-413f-8c2d-ae3526291a2d-gpt-raw.json"
+    },
+    {
+      "invoice": "Mammafiore",
+      "row": "Olio Nuto 609 10lt",
+      "errorTypes": [
+        "Phantom Row",
+        "Lot Number Contamination"
+      ],
+      "wrongFields": [
+        "description",
+        "quantity",
+        "unit",
+        "unit_price",
+        "line_total"
+      ],
+      "evidence": ".tmp/persistence-audit/pass-c-raw/36c99d19-6f9f-413f-8c2d-ae3526291a2d-extract-invoice.json"
+    }
+  ]
+}

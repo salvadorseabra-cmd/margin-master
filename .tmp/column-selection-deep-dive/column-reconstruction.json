@@ -1,0 +1,135 @@
+{
+  "generated_at": "2026-06-11T01:34:01.491Z",
+  "method": "Image-only transcription from row crops + full invoice; x-coordinates from column-shift-audit/column-layout.json",
+  "emporio_prosciutto": {
+    "invoice": "Emporio Italia",
+    "row": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC ~4,25KG",
+    "columns": [
+      {
+        "column": "codigo",
+        "header": "Código",
+        "value": "UO502",
+        "xStart": 0,
+        "xEnd": 52
+      },
+      {
+        "column": "lotes",
+        "header": "Lotes/Séries",
+        "value": "03-12-2026",
+        "xStart": 52,
+        "xEnd": 108
+      },
+      {
+        "column": "designacao",
+        "header": "Designação",
+        "value": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC ~4,25KG / Produto de Stock",
+        "xStart": 108,
+        "xEnd": 392
+      },
+      {
+        "column": "imposto",
+        "header": "Imposto",
+        "value": "IVA23",
+        "xStart": 392,
+        "xEnd": 438
+      },
+      {
+        "column": "qty",
+        "header": "Qtd.",
+        "value": "4,30",
+        "xStart": 438,
+        "xEnd": 478
+      },
+      {
+        "column": "unit_price",
+        "header": "Preço Unit.",
+        "value": "10,30 €",
+        "xStart": 478,
+        "xEnd": 548
+      },
+      {
+        "column": "discount_pct",
+        "header": "Desc.(%)",
+        "value": "17,50",
+        "xStart": 548,
+        "xEnd": 612
+      },
+      {
+        "column": "line_total",
+        "header": "Preço Total",
+        "value": "36,54 €",
+        "xStart": 612,
+        "xEnd": 724
+      }
+    ]
+  },
+  "bocconcino_pomodor": {
+    "invoice": "IL Bocconcino",
+    "row": "POMODORI PELATI (CX 2,5KG*6)",
+    "columns": [
+      {
+        "column": "referencia",
+        "header": "REFERÊNCIA",
+        "value": "VG0026",
+        "xStart": 0,
+        "xEnd": 72
+      },
+      {
+        "column": "descricao",
+        "header": "DESCRIÇÃO",
+        "value": "POMODORI PELATI (CX 2,5KG*6)",
+        "xStart": 72,
+        "xEnd": 292
+      },
+      {
+        "column": "qty",
+        "header": "QUANT.",
+        "value": "1,000",
+        "xStart": 292,
+        "xEnd": 358
+      },
+      {
+        "column": "cxs",
+        "header": "CXs",
+        "value": "(blank)",
+        "xStart": 358,
+        "xEnd": 392
+      },
+      {
+        "column": "unit",
+        "header": "UNI",
+        "value": "UNI",
+        "xStart": 392,
+        "xEnd": 424
+      },
+      {
+        "column": "unit_price",
+        "header": "P.VENDA S/IVA",
+        "value": "27,560 EUR",
+        "xStart": 424,
+        "xEnd": 518
+      },
+      {
+        "column": "discount_pct",
+        "header": "DESC",
+        "value": "20,00%",
+        "xStart": 518,
+        "xEnd": 578
+      },
+      {
+        "column": "line_total",
+        "header": "VALOR LIQUIDO",
+        "value": "22,05 EUR",
+        "xStart": 578,
+        "xEnd": 668
+      },
+      {
+        "column": "vat",
+        "header": "IVA",
+        "value": "23%",
+        "xStart": 668,
+        "xEnd": 752
+      }
+    ]
+  }
+}

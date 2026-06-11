@@ -1,0 +1,140 @@
+{
+  "generated_at": "2026-06-11T00:00:00.000Z",
+  "source": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+  "capabilities": [
+    {
+      "capability": "product_invention",
+      "allowed": true,
+      "evidence": [
+        {
+          "lines": "29",
+          "text": "Extract ALL invoice line items visible in the table."
+        },
+        {
+          "lines": "32-34",
+          "text": "NEVER invent values. But DO infer quantity/unit when clearly present inside product names. ... Use contextual reasoning."
+        },
+        {
+          "lines": "116",
+          "text": "Do not hallucinate."
+        }
+      ],
+      "assessment": "Effectively ALLOWED — 'extract ALL' + contextual reasoning with no artigo/SKU anchor or row-count guard. 'Do not hallucinate' is negated by infer rule. Mammafiore phantom 'Olio Noc 609' proves product invention.",
+      "vlIncident": "Mammafiore phantom Olio — 1 row across 51 aligned rows (2% hallucination rate)"
+    },
+    {
+      "capability": "sku_invention",
+      "allowed": true,
+      "evidence": [
+        {
+          "lines": "32-34",
+          "text": "infer quantity/unit when clearly present inside product names"
+        },
+        {
+          "lines": "absent",
+          "text": "No requirement for visible Artigo/product code column"
+        }
+      ],
+      "assessment": "ALLOWED — model constructs SKU-like names from fused row cues (lot 609 + 5l*2 → 'Olio Nuto 609 10lt'). No SKU validation.",
+      "vlIncident": "Mammafiore: Olio Noc 609 / Nui Lote 609 / Olio Nuto 609 10lt — label varies per run"
+    },
+    {
+      "capability": "qty_invention",
+      "allowed": true,
+      "evidence": [
+        {
+          "lines": "33-34",
+          "text": "DO infer quantity/unit when clearly present inside product names"
+        },
+        {
+          "lines": "108-110",
+          "text": "\"Salada\" with unit \"EM\" → quantity: 1"
+        },
+        {
+          "lines": "112-114",
+          "text": "If quantity truly cannot be determined: quantity = null"
+        }
+      ],
+      "assessment": "ALLOWED when description contains pack notation — *N, 5l*2, 1kg*2, CX*6 treated as qty source overriding column. Default qty=1 taught for EM unit.",
+      "vlIncident": "Bocconcino *6→6; Mammafiore Aceto *2→2; Rulo *2→2; Ginger Beer pack→24"
+    },
+    {
+      "capability": "unit_invention",
+      "allowed": true,
+      "evidence": [
+        {
+          "lines": "33-34",
+          "text": "DO infer quantity/unit when clearly present inside product names"
+        },
+        {
+          "lines": "48-51",
+          "text": "Peito de Frango → unit: \"kg\" (inferred from product type)"
+        },
+        {
+          "lines": "86-94",
+          "text": "Use these normalized units only when possible"
+        }
+      ],
+      "assessment": "ALLOWED — unit inferred from product name/type when column unit absent or ambiguous. Normalization list encourages coercion.",
+      "vlIncident": "Mammafiore Rulo pass-c-raw: unit 'kg' inferred from 1kg in name; Ginger Beer unit semantics shift"
+    },
+    {
+      "capability": "line_invention",
+      "allowed": true,
+      "evidence": [
+        {
+          "lines": "29",
+          "text": "Extract ALL invoice line items visible in the table"
+        },
+        {
+          "lines": "185",
+          "text": "Extract all invoice line items from this restaurant invoice table image"
+        },
+        {
+          "lines": "absent",
+          "text": "No row-count validation, no lot/sub-line exclusion, no artigo-code anchor"
+        }
+      ],
+      "assessment": "ALLOWED — completeness mandate without upper bound. Model may add rows from lot metadata, sub-lines, or fused adjacent-row cues.",
+      "vlIncident": "Mammafiore 9 rows vs 8 GT — phantom first appears in Pass C raw JSON"
+    },
+    {
+      "capability": "price_invention",
+      "allowed": false,
+      "evidence": [
+        {
+          "lines": "119-122",
+          "text": "Read ... digit by digit from their respective columns. ... copy each exactly from the invoice."
+        },
+        {
+          "lines": "123-124",
+          "text": "Never alter quantity or unit_price to force arithmetic closure."
+        }
+      ],
+      "assessment": "NOT explicitly allowed — prompt mandates column copy. However vision misreads (not invention) produce wrong prices: Prosciutto 8.17→17.06, POMODOR 25→20. Distinction: misread ≠ invented.",
+      "vlIncident": "Column shift errors — vision limitation, not prompt-encouraged invention"
+    },
+    {
+      "capability": "name_reconstruction",
+      "allowed": true,
+      "evidence": [
+        {
+          "lines": "34",
+          "text": "Screenshots may have messy OCR. Use contextual reasoning."
+        },
+        {
+          "lines": "absent",
+          "text": "No instruction to copy product name verbatim from description column"
+        }
+      ],
+      "assessment": "ALLOWED implicitly — no 'copy name exactly' rule. OCR character noise on descriptions (8 Aviludo May rows) is non-financial but shows name reconstruction behavior.",
+      "vlIncident": "Aviludo May: Anchovas/Alconfirosa etc.; non-financial description drift"
+    }
+  ],
+  "summary": {
+    "explicitlyForbidden": ["supplier", "invoice_date", "invoice_number", "invoice-level total"],
+    "implicitlyAllowed": ["product", "sku", "qty", "unit", "line", "name"],
+    "explicitlyForbiddenButOverridden": ["hallucination (L116) overridden by infer + contextual reasoning (L33-34)"],
+    "highestExposure": "line_invention + qty_invention from pack notation"
+  }
+}

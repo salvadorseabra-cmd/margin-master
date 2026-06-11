@@ -1,0 +1,55 @@
+{
+  "generated_at": "2026-06-11T01:24:11.881Z",
+  "note": "Pipeline has no discrete OCR stage; Pass C GPT reads cropped table image. Image transcription = effective OCR ground truth.",
+  "rows": [
+    {
+      "product": "Prosciutto Cotto",
+      "imageVisible": {
+        "qty": "4,30",
+        "unit_price": "10,30 €",
+        "discount": "17,50",
+        "total": "36,54 €"
+      },
+      "passCOld": {
+        "qty": 4.3,
+        "unit_price": 17.06,
+        "total": 36.54
+      },
+      "passCRefined": {
+        "qty": 4,
+        "unit_price": 9.17,
+        "total": 36.54
+      },
+      "ocrAlreadyWrong": {
+        "unit_price_old": "YES — €17.06 ≈ Desc.(%) column 17,50, not Preço Unit 10,30",
+        "unit_price_refined": "PARTIAL — €9.17 ≈ total÷qty (36.54÷4), not any visible column",
+        "total": "NO — €36.54 matches visible Preço Total column",
+        "qty_refined": "YES — 4.0 vs visible 4,30"
+      }
+    },
+    {
+      "product": "POMODOR PELATI",
+      "imageVisible": {
+        "qty": "1,000",
+        "unit_price": "27,560 EUR",
+        "discount": "20,00%",
+        "total": "22,05 EUR"
+      },
+      "passCOld": {
+        "qty": 2,
+        "unit_price": 20,
+        "total": 40
+      },
+      "passCRefined": {
+        "qty": 2,
+        "unit_price": 20,
+        "total": 40
+      },
+      "ocrAlreadyWrong": {
+        "unit_price": "YES — €20.00 matches DESC column 20,00% (not P.VENDA 27,560)",
+        "total": "YES — €40.00 = qty(2)×€20; visible VALOR LÍQUIDO is 22,05",
+        "qty_refined": "YES — 2 vs visible 1,000 (pack *6 confusion in earlier runs; refined fixed to 2 but still wrong vs image)"
+      }
+    }
+  ]
+}

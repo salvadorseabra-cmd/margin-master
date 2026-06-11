@@ -1,0 +1,144 @@
+{
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "storagePath": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781113610714-Screenshot_2026-06-07_at_21.04.58.png",
+  "dbRowCount": 5,
+  "expectedRows": 7,
+  "passCRowCount": 5,
+  "passCEligibleCount": 5,
+  "dbLineSum": 112.1,
+  "passCLineSum": 112.1,
+  "invoiceTotal": 290.64,
+  "netSubtotal": null,
+  "cropBounds": {
+    "top": 561,
+    "bottom": 881,
+    "headerTop": 571,
+    "headerBottom": 607,
+    "totalsStart": 857,
+    "detected": true
+  },
+  "cropFallbackUsed": false,
+  "passCNames": [
+    "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+    "POMODORI PELATI (CX 2,5KG*6)",
+    "ACQUA S.PELLEGRINO (CX 75CL*15)",
+    "RICOTTA TREVIGIANA 1,5KG",
+    "ROLO DE CARA E VACA 1KG"
+  ],
+  "dbNames": [
+    "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+    "POMODORI PELATI (CX 2,5KG*6)",
+    "ACQUA S.PELLEGRINO (CX 75CL*15)",
+    "RICOTTA TREVIGIANA 1,5KG",
+    "ROLO DE CARNE E VACA 1KG"
+  ],
+  "missingFromPassC": [
+    {
+      "needle": "Mozzarella Fior di Latte",
+      "inPassC": false,
+      "inDb": false
+    },
+    {
+      "needle": "Stracciatella",
+      "inPassC": false,
+      "inDb": false
+    }
+  ],
+  "eligibility": [
+    {
+      "raw": {
+        "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "unit_price": 27.3,
+        "total": 27.3
+      },
+      "normalized": {
+        "id": "x",
+        "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 27.3,
+        "total": 27.3
+      },
+      "rejected": false,
+      "eligible": true
+    },
+    {
+      "raw": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "unit_price": 27.56,
+        "total": 22.05
+      },
+      "normalized": {
+        "id": "x",
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 27.56,
+        "total": 22.05
+      },
+      "rejected": false,
+      "eligible": true
+    },
+    {
+      "raw": {
+        "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "quantity": 2,
+        "unit": "uni",
+        "unit_price": 26.292,
+        "total": 42.07
+      },
+      "normalized": {
+        "id": "x",
+        "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 26.292,
+        "total": 42.07
+      },
+      "rejected": false,
+      "eligible": true
+    },
+    {
+      "raw": {
+        "name": "RICOTTA TREVIGIANA 1,5KG",
+        "quantity": 1,
+        "unit": "uni",
+        "unit_price": 7.967,
+        "total": 7.97
+      },
+      "normalized": {
+        "id": "x",
+        "name": "RICOTTA TREVIGIANA 1,5KG",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 7.967,
+        "total": 7.97
+      },
+      "rejected": false,
+      "eligible": true
+    },
+    {
+      "raw": {
+        "name": "ROLO DE CARA E VACA 1KG",
+        "quantity": 1,
+        "unit": "uni",
+        "unit_price": 12.706,
+        "total": 12.71
+      },
+      "normalized": {
+        "id": "x",
+        "name": "ROLO DE CARA E VACA 1KG",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 12.706,
+        "total": 12.71
+      },
+      "rejected": false,
+      "eligible": true
+    }
+  ]
+}

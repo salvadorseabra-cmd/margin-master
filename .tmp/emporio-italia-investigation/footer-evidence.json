@@ -1,0 +1,35 @@
+{
+  "image": { "width": 724, "height": 1124, "pages": "1 of 2 (screenshot is page 1 only)" },
+  "tableBounds": {
+    "top": 456,
+    "bottom": 851,
+    "headerTop": 466,
+    "headerBottom": 502,
+    "totalsStart": 827,
+    "detected": true,
+    "note": "bottom=851 anchors footer crop; totals grey box (Subtotal/Total) sits above ~y700-820"
+  },
+  "footerCrop": {
+    "fractionStartY": 506,
+    "tableAnchoredStartY": 851,
+    "chosenStartY": 851,
+    "cropHeight": 273,
+    "includesDocumentTotals": false,
+    "includesIvaBreakdown": true
+  },
+  "groundTruth": {
+    "subtotal": 278.16,
+    "tax": 49.30,
+    "total": 327.46
+  },
+  "extractInvoiceResult": {
+    "total": null,
+    "net_subtotal": null,
+    "vat": null
+  },
+  "persistedInvoice": {
+    "id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+    "total": 0,
+    "invoice_date": "2026-05-19"
+  }
+}

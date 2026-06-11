@@ -1,0 +1,39 @@
+{
+  "queried_at": "2026-06-10T19:44:23.061Z",
+  "vl_project": "bjhnlrgodcqoyzddbpbd",
+  "prod_project": "lhackrnlnrsiamorzmkb",
+  "decimal_cl": {
+    "vl": {
+      "count": 1,
+      "rows": [
+        {
+          "id": "0dbbc281-9384-493f-9f92-68786058a5b5",
+          "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "quantity": 2,
+          "unit": "cx",
+          "unit_price": 9.69,
+          "total": 19.38,
+          "supplier_name": "Emporio Italia",
+          "invoice_date": "2026-05-19"
+        }
+      ]
+    },
+    "production": {
+      "count": 0,
+      "rows": []
+    }
+  },
+  "broader_patterns": {
+    "vl": [],
+    "production": []
+  },
+  "small_ml_beverages": {
+    "vl": [],
+    "production": []
+  },
+  "totals": {
+    "vl_invoice_items": 43,
+    "prod_invoice_items": 207
+  }
+}

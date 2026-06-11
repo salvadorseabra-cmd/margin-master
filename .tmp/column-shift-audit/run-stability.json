@@ -1,0 +1,120 @@
+{
+  "generated_at": "2026-06-11T01:26:11.746Z",
+  "invoices": [
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "runs": [
+        {
+          "run": 1,
+          "status": 200,
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25Kg",
+          "quantity": 4,
+          "unit_price": 10.17,
+          "total": 36.54
+        },
+        {
+          "run": 2,
+          "status": 200,
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4~4,25Kg",
+          "quantity": 4.3,
+          "unit_price": 8.2,
+          "total": 35.24
+        },
+        {
+          "run": 3,
+          "status": 200,
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25Kg Produto de Stock",
+          "quantity": 4.3,
+          "unit_price": 17,
+          "total": 36.54
+        },
+        {
+          "run": 4,
+          "status": 200,
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25Kg Produto de Stock",
+          "quantity": 4.3,
+          "unit_price": 8.17,
+          "total": 36.54
+        },
+        {
+          "run": 5,
+          "status": 200,
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+ 4,25Kg",
+          "quantity": 4.3,
+          "unit_price": 8.2,
+          "total": 36.54
+        }
+      ],
+      "unitPriceUnique": [
+        10.17,
+        8.2,
+        17,
+        8.17
+      ],
+      "totalUnique": [
+        36.54,
+        35.24
+      ],
+      "deterministic": false
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "runs": [
+        {
+          "run": 1,
+          "status": 200,
+          "name": "POMODORO PELATI (CX 2.5KG*6)",
+          "quantity": 2,
+          "unit_price": 20,
+          "total": 40
+        },
+        {
+          "run": 2,
+          "status": 200,
+          "name": "POMODORI PELATI (CX 2.5KG*6)",
+          "quantity": 2,
+          "unit_price": 27.56,
+          "total": 54.2
+        },
+        {
+          "run": 3,
+          "status": 200,
+          "name": "POMODORO PELATI (CX 2.5KG*6)",
+          "quantity": 2,
+          "unit_price": 25.9,
+          "total": 40
+        },
+        {
+          "run": 4,
+          "status": 200,
+          "name": "POMODORO PELATI (CX 2.5KG*6)",
+          "quantity": 2,
+          "unit_price": 27.56,
+          "total": 42.2
+        },
+        {
+          "run": 5,
+          "status": 200,
+          "name": "POMODORO PELATI (CX 2.5KG*6)",
+          "quantity": 2,
+          "unit_price": 27.56,
+          "total": 20.02
+        }
+      ],
+      "unitPriceUnique": [
+        20,
+        27.56,
+        25.9
+      ],
+      "totalUnique": [
+        40,
+        54.2,
+        42.2,
+        20.02
+      ],
+      "deterministic": false
+    }
+  ]
+}

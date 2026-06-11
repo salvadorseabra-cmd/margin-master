@@ -1,0 +1,1800 @@
+{
+  "da472b7f-0fd9-4a26-a37c-80ad335f7f7e": {
+    "invoice": "Bidfood Portugal",
+    "rows": [
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Manteiga Coimbra s/ sal EMB 1 Kg",
+        "extractedName": "Manteiga Coimbra s/ sal EMB 1 Kg",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Manteiga Coimbra s/ sal EMB 1 Kg",
+            "extracted": "Manteiga Coimbra s/ sal EMB 1 Kg"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 8,
+            "extracted": 8
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "kg",
+            "extracted": "kg"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 8.9,
+            "extracted": 8.9
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 71.2,
+            "extracted": 71.2
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Ovo MORENO Classe M Cx. 1.5 dúzias (CARTÃO)",
+        "extractedName": "Ovo MORENO Classe M Cx. 1.5 dúzias (CARTÃO)",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Ovo MORENO Classe M Cx. 1.5 dúzias (CARTÃO)",
+            "extracted": "Ovo MORENO Classe M Cx. 1.5 dúzias (CARTÃO)"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "cx",
+            "extracted": "cx"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 38.44,
+            "extracted": 38.44
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 38.44,
+            "extracted": 38.44
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Tomilho",
+        "extractedName": "Tomilho",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Tomilho",
+            "extracted": "Tomilho"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "mo",
+            "extracted": "mo"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 2.06,
+            "extracted": 2.06
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 2.06,
+            "extracted": 2.06
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Salada Ibérica FSTK EMB. 250g",
+        "extractedName": "Salada Ibérica FSTK EMB. 250g",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Salada Ibérica FSTK EMB. 250g",
+            "extracted": "Salada Ibérica FSTK EMB. 250g"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 4,
+            "extracted": 4
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "em",
+            "extracted": "em"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 2.33,
+            "extracted": 2.33
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 8.76,
+            "extracted": 8.76
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Manjericão",
+        "extractedName": "Manjericão",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Manjericão",
+            "extracted": "Manjericão"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 5,
+            "extracted": 5
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "mo",
+            "extracted": "mo"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 2.06,
+            "extracted": 2.06
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 10.28,
+            "extracted": 10.28
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Hortelã",
+        "extractedName": "Hortelã",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Hortelã",
+            "extracted": "Hortelã"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 0.5,
+            "extracted": 0.5
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "kg",
+            "extracted": "kg"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 6.74,
+            "extracted": 6.74
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 2.7,
+            "extracted": 2.7
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Pepino",
+        "extractedName": "Pepino",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Pepino",
+            "extracted": "Pepino"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 3.36,
+            "extracted": 3.36
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "kg",
+            "extracted": "kg"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 1.77,
+            "extracted": 1.77
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 4.76,
+            "extracted": 4.76
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Pêra Abacate Hasse",
+        "extractedName": "Pêra Abacate Hasse",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Pêra Abacate Hasse",
+            "extracted": "Pêra Abacate Hasse"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 3.28,
+            "extracted": 3.28
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "kg",
+            "extracted": "kg"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 5.32,
+            "extracted": 5.32
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 13.96,
+            "extracted": 13.96
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Courgettes",
+        "extractedName": "Courgettes",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Courgettes",
+            "extracted": "Courgettes"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 3.3,
+            "extracted": 3.3
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "kg",
+            "extracted": "kg"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 1.95,
+            "extracted": 1.95
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 5.15,
+            "extracted": 5.15
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Alho Francês",
+        "extractedName": "Alho Francês",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Alho Francês",
+            "extracted": "Alho Francês"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 5.42,
+            "extracted": 5.42
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "kg",
+            "extracted": "kg"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 1.77,
+            "extracted": 1.77
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 7.67,
+            "extracted": 7.67
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Abóbora Butternut",
+        "extractedName": "Abóbora Butternut",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Abóbora Butternut",
+            "extracted": "Abóbora Butternut"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 5.64,
+            "extracted": 5.64
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "kg",
+            "extracted": "kg"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 1.24,
+            "extracted": 1.24
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 5.59,
+            "extracted": 5.59
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      }
+    ]
+  },
+  "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2": {
+    "invoice": "Aviludo May",
+    "rows": [
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Filete de Anchoas Alcofinosa L4 495 g",
+        "extractedName": "Filete de Anchoas Alconfirosa L4 495 g",
+        "fields": {
+          "description": {
+            "status": "MINOR_VARIATION",
+            "groundTruth": "Filete de Anchoas Alcofinosa L4 495 g",
+            "extracted": "Filete de Anchoas Alconfirosa L4 495 g"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 2,
+            "extracted": 2
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 9.99,
+            "extracted": 9.99
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 19.98,
+            "extracted": 19.98
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Ovo Líquido Past.Gema Dovo 1 Kg",
+        "extractedName": "Ovo Liquido Past.Gema Dovo 1 Kg",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Ovo Líquido Past.Gema Dovo 1 Kg",
+            "extracted": "Ovo Liquido Past.Gema Dovo 1 Kg"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 6,
+            "extracted": 6
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 10.49,
+            "extracted": 10.49
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 62.94,
+            "extracted": 62.94
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Pepinos Extra Uli Frasco 6x720 g",
+        "extractedName": "Pepinos Extra Uil Frasco 6x720 g",
+        "fields": {
+          "description": {
+            "status": "MINOR_VARIATION",
+            "groundTruth": "Pepinos Extra Uli Frasco 6x720 g",
+            "extracted": "Pepinos Extra Uil Frasco 6x720 g"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "cx",
+            "extracted": "cx"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 22.49,
+            "extracted": 22.49
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 22.49,
+            "extracted": 22.49
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+        "extractedName": "Atum Oleo Bolsa Nau Cahirenta 1 Kg",
+        "fields": {
+          "description": {
+            "status": "MINOR_VARIATION",
+            "groundTruth": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+            "extracted": "Atum Oleo Bolsa Nau Cahirenta 1 Kg"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 2,
+            "extracted": 2
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 6.55,
+            "extracted": 6.55
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 13.1,
+            "extracted": 13.1
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Arroz Agulha Metro Chef 12x1 kg",
+        "extractedName": "Arroz Agulha Metro Chef 12x1 kg",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Arroz Agulha Metro Chef 12x1 kg",
+            "extracted": "Arroz Agulha Metro Chef 12x1 kg"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "cx",
+            "extracted": "cx"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 13.95,
+            "extracted": 13.95
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 13.95,
+            "extracted": 13.95
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Chocolate Culinaria Pantagruel 10x200 g",
+        "extractedName": "Chocolate Culinaria Pantagruel 10x200 g",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Chocolate Culinaria Pantagruel 10x200 g",
+            "extracted": "Chocolate Culinaria Pantagruel 10x200 g"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 2,
+            "extracted": 2
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "cx",
+            "extracted": "cx"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 29.99,
+            "extracted": 29.99
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 59.98,
+            "extracted": 59.98
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Açucar Branco METRO Chef 10x1 Kg",
+        "extractedName": "Acucar Branco METRO Chef 10x1 Kg",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Açucar Branco METRO Chef 10x1 Kg",
+            "extracted": "Acucar Branco METRO Chef 10x1 Kg"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "cx",
+            "extracted": "cx"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 9.99,
+            "extracted": 9.99
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 9.99,
+            "extracted": 9.99
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Nata Culinária 22% Reny Picot 6x1 L",
+        "extractedName": "Nata Culinaria 22% Remy Picot 6x1 L",
+        "fields": {
+          "description": {
+            "status": "MINOR_VARIATION",
+            "groundTruth": "Nata Culinária 22% Reny Picot 6x1 L",
+            "extracted": "Nata Culinaria 22% Remy Picot 6x1 L"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 5,
+            "extracted": 5
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "cx",
+            "extracted": "cx"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 18.89,
+            "extracted": 18.89
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 94.45,
+            "extracted": 94.45
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": false
+      }
+    ]
+  },
+  "c2f52357-0f80-491a-ba14-c97ff4837472": {
+    "invoice": "Aviludo April",
+    "rows": [
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Mozzarella Flor di Latte 2Kg",
+        "extractedName": "Mozzarella Flor di Latte 2Kg",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Mozzarella Flor di Latte 2Kg",
+            "extracted": "Mozzarella Flor di Latte 2Kg"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 13.69,
+            "extracted": 13.69
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 13.69,
+            "extracted": 13.69
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Açúcar Branco Metro Chef 10x1Kg",
+        "extractedName": "Açúcar Branco Metro Chef 10x1Kg",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Açúcar Branco Metro Chef 10x1Kg",
+            "extracted": "Açúcar Branco Metro Chef 10x1Kg"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "cx",
+            "extracted": "cx"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 9.29,
+            "extracted": 9.29
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 9.29,
+            "extracted": 9.29
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Chocolate Pantagruel 10x200g",
+        "extractedName": "Chocolate Pantagruel 10x200g",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Chocolate Pantagruel 10x200g",
+            "extracted": "Chocolate Pantagruel 10x200g"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 2,
+            "extracted": 2
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "cx",
+            "extracted": "cx"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 29.19,
+            "extracted": 29.19
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 58.38,
+            "extracted": 58.38
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Arroz Agulha Metro Chef 12x1kg",
+        "extractedName": "Arroz Agulha Metro Chef 12x1kg",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Arroz Agulha Metro Chef 12x1kg",
+            "extracted": "Arroz Agulha Metro Chef 12x1kg"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "cx",
+            "extracted": "cx"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 13.45,
+            "extracted": 13.45
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 13.45,
+            "extracted": 13.45
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "extractedName": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+            "extracted": "Atum Óleo Bolsa Nau Catrineta 1 Kg"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 2,
+            "extracted": 2
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 6.29,
+            "extracted": 6.29
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 12.58,
+            "extracted": 12.58
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Pepinos Extra II Frasco 6x720g",
+        "extractedName": "Pepinos Extra II Frasco 6x720g",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Pepinos Extra II Frasco 6x720g",
+            "extracted": "Pepinos Extra II Frasco 6x720g"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "cx",
+            "extracted": "cx"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 21.99,
+            "extracted": 21.99
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 21.99,
+            "extracted": 21.99
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Ovo Líquido Past.Gema Dovo 1kg",
+        "extractedName": "Ovo Líquido Past.Gema Dovo 1kg",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Ovo Líquido Past.Gema Dovo 1kg",
+            "extracted": "Ovo Líquido Past.Gema Dovo 1kg"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 6,
+            "extracted": 6
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 10.19,
+            "extracted": 10.19
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 61.14,
+            "extracted": 61.14
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Filete de Anchovas Alconfrisa Lt 495 g",
+        "extractedName": "Filete de Anchovas Alconfrisa Lt 495 g",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Filete de Anchovas Alconfrisa Lt 495 g",
+            "extracted": "Filete de Anchovas Alconfrisa Lt 495 g"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 2,
+            "extracted": 2
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 9.49,
+            "extracted": 9.49
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 18.98,
+            "extracted": 18.98
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Nata Reny Picot 22% 6x1L",
+        "extractedName": "Nata Reny Picot 22% 6x1L",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Nata Reny Picot 22% 6x1L",
+            "extracted": "Nata Reny Picot 22% 6x1L"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 5,
+            "extracted": 5
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "cx",
+            "extracted": "cx"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 18.29,
+            "extracted": 18.29
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 91.45,
+            "extracted": 91.45
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      }
+    ]
+  },
+  "17aa3591-ec98-4c21-89c9-5ae946bc97bb": {
+    "invoice": "Emporio Italia",
+    "rows": [
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "extractedName": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+            "extracted": "De Cecco - Paccheri Lisci Nr. 125 - 500g"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 24,
+            "extracted": 24
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 2.35,
+            "extracted": 2.35
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 50.2,
+            "extracted": 50.2
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+        "extractedName": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castellone 1/8° - 1,5kg",
+        "fields": {
+          "description": {
+            "status": "MINOR_VARIATION",
+            "groundTruth": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+            "extracted": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castellone 1/8° - 1,5kg"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1.35,
+            "extracted": 1.35
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "kg",
+            "extracted": "kg"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 9.92,
+            "extracted": 9.92
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 13.44,
+            "extracted": 13.44
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+        "extractedName": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+            "extracted": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 4.3,
+            "extracted": 4.3
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "kg",
+            "extracted": "kg"
+          },
+          "unit_price": {
+            "status": "WRONG",
+            "groundTruth": 8.17,
+            "extracted": 17
+          },
+          "line_total": {
+            "status": "WRONG",
+            "groundTruth": 35.14,
+            "extracted": 36.54
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": true
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+        "extractedName": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in Vela 1/2 ~2,5Kg",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+            "extracted": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in Vela 1/2 ~2,5Kg"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 3.11,
+            "extracted": 3.11
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "kg",
+            "extracted": "kg"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 10.1,
+            "extracted": 10.1
+          },
+          "line_total": {
+            "status": "MINOR_VARIATION",
+            "groundTruth": 31.07,
+            "extracted": 31.67
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "extractedName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+            "extracted": "SanPellegrino - Acqua in vitro 75cl x 15ud"
+          },
+          "quantity": {
+            "status": "WRONG",
+            "groundTruth": 2.56,
+            "extracted": 2
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "cx",
+            "extracted": "cx"
+          },
+          "unit_price": {
+            "status": "WRONG",
+            "groundTruth": 15.06,
+            "extracted": 19.3
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 38.56,
+            "extracted": 38.56
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": true
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+        "extractedName": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+            "extracted": "Rigamonti - Bresaola Punta d'Anca Oro 1/2"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 2.8,
+            "extracted": 2.8
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "kg",
+            "extracted": "kg"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 17.68,
+            "extracted": 17.7
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 49.48,
+            "extracted": 49.48
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Baladin - Ginger Beer 0.20cl",
+        "extractedName": "Baladin - Ginger Beer 0.20cl",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Baladin - Ginger Beer 0.20cl",
+            "extracted": "Baladin - Ginger Beer 0.20cl"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 2,
+            "extracted": 2
+          },
+          "unit": {
+            "status": "WRONG",
+            "groundTruth": "un",
+            "extracted": "cx"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 9.69,
+            "extracted": 9.69
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 19.38,
+            "extracted": 19.38
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": true
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Rovagnati - Salame Ventricina 2,5 Kg",
+        "extractedName": "Rovagnati - Salame Ventricina 2,5 Kg",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Rovagnati - Salame Ventricina 2,5 Kg",
+            "extracted": "Rovagnati - Salame Ventricina 2,5 Kg"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 2.6,
+            "extracted": 2.6
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "kg",
+            "extracted": "kg"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 16.6,
+            "extracted": 16.6
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 39.49,
+            "extracted": 39.49
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      }
+    ]
+  },
+  "f0aa5a08-86a3-4938-99f0-711e86073968": {
+    "invoice": "IL Bocconcino",
+    "rows": [
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "extractedName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+            "extracted": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 10,
+            "extracted": 10
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 9.5,
+            "extracted": 9.5
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 81.23,
+            "extracted": 81.23
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "STRACCIATELLA 250 GR",
+        "extractedName": "STRACCIATELLA 250 GR",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "STRACCIATELLA 250 GR",
+            "extracted": "STRACCIATELLA 250 GR"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 24,
+            "extracted": 24
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 4.141,
+            "extracted": 4.141
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 74.54,
+            "extracted": 74.54
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "extractedName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+            "extracted": "MEZZI PACCHERI MANCINI (CX 1KG*6)"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 27.56,
+            "extracted": 27.56
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 27.3,
+            "extracted": 27.3
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "POMODOR PELATI (CX 2.5KG*6)",
+        "extractedName": "POMODORINI pelati (CX 2.5KG*6)",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "POMODOR PELATI (CX 2.5KG*6)",
+            "extracted": "POMODORINI pelati (CX 2.5KG*6)"
+          },
+          "quantity": {
+            "status": "WRONG",
+            "groundTruth": 2,
+            "extracted": 6
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "WRONG",
+            "groundTruth": 25,
+            "extracted": 20
+          },
+          "line_total": {
+            "status": "WRONG",
+            "groundTruth": 50,
+            "extracted": 120
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": true
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "extractedName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+            "extracted": "ACQUA S.PELLEGRINO (CX 75CL*15)"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 2,
+            "extracted": 2
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 20.295,
+            "extracted": 20.295
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 42.07,
+            "extracted": 42.07
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "RICOTTA TREVIGIANA 1,5KG",
+        "extractedName": "RICOTTA TREVIGIANA 1,5KG",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "RICOTTA TREVIGIANA 1,5KG",
+            "extracted": "RICOTTA TREVIGIANA 1,5KG"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 7.97,
+            "extracted": 7.97
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 7.97,
+            "extracted": 7.97
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "ROLO DE CABRA E VACA 1KG",
+        "extractedName": "ROLO DE CABEÇA DE VACA 1KG",
+        "fields": {
+          "description": {
+            "status": "MINOR_VARIATION",
+            "groundTruth": "ROLO DE CABRA E VACA 1KG",
+            "extracted": "ROLO DE CABEÇA DE VACA 1KG"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 12.71,
+            "extracted": 12.71
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 12.71,
+            "extracted": 12.71
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": false
+      }
+    ]
+  },
+  "36c99d19-6f9f-413f-8c2d-ae3526291a2d": {
+    "invoice": "Mammafiore",
+    "rows": [
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "extractedName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+            "extracted": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 5.996,
+            "extracted": 5.996
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 16.922,
+            "extracted": 16.922
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 64.93,
+            "extracted": 64.93
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Farina Speciale pizza 25kg Amoruso",
+        "extractedName": "Farina Speciale pizza 25kg Amoruso",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Farina Speciale pizza 25kg Amoruso",
+            "extracted": "Farina Speciale pizza 25kg Amoruso"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 33.154,
+            "extracted": 33.154
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 26.52,
+            "extracted": 26.52
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "extractedName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+            "extracted": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 24,
+            "extracted": 24
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 1.529,
+            "extracted": 1.529
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 25.69,
+            "extracted": 25.69
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+        "extractedName": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+            "extracted": "Aceto balsamico di modena IGP pet 5lt*2 Toschi"
+          },
+          "quantity": {
+            "status": "WRONG",
+            "groundTruth": 1,
+            "extracted": 2
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 18.929,
+            "extracted": 18.929
+          },
+          "line_total": {
+            "status": "WRONG",
+            "groundTruth": 16.09,
+            "extracted": 15.09
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": true
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "MOZZA Fior di Latte Expert Julienne 3kg Simonetta",
+        "extractedName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+        "fields": {
+          "description": {
+            "status": "MINOR_VARIATION",
+            "groundTruth": "MOZZA Fior di Latte Expert Julienne 3kg Simonetta",
+            "extracted": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 10,
+            "extracted": 10
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 24.728,
+            "extracted": 24.728
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 200.3,
+            "extracted": 200.3
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Rulo Di Capra 1kg*2 Simonetta",
+        "extractedName": "Rub Di Capra 1kg *2 Simonetta",
+        "fields": {
+          "description": {
+            "status": "MINOR_VARIATION",
+            "groundTruth": "Rulo Di Capra 1kg*2 Simonetta",
+            "extracted": "Rub Di Capra 1kg *2 Simonetta"
+          },
+          "quantity": {
+            "status": "WRONG",
+            "groundTruth": 1,
+            "extracted": 2
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 15.192,
+            "extracted": 15.192
+          },
+          "line_total": {
+            "status": "WRONG",
+            "groundTruth": 10.86,
+            "extracted": 10.38
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": true
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Recargo por combustible",
+        "extractedName": "Recarga por combustivel",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Recargo por combustible",
+            "extracted": "Recarga por combustivel"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 2,
+            "extracted": 2
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 2,
+            "extracted": 2
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "matched",
+        "groundTruthDescription": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+        "extractedName": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+        "fields": {
+          "description": {
+            "status": "MATCH",
+            "groundTruth": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+            "extracted": "Farina 00 pasta fresca e gnocchi25kg Caputo"
+          },
+          "quantity": {
+            "status": "MATCH",
+            "groundTruth": 1,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MATCH",
+            "groundTruth": "un",
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MATCH",
+            "groundTruth": 39.101,
+            "extracted": 39.101
+          },
+          "line_total": {
+            "status": "MATCH",
+            "groundTruth": 30.11,
+            "extracted": 30.11
+          }
+        },
+        "rowFullyCorrect": true,
+        "rowHasError": false
+      },
+      {
+        "alignmentType": "phantom",
+        "groundTruthDescription": null,
+        "extractedName": "Olio Nuto 609 10lt",
+        "fields": {
+          "description": {
+            "status": "WRONG",
+            "groundTruth": null,
+            "extracted": "Olio Nuto 609 10lt"
+          },
+          "quantity": {
+            "status": "MISSING",
+            "groundTruth": null,
+            "extracted": 1
+          },
+          "unit": {
+            "status": "MISSING",
+            "groundTruth": null,
+            "extracted": "un"
+          },
+          "unit_price": {
+            "status": "MISSING",
+            "groundTruth": null,
+            "extracted": 18.295
+          },
+          "line_total": {
+            "status": "MISSING",
+            "groundTruth": null,
+            "extracted": 18.3
+          }
+        },
+        "rowFullyCorrect": false,
+        "rowHasError": true
+      }
+    ]
+  }
+}

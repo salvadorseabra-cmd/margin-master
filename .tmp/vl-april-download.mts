@@ -1,0 +1,12 @@
+import { createClient } from "@supabase/supabase-js";
+import { writeFileSync } from "node:fs";
+const VL_REF = "bjhnlrgodcqoyzddbpbd";
+const key = process.env.VL_KEY!;
+const sb = createClient(`https://${VL_REF}.supabase.co`, key, { auth: { persistSession: false } });
+const id = "c2f52357-0f80-491a-ba14-c97ff4837472";
+const { data: inv } = await sb.from("invoices").select("file_url,supplier_name").eq("id", id).single();
+const { data: signed } = await sb.storage.from("invoices").createSignedUrl(inv!.file_url, 300);
+const blob = await fetch(signed!.signedUrl).then((r) => r.blob());
+const buf = Buffer.from(await blob.arrayBuffer());
+writeFileSync("/tmp/aviludo-april.png", buf);
+console.log(JSON.stringify({ supplier: inv?.supplier_name, bytes: buf.length, type: blob.type }, null, 2));

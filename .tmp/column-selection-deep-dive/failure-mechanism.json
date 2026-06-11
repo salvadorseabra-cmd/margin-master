@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-06-11T01:34:01.493Z",
+  "classification": "E — Mixed",
+  "components": {
+    "A_headerAmbiguity": {
+      "applies": true,
+      "weight": "medium",
+      "evidence": "Emporio Pass C crop clips column headers (top=456 vs headers at y≈430)"
+    },
+    "B_columnProximity": {
+      "applies": true,
+      "weight": "high",
+      "evidence": "Preço Unit / Desc / Preço Total within ~134px on Emporio; P.VENDA/DESC/VALOR within ~154px on Bocconcino"
+    },
+    "C_cropTooTight": {
+      "applies": false,
+      "weight": "low",
+      "evidence": "Horizontal width preserved in Pass C table crop; not a narrow sub-column crop"
+    },
+    "D_visionModelLimitation": {
+      "applies": true,
+      "weight": "high",
+      "evidence": "Bocconcino has visible headers + EUR/% symbols yet GPT reads DESC as unit_price in run 1; prompt mandates column-faithful copy but model violates"
+    }
+  },
+  "perRow": {
+    "prosciutto": "B + A + D — proximity + missing headers in crop + model does not anchor to € symbol",
+    "pomodor": "B + D — proximity + model ignores header labels and % suffix despite visibility"
+  }
+}

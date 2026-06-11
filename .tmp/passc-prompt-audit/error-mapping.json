@@ -1,0 +1,279 @@
+{
+  "generated_at": "2026-06-11T00:00:00.000Z",
+  "mappings": [
+    {
+      "invoice": "IL Bocconcino",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "quantity",
+      "groundTruth": 2,
+      "extracted": "6 (postfix pass-c-raw) / 2 (fresh extract)",
+      "errorType": "Pack Multiplier Confusion",
+      "promptInstructions": [
+        {
+          "id": "never-invent-but-infer",
+          "lines": "32-34",
+          "mechanism": "Explicit permission to infer qty from product name; *6 in (CX 2.5KG*6) interpreted as purchased qty"
+        },
+        {
+          "id": "pack-24-bottles",
+          "lines": "53-55",
+          "mechanism": "Teaches *N suffix as purchased quantity — model generalizes to *6 case notation"
+        },
+        {
+          "id": "bad-good-33cl",
+          "lines": "80-84",
+          "mechanism": "Reinforces extracting pack multiplier from description over column"
+        },
+        {
+          "id": "size-vs-purchased-qty",
+          "lines": "69-71",
+          "mechanism": "Rule covers bottle/case retail packs but not wholesale CX*N notation"
+        }
+      ],
+      "contradictingInstruction": {
+        "id": "copy-exactly-authoritative",
+        "lines": "122",
+        "note": "Column shows qty=2; infer rule overrides column-faithful copy"
+      },
+      "evidence": [
+        ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-extract-invoice.json",
+        ".tmp/gpt-pattern-audit/multiplier-errors.json"
+      ]
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "unit_price / line_total",
+      "groundTruth": "€25 / €50",
+      "extracted": "€20 / €40 (fresh) / €20 / €120 (postfix)",
+      "errorType": "Column Shift",
+      "promptInstructions": [
+        {
+          "id": "price-digit-by-digit",
+          "lines": "119-121",
+          "mechanism": "Instructs column read but model still misreads PREÇO UNITÁRIO (25→20)"
+        },
+        {
+          "id": "copy-exactly-authoritative",
+          "lines": "122",
+          "mechanism": "Authoritative-copy rule present but ineffective — vision digit error"
+        },
+        {
+          "id": "digit-8-9-confusion",
+          "lines": "121",
+          "mechanism": "Awareness rule did not prevent 25→20 misread"
+        }
+      ],
+      "promptContribution": "PARTIAL — price error is primarily vision/OCR; prompt lacks column-isolation guidance",
+      "evidence": [
+        ".tmp/gpt-pattern-audit/column-errors.json",
+        ".tmp/persistence-audit/REPORT.md"
+      ]
+    },
+    {
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "field": "quantity",
+      "groundTruth": 1,
+      "extracted": "2 (pass-c-raw) / 1 (fresh extract)",
+      "errorType": "Pack Multiplier Confusion",
+      "promptInstructions": [
+        {
+          "id": "never-invent-but-infer",
+          "lines": "32-34",
+          "mechanism": "*2 in 'pet 5l*2' interpreted as purchased qty=2"
+        },
+        {
+          "id": "pack-24-bottles",
+          "lines": "53-55",
+          "mechanism": "Pack multiplier extraction pattern applied to wholesale dual-pack notation"
+        },
+        {
+          "id": "salada-em-default-qty",
+          "lines": "108-110",
+          "mechanism": "Model prefers filling qty from description over null/column"
+        }
+      ],
+      "contradictingInstruction": {
+        "id": "copy-exactly-authoritative",
+        "lines": "122",
+        "note": "Column qty=1 visible; infer rule causes override in raw run"
+      },
+      "evidence": [
+        ".tmp/mammafiore-line-audit/pass-c-raw.json",
+        ".tmp/gpt-pattern-audit/multiplier-errors.json"
+      ]
+    },
+    {
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "field": "quantity",
+      "groundTruth": 1,
+      "extracted": "2 (pass-c-raw) / 1 (fresh extract)",
+      "errorType": "Pack Multiplier Confusion",
+      "promptInstructions": [
+        {
+          "id": "never-invent-but-infer",
+          "lines": "32-34",
+          "mechanism": "*2 in '1kg*2' interpreted as purchased qty"
+        },
+        {
+          "id": "weight-in-name-1kg",
+          "lines": "44-46",
+          "mechanism": "1kg in name also parsed; dual signal (1kg + *2) confuses model"
+        },
+        {
+          "id": "bad-good-180g",
+          "lines": "73-78",
+          "mechanism": "Weight-vs-count heuristic does not cover 1kg*2 dual-unit-pack notation"
+        }
+      ],
+      "evidence": [
+        ".tmp/mammafiore-line-audit/pass-c-raw.json",
+        ".tmp/gpt-pattern-audit/multiplier-errors.json"
+      ]
+    },
+    {
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "product": "Phantom Olio (Olio Noc/Nute/Nuto / Nui Lote 609)",
+      "field": "entire row",
+      "groundTruth": "(absent — 8 rows on invoice)",
+      "extracted": "9th row invented",
+      "errorType": "Phantom Row; Lot Number Contamination",
+      "promptInstructions": [
+        {
+          "id": "extract-all-rows",
+          "lines": "29",
+          "mechanism": "Extract ALL — no ceiling; model adds 9th row"
+        },
+        {
+          "id": "never-invent-but-infer",
+          "lines": "32-34",
+          "mechanism": "Contextual reasoning on messy OCR invites fusing adjacent row cues"
+        },
+        {
+          "id": "user-extract-all",
+          "lines": "185",
+          "mechanism": "User message reinforces completeness over precision"
+        }
+      ],
+      "absentGuards": [
+        "do-not-hallucinate (line 116) — too weak, no lot/sub-line exclusion",
+        "no-anti-hallucination — no artigo-code anchor, no row-count check"
+      ],
+      "mechanism": "GPT fused Birra Peroni lot 6009 + Aceto pet 5l*2 (10L volume cue) + numeric columns into phantom olive-oil SKU",
+      "evidence": [
+        ".tmp/mammafiore-line-audit/phantom-item-trace.json",
+        ".tmp/hallucination-audit/phantom-analysis.json",
+        ".tmp/gpt-pattern-audit/phantoms.json"
+      ]
+    },
+    {
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "product": "Rovagnati Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "unit_price / line_total",
+      "groundTruth": "€8.17 / €35.14",
+      "extracted": "€17.06 / €36.54",
+      "errorType": "Column Shift",
+      "promptInstructions": [
+        {
+          "id": "price-digit-by-digit",
+          "lines": "119-121",
+          "mechanism": "Column read instructed but weight range '4-4,25KG' bleeds into price column read"
+        },
+        {
+          "id": "copy-exactly-authoritative",
+          "lines": "122",
+          "mechanism": "Authoritative copy failed — leading 8 dropped or wrong column selected"
+        },
+        {
+          "id": "never-invent-but-infer",
+          "lines": "32-34",
+          "mechanism": "Contextual reasoning may pull numerics from description into price field"
+        }
+      ],
+      "promptContribution": "LOW-MEDIUM — primarily vision column alignment; prompt lacks column-boundary isolation",
+      "evidence": [
+        ".tmp/gpt-pattern-audit/column-errors.json",
+        ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json"
+      ]
+    },
+    {
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "product": "SanPellegrino Acqua in vitro 75cl x 15ud",
+      "field": "quantity / unit_price",
+      "groundTruth": "2.56 cx / €15.06",
+      "extracted": "2 cx / €19.32",
+      "errorType": "Column Shift",
+      "promptInstructions": [
+        {
+          "id": "price-digit-by-digit",
+          "lines": "119-121",
+          "mechanism": "Qty truncated 2.56→2; price inflated — wrong column or digit bleed"
+        },
+        {
+          "id": "copy-exactly-authoritative",
+          "lines": "122",
+          "mechanism": "Column-faithful rule ineffective on dense Italian grid"
+        },
+        {
+          "id": "no-arithmetic-closure",
+          "lines": "123-124",
+          "mechanism": "Total ~preserved (€38.56 vs €38.65) — arithmetic masking hides column shift"
+        }
+      ],
+      "promptContribution": "LOW — vision/column alignment dominant; prompt does not cause but fails to prevent",
+      "evidence": [
+        ".tmp/gpt-pattern-audit/column-errors.json"
+      ]
+    },
+    {
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "product": "Baladin Ginger Beer 0.20cl",
+      "field": "quantity / unit / unit_price",
+      "groundTruth": "2 un / €9.69 / €19.38",
+      "extracted": "24 un / €0.85 / €19.38 (fresh)",
+      "errorType": "Pack Multiplier Confusion",
+      "promptInstructions": [
+        {
+          "id": "never-invent-but-infer",
+          "lines": "32-34",
+          "mechanism": "Implicit 24-pack in description interpreted as purchased qty"
+        },
+        {
+          "id": "bad-good-33cl",
+          "lines": "80-84",
+          "mechanism": "BAD: 33cl / GOOD: 24 un — directly teaches bottle-count-as-qty for beverage lines"
+        },
+        {
+          "id": "pack-24-bottles",
+          "lines": "53-55",
+          "mechanism": "Coca-Cola 33cl Pack 24 example is structurally identical pattern"
+        },
+        {
+          "id": "no-arithmetic-closure",
+          "lines": "123-124",
+          "mechanism": "24×€0.85=€20.40≠€19.38 but total column correct — semantic error passes"
+        }
+      ],
+      "contradictingInstruction": {
+        "id": "copy-exactly-authoritative",
+        "lines": "122",
+        "note": "Column shows qty=2 cases; infer-from-pack pattern overrides"
+      },
+      "evidence": [
+        ".tmp/gpt-pattern-audit/multiplier-errors.json",
+        ".tmp/gpt-pattern-audit/column-errors.json",
+        ".tmp/ginger-beer-audit/"
+      ]
+    }
+  ]
+}

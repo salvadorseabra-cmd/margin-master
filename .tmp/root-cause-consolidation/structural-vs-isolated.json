@@ -1,0 +1,81 @@
+{
+  "generated_at": "2026-06-11T01:12:02.299Z",
+  "rows": [
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "unit_price",
+      "failureFamily": "Column Shift",
+      "classification": "STRUCTURAL",
+      "rationale": "Mechanism applies to many invoice layouts (dense columns, discounts, weight-in-description)",
+      "financialImpactEuro": 1.4
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "total",
+      "failureFamily": "Column Shift",
+      "classification": "STRUCTURAL",
+      "rationale": "Mechanism applies to many invoice layouts (dense columns, discounts, weight-in-description)",
+      "financialImpactEuro": 1.4
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "unit_price",
+      "failureFamily": "Column Shift",
+      "classification": "STRUCTURAL",
+      "rationale": "Mechanism applies to many invoice layouts (dense columns, discounts, weight-in-description)",
+      "financialImpactEuro": 10
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "total",
+      "failureFamily": "Column Shift",
+      "classification": "STRUCTURAL",
+      "rationale": "Mechanism applies to many invoice layouts (dense columns, discounts, weight-in-description)",
+      "financialImpactEuro": 10
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "field": "total",
+      "failureFamily": "Model Variance",
+      "classification": "STRUCTURAL",
+      "rationale": "Mechanism applies to many invoice layouts (dense columns, discounts, weight-in-description)",
+      "financialImpactEuro": 36.66
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "field": "total",
+      "failureFamily": "Model Variance",
+      "classification": "STRUCTURAL",
+      "rationale": "Mechanism applies to many invoice layouts (dense columns, discounts, weight-in-description)",
+      "financialImpactEuro": 6.63
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "field": "total",
+      "failureFamily": "Model Variance",
+      "classification": "STRUCTURAL",
+      "rationale": "Mechanism applies to many invoice layouts (dense columns, discounts, weight-in-description)",
+      "financialImpactEuro": 11.01
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "field": "total",
+      "failureFamily": "Model Variance",
+      "classification": "STRUCTURAL",
+      "rationale": "Mechanism applies to many invoice layouts (dense columns, discounts, weight-in-description)",
+      "financialImpactEuro": 0.48
+    }
+  ],
+  "summary": {
+    "structural": 8,
+    "isolated": 0
+  }
+}

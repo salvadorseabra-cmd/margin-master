@@ -1,0 +1,429 @@
+{
+  "generated_at": "2026-06-11T01:05:11.223Z",
+  "comparison": {
+    "before": {
+      "stage": "before c33a7f1",
+      "fieldAccuracy": 89.41,
+      "quantityAccuracy": 93.75,
+      "financialAccuracy": 89.31,
+      "financialErrorEuro": 181.24,
+      "hallucinationRate": 1.85,
+      "perInvoice": [
+        {
+          "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+          "label": "Bidfood",
+          "itemCount": 11,
+          "qtyAccuracy": 100,
+          "fieldAccuracy": 95.45,
+          "financialAccuracy": 100,
+          "absFinancialError": 0,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+          "label": "Aviludo May",
+          "itemCount": 8,
+          "qtyAccuracy": 100,
+          "fieldAccuracy": 96.88,
+          "financialAccuracy": 100,
+          "absFinancialError": 0,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+          "label": "Aviludo April",
+          "itemCount": 9,
+          "qtyAccuracy": 100,
+          "fieldAccuracy": 86.11,
+          "financialAccuracy": 43.82,
+          "absFinancialError": 169.08,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+          "label": "Emporio",
+          "itemCount": 8,
+          "qtyAccuracy": 62.5,
+          "fieldAccuracy": 75,
+          "financialAccuracy": 99.46,
+          "absFinancialError": 1.49,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+          "label": "Bocconcino",
+          "itemCount": 7,
+          "qtyAccuracy": 100,
+          "fieldAccuracy": 89.29,
+          "financialAccuracy": 96.62,
+          "absFinancialError": 10,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+          "label": "Mammafiore",
+          "itemCount": 9,
+          "qtyAccuracy": 100,
+          "fieldAccuracy": 93.75,
+          "financialAccuracy": 95.95,
+          "absFinancialError": 0.67,
+          "hallucinationRate": 11.11
+        }
+      ]
+    },
+    "c33": {
+      "stage": "after c33a7f1",
+      "fieldAccuracy": 91.87,
+      "quantityAccuracy": 92.24,
+      "financialAccuracy": 94.82,
+      "financialErrorEuro": 92.35,
+      "hallucinationRate": 0,
+      "perInvoice": [
+        {
+          "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+          "label": "Bidfood",
+          "itemCount": 11,
+          "qtyAccuracy": 90.91,
+          "fieldAccuracy": 93.18,
+          "financialAccuracy": 100,
+          "absFinancialError": 0,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+          "label": "Aviludo May",
+          "itemCount": 8,
+          "qtyAccuracy": 87.5,
+          "fieldAccuracy": 90.63,
+          "financialAccuracy": 73.08,
+          "absFinancialError": 79.92,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+          "label": "Aviludo April",
+          "itemCount": 9,
+          "qtyAccuracy": 100,
+          "fieldAccuracy": 100,
+          "financialAccuracy": 100,
+          "absFinancialError": 0,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+          "label": "Emporio",
+          "itemCount": 8,
+          "qtyAccuracy": 75,
+          "fieldAccuracy": 81.25,
+          "financialAccuracy": 99.49,
+          "absFinancialError": 1.4,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+          "label": "Bocconcino",
+          "itemCount": 7,
+          "qtyAccuracy": 100,
+          "fieldAccuracy": 89.29,
+          "financialAccuracy": 96.62,
+          "absFinancialError": 10,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+          "label": "Mammafiore",
+          "itemCount": 8,
+          "qtyAccuracy": 100,
+          "fieldAccuracy": 96.88,
+          "financialAccuracy": 99.73,
+          "absFinancialError": 1.03,
+          "hallucinationRate": 0
+        }
+      ]
+    },
+    "refined": {
+      "stage": "after refinement",
+      "fieldAccuracy": 91.8,
+      "quantityAccuracy": 93.75,
+      "financialAccuracy": 96.96,
+      "financialErrorEuro": 66.34,
+      "hallucinationRate": 0,
+      "perInvoice": [
+        {
+          "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+          "label": "Bidfood",
+          "itemCount": 11,
+          "qtyAccuracy": 100,
+          "fieldAccuracy": 95.45,
+          "financialAccuracy": 100,
+          "absFinancialError": 0,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+          "label": "Aviludo May",
+          "itemCount": 8,
+          "qtyAccuracy": 100,
+          "fieldAccuracy": 100,
+          "financialAccuracy": 100,
+          "absFinancialError": 0,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+          "label": "Aviludo April",
+          "itemCount": 9,
+          "qtyAccuracy": 100,
+          "fieldAccuracy": 100,
+          "financialAccuracy": 100,
+          "absFinancialError": 0,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+          "label": "Emporio",
+          "itemCount": 8,
+          "qtyAccuracy": 62.5,
+          "fieldAccuracy": 78.13,
+          "financialAccuracy": 99.44,
+          "absFinancialError": 1.56,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+          "label": "Bocconcino",
+          "itemCount": 7,
+          "qtyAccuracy": 100,
+          "fieldAccuracy": 92.86,
+          "financialAccuracy": 96.62,
+          "absFinancialError": 10,
+          "hallucinationRate": 0
+        },
+        {
+          "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+          "label": "Mammafiore",
+          "itemCount": 8,
+          "qtyAccuracy": 100,
+          "fieldAccuracy": 84.38,
+          "financialAccuracy": 85.71,
+          "absFinancialError": 54.78,
+          "hallucinationRate": 0
+        }
+      ]
+    }
+  },
+  "targets": [
+    {
+      "invoice": "Bidfood",
+      "pattern": {},
+      "field": "quantity",
+      "expected": 0.5,
+      "actual": 0.5,
+      "pass": true
+    },
+    {
+      "invoice": "Aviludo May",
+      "pattern": {},
+      "field": "quantity",
+      "expected": 1,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "invoice": "Aviludo May",
+      "pattern": {},
+      "field": "total",
+      "expected": 9.99,
+      "actual": 9.99,
+      "pass": true
+    },
+    {
+      "invoice": "Emporio",
+      "pattern": {},
+      "field": "quantity",
+      "expected": 2,
+      "actual": 2,
+      "pass": true
+    },
+    {
+      "invoice": "Mammafiore",
+      "pattern": {},
+      "field": "total",
+      "expected": 16.09,
+      "actual": 16.09,
+      "pass": true
+    }
+  ],
+  "fixedRows": [
+    {
+      "invoice": "Bidfood",
+      "product": "Hortelã",
+      "gt": {
+        "qty": 0.5,
+        "total": 2.7
+      },
+      "extracted": {
+        "qty": 0.5,
+        "total": 2.7
+      },
+      "qtyOk": true,
+      "totalOk": true
+    },
+    {
+      "invoice": "Aviludo May",
+      "product": "Açucar Branco METRO Chef 10x1 Kg",
+      "gt": {
+        "qty": 1,
+        "total": 9.99
+      },
+      "extracted": {
+        "qty": 1,
+        "total": 9.99
+      },
+      "qtyOk": true,
+      "totalOk": true
+    },
+    {
+      "invoice": "Emporio",
+      "product": "Baladin - Ginger Beer 0.20cl",
+      "gt": {
+        "qty": 2,
+        "total": 19.38
+      },
+      "extracted": {
+        "qty": 2,
+        "total": 19.38
+      },
+      "qtyOk": true,
+      "totalOk": true
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "gt": {
+        "qty": 1,
+        "total": 16.09
+      },
+      "extracted": {
+        "qty": 1,
+        "total": 16.09
+      },
+      "qtyOk": true,
+      "totalOk": true
+    }
+  ],
+  "remainingWrongRows": [
+    {
+      "invoice": "Emporio",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "gt": {
+        "qty": 4.3,
+        "total": 35.14
+      },
+      "extracted": {
+        "qty": 4,
+        "total": 36.54
+      },
+      "qtyOk": false,
+      "totalOk": false
+    },
+    {
+      "invoice": "Emporio",
+      "product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "gt": {
+        "qty": 2.56,
+        "total": 38.56
+      },
+      "extracted": {
+        "qty": 2,
+        "total": 38.56
+      },
+      "qtyOk": false,
+      "totalOk": true
+    },
+    {
+      "invoice": "Emporio",
+      "product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+      "gt": {
+        "qty": 2.8,
+        "total": 49.48
+      },
+      "extracted": {
+        "qty": 2.28,
+        "total": 49.64
+      },
+      "qtyOk": false,
+      "totalOk": true
+    },
+    {
+      "invoice": "Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "gt": {
+        "qty": 2,
+        "total": 50
+      },
+      "extracted": {
+        "qty": 2,
+        "total": 40
+      },
+      "qtyOk": true,
+      "totalOk": false
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "gt": {
+        "qty": 5.996,
+        "total": 64.93
+      },
+      "extracted": {
+        "qty": 5.996,
+        "total": 101.59
+      },
+      "qtyOk": true,
+      "totalOk": false
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "gt": {
+        "qty": 1,
+        "total": 26.52
+      },
+      "extracted": {
+        "qty": 1,
+        "total": 33.15
+      },
+      "qtyOk": true,
+      "totalOk": false
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "gt": {
+        "qty": 24,
+        "total": 25.69
+      },
+      "extracted": {
+        "qty": 24,
+        "total": 36.7
+      },
+      "qtyOk": true,
+      "totalOk": false
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "gt": {
+        "qty": 1,
+        "total": 10.86
+      },
+      "extracted": {
+        "qty": 1,
+        "total": 10.38
+      },
+      "qtyOk": true,
+      "totalOk": false
+    }
+  ]
+}

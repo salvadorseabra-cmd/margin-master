@@ -1,0 +1,21 @@
+{
+  "imageWidth": 920,
+  "imageHeight": 1272,
+  "bounds": {
+    "top": 437,
+    "bottom": 1037,
+    "headerTop": 447,
+    "headerBottom": 465,
+    "totalsStart": 1013,
+    "detected": true
+  },
+  "fractionStartY": 572,
+  "summaryBandTop": null,
+  "footerCropStartY": 1037,
+  "footerCropHeight": 235,
+  "scanStart": 152,
+  "scanEnd": 699,
+  "greyHeaderThreshold": 163,
+  "imageSource": "cached",
+  "isPdf": false
+}

@@ -1,0 +1,222 @@
+{
+  "generated_at": "2026-06-11T01:39:40.954Z",
+  "count": 22,
+  "misreads": [
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "unit_price",
+      "wrongValue": 10.17,
+      "correctValue": 8.17,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #1",
+      "run": 1
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "total",
+      "wrongValue": 36.54,
+      "correctValue": 35.14,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #1",
+      "run": 1
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "quantity",
+      "wrongValue": 4,
+      "correctValue": 4.3,
+      "actualSourceColumn": "pack/qty",
+      "source": "5-run #1",
+      "run": 1
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "total",
+      "wrongValue": 35.24,
+      "correctValue": 35.14,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #2",
+      "run": 2
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "unit_price",
+      "wrongValue": 17,
+      "correctValue": 8.17,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #3",
+      "run": 3
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "total",
+      "wrongValue": 36.54,
+      "correctValue": 35.14,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #3",
+      "run": 3
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "total",
+      "wrongValue": 36.54,
+      "correctValue": 35.14,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #4",
+      "run": 4
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "total",
+      "wrongValue": 36.54,
+      "correctValue": 35.14,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #5",
+      "run": 5
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "unit_price",
+      "wrongValue": 20,
+      "correctValue": 25,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #1",
+      "run": 1
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "total",
+      "wrongValue": 40,
+      "correctValue": 50,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #1",
+      "run": 1
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "unit_price",
+      "wrongValue": 27.56,
+      "correctValue": 25,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #2",
+      "run": 2
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "total",
+      "wrongValue": 54.2,
+      "correctValue": 50,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #2",
+      "run": 2
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "unit_price",
+      "wrongValue": 25.9,
+      "correctValue": 25,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #3",
+      "run": 3
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "total",
+      "wrongValue": 40,
+      "correctValue": 50,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #3",
+      "run": 3
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "unit_price",
+      "wrongValue": 27.56,
+      "correctValue": 25,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #4",
+      "run": 4
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "total",
+      "wrongValue": 42.2,
+      "correctValue": 50,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #4",
+      "run": 4
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "unit_price",
+      "wrongValue": 27.56,
+      "correctValue": 25,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #5",
+      "run": 5
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "total",
+      "wrongValue": 20.02,
+      "correctValue": 50,
+      "actualSourceColumn": "see passc-choice-map",
+      "source": "5-run #5",
+      "run": 5
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Prosciutto",
+      "field": "unit_price",
+      "wrongValue": 17.06,
+      "correctValue": 8.17,
+      "actualSourceColumn": "Desc.(%)",
+      "source": "pass-c-raw"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Prosciutto",
+      "field": "unit_price",
+      "wrongValue": 9.17,
+      "correctValue": 8.17,
+      "actualSourceColumn": "total÷qty",
+      "source": "passc-refinement-validation"
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR",
+      "field": "unit_price",
+      "wrongValue": 20,
+      "correctValue": 25,
+      "actualSourceColumn": "DESC 20%",
+      "source": "passc-refinement-validation stable"
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR",
+      "field": "total",
+      "wrongValue": 40,
+      "correctValue": 50,
+      "actualSourceColumn": "2×20 calc",
+      "source": "passc-refinement-validation stable"
+    }
+  ]
+}

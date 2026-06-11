@@ -1,0 +1,59 @@
+{
+  "invoice": {
+    "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+    "supplier_name": "IL BOCCONCINO Distribuição ALIMENTAR",
+    "invoice_date": "2026-05-08",
+    "total": 290.64,
+    "file_url": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781113610714-Screenshot_2026-06-07_at_21.04.58.png",
+    "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+    "created_at": "2026-06-10T17:46:51.553519+00:00"
+  },
+  "dbItemCount": 5,
+  "dbItems": [
+    {
+      "id": "a6f63523-1ba0-4d50-ac8b-b781dc80779b",
+      "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 27.3,
+      "total": 27.3,
+      "created_at": "2026-06-10T17:47:04.686032+00:00"
+    },
+    {
+      "id": "eb8bbccd-059a-4ec5-b21f-859a0778c9ba",
+      "name": "POMODORI PELATI (CX 2,5KG*6)",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 27.56,
+      "total": 22.05,
+      "created_at": "2026-06-10T17:47:04.686032+00:00"
+    },
+    {
+      "id": "e38cc1ca-31ff-421a-a147-ab494f5df26c",
+      "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 26.292,
+      "total": 42.07,
+      "created_at": "2026-06-10T17:47:04.686032+00:00"
+    },
+    {
+      "id": "d89cff22-5a1c-44fa-a7ad-2d3d90604587",
+      "name": "RICOTTA TREVIGIANA 1,5KG",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 7.967,
+      "total": 7.97,
+      "created_at": "2026-06-10T17:47:04.686032+00:00"
+    },
+    {
+      "id": "9fc56213-8b09-44e7-85ca-e8ca0711c8e4",
+      "name": "ROLO DE CARNE E VACA 1KG",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 12.706,
+      "total": 12.71,
+      "created_at": "2026-06-10T17:47:04.686032+00:00"
+    }
+  ]
+}

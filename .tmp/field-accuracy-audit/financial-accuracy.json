@@ -1,0 +1,84 @@
+{
+  "vl_project": "bjhnlrgodcqoyzddbpbd",
+  "generated_at": "2026-06-10T21:59:31.704Z",
+  "note": "lineSum = sum(invoice_items.total); invoiceTotal = invoices.total (includes tax/shipping)",
+  "invoices": [
+    {
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice": "Bidfood Portugal",
+      "groundTruthLineSum": 170.57,
+      "extractedLineSum": 170.57,
+      "lineSumDelta": 0,
+      "lineSumDeltaPct": 0,
+      "groundTruthInvoiceTotal": 292.7,
+      "extractedInvoiceTotal": 292.7,
+      "invoiceTotalDelta": 0,
+      "financialAccuracyPct": 100
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoice": "Aviludo May",
+      "groundTruthLineSum": 296.88,
+      "extractedLineSum": 296.88,
+      "lineSumDelta": 0,
+      "lineSumDeltaPct": 0,
+      "groundTruthInvoiceTotal": 330.42,
+      "extractedInvoiceTotal": 330.42,
+      "invoiceTotalDelta": 0,
+      "financialAccuracyPct": 100
+    },
+    {
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoice": "Aviludo April",
+      "groundTruthLineSum": 300.95,
+      "extractedLineSum": 300.95,
+      "lineSumDelta": 0,
+      "lineSumDeltaPct": 0,
+      "groundTruthInvoiceTotal": 370.17,
+      "extractedInvoiceTotal": 370.17,
+      "invoiceTotalDelta": 0,
+      "financialAccuracyPct": 100
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "invoice": "Emporio Italia",
+      "groundTruthLineSum": 276.76,
+      "extractedLineSum": 278.76,
+      "lineSumDelta": 2,
+      "lineSumDeltaPct": 0.72,
+      "groundTruthInvoiceTotal": 327.46,
+      "extractedInvoiceTotal": 327.46,
+      "invoiceTotalDelta": 0,
+      "financialAccuracyPct": 99.28
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice": "IL Bocconcino",
+      "groundTruthLineSum": 295.82,
+      "extractedLineSum": 365.82,
+      "lineSumDelta": 70,
+      "lineSumDeltaPct": 23.66,
+      "groundTruthInvoiceTotal": 290.64,
+      "extractedInvoiceTotal": 290.64,
+      "invoiceTotalDelta": 0,
+      "financialAccuracyPct": 76.34
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice": "Mammafiore",
+      "groundTruthLineSum": 376.5,
+      "extractedLineSum": 393.32,
+      "lineSumDelta": 16.82,
+      "lineSumDeltaPct": 4.47,
+      "groundTruthInvoiceTotal": 415.96,
+      "extractedInvoiceTotal": 415.96,
+      "invoiceTotalDelta": 0,
+      "financialAccuracyPct": 95.53
+    }
+  ],
+  "aggregate": {
+    "avgLineSumDelta": 14.8,
+    "invoicesLineSumExact": 3,
+    "invoicesInvoiceTotalExact": 6
+  }
+}

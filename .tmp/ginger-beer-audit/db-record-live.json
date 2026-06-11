@@ -1,0 +1,134 @@
+{
+  "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "gingerItems": [
+    {
+      "id": "0dbbc281-9384-493f-9f92-68786058a5b5",
+      "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+      "name": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 9.69,
+      "total": 19.38,
+      "created_at": "2026-06-10T19:35:06.457801+00:00",
+      "updated_at": "2026-06-10T19:35:06.457801+00:00"
+    }
+  ],
+  "allItems": [
+    {
+      "id": "c7c934fd-c65d-4d96-8f48-51c7de9981ff",
+      "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": "un",
+      "unit_price": 2.35,
+      "total": 50.2,
+      "created_at": "2026-06-10T19:35:06.457801+00:00",
+      "updated_at": "2026-06-10T19:35:06.457801+00:00"
+    },
+    {
+      "id": "eadc0f01-4c35-4dc3-b67c-0569306eaebd",
+      "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castellone 1/8° - 1,5kg",
+      "quantity": 1.35,
+      "unit": "kg",
+      "unit_price": 9.92,
+      "total": 13.44,
+      "created_at": "2026-06-10T19:35:06.457801+00:00",
+      "updated_at": "2026-06-10T19:35:06.457801+00:00"
+    },
+    {
+      "id": "11d68d4d-f70c-4511-a997-c67b94f573c5",
+      "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+      "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg",
+      "quantity": 4.3,
+      "unit": "kg",
+      "unit_price": 17,
+      "total": 36.54,
+      "created_at": "2026-06-10T19:35:06.457801+00:00",
+      "updated_at": "2026-06-10T19:35:06.457801+00:00"
+    },
+    {
+      "id": "de9b9b65-2963-4702-852b-71cdb06cc2a3",
+      "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+      "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in Vela 1/2 ~2,5Kg",
+      "quantity": 3.11,
+      "unit": "kg",
+      "unit_price": 10.1,
+      "total": 31.67,
+      "created_at": "2026-06-10T19:35:06.457801+00:00",
+      "updated_at": "2026-06-10T19:35:06.457801+00:00"
+    },
+    {
+      "id": "2ff0d9a7-4b09-4956-bb4f-85e3d2268587",
+      "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+      "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 19.3,
+      "total": 38.56,
+      "created_at": "2026-06-10T19:35:06.457801+00:00",
+      "updated_at": "2026-06-10T19:35:06.457801+00:00"
+    },
+    {
+      "id": "fa9b959b-31c3-4dff-a797-1eadab5956c5",
+      "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+      "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+      "quantity": 2.8,
+      "unit": "kg",
+      "unit_price": 17.7,
+      "total": 49.48,
+      "created_at": "2026-06-10T19:35:06.457801+00:00",
+      "updated_at": "2026-06-10T19:35:06.457801+00:00"
+    },
+    {
+      "id": "0dbbc281-9384-493f-9f92-68786058a5b5",
+      "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+      "name": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 9.69,
+      "total": 19.38,
+      "created_at": "2026-06-10T19:35:06.457801+00:00",
+      "updated_at": "2026-06-10T19:35:06.457801+00:00"
+    },
+    {
+      "id": "b7d24e5a-8ed8-46b6-8780-68e109846810",
+      "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+      "name": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "quantity": 2.6,
+      "unit": "kg",
+      "unit_price": 16.6,
+      "total": 39.49,
+      "created_at": "2026-06-10T19:35:06.457801+00:00",
+      "updated_at": "2026-06-10T19:35:06.457801+00:00"
+    }
+  ],
+  "allGingerItems": [
+    {
+      "id": "0dbbc281-9384-493f-9f92-68786058a5b5",
+      "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+      "name": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 9.69,
+      "total": 19.38,
+      "created_at": "2026-06-10T19:35:06.457801+00:00",
+      "updated_at": "2026-06-10T19:35:06.457801+00:00",
+      "invoices": {
+        "supplier_name": "Emporio Italia"
+      }
+    }
+  ],
+  "ings": [],
+  "aliases": []
+}

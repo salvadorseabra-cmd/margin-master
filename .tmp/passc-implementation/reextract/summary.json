@@ -1,0 +1,217 @@
+[
+  {
+    "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "label": "Bidfood",
+    "status": 200,
+    "itemCount": 11,
+    "items": [
+      {
+        "name": "Manteiga Coimbra s/SAL EMB 1 Kg",
+        "quantity": 8
+      },
+      {
+        "name": "Ovo MORENO Classe M Cx.15 dúzias ( CARTÃO )",
+        "quantity": 1
+      },
+      {
+        "name": "Tomilho",
+        "quantity": 1
+      },
+      {
+        "name": "Salada Ibérica FSTK EMB. 250g",
+        "quantity": 4
+      },
+      {
+        "name": "Manjericão",
+        "quantity": 5
+      },
+      {
+        "name": "Hortelã",
+        "quantity": 1
+      },
+      {
+        "name": "Pepino",
+        "quantity": 3.36
+      },
+      {
+        "name": "Pêra Abacate Hasse",
+        "quantity": 3.28
+      },
+      {
+        "name": "Courgettes",
+        "quantity": 3.3
+      },
+      {
+        "name": "Alho Francês",
+        "quantity": 5.42
+      },
+      {
+        "name": "Abóbora Butternut",
+        "quantity": 5.64
+      }
+    ]
+  },
+  {
+    "id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+    "label": "Aviludo May",
+    "status": 200,
+    "itemCount": 8,
+    "items": [
+      {
+        "name": "Filete de Anchovas Alconfirosa L4 495 g",
+        "quantity": 2
+      },
+      {
+        "name": "Ovo Liquido Past.Gema Dovo 1 Kg",
+        "quantity": 6
+      },
+      {
+        "name": "Pepinos Extra Uil Frasco 6x720 g",
+        "quantity": 1
+      },
+      {
+        "name": "Atum Oleo Bolsa Nau Cafrieta 1 Kg",
+        "quantity": 2
+      },
+      {
+        "name": "Arroz Agulha Metro Chef 12x1 kg",
+        "quantity": 1
+      },
+      {
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "quantity": 2
+      },
+      {
+        "name": "Acucar Branco METRO Chef 10x1 Kg",
+        "quantity": 9
+      },
+      {
+        "name": "Nata Culinária 22% Reny Picot 6x1 Lt",
+        "quantity": 5
+      }
+    ]
+  },
+  {
+    "id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+    "label": "Aviludo April",
+    "status": 200,
+    "itemCount": 0,
+    "items": []
+  },
+  {
+    "id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+    "label": "Emporio",
+    "status": 200,
+    "itemCount": 8,
+    "items": [
+      {
+        "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "quantity": 24
+      },
+      {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castiglioni 1/8* ~1,5kg",
+        "quantity": 1.35
+      },
+      {
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,4~4,25KG",
+        "quantity": 4.3
+      },
+      {
+        "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 ~2,5kg",
+        "quantity": 3.11
+      },
+      {
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "quantity": 2
+      },
+      {
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+        "quantity": 2.58
+      },
+      {
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 2
+      },
+      {
+        "name": "Rovagnati - Salame Ventricina 2,5 Kg",
+        "quantity": 2.6
+      }
+    ]
+  },
+  {
+    "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+    "label": "Bocconcino",
+    "status": 200,
+    "itemCount": 7,
+    "items": [
+      {
+        "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "quantity": 10
+      },
+      {
+        "name": "STRACCIATELLA 250 GR",
+        "quantity": 24
+      },
+      {
+        "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "quantity": 1
+      },
+      {
+        "name": "POMODORO PELATI (CX 2,5KG*6)",
+        "quantity": 2
+      },
+      {
+        "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "quantity": 2
+      },
+      {
+        "name": "RICOTTA TREVIGIANA 1,5KG",
+        "quantity": 1
+      },
+      {
+        "name": "ROLO DE CABRA E VACA 1KG",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+    "label": "Mammafiore",
+    "status": 200,
+    "itemCount": 8,
+    "items": [
+      {
+        "name": "Guanciale di Suino stagionato +/- 1.5kg*7 Sorrentino",
+        "quantity": 5.996
+      },
+      {
+        "name": "Farina Speciale pizza 25kg Amoruso",
+        "quantity": 1
+      },
+      {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24
+      },
+      {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1
+      },
+      {
+        "name": "MOZZA Fioc di Latte Expet Julienne 3kg Simonetta",
+        "quantity": 10
+      },
+      {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1
+      },
+      {
+        "name": "Recarga por combustivel",
+        "quantity": 1
+      },
+      {
+        "name": "Farina oo pasta fresca e gnocchi25kg Caputo",
+        "quantity": 1
+      }
+    ]
+  }
+]

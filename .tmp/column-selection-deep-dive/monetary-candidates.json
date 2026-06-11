@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-06-11T01:34:01.493Z",
+  "emporio_prosciutto": [
+    {
+      "value": "4,30",
+      "numeric": 4.3,
+      "sourceColumn": "Qtd.",
+      "hasCurrency": false,
+      "hasPercent": false
+    },
+    {
+      "value": "10,30 €",
+      "numeric": 10.3,
+      "sourceColumn": "Preço Unit.",
+      "hasCurrency": true,
+      "hasPercent": false
+    },
+    {
+      "value": "17,50",
+      "numeric": 17.5,
+      "sourceColumn": "Desc.(%)",
+      "hasCurrency": false,
+      "hasPercent": false
+    },
+    {
+      "value": "36,54 €",
+      "numeric": 36.54,
+      "sourceColumn": "Preço Total",
+      "hasCurrency": true,
+      "hasPercent": false
+    }
+  ],
+  "bocconcino_pomodor": [
+    {
+      "value": "1,000",
+      "numeric": 1,
+      "sourceColumn": "QUANT.",
+      "hasCurrency": false,
+      "hasPercent": false
+    },
+    {
+      "value": "27,560 EUR",
+      "numeric": 27.56,
+      "sourceColumn": "P.VENDA S/IVA",
+      "hasCurrency": true,
+      "hasPercent": false
+    },
+    {
+      "value": "20,00%",
+      "numeric": 20,
+      "sourceColumn": "DESC",
+      "hasCurrency": false,
+      "hasPercent": true
+    },
+    {
+      "value": "22,05 EUR",
+      "numeric": 22.05,
+      "sourceColumn": "VALOR LIQUIDO",
+      "hasCurrency": true,
+      "hasPercent": false
+    },
+    {
+      "value": "23%",
+      "numeric": 23,
+      "sourceColumn": "IVA",
+      "hasCurrency": false,
+      "hasPercent": true
+    }
+  ]
+}

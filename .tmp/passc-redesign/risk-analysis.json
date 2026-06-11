@@ -1,0 +1,85 @@
+{
+  "generated_at": "2026-06-11T12:00:00.000Z",
+  "downsides": [
+    {
+      "risk": "More null quantity/unit values",
+      "severity": "MEDIUM",
+      "likelihood": "MEDIUM",
+      "description": "Removing infer-from-name (e.g. '15kg' in Acém Novilho, '1kg' in Bacon Burger) means rows with missing or illegible quantity columns will emit null instead of inferred values.",
+      "mitigation": "Post-GPT deterministic pack-parser for known patterns when column is null; flag null rows for human review in VL.",
+      "vlImpact": "Bidfood and Aviludo have clear quantity columns — low risk. Weight-based fresh meat lines without visible qty column are highest risk."
+    },
+    {
+      "risk": "Lower row recall on edge layouts",
+      "severity": "LOW",
+      "likelihood": "LOW",
+      "description": "Stricter 'only visible line items' rule may cause GPT to skip rows where product description is partially occluded or merged with lot sub-lines.",
+      "mitigation": "Geometry/crop quality already at 100% row recall post-fix. Monitor for missing rows on new suppliers.",
+      "vlImpact": "Current VL: 0 missing rows across 6 invoices. Risk is forward-looking, not retroactive."
+    },
+    {
+      "risk": "Unmatched rows in reconciliation",
+      "severity": "LOW",
+      "likelihood": "LOW",
+      "description": "If phantom row is correctly eliminated, Mammafiore drops from 9→8 extracted rows, improving alignment. No new unmatched real rows expected.",
+      "mitigation": "Row-count sanity check vs geometry Pass B.",
+      "vlImpact": "Positive — removes 1 phantom causing +€16.82 line-sum inflation."
+    },
+    {
+      "risk": "Missing unit_price/total on damaged columns",
+      "severity": "MEDIUM",
+      "likelihood": "LOW",
+      "description": "'Prefer null over guessing' may increase null prices on low-quality crops where current prompt would guess from arithmetic.",
+      "mitigation": "Existing reconcileLineItemAmounts can fill one missing field when two of three are present; do not extend reconcile to invent from description.",
+      "vlImpact": "Marginal — VL crops are high quality post geometry-fix."
+    },
+    {
+      "risk": "Regression on retail pack lines (33cl*24)",
+      "severity": "MEDIUM",
+      "likelihood": "LOW",
+      "description": "Column-faithful rule could theoretically under-extract Birra Peroni if model treats *24 as metadata despite column showing 24.",
+      "mitigation": "Positive example explicitly shows Aviludo Birra Peroni: column=24 → qty=24. Column always wins when both present.",
+      "vlImpact": "Bidfood/Aviludo retail pack lines remain correct — column and description agree."
+    },
+    {
+      "risk": "Weight-in-name products lose inferred qty",
+      "severity": "MEDIUM",
+      "likelihood": "MEDIUM",
+      "description": "Removing 'Acém Novilho 15kg → qty 15' pattern hurts invoices where purchased weight IS the qty but column shows weight in description only (common on butcher invoices).",
+      "mitigation": "Whitelist weight-as-qty ONLY when unit column shows kg AND no separate qty column exists; or handle in post-processing.",
+      "vlImpact": "Not observed in current 6-invoice VL corpus; monitor on future meat suppliers."
+    },
+    {
+      "risk": "Column-shift errors persist",
+      "severity": "HIGH",
+      "likelihood": "HIGH",
+      "description": "33% of financial errors (Prosciutto, Pellegrino, POMODOR price) are vision limitations prompt alone cannot fix.",
+      "mitigation": "Complement prompt with post-GPT arithmetic sanity checks, column-boundary hints from geometry, or re-OCR on price cells.",
+      "vlImpact": "Emporio line-sum delta (+€2) and Bocconcino price residual (€10) may remain after prompt deploy."
+    },
+    {
+      "risk": "Description OCR unchanged",
+      "severity": "LOW",
+      "likelihood": "HIGH",
+      "description": "8/15 error-catalog rows are description-only OCR noise. Strict description accuracy (84%) will not improve.",
+      "mitigation": "Accept MINOR_VARIATION tolerance; optional fuzzy-match in ingredient identity layer.",
+      "vlImpact": "Aviludo May strict description accuracy stays at 50%; lenient stays 100%."
+    }
+  ],
+  "regressionScenarios": [
+    {
+      "scenario": "Butcher invoice with weight-only qty in description",
+      "currentBehavior": "Infers qty=15 kg from '15kg' in name",
+      "proposedBehavior": "qty=null if column empty",
+      "severity": "MEDIUM"
+    },
+    {
+      "scenario": "Bidfood MO/EM herbs with qty=1 implicit",
+      "currentBehavior": "Infers qty=1 for Salada EM",
+      "proposedBehavior": "qty from column or null",
+      "severity": "LOW",
+      "note": "Bidfood columns are clear — no VL regression observed"
+    }
+  ],
+  "netRiskVerdict": "Benefits outweigh risks for VL corpus. Primary residual risk is column-shift vision errors and null qty on weight-in-name edge cases not present in current 6 invoices."
+}

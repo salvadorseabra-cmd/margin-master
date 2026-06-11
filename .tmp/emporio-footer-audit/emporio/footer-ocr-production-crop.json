@@ -1,0 +1,17 @@
+{
+  "source": "visual inspection of production footer-crop.png (y=851..1124, 724×273)",
+  "method": "manual OCR audit from saved crop image — OPENAI_API_KEY unavailable locally",
+  "raw_text": "IVA23 - 23.0% | 175,96 € | 40,47 €\nIVA13 - 13.0% | 38,56 € | 5,01 €\nDados Bancários\nBankinter\nPT50 0269 0105 00200085087 80\nBKBKPTPL\nPagina 1 de 2",
+  "monetary_values": [
+    { "context": "IVA23 base", "value": 175.96 },
+    { "context": "IVA23 montante", "value": 40.47 },
+    { "context": "IVA13 base", "value": 38.56 },
+    { "context": "IVA13 montante", "value": 5.01 }
+  ],
+  "ground_truth_visible": {
+    "278.16": false,
+    "49.30": false,
+    "327.46": false
+  },
+  "note": "Subtotal/Impostos/Total grey summary box is above crop start (y≈700–820); not present in production footer crop"
+}

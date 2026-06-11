@@ -1,0 +1,129 @@
+{
+  "input_name": "Baladin - Ginger Beer 0.20cl",
+  "inferPurchaseUnitsFromLineItemName": {
+    "purchase_quantity": 2,
+    "purchase_unit": "ml",
+    "base_unit": "ml",
+    "package_type": null,
+    "package_count": null,
+    "confidence": 0.92,
+    "reason": "volume token \"0.20CL\" (CL) → 2ml",
+    "purchase_unit_count": 1,
+    "pack_size": 2,
+    "pack_size_unit": "ml",
+    "size_is_metadata_only": false,
+    "normalized_stock_quantity": 2,
+    "stock_unit": "ml",
+    "recipe_usage_unit": "ml",
+    "conversion_hint": null
+  },
+  "detectVolume": {
+    "milliliters": 2,
+    "confidence": 0.92,
+    "reason": "volume token \"0.20CL\" (CL) → 2ml"
+  },
+  "inferBaseUnit": {
+    "purchase_quantity": 2,
+    "purchase_unit": "ml",
+    "base_unit": "ml",
+    "package_type": null,
+    "package_count": null,
+    "confidence": 0.92,
+    "reason": "volume token \"0.20CL\" (CL) → 2ml",
+    "purchase_unit_count": 1,
+    "pack_size": 2,
+    "pack_size_unit": "ml",
+    "size_is_metadata_only": false,
+    "normalized_stock_quantity": 2,
+    "stock_unit": "ml",
+    "recipe_usage_unit": "ml",
+    "conversion_hint": null
+  },
+  "parsePurchaseFormatPhrase": {
+    "kind": "weight_or_volume",
+    "containerCount": 1,
+    "containerUnit": "ml",
+    "packageQuantity": 2,
+    "packageUnit": "ml",
+    "matchedText": "0.20cl",
+    "confidence": 0.98,
+    "reason": "purchase structure (bare_measure)"
+  },
+  "resolveInvoiceLinePurchaseFormat": {
+    "kind": "weight_or_volume",
+    "ingredientIdentityHint": "Baladin - Ginger Beer",
+    "purchaseContainerCount": 24,
+    "purchaseContainerUnit": "ml",
+    "packageQuantity": 2,
+    "packageMeasurementUnit": "ml",
+    "normalizedUsableQuantity": 48,
+    "usableQuantityUnit": "ml",
+    "packageType": null,
+    "inferred": {
+      "purchase_quantity": 2,
+      "purchase_unit": "ml",
+      "base_unit": "ml",
+      "package_type": null,
+      "package_count": null,
+      "confidence": 0.92,
+      "reason": "volume token \"0.20CL\" (CL) → 2ml",
+      "purchase_unit_count": 1,
+      "pack_size": 2,
+      "pack_size_unit": "ml",
+      "size_is_metadata_only": false,
+      "normalized_stock_quantity": 2,
+      "stock_unit": "ml",
+      "recipe_usage_unit": "ml",
+      "conversion_hint": null
+    },
+    "confidence": 0.98,
+    "reason": "purchase structure (bare_measure); purchase structure (bare_measure)",
+    "stockNormalizationPipeline": "unified"
+  },
+  "resolveStructuredPurchaseForDisplay": {
+    "kind": "weight_or_volume",
+    "ingredientIdentityHint": "Baladin - Ginger Beer",
+    "purchaseContainerCount": 24,
+    "purchaseContainerUnit": "ml",
+    "packageQuantity": 2,
+    "packageMeasurementUnit": "ml",
+    "normalizedUsableQuantity": 48,
+    "usableQuantityUnit": "ml",
+    "packageType": null,
+    "inferred": {
+      "purchase_quantity": 2,
+      "purchase_unit": "ml",
+      "base_unit": "ml",
+      "package_type": null,
+      "package_count": null,
+      "confidence": 0.92,
+      "reason": "volume token \"0.20CL\" (CL) → 2ml",
+      "purchase_unit_count": 1,
+      "pack_size": 2,
+      "pack_size_unit": "ml",
+      "size_is_metadata_only": false,
+      "normalized_stock_quantity": 2,
+      "stock_unit": "ml",
+      "recipe_usage_unit": "ml",
+      "conversion_hint": null
+    },
+    "confidence": 0.98,
+    "reason": "purchase structure (bare_measure); purchase structure (bare_measure)",
+    "stockNormalizationPipeline": "unified"
+  },
+  "resolveUsablePerPricedUnit": {
+    "amount": 2,
+    "unit": "ml"
+  },
+  "computeEffectiveUsableCost": {
+    "cost": 425,
+    "unit": "L"
+  },
+  "recipeOperationalCostFieldsFromInvoiceLine": {
+    "current_price": 0.85,
+    "purchase_quantity": 24,
+    "cost_base_unit": "un",
+    "usable_volume_ml": 2
+  },
+  "cl_conversion_note": "detectVolume uses toMl(n)=n*10 for CL; 0.20*10=2ml. stock-normalization parseSizeAndUnit also does cl*10→ml but only when unit is separate token."
+}

@@ -1,0 +1,51 @@
+{
+  "emporio": {
+    "id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+    "expectedTotal": 327.46,
+    "dbTotal": 0,
+    "extractInvoiceTotal": null,
+    "footerCropStartY": 851,
+    "footerCropContainsTotals": false,
+    "tableBoundsBottom": 851,
+    "totalsStart": 827,
+    "gptProduction": { "total": null, "net_subtotal": null, "vat": null },
+    "validation": "N/A — all fields null"
+  },
+  "bidfood": {
+    "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "expectedTotal": 292.7,
+    "dbTotal": 292.7,
+    "extractInvoiceTotal": 292.7,
+    "footerCropStartY": 1037,
+    "footerCropContainsTotals": true,
+    "tableBoundsBottom": 1037,
+    "totalsStart": 1013,
+    "gptProduction": { "total": 292.7 },
+    "gptDebug": {
+      "total": 292.7,
+      "net_subtotal": 276.13,
+      "vat": 16.57,
+      "confidence": "high"
+    },
+    "validation": "high — 276.13+16.57=292.70"
+  },
+  "aviludoMay": {
+    "id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+    "expectedTotal": 330.42,
+    "dbTotal": 330.42,
+    "extractInvoiceTotal": 330.42,
+    "footerCropStartY": 448,
+    "footerCropContainsTotals": true,
+    "tableBoundsBottom": 448,
+    "totalsStart": 424,
+    "gptProduction": { "total": 330.42 },
+    "gptDebug": {
+      "total": 330.42,
+      "net_subtotal": 296.88,
+      "vat": 33.54,
+      "confidence": "high",
+      "note": "net_subtotal matches line-item sum, not printed Valor Líquido 268.63"
+    },
+    "validation": "high — 296.88+33.54=330.42 (arithmetically consistent but wrong net label)"
+  }
+}

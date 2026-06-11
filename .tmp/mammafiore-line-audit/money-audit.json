@@ -1,0 +1,86 @@
+{
+  "invoiceTotalWithVat": 415.96,
+  "netSubtotalFromFooter": null,
+  "note": "Line-item Valor column sums to net mercadoria (pre-IVA). Invoice total €415.96 = net + IVA from footer pass.",
+  "sums": {
+    "groundTruthLineSum": 376.5,
+    "passCRawSum": 394.62,
+    "passCSum": 390.35,
+    "afterNormalizeSum": 394.62,
+    "afterReconcileSum": 394.62,
+    "persistedSum": 393.32
+  },
+  "invoiceTotalStill415_96": true,
+  "perRow": [
+    {
+      "item": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "pdfTotal": 64.93,
+      "gptTotal": 64.93,
+      "persistedTotal": 64.93,
+      "status": "MATCH"
+    },
+    {
+      "item": "Farina Speciale pizza 25kg Amoruso",
+      "pdfTotal": 26.52,
+      "gptTotal": 26.52,
+      "persistedTotal": 26.52,
+      "status": "MATCH"
+    },
+    {
+      "item": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "pdfTotal": 25.69,
+      "gptTotal": 25.69,
+      "persistedTotal": 25.69,
+      "status": "MATCH"
+    },
+    {
+      "item": "PHANTOM — Olio (not on invoice)",
+      "pdfTotal": null,
+      "gptTotal": 15,
+      "persistedTotal": 18.3,
+      "status": "PHANTOM"
+    },
+    {
+      "item": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "pdfTotal": 16.09,
+      "gptTotal": 15,
+      "persistedTotal": 15.09,
+      "status": "PARTIAL"
+    },
+    {
+      "item": "MOZZA Fior di Latte Expert Julienne 3kg Simonetta",
+      "pdfTotal": 200.3,
+      "gptTotal": 200.3,
+      "persistedTotal": 200.3,
+      "status": "MATCH"
+    },
+    {
+      "item": "Rulo Di Capra 1kg*2 Simonetta",
+      "pdfTotal": 10.86,
+      "gptTotal": 10.8,
+      "persistedTotal": 10.38,
+      "status": "PARTIAL"
+    },
+    {
+      "item": "Recargo por combustible",
+      "pdfTotal": 2,
+      "gptTotal": 2,
+      "persistedTotal": 2,
+      "status": "PARTIAL"
+    },
+    {
+      "item": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+      "pdfTotal": 30.11,
+      "gptTotal": 30.11,
+      "persistedTotal": 30.11,
+      "status": "MATCH"
+    }
+  ],
+  "differenceExplainedBy": [
+    "Phantom oil row adds ~€15–18.8 to GPT/persisted sums (not on PDF)",
+    "Aceto qty misread (GPT qty=1–2 vs PDF qty=1; total off by ~€1)",
+    "Rulo qty/total misread (GPT total €10.8 vs PDF €10.86)",
+    "Ground truth net sum €376.50 vs persisted €393.32 — delta €16.82 driven mainly by phantom + aceto/rulo errors",
+    "Invoice header total €415.96 unchanged — sourced from footer pass, independent of line-item sum"
+  ]
+}

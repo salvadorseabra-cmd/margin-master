@@ -1,0 +1,359 @@
+{
+  "lineTrace": [
+    {
+      "groundTruth": {
+        "description": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "qty": 5.996,
+        "unit": "un",
+        "unit_price": 16.922,
+        "total": 64.93
+      },
+      "passC": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg S7 Sorrentino",
+        "quantity": 5.996,
+        "unit": "UN",
+        "unit_price": 16.922,
+        "total": 64.93
+      },
+      "passCRaw": {
+        "name": "Guanciale di Suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit": "kg",
+        "unit_price": 16.922,
+        "total": 64.93
+      },
+      "normalizeItems": {
+        "name": "Guanciale di Suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit": "kg",
+        "unit_price": 16.922,
+        "total": 64.93
+      },
+      "reconcile": {
+        "name": "Guanciale di Suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit": "kg",
+        "unit_price": 16.922,
+        "total": 64.93
+      },
+      "invoice_items": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit": "un",
+        "unit_price": 16.922,
+        "total": 64.93
+      }
+    },
+    {
+      "groundTruth": {
+        "description": "Farina Speciale pizza 25kg Amoruso",
+        "qty": 1,
+        "unit": "un",
+        "unit_price": 33.154,
+        "total": 26.52
+      },
+      "passC": {
+        "name": "Farina Speciale pizza 25kg Amoruso",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 33.154,
+        "total": 26.52
+      },
+      "passCRaw": {
+        "name": "Farina Speciale pizza 25kg Amorucci",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 33.154,
+        "total": 26.52
+      },
+      "normalizeItems": {
+        "name": "Farina Speciale pizza 25kg Amorucci",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 33.154,
+        "total": 26.52
+      },
+      "reconcile": {
+        "name": "Farina Speciale pizza 25kg Amorucci",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 33.154,
+        "total": 26.52
+      },
+      "invoice_items": {
+        "name": "Farina Speciale pizza 25kg Amoruso",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 33.154,
+        "total": 26.52
+      }
+    },
+    {
+      "groundTruth": {
+        "description": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "qty": 24,
+        "unit": "un",
+        "unit_price": 1.529,
+        "total": 25.69
+      },
+      "passC": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit": "UN",
+        "unit_price": 1.529,
+        "total": 25.69
+      },
+      "passCRaw": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 1.529,
+        "total": 25.69
+      },
+      "normalizeItems": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 1.529,
+        "total": 25.69
+      },
+      "reconcile": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 1.529,
+        "total": 25.69
+      },
+      "invoice_items": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 1.529,
+        "total": 25.69
+      }
+    },
+    {
+      "groundTruth": {
+        "description": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+        "qty": 1,
+        "unit": "un",
+        "unit_price": 18.929,
+        "total": 16.09
+      },
+      "passC": {
+        "name": "Aceto balsamico di modena IGP PET 5l*2 Toschi",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 18.295,
+        "total": 15
+      },
+      "passCRaw": {
+        "name": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 13.8,
+        "total": 15.96
+      },
+      "normalizeItems": {
+        "name": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 13.8,
+        "total": 15.96
+      },
+      "reconcile": {
+        "name": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 13.8,
+        "total": 15.96
+      },
+      "invoice_items": {
+        "name": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 18.929,
+        "total": 15.09
+      }
+    },
+    {
+      "groundTruth": {
+        "description": "MOZZA Fior di Latte Expert Julienne 3kg Simonetta",
+        "qty": 10,
+        "unit": "un",
+        "unit_price": 24.728,
+        "total": 200.3
+      },
+      "passC": {
+        "name": "MOZZA Fioc di Latte Expet Julienne 3kg Simonetta",
+        "quantity": 10,
+        "unit": "UN",
+        "unit_price": 24.728,
+        "total": 200.3
+      },
+      "passCRaw": {
+        "name": "MOZZA Fioc di Latte Expet Julienne 3kg Simonetta",
+        "quantity": 10,
+        "unit": "kg",
+        "unit_price": 24.728,
+        "total": 200.3
+      },
+      "normalizeItems": {
+        "name": "MOZZA Fioc di Latte Expet Julienne 3kg Simonetta",
+        "quantity": 10,
+        "unit": "kg",
+        "unit_price": 24.728,
+        "total": 200.3
+      },
+      "reconcile": {
+        "name": "MOZZA Fioc di Latte Expet Julienne 3kg Simonetta",
+        "quantity": 10,
+        "unit": "kg",
+        "unit_price": 24.728,
+        "total": 200.3
+      },
+      "invoice_items": {
+        "name": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+        "quantity": 10,
+        "unit": "un",
+        "unit_price": 24.728,
+        "total": 200.3
+      }
+    },
+    {
+      "groundTruth": {
+        "description": "Rulo Di Capra 1kg*2 Simonetta",
+        "qty": 1,
+        "unit": "un",
+        "unit_price": 15.192,
+        "total": 10.86
+      },
+      "passC": {
+        "name": "Rub Di Capra 1kg S2 Simonetta",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 15.192,
+        "total": 10.8
+      },
+      "passCRaw": {
+        "name": "Rub Di Capra 1kg*2 Simonetta",
+        "quantity": 2,
+        "unit": "kg",
+        "unit_price": 15.192,
+        "total": 10.28
+      },
+      "normalizeItems": {
+        "name": "Rub Di Capra 1kg*2 Simonetta",
+        "quantity": 2,
+        "unit": "kg",
+        "unit_price": 15.192,
+        "total": 10.28
+      },
+      "reconcile": {
+        "name": "Rub Di Capra 1kg*2 Simonetta",
+        "quantity": 2,
+        "unit": "kg",
+        "unit_price": 15.192,
+        "total": 10.28
+      },
+      "invoice_items": {
+        "name": "Rub Di Capra 1kg *2 Simonetta",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 15.192,
+        "total": 10.38
+      }
+    },
+    {
+      "groundTruth": {
+        "description": "Recargo por combustible",
+        "qty": 1,
+        "unit": "un",
+        "unit_price": 2,
+        "total": 2
+      },
+      "passC": {
+        "name": "Recargo por combustibile",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 2,
+        "total": 2
+      },
+      "passCRaw": {
+        "name": "Recargo por combustible",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 2,
+        "total": 2
+      },
+      "normalizeItems": {
+        "name": "Recargo por combustible",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 2,
+        "total": 2
+      },
+      "reconcile": {
+        "name": "Recargo por combustible",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 2,
+        "total": 2
+      },
+      "invoice_items": null
+    },
+    {
+      "groundTruth": {
+        "description": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+        "qty": 1,
+        "unit": "un",
+        "unit_price": 39.101,
+        "total": 30.11
+      },
+      "passC": {
+        "name": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 39.101,
+        "total": 30.11
+      },
+      "passCRaw": {
+        "name": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 39.101,
+        "total": 30.11
+      },
+      "normalizeItems": {
+        "name": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 39.101,
+        "total": 30.11
+      },
+      "reconcile": {
+        "name": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 39.101,
+        "total": 30.11
+      },
+      "invoice_items": {
+        "name": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 39.101,
+        "total": 30.11
+      }
+    }
+  ],
+  "phantomExtractedRows": [
+    {
+      "name": "Olio Nute 600g Dea",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 18.929,
+      "total": 15
+    }
+  ]
+}

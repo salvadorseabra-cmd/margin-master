@@ -1,0 +1,341 @@
+{
+  "generated_at": "2026-06-11T01:16:47.357Z",
+  "invoice": "Mammafiore",
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "itemCount": 8,
+      "rows": [
+        {
+          "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+          "qty": 5.996,
+          "unitPrice": 16.922,
+          "total": 64.93,
+          "gtTotal": 64.93,
+          "mathematicalTotal": 101.46,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Farina Speciale pizza 25kg Amoruso",
+          "qty": 1,
+          "unitPrice": 33.154,
+          "total": 26.52,
+          "gtTotal": 26.52,
+          "mathematicalTotal": 33.15,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "qty": 24,
+          "unitPrice": 1.529,
+          "total": 25.69,
+          "gtTotal": 25.69,
+          "mathematicalTotal": 36.7,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+          "qty": 1,
+          "unitPrice": 18.829,
+          "total": 15.09,
+          "gtTotal": 16.09,
+          "mathematicalTotal": 18.83,
+          "deltaFromGt": -1,
+          "behaviour": "C_alternate"
+        },
+        {
+          "product": "Rulo Di Capra 1kg*2 Simonetta",
+          "qty": 1,
+          "unitPrice": 15.192,
+          "total": 10.8,
+          "gtTotal": 10.86,
+          "mathematicalTotal": 15.19,
+          "deltaFromGt": -0.06,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+          "qty": 1,
+          "unitPrice": 39.101,
+          "total": 30.11,
+          "gtTotal": 30.11,
+          "mathematicalTotal": 39.1,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "itemCount": 8,
+      "rows": [
+        {
+          "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+          "qty": 5.996,
+          "unitPrice": 16.922,
+          "total": 101.54,
+          "gtTotal": 64.93,
+          "mathematicalTotal": 101.46,
+          "deltaFromGt": 36.61,
+          "behaviour": "B_recalculate_qty_x_price"
+        },
+        {
+          "product": "Farina Speciale pizza 25kg Amoruso",
+          "qty": 1,
+          "unitPrice": 33.154,
+          "total": 33.15,
+          "gtTotal": 26.52,
+          "mathematicalTotal": 33.15,
+          "deltaFromGt": 6.63,
+          "behaviour": "B_recalculate_qty_x_price"
+        },
+        {
+          "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "qty": 24,
+          "unitPrice": 1.529,
+          "total": 36.7,
+          "gtTotal": 25.69,
+          "mathematicalTotal": 36.7,
+          "deltaFromGt": 11.01,
+          "behaviour": "B_recalculate_qty_x_price"
+        },
+        {
+          "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+          "qty": 1,
+          "unitPrice": 18.829,
+          "total": 16.09,
+          "gtTotal": 16.09,
+          "mathematicalTotal": 18.83,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Rulo Di Capra 1kg*2 Simonetta",
+          "qty": 1,
+          "unitPrice": 15.192,
+          "total": 15.19,
+          "gtTotal": 10.86,
+          "mathematicalTotal": 15.19,
+          "deltaFromGt": 4.33,
+          "behaviour": "B_recalculate_qty_x_price"
+        },
+        {
+          "product": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+          "qty": 1,
+          "unitPrice": 39.101,
+          "total": 30.11,
+          "gtTotal": 30.11,
+          "mathematicalTotal": 39.1,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        }
+      ]
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "itemCount": 8,
+      "rows": [
+        {
+          "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+          "qty": 5.996,
+          "unitPrice": 16.922,
+          "total": 64.93,
+          "gtTotal": 64.93,
+          "mathematicalTotal": 101.46,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Farina Speciale pizza 25kg Amoruso",
+          "qty": 1,
+          "unitPrice": 33.154,
+          "total": 26.52,
+          "gtTotal": 26.52,
+          "mathematicalTotal": 33.15,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "qty": 24,
+          "unitPrice": 1.529,
+          "total": 25.69,
+          "gtTotal": 25.69,
+          "mathematicalTotal": 36.7,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+          "qty": 1,
+          "unitPrice": 18.829,
+          "total": 15.09,
+          "gtTotal": 16.09,
+          "mathematicalTotal": 18.83,
+          "deltaFromGt": -1,
+          "behaviour": "C_alternate"
+        },
+        {
+          "product": "Rulo Di Capra 1kg*2 Simonetta",
+          "qty": 1,
+          "unitPrice": 15.192,
+          "total": 10.89,
+          "gtTotal": 10.86,
+          "mathematicalTotal": 15.19,
+          "deltaFromGt": 0.03,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+          "qty": 1,
+          "unitPrice": 39.101,
+          "total": 30.11,
+          "gtTotal": 30.11,
+          "mathematicalTotal": 39.1,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        }
+      ]
+    },
+    {
+      "run": 4,
+      "status": 200,
+      "itemCount": 8,
+      "rows": [
+        {
+          "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+          "qty": 5.996,
+          "unitPrice": 16.922,
+          "total": 64.93,
+          "gtTotal": 64.93,
+          "mathematicalTotal": 101.46,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Farina Speciale pizza 25kg Amoruso",
+          "qty": 1,
+          "unitPrice": 33.154,
+          "total": 26.52,
+          "gtTotal": 26.52,
+          "mathematicalTotal": 33.15,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "qty": 24,
+          "unitPrice": 1.529,
+          "total": 25.69,
+          "gtTotal": 25.69,
+          "mathematicalTotal": 36.7,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+          "qty": 1,
+          "unitPrice": 18.829,
+          "total": 15.09,
+          "gtTotal": 16.09,
+          "mathematicalTotal": 18.83,
+          "deltaFromGt": -1,
+          "behaviour": "C_alternate"
+        },
+        {
+          "product": "Rulo Di Capra 1kg*2 Simonetta",
+          "qty": 1,
+          "unitPrice": 15.192,
+          "total": 10.89,
+          "gtTotal": 10.86,
+          "mathematicalTotal": 15.19,
+          "deltaFromGt": 0.03,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+          "qty": 1,
+          "unitPrice": 39.101,
+          "total": 30.11,
+          "gtTotal": 30.11,
+          "mathematicalTotal": 39.1,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        }
+      ]
+    },
+    {
+      "run": 5,
+      "status": 200,
+      "itemCount": 8,
+      "rows": [
+        {
+          "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+          "qty": 5.996,
+          "unitPrice": 16.922,
+          "total": 64.93,
+          "gtTotal": 64.93,
+          "mathematicalTotal": 101.46,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Farina Speciale pizza 25kg Amoruso",
+          "qty": 1,
+          "unitPrice": 33.154,
+          "total": 26.52,
+          "gtTotal": 26.52,
+          "mathematicalTotal": 33.15,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "qty": 24,
+          "unitPrice": 1.529,
+          "total": 25.69,
+          "gtTotal": 25.69,
+          "mathematicalTotal": 36.7,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+          "qty": 1,
+          "unitPrice": 18.829,
+          "total": 16.09,
+          "gtTotal": 16.09,
+          "mathematicalTotal": 18.83,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Rulo Di Capra 1kg*2 Simonetta",
+          "qty": 1,
+          "unitPrice": 15.192,
+          "total": 10.8,
+          "gtTotal": 10.86,
+          "mathematicalTotal": 15.19,
+          "deltaFromGt": -0.06,
+          "behaviour": "A_copy_invoice_total"
+        },
+        {
+          "product": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+          "qty": 1,
+          "unitPrice": 39.101,
+          "total": 30.11,
+          "gtTotal": 30.11,
+          "mathematicalTotal": 39.1,
+          "deltaFromGt": 0,
+          "behaviour": "A_copy_invoice_total"
+        }
+      ]
+    }
+  ]
+}

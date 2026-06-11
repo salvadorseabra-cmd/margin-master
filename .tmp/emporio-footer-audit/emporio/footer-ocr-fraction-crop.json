@@ -1,0 +1,22 @@
+{
+  "source": "visual inspection of footer-fraction-crop.png (y=506..1124, 55% bottom)",
+  "method": "manual OCR audit — proves totals ARE readable when crop includes grey summary box",
+  "raw_text": "…line items…\nDescontos 42,72 €\nSubtotal 278,16 €\nImpostos 49,30 €\nTotal 327,46 €\nOs bens/serviços foram colocados à disposição do adquirente em 19-05-2026\nImposto | Base | Montante\nIVA6 - 6.0% | 63,64 € | 3,82 €\nIVA23 - 23.0% | 175,96 € | 40,47 €\nIVA13 - 13.0% | 38,56 € | 5,01 €\nDados Bancários …",
+  "monetary_values": [
+    { "context": "Descontos", "value": 42.72 },
+    { "context": "Subtotal", "value": 278.16 },
+    { "context": "Impostos", "value": 49.3 },
+    { "context": "Total", "value": 327.46 },
+    { "context": "IVA6 base", "value": 63.64 },
+    { "context": "IVA6 montante", "value": 3.82 },
+    { "context": "IVA23 base", "value": 175.96 },
+    { "context": "IVA23 montante", "value": 40.47 },
+    { "context": "IVA13 base", "value": 38.56 },
+    { "context": "IVA13 montante", "value": 5.01 }
+  ],
+  "ground_truth_visible": {
+    "278.16": true,
+    "49.30": true,
+    "327.46": true
+  }
+}

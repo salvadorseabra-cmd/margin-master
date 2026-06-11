@@ -1,0 +1,166 @@
+{
+  "generated_at": "2026-06-11T01:16:47.357Z",
+  "products": [
+    {
+      "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "classification": "VARIANCE",
+      "uniqueTotals": [
+        64.93,
+        101.54
+      ],
+      "uniqueBehaviours": [
+        "A_copy_invoice_total",
+        "B_recalculate_qty_x_price"
+      ],
+      "evidence": {
+        "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "gtTotal": 64.93,
+        "c33Behaviour": "A_copy_invoice_total",
+        "refinedBehaviour": "C_alternate",
+        "run1to5Behaviours": [
+          "A_copy_invoice_total",
+          "B_recalculate_qty_x_price",
+          "A_copy_invoice_total",
+          "A_copy_invoice_total",
+          "A_copy_invoice_total"
+        ],
+        "dominantBehaviour": "C_alternate",
+        "alternatesAcrossRuns": true
+      }
+    },
+    {
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "classification": "VARIANCE",
+      "uniqueTotals": [
+        26.52,
+        33.15
+      ],
+      "uniqueBehaviours": [
+        "A_copy_invoice_total",
+        "B_recalculate_qty_x_price"
+      ],
+      "evidence": {
+        "product": "Farina Speciale pizza 25kg Amoruso",
+        "gtTotal": 26.52,
+        "c33Behaviour": "A_copy_invoice_total",
+        "refinedBehaviour": "B_recalculate_qty_x_price",
+        "run1to5Behaviours": [
+          "A_copy_invoice_total",
+          "B_recalculate_qty_x_price",
+          "A_copy_invoice_total",
+          "A_copy_invoice_total",
+          "A_copy_invoice_total"
+        ],
+        "dominantBehaviour": "C_alternate",
+        "alternatesAcrossRuns": true
+      }
+    },
+    {
+      "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "classification": "VARIANCE",
+      "uniqueTotals": [
+        25.69,
+        36.7
+      ],
+      "uniqueBehaviours": [
+        "A_copy_invoice_total",
+        "B_recalculate_qty_x_price"
+      ],
+      "evidence": {
+        "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "gtTotal": 25.69,
+        "c33Behaviour": "A_copy_invoice_total",
+        "refinedBehaviour": "B_recalculate_qty_x_price",
+        "run1to5Behaviours": [
+          "A_copy_invoice_total",
+          "B_recalculate_qty_x_price",
+          "A_copy_invoice_total",
+          "A_copy_invoice_total",
+          "A_copy_invoice_total"
+        ],
+        "dominantBehaviour": "C_alternate",
+        "alternatesAcrossRuns": true
+      }
+    },
+    {
+      "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "classification": "VARIANCE",
+      "uniqueTotals": [
+        15.09,
+        16.09
+      ],
+      "uniqueBehaviours": [
+        "C_alternate",
+        "A_copy_invoice_total"
+      ],
+      "evidence": {
+        "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+        "gtTotal": 16.09,
+        "c33Behaviour": "C_alternate",
+        "refinedBehaviour": "A_copy_invoice_total",
+        "run1to5Behaviours": [
+          "C_alternate",
+          "A_copy_invoice_total",
+          "C_alternate",
+          "C_alternate",
+          "A_copy_invoice_total"
+        ],
+        "dominantBehaviour": "C_alternate",
+        "alternatesAcrossRuns": true
+      }
+    },
+    {
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "classification": "VARIANCE",
+      "uniqueTotals": [
+        10.8,
+        15.19,
+        10.89
+      ],
+      "uniqueBehaviours": [
+        "A_copy_invoice_total",
+        "B_recalculate_qty_x_price"
+      ],
+      "evidence": {
+        "product": "Rulo Di Capra 1kg*2 Simonetta",
+        "gtTotal": 10.86,
+        "c33Behaviour": "A_copy_invoice_total",
+        "refinedBehaviour": "C_alternate",
+        "run1to5Behaviours": [
+          "A_copy_invoice_total",
+          "B_recalculate_qty_x_price",
+          "A_copy_invoice_total",
+          "A_copy_invoice_total",
+          "A_copy_invoice_total"
+        ],
+        "dominantBehaviour": "C_alternate",
+        "alternatesAcrossRuns": true
+      }
+    },
+    {
+      "product": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+      "classification": "STRUCTURAL_CORRECT",
+      "uniqueTotals": [
+        30.11
+      ],
+      "uniqueBehaviours": [
+        "A_copy_invoice_total"
+      ],
+      "evidence": {
+        "product": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+        "gtTotal": 30.11,
+        "c33Behaviour": "A_copy_invoice_total",
+        "refinedBehaviour": "A_copy_invoice_total",
+        "run1to5Behaviours": [
+          "A_copy_invoice_total",
+          "A_copy_invoice_total",
+          "A_copy_invoice_total",
+          "A_copy_invoice_total",
+          "A_copy_invoice_total"
+        ],
+        "dominantBehaviour": "A_copy_invoice_total",
+        "alternatesAcrossRuns": false
+      }
+    }
+  ]
+}

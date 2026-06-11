@@ -1,0 +1,40 @@
+{
+  "generated_at": "2026-06-11T01:12:02.299Z",
+  "families": [
+    {
+      "failureFamily": "Column Shift",
+      "recurrenceAt1000Invoices": "HIGH",
+      "rationale": "Any multi-column table with tight spacing; 2 stable VL cases (POMODORO, Prosciutto)"
+    },
+    {
+      "failureFamily": "Discount Handling",
+      "recurrenceAt1000Invoices": "HIGH",
+      "rationale": "Restaurant invoices commonly have qty×price≠total; Mammafiore has 4+ discounted lines"
+    },
+    {
+      "failureFamily": "Model Variance",
+      "recurrenceAt1000Invoices": "MEDIUM",
+      "rationale": "Non-deterministic GPT on discounted totals; same invoice correct on c33 run, wrong on 04c0d88 run"
+    },
+    {
+      "failureFamily": "Fractional Quantity",
+      "recurrenceAt1000Invoices": "MEDIUM",
+      "rationale": "Weight-based deli rows (Bresaola, Pellegrino); Hortelã now fixed"
+    },
+    {
+      "failureFamily": "Decimal Parsing",
+      "recurrenceAt1000Invoices": "LOW",
+      "rationale": "No active decimal-comma failures after Hortelã fix"
+    },
+    {
+      "failureFamily": "Pack Notation",
+      "recurrenceAt1000Invoices": "LOW",
+      "rationale": "c33a7f1 + 04c0d88 resolved pack-multiplier class"
+    },
+    {
+      "failureFamily": "GPT Hallucination",
+      "recurrenceAt1000Invoices": "LOW",
+      "rationale": "0% on refined validation"
+    }
+  ]
+}

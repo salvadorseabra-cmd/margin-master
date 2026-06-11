@@ -1,0 +1,196 @@
+{
+  "vl_project": "bjhnlrgodcqoyzddbpbd",
+  "generated_at": "2026-06-10T21:59:31.704Z",
+  "methodology": {
+    "lenient": "MATCH + MINOR_VARIATION count as correct",
+    "strict": "only MATCH counts as correct",
+    "numericTolerance": "qty ±0.05/2%; money ±€0.05/1%; description fuzzy ≥0.92 MATCH, ≥0.65 MINOR"
+  },
+  "aggregate": {
+    "invoicesAudited": 6,
+    "totalAlignedRows": 51,
+    "rowsFullyCorrect": 37,
+    "rowsFullyCorrectPct": 72.55,
+    "rowsWithErrorPct": 11.76,
+    "fieldAccuracyLenient": {
+      "description": 100,
+      "quantity": 92,
+      "unit": 98,
+      "unit_price": 94,
+      "line_total": 92
+    },
+    "fieldAccuracyStrict": {
+      "description": 84,
+      "quantity": 92,
+      "unit": 98,
+      "unit_price": 94,
+      "line_total": 90
+    },
+    "overallFieldAccuracyLenient": 95,
+    "overallFieldAccuracyStrict": 92
+  },
+  "perInvoice": [
+    {
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice": "Bidfood Portugal",
+      "groundTruthConfidence": "high",
+      "rowsAligned": 11,
+      "rowsFullyCorrect": 11,
+      "rowsFullyCorrectPct": 100,
+      "rowsWithError": 0,
+      "rowsWithErrorPct": 0,
+      "phantomRows": 0,
+      "fieldAccuracyLenient": {
+        "description": 100,
+        "quantity": 100,
+        "unit": 100,
+        "unit_price": 100,
+        "line_total": 100
+      },
+      "fieldAccuracyStrict": {
+        "description": 100,
+        "quantity": 100,
+        "unit": 100,
+        "unit_price": 100,
+        "line_total": 100
+      },
+      "overallFieldAccuracyLenient": 100,
+      "overallFieldAccuracyStrict": 100
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoice": "Aviludo May",
+      "groundTruthConfidence": "high",
+      "rowsAligned": 8,
+      "rowsFullyCorrect": 4,
+      "rowsFullyCorrectPct": 50,
+      "rowsWithError": 0,
+      "rowsWithErrorPct": 0,
+      "phantomRows": 0,
+      "fieldAccuracyLenient": {
+        "description": 100,
+        "quantity": 100,
+        "unit": 100,
+        "unit_price": 100,
+        "line_total": 100
+      },
+      "fieldAccuracyStrict": {
+        "description": 50,
+        "quantity": 100,
+        "unit": 100,
+        "unit_price": 100,
+        "line_total": 100
+      },
+      "overallFieldAccuracyLenient": 100,
+      "overallFieldAccuracyStrict": 90
+    },
+    {
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoice": "Aviludo April",
+      "groundTruthConfidence": "low",
+      "rowsAligned": 9,
+      "rowsFullyCorrect": 9,
+      "rowsFullyCorrectPct": 100,
+      "rowsWithError": 0,
+      "rowsWithErrorPct": 0,
+      "phantomRows": 0,
+      "fieldAccuracyLenient": {
+        "description": 100,
+        "quantity": 100,
+        "unit": 100,
+        "unit_price": 100,
+        "line_total": 100
+      },
+      "fieldAccuracyStrict": {
+        "description": 100,
+        "quantity": 100,
+        "unit": 100,
+        "unit_price": 100,
+        "line_total": 100
+      },
+      "overallFieldAccuracyLenient": 100,
+      "overallFieldAccuracyStrict": 100
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "invoice": "Emporio Italia",
+      "groundTruthConfidence": "high",
+      "rowsAligned": 8,
+      "rowsFullyCorrect": 3,
+      "rowsFullyCorrectPct": 37.5,
+      "rowsWithError": 3,
+      "rowsWithErrorPct": 37.5,
+      "phantomRows": 0,
+      "fieldAccuracyLenient": {
+        "description": 100,
+        "quantity": 88,
+        "unit": 88,
+        "unit_price": 75,
+        "line_total": 88
+      },
+      "fieldAccuracyStrict": {
+        "description": 88,
+        "quantity": 88,
+        "unit": 88,
+        "unit_price": 75,
+        "line_total": 75
+      },
+      "overallFieldAccuracyLenient": 88,
+      "overallFieldAccuracyStrict": 83
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice": "IL Bocconcino",
+      "groundTruthConfidence": "high",
+      "rowsAligned": 7,
+      "rowsFullyCorrect": 5,
+      "rowsFullyCorrectPct": 71.43,
+      "rowsWithError": 1,
+      "rowsWithErrorPct": 14.29,
+      "phantomRows": 0,
+      "fieldAccuracyLenient": {
+        "description": 100,
+        "quantity": 86,
+        "unit": 100,
+        "unit_price": 86,
+        "line_total": 86
+      },
+      "fieldAccuracyStrict": {
+        "description": 86,
+        "quantity": 86,
+        "unit": 100,
+        "unit_price": 86,
+        "line_total": 86
+      },
+      "overallFieldAccuracyLenient": 91,
+      "overallFieldAccuracyStrict": 89
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice": "Mammafiore",
+      "groundTruthConfidence": "high",
+      "rowsAligned": 8,
+      "rowsFullyCorrect": 5,
+      "rowsFullyCorrectPct": 62.5,
+      "rowsWithError": 2,
+      "rowsWithErrorPct": 25,
+      "phantomRows": 1,
+      "fieldAccuracyLenient": {
+        "description": 100,
+        "quantity": 75,
+        "unit": 100,
+        "unit_price": 100,
+        "line_total": 75
+      },
+      "fieldAccuracyStrict": {
+        "description": 75,
+        "quantity": 75,
+        "unit": 100,
+        "unit_price": 100,
+        "line_total": 75
+      },
+      "overallFieldAccuracyLenient": 90,
+      "overallFieldAccuracyStrict": 85
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "generated_at": "2026-06-11T00:00:00.000Z",
+  "counterfactual": "Column-only qty/price extraction; no multiplier inference from description; no invented rows; lot/sub-line rejection",
+  "assumptions": [
+    "Geometry/crop unchanged (post-fix state)",
+    "Same GPT-4.1 vision model",
+    "Post-prompt reconcile unchanged"
+  ],
+  "results": [
+    {
+      "error": "Bocconcino POMODOR qty 2→6",
+      "invoice": "IL Bocconcino",
+      "field": "quantity",
+      "verdict": "YES",
+      "confidence": "HIGH",
+      "rationale": "Column visibly shows qty=2. Removing infer-from-name (L33-34) and pack-*N examples (L53-84) eliminates *6→6 override. Fresh extract already shows qty=2 once postfix geometry fixed."
+    },
+    {
+      "error": "Bocconcino POMODOR unit_price 25→20",
+      "invoice": "IL Bocconcino",
+      "field": "unit_price",
+      "verdict": "UNCERTAIN",
+      "confidence": "MEDIUM",
+      "rationale": "Price error persists in fresh extract (qty=2 correct, price still €20). Column-only rule helps intent but vision digit misread (25→20) may survive as model/OCR limitation independent of pack inference."
+    },
+    {
+      "error": "Bocconcino POMODOR line_total 50→40/120",
+      "invoice": "IL Bocconcino",
+      "field": "line_total",
+      "verdict": "YES",
+      "confidence": "HIGH",
+      "rationale": "Total follows qty and price. Fixing qty (6→2) fixes €120→€50. Remaining €40 vs €50 depends on price counterfactual (UNCERTAIN)."
+    },
+    {
+      "error": "Mammafiore Aceto qty 1→2 (5l*2)",
+      "invoice": "Mammafiore",
+      "field": "quantity",
+      "verdict": "YES",
+      "confidence": "HIGH",
+      "rationale": "Column shows qty=1. No multiplier inference eliminates *2→2. Fresh extract (2026-06-11) already corrected to qty=1 with current prompt — proves column value is readable when inference suppressed."
+    },
+    {
+      "error": "Mammafiore Rulo qty 1→2 (1kg*2)",
+      "invoice": "Mammafiore",
+      "field": "quantity",
+      "verdict": "YES",
+      "confidence": "HIGH",
+      "rationale": "Same mechanism as Aceto. Fresh extract corrected to qty=1. Column-only extraction resolves."
+    },
+    {
+      "error": "Mammafiore phantom Olio",
+      "invoice": "Mammafiore",
+      "field": "entire row",
+      "verdict": "YES",
+      "confidence": "HIGH",
+      "rationale": "No invented rows + lot/sub-line rejection + row-count guard (8 artigo codes) eliminates 9th row. Geometry shows exactly 8 real rows; phantom is pure GPT invention."
+    },
+    {
+      "error": "Emporio Prosciutto unit_price 8.17→17.06",
+      "invoice": "Emporio Italia",
+      "field": "unit_price",
+      "verdict": "UNCERTAIN",
+      "confidence": "MEDIUM",
+      "rationale": "Column shift / digit bleed from weight range '4-4,25KG'. Column-only mandate reduces contextual bleed but dense Italian grid misalignment is primarily vision limitation."
+    },
+    {
+      "error": "Emporio San Pellegrino qty 2.56→2",
+      "invoice": "Emporio Italia",
+      "field": "quantity",
+      "verdict": "UNCERTAIN",
+      "confidence": "MEDIUM",
+      "rationale": "Decimal truncation suggests column misread not pack inference. Column-only helps but fractional qty parsing may still fail."
+    },
+    {
+      "error": "Emporio San Pellegrino unit_price 15.06→19.32",
+      "invoice": "Emporio Italia",
+      "field": "unit_price",
+      "verdict": "UNCERTAIN",
+      "confidence": "MEDIUM",
+      "rationale": "Wrong price column read. Not caused by pack inference; column isolation guidance may help but not guaranteed."
+    },
+    {
+      "error": "Emporio Ginger Beer qty 2→24",
+      "invoice": "Emporio Italia",
+      "field": "quantity",
+      "verdict": "YES",
+      "confidence": "HIGH",
+      "rationale": "Direct application of pack-24-bottles example (L53-55) and bad-good-33cl (L80-84). Column shows qty=2 cases. No multiplier inference fixes."
+    },
+    {
+      "error": "Emporio Ginger Beer unit 2 un vs 24 un",
+      "invoice": "Emporio Italia",
+      "field": "unit",
+      "verdict": "YES",
+      "confidence": "HIGH",
+      "rationale": "Follows qty error. Column-only extraction yields correct case/unit semantics."
+    },
+    {
+      "error": "Emporio Ginger Beer unit_price 9.69→0.85",
+      "invoice": "Emporio Italia",
+      "field": "unit_price",
+      "verdict": "YES",
+      "confidence": "HIGH",
+      "rationale": "Per-bottle price substituted for per-case price as consequence of qty=24 inference. Fixing qty restores case-level pricing."
+    }
+  ],
+  "summary": {
+    "YES": 8,
+    "NO": 0,
+    "UNCERTAIN": 4,
+    "promptDrivenErrorsFixed": "8/12 financial errors (67%) would likely disappear",
+    "visionResidualErrors": "4/12 (33%) — column shift / digit misread independent of pack inference"
+  }
+}

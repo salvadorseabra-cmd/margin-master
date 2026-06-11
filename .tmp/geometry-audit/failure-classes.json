@@ -1,0 +1,31 @@
+{
+  "Class 1: Header too low (Bocconcino)": {
+    "invoices": [],
+    "count": 0,
+    "description": "White-header invoice: grey-band fallback picks product metadata band below real column headers; crop top cuts off first rows."
+  },
+  "Class 2: Header search too late (Mammafiore)": {
+    "invoices": [
+      "Mammafiore Portugal"
+    ],
+    "count": 1,
+    "description": "White-header search zone (≥38% height) excludes real headers; grey fallback picks footer summary band; all rows excluded."
+  },
+  "Class 3: Footer below totals (Emporio)": {
+    "invoices": [],
+    "count": 0,
+    "description": "Table-anchored footer crop starts below grey Subtotal/Total box; GPT sees IVA/banking only."
+  },
+  "Class 4: PDF storage (geometry N/A)": {
+    "invoices": [
+      "Aviludo April"
+    ],
+    "count": 1,
+    "description": "Storage file is PDF; imagescript cannot decode; geometry and OCR blocked."
+  },
+  "Class 5: Header mis-detection (other)": {
+    "invoices": [],
+    "count": 0,
+    "description": "Grey-header or other template with >30px header delta without white-header pattern."
+  }
+}

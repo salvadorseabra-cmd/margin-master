@@ -1,0 +1,27 @@
+{
+  "finding": "Deployed vl-footer-debug and extract-invoice disagree on Emporio footer extraction",
+  "evidence": {
+    "fullImage_extract_invoice": {
+      "attempts": 3,
+      "total": null,
+      "status": 200
+    },
+    "fullImage_vl_footer_debug": {
+      "attempts": 5,
+      "total": 327.46,
+      "net_subtotal": 278.16,
+      "vat": 49.3,
+      "status": 200
+    },
+    "productionFooterCropOnly_vl_footer_debug": {
+      "total": null,
+      "note": "footer-crop.png sent as full image; re-crop strips remaining content"
+    },
+    "local_cropBottomPortion": {
+      "matches": ".tmp/emporio-footer-audit/emporio/footer-crop.png",
+      "footerCropStartY": 851,
+      "includesDocumentTotals": false
+    }
+  },
+  "interpretation": "extract-invoice uses table-anchored crop (y=851) matching repo code; deployed vl-footer-debug likely uses an older fraction-only crop (y≈506) that still includes the grey totals box. Production path is extract-invoice → null total."
+}

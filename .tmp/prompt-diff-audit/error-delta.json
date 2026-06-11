@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-06-11T00:52:43.016Z",
+  "ErrorsFixed": 9,
+  "ErrorsIntroduced": 3,
+  "HallucinationsRemoved": 1,
+  "QuantityCorrections": 1,
+  "PriceCorrections": 3,
+  "NewQuantityErrors": 2,
+  "NewPriceErrors": 1,
+  "NetErrorDelta": -6,
+  "OutcomeCounts": {
+    "IMPROVED": 9,
+    "REGRESSED": 3,
+    "PARTIAL_IMPROVEMENT": 1,
+    "NO_MATERIAL_CHANGE": 16
+  }
+}

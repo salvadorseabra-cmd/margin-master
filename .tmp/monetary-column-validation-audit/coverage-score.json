@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-06-11T01:39:40.954Z",
+  "rules": [
+    {
+      "rule": "A — qty×unit≈total",
+      "errorsDetected": 7,
+      "falsePositives": 12,
+      "notes": "High FP on legitimate discount lines"
+    },
+    {
+      "rule": "B — unit matches discount %",
+      "errorsDetected": 3,
+      "falsePositives": 0,
+      "notes": "Requires discount % candidate; strong for Pomodor €20"
+    },
+    {
+      "rule": "C — unit matches VAT %",
+      "errorsDetected": 0,
+      "falsePositives": 0,
+      "notes": "Rarely triggers"
+    },
+    {
+      "rule": "D — unit exceeds plausible net",
+      "errorsDetected": 5,
+      "falsePositives": 10,
+      "notes": "Catches list-price-as-unit when total is net"
+    },
+    {
+      "rule": "E — neighbour inconsistency",
+      "errorsDetected": 2,
+      "falsePositives": 0,
+      "notes": "Flags Pomodor €27.56 matching Mezzi row"
+    },
+    {
+      "rule": "F — discount column present",
+      "errorsDetected": 0,
+      "falsePositives": 0,
+      "notes": "Context only — enables other rules"
+    }
+  ],
+  "combinedDetection": {
+    "historicalErrorRuns": 12,
+    "detectedYES": 9,
+    "detectedPARTIAL": 0,
+    "undetectedNO": 3,
+    "detectionRatePct": 75
+  }
+}

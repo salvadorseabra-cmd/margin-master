@@ -1,0 +1,18 @@
+{
+  "imageWidth": 920,
+  "imageHeight": 1272,
+  "tableBounds": {
+    "top": 437,
+    "bottom": 1037,
+    "headerTop": 447,
+    "headerBottom": 465,
+    "totalsStart": 1013,
+    "detected": true
+  },
+  "fractionStartY": 572,
+  "footerCropStartY": 1037,
+  "footerCropHeight": 235,
+  "footerCropEndY": 1272,
+  "bottomFraction": 0.55,
+  "cropMethod": "max(fractionStartY, tableBoundsBottom)"
+}

@@ -1,0 +1,159 @@
+{
+  "generated_at": "2026-06-10T23:38:43.657Z",
+  "rows": [
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "label": "IL Bocconcino",
+      "key": "pomodor",
+      "dbRow": {
+        "id": "54ee3963-ec47-4ea7-b96d-b6a2c6499a64",
+        "name": "POMODORINI pelati (CX 2.5KG*6)",
+        "quantity": 6,
+        "unit": "un",
+        "unit_price": 20,
+        "total": 120
+      },
+      "renderItem": {
+        "name": "POMODORINI pelati (CX 2.5KG*6)",
+        "quantity": 6,
+        "unit": "un",
+        "unit_price": 20,
+        "total": 120
+      },
+      "uiPostDbTransformation": "NO",
+      "fieldsChangedInUi": []
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "label": "Mammafiore",
+      "key": "phantom-olio",
+      "dbRow": {
+        "id": "536358c9-36d7-43da-bc8b-306f1b23e26b",
+        "name": "Olio Nuto 609 10lt",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 18.295,
+        "total": 18.3
+      },
+      "renderItem": {
+        "name": "Olio Nuto 609 10lt",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 18.295,
+        "total": 18.3
+      },
+      "uiPostDbTransformation": "NO",
+      "fieldsChangedInUi": []
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "label": "Mammafiore",
+      "key": "aceto",
+      "dbRow": {
+        "id": "9e2ce10f-4661-4ec0-9bbb-5a6543d1e6e8",
+        "name": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 18.929,
+        "total": 15.09
+      },
+      "renderItem": {
+        "name": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 18.929,
+        "total": 15.09
+      },
+      "uiPostDbTransformation": "NO",
+      "fieldsChangedInUi": []
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "label": "Mammafiore",
+      "key": "rulo",
+      "dbRow": {
+        "id": "9321aae3-fd0f-4903-a76d-ec2d556f3e33",
+        "name": "Rub Di Capra 1kg *2 Simonetta",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 15.192,
+        "total": 10.38
+      },
+      "renderItem": {
+        "name": "Rub Di Capra 1kg *2 Simonetta",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 15.192,
+        "total": 10.38
+      },
+      "uiPostDbTransformation": "NO",
+      "fieldsChangedInUi": []
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "label": "Emporio Italia",
+      "key": "prosciutto",
+      "dbRow": {
+        "id": "11d68d4d-f70c-4511-a997-c67b94f573c5",
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg",
+        "quantity": 4.3,
+        "unit": "kg",
+        "unit_price": 17,
+        "total": 36.54
+      },
+      "renderItem": {
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg",
+        "quantity": 4.3,
+        "unit": "kg",
+        "unit_price": 17,
+        "total": 36.54
+      },
+      "uiPostDbTransformation": "NO",
+      "fieldsChangedInUi": []
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "label": "Emporio Italia",
+      "key": "pellegrino",
+      "dbRow": {
+        "id": "2ff0d9a7-4b09-4956-bb4f-85e3d2268587",
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 19.3,
+        "total": 38.56
+      },
+      "renderItem": {
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 19.3,
+        "total": 38.56
+      },
+      "uiPostDbTransformation": "NO",
+      "fieldsChangedInUi": []
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "label": "Emporio Italia",
+      "key": "ginger-beer",
+      "dbRow": {
+        "id": "0dbbc281-9384-493f-9f92-68786058a5b5",
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 9.69,
+        "total": 19.38
+      },
+      "renderItem": {
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 9.69,
+        "total": 19.38
+      },
+      "uiPostDbTransformation": "NO",
+      "fieldsChangedInUi": []
+    }
+  ]
+}

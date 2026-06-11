@@ -1,0 +1,101 @@
+{
+  "generated_at": "2026-06-11T01:16:47.357Z",
+  "products": [
+    {
+      "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "gtTotal": 64.93,
+      "bestRun": 64.93,
+      "worstRun": 101.54,
+      "errorRangeEuro": 36.61,
+      "maxErrorEuro": 36.61,
+      "minErrorEuro": 0,
+      "allRunTotals": [
+        64.93,
+        101.54,
+        64.93,
+        64.93,
+        64.93
+      ]
+    },
+    {
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "gtTotal": 26.52,
+      "bestRun": 26.52,
+      "worstRun": 33.15,
+      "errorRangeEuro": 6.63,
+      "maxErrorEuro": 6.63,
+      "minErrorEuro": 0,
+      "allRunTotals": [
+        26.52,
+        33.15,
+        26.52,
+        26.52,
+        26.52
+      ]
+    },
+    {
+      "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "gtTotal": 25.69,
+      "bestRun": 25.69,
+      "worstRun": 36.7,
+      "errorRangeEuro": 11.01,
+      "maxErrorEuro": 11.01,
+      "minErrorEuro": 0,
+      "allRunTotals": [
+        25.69,
+        36.7,
+        25.69,
+        25.69,
+        25.69
+      ]
+    },
+    {
+      "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "gtTotal": 16.09,
+      "bestRun": 16.09,
+      "worstRun": 15.09,
+      "errorRangeEuro": 1,
+      "maxErrorEuro": 1,
+      "minErrorEuro": 0,
+      "allRunTotals": [
+        15.09,
+        16.09,
+        15.09,
+        15.09,
+        16.09
+      ]
+    },
+    {
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "gtTotal": 10.86,
+      "bestRun": 10.86,
+      "worstRun": 15.19,
+      "errorRangeEuro": 4.3,
+      "maxErrorEuro": 4.33,
+      "minErrorEuro": 0.03,
+      "allRunTotals": [
+        10.8,
+        15.19,
+        10.89,
+        10.89,
+        10.8
+      ]
+    },
+    {
+      "product": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+      "gtTotal": 30.11,
+      "bestRun": 30.11,
+      "worstRun": 30.11,
+      "errorRangeEuro": 0,
+      "maxErrorEuro": 0,
+      "minErrorEuro": 0,
+      "allRunTotals": [
+        30.11,
+        30.11,
+        30.11,
+        30.11,
+        30.11
+      ]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-06-11T12:00:00.000Z",
+  "methodology": "Classification counts from gpt-pattern-audit/frequency.json cross-referenced with error-prevention-analysis.json verdicts. Rows may carry multiple error types; counts are per classification tag, not per row.",
+  "baseline": {
+    "source": ".tmp/gpt-pattern-audit/frequency.json",
+    "totalAlignedRows": 51,
+    "nonPerfectMatchRows": 15,
+    "financiallySignificantErrors": 7
+  },
+  "estimates": [
+    {
+      "errorType": "Pack Multiplier Confusion",
+      "currentCount": 4,
+      "afterPromptEstimated": 0,
+      "confidence": "HIGH",
+      "rationale": "All 4 cases (POMODOR *6, Aceto 5l*2, Rulo 1kg*2, Ginger Beer 24-pack) are direct consequences of infer-from-name rule. Proposed prompt adds explicit negative examples and column precedence. Fresh extracts already show qty correction for Aceto/Rulo/POMODOR when inference is suppressed. Residual risk: model non-determinism on edge cases."
+    },
+    {
+      "errorType": "Column Shift",
+      "currentCount": 3,
+      "afterPromptEstimated": 2,
+      "confidence": "MEDIUM",
+      "rationale": "Prosciutto (€8.17→€17.06), San Pellegrino (qty 2.56→2, price 15.06→19.32), Bocconcino POMODOR price (€25→€20) are vision column-alignment failures. Strengthened column-isolation language may reduce bleed by ~1 case but cannot eliminate dense-grid OCR limitations without post-processing guards."
+    },
+    {
+      "errorType": "Phantom Rows",
+      "currentCount": 1,
+      "afterPromptEstimated": 0,
+      "confidence": "HIGH",
+      "rationale": "Single Mammafiore phantom (lot 609 fusion). Anti-phantom rules + lot rejection + no invented rows should eliminate. Recommend pairing with deterministic row-count guard in implementation for belt-and-suspenders."
+    },
+    {
+      "errorType": "OCR Noise",
+      "currentCount": 8,
+      "afterPromptEstimated": 8,
+      "confidence": "HIGH",
+      "rationale": "All 8 are description-only spelling/character variants (Aviludo×4, Emporio×2, Bocconcino×1, Mammafiore×1). Column-faithful prompt does not target name transcription. No change expected."
+    }
+  ],
+  "aggregateProjection": {
+    "totalErrorClassifications": 17,
+    "currentPreventableByPrompt": 5,
+    "estimatedRemaining": 10,
+    "financialErrorReductionPct": 71,
+    "note": "71% = 5 of 7 financial errors (4 pack + 1 phantom) likely eliminated; 2 column-shift cases + partial price residuals remain"
+  }
+}

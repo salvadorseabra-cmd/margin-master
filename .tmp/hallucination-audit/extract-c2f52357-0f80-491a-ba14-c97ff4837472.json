@@ -1,0 +1,70 @@
+{
+  "supplier": "AVILUDO",
+  "invoice_date": "2026-04-17",
+  "total": 68.7,
+  "items": [
+    {
+      "name": "Filete de Anchovas Alconfrisa Lt 495 g",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 9.49,
+      "total": 9.49
+    },
+    {
+      "name": "Ovo Líquido Past.Gema Dovo 1kg",
+      "quantity": 6,
+      "unit": "un",
+      "unit_price": 10.19,
+      "total": 10.19
+    },
+    {
+      "name": "Pepinos Extra II Frasco 6x720g",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 21.99,
+      "total": 21.99
+    },
+    {
+      "name": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 6.29,
+      "total": 6.29
+    },
+    {
+      "name": "Arroz Agulha Metro Chef 12x1kg",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 13.45,
+      "total": 13.45
+    },
+    {
+      "name": "Chocolate Pantagruel 10x200g",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 29.19,
+      "total": 29.19
+    },
+    {
+      "name": "Açúcar Branco Metro Chef 10x1Kg",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 9.29,
+      "total": 9.29
+    },
+    {
+      "name": "Nata Reny Picot 22% 6x1L",
+      "quantity": 5,
+      "unit": "cx",
+      "unit_price": 18.29,
+      "total": 18.29
+    },
+    {
+      "name": "Mozzarella Fior di Latte 2Kg",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 13.69,
+      "total": 13.69
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "replayed_at": "2026-06-10T19:44:29.637Z",
+  "decimal_cl_matches": [
+    {
+      "id": "0dbbc281-9384-493f-9f92-68786058a5b5",
+      "dataset": "vl",
+      "product": "Baladin - Ginger Beer 0.20cl",
+      "invoice": "Emporio Italia — 2026-05-19",
+      "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "qty": 2,
+      "unit": "cx",
+      "unit_price": 9.69,
+      "parsed_volume_ml_per_unit": 2,
+      "parsed_volume_display": "2 ml/unit (4 ml total)",
+      "total_usable_ml": 4,
+      "usable_unit": "ml",
+      "cost_per_liter": null,
+      "theoretical_eur_per_liter": 4845,
+      "effective_usable_cost": {
+        "cost": 9.69,
+        "unit": "case"
+      },
+      "status": "SUSPECT",
+      "detectVolume_reason": "volume token \"0.20CL\" (CL) → 2ml",
+      "structured_display": {
+        "kind": "weight_or_volume",
+        "ingredientIdentityHint": "Baladin - Ginger Beer",
+        "purchaseContainerCount": 2,
+        "purchaseContainerUnit": "cx",
+        "packageQuantity": 2,
+        "packageMeasurementUnit": "ml",
+        "normalizedUsableQuantity": null,
+        "usableQuantityUnit": null,
+        "packageType": null,
+        "inferred": {
+          "purchase_quantity": 2,
+          "purchase_unit": "ml",
+          "base_unit": "ml",
+          "package_type": null,
+          "package_count": null,
+          "confidence": 0.92,
+          "reason": "volume token \"0.20CL\" (CL) → 2ml",
+          "purchase_unit_count": 1,
+          "pack_size": 2,
+          "pack_size_unit": "ml",
+          "size_is_metadata_only": false,
+          "normalized_stock_quantity": 2,
+          "stock_unit": "ml",
+          "recipe_usage_unit": "ml",
+          "conversion_hint": null
+        },
+        "confidence": 0.98,
+        "reason": "purchase structure (bare_measure); purchase structure (bare_measure); case row piece-weight-only display",
+        "stockNormalizationPipeline": "unified"
+      },
+      "per_priced_unit": {
+        "amount": 2,
+        "unit": "ml"
+      }
+    }
+  ],
+  "counts": {
+    "vl_matches": 1,
+    "production_matches": 0,
+    "suspect": 1,
+    "ok": 0
+  },
+  "broader_pattern_note": "No broader 0.xx L / 0.xxL matches in either dataset; see query-results.json"
+}

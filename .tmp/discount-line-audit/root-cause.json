@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-06-11T01:16:47.357Z",
+  "firstStage": "passC",
+  "evidence": [
+    "persistence-audit/stage-trace.json: aceto/rulo errors appear at passCRaw",
+    "mammafiore-line-audit/money-audit.json: PDF totals correct at GPT stage for Guanciale/Birra/Farina in baseline audit",
+    "normalizeItems/reconcile: no modification on discount total for audited Mammafiore rows (except aceto qty handoff)",
+    "DB/UI: stale vs fresh; not source of discount total divergence"
+  ],
+  "perProduct": [
+    {
+      "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "firstDivergenceStage": "passC",
+      "note": "Different Pass C runs produce different total strategy (copy vs recalc)"
+    },
+    {
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "firstDivergenceStage": "passC",
+      "note": "Different Pass C runs produce different total strategy (copy vs recalc)"
+    },
+    {
+      "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "firstDivergenceStage": "passC",
+      "note": "Different Pass C runs produce different total strategy (copy vs recalc)"
+    },
+    {
+      "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "firstDivergenceStage": "passC",
+      "note": "Different Pass C runs produce different total strategy (copy vs recalc)"
+    },
+    {
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "firstDivergenceStage": "passC",
+      "note": "Different Pass C runs produce different total strategy (copy vs recalc)"
+    },
+    {
+      "product": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+      "firstDivergenceStage": "passC",
+      "note": "Consistent copy or match behaviour"
+    }
+  ]
+}

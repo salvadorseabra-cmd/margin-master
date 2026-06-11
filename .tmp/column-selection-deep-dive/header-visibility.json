@@ -1,0 +1,120 @@
+{
+  "generated_at": "2026-06-11T01:34:01.493Z",
+  "note": "Assessed for Pass C table crop (geometry bounds) and row-only crop",
+  "emporio_prosciutto": {
+    "fullInvoice": {
+      "qty": {
+        "header": "Qtd.",
+        "visibility": "visible"
+      },
+      "unit_price": {
+        "header": "Preço Unit.",
+        "visibility": "visible"
+      },
+      "discount_pct": {
+        "header": "Desc.(%)",
+        "visibility": "visible"
+      },
+      "line_total": {
+        "header": "Preço Total",
+        "visibility": "visible"
+      }
+    },
+    "passCTableCrop": {
+      "cropBounds": "geometry top=456 — starts at first data row; headers at y≈430 clipped",
+      "qty": {
+        "header": "Qtd.",
+        "visibility": "cropped"
+      },
+      "unit_price": {
+        "header": "Preço Unit.",
+        "visibility": "cropped"
+      },
+      "discount_pct": {
+        "header": "Desc.(%)",
+        "visibility": "cropped"
+      },
+      "line_total": {
+        "header": "Preço Total",
+        "visibility": "cropped"
+      }
+    },
+    "rowCropOnly": {
+      "qty": {
+        "header": "Qtd.",
+        "visibility": "cropped"
+      },
+      "unit_price": {
+        "header": "Preço Unit.",
+        "visibility": "cropped"
+      },
+      "discount_pct": {
+        "header": "Desc.(%)",
+        "visibility": "cropped"
+      },
+      "line_total": {
+        "header": "Preço Total",
+        "visibility": "cropped"
+      }
+    },
+    "ambiguityNote": "Desc.(%) values use plain decimals (17,50) without % symbol — visually similar to prices"
+  },
+  "bocconcino_pomodor": {
+    "fullInvoice": {
+      "qty": {
+        "header": "QUANT.",
+        "visibility": "visible"
+      },
+      "unit_price": {
+        "header": "P.VENDA S/IVA",
+        "visibility": "visible"
+      },
+      "discount_pct": {
+        "header": "DESC",
+        "visibility": "visible"
+      },
+      "line_total": {
+        "header": "VALOR LIQUIDO",
+        "visibility": "visible"
+      }
+    },
+    "passCTableCrop": {
+      "cropBounds": "geometry top=433 — includes header row",
+      "qty": {
+        "header": "QUANT.",
+        "visibility": "visible"
+      },
+      "unit_price": {
+        "header": "P.VENDA S/IVA",
+        "visibility": "visible"
+      },
+      "discount_pct": {
+        "header": "DESC",
+        "visibility": "visible"
+      },
+      "line_total": {
+        "header": "VALOR LIQUIDO",
+        "visibility": "visible"
+      }
+    },
+    "rowCropOnly": {
+      "qty": {
+        "header": "QUANT.",
+        "visibility": "cropped"
+      },
+      "unit_price": {
+        "header": "P.VENDA S/IVA",
+        "visibility": "cropped"
+      },
+      "discount_pct": {
+        "header": "DESC",
+        "visibility": "cropped"
+      },
+      "line_total": {
+        "header": "VALOR LIQUIDO",
+        "visibility": "cropped"
+      }
+    },
+    "ambiguityNote": "DESC shows explicit % symbol; EUR suffix on price columns — strong format anchors"
+  }
+}

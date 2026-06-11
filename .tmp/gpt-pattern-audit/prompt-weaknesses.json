@@ -1,0 +1,81 @@
+{
+  "generated_at": "2026-06-10T23:56:09.494Z",
+  "source": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+  "weaknesses": [
+    {
+      "id": "infer-from-name",
+      "location": "TABLE_EXTRACTION_SYSTEM_PROMPT lines 33-34",
+      "text": "NEVER invent values. But DO infer quantity/unit when clearly present inside product names.",
+      "risk": "HIGH",
+      "mechanism": "Explicit permission to infer qty/unit from pack notation (*2, *6, 33cl*24) — directly causes Aceto/Rulo/POMODOR/Ginger Beer errors",
+      "affectedPatterns": [
+        "Pack Multiplier Confusion",
+        "Quantity Inflation"
+      ]
+    },
+    {
+      "id": "pack-examples",
+      "location": "lines 53-64, 73-84",
+      "text": "Coca-Cola 33cl Pack 24 → qty 24; BAD: 33cl GOOD: 24 un",
+      "risk": "HIGH",
+      "mechanism": "Teaches bottle-count extraction but no rule for when pack spec is metadata vs purchased qty (CX 2.5KG*6 case qty=2 not 6)",
+      "affectedPatterns": [
+        "Pack Multiplier Confusion"
+      ]
+    },
+    {
+      "id": "no-row-count",
+      "location": "line 29",
+      "text": "Extract ALL invoice line items visible in the table.",
+      "risk": "MEDIUM",
+      "mechanism": "No upper bound or row-count validation — GPT adds phantom rows (Mammafiore Olio)",
+      "affectedPatterns": [
+        "Phantom Row",
+        "Lot Number Contamination"
+      ]
+    },
+    {
+      "id": "null-allowed",
+      "location": "lines 112-114",
+      "text": "If quantity truly cannot be determined: quantity = null",
+      "risk": "LOW",
+      "mechanism": "Rarely used — GPT prefers guessing over null",
+      "affectedPatterns": [
+        "Unknown"
+      ]
+    },
+    {
+      "id": "price-authoritative",
+      "location": "lines 119-124",
+      "text": "quantity, unit_price, and total are each authoritative — copy each exactly",
+      "risk": "MEDIUM",
+      "mechanism": "Contradicts infer-from-name rule; GPT still misreads columns (Prosciutto 8.17→17)",
+      "affectedPatterns": [
+        "Column Shift"
+      ]
+    },
+    {
+      "id": "no-arithmetic-check",
+      "location": "lines 123-124",
+      "text": "quantity × unit_price may NOT equal total. Never alter to force closure.",
+      "risk": "MEDIUM",
+      "mechanism": "Allows inconsistent triples — Ginger Beer 24×€0.85=€19.38 passes despite wrong semantics",
+      "affectedPatterns": [
+        "Pack Multiplier Confusion",
+        "Column Shift"
+      ]
+    },
+    {
+      "id": "no-anti-hallucination",
+      "location": "entire prompt",
+      "text": "(absent)",
+      "risk": "HIGH",
+      "mechanism": "No instruction to reject lot numbers, footer rows, or sub-lines as separate items",
+      "affectedPatterns": [
+        "Phantom Row",
+        "Lot Number Contamination",
+        "Footer Leakage"
+      ]
+    }
+  ]
+}

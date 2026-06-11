@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-06-11T01:30:00.000Z",
+  "verdict": "A — Same failure class, B — Different neighbour-column patterns",
+  "failureClass": "Pass C numeric column mis-identification on dense multi-column restaurant invoice tables",
+  "prosciutto": {
+    "mechanism": "Alternates between reading Preço Unit (10,30→10.17), net unit (8.17), Desc.(%) (17→17.50), and derived values (8.2)",
+    "columnShiftEvidence": "Run 3 unit_price=17 matches Desc.(%) 17,50 on source row",
+    "deterministic": false,
+    "fiveRunUnitPrices": [10.17, 8.2, 17, 8.17, 8.2],
+    "fiveRunTotals": [36.54, 35.24, 36.54, 36.54, 36.54],
+    "bestRun": "Run 4: unit_price 8.17 (matches VL GT net), total 36.54 (matches visible Preço Total)"
+  },
+  "pomodor": {
+    "mechanism": "Alternates between reading DESC 20,00% as €20 (run 1) and P.VENDA 27,560 as unit_price (runs 2,4,5); totals inconsistent (40, 54.2, 42.2, 20.02)",
+    "columnShiftEvidence": "Run 1 unit_price=20 exact match to DESC column; runs 2/4/5 unit_price=27.56 matches P.VENDA",
+    "deterministic": false,
+    "fiveRunUnitPrices": [20, 27.56, 25.9, 27.56, 27.56],
+    "fiveRunTotals": [40, 54.2, 40, 42.2, 20.02],
+    "stableRefinedValidation": "Prior passc-refinement-validation run showed stable 20/40; this audit's 5 runs show 3 unit prices and 4 totals"
+  },
+  "sharedVsDifferent": {
+    "shared": "Both fail at Pass C only; both involve discount/% column adjacent to unit-price column; neither caused by geometry/footer/persistence",
+    "different": "Prosciutto shifts among gross price, net price, and discount %; Pomodor shifts between discount % and list P.VENDA; qty semantics differ (4.3 kg vs pack *6)"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-06-11T02:00:00.000Z",
+  "preferred_architecture": "H — Hybrid: Header-Anchored Crop + Structured Monetary Binding + Validator Gate",
+  "confidence_pct": 74,
+  "risks": [
+    {
+      "id": "R1",
+      "risk": "Self-consistent wrong triples evade validator",
+      "severity": "HIGH",
+      "likelihood": "MEDIUM",
+      "mitigation": "Structured schema forces separate gross/discount/net fields; binder rejects unit≈discount_pct (Rule B)",
+      "residual_cases": [
+        "Prosciutto refined: qty 4, unit €9.17, total €36.54 (arithmetically closed)",
+        "Pomodor: qty 2, unit €20, total €40 (= 2×20 DESC column)"
+      ],
+      "audit_source": "monetary-column-validation-audit: 25% undetected"
+    },
+    {
+      "id": "R2",
+      "risk": "Rule A false positives on legitimate discount lines",
+      "severity": "HIGH",
+      "likelihood": "HIGH if Rule A used alone",
+      "mitigation": "Never use Rule A alone; scope A only when discount_pct absent; prefer Rule B + E",
+      "examples": ["Mozzarella €9.50×10≠€81.23", "Emporio De Cecco", "Bidfood produce rows"],
+      "audit_source": "monetary-column-validation-audit: 37.5% FP on 32 correct rows"
+    },
+    {
+      "id": "R3",
+      "risk": "Header crop regression on non-Emporio layouts",
+      "severity": "MEDIUM",
+      "likelihood": "LOW–MEDIUM",
+      "mitigation": "Extend TABLE_TOP_MARGIN conditionally when headerTop detected above crop top; regression-test Bidfood/Aviludo crops",
+      "audit_source": "column-selection-deep-dive: Bocconcino already includes headers"
+    },
+    {
+      "id": "R4",
+      "risk": "GPT still mis-binds columns despite headers (Bocconcino)",
+      "severity": "HIGH",
+      "likelihood": "MEDIUM",
+      "mitigation": "Structured output + deterministic binder; targeted row retry with narrowed prompt",
+      "audit_source": "column-selection-deep-dive: crop NOT ambiguous, GPT still reads DESC as unit"
+    },
+    {
+      "id": "R5",
+      "risk": "Conflation with discount-line variance family (Mammafiore)",
+      "severity": "MEDIUM",
+      "likelihood": "MEDIUM if fixes over-apply qty×unit=total",
+      "mitigation": "Keep reconcileLineItemAmounts preservation of discounted totals; separate validator paths",
+      "audit_source": "discount-line-audit: GPT run variance, not column shift"
+    },
+    {
+      "id": "R6",
+      "risk": "Latency and cost increase",
+      "severity": "LOW",
+      "likelihood": "HIGH",
+      "mitigation": "Row-level retry only on flagged rows (~≤10% rows); avoid 5× full-invoice retry",
+      "audit_source": "column-shift-audit: 5-run full retry still non-deterministic"
+    },
+    {
+      "id": "R7",
+      "risk": "VL GT mismatch vs visible invoice (Prosciutto total €35.14 vs €36.54)",
+      "severity": "LOW",
+      "mitigation": "Bind to visible Preço Total column; do not derive from GT; document GT catalog drift separately",
+      "audit_source": "column-shift-audit: 4/5 runs read visible €36.54 correctly"
+    },
+    {
+      "id": "R8",
+      "risk": "Neighbour-row bleed (Pomodor €27.56 = Mezzi Paccheri above)",
+      "severity": "MEDIUM",
+      "likelihood": "MEDIUM",
+      "mitigation": "Rule E neighbour inconsistency + row-scoped crops on retry",
+      "audit_source": "column-shift-audit: Pomodor runs 2/4/5 read P.VENDA 27.560"
+    }
+  ],
+  "highlights": {
+    "top_mitigated": "R4 via structured binding + Rule B (0 FP on Pomodor €20)",
+    "top_residual": "R1 — requires column metadata, not arithmetic alone",
+    "do_not_do": "Rule A alone; full-invoice 5× retry; prompt-only for Bocconcino"
+  }
+}

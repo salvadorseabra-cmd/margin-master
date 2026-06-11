@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-06-11T01:12:02.299Z",
+  "families": [
+    {
+      "failureFamily": "Column Shift",
+      "errorCount": 4,
+      "totalFinancialImpactEuro": 22.8,
+      "affectedRows": [
+        "Emporio Italia / Rovagnati - Assaporami Prosciutto Cotto ",
+        "Emporio Italia / Rovagnati - Assaporami Prosciutto Cotto ",
+        "IL Bocconcino / POMODOR PELATI (CX 2.5KG*6)",
+        "IL Bocconcino / POMODOR PELATI (CX 2.5KG*6)"
+      ]
+    },
+    {
+      "failureFamily": "Model Variance",
+      "errorCount": 4,
+      "totalFinancialImpactEuro": 54.78,
+      "affectedRows": [
+        "Mammafiore / Guanciale di suino stagionato +/- 1,5kg*",
+        "Mammafiore / Farina Speciale pizza 25kg Amoruso",
+        "Mammafiore / Birra Peroni Nastro Azzurro PNA 33cl*24 ",
+        "Mammafiore / Rulo Di Capra 1kg*2 Simonetta"
+      ]
+    }
+  ],
+  "sharedMechanism": true
+}

@@ -1,0 +1,58 @@
+{
+  "generated_at": "2026-06-11T00:57:42.177Z",
+  "invoice": "Mammafiore",
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+  "groundTruth": {
+    "quantity": 1,
+    "unit_price": 18.929,
+    "total": 16.09
+  },
+  "trace": {
+    "gptPassCRawOldPrompt": {
+      "source": ".tmp/persistence-audit/pass-c-raw/36c99d19-6f9f-413f-8c2d-ae3526291a2d-gpt-raw.json",
+      "quantity": 2,
+      "unit_price": 13.8,
+      "total": 15.96,
+      "issue": "Pack multiplier: *2 interpreted as qty=2"
+    },
+    "gptBeforeRefinement": {
+      "source": ".tmp/persistence-audit/pass-c-raw/36c99d19-6f9f-413f-8c2d-ae3526291a2d-extract-invoice.json",
+      "quantity": 1,
+      "unit_price": 18.295,
+      "total": 15.9,
+      "deltaFromGT": -0.19
+    },
+    "gptAfterC33a7f1": {
+      "source": ".tmp/passc-implementation/reextract/36c99d19-6f9f-413f-8c2d-ae3526291a2d.json",
+      "quantity": 1,
+      "unit_price": 18.829,
+      "total": 15.09,
+      "deltaFromGT": -1
+    },
+    "db": {
+      "source": ".tmp/mammafiore-line-audit/db-invoice-items.json",
+      "quantity": 2,
+      "unit_price": 18.929,
+      "total": 15.09,
+      "note": "Stale DB mix: qty=2 from old multiplier error, total=15.09 from discounted line misread"
+    },
+    "pdfEvidence": {
+      "source": ".tmp/mammafiore-line-audit/money-audit.json",
+      "pdfTotal": 16.09,
+      "gptTotal": 15,
+      "persistedTotal": 15.09
+    }
+  },
+  "answers": {
+    "ocrIssue": "MINOR — description 5l*2 / 5lt*2 variance only; numerics unaffected",
+    "columnReadIssue": "YES — VALOR (total) column misread on discounted line (qty×unit_price ≠ total)",
+    "promptSideEffect": "MIXED — c33a7f1 FIXED qty (2→1, major win) but total drift worsened (€0.19→€1.00 off)",
+    "randomModelVariance": "YES — unit_price improved (18.295→18.829, closer to GT 18.929) while total moved away; non-deterministic digit read on discounted total",
+    "isRegressionFromC33a7f1": "PARTIAL — qty improved, total regressed"
+  },
+  "rootCause": "Discounted-line total column read variance. Line has qty=1, unit_price≈€18.83, total=€16.09 (15% discount). Model copies wrong digits from VALOR column. Not pack-multiplier (qty now correct). Predates c33a7f1 at €0.19; c33a7f1 run unlucky at €1.00.",
+  "mechanism": "OCR Noise / Column Shift on discounted total",
+  "financialImpactEuro": 1,
+  "confidence": "MEDIUM"
+}

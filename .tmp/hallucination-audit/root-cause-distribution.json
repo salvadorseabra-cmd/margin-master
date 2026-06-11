@@ -1,0 +1,19 @@
+{
+  "vl_project": "bjhnlrgodcqoyzddbpbd",
+  "generated_at": "2026-06-10T21:44:59.237Z",
+  "counts": {
+    "Geometry": 0,
+    "OCR": 0,
+    "GPT": 10,
+    "Normalization": 0,
+    "Persistence": 0
+  },
+  "notes": {
+    "Geometry": "Pre-fix Bocconcino crop (2 missing rows) — resolved post 2edcd02",
+    "OCR": "No separate OCR stage in pipeline; GPT vision acts as OCR",
+    "GPT": "Includes phantoms, partial field mismatches, and qty/unit errors",
+    "Normalization": "Ginger Beer 0.20cl is source-document text, not normalization hallucination",
+    "Persistence": "No evidence persistence creates rows"
+  },
+  "partialFieldErrorsAttributedToGpt": 9
+}

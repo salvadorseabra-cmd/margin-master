@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-06-11T00:52:43.017Z",
+  "before": {
+    "count": 1,
+    "phantoms": [
+      {
+        "invoice": "Mammafiore",
+        "phantom": "Nui Lote 609 Data Exp. 20/07/2027",
+        "total": 15.9
+      }
+    ],
+    "rate": 1.96
+  },
+  "after": {
+    "count": 0,
+    "phantoms": [],
+    "rate": 0
+  },
+  "mammafiore": {
+    "phantomOlioRemoved": true,
+    "beforePhantoms": [
+      {
+        "invoice": "Mammafiore",
+        "phantom": "Nui Lote 609 Data Exp. 20/07/2027",
+        "total": 15.9
+      }
+    ],
+    "afterPhantoms": [],
+    "rowCountBefore": 9,
+    "rowCountAfter": 8
+  },
+  "newPhantomsIntroduced": []
+}

@@ -1,0 +1,67 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio",
+  "supplier": "Emporio Italia, Lda.",
+  "extractedAt": "2026-06-11T01:02:59.200Z",
+  "status": 200,
+  "invoice_date": "19-05-2026",
+  "total": 327.46,
+  "items": [
+    {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+      "quantity": 24,
+      "unit": null,
+      "unit_price": 2.35,
+      "total": 50.2
+    },
+    {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Casaleggio 1/8 - 1,5Kg Produto de Stock",
+      "quantity": 1.35,
+      "unit": null,
+      "unit_price": 9.82,
+      "total": 13.44
+    },
+    {
+      "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4-4,25Kg Produto de Stock",
+      "quantity": 4,
+      "unit": null,
+      "unit_price": 9.17,
+      "total": 36.54
+    },
+    {
+      "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5Kg Produto de Stock",
+      "quantity": 3.11,
+      "unit": null,
+      "unit_price": 10,
+      "total": 31.07
+    },
+    {
+      "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+      "quantity": 2,
+      "unit": null,
+      "unit_price": 19.3,
+      "total": 38.56
+    },
+    {
+      "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - Produto de Stock",
+      "quantity": 2.28,
+      "unit": null,
+      "unit_price": 21.8,
+      "total": 49.64
+    },
+    {
+      "name": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 2,
+      "unit": null,
+      "unit_price": 9.69,
+      "total": 19.38
+    },
+    {
+      "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 16.6,
+      "total": 39.49
+    }
+  ]
+}

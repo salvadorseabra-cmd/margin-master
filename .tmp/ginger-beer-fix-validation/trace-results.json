@@ -1,0 +1,342 @@
+[
+  {
+    "label": "before-audit-24un",
+    "input": {
+      "name": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 24,
+      "unit": "un",
+      "unit_price": 0.85,
+      "line_total": 19.38
+    },
+    "volume": {
+      "detectVolume": {
+        "milliliters": 2,
+        "confidence": 0.92,
+        "reason": "volume token \"0.20CL\" (CL) → 2ml"
+      },
+      "extractSkuClue": null,
+      "rawVolumeMlPerUnit": 2,
+      "postDetectVolumeMlPerUnit": 2
+    },
+    "repair": {
+      "repairDecimalClBeverageVolumeExecuted": true,
+      "repairDecision": "warning-only",
+      "repairResult": {
+        "volumeMl": 2,
+        "repaired": false,
+        "warning": "decimal-cl-beverage-anomaly"
+      },
+      "consoleWarnings": [
+        "[volume-sanity] product=Baladin - Ginger Beer 0.20cl rawVolume=2ml reason=decimal-cl-beverage-anomaly"
+      ]
+    },
+    "structured": {
+      "purchaseFormat": {
+        "kind": "weight_or_volume",
+        "packageQuantity": 2,
+        "packageMeasurementUnit": "ml",
+        "normalizedUsableQuantity": 48,
+        "usableQuantityUnit": "ml",
+        "purchaseContainerCount": 24,
+        "purchaseContainerUnit": "ml"
+      },
+      "displayFormat": {
+        "normalizedUsableQuantity": 48,
+        "usableQuantityUnit": "ml",
+        "reason": "purchase structure (bare_measure); purchase structure (bare_measure)"
+      },
+      "isCaseRowWithEmbeddedPieceWeightOnly": false
+    },
+    "pricing": {
+      "usablePerPricedUnit": {
+        "amount": 2,
+        "unit": "ml"
+      },
+      "effectiveUsableCost": {
+        "cost": 425,
+        "unit": "L"
+      },
+      "recipeOperationalCostFields": {
+        "current_price": 0.85,
+        "purchase_quantity": 24,
+        "cost_base_unit": "un",
+        "usable_volume_ml": 2
+      }
+    },
+    "ui": {
+      "stockPresentation": {
+        "quantityLabel": "48 ml usable",
+        "usableQuantity": 48,
+        "usableUnit": "ml"
+      },
+      "pricingCard": {
+        "purchaseQuantityLine": "24 un",
+        "purchasePriceLine": "€0.85 / ml · €19.38 total",
+        "normalizedLine": "48 ml usable",
+        "usableCostLine": "€425.00 / L usable"
+      },
+      "effectiveUsableCostLabel": "€425.00 / L",
+      "usableStockLabel": "48 ml usable"
+    },
+    "summary": {
+      "parsedVolumeMlPerUnit": 2,
+      "totalUsableMl": 48,
+      "displayTotalUsableMl": 48,
+      "eurPerLUsable": 425,
+      "eurPerCaseUsable": null
+    }
+  },
+  {
+    "label": "after-live-db-row",
+    "input": {
+      "name": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 9.69,
+      "line_total": 19.38
+    },
+    "volume": {
+      "detectVolume": {
+        "milliliters": 2,
+        "confidence": 0.92,
+        "reason": "volume token \"0.20CL\" (CL) → 2ml"
+      },
+      "extractSkuClue": null,
+      "rawVolumeMlPerUnit": 2,
+      "postDetectVolumeMlPerUnit": 2
+    },
+    "repair": {
+      "repairDecimalClBeverageVolumeExecuted": true,
+      "repairDecision": "warning-only",
+      "repairResult": {
+        "volumeMl": 2,
+        "repaired": false,
+        "warning": "decimal-cl-beverage-anomaly"
+      },
+      "consoleWarnings": [
+        "[volume-sanity] product=Baladin - Ginger Beer 0.20cl rawVolume=2ml reason=decimal-cl-beverage-anomaly"
+      ]
+    },
+    "structured": {
+      "purchaseFormat": {
+        "kind": "weight_or_volume",
+        "packageQuantity": 2,
+        "packageMeasurementUnit": "ml",
+        "normalizedUsableQuantity": 4,
+        "usableQuantityUnit": "ml",
+        "purchaseContainerCount": 2,
+        "purchaseContainerUnit": "ml"
+      },
+      "displayFormat": {
+        "normalizedUsableQuantity": null,
+        "usableQuantityUnit": null,
+        "reason": "purchase structure (bare_measure); purchase structure (bare_measure); case row piece-weight-only display"
+      },
+      "isCaseRowWithEmbeddedPieceWeightOnly": true
+    },
+    "pricing": {
+      "usablePerPricedUnit": null,
+      "effectiveUsableCost": {
+        "cost": 9.69,
+        "unit": "case"
+      },
+      "recipeOperationalCostFields": {
+        "current_price": 9.69,
+        "purchase_quantity": 2,
+        "cost_base_unit": "ml"
+      }
+    },
+    "ui": {
+      "stockPresentation": {
+        "quantityLabel": null,
+        "usableQuantity": null,
+        "usableUnit": null
+      },
+      "pricingCard": {
+        "purchaseQuantityLine": "2 cases",
+        "purchasePriceLine": "€9.69 / case · €19.38 total",
+        "normalizedLine": null,
+        "usableCostLine": "€9.69 / case usable"
+      },
+      "effectiveUsableCostLabel": "€9.69 / case",
+      "usableStockLabel": null
+    },
+    "summary": {
+      "parsedVolumeMlPerUnit": 2,
+      "totalUsableMl": 4,
+      "displayTotalUsableMl": null,
+      "eurPerLUsable": null,
+      "eurPerCaseUsable": 9.69
+    }
+  },
+  {
+    "label": "after-live-with-sku",
+    "input": {
+      "name": "BBB-GINGER33ITA Baladin - Ginger Beer 0.20cl",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 9.69,
+      "line_total": 19.38
+    },
+    "volume": {
+      "detectVolume": {
+        "milliliters": 330,
+        "confidence": 0.92,
+        "reason": "volume token \"0.20CL\" (CL) → 330ml (sku-clue-GINGER33)"
+      },
+      "extractSkuClue": {
+        "milliliters": 330,
+        "clue": "GINGER33"
+      },
+      "rawVolumeMlPerUnit": 330,
+      "postDetectVolumeMlPerUnit": 330
+    },
+    "repair": {
+      "repairDecimalClBeverageVolumeExecuted": false,
+      "repairDecision": "skipped",
+      "repairResult": {
+        "volumeMl": 330,
+        "repaired": false
+      },
+      "consoleWarnings": []
+    },
+    "structured": {
+      "purchaseFormat": {
+        "kind": "weight_or_volume",
+        "packageQuantity": 330,
+        "packageMeasurementUnit": "ml",
+        "normalizedUsableQuantity": 660,
+        "usableQuantityUnit": "ml",
+        "purchaseContainerCount": 2,
+        "purchaseContainerUnit": "ml"
+      },
+      "displayFormat": {
+        "normalizedUsableQuantity": null,
+        "usableQuantityUnit": null,
+        "reason": "purchase structure (bare_measure); purchase structure (bare_measure); case row piece-weight-only display"
+      },
+      "isCaseRowWithEmbeddedPieceWeightOnly": true
+    },
+    "pricing": {
+      "usablePerPricedUnit": null,
+      "effectiveUsableCost": {
+        "cost": 9.69,
+        "unit": "case"
+      },
+      "recipeOperationalCostFields": {
+        "current_price": 9.69,
+        "purchase_quantity": 330,
+        "cost_base_unit": "ml"
+      }
+    },
+    "ui": {
+      "stockPresentation": {
+        "quantityLabel": null,
+        "usableQuantity": null,
+        "usableUnit": null
+      },
+      "pricingCard": {
+        "purchaseQuantityLine": "2 cases",
+        "purchasePriceLine": "€9.69 / case · €19.38 total",
+        "normalizedLine": null,
+        "usableCostLine": "€9.69 / case usable"
+      },
+      "effectiveUsableCostLabel": "€9.69 / case",
+      "usableStockLabel": null
+    },
+    "summary": {
+      "parsedVolumeMlPerUnit": 330,
+      "totalUsableMl": 660,
+      "displayTotalUsableMl": null,
+      "eurPerLUsable": null,
+      "eurPerCaseUsable": 9.69
+    }
+  },
+  {
+    "label": "before-audit-with-sku",
+    "input": {
+      "name": "BBB-GINGER33ITA Baladin - Ginger Beer 0.20cl",
+      "quantity": 24,
+      "unit": "un",
+      "unit_price": 0.85,
+      "line_total": 19.38
+    },
+    "volume": {
+      "detectVolume": {
+        "milliliters": 330,
+        "confidence": 0.92,
+        "reason": "volume token \"0.20CL\" (CL) → 330ml (sku-clue-GINGER33)"
+      },
+      "extractSkuClue": {
+        "milliliters": 330,
+        "clue": "GINGER33"
+      },
+      "rawVolumeMlPerUnit": 330,
+      "postDetectVolumeMlPerUnit": 330
+    },
+    "repair": {
+      "repairDecimalClBeverageVolumeExecuted": false,
+      "repairDecision": "skipped",
+      "repairResult": {
+        "volumeMl": 330,
+        "repaired": false
+      },
+      "consoleWarnings": []
+    },
+    "structured": {
+      "purchaseFormat": {
+        "kind": "weight_or_volume",
+        "packageQuantity": 330,
+        "packageMeasurementUnit": "ml",
+        "normalizedUsableQuantity": 7920,
+        "usableQuantityUnit": "ml",
+        "purchaseContainerCount": 24,
+        "purchaseContainerUnit": "ml"
+      },
+      "displayFormat": {
+        "normalizedUsableQuantity": 7920,
+        "usableQuantityUnit": "ml",
+        "reason": "purchase structure (bare_measure); purchase structure (bare_measure)"
+      },
+      "isCaseRowWithEmbeddedPieceWeightOnly": false
+    },
+    "pricing": {
+      "usablePerPricedUnit": {
+        "amount": 330,
+        "unit": "ml"
+      },
+      "effectiveUsableCost": {
+        "cost": 2.5757575757575757,
+        "unit": "L"
+      },
+      "recipeOperationalCostFields": {
+        "current_price": 0.85,
+        "purchase_quantity": 24,
+        "cost_base_unit": "un",
+        "usable_volume_ml": 330
+      }
+    },
+    "ui": {
+      "stockPresentation": {
+        "quantityLabel": "7.92 L usable",
+        "usableQuantity": 7920,
+        "usableUnit": "ml"
+      },
+      "pricingCard": {
+        "purchaseQuantityLine": "24 un",
+        "purchasePriceLine": "€0.85 / ml · €19.38 total",
+        "normalizedLine": "7.92 L usable",
+        "usableCostLine": "€2.5758 / L usable"
+      },
+      "effectiveUsableCostLabel": "€2.5758 / L",
+      "usableStockLabel": "7.92 L usable"
+    },
+    "summary": {
+      "parsedVolumeMlPerUnit": 330,
+      "totalUsableMl": 7920,
+      "displayTotalUsableMl": 7920,
+      "eurPerLUsable": 2.5757575757575757,
+      "eurPerCaseUsable": null
+    }
+  }
+]

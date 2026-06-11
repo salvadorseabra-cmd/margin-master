@@ -1,0 +1,40 @@
+{
+  "method": "extract-invoice Pass C on row band PNGs (rows above crop top)",
+  "bands": [
+    {
+      "label": "first",
+      "items": [
+        {
+          "name": "Farina Speciale pizza 25kg Amoruso",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 33.154,
+          "total": 26.52
+        }
+      ]
+    },
+    {
+      "label": "middle",
+      "items": [
+        {
+          "name": "Rulo Di Capra 1kg 1/2 Simonetta",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 15.192,
+          "total": 10.86
+        },
+        {
+          "name": "Recargo por combustible",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 2,
+          "total": 2
+        }
+      ]
+    },
+    {
+      "label": "last",
+      "items": []
+    }
+  ]
+}

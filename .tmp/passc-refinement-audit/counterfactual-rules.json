@@ -1,0 +1,34 @@
+{
+  "generated_at": "2026-06-11T00:57:42.177Z",
+  "designPrinciple": "Minimal additions to c33a7f1 column-faithful core — no revert of anti-phantom or pack-metadata guards",
+  "rules": [
+    {
+      "regression": "Bidfood Hortelã",
+      "proposedRule": "FRACTIONAL QUANTITIES: When the quantity column shows a decimal (e.g. 0,5 or 0.5) with unit KG, copy quantity exactly including the decimal. Do NOT round to 1. Herb rows (MO) and weight rows (KG) coexist on Bidfood invoices — read the unit column to disambiguate.\n\nExample:\n\"Hortelã\" with quantity column \"0,5\" and unit \"KG\"\n→ quantity: 0.5, unit: \"kg\", unit_price: from PREÇO UNITÁRIO (€/kg), total: from VALOR",
+      "expectedBenefit": "Restores Hortelã qty=0.5 kg, unit_price=6.74 without affecting MO herb rows",
+      "regressionRisk": "LOW — scoped to decimal+KG pattern; does not re-enable pack multiplier inference",
+      "targets": [
+        "Fractional Quantity"
+      ]
+    },
+    {
+      "regression": "Aviludo May Açúcar",
+      "proposedRule": "COLUMN ISOLATION: Read quantity ONLY from the quantity column cell — never from the unit price column. If quantity × unit_price ≠ total but total is legible, trust all three column values independently (discounted lines).\n\nPACK SIZE DISAMBIGUATION: Patterns like 10x1, 12x1, 6x720 in descriptions are case/pack specs. If quantity column shows \"1\" and description shows \"10x1 Kg\", quantity is 1 (one case), NOT 10 or 9.\n\nExample:\n\"Acúcar Branco METRO Chef 10x1 Kg\" with quantity column \"1\" and PREÇO UNITÁRIO \"9,99\"\n→ quantity: 1 (NOT 9 from 9,99, NOT 10 from 10x1)",
+      "expectedBenefit": "Fixes Açúcar qty 9→1, eliminates €79.92 financial error",
+      "regressionRisk": "LOW-MEDIUM — reinforces existing c33a7f1 negative examples; risk if model re-infers 10 from 10x1 when column illegible",
+      "targets": [
+        "Column Shift",
+        "Pack Notation"
+      ]
+    },
+    {
+      "regression": "Mammafiore Aceto",
+      "proposedRule": "DISCOUNTED LINES: When quantity × unit_price ≠ total, the line likely has a discount. Still copy total from VALOR column digit-by-digit. Do not substitute qty×price. Re-read total column if difference exceeds 5%.\n\nExample:\n\"Aceto balsamico pet 5l*2\" with qty=1, unit_price=18,83, total=16,09\n→ total: 16.09 (from VALOR, not computed)",
+      "expectedBenefit": "May recover €1 total drift on discounted lines; qty already correct",
+      "regressionRisk": "LOW — additive to existing price-accuracy section",
+      "targets": [
+        "OCR Noise"
+      ]
+    }
+  ]
+}

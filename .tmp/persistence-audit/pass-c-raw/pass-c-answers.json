@@ -1,0 +1,12 @@
+{
+  "generated_at": "2026-06-11T00:00:00.000Z",
+  "rows": [
+    { "invoice": "IL Bocconcino", "row": "pomodor", "passCAlreadyWrong": "YES", "evidence": "postfix pass-c qty=6/€120; fresh extract qty=2/€40 (still ≠ GT €50)" },
+    { "invoice": "Mammafiore", "row": "phantom-olio", "passCAlreadyWrong": "YES", "evidence": "Olio Noc 609 in pass-c-raw.json; fresh has Nui Lote phantom" },
+    { "invoice": "Mammafiore", "row": "aceto", "passCAlreadyWrong": "YES", "evidence": "pass-c-raw qty=2; fresh extract qty=1" },
+    { "invoice": "Mammafiore", "row": "rulo", "passCAlreadyWrong": "YES", "evidence": "pass-c-raw qty=2; fresh extract qty=1" },
+    { "invoice": "Emporio Italia", "row": "prosciutto", "passCAlreadyWrong": "YES", "evidence": "fresh extract unit_price=17.06 vs GT 8.17" },
+    { "invoice": "Emporio Italia", "row": "pellegrino", "passCAlreadyWrong": "YES", "evidence": "fresh extract qty=2 vs GT 2.56" },
+    { "invoice": "Emporio Italia", "row": "ginger-beer", "passCAlreadyWrong": "YES", "evidence": "fresh extract qty=24/un/€0.85 vs GT 2/un/€9.69" }
+  ]
+}

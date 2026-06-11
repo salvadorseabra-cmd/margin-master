@@ -1,0 +1,181 @@
+{
+  "generated_at": "2026-06-11T00:57:42.177Z",
+  "scope": "Post-c33a7f1 NEW reextract vs ground truth — unresolved financial/material errors",
+  "totalAbsoluteFinancialErrorEuro": 92.35,
+  "summary": {
+    "Fractional Quantity": 2,
+    "Pack Notation": 0,
+    "Column Shift": 3,
+    "OCR Noise": 2,
+    "Other": 0
+  },
+  "regressionsFromC33a7f1": [
+    {
+      "invoice": "Aviludo May",
+      "product": "Açucar Branco METRO Chef 10x1 Kg",
+      "category": "Column Shift",
+      "financialDeltaEuro": 79.92,
+      "fields": [
+        "quantity",
+        "total"
+      ],
+      "regressionFromC33a7f1": true
+    },
+    {
+      "invoice": "Bidfood",
+      "product": "Hortelã",
+      "category": "Fractional Quantity",
+      "financialDeltaEuro": 0,
+      "fields": [
+        "quantity",
+        "unit",
+        "unit_price"
+      ],
+      "regressionFromC33a7f1": true
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "category": "OCR Noise",
+      "financialDeltaEuro": 1,
+      "fields": [
+        "total",
+        "unit_price"
+      ],
+      "regressionFromC33a7f1": true,
+      "subcategory": "Discounted-line total column"
+    }
+  ],
+  "preExistingResiduals": [
+    {
+      "invoice": "Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "category": "Column Shift",
+      "financialDeltaEuro": 10,
+      "fields": [
+        "unit_price",
+        "total"
+      ],
+      "regressionFromC33a7f1": false,
+      "note": "Pre-existing: qty=2 correct post-c33a7f1 but unit_price €20 vs GT €25"
+    },
+    {
+      "invoice": "Emporio",
+      "product": "Rovagnati Prosciutto Cotto",
+      "category": "Column Shift",
+      "financialDeltaEuro": 1.4,
+      "fields": [
+        "unit_price",
+        "total"
+      ],
+      "regressionFromC33a7f1": false,
+      "note": "Pre-existing price column bleed (8.17→17)"
+    },
+    {
+      "invoice": "Emporio",
+      "product": "Rigamonti Bresaola",
+      "category": "Fractional Quantity",
+      "financialDeltaEuro": 0,
+      "fields": [
+        "quantity"
+      ],
+      "regressionFromC33a7f1": false,
+      "note": "qty 2.58 vs GT 2.8; total preserved — partial not regression"
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Rulo Di Capra 1kg*2",
+      "category": "OCR Noise",
+      "financialDeltaEuro": 0.03,
+      "fields": [
+        "total"
+      ],
+      "regressionFromC33a7f1": false,
+      "note": "Improved post-c33a7f1 (was -0.48)"
+    }
+  ],
+  "rows": [
+    {
+      "invoice": "Aviludo May",
+      "product": "Açucar Branco METRO Chef 10x1 Kg",
+      "category": "Column Shift",
+      "financialDeltaEuro": 79.92,
+      "fields": [
+        "quantity",
+        "total"
+      ],
+      "regressionFromC33a7f1": true
+    },
+    {
+      "invoice": "Bidfood",
+      "product": "Hortelã",
+      "category": "Fractional Quantity",
+      "financialDeltaEuro": 0,
+      "fields": [
+        "quantity",
+        "unit",
+        "unit_price"
+      ],
+      "regressionFromC33a7f1": true
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "category": "OCR Noise",
+      "financialDeltaEuro": 1,
+      "fields": [
+        "total",
+        "unit_price"
+      ],
+      "regressionFromC33a7f1": true,
+      "subcategory": "Discounted-line total column"
+    },
+    {
+      "invoice": "Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "category": "Column Shift",
+      "financialDeltaEuro": 10,
+      "fields": [
+        "unit_price",
+        "total"
+      ],
+      "regressionFromC33a7f1": false,
+      "note": "Pre-existing: qty=2 correct post-c33a7f1 but unit_price €20 vs GT €25"
+    },
+    {
+      "invoice": "Emporio",
+      "product": "Rovagnati Prosciutto Cotto",
+      "category": "Column Shift",
+      "financialDeltaEuro": 1.4,
+      "fields": [
+        "unit_price",
+        "total"
+      ],
+      "regressionFromC33a7f1": false,
+      "note": "Pre-existing price column bleed (8.17→17)"
+    },
+    {
+      "invoice": "Emporio",
+      "product": "Rigamonti Bresaola",
+      "category": "Fractional Quantity",
+      "financialDeltaEuro": 0,
+      "fields": [
+        "quantity"
+      ],
+      "regressionFromC33a7f1": false,
+      "note": "qty 2.58 vs GT 2.8; total preserved — partial not regression"
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Rulo Di Capra 1kg*2",
+      "category": "OCR Noise",
+      "financialDeltaEuro": 0.03,
+      "fields": [
+        "total"
+      ],
+      "regressionFromC33a7f1": false,
+      "note": "Improved post-c33a7f1 (was -0.48)"
+    }
+  ],
+  "note": "Pack Notation category has 0 standalone post-c33a7f1 errors — c33a7f1 fixed pack errors; Açúcar failure reclassified as Column Shift (price digit bleed, not 10x1 inference)"
+}

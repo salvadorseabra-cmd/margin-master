@@ -1,0 +1,69 @@
+{
+  "cropBounds": {
+    "Mammafiore": {
+      "beforeTop": 622,
+      "after": {
+        "top": 386,
+        "headerTop": 396,
+        "bottom": 890
+      }
+    },
+    "Bocconcino": {
+      "beforeTop": 561,
+      "after": {
+        "top": 433,
+        "headerTop": 443,
+        "bottom": 881
+      }
+    },
+    "Bidfood": {
+      "beforeTop": 437,
+      "after": {
+        "top": 437,
+        "headerTop": 447,
+        "bottom": 1037
+      }
+    },
+    "AviludoMay": {
+      "beforeTop": 218,
+      "after": {
+        "top": 218,
+        "headerTop": 228,
+        "bottom": 448
+      }
+    },
+    "Emporio": {
+      "beforeTop": 456,
+      "after": {
+        "top": 456,
+        "headerTop": 466,
+        "bottom": 851
+      }
+    }
+  },
+  "extraction": {
+    "Mammafiore": {
+      "expected": 8,
+      "got": 9,
+      "names": [
+        "Guanciale di suino stagionato +/- 1.5kg*7 Sorrentino",
+        "Farina Speciale pizza 25kg Amoruso",
+        "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "Olio Nueto 609 DOP 3lt",
+        "Aceto balsamico di modena igp PET 5lt*2 Toschi",
+        "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+        "Rub Di Capra 1kg *2 Simonetta",
+        "Recarga por combustible",
+        "Farina 00 pasta fresca e gnocchi25kg Caputo"
+      ],
+      "total": 415.96
+    },
+    "Bocconcino": {
+      "expected": 7,
+      "got": 7
+    },
+    "Bidfood": {
+      "got": 11
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+  "invoice_date": "2026-05-08",
+  "total": 290.64,
+  "items": [
+    {
+      "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "quantity": 10,
+      "unit": "un",
+      "unit_price": 9.5,
+      "total": 81.23
+    },
+    {
+      "name": "STRACCIATELLA 250 GR",
+      "quantity": 24,
+      "unit": "un",
+      "unit_price": 4.141,
+      "total": 74.54
+    },
+    {
+      "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 27.56,
+      "total": 27.3
+    },
+    {
+      "name": "POMODORINI pelati (CX 2,5KG*6)",
+      "quantity": 6,
+      "unit": "un",
+      "unit_price": 20,
+      "total": 120
+    },
+    {
+      "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 20.295,
+      "total": 42.07
+    },
+    {
+      "name": "RICOTTA TREVIGIANA 1,5KG",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 7.97,
+      "total": 7.97
+    },
+    {
+      "name": "ROLO DE CABRA E VACA 1KG",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 12.71,
+      "total": 12.71
+    }
+  ]
+}

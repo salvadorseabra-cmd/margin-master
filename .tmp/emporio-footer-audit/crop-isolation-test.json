@@ -1,0 +1,62 @@
+[
+  {
+    "label": "emporio production footer-crop only → vl-footer-debug",
+    "fn": "vl-footer-debug",
+    "status": 200,
+    "body": {
+      "rawGptJson": {
+        "total": null,
+        "net_subtotal": null,
+        "vat": null
+      },
+      "parsed": {
+        "total": null,
+        "net_subtotal": null,
+        "vat": null,
+        "confidence": null,
+        "validation_warning": null
+      }
+    }
+  },
+  {
+    "label": "emporio production footer-crop only → extract-invoice",
+    "fn": "extract-invoice",
+    "status": 200,
+    "body": {
+      "supplier": null,
+      "invoice_date": null,
+      "total": null,
+      "items": []
+    }
+  },
+  {
+    "label": "emporio fraction crop → vl-footer-debug",
+    "fn": "vl-footer-debug",
+    "status": 200,
+    "body": {
+      "rawGptJson": {
+        "total": null,
+        "net_subtotal": null,
+        "vat": null
+      },
+      "parsed": {
+        "total": null,
+        "net_subtotal": null,
+        "vat": null,
+        "confidence": null,
+        "validation_warning": null
+      }
+    }
+  },
+  {
+    "label": "emporio fraction crop → extract-invoice",
+    "fn": "extract-invoice",
+    "status": 200,
+    "body": {
+      "supplier": null,
+      "invoice_date": "19-05-2026",
+      "total": null,
+      "items": []
+    }
+  }
+]

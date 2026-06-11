@@ -1,0 +1,61 @@
+{
+  "generated_at": "2026-06-10T23:56:09.493Z",
+  "cases": [
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "notation": "*6 in pack spec",
+      "gtQty": 2,
+      "gptQty": 6,
+      "pattern": "postfix pass-c-raw used *6 as purchased qty",
+      "errorType": "Pack Multiplier Confusion"
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Aceto balsamico pet 5l*2 Toschi",
+      "notation": "5l*2",
+      "gtQty": 1,
+      "gptQtyRaw": 2,
+      "gptQtyFresh": 1,
+      "pattern": "pass-c-raw: *2 interpreted as qty=2; fresh extract corrected to qty=1",
+      "errorType": "Pack Multiplier Confusion"
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "notation": "1kg*2",
+      "gtQty": 1,
+      "gptQtyRaw": 2,
+      "gptQtyFresh": 1,
+      "pattern": "pass-c-raw: *2 interpreted as qty=2",
+      "errorType": "Pack Multiplier Confusion"
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Birra Peroni 33cl*24",
+      "notation": "33cl*24",
+      "gtQty": 24,
+      "gptQty": 24,
+      "pattern": "CORRECT — prompt example 'Coca-Cola 33cl Pack 24 → qty 24' applies; not an error",
+      "errorType": null
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Baladin Ginger Beer 0.20cl",
+      "notation": "implicit 24-pack",
+      "gtQty": 2,
+      "gptQty": 24,
+      "pattern": "Fresh extract: bottle count substituted for case count",
+      "errorType": "Pack Multiplier Confusion"
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "MOZZARELLA 125GR*8",
+      "notation": "125GR*8",
+      "gtQty": 10,
+      "gptQty": 10,
+      "pattern": "CORRECT — purchased qty from column, not *8",
+      "errorType": null
+    }
+  ]
+}

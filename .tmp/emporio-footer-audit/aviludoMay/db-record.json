@@ -1,0 +1,80 @@
+{
+  "queryError": null,
+  "invoice": {
+    "id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+    "supplier_name": "Aviludo",
+    "total": 330.42,
+    "invoice_date": "2026-05-19",
+    "file_url": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1780870127518-Screenshot_2026-06-07_at_21.05.11.png",
+    "created_at": "2026-06-07T22:08:48.354666+00:00",
+    "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5"
+  },
+  "itemsCount": 8,
+  "itemsSum": 296.88,
+  "items": [
+    {
+      "id": "6f870e82-0f39-4676-ba25-5f4ec5661649",
+      "name": "Filete de Anchoas Alconfirosa L4 495 g",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 9.99,
+      "total": 19.98
+    },
+    {
+      "id": "0110c119-0b3d-4f48-a3f9-15a334803f5c",
+      "name": "Ovo Liquido Past.Gema Dovo 1 Kg",
+      "quantity": 6,
+      "unit": "un",
+      "unit_price": 10.49,
+      "total": 62.94
+    },
+    {
+      "id": "aea8656a-5c76-46c7-b260-769196b58a56",
+      "name": "Pepinos Extra Uil Frasco 6x720 g",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 22.49,
+      "total": 22.49
+    },
+    {
+      "id": "d0ab1f79-6f2d-4285-b448-53873ab5ba45",
+      "name": "Atum Oleo Bolsa Nau Cahirenta 1 Kg",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 6.55,
+      "total": 13.1
+    },
+    {
+      "id": "b5ecb546-963c-4c38-8726-6ac347f86224",
+      "name": "Arroz Agulha Metro Chef 12x1 kg",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 13.95,
+      "total": 13.95
+    },
+    {
+      "id": "918e95cb-cfa2-44bf-a2fe-b792bc6ef2dc",
+      "name": "Chocolate Culinaria Pantagruel 10x200 g",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 29.99,
+      "total": 59.98
+    },
+    {
+      "id": "2fcac844-7169-4763-bdbc-7f079e4b71b7",
+      "name": "Acucar Branco METRO Chef 10x1 Kg",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 9.99,
+      "total": 9.99
+    },
+    {
+      "id": "3c809b11-deaf-41b7-b7f9-c4b8eb6d981a",
+      "name": "Nata Culinaria 22% Remy Picot 6x1 L",
+      "quantity": 5,
+      "unit": "cx",
+      "unit_price": 18.89,
+      "total": 94.45
+    }
+  ]
+}

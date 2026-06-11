@@ -1,0 +1,87 @@
+{
+  "phantomLabel": "Olio Nuto 609 10lt (persisted DB) / Olio Noc 609 Della O.P. (Pass C raw this run) / Olio Nute 600g Dea (extract-invoice this run)",
+  "visibleOnSourceInvoice": false,
+  "firstAppearance": "GPT (Pass C raw JSON — before normalizeItems)",
+  "stages": {
+    "sourceInvoice": {
+      "present": false,
+      "evidence": "Manual transcription of invoice-full.png — exactly 8 product rows; no olive oil anywhere on page"
+    },
+    "crop": {
+      "present": false,
+      "cropTop": 386,
+      "cropBounds": {
+        "top": 386,
+        "bottom": 890,
+        "headerTop": 396,
+        "headerBottom": 432,
+        "totalsStart": 866,
+        "detected": true
+      },
+      "note": "Geometry fix deployed — crop now includes all 8 real rows (was top=622 before fix). Crop cannot invent text."
+    },
+    "ocr": {
+      "present": false,
+      "note": "No separate OCR stage; GPT vision reads cropped table image directly"
+    },
+    "gptPassCRaw": {
+      "present": true,
+      "item": {
+        "name": "Olio Noc 609 Della O.P.",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 18.829,
+        "total": 18.83
+      },
+      "evidence": "pass-c-raw.json via vl-prompt-compare on production table crop"
+    },
+    "afterNormalizeItems": {
+      "present": true,
+      "item": {
+        "name": "Olio Noc 609 Della O.P.",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 18.829,
+        "total": 18.83
+      },
+      "note": "normalizeItems preserves row count — does not add/remove lines"
+    },
+    "afterReconcile": {
+      "present": true,
+      "item": {
+        "name": "Olio Noc 609 Della O.P.",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 18.829,
+        "total": 18.83
+      },
+      "note": "reconcileLineItemAmounts / reconcileLineItemsToNetSubtotal preserve row count"
+    },
+    "extractInvoiceResponse": {
+      "present": true,
+      "item": {
+        "name": "Olio Nute 600g Dea",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 18.929,
+        "total": 15
+      },
+      "note": "GPT non-determinism — same crop, different phantom label vs pass-c-raw run seconds apart"
+    },
+    "persistence": {
+      "present": true,
+      "item": {
+        "id": "536358c9-36d7-43da-bc8b-306f1b23e26b",
+        "name": "Olio Nuto 609 10lt",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 18.295,
+        "total": 18.3,
+        "created_at": "2026-06-10T21:16:48.838025+00:00"
+      },
+      "note": "DB reflects earlier extraction run (21:16 UTC); client inserted Pass C output verbatim — persistence did not create the phantom"
+    }
+  },
+  "hallucinationHypothesis": "GPT fused visual cues from adjacent rows: Birra Peroni sub-line lot '6009', Aceto 'pet 5l*2' (10L volume), and numeric columns into a phantom olive-oil SKU. No 'Olio' text exists on the invoice.",
+  "gptProducedPhantomOil": "YES"
+}

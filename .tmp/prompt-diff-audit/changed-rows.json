@@ -1,0 +1,524 @@
+[
+  {
+    "Invoice": "Bidfood",
+    "Product": "Tomilho",
+    "Old": {
+      "description": "Tomilho",
+      "quantity": 1,
+      "unit": "mo",
+      "unit_price": 2.57,
+      "total": 2.06
+    },
+    "New": {
+      "description": "Tomilho",
+      "quantity": 1,
+      "unit": "mo",
+      "unit_price": 2.06,
+      "total": 2.06
+    }
+  },
+  {
+    "Invoice": "Bidfood",
+    "Product": "Hortelã",
+    "Old": {
+      "description": "Hortelã",
+      "quantity": 0.5,
+      "unit": "kg",
+      "unit_price": 6.74,
+      "total": 2.7
+    },
+    "New": {
+      "description": "Hortelã",
+      "quantity": 1,
+      "unit": "mo",
+      "unit_price": 2.7,
+      "total": 2.7
+    }
+  },
+  {
+    "Invoice": "Aviludo May",
+    "Product": "Pepinos Extra Uli Frasco 6x720 g",
+    "Old": {
+      "description": "Pepinos Extra Uji Frasco 6x720 g",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 22.49,
+      "total": 22.49
+    },
+    "New": {
+      "description": "Pepinos Extra Uil Frasco 6x720 g",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 22.49,
+      "total": 22.49
+    }
+  },
+  {
+    "Invoice": "Aviludo May",
+    "Product": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+    "Old": {
+      "description": "Atum Óleo Bolsa Nau Cafriente 1 Kg",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 6.55,
+      "total": 13.1
+    },
+    "New": {
+      "description": "Atum Oleo Bolsa Nau Cafrieta 1 Kg",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 6.55,
+      "total": 13.1
+    }
+  },
+  {
+    "Invoice": "Aviludo May",
+    "Product": "Açucar Branco METRO Chef 10x1 Kg",
+    "Old": {
+      "description": "Acúcar Branco METRO Chef 10x1 Kg",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 9.99,
+      "total": 9.99
+    },
+    "New": {
+      "description": "Acucar Branco METRO Chef 10x1 Kg",
+      "quantity": 9,
+      "unit": "cx",
+      "unit_price": 9.99,
+      "total": 89.91
+    }
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Chocolate Pantagruel 10x200g",
+    "Old": {
+      "description": "Chocolate Pantagruel 10x200g",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 29.19,
+      "total": 29.19
+    },
+    "New": {
+      "description": "Chocolate Pantagruel 10x200g",
+      "quantity": 2,
+      "unit": "CX",
+      "unit_price": 29.19,
+      "total": 58.38
+    }
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+    "Old": {
+      "description": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 6.29,
+      "total": 6.29
+    },
+    "New": {
+      "description": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+      "quantity": 2,
+      "unit": "UN",
+      "unit_price": 6.29,
+      "total": 12.58
+    }
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Ovo Líquido Past.Gema Dovo 1kg",
+    "Old": {
+      "description": "Ovo Líquido Past.Gema Dovo 1kg",
+      "quantity": 6,
+      "unit": "un",
+      "unit_price": 10.19,
+      "total": 10.19
+    },
+    "New": {
+      "description": "Ovo Líquido Past.Gema Dovo 1kg",
+      "quantity": 6,
+      "unit": "UN",
+      "unit_price": 10.19,
+      "total": 61.14
+    }
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Filete de Anchovas Alconfrisa Lt 495 g",
+    "Old": {
+      "description": "Filete de Anchovas Alconfrisa Lt 495 g",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 9.49,
+      "total": 9.49
+    },
+    "New": {
+      "description": "Filete de Anchovas Alconfrisa Lt 495 g",
+      "quantity": 2,
+      "unit": "UN",
+      "unit_price": 9.49,
+      "total": 18.98
+    }
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Nata Reny Picot 22% 6x1L",
+    "Old": {
+      "description": "Nata Reny Picot 22% 6x1L",
+      "quantity": 5,
+      "unit": "cx",
+      "unit_price": 18.29,
+      "total": 18.29
+    },
+    "New": {
+      "description": "Nata Reny Picot 22% 6x1L",
+      "quantity": 5,
+      "unit": "CX",
+      "unit_price": 18.29,
+      "total": 91.45
+    }
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+    "Old": {
+      "description": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": "un",
+      "unit_price": 2.35,
+      "total": 50.2
+    },
+    "New": {
+      "description": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null,
+      "unit_price": 2.35,
+      "total": 50.2
+    }
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+    "Old": {
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castagna 1/8 ~1.5Kg",
+      "quantity": 1.35,
+      "unit": "kg",
+      "unit_price": 9.82,
+      "total": 13.44
+    },
+    "New": {
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castiglioni 1/8* ~1,5kg",
+      "quantity": 1.35,
+      "unit": null,
+      "unit_price": 9.82,
+      "total": 13.44
+    }
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+    "Old": {
+      "description": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4.4~4.25Kg",
+      "quantity": 4.3,
+      "unit": "kg",
+      "unit_price": 17.06,
+      "total": 36.54
+    },
+    "New": {
+      "description": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,4~4,25KG",
+      "quantity": 4.3,
+      "unit": null,
+      "unit_price": 17,
+      "total": 36.54
+    }
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+    "Old": {
+      "description": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 ~2,5Kg",
+      "quantity": 3.11,
+      "unit": "kg",
+      "unit_price": 10.1,
+      "total": 31.07
+    },
+    "New": {
+      "description": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 ~2,5kg",
+      "quantity": 3.11,
+      "unit": null,
+      "unit_price": 10.1,
+      "total": 31.07
+    }
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+    "Old": {
+      "description": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 19.32,
+      "total": 38.65
+    },
+    "New": {
+      "description": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "quantity": 2,
+      "unit": null,
+      "unit_price": 19.3,
+      "total": 38.56
+    }
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+    "Old": {
+      "description": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+      "quantity": 1.8,
+      "unit": "kg",
+      "unit_price": 28,
+      "total": 49.48
+    },
+    "New": {
+      "description": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+      "quantity": 2.58,
+      "unit": null,
+      "unit_price": 19.2,
+      "total": 49.48
+    }
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Baladin - Ginger Beer 0.20cl",
+    "Old": {
+      "description": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 24,
+      "unit": "un",
+      "unit_price": 0.85,
+      "total": 19.38
+    },
+    "New": {
+      "description": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 2,
+      "unit": null,
+      "unit_price": 9.69,
+      "total": 19.38
+    }
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Rovagnati - Salame Ventricina 2,5 Kg",
+    "Old": {
+      "description": "Rovagnati - Salame Ventricina 2.5 Kg",
+      "quantity": 2.6,
+      "unit": "kg",
+      "unit_price": 16.6,
+      "total": 39.49
+    },
+    "New": {
+      "description": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 16.6,
+      "total": 39.49
+    }
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+    "Old": {
+      "description": "MOZZARELLA FIOR DI LATTE 'IL BOCCONCINO' 125GR*8",
+      "quantity": 10,
+      "unit": "un",
+      "unit_price": 9.5,
+      "total": 81.23
+    },
+    "New": {
+      "description": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "quantity": 10,
+      "unit": "uni",
+      "unit_price": 9.5,
+      "total": 81.23
+    }
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "STRACCIATELLA 250 GR",
+    "Old": {
+      "description": "STRACCIATELLA 250 GR",
+      "quantity": 24,
+      "unit": "un",
+      "unit_price": 4.141,
+      "total": 74.54
+    },
+    "New": {
+      "description": "STRACCIATELLA 250 GR",
+      "quantity": 24,
+      "unit": "uni",
+      "unit_price": 4.141,
+      "total": 74.54
+    }
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+    "Old": {
+      "description": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 27.56,
+      "total": 27.3
+    },
+    "New": {
+      "description": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "quantity": 1,
+      "unit": "uni",
+      "unit_price": 27.56,
+      "total": 27.3
+    }
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "POMODOR PELATI (CX 2.5KG*6)",
+    "Old": {
+      "description": "POMODORO PELATI (CX 2,5KG*6)",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 20,
+      "total": 40
+    },
+    "New": {
+      "description": "POMODORO PELATI (CX 2,5KG*6)",
+      "quantity": 2,
+      "unit": "uni",
+      "unit_price": 20,
+      "total": 40
+    }
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+    "Old": {
+      "description": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 20.95,
+      "total": 42.07
+    },
+    "New": {
+      "description": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "quantity": 2,
+      "unit": "uni",
+      "unit_price": 20.96,
+      "total": 42.07
+    }
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "RICOTTA TREVIGIANA 1,5KG",
+    "Old": {
+      "description": "RICOTTA TREVIGIANA 1,5KG",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 7.97,
+      "total": 7.97
+    },
+    "New": {
+      "description": "RICOTTA TREVIGIANA 1,5KG",
+      "quantity": 1,
+      "unit": "uni",
+      "unit_price": 7.97,
+      "total": 7.97
+    }
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "ROLO DE CABRA E VACA 1KG",
+    "Old": {
+      "description": "ROLO DE CABRA E VACA 1KG",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 12.71,
+      "total": 12.71
+    },
+    "New": {
+      "description": "ROLO DE CABRA E VACA 1KG",
+      "quantity": 1,
+      "unit": "uni",
+      "unit_price": 12.71,
+      "total": 12.71
+    }
+  },
+  {
+    "Invoice": "Mammafiore",
+    "Product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+    "Old": {
+      "description": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 18.295,
+      "total": 15.9
+    },
+    "New": {
+      "description": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 18.829,
+      "total": 15.09
+    }
+  },
+  {
+    "Invoice": "Mammafiore",
+    "Product": "Rulo Di Capra 1kg*2 Simonetta",
+    "Old": {
+      "description": "Rub Di Capra 1kg *2 Simonetta",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 15.192,
+      "total": 10.38
+    },
+    "New": {
+      "description": "Rulo Di Capra 1kg*2 Simonetta",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 15.192,
+      "total": 10.83
+    }
+  },
+  {
+    "Invoice": "Mammafiore",
+    "Product": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+    "Old": {
+      "description": "Farina con pasta fresca e gnocchi25kg Caputo",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 39.101,
+      "total": 30.11
+    },
+    "New": {
+      "description": "Farina oo pasta fresca e gnocchi25kg Caputo",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 39.101,
+      "total": 30.11
+    }
+  },
+  {
+    "Invoice": "Mammafiore",
+    "Product": "[PHANTOM REMOVED] Nui Lote 609 Data Exp. 20/07/2027",
+    "Old": {
+      "description": "Nui Lote 609 Data Exp. 20/07/2027",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 18.295,
+      "total": 15.9
+    },
+    "New": {
+      "description": "",
+      "quantity": null,
+      "unit": null,
+      "unit_price": null,
+      "total": null
+    }
+  }
+]

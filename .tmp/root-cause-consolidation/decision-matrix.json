@@ -1,0 +1,69 @@
+{
+  "generated_at": "2026-06-11T01:12:02.298Z",
+  "options": {
+    "A_closeValidationLabNow": {
+      "label": "Close Validation Lab now",
+      "confidence": 72,
+      "risk": "MEDIUM",
+      "score": 72,
+      "pros": [
+        "All targeted regressions fixed",
+        "0% hallucination",
+        "Row recall 100%",
+        "Stable errors only ~€11"
+      ],
+      "cons": [
+        "Column shift persists on 2 invoices",
+        "Discount totals run-variable",
+        "April PDF flake"
+      ],
+      "recommendation": "VIABLE"
+    },
+    "B_fixStructuralFirst": {
+      "label": "Fix remaining structural issues first",
+      "confidence": 85,
+      "risk": "LOW",
+      "score": 88,
+      "pros": [
+        "Addresses Column Shift + Discount Handling root classes",
+        "Reduces € risk at scale"
+      ],
+      "cons": [
+        "Delays VL closure",
+        "May need non-prompt changes for column geometry"
+      ],
+      "recommendation": "PREFERRED if blocking production"
+    },
+    "C_continueBroadIngestion": {
+      "label": "Continue broad invoice ingestion",
+      "confidence": 45,
+      "risk": "HIGH",
+      "score": 40,
+      "pros": [
+        "Real-world diversity data"
+      ],
+      "cons": [
+        "Column shift + discount errors will propagate to DB",
+        "No human review loop assumed"
+      ],
+      "recommendation": "NOT RECOMMENDED"
+    },
+    "D_gatherMoreLayouts": {
+      "label": "Gather more invoice layouts before closing",
+      "confidence": 68,
+      "risk": "MEDIUM",
+      "score": 65,
+      "pros": [
+        "Validates structural vs isolated hypothesis",
+        "April PDF class needs more samples"
+      ],
+      "cons": [
+        "6-invoice VL already exhausted root-cause families",
+        "Diminishing returns"
+      ],
+      "recommendation": "OPTIONAL"
+    }
+  },
+  "winner": "A_closeValidationLabNow",
+  "winnerNote": "With B as parallel track for column-shift hardening; stable error budget ~€11/51 rows"
+}

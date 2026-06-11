@@ -1,0 +1,62 @@
+{
+  "generated_at": "2026-06-11T00:57:42.176Z",
+  "invoice": "Bidfood",
+  "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+  "product": "Hortelã",
+  "groundTruth": {
+    "description": "Hortelã",
+    "quantity": 0.5,
+    "unit": "kg",
+    "unit_price": 6.74,
+    "total": 2.7,
+    "source": ".tmp/field-accuracy-audit/ground-truth.json — emporio-footer-audit validated 11/11 PASS"
+  },
+  "trace": {
+    "crop": {
+      "source": ".tmp/emporio-footer-audit/bidfood/crop-bounds.json",
+      "note": "Table crop includes Hortelã row; Bidfood uses MO/EM/kg mixed units in same band",
+      "evidence": [
+        ".tmp/emporio-footer-audit/bidfood/invoice-full.png"
+      ]
+    },
+    "gptBefore": {
+      "prompt": "pre-c33a7f1 (infer-from-name + contextual reasoning)",
+      "source": ".tmp/hallucination-audit/extract-da472b7f-0fd9-4a26-a37c-80ad335f7f7e.json",
+      "quantity": 0.5,
+      "unit": "kg",
+      "unit_price": 6.74,
+      "total": 2.7,
+      "correct": true
+    },
+    "gptAfter": {
+      "prompt": "c33a7f1 column-faithful",
+      "source": ".tmp/passc-implementation/reextract/da472b7f-0fd9-4a26-a37c-80ad335f7f7e.json",
+      "quantity": 1,
+      "unit": "mo",
+      "unit_price": 2.7,
+      "total": 2.7,
+      "correct": false
+    },
+    "db": {
+      "source": ".tmp/emporio-footer-audit/bidfood/db-record.json",
+      "quantity": 0.5,
+      "unit": "kg",
+      "unit_price": 6.74,
+      "total": 2.7,
+      "note": "DB reflects pre-c33a7f1 extract; not yet overwritten by refinement run"
+    }
+  },
+  "answers": {
+    "isHalfVisuallyReadable": "YES — corroborated by old prompt (0.5), DB (0.5), and emporio-footer retry (0.5) on same invoice image",
+    "didOldPromptReadHalf": true,
+    "didNewPromptReadOne": true,
+    "ocrLostDecimal": "UNLIKELY primary cause — same image produced 0.5 under old prompt; decimal comma 0,5 readable when model targets kg column",
+    "columnReadingFail": "YES — new run reads unit MO (herb template) and unit_price €2.70 (= line total, not €/kg)",
+    "promptContributed": "YES — c33a7f1 added Tomilho/Manjericão MO positive examples without Hortelã fractional-kg counter-example; removed contextual weight inference",
+    "financialImpact": 0,
+    "qtyFieldImpact": true
+  },
+  "rootCause": "Prompt template bias: GPT pattern-matched Hortelã to herb MO rows (Tomilho qty=1) instead of reading 0,5 KG from quantity/unit columns. Secondary column shift: PREÇO UNITÁRIO read as line total (€2.70).",
+  "mechanism": "Fractional Quantity + Column Shift",
+  "confidence": "HIGH"
+}

@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-06-11T01:16:47.357Z",
+  "ifDiscountIgnored": {
+    "vlReadiness": "MOSTLY READY",
+    "financialErrorEuro": 66.34,
+    "note": "Single bad run inflates metric; stable Column Shift ~€21 remains"
+  },
+  "ifDiscountSolved": {
+    "vlReadiness": "READY",
+    "projectedFinancialErrorEuro": 6.76,
+    "note": "Best-run Mammafiore totals match GT for Guanciale/Birra/Farina; Aceto fixed in refined"
+  },
+  "recommendation": "Close VL — discount errors are GPT run variance on a structural discount-line class, not a deterministic pipeline bug"
+}

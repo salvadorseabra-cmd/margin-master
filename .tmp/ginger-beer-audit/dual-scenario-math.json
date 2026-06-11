@@ -1,0 +1,40 @@
+{
+  "shared_per_unit_volume": {
+    "token": "0.20cl",
+    "parsed_cl": 0.2,
+    "ml_per_bottle": 2,
+    "code_paths": [
+      "ingredient-unit-inference.ts detectVolume: toMl(n)=n×10",
+      "stock-normalization.ts parseSizeAndUnit: cl→ml via n×10"
+    ]
+  },
+  "scenario_user_reported_24un": {
+    "qty": 24,
+    "unit": "un",
+    "unit_price": 0.85,
+    "total_usable_ml": 48,
+    "usable_formula": "24 × 2 ml = 48 ml",
+    "liters_per_unit": 0.002,
+    "cost_per_liter": 425,
+    "cost_formula": "€0.85 / 0.002 L = €425/L"
+  },
+  "scenario_db_current_2cx": {
+    "qty": 2,
+    "unit": "cx",
+    "unit_price": 9.69,
+    "total_usable_ml": 4,
+    "usable_formula": "2 cx × 2 ml/cx-per-item-parse = 4 ml (stock pipeline treats cx as row multiplier only)",
+    "note": "Pack inner count (12 bottles/cx) NOT parsed from name — only bare 0.20cl token"
+  },
+  "counterfactual_correct_33cl": {
+    "sku_hint": "BBB-GINGER33ITA",
+    "ml_per_bottle": 330,
+    "total_ml_24_bottles": 7920,
+    "cost_per_liter_at_085": 2.58
+  },
+  "counterfactual_typo_20cl": {
+    "ml_per_bottle": 200,
+    "total_ml_24_bottles": 4800,
+    "cost_per_liter_at_085": 4.25
+  }
+}

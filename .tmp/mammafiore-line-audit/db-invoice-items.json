@@ -1,0 +1,95 @@
+{
+  "invoice": {
+    "id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+    "supplier_name": "Mammafiore Portugal",
+    "invoice_date": "2026-05-19",
+    "total": 415.96,
+    "file_url": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781124591362-Screenshot_2026-06-07_at_21.05.02.png",
+    "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+    "created_at": "2026-06-10T20:49:53.458608+00:00"
+  },
+  "dbItemCount": 9,
+  "dbItems": [
+    {
+      "id": "c4fdf3c5-4d88-44d8-ae90-2e002ecfcdd8",
+      "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "quantity": 5.996,
+      "unit": "un",
+      "unit_price": 16.922,
+      "total": 64.93,
+      "created_at": "2026-06-10T21:16:48.838025+00:00"
+    },
+    {
+      "id": "c6e09749-d580-47b5-bb9f-297e72db14ba",
+      "name": "Farina Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 33.154,
+      "total": 26.52,
+      "created_at": "2026-06-10T21:16:48.838025+00:00"
+    },
+    {
+      "id": "4c5d3bbb-dece-465d-8037-978f649d1c88",
+      "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "quantity": 24,
+      "unit": "un",
+      "unit_price": 1.529,
+      "total": 25.69,
+      "created_at": "2026-06-10T21:16:48.838025+00:00"
+    },
+    {
+      "id": "536358c9-36d7-43da-bc8b-306f1b23e26b",
+      "name": "Olio Nuto 609 10lt",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 18.295,
+      "total": 18.3,
+      "created_at": "2026-06-10T21:16:48.838025+00:00"
+    },
+    {
+      "id": "9e2ce10f-4661-4ec0-9bbb-5a6543d1e6e8",
+      "name": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 18.929,
+      "total": 15.09,
+      "created_at": "2026-06-10T21:16:48.838025+00:00"
+    },
+    {
+      "id": "93dc5127-f332-47e1-8e5c-2ca4c1735a8b",
+      "name": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "quantity": 10,
+      "unit": "un",
+      "unit_price": 24.728,
+      "total": 200.3,
+      "created_at": "2026-06-10T21:16:48.838025+00:00"
+    },
+    {
+      "id": "9321aae3-fd0f-4903-a76d-ec2d556f3e33",
+      "name": "Rub Di Capra 1kg *2 Simonetta",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 15.192,
+      "total": 10.38,
+      "created_at": "2026-06-10T21:16:48.838025+00:00"
+    },
+    {
+      "id": "1a9e2941-fed0-40ec-890f-639fc3ce2518",
+      "name": "Recarga por combustivel",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 2,
+      "total": 2,
+      "created_at": "2026-06-10T21:16:48.838025+00:00"
+    },
+    {
+      "id": "27698ac7-bce7-47cc-8c23-61cec063a803",
+      "name": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 39.101,
+      "total": 30.11,
+      "created_at": "2026-06-10T21:16:48.838025+00:00"
+    }
+  ]
+}

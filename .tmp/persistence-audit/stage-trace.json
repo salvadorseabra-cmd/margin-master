@@ -1,0 +1,438 @@
+{
+  "generated_at": "2026-06-10T23:38:43.648Z",
+  "rows": [
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "label": "IL Bocconcino",
+      "key": "pomodor",
+      "issue": "qty=2/€25/€50 vs DB qty=6/€20/€120 (+€70)",
+      "table": {
+        "groundTruth": {
+          "name": "POMODOR PELATI (CX 2.5KG*6)",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 25,
+          "total": 50
+        },
+        "gptPassCRaw": {
+          "name": "POMODORINI pelati (CX 2,5KG*6)",
+          "quantity": 6,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 120
+        },
+        "normalizeItems": {
+          "name": "POMODORINI pelati (CX 2,5KG*6)",
+          "quantity": 6,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 120
+        },
+        "reconcile": null,
+        "extractInvoiceResponse": {
+          "name": "POMODORO PELATI (CX 2,5KG*6)",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 40
+        },
+        "persistencePayload": {
+          "name": "POMODORO PELATI (CX 2,5KG*6)",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 40
+        },
+        "db": {
+          "id": "54ee3963-ec47-4ea7-b96d-b6a2c6499a64",
+          "name": "POMODORINI pelati (CX 2.5KG*6)",
+          "quantity": 6,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 120
+        },
+        "ui": {
+          "name": "POMODORINI pelati (CX 2.5KG*6)",
+          "quantity": 6,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 120
+        }
+      },
+      "passCAlreadyWrong": "YES",
+      "reconcileModifiedQtyPriceTotal": "NO",
+      "persistenceModified": "YES",
+      "uiTransformed": "NO",
+      "firstStageWhereErrorAppears": "passCRaw",
+      "rootCause": "GPT",
+      "dbStaleVsFreshExtract": "YES",
+      "freshExtractMatchesDb": "NO"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "label": "Mammafiore",
+      "key": "phantom-olio",
+      "issue": "Phantom Olio line (+€15–18)",
+      "table": {
+        "groundTruth": {
+          "name": "(absent)",
+          "quantity": null,
+          "unit": null,
+          "unit_price": null,
+          "total": null
+        },
+        "gptPassCRaw": {
+          "name": "Olio Noc 609 Della O.P.",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.829,
+          "total": 18.83
+        },
+        "normalizeItems": {
+          "name": "Olio Noc 609 Della O.P.",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.829,
+          "total": 18.83
+        },
+        "reconcile": null,
+        "extractInvoiceResponse": null,
+        "persistencePayload": null,
+        "db": {
+          "id": "536358c9-36d7-43da-bc8b-306f1b23e26b",
+          "name": "Olio Nuto 609 10lt",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.295,
+          "total": 18.3
+        },
+        "ui": {
+          "name": "Olio Nuto 609 10lt",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.295,
+          "total": 18.3
+        }
+      },
+      "passCAlreadyWrong": "YES",
+      "reconcileModifiedQtyPriceTotal": "NO",
+      "persistenceModified": "NO",
+      "uiTransformed": "NO",
+      "firstStageWhereErrorAppears": "passCRaw",
+      "rootCause": "GPT",
+      "dbStaleVsFreshExtract": "NO",
+      "freshExtractMatchesDb": "NO"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "label": "Mammafiore",
+      "key": "aceto",
+      "issue": "qty 1 vs DB 2 (*2 pack notation)",
+      "table": {
+        "groundTruth": {
+          "name": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.929,
+          "total": 16.09
+        },
+        "gptPassCRaw": {
+          "name": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 13.8,
+          "total": 15.96
+        },
+        "normalizeItems": {
+          "name": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 13.8,
+          "total": 15.96
+        },
+        "reconcile": {
+          "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+          "quantity": 1,
+          "unit": "UN",
+          "unit_price": 18.295,
+          "total": 15.9
+        },
+        "extractInvoiceResponse": {
+          "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+          "quantity": 1,
+          "unit": "UN",
+          "unit_price": 18.295,
+          "total": 15.9
+        },
+        "persistencePayload": {
+          "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.295,
+          "total": 15.9
+        },
+        "db": {
+          "id": "9e2ce10f-4661-4ec0-9bbb-5a6543d1e6e8",
+          "name": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 18.929,
+          "total": 15.09
+        },
+        "ui": {
+          "name": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 18.929,
+          "total": 15.09
+        }
+      },
+      "passCAlreadyWrong": "YES",
+      "reconcileModifiedQtyPriceTotal": "YES",
+      "persistenceModified": "YES",
+      "uiTransformed": "NO",
+      "firstStageWhereErrorAppears": "passCRaw",
+      "rootCause": "GPT",
+      "dbStaleVsFreshExtract": "YES",
+      "freshExtractMatchesDb": "NO"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "label": "Mammafiore",
+      "key": "rulo",
+      "issue": "qty 1 vs DB 2 (*2 pack notation)",
+      "table": {
+        "groundTruth": {
+          "name": "Rulo Di Capra 1kg*2 Simonetta",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 15.192,
+          "total": 10.86
+        },
+        "gptPassCRaw": {
+          "name": "Rub Di Capra 1kg*2 Simonetta",
+          "quantity": 2,
+          "unit": "kg",
+          "unit_price": 15.192,
+          "total": 10.28
+        },
+        "normalizeItems": {
+          "name": "Rub Di Capra 1kg*2 Simonetta",
+          "quantity": 2,
+          "unit": "kg",
+          "unit_price": 15.192,
+          "total": 10.28
+        },
+        "reconcile": {
+          "name": "Rub Di Capra 1kg *2 Simonetta",
+          "quantity": 1,
+          "unit": "UN",
+          "unit_price": 15.192,
+          "total": 10.38
+        },
+        "extractInvoiceResponse": {
+          "name": "Rub Di Capra 1kg *2 Simonetta",
+          "quantity": 1,
+          "unit": "UN",
+          "unit_price": 15.192,
+          "total": 10.38
+        },
+        "persistencePayload": {
+          "name": "Rub Di Capra 1kg *2 Simonetta",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 15.192,
+          "total": 10.38
+        },
+        "db": {
+          "id": "9321aae3-fd0f-4903-a76d-ec2d556f3e33",
+          "name": "Rub Di Capra 1kg *2 Simonetta",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 15.192,
+          "total": 10.38
+        },
+        "ui": {
+          "name": "Rub Di Capra 1kg *2 Simonetta",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 15.192,
+          "total": 10.38
+        }
+      },
+      "passCAlreadyWrong": "YES",
+      "reconcileModifiedQtyPriceTotal": "YES",
+      "persistenceModified": "YES",
+      "uiTransformed": "NO",
+      "firstStageWhereErrorAppears": "passCRaw",
+      "rootCause": "GPT",
+      "dbStaleVsFreshExtract": "YES",
+      "freshExtractMatchesDb": "NO"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "label": "Emporio Italia",
+      "key": "prosciutto",
+      "issue": "unit_price 8.17→17",
+      "table": {
+        "groundTruth": {
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 8.17,
+          "total": 35.14
+        },
+        "gptPassCRaw": null,
+        "normalizeItems": null,
+        "reconcile": null,
+        "extractInvoiceResponse": {
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4.4~4.25Kg",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 17.06,
+          "total": 36.54
+        },
+        "persistencePayload": {
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4.4~4.25Kg",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 17.06,
+          "total": 36.54
+        },
+        "db": {
+          "id": "11d68d4d-f70c-4511-a997-c67b94f573c5",
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 17,
+          "total": 36.54
+        },
+        "ui": {
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 17,
+          "total": 36.54
+        }
+      },
+      "passCAlreadyWrong": "YES",
+      "reconcileModifiedQtyPriceTotal": "NO",
+      "persistenceModified": "YES",
+      "uiTransformed": "NO",
+      "firstStageWhereErrorAppears": "extractInvoice",
+      "rootCause": "GPT",
+      "dbStaleVsFreshExtract": "YES",
+      "freshExtractMatchesDb": "NO"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "label": "Emporio Italia",
+      "key": "pellegrino",
+      "issue": "qty 2.56→2, unit_price 15.06→19.3",
+      "table": {
+        "groundTruth": {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2.56,
+          "unit": "cx",
+          "unit_price": 15.06,
+          "total": 38.56
+        },
+        "gptPassCRaw": null,
+        "normalizeItems": null,
+        "reconcile": null,
+        "extractInvoiceResponse": {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "cx",
+          "unit_price": 19.32,
+          "total": 38.65
+        },
+        "persistencePayload": {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "cx",
+          "unit_price": 19.32,
+          "total": 38.65
+        },
+        "db": {
+          "id": "2ff0d9a7-4b09-4956-bb4f-85e3d2268587",
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "cx",
+          "unit_price": 19.3,
+          "total": 38.56
+        },
+        "ui": {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "cx",
+          "unit_price": 19.3,
+          "total": 38.56
+        }
+      },
+      "passCAlreadyWrong": "YES",
+      "reconcileModifiedQtyPriceTotal": "NO",
+      "persistenceModified": "YES",
+      "uiTransformed": "NO",
+      "firstStageWhereErrorAppears": "extractInvoice",
+      "rootCause": "GPT",
+      "dbStaleVsFreshExtract": "YES",
+      "freshExtractMatchesDb": "NO"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "label": "Emporio Italia",
+      "key": "ginger-beer",
+      "issue": "unit un→cx",
+      "table": {
+        "groundTruth": {
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 9.69,
+          "total": 19.38
+        },
+        "gptPassCRaw": null,
+        "normalizeItems": null,
+        "reconcile": null,
+        "extractInvoiceResponse": {
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 0.85,
+          "total": 19.38
+        },
+        "persistencePayload": {
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 0.85,
+          "total": 19.38
+        },
+        "db": {
+          "id": "0dbbc281-9384-493f-9f92-68786058a5b5",
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "quantity": 2,
+          "unit": "cx",
+          "unit_price": 9.69,
+          "total": 19.38
+        },
+        "ui": {
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "quantity": 2,
+          "unit": "cx",
+          "unit_price": 9.69,
+          "total": 19.38
+        }
+      },
+      "passCAlreadyWrong": "YES",
+      "reconcileModifiedQtyPriceTotal": "NO",
+      "persistenceModified": "YES",
+      "uiTransformed": "NO",
+      "firstStageWhereErrorAppears": "extractInvoice",
+      "rootCause": "GPT",
+      "dbStaleVsFreshExtract": "YES",
+      "freshExtractMatchesDb": "NO"
+    }
+  ]
+}

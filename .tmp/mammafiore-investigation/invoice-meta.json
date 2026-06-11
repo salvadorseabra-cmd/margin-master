@@ -1,0 +1,13 @@
+{
+  "invoice": {
+    "id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+    "supplier_name": "Mammafiore Portugal",
+    "invoice_date": "2026-05-19",
+    "total": 415.96,
+    "file_url": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781124591362-Screenshot_2026-06-07_at_21.05.02.png",
+    "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+    "created_at": "2026-06-10T20:49:53.458608+00:00"
+  },
+  "dbItemCount": 0,
+  "dbItems": []
+}

@@ -1,0 +1,58 @@
+{
+  "rows": [
+    {
+      "groundTruthItem": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "extractedItem": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "persistedItem": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "status": "MATCH"
+    },
+    {
+      "groundTruthItem": "Farina Speciale pizza 25kg Amoruso",
+      "extractedItem": "Farina Speciale pizza 25kg Amoruso",
+      "persistedItem": "Farina Speciale pizza 25kg Amoruso",
+      "status": "MATCH"
+    },
+    {
+      "groundTruthItem": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "extractedItem": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "persistedItem": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "status": "MATCH"
+    },
+    {
+      "groundTruthItem": null,
+      "extractedItem": "Olio Nute 600g Dea",
+      "persistedItem": "Olio Nuto 609 10lt",
+      "status": "PHANTOM"
+    },
+    {
+      "groundTruthItem": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "extractedItem": "Aceto balsamico di modena IGP PET 5l*2 Toschi",
+      "persistedItem": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+      "status": "PARTIAL"
+    },
+    {
+      "groundTruthItem": "MOZZA Fior di Latte Expert Julienne 3kg Simonetta",
+      "extractedItem": "MOZZA Fioc di Latte Expet Julienne 3kg Simonetta",
+      "persistedItem": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "status": "PARTIAL"
+    },
+    {
+      "groundTruthItem": "Rulo Di Capra 1kg*2 Simonetta",
+      "extractedItem": "Rub Di Capra 1kg S2 Simonetta",
+      "persistedItem": "Rub Di Capra 1kg *2 Simonetta",
+      "status": "PARTIAL"
+    },
+    {
+      "groundTruthItem": "Recargo por combustible",
+      "extractedItem": "Recargo por combustibile",
+      "persistedItem": "Recarga por combustivel",
+      "status": "PARTIAL"
+    },
+    {
+      "groundTruthItem": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+      "extractedItem": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+      "persistedItem": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+      "status": "MATCH"
+    }
+  ]
+}

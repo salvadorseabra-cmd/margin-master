@@ -1,0 +1,69 @@
+{
+  "generated_at": "2026-06-11T01:12:02.299Z",
+  "classifications": [
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "unit_price",
+      "family": "Column Shift",
+      "financialImpactEuro": 1.4,
+      "structuralOrIsolated": "STRUCTURAL"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "total",
+      "family": "Column Shift",
+      "financialImpactEuro": 1.4,
+      "structuralOrIsolated": "STRUCTURAL"
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "unit_price",
+      "family": "Column Shift",
+      "financialImpactEuro": 10,
+      "structuralOrIsolated": "STRUCTURAL"
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "total",
+      "family": "Column Shift",
+      "financialImpactEuro": 10,
+      "structuralOrIsolated": "STRUCTURAL"
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "field": "total",
+      "family": "Model Variance",
+      "financialImpactEuro": 36.66,
+      "structuralOrIsolated": "STRUCTURAL"
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "field": "total",
+      "family": "Model Variance",
+      "financialImpactEuro": 6.63,
+      "structuralOrIsolated": "STRUCTURAL"
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "field": "total",
+      "family": "Model Variance",
+      "financialImpactEuro": 11.01,
+      "structuralOrIsolated": "STRUCTURAL"
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "field": "total",
+      "family": "Model Variance",
+      "financialImpactEuro": 0.48,
+      "structuralOrIsolated": "STRUCTURAL"
+    }
+  ]
+}

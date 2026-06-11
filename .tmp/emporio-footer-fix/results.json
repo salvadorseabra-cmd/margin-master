@@ -1,0 +1,38 @@
+[
+  {
+    "invoice": "Emporio Italia",
+    "id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+    "beforeStartY": 851,
+    "afterStartY": 506,
+    "cropHeight": 618,
+    "summaryBandTop": 710,
+    "totalsInCrop": true,
+    "expected": 327.46,
+    "extracted": 327.46,
+    "pass": true
+  },
+  {
+    "invoice": "Bidfood",
+    "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "beforeStartY": 1037,
+    "afterStartY": 1037,
+    "cropHeight": 235,
+    "summaryBandTop": null,
+    "totalsInCrop": true,
+    "expected": 292.7,
+    "extracted": null,
+    "pass": false
+  },
+  {
+    "invoice": "Aviludo May",
+    "id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+    "beforeStartY": 448,
+    "afterStartY": 448,
+    "cropHeight": 490,
+    "summaryBandTop": null,
+    "totalsInCrop": true,
+    "expected": 330.42,
+    "extracted": 330.42,
+    "pass": true
+  }
+]

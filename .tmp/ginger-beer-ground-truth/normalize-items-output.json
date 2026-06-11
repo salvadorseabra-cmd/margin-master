@@ -1,0 +1,17 @@
+{
+  "rawGptItem": {
+    "name": "Baladin - Ginger Beer 0.20cl",
+    "quantity": 2,
+    "unit": "un",
+    "unit_price": 9.65,
+    "total": 19.38
+  },
+  "normalizedGptItem": {
+    "name": "Baladin - Ginger Beer 0.20cl",
+    "quantity": 2,
+    "unit": "un",
+    "unit_price": 9.65,
+    "total": 19.38
+  },
+  "nameUnchanged": true
+}

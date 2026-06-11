@@ -1,0 +1,7 @@
+{
+  "status": 546,
+  "body": {
+    "code": "WORKER_RESOURCE_LIMIT",
+    "message": "Function failed due to not having enough compute resources (please check logs)"
+  }
+}

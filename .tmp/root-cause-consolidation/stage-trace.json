@@ -1,0 +1,449 @@
+{
+  "generated_at": "2026-06-11T01:12:02.298Z",
+  "traces": [
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "unit_price",
+      "firstDivergenceStage": "passC",
+      "stages": {
+        "groundTruth": {
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 8.17,
+          "total": 35.14
+        },
+        "passCRaw": null,
+        "normalizeItems": null,
+        "reconcile": null,
+        "extractInvoiceResponse": {
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4.4~4.25Kg",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 17.06,
+          "total": 36.54
+        },
+        "db": {
+          "id": "11d68d4d-f70c-4511-a997-c67b94f573c5",
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 17,
+          "total": 36.54
+        },
+        "ui": {
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 17,
+          "total": 36.54
+        },
+        "refinedPassC": {
+          "unit_price": 9.17
+        }
+      },
+      "evidence": [
+        ".tmp/passc-refinement-validation/post-audit.json",
+        ".tmp/persistence-audit/stage-trace.json"
+      ]
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "field": "total",
+      "firstDivergenceStage": "passC",
+      "stages": {
+        "groundTruth": {
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 8.17,
+          "total": 35.14
+        },
+        "passCRaw": null,
+        "normalizeItems": null,
+        "reconcile": null,
+        "extractInvoiceResponse": {
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4.4~4.25Kg",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 17.06,
+          "total": 36.54
+        },
+        "db": {
+          "id": "11d68d4d-f70c-4511-a997-c67b94f573c5",
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 17,
+          "total": 36.54
+        },
+        "ui": {
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 17,
+          "total": 36.54
+        },
+        "refinedPassC": {
+          "total": 36.54
+        }
+      },
+      "evidence": [
+        ".tmp/passc-refinement-validation/post-audit.json",
+        ".tmp/persistence-audit/stage-trace.json"
+      ]
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "unit_price",
+      "firstDivergenceStage": "passC",
+      "stages": {
+        "groundTruth": {
+          "name": "POMODOR PELATI (CX 2.5KG*6)",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 25,
+          "total": 50
+        },
+        "passCRaw": {
+          "name": "POMODORINI pelati (CX 2,5KG*6)",
+          "quantity": 6,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 120
+        },
+        "normalizeItems": {
+          "name": "POMODORINI pelati (CX 2,5KG*6)",
+          "quantity": 6,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 120
+        },
+        "reconcile": null,
+        "extractInvoiceResponse": {
+          "name": "POMODORO PELATI (CX 2,5KG*6)",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 40
+        },
+        "db": {
+          "id": "54ee3963-ec47-4ea7-b96d-b6a2c6499a64",
+          "name": "POMODORINI pelati (CX 2.5KG*6)",
+          "quantity": 6,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 120
+        },
+        "ui": {
+          "name": "POMODORINI pelati (CX 2.5KG*6)",
+          "quantity": 6,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 120
+        },
+        "refinedPassC": {
+          "unit_price": 20
+        }
+      },
+      "evidence": [
+        ".tmp/passc-refinement-validation/post-audit.json",
+        ".tmp/persistence-audit/stage-trace.json"
+      ]
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "field": "total",
+      "firstDivergenceStage": "passC",
+      "stages": {
+        "groundTruth": {
+          "name": "POMODOR PELATI (CX 2.5KG*6)",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 25,
+          "total": 50
+        },
+        "passCRaw": {
+          "name": "POMODORINI pelati (CX 2,5KG*6)",
+          "quantity": 6,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 120
+        },
+        "normalizeItems": {
+          "name": "POMODORINI pelati (CX 2,5KG*6)",
+          "quantity": 6,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 120
+        },
+        "reconcile": null,
+        "extractInvoiceResponse": {
+          "name": "POMODORO PELATI (CX 2,5KG*6)",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 40
+        },
+        "db": {
+          "id": "54ee3963-ec47-4ea7-b96d-b6a2c6499a64",
+          "name": "POMODORINI pelati (CX 2.5KG*6)",
+          "quantity": 6,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 120
+        },
+        "ui": {
+          "name": "POMODORINI pelati (CX 2.5KG*6)",
+          "quantity": 6,
+          "unit": "un",
+          "unit_price": 20,
+          "total": 120
+        },
+        "refinedPassC": {
+          "total": 40
+        }
+      },
+      "evidence": [
+        ".tmp/passc-refinement-validation/post-audit.json",
+        ".tmp/persistence-audit/stage-trace.json"
+      ]
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "field": "total",
+      "firstDivergenceStage": "passC",
+      "stages": {
+        "groundTruth": {
+          "name": "(absent)",
+          "quantity": null,
+          "unit": null,
+          "unit_price": null,
+          "total": null
+        },
+        "passCRaw": {
+          "name": "Olio Noc 609 Della O.P.",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.829,
+          "total": 18.83
+        },
+        "normalizeItems": {
+          "name": "Olio Noc 609 Della O.P.",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.829,
+          "total": 18.83
+        },
+        "reconcile": null,
+        "extractInvoiceResponse": null,
+        "db": {
+          "id": "536358c9-36d7-43da-bc8b-306f1b23e26b",
+          "name": "Olio Nuto 609 10lt",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.295,
+          "total": 18.3
+        },
+        "ui": {
+          "name": "Olio Nuto 609 10lt",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.295,
+          "total": 18.3
+        },
+        "refinedPassC": {
+          "total": 101.59
+        },
+        "runVariance": {
+          "c33Value": 64.93,
+          "refinedValue": 101.59,
+          "note": "c33a7f1 run correct, 04c0d88 run wrong — non-deterministic Pass C on discounted line"
+        }
+      },
+      "evidence": [
+        ".tmp/passc-refinement-validation/post-audit.json",
+        ".tmp/persistence-audit/stage-trace.json"
+      ]
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "field": "total",
+      "firstDivergenceStage": "passC",
+      "stages": {
+        "groundTruth": {
+          "name": "(absent)",
+          "quantity": null,
+          "unit": null,
+          "unit_price": null,
+          "total": null
+        },
+        "passCRaw": {
+          "name": "Olio Noc 609 Della O.P.",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.829,
+          "total": 18.83
+        },
+        "normalizeItems": {
+          "name": "Olio Noc 609 Della O.P.",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.829,
+          "total": 18.83
+        },
+        "reconcile": null,
+        "extractInvoiceResponse": null,
+        "db": {
+          "id": "536358c9-36d7-43da-bc8b-306f1b23e26b",
+          "name": "Olio Nuto 609 10lt",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.295,
+          "total": 18.3
+        },
+        "ui": {
+          "name": "Olio Nuto 609 10lt",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.295,
+          "total": 18.3
+        },
+        "refinedPassC": {
+          "total": 33.15
+        },
+        "runVariance": {
+          "c33Value": 26.52,
+          "refinedValue": 33.15,
+          "note": "c33a7f1 run correct, 04c0d88 run wrong — non-deterministic Pass C on discounted line"
+        }
+      },
+      "evidence": [
+        ".tmp/passc-refinement-validation/post-audit.json",
+        ".tmp/persistence-audit/stage-trace.json"
+      ]
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "field": "total",
+      "firstDivergenceStage": "passC",
+      "stages": {
+        "groundTruth": {
+          "name": "(absent)",
+          "quantity": null,
+          "unit": null,
+          "unit_price": null,
+          "total": null
+        },
+        "passCRaw": {
+          "name": "Olio Noc 609 Della O.P.",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.829,
+          "total": 18.83
+        },
+        "normalizeItems": {
+          "name": "Olio Noc 609 Della O.P.",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.829,
+          "total": 18.83
+        },
+        "reconcile": null,
+        "extractInvoiceResponse": null,
+        "db": {
+          "id": "536358c9-36d7-43da-bc8b-306f1b23e26b",
+          "name": "Olio Nuto 609 10lt",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.295,
+          "total": 18.3
+        },
+        "ui": {
+          "name": "Olio Nuto 609 10lt",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.295,
+          "total": 18.3
+        },
+        "refinedPassC": {
+          "total": 36.7
+        },
+        "runVariance": {
+          "c33Value": 25.69,
+          "refinedValue": 36.7,
+          "note": "c33a7f1 run correct, 04c0d88 run wrong — non-deterministic Pass C on discounted line"
+        }
+      },
+      "evidence": [
+        ".tmp/passc-refinement-validation/post-audit.json",
+        ".tmp/persistence-audit/stage-trace.json"
+      ]
+    },
+    {
+      "invoice": "Mammafiore",
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "field": "total",
+      "firstDivergenceStage": "passC",
+      "stages": {
+        "groundTruth": {
+          "name": "(absent)",
+          "quantity": null,
+          "unit": null,
+          "unit_price": null,
+          "total": null
+        },
+        "passCRaw": {
+          "name": "Olio Noc 609 Della O.P.",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.829,
+          "total": 18.83
+        },
+        "normalizeItems": {
+          "name": "Olio Noc 609 Della O.P.",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.829,
+          "total": 18.83
+        },
+        "reconcile": null,
+        "extractInvoiceResponse": null,
+        "db": {
+          "id": "536358c9-36d7-43da-bc8b-306f1b23e26b",
+          "name": "Olio Nuto 609 10lt",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.295,
+          "total": 18.3
+        },
+        "ui": {
+          "name": "Olio Nuto 609 10lt",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 18.295,
+          "total": 18.3
+        },
+        "refinedPassC": {
+          "total": 10.38
+        },
+        "runVariance": {
+          "c33Value": 10.83,
+          "refinedValue": 10.38,
+          "note": "c33a7f1 run correct, 04c0d88 run wrong — non-deterministic Pass C on discounted line"
+        }
+      },
+      "evidence": [
+        ".tmp/passc-refinement-validation/post-audit.json",
+        ".tmp/persistence-audit/stage-trace.json"
+      ]
+    }
+  ]
+}

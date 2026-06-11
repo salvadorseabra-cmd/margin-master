@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-06-10T23:56:09.492Z",
+  "phantoms": [
+    {
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "phantomLabels": [
+        "Olio Noc 609 Della O.P. (pass-c-raw)",
+        "Olio Nute 600g Dea (extract-invoice prior run)",
+        "Nui Lote 609 Data Exp. 20/07/2027 (fresh extract-invoice 2026-06-11)",
+        "Olio Nuto 609 10lt (DB persisted)"
+      ],
+      "visibleInCrop": false,
+      "visibleInOcr": false,
+      "inPassC": true,
+      "persisted": true,
+      "mechanism": "GPT fused Birra Peroni lot '6009', Aceto 'pet 5l*2' volume cue, and numeric columns into phantom SKU; fresh runs relabel as lot-metadata row",
+      "evidence": [
+        ".tmp/mammafiore-line-audit/phantom-item-trace.json",
+        ".tmp/persistence-audit/pass-c-raw/36c99d19-6f9f-413f-8c2d-ae3526291a2d-gpt-raw.json",
+        ".tmp/hallucination-audit/phantom-analysis.json"
+      ]
+    }
+  ]
+}

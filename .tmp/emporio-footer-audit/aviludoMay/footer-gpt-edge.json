@@ -1,0 +1,17 @@
+{
+  "status": 200,
+  "body": {
+    "rawGptJson": {
+      "total": 330.42,
+      "net_subtotal": 296.88,
+      "vat": 33.54
+    },
+    "parsed": {
+      "total": 330.42,
+      "net_subtotal": 296.88,
+      "vat": 33.54,
+      "confidence": "high",
+      "validation_warning": null
+    }
+  }
+}

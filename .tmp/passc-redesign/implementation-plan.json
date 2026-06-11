@@ -1,0 +1,117 @@
+{
+  "generated_at": "2026-06-11T12:00:00.000Z",
+  "designOnly": true,
+  "targetFile": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+  "promptConstant": "TABLE_EXTRACTION_SYSTEM_PROMPT",
+  "userMessageLine": 185,
+  "changes": [
+    {
+      "action": "REPLACE",
+      "section": "CRITICAL RULES block",
+      "lines": "27-34",
+      "current": "Extract ALL + infer-from-name + contextual reasoning",
+      "proposed": "Column-faithful extraction preamble (copy qty/price/total from columns only; descriptions never override; prefer null over guessing)",
+      "rationale": "Eliminates CRITICAL contradiction with L122; removes root cause of pack-multiplier errors"
+    },
+    {
+      "action": "REMOVE",
+      "section": "Infer-from-name permission",
+      "lines": "33-34",
+      "current": "But DO infer quantity/unit when clearly present inside product names. Screenshots may have messy OCR. Use contextual reasoning.",
+      "proposed": null,
+      "rationale": "Direct cause of POMODOR *6, Aceto *2, Rulo *2, Ginger Beer 24 errors"
+    },
+    {
+      "action": "REPLACE",
+      "section": "IMPORTANT PATTERNS examples",
+      "lines": "36-84",
+      "current": "7 retail pack examples teaching *N as purchased qty (Coca-Cola 33cl Pack 24, BAD/GOOD 33cl, etc.)",
+      "proposed": "NEGATIVE EXAMPLES block (POMODOR CX*6, Aceto 5l*2, Rulo 1kg*2, Ginger Beer) + POSITIVE EXAMPLES (Bidfood MO/EM, Aviludo 33cl*24 with column=24)",
+      "rationale": "Retail examples generalize to wholesale CX*N; negative examples anchor correct behavior"
+    },
+    {
+      "action": "MODIFY",
+      "section": "Weight-in-name examples",
+      "lines": "40-46",
+      "current": "Acém 15kg → qty 15; Bacon 1kg → qty 1",
+      "proposed": "Move to conditional: only when NO quantity column visible → null (or post-process whitelist)",
+      "rationale": "Prevents description overriding column; accepts null regression risk on butcher invoices"
+    },
+    {
+      "action": "MODIFY",
+      "section": "Salada EM default qty",
+      "lines": "108-110",
+      "current": "Salada with unit EM → quantity: 1",
+      "proposed": "Salada with unit EM and quantity column '1' → quantity: 1 (column-faithful)",
+      "rationale": "Remove implicit qty=1 inference"
+    },
+    {
+      "action": "ADD",
+      "section": "Anti-phantom guards",
+      "lines": "after line 116 (do not hallucinate)",
+      "current": null,
+      "proposed": "Reject lot/expiry sub-lines; one row per visible product; never reconstruct from lot numbers",
+      "rationale": "Eliminates Mammafiore phantom row"
+    },
+    {
+      "action": "STRENGTHEN",
+      "section": "PRICE ACCURACY",
+      "lines": "119-125",
+      "current": "Copy exactly + digit-by-digit",
+      "proposed": "Add explicit column-boundary rule: do not read numerics from description into price fields; weight ranges (4-4,25KG) are not prices",
+      "rationale": "May reduce Prosciutto column bleed (UNCERTAIN)"
+    },
+    {
+      "action": "MODIFY",
+      "section": "User message",
+      "lines": "185",
+      "current": "Extract all invoice line items from this restaurant invoice table image.",
+      "proposed": "Extract each visible invoice line item. Copy quantity, unit price, and total from their table columns only.",
+      "rationale": "Align user message with column-faithful system prompt; reduce extract-all pressure"
+    }
+  ],
+  "optionalPostPromptGuards": [
+    {
+      "location": "invoice-table-extraction.ts after normalizeItems (line 192)",
+      "guard": "Row-count check vs geometry Pass B expected count",
+      "priority": "HIGH"
+    },
+    {
+      "location": "invoice-table-extraction.ts or new filter module",
+      "guard": "Reject rows matching /Lote\\s*\\d|Data\\s*Exp/i without product name",
+      "priority": "HIGH"
+    },
+    {
+      "location": "invoice-line-reconcile.ts",
+      "guard": "Flag qty×unit_price ≠ total beyond tolerance when all three non-null",
+      "priority": "MEDIUM",
+      "note": "Would catch Ginger Beer 24×€0.85 semantic error even if prompt fails"
+    }
+  ],
+  "deploymentSequence": [
+    "1. Replace TABLE_EXTRACTION_SYSTEM_PROMPT with proposed-prompt.txt content",
+    "2. Update user message (line 185)",
+    "3. Add optional post-prompt phantom/lot filter",
+    "4. Re-extract all 6 VL invoices (persistence-audit: DB is stale for 6/7 problem rows)",
+    "5. Run field-accuracy + hallucination audits to validate projection",
+    "6. Add Mammafiore regression fixture: assert 8 items, no /Olio|Lote 609/i"
+  ],
+  "filesToTouch": [
+    {
+      "path": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+      "lines": "10-125, 185",
+      "changeType": "prompt rewrite"
+    },
+    {
+      "path": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+      "lines": "192-193",
+      "changeType": "optional post-filter hook",
+      "optional": true
+    }
+  ],
+  "filesNotToChange": [
+    "supabase/functions/extract-invoice/invoice-line-reconcile.ts (unless adding sanity flag)",
+    "supabase/functions/extract-invoice/invoice-image-crop.ts",
+    "src/routes/invoices.tsx (re-extract trigger is operational, not prompt)"
+  ]
+}

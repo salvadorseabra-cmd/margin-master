@@ -1,0 +1,89 @@
+{
+  "generated_at": "2026-06-11T00:00:00.000Z",
+  "rows": [
+    {
+      "invoice": "IL Bocconcino",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "row": "pomodor",
+      "issue": "qty=2/€25/€50 vs DB qty=6/€20/€120 (+€70)",
+      "deltaEur": 70,
+      "firstStageWhereDeltaAppears": "passCRaw",
+      "rootCause": "GPT",
+      "passCAlreadyWrong": "YES",
+      "dbStaleVsFreshExtract": "YES",
+      "freshExtract": { "quantity": 2, "unit_price": 20, "total": 40 }
+    },
+    {
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "row": "phantom-olio",
+      "issue": "Phantom Olio, Aceto *2, Rulo *2 → +€16.82 delta (phantom portion)",
+      "deltaEur": 18.3,
+      "firstStageWhereDeltaAppears": "passCRaw",
+      "rootCause": "GPT",
+      "passCAlreadyWrong": "YES",
+      "dbStaleVsFreshExtract": "YES",
+      "freshExtract": { "name": "Nui Lote 609 Data Exp. 20/07/2027", "total": 15.9 }
+    },
+    {
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "row": "aceto",
+      "issue": "qty 1 vs DB 2 (*2 pack notation)",
+      "deltaEur": -1,
+      "firstStageWhereDeltaAppears": "passCRaw",
+      "rootCause": "GPT",
+      "passCAlreadyWrong": "YES",
+      "dbStaleVsFreshExtract": "YES",
+      "freshExtract": { "quantity": 1, "unit_price": 18.295, "total": 15.9 }
+    },
+    {
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "row": "rulo",
+      "issue": "qty 1 vs DB 2 (*2 pack notation)",
+      "deltaEur": -0.48,
+      "firstStageWhereDeltaAppears": "passCRaw",
+      "rootCause": "GPT",
+      "passCAlreadyWrong": "YES",
+      "dbStaleVsFreshExtract": "YES",
+      "freshExtract": { "quantity": 1, "unit_price": 15.192, "total": 10.38 }
+    },
+    {
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "row": "prosciutto",
+      "issue": "unit_price 8.17→17",
+      "deltaEur": 1.4,
+      "firstStageWhereDeltaAppears": "extractInvoice",
+      "rootCause": "GPT",
+      "passCAlreadyWrong": "YES",
+      "dbStaleVsFreshExtract": "YES",
+      "freshExtract": { "unit_price": 17.06, "total": 36.54 }
+    },
+    {
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "row": "pellegrino",
+      "issue": "qty 2.56→2, unit_price 15.06→19.3",
+      "deltaEur": 0,
+      "firstStageWhereDeltaAppears": "extractInvoice",
+      "rootCause": "GPT",
+      "passCAlreadyWrong": "YES",
+      "dbStaleVsFreshExtract": "YES",
+      "freshExtract": { "quantity": 2, "unit_price": 19.32, "total": 38.65 }
+    },
+    {
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "row": "ginger-beer",
+      "issue": "unit un→cx (DB); fresh has qty 24/un",
+      "deltaEur": 0,
+      "firstStageWhereDeltaAppears": "extractInvoice",
+      "rootCause": "GPT",
+      "passCAlreadyWrong": "YES",
+      "dbStaleVsFreshExtract": "YES",
+      "freshExtract": { "quantity": 24, "unit": "un", "unit_price": 0.85, "total": 19.38 }
+    }
+  ]
+}

@@ -1,0 +1,188 @@
+{
+  "generated_at": "2026-06-11T12:00:00.000Z",
+  "methodology": "Counterfactual simulation using passc-prompt-audit counterfactual-analysis.json, gpt-pattern-audit error-catalog.json, and persistence-audit fresh-extract evidence. OPENAI_API_KEY unavailable — no live spot-check extractions.",
+  "proposedPromptSummary": "Column-faithful extraction; pack notation as metadata; no inference from description; anti-phantom/lot guards; null over guessing",
+  "rows": [
+    {
+      "rowIndex": 1,
+      "invoice": "Aviludo May",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "product": "Filete de Anchoas Alcofinosa L4 495 g",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "verdict": "NO",
+      "confidence": "HIGH",
+      "reasoning": "Description spelling variant only (Alcofinosa→Alconfirosa). Numerics correct. Column-faithful prompt does not address vision OCR on product names."
+    },
+    {
+      "rowIndex": 2,
+      "invoice": "Aviludo May",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "product": "Pepinos Extra Uli Frasco 6x720 g",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "verdict": "NO",
+      "confidence": "HIGH",
+      "reasoning": "Description OCR noise (Uli→Uji). All numeric columns correct. Prompt redesign targets qty/price column fidelity, not name transcription."
+    },
+    {
+      "rowIndex": 3,
+      "invoice": "Aviludo May",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "product": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "verdict": "NO",
+      "confidence": "HIGH",
+      "reasoning": "Description OCR only. Qty=2, prices match GT. Not preventable by column-faithful rules."
+    },
+    {
+      "rowIndex": 4,
+      "invoice": "Aviludo May",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "product": "Nata Culinária 22% Reny Picot 6x1 L",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "verdict": "NO",
+      "confidence": "HIGH",
+      "reasoning": "Description accent/spelling noise. Qty=5 cx and prices correct. 6x1 L is pack metadata; column already authoritative at qty=5."
+    },
+    {
+      "rowIndex": 5,
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "product": "Arrigoni Gorgonzola DOP Dolce",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "verdict": "UNCERTAIN",
+      "confidence": "LOW",
+      "reasoning": "Primarily description OCR (Castelgrottto→Castagna). Fresh extract also shows minor unit_price drift (€9.92→€9.82). Column-faithful mandate may marginally reduce price bleed but name OCR persists."
+    },
+    {
+      "rowIndex": 6,
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "product": "Rovagnati Prosciutto Cotto Scelto HC 4-4,25KG",
+      "errorType": "Column Shift",
+      "wrongFields": ["unit_price", "line_total"],
+      "verdict": "UNCERTAIN",
+      "confidence": "MEDIUM",
+      "reasoning": "Unit price €8.17→€17.06 is vision column bleed from weight range '4-4,25KG', not pack-inference. Proposed prompt strengthens column isolation but dense Italian grid misalignment is primarily a vision limitation; passc-prompt-audit rates this UNCERTAIN."
+    },
+    {
+      "rowIndex": 7,
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "product": "Rovagnati Mortadella IGP 'Massima' con Pistacchio",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "verdict": "NO",
+      "confidence": "HIGH",
+      "reasoning": "Description formatting variant only. All financial fields match GT. Not addressable by column-faithful redesign."
+    },
+    {
+      "rowIndex": 8,
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "product": "SanPellegrino Acqua in vitro 75cl x 15ud",
+      "errorType": "Column Shift",
+      "wrongFields": ["quantity", "unit_price"],
+      "verdict": "UNCERTAIN",
+      "confidence": "MEDIUM",
+      "reasoning": "Qty truncated 2.56→2 and price inflated 15.06→19.32 while total ~preserved — classic wrong-column read, not pack multiplier. Column-only rule helps intent but fractional qty parsing on dense grids may still fail."
+    },
+    {
+      "rowIndex": 9,
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "product": "Baladin Ginger Beer 0.20cl",
+      "errorType": "Pack Multiplier Confusion",
+      "wrongFields": ["unit"],
+      "verdict": "YES",
+      "confidence": "HIGH",
+      "reasoning": "Qty 2→24 and unit_price €9.69→€0.85 caused by inferring 24-bottle pack from description over column qty=2. Proposed negative example explicitly forbids this. Fixing qty restores case-level unit and pricing."
+    },
+    {
+      "rowIndex": 10,
+      "invoice": "IL Bocconcino",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "errorType": "Pack Multiplier Confusion; Column Shift",
+      "wrongFields": ["quantity", "unit_price", "line_total"],
+      "verdict": "UNCERTAIN",
+      "confidence": "MEDIUM",
+      "reasoning": "Qty 6→2: YES — column shows 2, *6 is metadata (pass-c-raw had 6; fresh extract already qty=2). Price €25→€20 and total €50→€40: UNCERTAIN — persists in fresh extract despite correct qty; vision digit misread independent of pack inference. Row partially preventable."
+    },
+    {
+      "rowIndex": 11,
+      "invoice": "IL Bocconcino",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "product": "ROLO DE CABRA E VACA 1KG",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "verdict": "NO",
+      "confidence": "HIGH",
+      "reasoning": "Description OCR only (CABRA→CABEÇA). All numerics correct. Not preventable by prompt redesign."
+    },
+    {
+      "rowIndex": 12,
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "errorType": "Pack Multiplier Confusion",
+      "wrongFields": ["quantity", "line_total", "unit_price"],
+      "verdict": "YES",
+      "confidence": "HIGH",
+      "reasoning": "Qty 2→1: YES — column shows 1; *2 is pack metadata. Fresh extract (2026-06-11) already corrected qty=1 when inference suppressed, proving column is readable. Remaining price/total deltas (€18.929 vs €18.295) are separate column-read issues; qty error is prompt-preventable."
+    },
+    {
+      "rowIndex": 13,
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "product": "MOZZA Fior di Latte Expert Julienne 3kg Simonetta",
+      "errorType": "OCR Character Noise",
+      "wrongFields": [],
+      "verdict": "NO",
+      "confidence": "HIGH",
+      "reasoning": "Description spelling (Fioc/Expet). Qty=10 and prices match GT. Not preventable."
+    },
+    {
+      "rowIndex": 14,
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "errorType": "Pack Multiplier Confusion",
+      "wrongFields": ["quantity", "line_total"],
+      "verdict": "YES",
+      "confidence": "HIGH",
+      "reasoning": "Qty 2→1: YES — column shows 1; 1kg*2 is dual-pack metadata. Fresh extract corrected to qty=1. Line_total delta (€10.86 vs €10.38) may persist as price-column read issue, but primary pack-multiplier error is preventable."
+    },
+    {
+      "rowIndex": 15,
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "product": "Nui Lote 609 Data Exp. 20/07/2027 (phantom)",
+      "errorType": "Phantom Row; Lot Number Contamination",
+      "wrongFields": ["description", "quantity", "unit", "unit_price", "line_total"],
+      "verdict": "YES",
+      "confidence": "HIGH",
+      "reasoning": "Row absent from invoice (8 GT rows, geometry confirms 8). GPT fused lot 609 + Aceto 5l*2 cues. Proposed anti-phantom rules (reject Lote/Data Exp, no invented rows, one row per visible line) eliminate this row entirely."
+    }
+  ],
+  "summary": {
+    "totalRows": 15,
+    "YES": 4,
+    "NO": 7,
+    "UNCERTAIN": 4,
+    "byErrorType": {
+      "Pack Multiplier Confusion": { "total": 4, "YES": 3, "NO": 0, "UNCERTAIN": 1 },
+      "Column Shift": { "total": 3, "YES": 0, "NO": 0, "UNCERTAIN": 3 },
+      "Phantom Row": { "total": 1, "YES": 1, "NO": 0, "UNCERTAIN": 0 },
+      "Lot Number Contamination": { "total": 1, "YES": 1, "NO": 0, "UNCERTAIN": 0 },
+      "OCR Character Noise": { "total": 8, "YES": 0, "NO": 7, "UNCERTAIN": 1 }
+    },
+    "financialErrorsPrevented": "5/7 financially significant errors (pack multiplier + phantom) likely prevented; 2/7 column-shift errors uncertain; 0/8 OCR description errors prevented",
+    "promptDrivenFixRate": "67% of financial field errors per passc-prompt-audit counterfactual (8/12 field-level verdicts YES)"
+  },
+  "bidfoodNote": "Bidfood Portugal has zero errors in error-catalog.json — column-faithful prompt preserves all 11/11 correct rows (MO/EM units, column qty). No regression expected."
+}

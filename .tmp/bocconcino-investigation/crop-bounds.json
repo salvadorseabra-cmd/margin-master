@@ -1,0 +1,24 @@
+{
+  "fullImage": {
+    "width": 752,
+    "height": 1074
+  },
+  "bounds": {
+    "top": 561,
+    "bottom": 881,
+    "headerTop": 571,
+    "headerBottom": 607,
+    "totalsStart": 857,
+    "detected": true
+  },
+  "cropResult": {
+    "fallbackUsed": false,
+    "cropHeight": 320,
+    "cropTop": 561,
+    "cropBottom": 881,
+    "croppedSize": {
+      "width": 752,
+      "height": 320
+    }
+  }
+}

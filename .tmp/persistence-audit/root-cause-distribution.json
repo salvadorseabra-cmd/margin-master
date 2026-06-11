@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-06-11T00:00:00.000Z",
+  "total": 7,
+  "methodology": "First stage where value differs from ground truth; separate stale-DB flag when fresh extract-invoice ≠ DB",
+  "distribution": [
+    { "source": "GPT Extraction", "count": 7, "percent": 100 },
+    { "source": "normalizeItems", "count": 0, "percent": 0 },
+    { "source": "Reconcile", "count": 0, "percent": 0 },
+    { "source": "Persistence (active corruption)", "count": 0, "percent": 0 },
+    { "source": "Stale DB (no re-extract)", "count": 6, "percent": 85.71 },
+    { "source": "UI", "count": 0, "percent": 0 }
+  ],
+  "notes": "All GT deltas originate in GPT Pass C. Zero evidence of normalizeItems, reconcile, client insert, or UI altering qty/unit_price/total. Six of seven DB rows differ from fresh extract-invoice — stale snapshots from initial upload, not pipeline corruption."
+}

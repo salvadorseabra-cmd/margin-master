@@ -1,0 +1,93 @@
+{
+  "generated_at": "2026-06-10T23:56:09.492Z",
+  "cases": [
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati Prosciutto Cotto",
+      "gt": {
+        "qty": 4.3,
+        "unit": "kg",
+        "unit_price": 8.17,
+        "total": 35.14
+      },
+      "gpt": {
+        "qty": 4.3,
+        "unit": "kg",
+        "unit_price": 17.06,
+        "total": 36.54
+      },
+      "hypothesis": "Unit price column misread — GPT returned €17.06 vs GT €8.17; likely bleed from weight range '4-4,25KG' or adjacent numeric column (leading 8 dropped or qty column absorbed)",
+      "neighbouringBleed": true,
+      "passCSource": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "SanPellegrino Acqua 75cl x 15ud",
+      "gt": {
+        "qty": 2.56,
+        "unit": "cx",
+        "unit_price": 15.06,
+        "total": 38.56
+      },
+      "gpt": {
+        "qty": 2,
+        "unit": "cx",
+        "unit_price": 19.32,
+        "total": 38.65
+      },
+      "hypothesis": "Qty truncated 2.56→2; unit_price inflated 15.06→19.32 while line total ~preserved — classic column shift / wrong price column read",
+      "neighbouringBleed": true,
+      "passCSource": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json"
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "gt": {
+        "qty": 2,
+        "unit": "un",
+        "unit_price": 25,
+        "total": 50
+      },
+      "gptFresh": {
+        "qty": 2,
+        "unit": "un",
+        "unit_price": 20,
+        "total": 40
+      },
+      "gptPostfix": {
+        "qty": 6,
+        "unit": "un",
+        "unit_price": 20,
+        "total": 120
+      },
+      "hypothesis": "Postfix run: pack *6 → qty 6 (multiplier confusion). Fresh run: qty correct but unit_price €20 vs GT €25 — price column misread",
+      "neighbouringBleed": true,
+      "passCSource": ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-extract-invoice.json"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Baladin Ginger Beer 0.20cl",
+      "gt": {
+        "qty": 2,
+        "unit": "un",
+        "unit_price": 9.69,
+        "total": 19.38
+      },
+      "gptFresh": {
+        "qty": 24,
+        "unit": "un",
+        "unit_price": 0.85,
+        "total": 19.38
+      },
+      "gptDb": {
+        "qty": 2,
+        "unit": "cx",
+        "unit_price": 9.69,
+        "total": 19.38
+      },
+      "hypothesis": "Fresh Pass C reads 24-bottle pack as qty with per-bottle price; DB has unit cx conflation — arithmetic closure masks semantic error",
+      "neighbouringBleed": false,
+      "passCSource": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json"
+    }
+  ]
+}

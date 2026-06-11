@@ -1,0 +1,13 @@
+{
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "dbRowCount": 9,
+  "passCRawCount": 9,
+  "passCCount": 9,
+  "gptProducedOlio": true,
+  "phantomPassCRawName": "Olio Noc 609 Della O.P.",
+  "phantomPersistedName": "Olio Nuto 609 10lt",
+  "groundTruthSum": 376.5,
+  "passCSum": 390.35,
+  "invoiceTotal": 415.96,
+  "cropTop": 386
+}

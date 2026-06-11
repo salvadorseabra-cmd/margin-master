@@ -1,0 +1,47 @@
+{
+  "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "supplier": "Emporio Italia",
+  "live_db_row": {
+    "id": "0dbbc281-9384-493f-9f92-68786058a5b5",
+    "name": "Baladin - Ginger Beer 0.20cl",
+    "quantity": 2,
+    "unit": "cx",
+    "unit_price": 9.69,
+    "total": 19.38,
+    "ingredient_link": null
+  },
+  "before_pre_fix_baseline_24un": {
+    "parsed_volume_ml_per_unit": 2,
+    "usable_qty_total_ml": 48,
+    "eur_per_l_usable": 425,
+    "repair_executed_in_detectVolume": true,
+    "repair_decision": "warning-only"
+  },
+  "after_current_live_row": {
+    "parsed_volume_ml_per_unit": 2,
+    "usable_qty_costing_path_ml": 4,
+    "usable_qty_display_path_ml": null,
+    "eur_per_l_usable": null,
+    "eur_per_case_usable": 9.69,
+    "repair_executed_in_detectVolume": true,
+    "repair_decision": "warning-only",
+    "ui_shows_48ml_and_425_per_L": false,
+    "ui_card": {
+      "purchaseQuantityLine": "2 cases",
+      "purchasePriceLine": "€9.69 / case · €19.38 total",
+      "normalizedLine": null,
+      "usableCostLine": "€9.69 / case usable"
+    }
+  },
+  "after_simulated_sku_in_name_24un": {
+    "name": "BBB-GINGER33ITA Baladin - Ginger Beer 0.20cl",
+    "parsed_volume_ml_per_unit": 330,
+    "usable_qty_total_ml": 7920,
+    "eur_per_l_usable": 2.576,
+    "repair_executed_in_detectVolume": true,
+    "repair_decision": "repaired",
+    "repair_reason": "sku-clue-GINGER33"
+  },
+  "bug_disappeared": false,
+  "bug_disappeared_explanation": "Stored name lacks product code BBB-GINGER33ITA; repair only applies SKU clue when GINGER33 is present in the name string. Current cx row also masks absurd €/L in UI via isCaseRowWithEmbeddedPieceWeightOnly."
+}

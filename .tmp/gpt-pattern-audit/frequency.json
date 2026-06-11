@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-06-10T23:56:09.492Z",
+  "frequencies": [
+    {
+      "errorType": "OCR Character Noise",
+      "count": 8
+    },
+    {
+      "errorType": "Pack Multiplier Confusion",
+      "count": 4
+    },
+    {
+      "errorType": "Column Shift",
+      "count": 3
+    },
+    {
+      "errorType": "Phantom Row",
+      "count": 1
+    },
+    {
+      "errorType": "Lot Number Contamination",
+      "count": 1
+    }
+  ],
+  "totalClassifications": 17
+}

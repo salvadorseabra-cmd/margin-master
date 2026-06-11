@@ -1,0 +1,259 @@
+{
+  "generated_at": "2026-06-10T23:38:43.657Z",
+  "rows": [
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "label": "IL Bocconcino",
+      "key": "pomodor",
+      "extractInvoiceHandoff": {
+        "name": "POMODORO PELATI (CX 2,5KG*6)",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 20,
+        "total": 40
+      },
+      "clientNormalize": {
+        "name": "POMODORO PELATI (CX 2,5KG*6)",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 20,
+        "total": 40,
+        "id": "x"
+      },
+      "insertPayload": {
+        "name": "POMODORO PELATI (CX 2,5KG*6)",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 20,
+        "total": 40
+      },
+      "dbStored": {
+        "id": "54ee3963-ec47-4ea7-b96d-b6a2c6499a64",
+        "name": "POMODORINI pelati (CX 2.5KG*6)",
+        "quantity": 6,
+        "unit": "un",
+        "unit_price": 20,
+        "total": 120
+      },
+      "persistenceModifiedFields": "YES",
+      "dbStaleVsFreshExtract": "YES",
+      "dbCreatedAt": "2026-06-10T17:46:51.553519+00:00",
+      "note": "DB row differs from fresh extract-invoice handoff"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "label": "Mammafiore",
+      "key": "phantom-olio",
+      "extractInvoiceHandoff": null,
+      "clientNormalize": null,
+      "insertPayload": null,
+      "dbStored": {
+        "id": "536358c9-36d7-43da-bc8b-306f1b23e26b",
+        "name": "Olio Nuto 609 10lt",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 18.295,
+        "total": 18.3
+      },
+      "persistenceModifiedFields": "NO",
+      "dbStaleVsFreshExtract": "YES",
+      "dbCreatedAt": "2026-06-10T20:49:53.458608+00:00",
+      "note": "Numeric fields differ between fresh extract and DB — likely stale DB from earlier run"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "label": "Mammafiore",
+      "key": "aceto",
+      "extractInvoiceHandoff": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 18.295,
+        "total": 15.9
+      },
+      "clientNormalize": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 18.295,
+        "total": 15.9,
+        "id": "x"
+      },
+      "insertPayload": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 18.295,
+        "total": 15.9
+      },
+      "dbStored": {
+        "id": "9e2ce10f-4661-4ec0-9bbb-5a6543d1e6e8",
+        "name": "Aceto balsamico di modena IGP pet 5lt*2 Toschi",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 18.929,
+        "total": 15.09
+      },
+      "persistenceModifiedFields": "YES",
+      "dbStaleVsFreshExtract": "YES",
+      "dbCreatedAt": "2026-06-10T20:49:53.458608+00:00",
+      "note": "DB row differs from fresh extract-invoice handoff"
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "label": "Mammafiore",
+      "key": "rulo",
+      "extractInvoiceHandoff": {
+        "name": "Rub Di Capra 1kg *2 Simonetta",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 15.192,
+        "total": 10.38
+      },
+      "clientNormalize": {
+        "name": "Rub Di Capra 1kg *2 Simonetta",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 15.192,
+        "total": 10.38,
+        "id": "x"
+      },
+      "insertPayload": {
+        "name": "Rub Di Capra 1kg *2 Simonetta",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 15.192,
+        "total": 10.38
+      },
+      "dbStored": {
+        "id": "9321aae3-fd0f-4903-a76d-ec2d556f3e33",
+        "name": "Rub Di Capra 1kg *2 Simonetta",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 15.192,
+        "total": 10.38
+      },
+      "persistenceModifiedFields": "YES",
+      "dbStaleVsFreshExtract": "YES",
+      "dbCreatedAt": "2026-06-10T20:49:53.458608+00:00",
+      "note": "DB row differs from fresh extract-invoice handoff"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "label": "Emporio Italia",
+      "key": "prosciutto",
+      "extractInvoiceHandoff": {
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4.4~4.25Kg",
+        "quantity": 4.3,
+        "unit": "kg",
+        "unit_price": 17.06,
+        "total": 36.54
+      },
+      "clientNormalize": {
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4.4~4.25Kg",
+        "quantity": 4.3,
+        "unit": "kg",
+        "unit_price": 17.06,
+        "total": 36.54,
+        "id": "x"
+      },
+      "insertPayload": {
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4.4~4.25Kg",
+        "quantity": 4.3,
+        "unit": "kg",
+        "unit_price": 17.06,
+        "total": 36.54
+      },
+      "dbStored": {
+        "id": "11d68d4d-f70c-4511-a997-c67b94f573c5",
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg",
+        "quantity": 4.3,
+        "unit": "kg",
+        "unit_price": 17,
+        "total": 36.54
+      },
+      "persistenceModifiedFields": "YES",
+      "dbStaleVsFreshExtract": "YES",
+      "dbCreatedAt": "2026-06-10T18:27:04.40172+00:00",
+      "note": "DB row differs from fresh extract-invoice handoff"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "label": "Emporio Italia",
+      "key": "pellegrino",
+      "extractInvoiceHandoff": {
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 19.32,
+        "total": 38.65
+      },
+      "clientNormalize": {
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 19.32,
+        "total": 38.65,
+        "id": "x"
+      },
+      "insertPayload": {
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 19.32,
+        "total": 38.65
+      },
+      "dbStored": {
+        "id": "2ff0d9a7-4b09-4956-bb4f-85e3d2268587",
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 19.3,
+        "total": 38.56
+      },
+      "persistenceModifiedFields": "YES",
+      "dbStaleVsFreshExtract": "YES",
+      "dbCreatedAt": "2026-06-10T18:27:04.40172+00:00",
+      "note": "DB row differs from fresh extract-invoice handoff"
+    },
+    {
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "label": "Emporio Italia",
+      "key": "ginger-beer",
+      "extractInvoiceHandoff": {
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 0.85,
+        "total": 19.38
+      },
+      "clientNormalize": {
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 0.85,
+        "total": 19.38,
+        "id": "x"
+      },
+      "insertPayload": {
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 0.85,
+        "total": 19.38
+      },
+      "dbStored": {
+        "id": "0dbbc281-9384-493f-9f92-68786058a5b5",
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 9.69,
+        "total": 19.38
+      },
+      "persistenceModifiedFields": "YES",
+      "dbStaleVsFreshExtract": "YES",
+      "dbCreatedAt": "2026-06-10T18:27:04.40172+00:00",
+      "note": "DB row differs from fresh extract-invoice handoff"
+    }
+  ]
+}

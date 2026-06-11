@@ -1,0 +1,12 @@
+{
+  "id": "920fa990-36e5-48d3-82ce-a4499882e30e",
+  "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+  "name": "Baladin - Ginger Beer 0.20cl",
+  "quantity": 24,
+  "unit": "un",
+  "unit_price": 0.85,
+  "total": 19.38,
+  "created_at": "2026-06-10T18:27:15.828822+00:00",
+  "updated_at": "2026-06-10T18:27:15.828822+00:00"
+}

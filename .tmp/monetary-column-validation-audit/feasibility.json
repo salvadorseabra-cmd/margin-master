@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-06-11T01:39:40.954Z",
+  "canReduceMonetaryColumnFamily": "MEDIUM",
+  "confidence": "MEDIUM",
+  "rationale": [
+    "Combined rules detect 9/12 historical error runs as YES, 2 PARTIAL, 1 NO",
+    "Rule B catches discount-as-price (Pomodor €20) but needs discount % visible to validator",
+    "Rule A alone unusable — 57% false positive rate on correct discount rows",
+    "Post-Pass C validator lacks column candidates unless second parse pass added",
+    "Prosciutto €8.17 unit + €36.54 total passes all rules — indistinguishable from correct without GT"
+  ],
+  "blockers": [
+    "Validator only sees GPT output triple — not which column was read",
+    "Discounted lines legitimately fail Rule A",
+    "Correct extractions can match wrong column arithmetic (Pomodor 2×20=40)"
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "queryError": null,
+  "invoice": {
+    "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "supplier_name": "Bidfood Portugal",
+    "total": 292.7,
+    "invoice_date": "2026-05-25",
+    "file_url": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781044599758-Screenshot_2026-06-07_at_21.04.40.png",
+    "created_at": "2026-06-09T22:36:41.424691+00:00",
+    "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5"
+  },
+  "itemsCount": 11,
+  "itemsSum": 170.57,
+  "items": [
+    {
+      "id": "151bd05f-e577-4307-800a-33acb26958ea",
+      "name": "Manteiga Coimbra s/ sal EMB 1 Kg",
+      "quantity": 8,
+      "unit": "kg",
+      "unit_price": 8.9,
+      "total": 71.2
+    },
+    {
+      "id": "4d54ccb0-925b-46b3-a4c8-dd36562b2d89",
+      "name": "Ovo MORENO Classe M Cx. 1.5 dúzias (CARTÃO)",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 38.44,
+      "total": 38.44
+    },
+    {
+      "id": "8c6a590e-e491-4d7e-ac6a-3e40096d561f",
+      "name": "Tomilho",
+      "quantity": 1,
+      "unit": "mo",
+      "unit_price": 2.06,
+      "total": 2.06
+    },
+    {
+      "id": "ba765a55-f37a-46ed-b91f-18301839cc73",
+      "name": "Salada Ibérica FSTK EMB. 250g",
+      "quantity": 4,
+      "unit": "em",
+      "unit_price": 2.33,
+      "total": 8.76
+    },
+    {
+      "id": "64ab6170-3de4-4122-950e-9a090dfccceb",
+      "name": "Manjericão",
+      "quantity": 5,
+      "unit": "mo",
+      "unit_price": 2.06,
+      "total": 10.28
+    },
+    {
+      "id": "34820856-64e9-4e64-b5b2-b2d3ac4e2fff",
+      "name": "Hortelã",
+      "quantity": 0.5,
+      "unit": "kg",
+      "unit_price": 6.74,
+      "total": 2.7
+    },
+    {
+      "id": "52e14fd1-ee3f-4682-8d9c-c96189e8ecd1",
+      "name": "Pepino",
+      "quantity": 3.36,
+      "unit": "kg",
+      "unit_price": 1.77,
+      "total": 4.76
+    },
+    {
+      "id": "017dc610-eafe-4ce1-b481-d7bb4fd72947",
+      "name": "Pêra Abacate Hasse",
+      "quantity": 3.28,
+      "unit": "kg",
+      "unit_price": 5.32,
+      "total": 13.96
+    },
+    {
+      "id": "d8a789ec-02f4-452e-a5d9-235cada718f0",
+      "name": "Courgettes",
+      "quantity": 3.3,
+      "unit": "kg",
+      "unit_price": 1.95,
+      "total": 5.15
+    },
+    {
+      "id": "99568fda-9d82-40a3-8e31-06d676911b71",
+      "name": "Alho Francês",
+      "quantity": 5.42,
+      "unit": "kg",
+      "unit_price": 1.77,
+      "total": 7.67
+    },
+    {
+      "id": "5ec3c999-9c13-4f49-a039-2b8cad7e0a00",
+      "name": "Abóbora Butternut",
+      "quantity": 5.64,
+      "unit": "kg",
+      "unit_price": 1.24,
+      "total": 5.59
+    }
+  ]
+}

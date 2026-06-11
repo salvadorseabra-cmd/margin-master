@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-06-11T00:57:42.177Z",
+  "methodology": "Row-level counterfactual: fix 3 c33a7f1 regressions + retain all c33a7f1 improvements",
+  "metrics": {
+    "fieldAccuracy": {
+      "current": 91.87,
+      "refinedEstimate": 95.2
+    },
+    "quantityAccuracy": {
+      "current": 92.24,
+      "refinedEstimate": 98
+    },
+    "financialErrorEuro": {
+      "current": 92.35,
+      "refinedEstimate": 12.4,
+      "note": "€92.35 − €79.92 (Açúcar) ≈ €12.43 residual (Bocconcino POMODOR €10, Prosciutto €1.4, Aceto €1)"
+    },
+    "hallucinationRate": {
+      "current": 0,
+      "refinedEstimate": 0
+    }
+  },
+  "assumptions": [
+    "Hortelã fractional rule fixes qty field (no financial delta)",
+    "Açúcar column-isolation rule fixes €79.92 error with high confidence",
+    "Aceto discounted-line rule may reduce €1 drift (medium confidence)",
+    "Pre-existing Bocconcino/Emporio errors out of scope for this refinement"
+  ],
+  "confidence": "HIGH for Açúcar+Hortelã qty; MEDIUM for Aceto total"
+}

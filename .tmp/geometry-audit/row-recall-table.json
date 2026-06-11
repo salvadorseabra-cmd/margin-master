@@ -1,0 +1,50 @@
+[
+  {
+    "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+    "invoice": "Aviludo May",
+    "rowsExpected": 8,
+    "rowsExtracted": 8,
+    "rowRecall": 1,
+    "status": "PASS"
+  },
+  {
+    "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+    "invoice": "Aviludo April",
+    "rowsExpected": 9,
+    "rowsExtracted": 9,
+    "rowRecall": 1,
+    "status": "PASS"
+  },
+  {
+    "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "invoice": "Bidfood Portugal",
+    "rowsExpected": 11,
+    "rowsExtracted": 11,
+    "rowRecall": 1,
+    "status": "PASS"
+  },
+  {
+    "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+    "invoice": "IL Bocconcino",
+    "rowsExpected": 7,
+    "rowsExtracted": 7,
+    "rowRecall": 1,
+    "status": "PASS"
+  },
+  {
+    "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+    "invoice": "Emporio Italia",
+    "rowsExpected": 8,
+    "rowsExtracted": 8,
+    "rowRecall": 1,
+    "status": "PASS"
+  },
+  {
+    "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+    "invoice": "Mammafiore Portugal",
+    "rowsExpected": 8,
+    "rowsExtracted": 0,
+    "rowRecall": 0,
+    "status": "FAIL"
+  }
+]

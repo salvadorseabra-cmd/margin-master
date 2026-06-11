@@ -1,0 +1,265 @@
+[
+  {
+    "Invoice": "Bidfood",
+    "Product": "Tomilho",
+    "Outcome": "IMPROVED",
+    "RootCauses": [
+      "Stronger column-first rule"
+    ],
+    "Detail": "qty 1→1 (GT 1); total €2.06→€2.06 (GT €2.06)"
+  },
+  {
+    "Invoice": "Bidfood",
+    "Product": "Hortelã",
+    "Outcome": "REGRESSED",
+    "RootCauses": [
+      "Visual column reading failure",
+      "OCR limitation"
+    ],
+    "Detail": "qty 0.5→1 (GT 0.5); total €2.7→€2.7 (GT €2.7)"
+  },
+  {
+    "Invoice": "Aviludo May",
+    "Product": "Pepinos Extra Uli Frasco 6x720 g",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 1→1 (GT 1); total €22.49→€22.49 (GT €22.49)"
+  },
+  {
+    "Invoice": "Aviludo May",
+    "Product": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 2→2 (GT 2); total €13.1→€13.1 (GT €13.1)"
+  },
+  {
+    "Invoice": "Aviludo May",
+    "Product": "Açucar Branco METRO Chef 10x1 Kg",
+    "Outcome": "REGRESSED",
+    "RootCauses": [
+      "Visual column reading failure",
+      "OCR limitation"
+    ],
+    "Detail": "qty 1→9 (GT 1); total €9.99→€89.91 (GT €9.99)"
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Chocolate Pantagruel 10x200g",
+    "Outcome": "IMPROVED",
+    "RootCauses": [
+      "Stronger column-first rule"
+    ],
+    "Detail": "qty 2→2 (GT 2); total €29.19→€58.38 (GT €58.38)"
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+    "Outcome": "IMPROVED",
+    "RootCauses": [
+      "Stronger column-first rule"
+    ],
+    "Detail": "qty 2→2 (GT 2); total €6.29→€12.58 (GT €12.58)"
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Ovo Líquido Past.Gema Dovo 1kg",
+    "Outcome": "IMPROVED",
+    "RootCauses": [
+      "Stronger column-first rule"
+    ],
+    "Detail": "qty 6→6 (GT 6); total €10.19→€61.14 (GT €61.14)"
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Filete de Anchovas Alconfrisa Lt 495 g",
+    "Outcome": "IMPROVED",
+    "RootCauses": [
+      "Stronger column-first rule"
+    ],
+    "Detail": "qty 2→2 (GT 2); total €9.49→€18.98 (GT €18.98)"
+  },
+  {
+    "Invoice": "Aviludo April",
+    "Product": "Nata Reny Picot 22% 6x1L",
+    "Outcome": "IMPROVED",
+    "RootCauses": [
+      "Stronger column-first rule"
+    ],
+    "Detail": "qty 5→5 (GT 5); total €18.29→€91.45 (GT €91.45)"
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 24→24 (GT 24); total €50.2→€50.2 (GT €50.2)"
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 1.35→1.35 (GT 1.35); total €13.44→€13.44 (GT €13.44)"
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 4.3→4.3 (GT 4.3); total €36.54→€36.54 (GT €35.14)"
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 3.11→3.11 (GT 3.11); total €31.07→€31.07 (GT €31.07)"
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 2→2 (GT 2.56); total €38.65→€38.56 (GT €38.56)"
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+    "Outcome": "PARTIAL IMPROVEMENT",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 1.8→2.58 (GT 2.8); total €49.48→€49.48 (GT €49.48)"
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Baladin - Ginger Beer 0.20cl",
+    "Outcome": "IMPROVED",
+    "RootCauses": [
+      "Stronger column-first rule"
+    ],
+    "Detail": "qty 24→2 (GT 2); total €19.38→€19.38 (GT €19.38)"
+  },
+  {
+    "Invoice": "Emporio",
+    "Product": "Rovagnati - Salame Ventricina 2,5 Kg",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 2.6→2.6 (GT 2.6); total €39.49→€39.49 (GT €39.49)"
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 10→10 (GT 10); total €81.23→€81.23 (GT €81.23)"
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "STRACCIATELLA 250 GR",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 24→24 (GT 24); total €74.54→€74.54 (GT €74.54)"
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 1→1 (GT 1); total €27.3→€27.3 (GT €27.3)"
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "POMODOR PELATI (CX 2.5KG*6)",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 2→2 (GT 2); total €40→€40 (GT €50)"
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 2→2 (GT 2); total €42.07→€42.07 (GT €42.07)"
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "RICOTTA TREVIGIANA 1,5KG",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 1→1 (GT 1); total €7.97→€7.97 (GT €7.97)"
+  },
+  {
+    "Invoice": "Bocconcino",
+    "Product": "ROLO DE CABRA E VACA 1KG",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 1→1 (GT 1); total €12.71→€12.71 (GT €12.71)"
+  },
+  {
+    "Invoice": "Mammafiore",
+    "Product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+    "Outcome": "REGRESSED",
+    "RootCauses": [
+      "Visual column reading failure"
+    ],
+    "Detail": "qty 1→1 (GT 1); total €15.9→€15.09 (GT €16.09)"
+  },
+  {
+    "Invoice": "Mammafiore",
+    "Product": "Rulo Di Capra 1kg*2 Simonetta",
+    "Outcome": "IMPROVED",
+    "RootCauses": [
+      "Stronger column-first rule"
+    ],
+    "Detail": "qty 1→1 (GT 1); total €10.38→€10.83 (GT €10.86)"
+  },
+  {
+    "Invoice": "Mammafiore",
+    "Product": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+    "Outcome": "NO MATERIAL CHANGE",
+    "RootCauses": [
+      "OCR limitation"
+    ],
+    "Detail": "qty 1→1 (GT 1); total €30.11→€30.11 (GT €30.11)"
+  },
+  {
+    "Invoice": "Mammafiore",
+    "Product": "Nui Lote 609 Data Exp. 20/07/2027",
+    "Outcome": "IMPROVED",
+    "RootCauses": [
+      "Stronger column-first rule"
+    ],
+    "Detail": "Phantom row removed: \"Nui Lote 609 Data Exp. 20/07/2027\" (€15.9)"
+  }
+]

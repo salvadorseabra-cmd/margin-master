@@ -1,0 +1,205 @@
+{
+  "generated_at": "2026-06-11T00:52:43.017Z",
+  "rows": [
+    {
+      "Invoice": "Bidfood",
+      "Product": "Tomilho",
+      "GT": 2.06,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Bidfood",
+      "Product": "Hortelã",
+      "GT": 2.7,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Aviludo May",
+      "Product": "Pepinos Extra Uli Frasco 6x720 g",
+      "GT": 22.49,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Aviludo May",
+      "Product": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+      "GT": 13.1,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Aviludo May",
+      "Product": "Açucar Branco METRO Chef 10x1 Kg",
+      "GT": 9.99,
+      "OldDelta": 0,
+      "NewDelta": 79.92
+    },
+    {
+      "Invoice": "Aviludo April",
+      "Product": "Chocolate Pantagruel 10x200g",
+      "GT": 58.38,
+      "OldDelta": -29.19,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Aviludo April",
+      "Product": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+      "GT": 12.58,
+      "OldDelta": -6.29,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Aviludo April",
+      "Product": "Ovo Líquido Past.Gema Dovo 1kg",
+      "GT": 61.14,
+      "OldDelta": -50.95,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Aviludo April",
+      "Product": "Filete de Anchovas Alconfrisa Lt 495 g",
+      "GT": 18.98,
+      "OldDelta": -9.49,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Aviludo April",
+      "Product": "Nata Reny Picot 22% 6x1L",
+      "GT": 91.45,
+      "OldDelta": -73.16,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Emporio",
+      "Product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "GT": 50.2,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Emporio",
+      "Product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+      "GT": 13.44,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Emporio",
+      "Product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "GT": 35.14,
+      "OldDelta": 1.4,
+      "NewDelta": 1.4
+    },
+    {
+      "Invoice": "Emporio",
+      "Product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+      "GT": 31.07,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Emporio",
+      "Product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "GT": 38.56,
+      "OldDelta": 0.09,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Emporio",
+      "Product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+      "GT": 49.48,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Emporio",
+      "Product": "Baladin - Ginger Beer 0.20cl",
+      "GT": 19.38,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Emporio",
+      "Product": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "GT": 39.49,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Bocconcino",
+      "Product": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "GT": 81.23,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Bocconcino",
+      "Product": "STRACCIATELLA 250 GR",
+      "GT": 74.54,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Bocconcino",
+      "Product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "GT": 27.3,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Bocconcino",
+      "Product": "POMODOR PELATI (CX 2.5KG*6)",
+      "GT": 50,
+      "OldDelta": -10,
+      "NewDelta": -10
+    },
+    {
+      "Invoice": "Bocconcino",
+      "Product": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "GT": 42.07,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Bocconcino",
+      "Product": "RICOTTA TREVIGIANA 1,5KG",
+      "GT": 7.97,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Bocconcino",
+      "Product": "ROLO DE CABRA E VACA 1KG",
+      "GT": 12.71,
+      "OldDelta": 0,
+      "NewDelta": 0
+    },
+    {
+      "Invoice": "Mammafiore",
+      "Product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "GT": 16.09,
+      "OldDelta": -0.19,
+      "NewDelta": -1
+    },
+    {
+      "Invoice": "Mammafiore",
+      "Product": "Rulo Di Capra 1kg*2 Simonetta",
+      "GT": 10.86,
+      "OldDelta": -0.48,
+      "NewDelta": -0.03
+    },
+    {
+      "Invoice": "Mammafiore",
+      "Product": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+      "GT": 30.11,
+      "OldDelta": 0,
+      "NewDelta": 0
+    }
+  ],
+  "totalAbsoluteFinancialErrorBefore": 181.24,
+  "totalAbsoluteFinancialErrorAfter": 92.35,
+  "deltaEuro": -88.89,
+  "improved": true
+}

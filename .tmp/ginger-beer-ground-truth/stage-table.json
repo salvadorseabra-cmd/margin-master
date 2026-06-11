@@ -1,0 +1,69 @@
+{
+  "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "supplier": "Emporio Italia",
+  "vl_project": "bjhnlrgodcqoyzddbpbd",
+  "storage_path": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781116023680-Screenshot_2026-06-07_at_21.05.07.png",
+  "stages": {
+    "pdf_image_visible_text": {
+      "value": "Baladin - Ginger Beer 0.20cl",
+      "product_code": "BBB-GINGER33ITA",
+      "full_row": "BBB-GINGER33ITA | 30-06-2027 | Baladin - Ginger Beer 0.20cl | IVA23 | 24,00 | 0,85 € | 5.00 | 19,38 €",
+      "contains_0_20cl": true,
+      "evidence": [
+        ".tmp/ginger-beer-ground-truth/invoice-full.png",
+        ".tmp/ginger-beer-ground-truth/table-data-crop.png"
+      ]
+    },
+    "ocr_row_crop": {
+      "value": "Baladin - Ginger Beer 0.20cl (printed as 0,20cl with PT comma on close row crop)",
+      "contains_0_20cl": true,
+      "method": "manual transcription — no discrete OCR stage in pipeline; row-ocr-only.ts skipped (no local OPENAI_API_KEY)",
+      "evidence": [
+        ".tmp/ginger-beer-ground-truth/row-ocr-result.json",
+        ".tmp/ginger-beer-ground-truth/ginger-beer-row-crop.png"
+      ]
+    },
+    "gpt_json_pass_d": {
+      "value": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 24,
+      "unit": "un",
+      "unit_price": 0.85,
+      "total": 19.38,
+      "contains_0_20cl": true,
+      "source": "fresh re-invoke 2026-06-10",
+      "evidence": [
+        ".tmp/ginger-beer-ground-truth/extract-invoice-retry.json",
+        ".tmp/emporio-italia-investigation/extract-invoice-response.json"
+      ]
+    },
+    "normalizeItems": {
+      "value": "Baladin - Ginger Beer 0.20cl",
+      "contains_0_20cl": true,
+      "transform_applied": false,
+      "note": "normalizeItems() only coerces types; name string passed through unchanged",
+      "evidence": [
+        ".tmp/ginger-beer-ground-truth/normalize-items-output.json",
+        "supabase/functions/extract-invoice/invoice-table-extraction.ts lines 137-147"
+      ]
+    },
+    "invoice_items_name_db": {
+      "value": "Baladin - Ginger Beer 0.20cl",
+      "id": "0dbbc281-9384-493f-9f92-68786058a5b5",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 9.69,
+      "total": 19.38,
+      "contains_0_20cl": true,
+      "source": "live VL query 2026-06-10",
+      "evidence": [
+        ".tmp/ginger-beer-audit/db-record-live.json"
+      ]
+    }
+  },
+  "first_appearance": {
+    "stage": "pdf_image_visible_text",
+    "answer": "A",
+    "answer_label": "Source document contains 0.20cl",
+    "reasoning": "The printed Designação column on the Emporio Italia invoice (screenshot) explicitly shows 0.20cl before any extraction. GPT faithfully copies this text; normalizeItems() does not alter it."
+  }
+}

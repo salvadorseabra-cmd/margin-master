@@ -1,0 +1,118 @@
+{
+  "generated_at": "2026-06-11T00:00:00.000Z",
+  "scope": "VL corpus — 6 invoices, 51 aligned rows, 14 non-perfect-match rows, 7 financially significant error rows",
+  "methodology": "Cross-verified persistence-audit (Pass C origin 100%), gpt-pattern-audit (error taxonomy), field-accuracy-audit, hallucination-audit, mammafiore-line-audit, geometry-audit. Focus: prompt design contribution only.",
+  "contributions": {
+    "prompt_design": {
+      "percent": 50,
+      "range": "45-55",
+      "evidence": [
+        "infer-from-name rule (L33-34) directly maps to 4 pack-multiplier errors",
+        "pack-24-bottles examples (L53-67, L80-84) teach *N-as-qty pattern generalized to CX*N",
+        "extract-all (L29) + no anti-phantom guard enables Mammafiore 9th row",
+        "copy-exactly vs infer contradiction creates unpredictable field authority",
+        "no-arithmetic-closure allows Ginger Beer semantic error to pass"
+      ],
+      "errorsPrimarilyPromptDriven": [
+        "Bocconcino POMODOR qty 6",
+        "Mammafiore Aceto qty 2",
+        "Mammafiore Rulo qty 2",
+        "Emporio Ginger Beer qty/unit/price semantics",
+        "Mammafiore phantom Olio"
+      ]
+    },
+    "ocr": {
+      "percent": 28,
+      "range": "25-30",
+      "evidence": [
+        "GPT vision is sole OCR stage — no separate OCR pipeline",
+        "8 Aviludo May description-only character noise rows",
+        "Prosciutto 8.17→17.06 digit/column bleed",
+        "Pellegrino qty 2.56→2 decimal truncation",
+        "Bocconcino price 25→20 persists despite correct qty in fresh extract"
+      ],
+      "note": "OCR here means GPT vision column reading, not Tesseract"
+    },
+    "geometry": {
+      "percent": 7,
+      "range": "5-10",
+      "evidence": [
+        "5/6 invoices PASS geometry post-fix (geometry-audit)",
+        "Bocconcino qty=6 error occurred under postfix crop but qty=2 achievable post geometry fix — inference not geometry",
+        "Mammafiore phantom occurs AFTER geometry fix (crop top 386, 8/8 rows visible)",
+        "Historical Mammafiore 0/8 rows was geometry; not implicated in current error set"
+      ],
+      "note": "Geometry was prerequisite for extraction but not root cause of audited field errors"
+    },
+    "model_limitations": {
+      "percent": 15,
+      "range": "12-18",
+      "evidence": [
+        "Non-determinism: phantom label varies (Olio Noc / Nute / Nui Lote 609) across runs",
+        "Column alignment on dense Italian/Portuguese price grids",
+        "Aceto/Rulo: same prompt sometimes yields qty=1 (fresh) sometimes qty=2 (raw)",
+        "8↔9 digit confusion awareness (L121) ineffective on Prosciutto"
+      ]
+    }
+  },
+  "perErrorAttribution": [
+    {
+      "error": "Bocconcino POMODOR qty 2→6",
+      "prompt_design": 70,
+      "ocr": 10,
+      "geometry": 10,
+      "model_limitations": 10
+    },
+    {
+      "error": "Bocconcino POMODOR price 25→20",
+      "prompt_design": 15,
+      "ocr": 55,
+      "geometry": 5,
+      "model_limitations": 25
+    },
+    {
+      "error": "Mammafiore Aceto qty 1→2",
+      "prompt_design": 75,
+      "ocr": 5,
+      "geometry": 0,
+      "model_limitations": 20
+    },
+    {
+      "error": "Mammafiore Rulo qty 1→2",
+      "prompt_design": 75,
+      "ocr": 5,
+      "geometry": 0,
+      "model_limitations": 20
+    },
+    {
+      "error": "Mammafiore phantom Olio",
+      "prompt_design": 60,
+      "ocr": 5,
+      "geometry": 0,
+      "model_limitations": 35
+    },
+    {
+      "error": "Emporio Prosciutto price",
+      "prompt_design": 10,
+      "ocr": 50,
+      "geometry": 5,
+      "model_limitations": 35
+    },
+    {
+      "error": "Emporio Pellegrino qty/price",
+      "prompt_design": 10,
+      "ocr": 55,
+      "geometry": 5,
+      "model_limitations": 30
+    },
+    {
+      "error": "Emporio Ginger Beer",
+      "prompt_design": 80,
+      "ocr": 5,
+      "geometry": 0,
+      "model_limitations": 15
+    }
+  ],
+  "conclusion": "Prompt design is the largest single contributor (~50%) to VL extraction errors, specifically via infer-from-name pack notation rules and absent anti-phantom guards. OCR/vision column misreads account for ~28%. Geometry is largely resolved and contributes ~7% to residual errors. Model non-determinism adds ~15%.",
+  "highestRoiChangeArea": "Column-first extraction with pack-metadata disambiguation — read qty/unit_price/total strictly from visible columns; treat (CX 2.5KG*6), pet 5l*2, 1kg*2 as description metadata unless column qty is null AND pack notation matches retail bottle/case pattern with worked negative examples"
+}

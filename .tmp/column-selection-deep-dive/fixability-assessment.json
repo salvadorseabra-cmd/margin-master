@@ -1,0 +1,31 @@
+{
+  "generated_at": "2026-06-11T01:34:01.493Z",
+  "canErrorClassBeEliminated": {
+    "verdict": "MEDIUM confidence — theoretically yes, practically requires column anchoring beyond current vision-only Pass C",
+    "rationale": [
+      "Bocconcino crop contains sufficient discriminators (headers, EUR, %)",
+      "Emporio crop lacks headers; discount column lacks % — harder case",
+      "5-run variance shows model sometimes finds correct column (Prosciutto run 4: €8.17)",
+      "Prompt already mandates column-faithful extraction; violations persist"
+    ]
+  },
+  "enoughInfoInCrop": {
+    "bocconcino": {
+      "verdict": "YES",
+      "confidence": "HIGH",
+      "note": "Headers + EUR/% unambiguous"
+    },
+    "emporio": {
+      "verdict": "MARGINAL",
+      "confidence": "MEDIUM",
+      "note": "Headers clipped in geometry crop; discount lacks % symbol"
+    },
+    "overall": "MARGINAL — sufficient on Bocconcino, insufficient on Emporio without header inclusion"
+  },
+  "eliminationBlockers": [
+    "GPT does not reliably bind unit_price to column with EUR suffix",
+    "GPT treats plain decimal discount values as euro amounts",
+    "Emporio geometry crop may exclude header row",
+    "Prompt negative example for POMODOR uses qty=2/€25/€50 — mismatches visible row (qty=1/€27.56/€22.05)"
+  ]
+}

@@ -1,0 +1,642 @@
+[
+  {
+    "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+    "label": "Bocconcino",
+    "imagePath": ".tmp/bocconcino-investigation/invoice-full.png",
+    "imageWidth": 752,
+    "imageHeight": 1074,
+    "constants": {
+      "HEADER_BAND_ROWS": 18,
+      "TOP_MARGIN": 10,
+      "scanStartFraction": 0.12,
+      "scanEndFraction": 0.55,
+      "scanStart": 128,
+      "scanEnd": 590,
+      "bandThresholdDelta": 12,
+      "MIN_TABLE_HEIGHT": 170
+    },
+    "productionBounds": {
+      "top": 561,
+      "bottom": 881,
+      "headerTop": 571,
+      "headerBottom": 607,
+      "totalsStart": 857,
+      "detected": true
+    },
+    "expectedHeaderTop": 430,
+    "expectedCropTop": 420,
+    "detectedCropTop": 561,
+    "deltaHeaderPx": 141,
+    "deltaCropTopPx": 141,
+    "expectedBandAverage": 195.06,
+    "winnerBandAverage": 167.43,
+    "expectedBandRank": 204,
+    "topCandidates": [
+      {
+        "y": 571,
+        "bandAverage": 167.43,
+        "isWinner": true,
+        "rank": 1,
+        "deltaFromWinner": 0,
+        "atExpected": false
+      },
+      {
+        "y": 570,
+        "bandAverage": 167.85,
+        "isWinner": false,
+        "rank": 2,
+        "deltaFromWinner": 0.43,
+        "atExpected": false
+      },
+      {
+        "y": 569,
+        "bandAverage": 168.99,
+        "isWinner": false,
+        "rank": 3,
+        "deltaFromWinner": 1.57,
+        "atExpected": false
+      },
+      {
+        "y": 568,
+        "bandAverage": 170.12,
+        "isWinner": false,
+        "rank": 4,
+        "deltaFromWinner": 2.7,
+        "atExpected": false
+      },
+      {
+        "y": 567,
+        "bandAverage": 171.44,
+        "isWinner": false,
+        "rank": 5,
+        "deltaFromWinner": 4.01,
+        "atExpected": false
+      },
+      {
+        "y": 547,
+        "bandAverage": 172.53,
+        "isWinner": false,
+        "rank": 6,
+        "deltaFromWinner": 5.1,
+        "atExpected": false
+      },
+      {
+        "y": 548,
+        "bandAverage": 172.67,
+        "isWinner": false,
+        "rank": 7,
+        "deltaFromWinner": 5.24,
+        "atExpected": false
+      },
+      {
+        "y": 546,
+        "bandAverage": 172.76,
+        "isWinner": false,
+        "rank": 8,
+        "deltaFromWinner": 5.34,
+        "atExpected": false
+      },
+      {
+        "y": 566,
+        "bandAverage": 172.77,
+        "isWinner": false,
+        "rank": 9,
+        "deltaFromWinner": 5.34,
+        "atExpected": false
+      },
+      {
+        "y": 545,
+        "bandAverage": 173,
+        "isWinner": false,
+        "rank": 10,
+        "deltaFromWinner": 5.57,
+        "atExpected": false
+      },
+      {
+        "y": 549,
+        "bandAverage": 173.13,
+        "isWinner": false,
+        "rank": 11,
+        "deltaFromWinner": 5.7,
+        "atExpected": false
+      },
+      {
+        "y": 544,
+        "bandAverage": 173.51,
+        "isWinner": false,
+        "rank": 12,
+        "deltaFromWinner": 6.08,
+        "atExpected": false
+      },
+      {
+        "y": 565,
+        "bandAverage": 173.91,
+        "isWinner": false,
+        "rank": 13,
+        "deltaFromWinner": 6.48,
+        "atExpected": false
+      },
+      {
+        "y": 550,
+        "bandAverage": 174.01,
+        "isWinner": false,
+        "rank": 14,
+        "deltaFromWinner": 6.59,
+        "atExpected": false
+      },
+      {
+        "y": 543,
+        "bandAverage": 174.26,
+        "isWinner": false,
+        "rank": 15,
+        "deltaFromWinner": 6.83,
+        "atExpected": false
+      }
+    ],
+    "allCandidatesPath": "/Users/salvadorseabra1/margin-master/.tmp/table-bounds-investigation/bocconcino-candidates.json",
+    "overlayPath": "/Users/salvadorseabra1/margin-master/.tmp/table-bounds-investigation/bocconcino-overlay.png",
+    "heuristicExplanation": "Global minimum 18-row mean luminance in scan band [12%,55%] = y=571 (avg=167.43). True grey header at y≈430 has avg=195.06 (rank #204, +27.64 vs winner). Band at y=571 spans Stracciatella metadata / inter-row gap — darker than column header because multi-line product rows + QR/certification blocks above leave the real header band lighter. cropTop = headerTop - 10 = 561 cuts between Stracciatella and Mezzi Paccheri.",
+    "rowsLost": true,
+    "expectedRows": 7
+  },
+  {
+    "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "label": "Bidfood",
+    "imagePath": ".tmp/bidfood-ovo.png",
+    "imageWidth": 920,
+    "imageHeight": 1272,
+    "constants": {
+      "HEADER_BAND_ROWS": 18,
+      "TOP_MARGIN": 10,
+      "scanStartFraction": 0.12,
+      "scanEndFraction": 0.55,
+      "scanStart": 152,
+      "scanEnd": 699,
+      "bandThresholdDelta": 12,
+      "MIN_TABLE_HEIGHT": 170
+    },
+    "productionBounds": {
+      "top": 437,
+      "bottom": 1005,
+      "headerTop": 447,
+      "headerBottom": 465,
+      "totalsStart": 799,
+      "detected": true
+    },
+    "expectedHeaderTop": 280,
+    "expectedCropTop": 270,
+    "detectedCropTop": 437,
+    "deltaHeaderPx": 167,
+    "deltaCropTopPx": 167,
+    "expectedBandAverage": 216.88,
+    "winnerBandAverage": 155.74,
+    "expectedBandRank": 439,
+    "topCandidates": [
+      {
+        "y": 447,
+        "bandAverage": 155.74,
+        "isWinner": true,
+        "rank": 1,
+        "deltaFromWinner": 0,
+        "atExpected": false
+      },
+      {
+        "y": 448,
+        "bandAverage": 156.07,
+        "isWinner": false,
+        "rank": 2,
+        "deltaFromWinner": 0.33,
+        "atExpected": false
+      },
+      {
+        "y": 446,
+        "bandAverage": 156.32,
+        "isWinner": false,
+        "rank": 3,
+        "deltaFromWinner": 0.59,
+        "atExpected": false
+      },
+      {
+        "y": 449,
+        "bandAverage": 156.86,
+        "isWinner": false,
+        "rank": 4,
+        "deltaFromWinner": 1.12,
+        "atExpected": false
+      },
+      {
+        "y": 445,
+        "bandAverage": 157.86,
+        "isWinner": false,
+        "rank": 5,
+        "deltaFromWinner": 2.13,
+        "atExpected": false
+      },
+      {
+        "y": 450,
+        "bandAverage": 158.13,
+        "isWinner": false,
+        "rank": 6,
+        "deltaFromWinner": 2.39,
+        "atExpected": false
+      },
+      {
+        "y": 444,
+        "bandAverage": 159.31,
+        "isWinner": false,
+        "rank": 7,
+        "deltaFromWinner": 3.57,
+        "atExpected": false
+      },
+      {
+        "y": 451,
+        "bandAverage": 160.32,
+        "isWinner": false,
+        "rank": 8,
+        "deltaFromWinner": 4.59,
+        "atExpected": false
+      },
+      {
+        "y": 443,
+        "bandAverage": 161.11,
+        "isWinner": false,
+        "rank": 9,
+        "deltaFromWinner": 5.37,
+        "atExpected": false
+      },
+      {
+        "y": 452,
+        "bandAverage": 163.68,
+        "isWinner": false,
+        "rank": 10,
+        "deltaFromWinner": 7.94,
+        "atExpected": false
+      },
+      {
+        "y": 442,
+        "bandAverage": 163.7,
+        "isWinner": false,
+        "rank": 11,
+        "deltaFromWinner": 7.96,
+        "atExpected": false
+      },
+      {
+        "y": 453,
+        "bandAverage": 165.66,
+        "isWinner": false,
+        "rank": 12,
+        "deltaFromWinner": 9.92,
+        "atExpected": false
+      },
+      {
+        "y": 441,
+        "bandAverage": 166.41,
+        "isWinner": false,
+        "rank": 13,
+        "deltaFromWinner": 10.67,
+        "atExpected": false
+      },
+      {
+        "y": 454,
+        "bandAverage": 167.35,
+        "isWinner": false,
+        "rank": 14,
+        "deltaFromWinner": 11.61,
+        "atExpected": false
+      },
+      {
+        "y": 534,
+        "bandAverage": 167.53,
+        "isWinner": false,
+        "rank": 15,
+        "deltaFromWinner": 11.79,
+        "atExpected": false
+      }
+    ],
+    "allCandidatesPath": "/Users/salvadorseabra1/margin-master/.tmp/table-bounds-investigation/bidfood-candidates.json",
+    "overlayPath": "/Users/salvadorseabra1/margin-master/.tmp/table-bounds-investigation/bidfood-overlay.png",
+    "heuristicExplanation": "Detected y=447 (rank #1, avg=155.74); expected y=280 is rank #439 (avg=216.88).",
+    "rowsLost": null,
+    "expectedRows": null
+  },
+  {
+    "id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+    "label": "Aviludo May",
+    "imagePath": ".tmp/aviludo-investigation/reference_3b4cb21f_scan.png",
+    "imageWidth": 742,
+    "imageHeight": 938,
+    "constants": {
+      "HEADER_BAND_ROWS": 18,
+      "TOP_MARGIN": 10,
+      "scanStartFraction": 0.12,
+      "scanEndFraction": 0.55,
+      "scanStart": 112,
+      "scanEnd": 515,
+      "bandThresholdDelta": 12,
+      "MIN_TABLE_HEIGHT": 170
+    },
+    "productionBounds": {
+      "top": 218,
+      "bottom": 448,
+      "headerTop": 228,
+      "headerBottom": 247,
+      "totalsStart": 424,
+      "detected": true
+    },
+    "expectedHeaderTop": 228,
+    "expectedCropTop": 218,
+    "detectedCropTop": 218,
+    "deltaHeaderPx": 0,
+    "deltaCropTopPx": 0,
+    "expectedBandAverage": 160.67,
+    "winnerBandAverage": 160.67,
+    "expectedBandRank": 1,
+    "topCandidates": [
+      {
+        "y": 228,
+        "bandAverage": 160.67,
+        "isWinner": true,
+        "rank": 1,
+        "deltaFromWinner": 0,
+        "atExpected": true
+      },
+      {
+        "y": 229,
+        "bandAverage": 160.67,
+        "isWinner": false,
+        "rank": 2,
+        "deltaFromWinner": 0,
+        "atExpected": true
+      },
+      {
+        "y": 230,
+        "bandAverage": 160.95,
+        "isWinner": false,
+        "rank": 3,
+        "deltaFromWinner": 0.29,
+        "atExpected": true
+      },
+      {
+        "y": 227,
+        "bandAverage": 161.09,
+        "isWinner": false,
+        "rank": 4,
+        "deltaFromWinner": 0.42,
+        "atExpected": true
+      },
+      {
+        "y": 231,
+        "bandAverage": 161.42,
+        "isWinner": false,
+        "rank": 5,
+        "deltaFromWinner": 0.75,
+        "atExpected": false
+      },
+      {
+        "y": 226,
+        "bandAverage": 161.96,
+        "isWinner": false,
+        "rank": 6,
+        "deltaFromWinner": 1.29,
+        "atExpected": true
+      },
+      {
+        "y": 232,
+        "bandAverage": 162.26,
+        "isWinner": false,
+        "rank": 7,
+        "deltaFromWinner": 1.59,
+        "atExpected": false
+      },
+      {
+        "y": 225,
+        "bandAverage": 163.13,
+        "isWinner": false,
+        "rank": 8,
+        "deltaFromWinner": 2.47,
+        "atExpected": false
+      },
+      {
+        "y": 233,
+        "bandAverage": 163.37,
+        "isWinner": false,
+        "rank": 9,
+        "deltaFromWinner": 2.7,
+        "atExpected": false
+      },
+      {
+        "y": 224,
+        "bandAverage": 164.59,
+        "isWinner": false,
+        "rank": 10,
+        "deltaFromWinner": 3.93,
+        "atExpected": false
+      },
+      {
+        "y": 234,
+        "bandAverage": 164.84,
+        "isWinner": false,
+        "rank": 11,
+        "deltaFromWinner": 4.18,
+        "atExpected": false
+      },
+      {
+        "y": 223,
+        "bandAverage": 166.46,
+        "isWinner": false,
+        "rank": 12,
+        "deltaFromWinner": 5.79,
+        "atExpected": false
+      },
+      {
+        "y": 235,
+        "bandAverage": 166.53,
+        "isWinner": false,
+        "rank": 13,
+        "deltaFromWinner": 5.86,
+        "atExpected": false
+      },
+      {
+        "y": 236,
+        "bandAverage": 168.39,
+        "isWinner": false,
+        "rank": 14,
+        "deltaFromWinner": 7.72,
+        "atExpected": false
+      },
+      {
+        "y": 222,
+        "bandAverage": 168.57,
+        "isWinner": false,
+        "rank": 15,
+        "deltaFromWinner": 7.9,
+        "atExpected": false
+      }
+    ],
+    "allCandidatesPath": "/Users/salvadorseabra1/margin-master/.tmp/table-bounds-investigation/aviludo-may-candidates.json",
+    "overlayPath": "/Users/salvadorseabra1/margin-master/.tmp/table-bounds-investigation/aviludo-may-overlay.png",
+    "heuristicExplanation": "Expected header at y=228 is the global minimum grey band (rank #1). Detection correct.",
+    "rowsLost": false,
+    "expectedRows": 8
+  },
+  {
+    "id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+    "label": "Aviludo April",
+    "imagePath": ".tmp/aviludo-investigation/Aviludo_Historico_2026_04_with_total.pdf.png",
+    "imageWidth": 848,
+    "imageHeight": 1200,
+    "constants": {
+      "HEADER_BAND_ROWS": 18,
+      "TOP_MARGIN": 10,
+      "scanStartFraction": 0.12,
+      "scanEndFraction": 0.55,
+      "scanStart": 144,
+      "scanEnd": 660,
+      "bandThresholdDelta": 12,
+      "MIN_TABLE_HEIGHT": 170
+    },
+    "productionBounds": {
+      "top": 184,
+      "bottom": 439,
+      "headerTop": 194,
+      "headerBottom": 212,
+      "totalsStart": 415,
+      "detected": true
+    },
+    "expectedHeaderTop": 228,
+    "expectedCropTop": 218,
+    "detectedCropTop": 184,
+    "deltaHeaderPx": -34,
+    "deltaCropTopPx": -34,
+    "expectedBandAverage": 234.66,
+    "winnerBandAverage": 203.95,
+    "expectedBandRank": 124,
+    "topCandidates": [
+      {
+        "y": 194,
+        "bandAverage": 203.95,
+        "isWinner": true,
+        "rank": 1,
+        "deltaFromWinner": 0,
+        "atExpected": false
+      },
+      {
+        "y": 195,
+        "bandAverage": 205.75,
+        "isWinner": false,
+        "rank": 2,
+        "deltaFromWinner": 1.8,
+        "atExpected": false
+      },
+      {
+        "y": 185,
+        "bandAverage": 207.38,
+        "isWinner": false,
+        "rank": 3,
+        "deltaFromWinner": 3.43,
+        "atExpected": false
+      },
+      {
+        "y": 184,
+        "bandAverage": 207.52,
+        "isWinner": false,
+        "rank": 4,
+        "deltaFromWinner": 3.58,
+        "atExpected": false
+      },
+      {
+        "y": 196,
+        "bandAverage": 207.88,
+        "isWinner": false,
+        "rank": 5,
+        "deltaFromWinner": 3.94,
+        "atExpected": false
+      },
+      {
+        "y": 197,
+        "bandAverage": 209.84,
+        "isWinner": false,
+        "rank": 6,
+        "deltaFromWinner": 5.89,
+        "atExpected": false
+      },
+      {
+        "y": 183,
+        "bandAverage": 209.92,
+        "isWinner": false,
+        "rank": 7,
+        "deltaFromWinner": 5.97,
+        "atExpected": false
+      },
+      {
+        "y": 193,
+        "bandAverage": 211.11,
+        "isWinner": false,
+        "rank": 8,
+        "deltaFromWinner": 7.16,
+        "atExpected": false
+      },
+      {
+        "y": 198,
+        "bandAverage": 212.07,
+        "isWinner": false,
+        "rank": 9,
+        "deltaFromWinner": 8.13,
+        "atExpected": false
+      },
+      {
+        "y": 182,
+        "bandAverage": 212.42,
+        "isWinner": false,
+        "rank": 10,
+        "deltaFromWinner": 8.47,
+        "atExpected": false
+      },
+      {
+        "y": 199,
+        "bandAverage": 214.71,
+        "isWinner": false,
+        "rank": 11,
+        "deltaFromWinner": 10.77,
+        "atExpected": false
+      },
+      {
+        "y": 186,
+        "bandAverage": 214.91,
+        "isWinner": false,
+        "rank": 12,
+        "deltaFromWinner": 10.96,
+        "atExpected": false
+      },
+      {
+        "y": 181,
+        "bandAverage": 215.03,
+        "isWinner": false,
+        "rank": 13,
+        "deltaFromWinner": 11.08,
+        "atExpected": false
+      },
+      {
+        "y": 190,
+        "bandAverage": 215.54,
+        "isWinner": false,
+        "rank": 16,
+        "deltaFromWinner": 11.6,
+        "atExpected": false
+      },
+      {
+        "y": 191,
+        "bandAverage": 215.54,
+        "isWinner": false,
+        "rank": 14,
+        "deltaFromWinner": 11.59,
+        "atExpected": false
+      }
+    ],
+    "allCandidatesPath": "/Users/salvadorseabra1/margin-master/.tmp/table-bounds-investigation/aviludo-april-candidates.json",
+    "overlayPath": "/Users/salvadorseabra1/margin-master/.tmp/table-bounds-investigation/aviludo-april-overlay.png",
+    "heuristicExplanation": "Detected y=194 (rank #1, avg=203.95); expected y=228 is rank #124 (avg=234.66).",
+    "rowsLost": null,
+    "expectedRows": 9
+  }
+]

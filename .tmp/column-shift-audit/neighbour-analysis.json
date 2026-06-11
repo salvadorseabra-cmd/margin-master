@@ -1,0 +1,77 @@
+{
+  "generated_at": "2026-06-11T01:30:00.000Z",
+  "table": [
+    {
+      "product": "Prosciutto Cotto",
+      "wrongField": "unit_price",
+      "wrongValue": 17,
+      "run": "5-run audit #3",
+      "sourceColumn": "Desc.(%)",
+      "sourceValueOnInvoice": "17,50",
+      "evidence": "Exact neighbour: discount % read as unit price"
+    },
+    {
+      "product": "Prosciutto Cotto",
+      "wrongField": "unit_price",
+      "wrongValue": 10.17,
+      "run": "5-run audit #1",
+      "sourceColumn": "Preço Unit.",
+      "sourceValueOnInvoice": "10,30 €",
+      "evidence": "Gross list price with OCR digit drift (10.30→10.17)"
+    },
+    {
+      "product": "Prosciutto Cotto",
+      "wrongField": "unit_price",
+      "wrongValue": 8.17,
+      "run": "5-run audit #4",
+      "sourceColumn": "Preço Unit. (net after discount)",
+      "sourceValueOnInvoice": "8,17 (VL GT net)",
+      "evidence": "CORRECT run — matches VL ground-truth net unit"
+    },
+    {
+      "product": "Prosciutto Cotto",
+      "wrongField": "total",
+      "wrongValue": 36.54,
+      "run": "runs 1,3,4,5",
+      "sourceColumn": "Preço Total",
+      "sourceValueOnInvoice": "36,54 €",
+      "evidence": "Matches visible invoice total; VL GT €35.14 is €1.40 lower"
+    },
+    {
+      "product": "POMODOR PELATI",
+      "wrongField": "unit_price",
+      "wrongValue": 20,
+      "run": "5-run audit #1; passc-refinement-validation",
+      "sourceColumn": "DESC (discount %)",
+      "sourceValueOnInvoice": "20,00%",
+      "evidence": "Discount % stripped to numeric 20 used as euro price"
+    },
+    {
+      "product": "POMODOR PELATI",
+      "wrongField": "unit_price",
+      "wrongValue": 27.56,
+      "run": "5-run audit #2,4,5",
+      "sourceColumn": "P.VENDA S/IVA",
+      "sourceValueOnInvoice": "27,560 EUR",
+      "evidence": "Reads list price but ignores 20% discount"
+    },
+    {
+      "product": "POMODOR PELATI",
+      "wrongField": "total",
+      "wrongValue": 40,
+      "run": "5-run audit #1,3",
+      "sourceColumn": "calculated (qty×shifted price)",
+      "sourceValueOnInvoice": "2 × 20 = 40",
+      "evidence": "Derived from discount-as-price, not VALOR LÍQUIDO 22,05"
+    },
+    {
+      "product": "POMODOR PELATI",
+      "wrongField": "total",
+      "wrongValue": 20.02,
+      "run": "5-run audit #5",
+      "sourceColumn": "DESC / partial column bleed",
+      "sourceValueOnInvoice": "20,00%",
+      "evidence": "Total collapses to discount-column magnitude"
+    }
+  ]
+}

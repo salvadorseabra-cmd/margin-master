@@ -1,0 +1,47 @@
+{
+  "fullImage": {
+    "w": 742,
+    "h": 1184
+  },
+  "bounds": {
+    "top": 622,
+    "bottom": 890,
+    "headerTop": 632,
+    "headerBottom": 668,
+    "totalsStart": 866,
+    "detected": true
+  },
+  "cropResult": {
+    "fallbackUsed": false,
+    "cropHeight": 268,
+    "cropTop": 622,
+    "cropBottom": 890
+  },
+  "headerDiagnostic": {
+    "imageSize": {
+      "w": 742,
+      "h": 1184
+    },
+    "scanRange": {
+      "scanStart": 142,
+      "scanEnd": 651
+    },
+    "whiteHeaderSearchStart": 449,
+    "greyDetection": {
+      "darkestHeaderTop": 632,
+      "bestBandAverage": 176.51,
+      "triggersWhitePath": true
+    },
+    "rulesInWhiteSearchZone": [],
+    "productionBounds": {
+      "top": 622,
+      "bottom": 890,
+      "headerTop": 632,
+      "headerBottom": 668,
+      "totalsStart": 866,
+      "detected": true
+    },
+    "expectedHeaderApproxY": 370,
+    "analysis": "Real column headers at y≈370; white-header search starts y≥449; grey fallback picks y=632 (footer band)"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+  "label": "Aviludo May",
+  "supplier": "AVIJUDO - Indústria e Comércio de Produtos Alimentares, S.A.",
+  "extractedAt": "2026-06-11T01:04:27.319Z",
+  "status": 200,
+  "attempt": 1,
+  "invoice_date": "19/05/2026",
+  "total": 330.42,
+  "items": [
+    {
+      "name": "Filete de Anchoas Alconfitosa L4 495 g",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 9.99,
+      "total": 19.98
+    },
+    {
+      "name": "Ovo Liquido Past.Gema Dovo 1 Kg",
+      "quantity": 6,
+      "unit": "un",
+      "unit_price": 10.49,
+      "total": 62.94
+    },
+    {
+      "name": "Pepinos Extra Uli Frasco 6x720 g",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 22.49,
+      "total": 22.49
+    },
+    {
+      "name": "Atum Óleo Bolsa Nau Cafiritea 1 Kg",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 6.55,
+      "total": 13.1
+    },
+    {
+      "name": "Arroz Agulha Metro Chef 12x1 kg",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 13.95,
+      "total": 13.95
+    },
+    {
+      "name": "Chocolate Culinaria Pantagurel 10x200 g",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 29.99,
+      "total": 59.98
+    },
+    {
+      "name": "Açucar Branco METRO Chef 10x1 Kg",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 9.99,
+      "total": 9.99
+    },
+    {
+      "name": "Nata Culinaria 22% Remy Picot 6x1 L1",
+      "quantity": 5,
+      "unit": "cx",
+      "unit_price": 18.89,
+      "total": 94.45
+    }
+  ]
+}

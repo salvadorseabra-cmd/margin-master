@@ -1,0 +1,21 @@
+{
+  "generated_at": "2026-06-11T01:39:40.954Z",
+  "baseline": {
+    "source": "passc-refinement-validation/post-audit.json refined stage",
+    "fieldAccuracy": 91.8,
+    "financialAccuracy": 96.96,
+    "financialErrorEuro": 66.34,
+    "columnShiftResidualEuro": 21.4
+  },
+  "ifValidatorExisted": {
+    "assumedDetectionRate": 75,
+    "errorsAutoFlagged": "~9-10 of 12 historical misread runs",
+    "errorsUnflagged": "Prosciutto run 4 (unit 8.17, total 36.54); Pomodor run 1 (2×20=40)",
+    "projectedFieldAccuracy": 93.5,
+    "projectedFinancialAccuracy": 98.5,
+    "projectedFinancialErrorEuro": 45,
+    "remainingErrorBudgetEuro": 45,
+    "note": "Assumes flagged rows trigger retry/review; does not fix extraction automatically"
+  },
+  "vlReadiness": "MEDIUM improvement — flags majority but not all column-shift errors"
+}

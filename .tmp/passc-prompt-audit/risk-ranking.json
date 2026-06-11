@@ -1,0 +1,209 @@
+{
+  "generated_at": "2026-06-11T00:00:00.000Z",
+  "source": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+  "rankings": [
+    {
+      "rank": 1,
+      "id": "never-invent-but-infer",
+      "lines": "32-34",
+      "risk": "CRITICAL",
+      "score": 95,
+      "rationale": "Directly causes 4 pack-multiplier errors and enables phantom row fusion. Core contradiction with copy-exactly rule.",
+      "vlErrorsCaused": [
+        "Bocconcino POMODOR qty 6",
+        "Mammafiore Aceto qty 2",
+        "Mammafiore Rulo qty 2",
+        "Emporio Ginger Beer qty 24",
+        "Mammafiore phantom Olio (contextual fusion)"
+      ]
+    },
+    {
+      "rank": 2,
+      "id": "pack-24-bottles",
+      "lines": "53-55",
+      "risk": "CRITICAL",
+      "score": 90,
+      "rationale": "Canonical example teaching *N as purchased qty. Correct for Birra Peroni; catastrophic generalization to CX*N and beverage case lines.",
+      "vlErrorsCaused": [
+        "Bocconcino *6→qty 6",
+        "Emporio Ginger Beer 24-pack"
+      ]
+    },
+    {
+      "rank": 3,
+      "id": "bad-good-33cl",
+      "lines": "80-84",
+      "risk": "HIGH",
+      "score": 85,
+      "rationale": "Explicit BAD/GOOD pair reinforces bottle-count extraction; structurally identical to Ginger Beer failure mode.",
+      "vlErrorsCaused": [
+        "Emporio Ginger Beer qty 24 / €0.85"
+      ]
+    },
+    {
+      "rank": 4,
+      "id": "copy-exactly-authoritative",
+      "lines": "122",
+      "risk": "HIGH",
+      "score": 80,
+      "rationale": "Not dangerous alone — but its contradiction with infer rule creates unpredictable precedence. When honored, still fails on column shift (vision).",
+      "vlErrorsCaused": [
+        "Bocconcino unit_price 25→20",
+        "Emporio Prosciutto 8.17→17.06",
+        "Emporio Pellegrino qty/price shift"
+      ],
+      "note": "Failure mode when rule is ignored vs when rule is followed but vision misreads"
+    },
+    {
+      "rank": 5,
+      "id": "extract-all-rows",
+      "lines": "29",
+      "risk": "HIGH",
+      "score": 75,
+      "rationale": "No row-count ceiling. Combined with weak anti-hallucination, enables 9th phantom row.",
+      "vlErrorsCaused": [
+        "Mammafiore phantom Olio"
+      ]
+    },
+    {
+      "rank": 6,
+      "id": "no-anti-hallucination",
+      "lines": "(absent)",
+      "risk": "HIGH",
+      "score": 75,
+      "rationale": "Missing guard for lot numbers, sub-lines, artigo codes. 'Do not hallucinate' (L116) is one line with no enforcement mechanism.",
+      "vlErrorsCaused": [
+        "Mammafiore phantom Olio / Nui Lote 609"
+      ]
+    },
+    {
+      "rank": 7,
+      "id": "size-vs-purchased-qty",
+      "lines": "69-71",
+      "risk": "HIGH",
+      "score": 70,
+      "rationale": "Correct intent but incomplete scope — covers retail bottle/case only, not wholesale CX*N notation.",
+      "vlErrorsCaused": [
+        "Bocconcino (CX 2.5KG*6)"
+      ]
+    },
+    {
+      "rank": 8,
+      "id": "no-arithmetic-closure",
+      "lines": "123-124",
+      "risk": "MEDIUM",
+      "score": 60,
+      "rationale": "Prevents false corrections but allows semantically wrong triples to pass (Ginger Beer arithmetic closure masks error).",
+      "vlErrorsCaused": [
+        "Emporio Ginger Beer — wrong qty/unit_price with matching total"
+      ]
+    },
+    {
+      "rank": 9,
+      "id": "salada-em-default-qty",
+      "lines": "108-110",
+      "risk": "MEDIUM",
+      "score": 55,
+      "rationale": "Teaches implicit qty=1 when column not shown — encourages filling over null.",
+      "vlErrorsCaused": []
+    },
+    {
+      "rank": 10,
+      "id": "manjericao-mo-infer",
+      "lines": "105-106",
+      "risk": "MEDIUM",
+      "score": 50,
+      "rationale": "Unit inferred without qty — partial field reconstruction pattern.",
+      "vlErrorsCaused": []
+    },
+    {
+      "rank": 11,
+      "id": "price-digit-by-digit",
+      "lines": "119-121",
+      "risk": "MEDIUM",
+      "score": 45,
+      "rationale": "Correct intent; undermined by infer rule for qty. Price errors persist despite this instruction.",
+      "vlErrorsCaused": [
+        "Bocconcino price 25→20",
+        "Emporio Prosciutto",
+        "Emporio Pellegrino"
+      ]
+    },
+    {
+      "rank": 12,
+      "id": "weight-in-name-examples",
+      "lines": "40-46",
+      "risk": "MEDIUM",
+      "score": 40,
+      "rationale": "Embedded weight as qty; not directly implicated in VL financial errors but reinforces name-over-column pattern.",
+      "vlErrorsCaused": []
+    },
+    {
+      "rank": 13,
+      "id": "null-when-unknown",
+      "lines": "112-114",
+      "risk": "MEDIUM",
+      "score": 35,
+      "rationale": "Correct escape hatch but contradicted by 7+ inference examples; rarely used by model.",
+      "vlErrorsCaused": []
+    },
+    {
+      "rank": 14,
+      "id": "do-not-hallucinate",
+      "lines": "116",
+      "risk": "MEDIUM",
+      "score": 30,
+      "rationale": "Weak standalone guard; overridden by infer + contextual reasoning.",
+      "vlErrorsCaused": [
+        "Mammafiore phantom"
+      ]
+    },
+    {
+      "rank": 15,
+      "id": "user-extract-all",
+      "lines": "185",
+      "risk": "MEDIUM",
+      "score": 30,
+      "rationale": "Reinforces system extract-all without precision qualifier.",
+      "vlErrorsCaused": [
+        "Mammafiore phantom"
+      ]
+    },
+    {
+      "rank": 16,
+      "id": "normalized-units",
+      "lines": "86-94",
+      "risk": "LOW",
+      "score": 15,
+      "rationale": "Unit canonicalization; 98% unit accuracy in VL.",
+      "vlErrorsCaused": []
+    },
+    {
+      "rank": 17,
+      "id": "bidfood-mo-em",
+      "lines": "96-110",
+      "risk": "LOW",
+      "score": 10,
+      "rationale": "Supplier-specific; Bidfood/Aviludo invoices pass.",
+      "vlErrorsCaused": []
+    },
+    {
+      "rank": 18,
+      "id": "digit-8-9-confusion",
+      "lines": "121",
+      "risk": "LOW",
+      "score": 10,
+      "rationale": "Awareness only; no structural fix.",
+      "vlErrorsCaused": []
+    },
+    {
+      "rank": 19,
+      "id": "exclude-metadata-fields",
+      "lines": "117",
+      "risk": "LOW",
+      "score": 5,
+      "rationale": "Prevents header/footer field leakage into line items.",
+      "vlErrorsCaused": []
+    }
+  ]
+}

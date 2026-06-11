@@ -1,0 +1,157 @@
+{
+  "generated_at": "2026-06-11T01:39:40.953Z",
+  "cases": [
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "run": 1,
+      "qty": 4,
+      "unit_price": 10.17,
+      "total": 36.54,
+      "detection": "YES",
+      "triggeringRules": [
+        "A_qty_x_unit_approx_total",
+        "D_unit_exceeds_plausible_net"
+      ]
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "run": 2,
+      "qty": 4.3,
+      "unit_price": 8.2,
+      "total": 35.24,
+      "detection": "NO",
+      "triggeringRules": []
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "run": 3,
+      "qty": 4.3,
+      "unit_price": 17,
+      "total": 36.54,
+      "detection": "YES",
+      "triggeringRules": [
+        "A_qty_x_unit_approx_total",
+        "B_unit_matches_discount_pct",
+        "D_unit_exceeds_plausible_net"
+      ]
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "run": 4,
+      "qty": 4.3,
+      "unit_price": 8.17,
+      "total": 36.54,
+      "detection": "YES",
+      "triggeringRules": [
+        "A_qty_x_unit_approx_total"
+      ]
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "run": 5,
+      "qty": 4.3,
+      "unit_price": 8.2,
+      "total": 36.54,
+      "detection": "YES",
+      "triggeringRules": [
+        "A_qty_x_unit_approx_total"
+      ]
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "run": 1,
+      "qty": 2,
+      "unit_price": 20,
+      "total": 40,
+      "detection": "YES",
+      "triggeringRules": [
+        "B_unit_matches_discount_pct"
+      ]
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "run": 2,
+      "qty": 2,
+      "unit_price": 27.56,
+      "total": 54.2,
+      "detection": "NO",
+      "triggeringRules": []
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "run": 3,
+      "qty": 2,
+      "unit_price": 25.9,
+      "total": 40,
+      "detection": "YES",
+      "triggeringRules": [
+        "A_qty_x_unit_approx_total",
+        "D_unit_exceeds_plausible_net"
+      ]
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "run": 4,
+      "qty": 2,
+      "unit_price": 27.56,
+      "total": 42.2,
+      "detection": "YES",
+      "triggeringRules": [
+        "A_qty_x_unit_approx_total",
+        "D_unit_exceeds_plausible_net",
+        "E_inconsistent_with_neighbour"
+      ]
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "run": 5,
+      "qty": 2,
+      "unit_price": 27.56,
+      "total": 20.02,
+      "detection": "YES",
+      "triggeringRules": [
+        "A_qty_x_unit_approx_total",
+        "D_unit_exceeds_plausible_net",
+        "E_inconsistent_with_neighbour"
+      ]
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Prosciutto",
+      "run": "prosciutto-refined",
+      "qty": 4,
+      "unit_price": 9.17,
+      "total": 36.54,
+      "detection": "NO",
+      "triggeringRules": []
+    },
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR",
+      "run": "pomodor-refined",
+      "qty": 2,
+      "unit_price": 20,
+      "total": 40,
+      "detection": "YES",
+      "triggeringRules": [
+        "B_unit_matches_discount_pct"
+      ]
+    }
+  ],
+  "summary": {
+    "total": 12,
+    "YES": 9,
+    "PARTIAL": 0,
+    "NO": 3
+  }
+}
