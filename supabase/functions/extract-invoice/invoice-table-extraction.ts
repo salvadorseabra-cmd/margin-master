@@ -1,6 +1,11 @@
 import { cropTableRegionForLineItems } from "./invoice-image-crop.ts";
 import { callOpenAiJson } from "./invoice-date-extraction.ts";
 import {
+  bindMonetaryColumns,
+  monetaryToInvoiceLineItem,
+  parseMonetaryLineItems,
+} from "./invoice-monetary-binding.ts";
+import {
   reconcileLineItemAmounts,
   reconcileLineItemsToNetSubtotal,
   type InvoiceLineItem as ReconciledLineItem,
@@ -179,56 +184,6 @@ export type TableExtractionResult = {
   };
 };
 
-const round2 = (n: number) => Math.round(n * 100) / 100;
-
-function normalizeNumberField(item: Record<string, unknown>, key: string): number | null {
-  const value = item[key];
-  return typeof value === "number" ? value : null;
-}
-
-function resolveUnitPrice(
-  grossUnitPrice: number | null,
-  discountPct: number | null,
-  unitPrice: number | null,
-): number | null {
-  if (grossUnitPrice != null && discountPct != null) {
-    return round2(grossUnitPrice * (1 - discountPct / 100));
-  }
-  if (unitPrice != null) return unitPrice;
-  return grossUnitPrice;
-}
-
-function resolveTotal(
-  lineTotalNet: number | null,
-  total: number | null,
-): number | null {
-  return lineTotalNet ?? total;
-}
-
-function normalizeItems(raw: unknown): InvoiceLineItem[] {
-  if (!Array.isArray(raw)) return [];
-
-  return raw.map((item) => {
-    const row = item && typeof item === "object"
-      ? (item as Record<string, unknown>)
-      : {};
-
-    const grossUnitPrice = normalizeNumberField(row, "gross_unit_price");
-    const discountPct = normalizeNumberField(row, "discount_pct");
-    const lineTotalNet = normalizeNumberField(row, "line_total_net");
-    const unitPrice = normalizeNumberField(row, "unit_price");
-    const total = normalizeNumberField(row, "total");
-
-    return {
-      name: typeof row.name === "string" ? row.name : "Unknown item",
-      quantity: typeof row.quantity === "number" ? row.quantity : null,
-      unit: typeof row.unit === "string" ? row.unit : null,
-      unit_price: resolveUnitPrice(grossUnitPrice, discountPct, unitPrice),
-      total: resolveTotal(lineTotalNet, total),
-    };
-  });
-}
-
 export async function extractTableItemsFromImage(
   imageDataUrl: string,
   apiKey: string,
@@ -272,7 +227,10 @@ export async function extractTableItemsFromImage(
     },
   ]);
 
-  const items = reconcileLineItemAmounts(normalizeItems(parsed.items));
+  const boundItems = bindMonetaryColumns(parseMonetaryLineItems(parsed.items));
+  const items = reconcileLineItemAmounts(
+    boundItems.map(monetaryToInvoiceLineItem),
+  );
 
   return {
     items,

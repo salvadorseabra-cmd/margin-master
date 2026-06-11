@@ -1,78 +1,28 @@
 {
-  "generated_at": "2026-06-11T23:45:00.000Z",
-  "audit": "Hybrid H Phase 1+2 deployment verification (read-only)",
+  "generated_at": "2026-06-11T23:23:02.030Z",
+  "audit": "Hybrid H Phase 1+2 deployment verification — updated after v21 deploy",
 
   "answers": {
-    "hybridHPhase12Deployed": false,
-    "deployedCommit": "214e864",
-    "deployedCommitMessage": "checkpoint: validation lab before hybrid h monetary binding",
-    "deployedEdgeVersion": 20,
-    "deployedEdgeUpdatedAtUtc": "2026-06-11T01:01:59",
-    "returnsStructuredMonetaryFields": false,
-    "structuredFieldsNote": "Deployed code (214e864) has no gross_unit_price/discount_pct/line_total_net in Pass C prompt or normalizeItems. Even after Phase 1+2 deploy, index.ts returns reconciled items with legacy keys only (unit_price, total) — structured fields are internal to Pass C, not exposed in HTTP response unless index.ts is extended."
+    "hybridHPhase12Deployed": true,
+    "deployedCommit": "65452a9",
+    "deployedCommitMessage": "feat: hybrid h phase 1 and phase 2",
+    "deployedEdgeVersion": 21,
+    "deployedEdgeUpdatedAtUtc": "2026-06-11T23:19:43",
+    "priorVersion": 20,
+    "priorCommit": "214e864",
+    "returnsStructuredMonetaryFieldsInApi": false,
+    "structuredFieldsNote": "Phase 2 schema active in Pass C prompt and normalizeItems internally; index.ts HTTP response returns legacy unit_price/total only. gross_unit_price/discount_pct/line_total_net not exposed unless index.ts extended."
   },
 
-  "localWorkingTree": {
-    "phase1Plus2Uncommitted": true,
-    "modifiedFiles": [
-      "supabase/functions/extract-invoice/invoice-crop-geometry.ts",
-      "supabase/functions/extract-invoice/invoice-table-extraction.ts",
-      "supabase/functions/extract-invoice/invoice-image-crop.test.ts"
-    ],
-    "phase1Change": "TABLE_TOP_MARGIN 10 → 36 (header-inclusive Pass C crop)",
-    "phase2Change": "Pass C schema + prompt: gross_unit_price, discount_pct, line_total_net; normalizeItems derives unit_price/total",
-    "headCommit": "214e8640a07803a2fbce73672f8be25b5aa8e7dd",
-    "diffLineCount": 155
+  "fiveRunStabilitySummary": {
+    "source": "pomodor-5run-stability.json",
+    "correctVsVlGt": 0,
+    "incorrectVsVlGt": 5,
+    "stabilityPct": 0,
+    "deterministic": true,
+    "modalValues": { "quantity": 1, "unit_price": 22.05, "total": 22.05 },
+    "failurePattern": "VALOR_net_as_unit_and_total"
   },
 
-  "deployedVsLocalEvidence": {
-    "gitShow214e864": {
-      "TABLE_TOP_MARGIN": 10,
-      "gross_unit_price_in_prompt": false
-    },
-    "gitDiffShowsPhase12": true,
-    "vlEntrypointMatchesRepo": "file:///Users/salvadorseabra1/margin-master/supabase/functions/extract-invoice/index.ts",
-    "vlEzbrSha256": "3f4c82bdc0cd04387ca48d996a6be877d2e27b640892ff04cc04e54dc8411966",
-    "deployedMatchesCommittedHead": true,
-    "deployedMatchesPhase12WorkingTree": false
-  },
-
-  "freshInvoke": {
-    "projectRef": "bjhnlrgodcqoyzddbpbd",
-    "function": "extract-invoice",
-    "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-    "invokedAt": "2026-06-11T23:45:00.000Z",
-    "status": 200,
-    "itemCount": 7,
-    "responseTopLevelKeys": ["supplier", "invoice_date", "total", "items"],
-    "itemKeys": ["name", "quantity", "unit", "unit_price", "total"],
-    "hasStructuredFieldsInResponse": false,
-    "gptRawExposed": false,
-    "tableCropInResponse": null,
-    "pomodor": {
-      "name": "POMODORO PELATI (CX 2,5KG*6)",
-      "quantity": 2,
-      "unit": "uni",
-      "unit_price": 25,
-      "total": 50,
-      "gross_unit_price": null,
-      "discount_pct": null,
-      "line_total_net": null
-    },
-    "pomodorNote": "Single invoke lucky €25/€50 vs VL GT; prior 5-run stability (same session) showed 4/5 DESC bleed €20/€40 — not structurally resolved on deployed code"
-  },
-
-  "deploymentStepsRequired": [
-    "1. Commit Phase 1+2 changes: invoice-crop-geometry.ts, invoice-table-extraction.ts, invoice-image-crop.test.ts",
-    "2. Run tests: deno test --allow-read --allow-net supabase/functions/extract-invoice/invoice-image-crop.test.ts",
-    "3. Deploy to VL: supabase functions deploy extract-invoice --project-ref bjhnlrgodcqoyzddbpbd",
-    "4. Verify deploy: supabase functions list --project-ref bjhnlrgodcqoyzddbpbd (version should increment past 20)",
-    "5. Invoke Bocconcino f0aa5a08-86a3-4938-99f0-711e86073968 — 5-run Pomodor stability; expect legacy unit_price/total in response (structured fields internal unless index.ts extended)",
-    "6. Proceed to Phase 3 binder (invoice-monetary-binding.ts) — Phase 1+2 alone insufficient per design audit"
-  ],
-
-  "nextAction": "DEPLOY Phase 1+2 to VL (commit + supabase functions deploy), then run 5-run Bocconcino Pomodor stability validation; Phase 3 binder still required to close column-shift family",
-
-  "bocconcinoValidationDeferred": true,
-  "bocconcinoValidationReason": "Phase 1+2 not deployed — Pomodor validation against actual Hybrid H code requires deploy or local OPENAI_API_KEY (unavailable in this environment)"
+  "nextAction": "Implement Phase 3 binder; re-run 5-run Pomodor stability after deploy"
 }

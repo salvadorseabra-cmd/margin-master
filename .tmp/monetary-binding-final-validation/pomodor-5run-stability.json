@@ -1,0 +1,188 @@
+{
+  "generated_at": "2026-06-11T23:23:02.030Z",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "product": "POMODOR PELATI (CX 2.5KG*6)",
+  "imageSource": "VL storage signed URL (local .b64 fixture truncated — 0 items on first attempt)",
+  "deployment": {
+    "hybridHPhase12Deployed": true,
+    "extractInvoiceVersion": 21,
+    "extractInvoiceUpdatedAt": "2026-06-11T23:19:43.825Z",
+    "deployedCommit": "65452a9",
+    "deployedCommitMessage": "feat: hybrid h phase 1 and phase 2",
+    "priorVersion": 20,
+    "priorCommit": "214e864",
+    "ezbrSha256": "0f65cdbe9dada0c8cf6bb05d857d885f600daf01e825f5f5d70a99c74219e4ff",
+    "structuredFieldsInApiResponse": false,
+    "structuredFieldsNote": "index.ts returns reconciled legacy items only; gross_unit_price/discount_pct/line_total_net exist in Pass C prompt/normalizeItems but are stripped before HTTP response. GPT raw not exposed.",
+    "itemKeysObserved": ["name", "quantity", "unit", "unit_price", "total"]
+  },
+  "baselines": {
+    "visibleInvoice": {
+      "source": "column-shift-audit/ground-truth.json",
+      "quantity": 1,
+      "gross_unit_price": 27.56,
+      "discount_pct": 20,
+      "line_total_net": 22.05,
+      "note": "Visible QUANT=1, P.VENDA=27.56, DESC=20%, VALOR=22.05"
+    },
+    "vlCatalogGt": {
+      "source": "field-accuracy-audit/ground-truth.json",
+      "quantity": 2,
+      "unit_price": 25,
+      "total": 50
+    },
+    "preHybridRefined": {
+      "source": "passc-refinement-validation",
+      "quantity": 2,
+      "unit_price": 20,
+      "total": 40,
+      "pattern": "DESC_20_bleed"
+    },
+    "preHybrid5Run": {
+      "source": "column-shift-audit/run-stability.json",
+      "unitPriceUnique": [20, 27.56, 25.9],
+      "totalUnique": [40, 54.2, 42.2, 20.02],
+      "deterministic": false
+    },
+    "preHybridDeployed3Run": {
+      "source": "bocconcino-hybrid-validation",
+      "correctVsVlGt": 0,
+      "descBleedUnit20": 2
+    }
+  },
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "elapsedMs": 20623,
+      "itemCount": 7,
+      "hasStructuredFields": false,
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      }
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "elapsedMs": 18138,
+      "itemCount": 7,
+      "hasStructuredFields": false,
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      }
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "elapsedMs": 19344,
+      "itemCount": 7,
+      "hasStructuredFields": false,
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      }
+    },
+    {
+      "run": 4,
+      "status": 200,
+      "elapsedMs": 13422,
+      "itemCount": 7,
+      "hasStructuredFields": false,
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      }
+    },
+    {
+      "run": 5,
+      "status": 200,
+      "elapsedMs": 14078,
+      "itemCount": 7,
+      "hasStructuredFields": false,
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      }
+    }
+  ],
+  "summary": {
+    "correctVsVlGt": {
+      "count": 0,
+      "runNumbers": [],
+      "criteria": "qty=2, unit_price=25, total=50"
+    },
+    "incorrectVsVlGt": {
+      "count": 5,
+      "runNumbers": [1, 2, 3, 4, 5],
+      "values": {
+        "quantity": 1,
+        "unit_price": 22.05,
+        "total": 22.05,
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null
+      },
+      "failurePattern": "VALOR_net_as_unit_and_total",
+      "failureDetail": "Stable 5/5: reads VALOR LÍQUIDO €22.05 into both unit_price and total; qty=1 matches visible invoice not VL GT qty=2. DESC €20 bleed eliminated but column binding still wrong vs VL GT."
+    },
+    "stabilityPctCorrect": 0,
+    "runToRunDeterministic": true,
+    "unitPriceUnique": [22.05],
+    "totalUnique": [22.05],
+    "qtyUnique": [1],
+    "descBleedUnit20Count": 0,
+    "comparisonToPreHybrid": {
+      "descBleedEliminated": true,
+      "varianceEliminated": true,
+      "vlGtResolved": false,
+      "newStablePattern": "VALOR €22.05 copied to unit_price and total; qty regressed to visible 1"
+    }
+  },
+  "monetaryErrorEstimateEuro": {
+    "vsVlGtTotal": 27.95,
+    "vsVlGtUnitPrice": 2.95,
+    "vsVlGtCalculation": "|50 − 22.05| = €27.95 on line total; prior pre-hybrid modal error was €10 (€40 vs €50)",
+    "stableResidual": 27.95,
+    "note": "Phase 1+2 made extraction deterministic but shifted error from DESC bleed (€20/€40) to visible-net bleed (€22.05/€22.05 qty 1)"
+  },
+  "phase3BinderRequired": true,
+  "phase3Reasoning": [
+    "0/5 runs match VL GT (qty 2, unit €25, total €50)",
+    "5/5 runs deterministic but wrong — VALOR LÍQUIDO €22.05 used as unit_price AND total",
+    "Structured monetary fields not exposed in API — cannot verify gross_unit_price/discount_pct binding without index.ts debug extension",
+    "Phase 1+2 eliminated run-to-run variance and DESC €20 bleed but did not resolve column binding vs VL GT",
+    "bindMonetaryColumns (Phase 3) still required to map gross/discount/net columns and derive correct unit_price/total"
+  ]
+}
