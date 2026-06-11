@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-06-11T23:06:00.000Z",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "product": "POMODOR PELATI (CX 2.5KG*6)",
+  "verdict": "partial",
+  "verdictDetail": "NOT RESOLVED at stability level; occasional single-run match to VL GT (€25/€50) is GPT variance, not structural fix",
+  "phase1Plus2Deployed": false,
+  "phase1Plus2Validated": false,
+  "confidencePct": 82,
+  "evidence": {
+    "deployedCode": "214e864 / 04c0d88 Pass C — no structured schema, TABLE_TOP_MARGIN=10",
+    "localUncommitted": "Phase 1+2 in working tree only — not tested on VL edge in this audit",
+    "stability3Run": {
+      "correctVsVlGt": 0,
+      "descBleedUnit20": 2,
+      "wrongTotals": 3
+    },
+    "singleInvokeLucky": { "unit": 25, "total": 50 },
+    "dbPersisted": { "unit": 25, "total": 50, "fromLuckyReread": true },
+    "preHybridRefined": { "unit": 20, "total": 40 },
+    "visibleInvoice": { "qty": 1, "total": 22.05, "neverExtractedIn5Run": true }
+  },
+  "phase3BinderRequired": true,
+  "phase3Reasoning": [
+    "Phase 1+2 not deployed — cannot claim Hybrid H fix validated",
+    "Bocconcino headers already visible pre-Phase-1; column-selection-deep-dive: GPT misreads DESC without header clip",
+    "3/3 post-audit invokes still show unit €20 or €25.9 with total €40 — Rule B would flag unit≈discount_pct",
+    "25% arithmetically self-consistent wrong triples (2×20=40) remain undetectable without binder",
+    "monetary-column-validation-audit: validator-only insufficient; structured fields + bindMonetaryColumns needed"
+  ],
+  "remainingColumnShiftOnBocconcino": ["POMODOR PELATI only"],
+  "recommendation": "Deploy Phase 1+2 to VL, re-run 5-run stability + implement Phase 3 binder before closing column-shift family"
+}

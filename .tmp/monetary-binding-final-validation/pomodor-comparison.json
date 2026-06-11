@@ -1,0 +1,295 @@
+{
+  "generated_at": "2026-06-11T23:17:13.657Z",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "product": "POMODOR PELATI (CX 2.5KG*6)",
+  "baselines": {
+    "visibleInvoice": {
+      "qty": 1,
+      "gross_unit_price": 27.56,
+      "discount_pct": 20,
+      "line_total_net": 22.05,
+      "unit_price_net": 22.05,
+      "note": "Visible row QUANT=1; VL GT qty=2 is post-geometry interpretation"
+    },
+    "vlCatalogGt": {
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 25,
+      "total": 50,
+      "source": "field-accuracy-audit/ground-truth.json"
+    },
+    "preHybridRefined": {
+      "qty": 2,
+      "unit_price": 20,
+      "total": 40
+    },
+    "preHybrid5RunStability": [
+      {
+        "run": 1,
+        "status": 200,
+        "name": "POMODORO PELATI (CX 2.5KG*6)",
+        "quantity": 2,
+        "unit_price": 20,
+        "total": 40
+      },
+      {
+        "run": 2,
+        "status": 200,
+        "name": "POMODORI PELATI (CX 2.5KG*6)",
+        "quantity": 2,
+        "unit_price": 27.56,
+        "total": 54.2
+      },
+      {
+        "run": 3,
+        "status": 200,
+        "name": "POMODORO PELATI (CX 2.5KG*6)",
+        "quantity": 2,
+        "unit_price": 25.9,
+        "total": 40
+      },
+      {
+        "run": 4,
+        "status": 200,
+        "name": "POMODORO PELATI (CX 2.5KG*6)",
+        "quantity": 2,
+        "unit_price": 27.56,
+        "total": 42.2
+      },
+      {
+        "run": 5,
+        "status": 200,
+        "name": "POMODORO PELATI (CX 2.5KG*6)",
+        "quantity": 2,
+        "unit_price": 27.56,
+        "total": 20.02
+      }
+    ],
+    "bocconcinoHybridValidation3Run": [
+      {
+        "run": 1,
+        "qty": 2,
+        "unit_price": 20,
+        "total": 40
+      },
+      {
+        "run": 2,
+        "qty": 2,
+        "unit_price": 25.9,
+        "total": 40
+      },
+      {
+        "run": 3,
+        "qty": 2,
+        "unit_price": 20,
+        "total": 40
+      }
+    ]
+  },
+  "deployedPreHybrid": {
+    "runs": [
+      {
+        "run": 1,
+        "status": 200,
+        "itemCount": 7,
+        "hasStructuredFields": false,
+        "pomodor": {
+          "name": "POMODORO PELATI (CX 2,5KG*6)",
+          "quantity": 2,
+          "unit": "uni",
+          "unit_price": 25,
+          "total": 50
+        },
+        "sampleFirstItemKeys": [
+          "name",
+          "quantity",
+          "unit",
+          "unit_price",
+          "total"
+        ]
+      },
+      {
+        "run": 2,
+        "status": 200,
+        "itemCount": 7,
+        "hasStructuredFields": false,
+        "pomodor": {
+          "name": "POMODORO PELATI (CX 2.5KG*6)",
+          "quantity": 2,
+          "unit": "uni",
+          "unit_price": 20,
+          "total": 40
+        },
+        "sampleFirstItemKeys": [
+          "name",
+          "quantity",
+          "unit",
+          "unit_price",
+          "total"
+        ]
+      },
+      {
+        "run": 3,
+        "status": 200,
+        "itemCount": 7,
+        "hasStructuredFields": false,
+        "pomodor": {
+          "name": "POMODORO PELATI (CX 2.5KG*6)",
+          "quantity": 2,
+          "unit": "uni",
+          "unit_price": 20,
+          "total": 40
+        },
+        "sampleFirstItemKeys": [
+          "name",
+          "quantity",
+          "unit",
+          "unit_price",
+          "total"
+        ]
+      },
+      {
+        "run": 4,
+        "status": 200,
+        "itemCount": 7,
+        "hasStructuredFields": false,
+        "pomodor": {
+          "name": "POMODORO PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "unit_price": 20,
+          "total": 20
+        },
+        "sampleFirstItemKeys": [
+          "name",
+          "quantity",
+          "unit",
+          "unit_price",
+          "total"
+        ]
+      },
+      {
+        "run": 5,
+        "status": 200,
+        "itemCount": 7,
+        "hasStructuredFields": false,
+        "pomodor": {
+          "name": "POMODORO PELATI (CX 2,5KG*6)",
+          "quantity": 2,
+          "unit": "uni",
+          "unit_price": 20,
+          "total": 40
+        },
+        "sampleFirstItemKeys": [
+          "name",
+          "quantity",
+          "unit",
+          "unit_price",
+          "total"
+        ]
+      }
+    ],
+    "summary": {
+      "runCount": 5,
+      "unitPriceUnique": [
+        25,
+        20
+      ],
+      "totalUnique": [
+        50,
+        40,
+        20
+      ],
+      "qtyUnique": [
+        2,
+        1
+      ],
+      "correctVsVlGt": 1,
+      "descBleedUnit20": 4,
+      "deterministic": false
+    }
+  },
+  "localPhase12": {
+    "apiAvailable": false,
+    "runs": [
+      {
+        "skipped": true,
+        "reason": "OPENAI_API_KEY not set",
+        "runIndex": 1
+      },
+      {
+        "skipped": true,
+        "reason": "OPENAI_API_KEY not set",
+        "runIndex": 2
+      },
+      {
+        "skipped": true,
+        "reason": "OPENAI_API_KEY not set",
+        "runIndex": 3
+      },
+      {
+        "skipped": true,
+        "reason": "OPENAI_API_KEY not set",
+        "runIndex": 4
+      },
+      {
+        "skipped": true,
+        "reason": "OPENAI_API_KEY not set",
+        "runIndex": 5
+      }
+    ],
+    "summary": null,
+    "note": "OPENAI_API_KEY unavailable locally — Phase 1+2 Pass C GPT runs not executed; geometry tests + deployed baseline used"
+  },
+  "fieldVerdicts": {
+    "quantity": {
+      "vlGt": 2,
+      "preHybrid": 2,
+      "deployedModal": [
+        2,
+        1
+      ],
+      "phase12Modal": null,
+      "verdict": "Unchanged (deployed pre-hybrid)"
+    },
+    "unit_price": {
+      "vlGt": 25,
+      "preHybrid": 20,
+      "deployedUnique": [
+        25,
+        20
+      ],
+      "phase12Unique": null,
+      "verdict": "Incorrect"
+    },
+    "total": {
+      "vlGt": 50,
+      "preHybrid": 40,
+      "deployedUnique": [
+        50,
+        40,
+        20
+      ],
+      "phase12Unique": null,
+      "verdict": "Partial"
+    },
+    "gross_unit_price": {
+      "expectedFromVisible": 27.56,
+      "phase12Structured": null,
+      "verdict": "Not tested (no API)"
+    },
+    "discount_pct": {
+      "expectedFromVisible": 20,
+      "phase12Structured": null,
+      "verdict": "Not tested (no API)"
+    },
+    "line_total_net": {
+      "expectedFromVisible": 22.05,
+      "phase12Structured": null,
+      "verdict": "Not tested (no API)"
+    }
+  },
+  "pomodorVerdict": "NOT RESOLVED — pre-hybrid DESC bleed (deployed)",
+  "phase3BinderRequired": true,
+  "phase3Reason": "Phase 1+2 not deployed to VL; local GPT validation blocked without OPENAI_API_KEY; prior audits + fresh 5-run deployed baseline show DESC-as-unit (€20) modal pattern; Rule B detectable but binder needed to fix"
+}

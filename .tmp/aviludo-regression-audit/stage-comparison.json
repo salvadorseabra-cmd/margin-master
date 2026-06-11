@@ -1,0 +1,197 @@
+{
+  "generated_at": "2026-06-11T23:08:43.411Z",
+  "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+  "inputPaths": {
+    "historicalSuccess": "PNG fixture (.tmp/footer-validation-4dc40c3/april-historico-png-fixture.b64.txt)",
+    "productionReRead": "Storage PDF 2497 bytes (client rasterizes to PNG in browser)",
+    "auditDirectPdf": "Raw PDF data URL to edge (no rasterization)"
+  },
+  "stages": {
+    "geometry": {
+      "historical": {
+        "source": ".tmp/geometry-audit/c2f52357-...-geometry.json",
+        "imageSource": "local_fallback_pdf PNG",
+        "bounds": {
+          "top": 184,
+          "bottom": 439,
+          "headerTop": 194,
+          "cropHeight": 255
+        },
+        "margin10top": 184,
+        "margin36top": 158,
+        "deltaTopPx": 26,
+        "note": "Phase 1 changes top by 26px on this fixture; both include header row"
+      },
+      "current": {
+        "top": 158,
+        "bottom": 439,
+        "headerTop": 194,
+        "headerBottom": 212,
+        "totalsStart": 415,
+        "detected": true
+      }
+    },
+    "crop": {
+      "historical": {
+        "fallbackUsed": false,
+        "cropHeight": 255
+      },
+      "currentLocalMargin36": {
+        "top": 158,
+        "bottom": 439,
+        "cropHeight": 281
+      },
+      "regressionFromPhase1": "UNLIKELY — Aviludo April top moves 194→184 vs 194→158; header still in crop"
+    },
+    "ocr": {
+      "note": "No deterministic OCR stage; vision GPT only",
+      "historical": "N/A",
+      "current": "N/A"
+    },
+    "passA_date": {
+      "historical": {
+        "invoice_date": "2026-04-17",
+        "value": "2026-04-17"
+      },
+      "currentPngRuns": [
+        {
+          "run": 1,
+          "invoice_date": "2026-04-17"
+        },
+        {
+          "run": 2,
+          "invoice_date": "2026-04-17"
+        },
+        {
+          "run": 3,
+          "invoice_date": "2026-04-17"
+        }
+      ],
+      "currentPdf": {
+        "invoice_date": null
+      }
+    },
+    "passB_supplier": {
+      "historical": {
+        "supplier": "AVILUDO",
+        "value": "AVILUDO"
+      },
+      "currentPngRuns": [
+        {
+          "run": 1,
+          "supplier": "AVILUDO"
+        },
+        {
+          "run": 2,
+          "supplier": "AVILUDO"
+        },
+        {
+          "run": 3,
+          "supplier": "AVILUDO"
+        }
+      ],
+      "currentPdf": {
+        "supplier": null
+      }
+    },
+    "passC_table": {
+      "historical": {
+        "timestamp": "2026-06-11T00:48:05.506Z",
+        "itemCount": 9,
+        "commit": "~04c0d88 deployed"
+      },
+      "currentPngRuns": [
+        {
+          "run": 1,
+          "itemCount": 9,
+          "total": 687.07
+        },
+        {
+          "run": 2,
+          "itemCount": 9,
+          "total": 630.71
+        },
+        {
+          "run": 3,
+          "itemCount": 9,
+          "total": 69.07
+        }
+      ],
+      "currentPdf": {
+        "status": 200,
+        "pdfSizeBytes": 2497,
+        "supplier": null,
+        "total": null,
+        "itemCount": 0,
+        "dataUrlPrefix": "data:application/pdf;base64,JVBE"
+      },
+      "storagePdfHistorical": {
+        "id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "label": "Aviludo April",
+        "status": 200,
+        "itemCount": 0,
+        "items": []
+      }
+    },
+    "finalItems": {
+      "historical": 9,
+      "currentPngBest": 9,
+      "currentPngWorst": 9,
+      "currentPdf": 0
+    }
+  },
+  "pngRuns": [
+    {
+      "run": 1,
+      "status": 200,
+      "supplier": "AVILUDO",
+      "invoice_date": "2026-04-17",
+      "total": 687.07,
+      "itemCount": 9,
+      "itemsPreview": [
+        "Filete de Anchovas Alconfrisa Lt 495 g",
+        "Ovo Líquido Past.Gema Dovo 1kg"
+      ],
+      "hasStructuredFields": false
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "supplier": "AVILUDO",
+      "invoice_date": "2026-04-17",
+      "total": 630.71,
+      "itemCount": 9,
+      "itemsPreview": [
+        "Filete de Anchovas Alconfrisa Lt 495 g",
+        "Ovo Líquido Past.Gema Dovo 1kg"
+      ],
+      "hasStructuredFields": false
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "supplier": "AVILUDO",
+      "invoice_date": "2026-04-17",
+      "total": 69.07,
+      "itemCount": 9,
+      "itemsPreview": [
+        "Filete de Anchovas Alconfrisa Lt 495 g",
+        "Ovo Líquido Past.Gema Dovo 1kg"
+      ],
+      "hasStructuredFields": false
+    }
+  ],
+  "pdfRun": {
+    "status": 200,
+    "pdfSizeBytes": 2497,
+    "supplier": null,
+    "total": null,
+    "itemCount": 0,
+    "dataUrlPrefix": "data:application/pdf;base64,JVBE"
+  },
+  "gitState": {
+    "head": "214e864",
+    "phase12LocalModified": true,
+    "deployedEqualsHead": true
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "generated_at": "2026-06-11T23:17:13.658Z",
+  "family": "Monetary Column Binding",
+  "phase1Plus2Deployed": false,
+  "phase1Plus2LocalValidatedGpt": false,
+  "remainingStructuralRows": [
+    {
+      "invoice": "IL Bocconcino",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "product": "POMODOR PELATI",
+      "status": "CLOSED",
+      "stableWrongPattern": "unit €20 = DESC 20%; neighbour P.VENDA €27.56 bleed",
+      "euroImpactVsVlGt": 10,
+      "phase1Plus2Impact": "UNKNOWN (GPT not run) — Bocconcino headers already visible; Phase 1 geometry low impact expected"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "product": "Rovagnati Prosciutto Cotto",
+      "status": "OPEN (expected improved by Phase 1 header crop)",
+      "stableWrongPattern": "unit shifts among Desc.% €17, gross €10.17, derived €9.17",
+      "euroImpactVsVlGt": 1.4,
+      "phase1Plus2Impact": "Phase 1 TABLE_TOP_MARGIN=36 includes headers (Emporio test passes locally); Phase 2 schema separates discount_pct from gross_unit_price — user-reported improvement not re-validated GPT here (no API key)",
+      "preHybridRefined": {
+        "qty": 4,
+        "unit_price": 9.17,
+        "total": 36.54
+      },
+      "preHybrid5RunSummary": {
+        "unitPriceUnique": [
+          10.17,
+          8.2,
+          17,
+          8.17
+        ]
+      }
+    }
+  ],
+  "estimatedResidualFinancialErrorEuro": {
+    "stableStructural": 11.4,
+    "breakdown": {
+      "pomodor": 10,
+      "prosciutto": 1.4
+    },
+    "note": "Excludes Mammafiore discount-line GPT variance (~€54.78 run-to-run, separate family)",
+    "afterPhase1Plus2Estimate": {
+      "low": 10,
+      "high": 21.4,
+      "confidencePct": 55,
+      "rationale": "Phase 1+2 GPT not executed locally; Emporio header fix may drop Prosciutto ~€1.4; Pomodor likely unchanged without Phase 3 binder"
+    }
+  },
+  "recommendation": {
+    "closeFamily": false,
+    "proceedToPhase3": true,
+    "rationale": [
+      "Phase 1+2 uncommitted and not on VL edge (v20 / 214e864 lineage)",
+      "Deployed 5-run refresh confirms GPT variance; DESC €20 bleed remains modal without binder",
+      "monetary-column-validation-audit: 25% self-consistent wrong triples need bindMonetaryColumns",
+      "Deploy Phase 1+2 to VL then implement Phase 3 binder before closing family"
+    ]
+  }
+}

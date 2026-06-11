@@ -1,0 +1,337 @@
+{
+  "generated_at": "2026-06-11T22:48:09.795Z",
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "counts": {
+    "historicalDbSnapshot": 8,
+    "priorReextractPassC": 8,
+    "currentDb": 16,
+    "freshExtractDeployed": 0
+  },
+  "dbQueryError": null,
+  "invoiceQueryError": "column invoices.updated_at does not exist",
+  "invoice": null,
+  "dbDuplicatesByNormalizedName": [
+    {
+      "name": "de cecco paccheri lisci nr 125 500g produto de stock",
+      "count": 2
+    },
+    {
+      "name": "rovagnati assaporami prosciutto cotto scelto hc 4 4 25kg produto de stock",
+      "count": 2
+    },
+    {
+      "name": "rovagnati mortadella igp massima con pistacchio 1 2 3 5kg produto de stock",
+      "count": 2
+    },
+    {
+      "name": "sanpellegrino acqua in vitro 75cl x 15ud produto de stock",
+      "count": 2
+    },
+    {
+      "name": "rigamonti bresaola punta d anca oro 1 2 produto de stock",
+      "count": 2
+    },
+    {
+      "name": "baladin ginger beer 0 20cl",
+      "count": 2
+    },
+    {
+      "name": "rovagnati salame ventricina 2 5 kg produto de stock",
+      "count": 2
+    }
+  ],
+  "extractDuplicatesByNormalizedName": [],
+  "dbCreatedAtBuckets": [
+    [
+      "2026-06-11T22:41:41",
+      16
+    ]
+  ],
+  "dbItems": [
+    {
+      "id": "4472563f-7b0b-47eb-8cd3-3d649abc2af0",
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+      "quantity": 24,
+      "unit": "g",
+      "unit_price": 2.35,
+      "total": 50.2,
+      "created_at": "2026-06-11T22:41:41.517584+00:00",
+      "updated_at": "2026-06-11T22:41:41.517584+00:00"
+    },
+    {
+      "id": "5ee0da49-88a0-49a8-a5e1-57864d9a156c",
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castellapo 1/8*~1,5Kg Produto de Stock",
+      "quantity": 1.35,
+      "unit": "g",
+      "unit_price": 9.82,
+      "total": 13.44,
+      "created_at": "2026-06-11T22:41:41.517584+00:00",
+      "updated_at": "2026-06-11T22:41:41.517584+00:00"
+    },
+    {
+      "id": "c1b5ad61-45ba-4d6a-a4d4-a1572c3e3a7e",
+      "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+ 4,25KG Produto de Stock",
+      "quantity": 4.3,
+      "unit": "g",
+      "unit_price": 17,
+      "total": 36.54,
+      "created_at": "2026-06-11T22:41:41.517584+00:00",
+      "updated_at": "2026-06-11T22:41:41.517584+00:00"
+    },
+    {
+      "id": "2ecb0631-5eac-4032-b5b5-8afef220115a",
+      "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 ~3,5Kg Produto de Stock",
+      "quantity": 3.11,
+      "unit": "g",
+      "unit_price": 10.01,
+      "total": 31.07,
+      "created_at": "2026-06-11T22:41:41.517584+00:00",
+      "updated_at": "2026-06-11T22:41:41.517584+00:00"
+    },
+    {
+      "id": "24f8d991-2afd-46c8-9a5a-126a3c4aa643",
+      "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+      "quantity": 1,
+      "unit": "ml",
+      "unit_price": 25.74,
+      "total": 25.74,
+      "created_at": "2026-06-11T22:41:41.517584+00:00",
+      "updated_at": "2026-06-11T22:41:41.517584+00:00"
+    },
+    {
+      "id": "9dc6e93e-16ca-496b-acda-872d6ce7dfb7",
+      "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 Produto de Stock",
+      "quantity": 2.8,
+      "unit": null,
+      "unit_price": 17.67,
+      "total": 49.48,
+      "created_at": "2026-06-11T22:41:41.517584+00:00",
+      "updated_at": "2026-06-11T22:41:41.517584+00:00"
+    },
+    {
+      "id": "708bc384-8a73-4914-bd84-904aa1fd26ae",
+      "name": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 2,
+      "unit": "ml",
+      "unit_price": 9.69,
+      "total": 19.38,
+      "created_at": "2026-06-11T22:41:41.517584+00:00",
+      "updated_at": "2026-06-11T22:41:41.517584+00:00"
+    },
+    {
+      "id": "9278eba9-eeda-474c-aa88-271be8d43afc",
+      "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+      "quantity": 2.6,
+      "unit": "g",
+      "unit_price": 16.6,
+      "total": 39.49,
+      "created_at": "2026-06-11T22:41:41.517584+00:00",
+      "updated_at": "2026-06-11T22:41:41.517584+00:00"
+    },
+    {
+      "id": "8693f271-83d9-4589-ade1-9dfd44ef3350",
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+      "quantity": 24,
+      "unit": "g",
+      "unit_price": 2.35,
+      "total": 50.2,
+      "created_at": "2026-06-11T22:41:41.526773+00:00",
+      "updated_at": "2026-06-11T22:41:41.526773+00:00"
+    },
+    {
+      "id": "78ed7ee9-1e4d-426f-9ffe-46e386748ddd",
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelli 1978 - 1,5 Kg Produto de Stock",
+      "quantity": 1.35,
+      "unit": "g",
+      "unit_price": 9.92,
+      "total": 13.44,
+      "created_at": "2026-06-11T22:41:41.526773+00:00",
+      "updated_at": "2026-06-11T22:41:41.526773+00:00"
+    },
+    {
+      "id": "e5ea6dcb-5a37-4b6a-a2ba-d91f692eb6c5",
+      "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4,25Kg Produto de Stock",
+      "quantity": 4,
+      "unit": "g",
+      "unit_price": 9.15,
+      "total": 36.54,
+      "created_at": "2026-06-11T22:41:41.526773+00:00",
+      "updated_at": "2026-06-11T22:41:41.526773+00:00"
+    },
+    {
+      "id": "2bd0ba53-0d18-47a1-84b9-c94bc73b67cd",
+      "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5kg Produto de Stock",
+      "quantity": 3.11,
+      "unit": "g",
+      "unit_price": 10.1,
+      "total": 31.67,
+      "created_at": "2026-06-11T22:41:41.526773+00:00",
+      "updated_at": "2026-06-11T22:41:41.526773+00:00"
+    },
+    {
+      "id": "ac661dab-922e-4376-9723-7f740f9b7d4d",
+      "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+      "quantity": 2,
+      "unit": "ml",
+      "unit_price": 19.3,
+      "total": 38.56,
+      "created_at": "2026-06-11T22:41:41.526773+00:00",
+      "updated_at": "2026-06-11T22:41:41.526773+00:00"
+    },
+    {
+      "id": "74867bc9-0aa9-4482-a2a1-fe5bb9bdeb0d",
+      "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - Produto de Stock",
+      "quantity": 2.28,
+      "unit": null,
+      "unit_price": 21.8,
+      "total": 49.64,
+      "created_at": "2026-06-11T22:41:41.526773+00:00",
+      "updated_at": "2026-06-11T22:41:41.526773+00:00"
+    },
+    {
+      "id": "5c2f1934-4fcd-40d7-ba1b-8703db21193e",
+      "name": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 2,
+      "unit": "ml",
+      "unit_price": 9.69,
+      "total": 19.38,
+      "created_at": "2026-06-11T22:41:41.526773+00:00",
+      "updated_at": "2026-06-11T22:41:41.526773+00:00"
+    },
+    {
+      "id": "86abade6-3449-4cef-b34a-22c0685c25a3",
+      "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+      "quantity": 2.6,
+      "unit": "g",
+      "unit_price": 16.6,
+      "total": 39.49,
+      "created_at": "2026-06-11T22:41:41.526773+00:00",
+      "updated_at": "2026-06-11T22:41:41.526773+00:00"
+    }
+  ],
+  "freshExtractItems": [],
+  "priorReextractItems": [
+    {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+      "quantity": 24,
+      "unit": null,
+      "unit_price": 2.35,
+      "total": 50.2
+    },
+    {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Casaleggio 1/8 - 1,5Kg Produto de Stock",
+      "quantity": 1.35,
+      "unit": null,
+      "unit_price": 9.82,
+      "total": 13.44
+    },
+    {
+      "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4-4,25Kg Produto de Stock",
+      "quantity": 4,
+      "unit": null,
+      "unit_price": 9.17,
+      "total": 36.54
+    },
+    {
+      "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5Kg Produto de Stock",
+      "quantity": 3.11,
+      "unit": null,
+      "unit_price": 10,
+      "total": 31.07
+    },
+    {
+      "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+      "quantity": 2,
+      "unit": null,
+      "unit_price": 19.3,
+      "total": 38.56
+    },
+    {
+      "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - Produto de Stock",
+      "quantity": 2.28,
+      "unit": null,
+      "unit_price": 21.8,
+      "total": 49.64
+    },
+    {
+      "name": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 2,
+      "unit": null,
+      "unit_price": 9.69,
+      "total": 19.38
+    },
+    {
+      "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 16.6,
+      "total": 39.49
+    }
+  ],
+  "historicalDbItems": [
+    {
+      "id": "c0cfaecf-82ce-4fc7-8b23-d8481f9dfbc3",
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": "un",
+      "unit_price": 2.35,
+      "total": 50.2
+    },
+    {
+      "id": "9d9ad887-a95c-46fa-9cb3-2bfea0846a29",
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castiglione 1/8° - 1,5kg",
+      "quantity": 1.35,
+      "unit": "kg",
+      "unit_price": 9.92,
+      "total": 13.44
+    },
+    {
+      "id": "9bde7eb4-5635-49e5-bd62-00c6a4eb4d0f",
+      "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,2-4,25kg",
+      "quantity": 4.3,
+      "unit": "kg",
+      "unit_price": 7.1,
+      "total": 30.53
+    },
+    {
+      "id": "63290da9-e419-49bf-94be-c9feacb79206",
+      "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in v. 2–3,5kg",
+      "quantity": 3.11,
+      "unit": "kg",
+      "unit_price": 10.1,
+      "total": 31.07
+    },
+    {
+      "id": "2c21f0de-3d7c-4de2-8543-833b1d059986",
+      "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 19.3,
+      "total": 38.56
+    },
+    {
+      "id": "220496bf-4717-4f04-8b72-e0479c3d1ec7",
+      "name": "Rigamonti - Bresaola Punta d’Anca Oro 1/2",
+      "quantity": 1.8,
+      "unit": "kg",
+      "unit_price": 27.49,
+      "total": 49.48
+    },
+    {
+      "id": "920fa990-36e5-48d3-82ce-a4499882e30e",
+      "name": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 24,
+      "unit": "un",
+      "unit_price": 0.85,
+      "total": 19.38
+    },
+    {
+      "id": "f5ce0ba6-8532-4548-84bb-e2887ed3388d",
+      "name": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "quantity": 2.6,
+      "unit": "kg",
+      "unit_price": 16.6,
+      "total": 39.49
+    }
+  ]
+}

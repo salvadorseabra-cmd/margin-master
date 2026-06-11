@@ -1,0 +1,53 @@
+{
+  "generated_at": "2026-06-11T22:50:00.000Z",
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "reReadEntryPoint": {
+    "file": "src/routes/invoices.tsx",
+    "function": "reExtract",
+    "line": 2080,
+    "calls": "runExtraction(row.id, dataUrl)"
+  },
+  "persistenceSequence": [
+    {
+      "step": 1,
+      "location": "src/routes/invoices.tsx:1236",
+      "action": "supabase.functions.invoke('extract-invoice', { imageDataUrl })",
+      "notes": "Edge function returns items array; no DB write in extract-invoice/index.ts"
+    },
+    {
+      "step": 2,
+      "location": "src/routes/invoices.tsx:1263",
+      "action": "supabase.from('invoice_items').delete().eq('invoice_id', invoiceId)",
+      "notes": "Delete-all-then-insert pattern. Return value/error NOT checked."
+    },
+    {
+      "step": 3,
+      "location": "src/routes/invoices.tsx:1264-1266",
+      "action": "normalizeInvoiceItemFields + shouldRejectInvoiceIngredientRow filter"
+    },
+    {
+      "step": 4,
+      "location": "src/routes/invoices.tsx:1302",
+      "action": "supabase.from('invoice_items').insert(insertRows)",
+      "notes": "Bulk insert; insertError is checked and thrown"
+    },
+    {
+      "step": 5,
+      "location": "src/routes/invoices.tsx:2132",
+      "action": "loadItems + load() refresh UI after reExtract"
+    }
+  ],
+  "edgeFunctionWritesDb": false,
+  "schemaConstraints": {
+    "uniquePerInvoice": "NONE — invoice_items has no unique constraint on (invoice_id, name)",
+    "rlsDelete": "items_delete_own — delete allowed when parent invoice owned by auth.uid()"
+  },
+  "deleteBeforeInsertVerified": true,
+  "deleteErrorHandling": "NONE — delete result not inspected",
+  "concurrencyRisk": {
+    "verdict": "HIGH",
+    "mechanism": "Two overlapping reExtract/runExtraction calls can both pass delete (0 rows) then both insert 8 rows → 16 rows",
+    "evidence": "DB shows two insert batches 9ms apart (2026-06-11T22:41:41.517584 and .526773), 8 rows each"
+  },
+  "priorAuditReference": ".tmp/persistence-audit/REPORT.md — persistence is lossless; stale DB was prior issue, not corruption"
+}

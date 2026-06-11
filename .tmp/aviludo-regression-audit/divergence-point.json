@@ -1,0 +1,58 @@
+{
+  "generated_at": "2026-06-11T23:10:00.000Z",
+  "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+  "firstFailingStage": "crop_generation",
+  "firstFailingStageAlias": "image_decode_input",
+  "manifestationAtPassC": "passC_table returns items:[] (symptom, not root cause for PDF path)",
+  "failureModes": [
+    {
+      "mode": "PDF data URL to edge (primary production risk)",
+      "firstDivergence": "crop_generation",
+      "detail": "extract-invoice Image.decode cannot parse application/pdf bytes; table crop fails open; GPT passes receive unusable image → all fields null, items:[]",
+      "evidence": {
+        "pdfSizeBytes": 2497,
+        "invokeStatus": 200,
+        "supplier": null,
+        "invoice_date": null,
+        "total": null,
+        "itemCount": 0
+      }
+    },
+    {
+      "mode": "Valid PNG input (historical success path)",
+      "firstDivergence": "none_observed",
+      "detail": "PNG fixture with correct data URL: 3/3 invokes return 9 items on deployed code (214e864)",
+      "evidence": {
+        "runs": [
+          { "run": 1, "itemCount": 9, "supplier": "AVILUDO", "invoice_date": "2026-04-17" },
+          { "run": 2, "itemCount": 9, "supplier": "AVILUDO", "invoice_date": "2026-04-17" },
+          { "run": 3, "itemCount": 9, "supplier": "AVILUDO", "invoice_date": "2026-04-17" }
+        ],
+        "historical": { "timestamp": "2026-06-11T00:48:05Z", "itemCount": 9 }
+      }
+    },
+    {
+      "mode": "Intermittent Pass C empty on valid PNG",
+      "firstDivergence": "passC_table",
+      "detail": "Documented in passc-refinement-validation (storage PDF 0 items); NOT reproduced in 3 PNG runs this audit",
+      "confidence": "LOW frequency when image valid"
+    }
+  ],
+  "stageOrder": [
+    { "stage": "geometry", "historical": "top=184 bottom=439 headerTop=194", "currentPng": "top=158/184 bottom=439 (margin 36 vs 10)", "pdfPath": "skipped — decode fails" },
+    { "stage": "crop", "historical": "cropHeight=255", "currentPng": "cropHeight=255-281", "pdfPath": "fallback or garbage" },
+    { "stage": "ocr", "note": "No OCR — vision only" },
+    { "stage": "passA_date", "historical": "2026-04-17", "currentPng": "2026-04-17", "pdfPath": null },
+    { "stage": "passB_supplier", "historical": "AVILUDO", "currentPng": "AVILUDO", "pdfPath": null },
+    { "stage": "passC_table", "historical": 9, "currentPng": 9, "pdfPath": 0 },
+    { "stage": "final_items", "historical": 9, "currentPng": 9, "pdfPath": 0 }
+  ],
+  "confidencePct": 85,
+  "rollbackPhase1Phase2WouldRestore": "no",
+  "rollbackReasoning": [
+    "Hybrid H Phase 1+2 NOT deployed to VL (hasStructuredFields=false, HEAD 214e864)",
+    "PNG extraction works 9/9 on deployed pre-Hybrid code in this audit",
+    "Phase 1 margin change (26px) does not exclude Aviludo table rows",
+    "Phase 2 schema not active on edge"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-06-11T23:10:00.000Z",
+  "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+  "hybridHDeployState": {
+    "phase1Local": "TABLE_TOP_MARGIN 10→36 in working tree only",
+    "phase2Local": "structured monetary schema in working tree only",
+    "vlEdgeDeployed": "214e864 (pre-Hybrid checkpoint)",
+    "evidence": "3 PNG invokes: hasStructuredFields=false; git diff shows uncommitted changes"
+  },
+  "phase1Assessment": {
+    "introducedRegression": false,
+    "aviludoAprilGeometry": {
+      "deployedMargin10": { "top": 184, "bottom": 439, "cropHeight": 255 },
+      "localMargin36": { "top": 158, "bottom": 439, "cropHeight": 281 },
+      "deltaTopPx": 26,
+      "headerTop": 194,
+      "tableRowsExcluded": false
+    },
+    "rollbackWouldRestore9Items": "no — PNG path already returns 9 on deployed margin=10"
+  },
+  "phase2Assessment": {
+    "introducedRegression": "not applicable — not deployed",
+    "rollbackWouldRestore9Items": "no"
+  },
+  "actualRegressionCause": {
+    "primary": "Invalid image input path — 2.5KB storage PDF sent to edge without client rasterization",
+    "secondary": "Intermittent 0-item GPT responses on PDF/storage path (passc-refinement-validation)",
+    "notCause": "Hybrid H Phase 1 or Phase 2"
+  },
+  "aviludoRereadAuditNote": {
+    "observed0ItemsPng": "Likely audit script sent double-prefixed data URL (data:image/png;base64,data:image/png;base64,...)",
+    "observed0ItemsPdf": "Confirmed reproducible — PDF to edge always 0 in this audit"
+  },
+  "recommendation": "Replace storage PDF with full PNG; ensure client PDF rasterization succeeds before invoke; do not rollback Phase 1/2"
+}

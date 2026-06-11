@@ -1,0 +1,90 @@
+{
+  "generated_at": "2026-06-11T23:06:00.000Z",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "label": "IL Bocconcino",
+  "deployState": {
+    "headCommit": "214e864",
+    "phase1Plus2Deployed": false,
+    "phase1Plus2LocalUncommitted": true,
+    "evidence": "git diff shows TABLE_TOP_MARGIN 36 + structured schema only in working tree; deployed invoke returns legacy {unit_price,total} only, no gross_unit_price/discount_pct"
+  },
+  "referenceBaselines": {
+    "visibleInvoice": {
+      "source": "column-shift-audit/ground-truth.json",
+      "pomodor": { "qty": 1, "unit_gross": 27.56, "discount_pct": 20, "unit_net": 22.05, "total": 22.05 }
+    },
+    "vlCatalogGt": {
+      "source": "field-accuracy-audit/ground-truth.json",
+      "pomodor": { "qty": 2, "unit": 25, "total": 50 }
+    },
+    "preHybridRefined": {
+      "source": "passc-refinement-validation/reextract/f0aa5a08-....json + post-audit.json",
+      "pomodor": { "qty": 2, "unit": 20, "total": 40 },
+      "financialErrorEuro": 10
+    },
+    "preHybrid5RunStability": {
+      "source": "column-shift-audit/run-stability.json",
+      "pomodorUnitPrices": [20, 27.56, 25.9],
+      "pomodorTotals": [40, 54.2, 42.2, 20.02],
+      "deterministic": false
+    }
+  },
+  "rows": [
+    {
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "primaryTarget": true,
+      "failureFamily": "Column Shift",
+      "visibleInvoice": { "qty": 1, "unit_price": 22.05, "total": 22.05, "note": "P.VENDA 27.56, DESC 20%, VALOR 22.05" },
+      "vlCatalogGt": { "qty": 2, "unit_price": 25, "total": 50 },
+      "preHybridRefined": { "qty": 2, "unit_price": 20, "total": 40, "verdict": "Incorrect", "deltaEuro": 10 },
+      "currentDeployedExtract": {
+        "singleInvokeAudit": { "qty": 2, "unit_price": 25, "total": 50, "verdictVsVlGt": "Correct", "verdictVsVisible": "Incorrect" },
+        "stability3Run": [
+          { "run": 1, "qty": 2, "unit_price": 20, "total": 40 },
+          { "run": 2, "qty": 2, "unit_price": 25.9, "total": 40 },
+          { "run": 3, "qty": 2, "unit_price": 20, "total": 40 }
+        ],
+        "stabilityVerdict": "2/3 runs unit=20 (DESC bleed); 0/3 match VL GT",
+        "comparisonVsPreHybrid": "Same/Worse — still €20 DESC column on majority runs"
+      },
+      "currentDb": {
+        "qty": 2,
+        "unit_price": 25,
+        "total": 50,
+        "created_at": "2026-06-11T22:44:21",
+        "note": "Lucky single re-read persisted; not stable across invokes"
+      },
+      "overallVsVlGt": "Partial — single-run correct possible, not reliable",
+      "overallVsVisible": "Not resolved",
+      "betterSameWorse": "Same (stability) / lucky Better (single run)"
+    },
+    {
+      "product": "MOZZARELLA FIOR DI LATTE (discounted line — context)",
+      "primaryTarget": false,
+      "failureFamily": "Legitimate discount (not column-shift)",
+      "vlCatalogGt": { "qty": 10, "unit_price": 9.5, "total": 81.23 },
+      "preHybridRefined": { "qty": 10, "unit_price": 9.5, "total": 81.23 },
+      "currentDeployedExtract": { "qty": 10, "unit_price": 9.5, "total": 81.23 },
+      "verdict": "Correct",
+      "betterSameWorse": "Same"
+    },
+    {
+      "product": "MEZZI PACCHERI MANCINI (neighbour bleed context)",
+      "primaryTarget": false,
+      "failureFamily": "Neighbour column (Pomodor run 2/4/5)",
+      "vlCatalogGt": { "qty": 1, "unit_price": 27.56, "total": 27.3 },
+      "preHybridRefined": { "qty": 1, "unit_price": 27.56, "total": 27.3 },
+      "currentDeployedExtract": { "qty": 1, "unit_price": 27.56, "total": 27.3 },
+      "verdict": "Correct",
+      "betterSameWorse": "Same"
+    }
+  ],
+  "remainingColumnShiftRows": [
+    {
+      "product": "POMODOR PELATI",
+      "status": "OPEN",
+      "stableWrongPattern": "unit €20 = DESC 20%; unit €27.56 = P.VENDA neighbour bleed",
+      "euroImpact": 10
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-06-11T22:55:00.000Z",
+  "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+  "uiFlags": {
+    "reReadButtonVisible": {
+      "condition": "isExtractableInvoicePath(r.file_path) === true",
+      "aviludoApril": true,
+      "reason": "file_url ends with .pdf — in EXTRACTABLE_EXTENSIONS"
+    },
+    "reReadButtonDisabled": {
+      "condition": "!!extracting[r.id]",
+      "blocksWhen": "Another extraction in flight for same invoice"
+    },
+    "expandedPanelReRead": {
+      "condition": "onExtract passed only when isExtractable",
+      "disabledWhen": "extracting === true"
+    },
+    "silentEarlyReturnsInReExtract": [
+      { "check": "!row.file_path", "userFeedback": "none" },
+      { "check": "!isExtractableInvoicePath(row.file_path)", "userFeedback": "none" },
+      { "check": "!signed (createSignedUrl failed)", "userFeedback": "none" }
+    ],
+    "noEmptyExtractionGuard": true,
+    "noUserToastOnFailure": true
+  },
+  "runExtractionFlags": {
+    "deleteAlwaysRuns": true,
+    "deleteBeforeInsertCheck": "line 1263 runs BEFORE items.length guard",
+    "insertSkippedWhenZeroItems": {
+      "condition": "items.length === 0",
+      "log": "stage=9 persistence-skipped reason=no items from extraction"
+    },
+    "returnsNullOnException": true,
+    "returnsSuccessObjectOnZeroItems": true,
+    "extractingClearedInFinally": true
+  },
+  "backendFlags": {
+    "extractInvoiceAcceptsPdfDataUrl": false,
+    "note": "Edge function Image.decode expects image/png|jpeg; raw PDF data URLs decode fail or produce empty pipeline",
+    "clientMustRasterizePdf": true,
+    "rasterizeRequiresBrowser": "pdf-to-invoice-image.ts throws outside document"
+  },
+  "aviludoAprilSpecific": {
+    "storageFileSizeBytes": 2497,
+    "storageExt": "pdf",
+    "knownPdfFlake": true,
+    "auditReference": "passc-refinement-validation/REPORT.md — PDF re-extract returned 0 items",
+    "pngFixtureWorksHistorically": true,
+    "pngFixtureCurrentDeploy": "0 items on 2026-06-11 audit invoke"
+  }
+}

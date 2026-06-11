@@ -18,6 +18,9 @@ Return ONLY valid JSON with this exact structure:
       "name": string,
       "quantity": number | null,
       "unit": string | null,
+      "gross_unit_price": number | null,
+      "discount_pct": number | null,
+      "line_total_net": number | null,
       "unit_price": number | null,
       "total": number | null
     }
@@ -31,14 +34,20 @@ COLUMN-FAITHFUL EXTRACTION (highest priority — overrides all else)
 Each table row has distinct columns. Copy values ONLY from their designated column:
 
 1. QUANTITY column → quantity (and unit, if a unit column is visible)
-2. PREÇO UNITÁRIO / unit price column → unit_price
-3. VALOR / total / line total column → total
-4. Product description column → name
+2. PREÇO UNITÁRIO / P.VENDA / list unit price column → gross_unit_price
+3. DESC / Desc.(%) / discount column → discount_pct (percentage only — never a euro amount)
+4. VALOR / Preço Total / line total column → line_total_net
+5. Product description column → name
+
+MONETARY COLUMN BINDING (use column headers — never swap columns):
+- gross_unit_price: copy ONLY from the unit/list price column (EUR suffix). Read digit by digit.
+- discount_pct: copy ONLY from the discount/% column. Strip the % symbol. Never put this in gross_unit_price or line_total_net.
+- line_total_net: copy ONLY from the line total column (rightmost EUR total for the row). Read digit by digit.
+- unit_price and total: leave null when gross_unit_price / line_total_net are populated (downstream derives them).
+- If a row has no discount column, set discount_pct to null and copy unit_price from the unit price column instead of gross_unit_price.
 
 RULES:
 - Copy quantity ONLY from the quantity column. Never override with numbers from the description.
-- Copy unit_price ONLY from the unit price column. Read digit by digit.
-- Copy total ONLY from the line total column. Read digit by digit.
 - Descriptions NEVER override table quantities or prices.
 - If a column value is illegible or absent → set that field to null. Prefer null over guessing.
 - NEVER invent values. NEVER reconstruct rows from lot numbers, expiry dates, or footer text.
@@ -73,11 +82,12 @@ FRACTIONAL QUANTITIES (copy decimals exactly — never round):
 NEGATIVE EXAMPLES (common failures — do NOT repeat)
 ═══════════════════════════════════════════════════════════════
 
-"POMODORO PELATI (CX 2.5KG*6)" with quantity column "2"
-→ quantity: 2 (NOT 6 — *6 is units-per-case, not purchased qty)
-→ unit: from column (e.g. "un")
-→ unit_price: from PREÇO UNITÁRIO column (e.g. 25.00)
-→ total: from total column (e.g. 50.00)
+"POMODORI PELATI (CX 2,5KG*6)" with quantity "1,000", P.VENDA "27,560 EUR", DESC "20,00%", VALOR "22,05 EUR"
+→ quantity: 1 (NOT 6 — *6 is units-per-case)
+→ gross_unit_price: 27.56 (from P.VENDA — NOT from DESC 20)
+→ discount_pct: 20 (from DESC — NOT 20 as a euro price)
+→ line_total_net: 22.05 (from VALOR LÍQUIDO)
+→ unit_price: null, total: null
 
 "Aceto balsamico di Modena IGP pet 5l*2 Toschi" with quantity column "1"
 → quantity: 1 (NOT 2 — *2 means 2×5L pack spec, not qty purchased)
@@ -141,8 +151,8 @@ PRICE ACCURACY
 
 - Read PREÇO UNITÁRIO and VALOR digit by digit from their respective columns.
 - Do not confuse 8 and 9 (e.g. 9,99 misread as 8,99).
-- DISCOUNTED LINES: When quantity × unit_price ≠ total, copy total exactly from the VALOR column.
-  Never recompute total from qty × price. Re-read the VALOR column digit by digit.
+- DISCOUNTED LINES: Populate gross_unit_price, discount_pct, and line_total_net from their separate columns.
+  Never put the discount % value into gross_unit_price. Never recompute line_total_net from qty × price.
 - When quantity is 1, unit_price usually equals line total (unless discount applies).
 - Do not read numerics from the description into price fields; weight ranges (4-4,25KG) are not prices.
 
@@ -169,16 +179,54 @@ export type TableExtractionResult = {
   };
 };
 
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+function normalizeNumberField(item: Record<string, unknown>, key: string): number | null {
+  const value = item[key];
+  return typeof value === "number" ? value : null;
+}
+
+function resolveUnitPrice(
+  grossUnitPrice: number | null,
+  discountPct: number | null,
+  unitPrice: number | null,
+): number | null {
+  if (grossUnitPrice != null && discountPct != null) {
+    return round2(grossUnitPrice * (1 - discountPct / 100));
+  }
+  if (unitPrice != null) return unitPrice;
+  return grossUnitPrice;
+}
+
+function resolveTotal(
+  lineTotalNet: number | null,
+  total: number | null,
+): number | null {
+  return lineTotalNet ?? total;
+}
+
 function normalizeItems(raw: unknown): InvoiceLineItem[] {
   if (!Array.isArray(raw)) return [];
 
-  return raw.map((item) => ({
-    name: typeof item?.name === "string" ? item.name : "Unknown item",
-    quantity: typeof item?.quantity === "number" ? item.quantity : null,
-    unit: typeof item?.unit === "string" ? item.unit : null,
-    unit_price: typeof item?.unit_price === "number" ? item.unit_price : null,
-    total: typeof item?.total === "number" ? item.total : null,
-  }));
+  return raw.map((item) => {
+    const row = item && typeof item === "object"
+      ? (item as Record<string, unknown>)
+      : {};
+
+    const grossUnitPrice = normalizeNumberField(row, "gross_unit_price");
+    const discountPct = normalizeNumberField(row, "discount_pct");
+    const lineTotalNet = normalizeNumberField(row, "line_total_net");
+    const unitPrice = normalizeNumberField(row, "unit_price");
+    const total = normalizeNumberField(row, "total");
+
+    return {
+      name: typeof row.name === "string" ? row.name : "Unknown item",
+      quantity: typeof row.quantity === "number" ? row.quantity : null,
+      unit: typeof row.unit === "string" ? row.unit : null,
+      unit_price: resolveUnitPrice(grossUnitPrice, discountPct, unitPrice),
+      total: resolveTotal(lineTotalNet, total),
+    };
+  });
 }
 
 export async function extractTableItemsFromImage(
@@ -217,7 +265,7 @@ export async function extractTableItemsFromImage(
       content: [
         {
           type: "text",
-          text: "Extract each visible invoice line item. Copy quantity, unit price, and total from their table columns only.",
+          text: "Extract each visible invoice line item. Copy quantity, gross_unit_price, discount_pct, and line_total_net from their labeled table columns.",
         },
         { type: "image_url", image_url: { url: croppedDataUrl } },
       ],

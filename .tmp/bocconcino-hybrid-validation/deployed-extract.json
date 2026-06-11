@@ -1,0 +1,84 @@
+{
+  "generated_at": "2026-06-11T23:04:36.764Z",
+  "invoice": {
+    "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+    "supplier_name": "IL BOCCONCINO Distribuição ALIMENTAR",
+    "total": 290.64,
+    "invoice_date": "2026-05-08",
+    "file_url": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781113610714-Screenshot_2026-06-07_at_21.04.58.png",
+    "created_at": "2026-06-10T17:46:51.553519+00:00"
+  },
+  "deployedExtract": {
+    "status": 200,
+    "itemCount": 7,
+    "tableCrop": null,
+    "pomodor": {
+      "name": "POMODORO PELATI (CX 2.5KG*6)",
+      "quantity": 2,
+      "unit": "uni",
+      "unit_price": 25,
+      "total": 50
+    },
+    "allItems": [
+      {
+        "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "quantity": 10,
+        "unit": "uni",
+        "unit_price": 9.5,
+        "total": 81.23
+      },
+      {
+        "name": "STRACCIATELLA 250 GR",
+        "quantity": 24,
+        "unit": "uni",
+        "unit_price": 4.141,
+        "total": 74.54
+      },
+      {
+        "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "unit_price": 27.56,
+        "total": 27.3
+      },
+      {
+        "name": "POMODORO PELATI (CX 2.5KG*6)",
+        "quantity": 2,
+        "unit": "uni",
+        "unit_price": 25,
+        "total": 50
+      },
+      {
+        "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "quantity": 2,
+        "unit": "uni",
+        "unit_price": 20.295,
+        "total": 42.07
+      },
+      {
+        "name": "RICOTTA TREVIGIANA 1,5KG",
+        "quantity": 1,
+        "unit": "uni",
+        "unit_price": 7.97,
+        "total": 7.97
+      },
+      {
+        "name": "ROLO DE CABRA E VACA 1KG",
+        "quantity": 1,
+        "unit": "uni",
+        "unit_price": 12.71,
+        "total": 12.71
+      }
+    ],
+    "error": null
+  },
+  "gitPhase12": {
+    "localModified": true,
+    "files": [
+      "supabase/functions/extract-invoice/invoice-crop-geometry.ts (TABLE_TOP_MARGIN 10→36)",
+      "supabase/functions/extract-invoice/invoice-table-extraction.ts (structured monetary schema)"
+    ],
+    "headCommit": "214e864",
+    "note": "Phase 1+2 changes are uncommitted locally; VL edge invoke uses deployed function unless separately deployed"
+  }
+}

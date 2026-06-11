@@ -9,6 +9,7 @@ import {
   EMPORIO_FRACTION_START_Y,
   EMPORIO_TABLE_BOTTOM_Y,
   EMPORIO_TOTALS_BAND_Y,
+  TABLE_TOP_MARGIN,
 } from "./invoice-crop-geometry.ts";
 import {
   detectSummaryTotalsBandTop,
@@ -29,7 +30,7 @@ Deno.test("detectTableBounds: Bidfood preserves grey-header crop (headerTop≈44
   // Before fix: headerTop=447, cropTop=437
   assertGreater(bounds.headerTop, 440);
   assertLess(bounds.headerTop, 455);
-  assertEquals(bounds.top, bounds.headerTop - 10);
+  assertEquals(bounds.top, bounds.headerTop - TABLE_TOP_MARGIN);
   assertLess(bounds.top, 446);
   assertEquals(bounds.detected, true);
 });
@@ -43,7 +44,7 @@ Deno.test("detectTableBounds: Aviludo May preserves 8-row crop (headerTop=228)",
   // Before fix: headerTop=228, cropTop=218, bottom=448
   assertGreater(bounds.headerTop, 220);
   assertLess(bounds.headerTop, 235);
-  assertEquals(bounds.top, 218);
+  assertEquals(bounds.top, bounds.headerTop - TABLE_TOP_MARGIN);
   assertGreater(bounds.bottom, 440);
   assertEquals(bounds.detected, true);
 });
@@ -86,6 +87,16 @@ Deno.test("detectTableBounds: Bocconcino anchors white header near y≈453, not 
   assertLess(bounds.top, stracciatellaRowY);
   assertGreater(bounds.bottom, mozzarellaRowY);
   assertGreater(bounds.bottom, stracciatellaRowY);
+});
+
+Deno.test("detectTableBounds: Emporio Italia includes column header row (top≤430)", async () => {
+  const image = await loadImage(".tmp/emporio-footer-audit/emporio/invoice-full.png");
+  const bounds = detectTableBounds(image);
+
+  assertEquals(bounds.top, bounds.headerTop - TABLE_TOP_MARGIN);
+  assertLess(bounds.top, 431);
+  assertEquals(bounds.bottom, EMPORIO_TABLE_BOTTOM_Y);
+  assertEquals(bounds.detected, true);
 });
 
 Deno.test("footer crop: Emporio Italia includes grey totals box (Subtotal/Total)", async () => {

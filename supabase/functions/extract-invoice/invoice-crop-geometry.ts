@@ -70,7 +70,8 @@ export const SUMMARY_BAND_LUMINANCE_MAX = 188;
 export const TABLE_SCAN_START_FRACTION = 0.12;
 export const TABLE_SCAN_END_FRACTION = 0.55;
 export const HEADER_BAND_ROWS = 18;
-export const TABLE_TOP_MARGIN = 10;
+/** Rows above detected headerTop included in Pass C crop (Emporio headers sit ~36px above grey band). */
+export const TABLE_TOP_MARGIN = 36;
 export const MIN_TABLE_HEIGHT = 170;
 export const HEADER_BAND_THRESHOLD_DELTA = 12;
 

@@ -1,0 +1,85 @@
+{
+  "generated_at": "2026-06-11T22:55:00.000Z",
+  "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+  "label": "Aviludo April",
+  "invoiceDate": "2026-04-17",
+  "steps": [
+    {
+      "step": 1,
+      "stage": "UI click",
+      "location": "src/routes/invoices.tsx:2437 or ItemsTable:3091",
+      "action": "onClick → reExtract(row)",
+      "blocked": false,
+      "evidence": "file_path is .pdf — button rendered when isExtractable"
+    },
+    {
+      "step": 2,
+      "stage": "reExtract guards",
+      "location": "invoices.tsx:2080-2087",
+      "checks": [
+        { "file_path present": true },
+        { "isExtractableInvoicePath": true },
+        { "createSignedUrl": "expected success — storage path exists" }
+      ],
+      "failurePoint": false
+    },
+    {
+      "step": 3,
+      "stage": "Client PDF → PNG",
+      "location": "invoice-extraction-input.ts:52-54",
+      "action": "fileToExtractionDataUrl(blob) → renderPdfFirstPageToPngDataUrl",
+      "note": "Browser pdfjs rasterization; 2497-byte storage PDF may render low-quality/blank page",
+      "failurePoint": "POSSIBLE — if rasterize throws, reExtract has no try/catch"
+    },
+    {
+      "step": 4,
+      "stage": "API request",
+      "location": "invoices.tsx:1236",
+      "endpoint": "POST /functions/v1/extract-invoice",
+      "payload": "{ imageDataUrl: <png data URL> }",
+      "auth": "supabase anon key via functions.invoke",
+      "failurePoint": false
+    },
+    {
+      "step": 5,
+      "stage": "Edge function",
+      "location": "supabase/functions/extract-invoice/index.ts",
+      "passes": ["date", "supplier", "footer", "table Pass C"],
+      "failurePoint": true,
+      "observed": {
+        "httpStatus": 200,
+        "itemsCount": 0,
+        "supplier": null,
+        "total": null,
+        "error": null
+      },
+      "evidence": "Live invoke 2026-06-11 — storage PDF data URL 0 items; PNG fixture 0 items on current deploy"
+    },
+    {
+      "step": 6,
+      "stage": "runExtraction persistence",
+      "location": "invoices.tsx:1263-1347",
+      "actions": [
+        "DELETE all invoice_items for invoice_id — ALWAYS runs",
+        "INSERT skipped — items.length === 0"
+      ],
+      "failurePoint": true,
+      "effect": "Existing 9 DB rows deleted; nothing re-inserted",
+      "logMessage": "[invoice-ocr] stage=9 persistence-skipped reason=no items from extraction"
+    },
+    {
+      "step": 7,
+      "stage": "reExtract post-process",
+      "location": "invoices.tsx:2091-2133",
+      "action": "Updates invoice metadata; loadItems + load refresh",
+      "result": "UI shows 0 line items — appears as re-read failure",
+      "failurePoint": false
+    }
+  ],
+  "primaryFailurePoint": "Step 5 + Step 6 — extract-invoice returns empty items; client deletes existing rows without re-insert",
+  "secondaryContributors": [
+    "2.5KB storage PDF (known VL flake)",
+    "No empty-result guard before DELETE",
+    "No user-visible error when itemsCount=0"
+  ]
+}
