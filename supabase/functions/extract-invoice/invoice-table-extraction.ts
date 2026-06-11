@@ -24,104 +24,114 @@ Return ONLY valid JSON with this exact structure:
   ]
 }
 
-CRITICAL RULES:
+═══════════════════════════════════════════════════════════════
+COLUMN-FAITHFUL EXTRACTION (highest priority — overrides all else)
+═══════════════════════════════════════════════════════════════
 
-- Extract ALL invoice line items visible in the table.
-- quantity must represent the PURCHASED quantity.
-- unit must represent the PURCHASED unit.
-- NEVER invent values.
-- But DO infer quantity/unit when clearly present inside product names.
-- Screenshots may have messy OCR. Use contextual reasoning.
+Each table row has distinct columns. Copy values ONLY from their designated column:
 
-IMPORTANT PATTERNS:
+1. QUANTITY column → quantity (and unit, if a unit column is visible)
+2. PREÇO UNITÁRIO / unit price column → unit_price
+3. VALOR / total / line total column → total
+4. Product description column → name
 
-Examples:
+RULES:
+- Copy quantity ONLY from the quantity column. Never override with numbers from the description.
+- Copy unit_price ONLY from the unit price column. Read digit by digit.
+- Copy total ONLY from the line total column. Read digit by digit.
+- Descriptions NEVER override table quantities or prices.
+- If a column value is illegible or absent → set that field to null. Prefer null over guessing.
+- NEVER invent values. NEVER reconstruct rows from lot numbers, expiry dates, or footer text.
+- NEVER create rows not visibly present as distinct product lines in the table.
+- Extract ONLY rows that are clearly separate invoice line items with a product description.
 
-"Acém Novilho Extra s/ osso 15kg"
-→ quantity: 15
-→ unit: "kg"
+PACK NOTATION IN DESCRIPTIONS IS METADATA (not purchased quantity):
+Patterns like *2, *6, *24, x15, 33cl*24, 1kg*2, CX6, (CX 2.5KG*6), pet 5l*2 describe pack size,
+case contents, or unit weight — NOT the purchased quantity unless the quantity column shows that number.
 
-"Bacon Burger Premium Fatiado 1kg"
-→ quantity: 1
-→ unit: "kg"
+When quantity column AND description disagree → ALWAYS trust the quantity column.
 
-"Peito de Frango Calibrado"
-with visible quantity column "10"
-→ quantity: 10
-→ unit: "kg"
+═══════════════════════════════════════════════════════════════
+NEGATIVE EXAMPLES (common failures — do NOT repeat)
+═══════════════════════════════════════════════════════════════
 
-"Coca-Cola 33cl Pack 24"
-→ quantity: 24
-→ unit: "un"
+"POMODORO PELATI (CX 2.5KG*6)" with quantity column "2"
+→ quantity: 2 (NOT 6 — *6 is units-per-case, not purchased qty)
+→ unit: from column (e.g. "un")
+→ unit_price: from PREÇO UNITÁRIO column (e.g. 25.00)
+→ total: from total column (e.g. 50.00)
 
-"Água 25cl Pack 24"
-→ quantity: 24
-→ unit: "un"
+"Aceto balsamico di Modena IGP pet 5l*2 Toschi" with quantity column "1"
+→ quantity: 1 (NOT 2 — *2 means 2×5L pack spec, not qty purchased)
+→ unit_price and total: from their columns only
 
-"Hamburger Angus 180gr Caixa 40 un"
-→ quantity: 40
-→ unit: "un"
+"Rulo Di Capra 1kg*2 Simonetta" with quantity column "1"
+→ quantity: 1 (NOT 2 — *2 is dual-unit pack metadata)
+→ unit: from column
 
-"Pão Brioche 80g 120 un"
-→ quantity: 120
-→ unit: "un"
+"Baladin - Ginger Beer 0.20cl" with quantity column "2"
+→ quantity: 2 (NOT 24 — do not infer bottle count from pack size)
+→ unit_price: from column (per purchased unit, e.g. €9.69)
+→ total: from column (e.g. €19.38)
 
-If product size exists separately from purchased quantity:
-- purchased quantity = pack/case/unit count
-- NOT the per-item weight
+REJECT as line items (do NOT extract):
+- "Nui Lote 609 Data Exp. 20/07/2027" — lot/expiry metadata, not a product
+- "Lote 6009", "Nº Lote", "Data Exp." sub-lines — never standalone rows
+- Rows with no visible product description in the description column
 
-Examples:
-BAD:
-180g
+═══════════════════════════════════════════════════════════════
+POSITIVE EXAMPLES (correct column-faithful extraction)
+═══════════════════════════════════════════════════════════════
 
-GOOD:
-40 un
+Bidfood — "Tomilho" with quantity column "1" and unit column "MO"
+→ quantity: 1, unit: "mo", unit_price: from column, total: from column
 
-BAD:
-33cl
+Bidfood — "Manjericão" with quantity column "2" and unit "MO"
+→ quantity: 2, unit: "mo" (from columns, not inferred from name)
 
-GOOD:
-24 un
+Aviludo — "Birra Peroni 33cl*24" with quantity column "24"
+→ quantity: 24, unit: "un"
+→ *24 in description is metadata; column confirms purchased count of 24 bottles
 
-Use these normalized units only when possible:
-kg
-g
-L
-ml
-un
-cx
-mo
-em
+"Peito de Frango Calibrado" with quantity column "10" and unit column "kg"
+→ quantity: 10, unit: "kg" (both from columns)
 
-Bidfood / Portuguese supplier abbreviations (preserve exactly — do NOT coerce to cx):
-- "MO" or "maço" = bunch of fresh herbs → unit: "mo"
-- "EM" or "embalagem" = retail pack → unit: "em"
+"Acém Novilho Extra s/ osso 15kg" with NO quantity column visible
+→ quantity: null, unit: null (do NOT infer 15 from description weight)
 
-Examples:
-"Tomilho" with quantity column "1" and unit "MO"
-→ quantity: 1
-→ unit: "mo"
+═══════════════════════════════════════════════════════════════
+UNIT NORMALIZATION
+═══════════════════════════════════════════════════════════════
 
-"Manjericão" with unit "MO"
-→ unit: "mo"
+Use normalized units when the column shows them:
+kg, g, L, ml, un, cx, mo, em
 
-"Salada" with unit "EM"
-→ quantity: 1
-→ unit: "em"
+Bidfood / Portuguese supplier abbreviations (preserve exactly):
+- "MO" or "maço" → unit: "mo"
+- "EM" or "embalagem" → unit: "em"
+Do NOT coerce MO/EM to cx.
 
-If quantity truly cannot be determined:
-- quantity = null
-- unit = null
+"Salada" with unit "EM" and quantity column "1"
+→ quantity: 1, unit: "em" (from columns)
 
-Do not hallucinate.
-Do NOT extract supplier, total, invoice_date, or invoice_number.
+═══════════════════════════════════════════════════════════════
+PRICE ACCURACY
+═══════════════════════════════════════════════════════════════
 
-PRICE ACCURACY (critical for Portuguese invoices):
-- Read quantity, PREÇO UNITÁRIO, and VALOR DA MERCADORIA digit by digit from their respective columns.
-- Do not confuse 8 and 9 (e.g. 9,99 misread as 8,99 or 9,49).
-- quantity, unit_price, and total are each authoritative — copy each exactly from the invoice.
-- Discounted/promotional lines are common: quantity × unit_price may NOT equal total. Never alter quantity or unit_price to force arithmetic closure.
-- When quantity is 1, unit_price usually equals the line total column (unless a line discount applies).
+- Read PREÇO UNITÁRIO and VALOR digit by digit from their respective columns.
+- Do not confuse 8 and 9 (e.g. 9,99 misread as 8,99).
+- quantity × unit_price may NOT equal total on discounted lines — never alter column values to force closure.
+- When quantity is 1, unit_price usually equals line total (unless discount applies).
+- Do not read numerics from the description into price fields; weight ranges (4-4,25KG) are not prices.
+
+═══════════════════════════════════════════════════════════════
+OUTPUT INTEGRITY
+═══════════════════════════════════════════════════════════════
+
+- One output row per visible invoice line item. No extra rows.
+- Do not hallucinate products, SKUs, quantities, or prices.
+- Do NOT extract supplier, invoice_date, invoice_number, or invoice footer totals.
+- If quantity truly cannot be read from the column: quantity = null, unit = null.
 `.trim();
 
 export type InvoiceLineItem = ReconciledLineItem;
@@ -182,7 +192,7 @@ export async function extractTableItemsFromImage(
       content: [
         {
           type: "text",
-          text: "Extract all invoice line items from this restaurant invoice table image.",
+          text: "Extract each visible invoice line item. Copy quantity, unit price, and total from their table columns only.",
         },
         { type: "image_url", image_url: { url: croppedDataUrl } },
       ],
