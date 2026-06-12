@@ -1,5 +1,8 @@
 import { cropTableRegionForLineItems } from "./invoice-image-crop.ts";
-import { callOpenAiJson } from "./invoice-date-extraction.ts";
+import {
+  callOpenAiJson,
+  type OpenAiResponseFormat,
+} from "./invoice-date-extraction.ts";
 import {
   bindMonetaryColumns,
   monetaryToInvoiceLineItem,
@@ -25,9 +28,7 @@ Return ONLY valid JSON with this exact structure:
       "unit": string | null,
       "gross_unit_price": number | null,
       "discount_pct": number | null,
-      "line_total_net": number | null,
-      "unit_price": number | null,
-      "total": number | null
+      "line_total_net": number | null
     }
   ]
 }
@@ -48,8 +49,8 @@ MONETARY COLUMN BINDING (use column headers — never swap columns):
 - gross_unit_price: copy ONLY from the unit/list price column (EUR suffix). Read digit by digit.
 - discount_pct: copy ONLY from the discount/% column. Strip the % symbol. Never put this in gross_unit_price or line_total_net.
 - line_total_net: copy ONLY from the line total column (rightmost EUR total for the row). Read digit by digit.
-- unit_price and total: leave null when gross_unit_price / line_total_net are populated (downstream derives them).
-- If a row has no discount column, set discount_pct to null and copy unit_price from the unit price column instead of gross_unit_price.
+- If a row has no discount column, set discount_pct to null.
+- Downstream derives unit_price and total from these structured columns.
 
 RULES:
 - Copy quantity ONLY from the quantity column. Never override with numbers from the description.
@@ -92,7 +93,6 @@ NEGATIVE EXAMPLES (common failures — do NOT repeat)
 → gross_unit_price: 27.56 (from P.VENDA — NOT from DESC 20)
 → discount_pct: 20 (from DESC — NOT 20 as a euro price)
 → line_total_net: 22.05 (from VALOR LÍQUIDO)
-→ unit_price: null, total: null
 
 "Aceto balsamico di Modena IGP pet 5l*2 Toschi" with quantity column "1"
 → quantity: 1 (NOT 2 — *2 means 2×5L pack spec, not qty purchased)
@@ -174,6 +174,44 @@ OUTPUT INTEGRITY
 - If quantity truly cannot be read from the column: quantity = null, unit = null.
 `.trim();
 
+const TABLE_EXTRACTION_RESPONSE_FORMAT: OpenAiResponseFormat = {
+  type: "json_schema",
+  json_schema: {
+    name: "invoice_line_items",
+    strict: true,
+    schema: {
+      type: "object",
+      properties: {
+        items: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              quantity: { type: ["number", "null"] },
+              unit: { type: ["string", "null"] },
+              gross_unit_price: { type: ["number", "null"] },
+              discount_pct: { type: ["number", "null"] },
+              line_total_net: { type: ["number", "null"] },
+            },
+            required: [
+              "name",
+              "quantity",
+              "unit",
+              "gross_unit_price",
+              "discount_pct",
+              "line_total_net",
+            ],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: ["items"],
+      additionalProperties: false,
+    },
+  },
+};
+
 export type InvoiceLineItem = ReconciledLineItem;
 
 export type TableExtractionResult = {
@@ -213,19 +251,23 @@ export async function extractTableItemsFromImage(
     });
   }
 
-  const parsed = await callOpenAiJson(apiKey, [
-    { role: "system", content: TABLE_EXTRACTION_SYSTEM_PROMPT },
-    {
-      role: "user",
-      content: [
-        {
-          type: "text",
-          text: "Extract each visible invoice line item. Copy quantity, gross_unit_price, discount_pct, and line_total_net from their labeled table columns.",
-        },
-        { type: "image_url", image_url: { url: croppedDataUrl } },
-      ],
-    },
-  ]);
+  const parsed = await callOpenAiJson(
+    apiKey,
+    [
+      { role: "system", content: TABLE_EXTRACTION_SYSTEM_PROMPT },
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: "Extract each visible invoice line item. Copy quantity, gross_unit_price, discount_pct, and line_total_net from their labeled table columns.",
+          },
+          { type: "image_url", image_url: { url: croppedDataUrl } },
+        ],
+      },
+    ],
+    TABLE_EXTRACTION_RESPONSE_FORMAT,
+  );
 
   const boundItems = bindMonetaryColumns(parseMonetaryLineItems(parsed.items));
   const items = reconcileLineItemAmounts(

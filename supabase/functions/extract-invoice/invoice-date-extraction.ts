@@ -34,9 +34,21 @@ type OpenAiMessage = {
   content: string | Array<{ type: string; text?: string; image_url?: { url: string } }>;
 };
 
+export type OpenAiResponseFormat =
+  | { type: "json_object" }
+  | {
+      type: "json_schema";
+      json_schema: {
+        name: string;
+        strict: boolean;
+        schema: Record<string, unknown>;
+      };
+    };
+
 export async function callOpenAiJson(
   apiKey: string,
   messages: OpenAiMessage[],
+  responseFormat: OpenAiResponseFormat = { type: "json_object" },
 ): Promise<Record<string, unknown>> {
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -46,7 +58,7 @@ export async function callOpenAiJson(
     },
     body: JSON.stringify({
       model: "gpt-4.1",
-      response_format: { type: "json_object" },
+      response_format: responseFormat,
       messages,
     }),
   });
