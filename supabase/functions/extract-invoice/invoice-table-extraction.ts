@@ -47,7 +47,9 @@ Each table row has distinct columns. Copy values ONLY from their designated colu
 
 MONETARY COLUMN BINDING (use column headers — never swap columns):
 - gross_unit_price: copy ONLY from the unit/list price column (EUR suffix). Read digit by digit.
-- discount_pct: copy ONLY from the discount/% column. Strip the % symbol. Never put this in gross_unit_price or line_total_net.
+- discount_pct: copy ONLY from the discount/% column. Strip the % symbol when present.
+  Emporio Italia / dense tables: Desc.(%) often shows plain decimals WITHOUT % (e.g. 17,50 or 10,00) — still discount_pct, NOT a euro price.
+  The discount column sits BETWEEN the unit-price column and the line-total column — never copy it into gross_unit_price or line_total_net.
 - line_total_net: copy ONLY from the line total column (rightmost EUR total for the row). Read digit by digit.
 - If a row has no discount column, set discount_pct to null.
 - Downstream derives unit_price and total from these structured columns.
@@ -93,6 +95,18 @@ NEGATIVE EXAMPLES (common failures — do NOT repeat)
 → gross_unit_price: 27.56 (from P.VENDA — NOT from DESC 20)
 → discount_pct: 20 (from DESC — NOT 20 as a euro price)
 → line_total_net: 22.05 (from VALOR LÍQUIDO)
+
+Emporio Italia — "Assaporami Prosciutto Cotto" with Qtd "4,30", Preço Unit "10,30 €", Desc.(%) "17,50", Preço Total "36,54 €"
+→ quantity: 4.3
+→ gross_unit_price: 10.3 (from Preço Unit — has € suffix)
+→ discount_pct: 17.5 (from Desc.(%) — plain 17,50 without % symbol; NOT a euro price, NOT gross_unit_price)
+→ line_total_net: 36.54 (from Preço Total)
+
+Emporio Italia — discount column format examples (plain decimal, no % symbol):
+- Desc.(%) "17,50" → discount_pct: 17.5
+- Desc.(%) "10,00" → discount_pct: 10
+- Desc.(%) "8,50" → discount_pct: 8.5
+Never put these values in gross_unit_price — they are percentages from the Desc.(%) column only.
 
 "Aceto balsamico di Modena IGP pet 5l*2 Toschi" with quantity column "1"
 → quantity: 1 (NOT 2 — *2 means 2×5L pack spec, not qty purchased)
@@ -158,6 +172,8 @@ PRICE ACCURACY
 - Do not confuse 8 and 9 (e.g. 9,99 misread as 8,99).
 - DISCOUNTED LINES: Populate gross_unit_price, discount_pct, and line_total_net from their separate columns.
   Never put the discount % value into gross_unit_price. Never recompute line_total_net from qty × price.
+- Emporio Desc.(%) without %: values like 17,50 between Preço Unit and Preço Total are discount_pct (e.g. 17.5), even when no % symbol is printed.
+- Bocconcino DESC with %: values like 20,00% are discount_pct: 20 — strip the % symbol only.
 - When quantity is 1, unit_price usually equals line total (unless discount applies).
 - Do not read numerics from the description into price fields; weight ranges (4-4,25KG) are not prices.
 
