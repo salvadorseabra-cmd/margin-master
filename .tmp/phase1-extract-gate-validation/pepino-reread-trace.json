@@ -1,0 +1,93 @@
+{
+  "generated_at": "2026-06-14T10:45:00.000Z",
+  "reference_ids": {
+    "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "invoice_item_id_prior_audit": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+    "invoice_item_id_latest_reread": "dd539785-6267-437e-b2e1-34e2debc532e",
+    "wrong_ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+    "history_row_id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4"
+  },
+  "validation_modes": {
+    "simulated_gate_on": {
+      "method": "vitest syncOperationalIngredientCostsFromInvoiceLines + ingredient-match-explanation tests",
+      "gate_flag": "VITE_MATCH_LIFECYCLE_EXTRACT_GATE=true",
+      "alias_auto_confirm": "default true"
+    },
+    "observed_live_reread": {
+      "method": "readonly Supabase query via supabase CLI service_role",
+      "queried_at": "2026-06-14T10:42:42.038Z",
+      "note": "Re-extract wall-clock 2026-06-14T10:39:05Z; gate code is uncommitted local — not evidenced in running app"
+    }
+  },
+  "matcher_result_pepino_line": {
+    "item_name": "Pepino",
+    "supplier": "Bidfood Portugal",
+    "quantity": 3.36,
+    "unit": "kg",
+    "unit_price": 1.77,
+    "kind": "exact",
+    "displayState": "confirmed",
+    "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+    "alias_lookup": "miss (Bidfood::pepino)",
+    "similarityScore": 0.88,
+    "source": "query-raw.json live_match + vitest matcher logs"
+  },
+  "gate_evaluation": {
+    "isMatchLifecycleExtractGateEnabled_default": true,
+    "isExtractCostSyncAuthorizedMatch_exact": false,
+    "expected_action_gate_on": "continue after logExtractCostGateSkipped — no persist"
+  },
+  "simulated_reread_trace_gate_on": [
+    {
+      "step": 1,
+      "location": "src/routes/invoices.tsx:1358",
+      "action": "syncOperationalIngredientCostsFromInvoiceLines invoked post-insert"
+    },
+    {
+      "step": 2,
+      "location": "src/lib/ingredient-operational-intelligence.ts:958",
+      "action": "resolveInvoiceTableRowIngredientMatch → kind exact, displayState confirmed"
+    },
+    {
+      "step": 3,
+      "location": "src/lib/ingredient-operational-intelligence.ts:967-974",
+      "action": "isMatchLifecycleExtractGateEnabled() true → isExtractCostSyncAuthorizedMatch false → logExtractCostGateSkipped → continue (skip persist)"
+    },
+    {
+      "step": 4,
+      "location": "persistOperationalIngredientCostFromInvoiceLine",
+      "action": "NOT CALLED",
+      "test_evidence": "persistSpy.not.toHaveBeenCalled()"
+    }
+  ],
+  "observed_live_reread_trace": [
+    {
+      "step": 1,
+      "timestamp": "2026-06-14T10:39:05.571988Z",
+      "action": "invoice_items delete+insert for da472b7f; Pepino line id dd539785"
+    },
+    {
+      "step": 2,
+      "timestamp": "2026-06-14T10:39:06.039985Z",
+      "action": "ingredients 635a1189 current_price updated 21.99 → 1.77, purchase_quantity → 1000",
+      "inference": "persistOperationalIngredientCostFromInvoiceLine ran (extract sync without gate)"
+    },
+    {
+      "step": 3,
+      "action": "ingredient_price_history unchanged",
+      "history_count": 3,
+      "a689bd91_new_price": 0.00177
+    }
+  ],
+  "unit_test_output_excerpt": {
+    "test": "skips bare exact and suggested matches when extract gate is enabled",
+    "log": {
+      "action": "skipped",
+      "itemName": "PEPINO",
+      "matchKind": "exact",
+      "displayState": "confirmed",
+      "reason": "extract_gate_not_authorized"
+    },
+    "updatedIngredientIds": []
+  }
+}

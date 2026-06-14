@@ -1,0 +1,54 @@
+{
+  "generated_at": "2026-06-14T10:45:00.000Z",
+  "verdict_code": 2,
+  "verdict_label": "Partial protection",
+  "confidence": 0.91,
+  "summary": "Phase 1 extract gate correctly blocks Pepino bare-exact cost sync in code and unit tests when VITE_MATCH_LIFECYCLE_EXTRACT_GATE is enabled (default). Latest live Bidfood re-read (2026-06-14T10:39Z) still updated ingredients.current_price for Pepino conserva — gate not active in the running build. Existing poison row a689bd91 persists; ungated bypass paths remain (flag off, backfill, intentional manual confirm/correct).",
+  "pepino_case_blocked_when_gate_on": true,
+  "live_reread_gate_active": false,
+  "questions": {
+    "1_sync_executed_on_latest_reread": {
+      "answer": "inferred_yes",
+      "evidence": "ingredients.updated_at 2026-06-14T10:39:06Z aligns with invoice_items re-insert 2026-06-14T10:39:05Z; current_price changed to Pepino-fresh values (1.77, qty 1000)"
+    },
+    "2_isExtractCostSyncAuthorizedMatch": {
+      "answer": false,
+      "match_kind": "exact",
+      "display_state": "confirmed",
+      "evidence": "query-raw.json live_match; unit test matcher output for PEPINO→PEPINO CONSERVA"
+    },
+    "3_logExtractCostGateSkipped": {
+      "answer_simulated": true,
+      "answer_observed_live": "not_observable",
+      "evidence": "vitest stdout emits [match-lifecycle-extract-gate] action:skipped for PEPINO exact; no server log store"
+    },
+    "4_persistOperationalIngredientCostFromInvoiceLine": {
+      "answer_simulated_gate_on": false,
+      "answer_live_reread": true,
+      "evidence": "persistSpy not called in gate test; live DB current_price updated at re-read timestamp"
+    },
+    "5_appendIngredientPriceHistoryFromInvoiceLine": {
+      "answer_simulated_gate_on": false,
+      "answer_live_reread": "no_new_row",
+      "evidence": "gate test blocks before persist; live history count still 3, a689bd91 unchanged"
+    },
+    "6_ingredient_price_history_modified": {
+      "answer_live_reread": false,
+      "evidence": "3 rows unchanged; a689bd91 new_price still 0.00177, created_at 2026-05-25T12:00:00Z"
+    },
+    "7_ingredients_current_price_modified": {
+      "answer_live_reread": true,
+      "evidence": "current_price 21.99 (prior audit) → 1.77 at 2026-06-14T10:39:06Z"
+    },
+    "8_before_after_comparison": {
+      "documented_in": "before-after-comparison.json"
+    },
+    "9_gate_blocks_pepino_path": {
+      "answer_code_gate_on": true,
+      "answer_live_deployment": false
+    },
+    "10_bypass_paths": {
+      "documented_in": "bypass-risk-audit.json"
+    }
+  }
+}

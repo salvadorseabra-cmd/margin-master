@@ -1,0 +1,87 @@
+{
+  "generated_at": "2026-06-14T10:45:00.000Z",
+  "gate_location": {
+    "file": "src/lib/ingredient-operational-intelligence.ts",
+    "function": "syncOperationalIngredientCostsFromInvoiceLines",
+    "lines": "967-975",
+    "flag": "isMatchLifecycleExtractGateEnabled() — default ON unless VITE_MATCH_LIFECYCLE_EXTRACT_GATE=false|0|off"
+  },
+  "authorized_match_kinds": {
+    "always": ["confirmed-alias", "confirmed-override"],
+    "when_alias_auto_confirm_on": ["operational-memory", "operational-alias"],
+    "blocked_at_extract": ["exact", "semantic", "operational-equivalent"]
+  },
+  "callers_of_persistOperationalIngredientCostFromInvoiceLine": [
+    {
+      "caller": "syncOperationalIngredientCostsFromInvoiceLines",
+      "file": "src/lib/ingredient-operational-intelligence.ts:980",
+      "gated": true,
+      "risk": "low_when_gate_on"
+    },
+    {
+      "caller": "persistIngredientCorrectionForItem",
+      "file": "src/routes/invoices.tsx:1782",
+      "gated": false,
+      "risk": "intentional_post_confirm",
+      "note": "User confirm/correct/manual pick — expected write path after human action"
+    }
+  ],
+  "callers_of_appendIngredientPriceHistoryFromInvoiceLine": [
+    {
+      "caller": "persistOperationalIngredientCostFromInvoiceLine",
+      "file": "src/lib/ingredient-auto-persist.ts:140",
+      "gated_indirectly": true,
+      "risk": "low_when_extract_gate_on"
+    },
+    {
+      "caller": "backfillIngredientPriceHistoryFromInvoices",
+      "file": "src/lib/ingredient-price-history-backfill.ts:184",
+      "gated": false,
+      "risk": "high",
+      "note": "Replays matcher; skips only unmatched bucket — exact Pepino would re-poison. Planned Phase 7 gate not implemented."
+    }
+  ],
+  "extract_path": {
+    "file": "src/routes/invoices.tsx:1358",
+    "calls": "syncOperationalIngredientCostsFromInvoiceLines only",
+    "direct_persist_bypass": false
+  },
+  "rollback_bypass": {
+    "flag": "VITE_MATCH_LIFECYCLE_EXTRACT_GATE=false",
+    "effect": "legacy skip-unmatched-only — Pepino exact persists (proven by vitest third test case)",
+    "risk": "high_if_disabled"
+  },
+  "operational_memory_bypass": {
+    "flag": "VITE_MATCH_LIFECYCLE_ALIAS_AUTO_CONFIRM",
+    "default": true,
+    "pepino_bidfood_applicable": false,
+    "reason": "No operational-memory/alias hit for bare Pepino + Bidfood supplier"
+  },
+  "pepino_specific_bypass_for_pre_review_contamination": [
+    {
+      "path": "extract_sync_with_gate_disabled",
+      "blocks_pepino": false,
+      "severity": "critical"
+    },
+    {
+      "path": "extract_sync_with_gate_enabled",
+      "blocks_pepino": true,
+      "severity": "none"
+    },
+    {
+      "path": "backfillIngredientPriceHistoryFromInvoices",
+      "blocks_pepino": false,
+      "severity": "medium_admin_only"
+    },
+    {
+      "path": "persistIngredientCorrectionForItem",
+      "blocks_pepino": false,
+      "severity": "low_intentional_human"
+    }
+  ],
+  "live_deployment_gap": {
+    "observed": "2026-06-14T10:39 re-read wrote current_price without gate behavior",
+    "likely_cause": "Phase 1 gate code uncommitted / not built into app that performed re-read",
+    "git_status_evidence": "match-lifecycle-flags.ts, gate logic in ingredient-operational-intelligence.ts are modified/untracked in workspace"
+  }
+}

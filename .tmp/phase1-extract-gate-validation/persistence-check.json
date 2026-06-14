@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-06-14T10:45:00.000Z",
+  "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+  "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+  "queried_at": "2026-06-14T10:42:42.038Z",
+  "query_source": "supabase_cli_readonly_service_role",
+  "simulated_gate_on_reread": {
+    "syncOperationalIngredientCostsFromInvoiceLines": "executes but skips Pepino line",
+    "persistOperationalIngredientCostFromInvoiceLine": false,
+    "appendIngredientPriceHistoryFromInvoiceLine": false,
+    "ingredient_price_history_new_or_updated": false,
+    "ingredients_current_price_modified": false
+  },
+  "observed_live_latest_reread": {
+    "reread_wall_clock": "2026-06-14T10:39:05Z",
+    "syncOperationalIngredientCostsFromInvoiceLines": "inferred_executed",
+    "persistOperationalIngredientCostFromInvoiceLine": true,
+    "appendIngredientPriceHistoryFromInvoiceLine": "not_new_row",
+    "ingredient_price_history_new_or_updated": false,
+    "ingredients_current_price_modified": true,
+    "ingredient_after": {
+      "current_price": 1.77,
+      "purchase_quantity": 1000,
+      "updated_at": "2026-06-14T10:39:06.039985+00:00"
+    },
+    "history_rows_count": 3,
+    "bidfood_history_row": {
+      "id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+      "new_price": 0.00177,
+      "created_at": "2026-05-25T12:00:00+00:00",
+      "modified_on_reread": false
+    },
+    "pepino_invoice_item": {
+      "id": "dd539785-6267-437e-b2e1-34e2debc532e",
+      "name": "Pepino",
+      "quantity": 3.36,
+      "unit": "kg",
+      "unit_price": 1.77,
+      "created_at": "2026-06-14T10:39:05.571988+00:00"
+    }
+  },
+  "interpretation": "Live re-read re-poisoned ingredients.current_price via legacy extract sync. History row a689bd91 from original 2026-06-09 contamination was not deleted and was not superseded by a new insert on this re-read."
+}

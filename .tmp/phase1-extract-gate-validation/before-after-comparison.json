@@ -1,0 +1,53 @@
+{
+  "generated_at": "2026-06-14T10:45:00.000Z",
+  "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+  "comparison_scope": "Bidfood Pepino re-read on invoice da472b7f",
+  "before": {
+    "source": ".tmp/pepino-contamination-timeline/query-raw.json + persistence-trace.json",
+    "as_of": "2026-06-13 audit (post 2026-06-13T21:50 re-extract)",
+    "invoice_item_id": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+    "invoice_item_created_at": "2026-06-13T21:50:38.703943+00:00",
+    "history_count": 3,
+    "history_latest_row": {
+      "id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "new_price": 0.00177,
+      "created_at": "2026-05-25T12:00:00+00:00"
+    },
+    "ingredients_current_price": 21.99,
+    "ingredients_purchase_quantity": 6,
+    "ingredients_updated_at": "2026-06-13T21:54:23.387484+00:00"
+  },
+  "after": {
+    "source": "live readonly Supabase query",
+    "as_of": "2026-06-14T10:42:42Z (following 2026-06-14T10:39 re-extract)",
+    "invoice_item_id": "dd539785-6267-437e-b2e1-34e2debc532e",
+    "invoice_item_created_at": "2026-06-14T10:39:05.571988+00:00",
+    "history_count": 3,
+    "history_latest_row": {
+      "id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "new_price": 0.00177,
+      "created_at": "2026-05-25T12:00:00+00:00"
+    },
+    "ingredients_current_price": 1.77,
+    "ingredients_purchase_quantity": 1000,
+    "ingredients_updated_at": "2026-06-14T10:39:06.039985+00:00"
+  },
+  "delta": {
+    "history_count": 0,
+    "history_latest_row_changed": false,
+    "current_price_changed": true,
+    "current_price_delta": "21.99 → 1.77 (re-contaminated with Pepino fresco pack semantics)",
+    "purchase_quantity_changed": true,
+    "purchase_quantity_delta": "6 → 1000",
+    "new_history_row_on_reread": false,
+    "gate_would_have_blocked_if_enabled": true
+  },
+  "simulated_after_if_gate_on": {
+    "source": "vitest ingredient-operational-intelligence-extract-gate.test.ts",
+    "history_count": "unchanged (no write)",
+    "current_price": "unchanged (no write)",
+    "updatedIngredientIds": []
+  }
+}
