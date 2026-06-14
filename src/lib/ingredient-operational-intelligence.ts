@@ -16,8 +16,13 @@ import type {
 import { buildInvoiceMatchCatalog } from "@/lib/ingredient-canonical-synthesis";
 import {
   buildMatchExplanation,
+  isExtractCostSyncAuthorizedMatch,
   type InvoiceIngredientDisplayState,
 } from "@/lib/ingredient-match-explanation";
+import {
+  isMatchLifecycleAliasAutoConfirmEnabled,
+  isMatchLifecycleExtractGateEnabled,
+} from "@/lib/match-lifecycle-flags";
 import {
   invoiceRowMatchSummaryBucket,
   resolveInvoiceTableRowIngredientMatch,
@@ -50,6 +55,7 @@ import type { Database } from "@/integrations/supabase/types";
 type DbClient = SupabaseClient<Database>;
 
 const LOG_PREFIX = "[ingredient-operational-intelligence]";
+const EXTRACT_GATE_LOG_PREFIX = "[match-lifecycle-extract-gate]";
 const INVOICE_ITEM_SCAN_LIMIT = 800;
 export const MATCHED_INVOICE_PRODUCTS_SCAN_LIMIT = 5000;
 const MATCHED_INVOICE_PRODUCTS_CACHE_TTL_MS = 60_000;
@@ -899,6 +905,33 @@ export type InvoiceLineOperationalCostSyncInput = {
   supplierName?: string | null;
 };
 
+function logExtractCostGateSkipped(
+  itemName: string,
+  matchKind: string,
+  displayState: InvoiceIngredientDisplayState,
+): void {
+  console.info(EXTRACT_GATE_LOG_PREFIX, {
+    action: "skipped",
+    itemName,
+    matchKind,
+    displayState,
+    reason: "extract_gate_not_authorized",
+  });
+}
+
+function logExtractCostGatePersisted(
+  itemName: string,
+  matchKind: string,
+  ingredientId: string,
+): void {
+  console.info(EXTRACT_GATE_LOG_PREFIX, {
+    action: "persisted",
+    itemName,
+    matchKind,
+    ingredientId,
+  });
+}
+
 /** After invoice ingest, push matched line prices onto canonical `ingredients` rows. */
 export async function syncOperationalIngredientCostsFromInvoiceLines(
   client: DbClient,
@@ -930,7 +963,19 @@ export async function syncOperationalIngredientCostsFromInvoiceLines(
     );
     const matchedIngredientId = match?.ingredient.id?.trim();
     if (!match || !matchedIngredientId) continue;
-    if (invoiceRowMatchSummaryBucket(state.displayState) === "unmatched") continue;
+
+    if (isMatchLifecycleExtractGateEnabled()) {
+      if (
+        !isExtractCostSyncAuthorizedMatch(match, {
+          aliasAutoConfirm: isMatchLifecycleAliasAutoConfirmEnabled(),
+        })
+      ) {
+        logExtractCostGateSkipped(item.name, match.kind, state.displayState);
+        continue;
+      }
+    } else if (invoiceRowMatchSummaryBucket(state.displayState) === "unmatched") {
+      continue;
+    }
 
     const { updated, error } = await persistOperationalIngredientCostFromInvoiceLine(
       client,
@@ -947,7 +992,12 @@ export async function syncOperationalIngredientCostsFromInvoiceLines(
       logQueryFailure("syncOperationalIngredientCostsFromInvoiceLines", error.message);
       continue;
     }
-    if (updated) updatedIngredientIds.add(matchedIngredientId);
+    if (updated) {
+      updatedIngredientIds.add(matchedIngredientId);
+      if (isMatchLifecycleExtractGateEnabled()) {
+        logExtractCostGatePersisted(item.name, match.kind, matchedIngredientId);
+      }
+    }
   }
 
   return { updatedIngredientIds: [...updatedIngredientIds] };

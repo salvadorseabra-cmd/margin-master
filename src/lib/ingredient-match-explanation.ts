@@ -41,6 +41,28 @@ export function isSuggestedIngredientMatch(
   return match?.kind === "semantic" || match?.kind === "operational-equivalent";
 }
 
+/**
+ * Phase 1 extract gate: only prior-confirmed match kinds may write cost at ingest.
+ * Bare `exact` (e.g. Pepino family match) and suggested kinds are excluded.
+ */
+export function isExtractCostSyncAuthorizedMatch(
+  match: Pick<IngredientCanonicalMatch, "kind"> | null | undefined,
+  options: { aliasAutoConfirm?: boolean } = {},
+): boolean {
+  if (!match) return false;
+  const aliasAutoConfirm = options.aliasAutoConfirm !== false;
+  switch (match.kind) {
+    case "confirmed-alias":
+    case "confirmed-override":
+      return true;
+    case "operational-memory":
+    case "operational-alias":
+      return aliasAutoConfirm;
+    default:
+      return false;
+  }
+}
+
 export function isInvoiceLineMatchedOrSuggested(
   match: IngredientCanonicalMatch | null | undefined,
 ): boolean {

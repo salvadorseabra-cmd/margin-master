@@ -4,6 +4,7 @@ import {
   buildMatchTargetLabel,
   formatMatchReasoningTooltip,
   formatMatchTargetLabel,
+  isExtractCostSyncAuthorizedMatch,
   isInvoiceLineMatchedOrSuggested,
   matchTargetLabelPrefix,
   resolveConfirmedAliasScope,
@@ -23,6 +24,37 @@ const baseMatch = (
   normalizedIngredientName: "tomate cherry",
   reason: "same normalized ingredient name",
   ...overrides,
+});
+
+describe("isExtractCostSyncAuthorizedMatch", () => {
+  it("authorizes alias and override matches for extract cost sync", () => {
+    expect(isExtractCostSyncAuthorizedMatch(baseMatch({ kind: "confirmed-alias" }))).toBe(true);
+    expect(isExtractCostSyncAuthorizedMatch(baseMatch({ kind: "confirmed-override" }))).toBe(true);
+    expect(isExtractCostSyncAuthorizedMatch(baseMatch({ kind: "operational-memory" }))).toBe(true);
+    expect(isExtractCostSyncAuthorizedMatch(baseMatch({ kind: "operational-alias" }))).toBe(true);
+  });
+
+  it("blocks bare exact and suggested kinds until user confirms", () => {
+    expect(isExtractCostSyncAuthorizedMatch(baseMatch({ kind: "exact" }))).toBe(false);
+    expect(isExtractCostSyncAuthorizedMatch(baseMatch({ kind: "semantic" }))).toBe(false);
+    expect(
+      isExtractCostSyncAuthorizedMatch(baseMatch({ kind: "operational-equivalent" })),
+    ).toBe(false);
+    expect(isExtractCostSyncAuthorizedMatch(null)).toBe(false);
+  });
+
+  it("excludes operational-memory when alias auto-confirm is disabled", () => {
+    expect(
+      isExtractCostSyncAuthorizedMatch(baseMatch({ kind: "operational-memory" }), {
+        aliasAutoConfirm: false,
+      }),
+    ).toBe(false);
+    expect(
+      isExtractCostSyncAuthorizedMatch(baseMatch({ kind: "confirmed-alias" }), {
+        aliasAutoConfirm: false,
+      }),
+    ).toBe(true);
+  });
 });
 
 describe("resolveInvoiceIngredientDisplayState", () => {
