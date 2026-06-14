@@ -62,6 +62,8 @@ serve(async (req) => {
     console.log("[invoice-ocr] stage=2 ocr-started", {
       provider: "openai",
       model: "gpt-4.1",
+      temperature: 0,
+      seed: 42,
       mode: "vision-json-four-pass",
       passes: ["date-specialist", "supplier-specialist", "footer-totals-specialist", "table-specialist"],
       note: "deterministic OCR parsers (parseContinente/parsePadaria/stages.ts) not invoked",

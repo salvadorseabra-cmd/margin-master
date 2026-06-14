@@ -1,0 +1,372 @@
+[
+  {
+    "crop": "full",
+    "run": 1,
+    "elapsed_s": 20.1,
+    "item_count": 8,
+    "items": [
+      {
+        "name": "Filete de Anchoas Alconfirosa LI 495 g",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 9.99,
+        "total": 19.98
+      },
+      {
+        "name": "Ovo Líquido Past.Gema Dovo 1 Kg",
+        "quantity": 6,
+        "unit": "un",
+        "unit_price": 10.49,
+        "total": 62.94
+      },
+      {
+        "name": "Pepinos Extra Uli Frasco 6x720 g",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 22.49,
+        "total": 22.49
+      },
+      {
+        "name": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 13.1,
+        "total": 13.1
+      },
+      {
+        "name": "Arroz Agulha Metro Chef 12x1 kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 13.95,
+        "total": 13.95
+      },
+      {
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 29.99,
+        "total": 59.98
+      },
+      {
+        "name": "Açucar Branco METRO Chef 10x1 Kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 9.99,
+        "total": 9.99
+      },
+      {
+        "name": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+        "quantity": 5,
+        "unit": "cx",
+        "unit_price": 18.89,
+        "total": 94.45
+      }
+    ],
+    "supplier": null,
+    "total": 330.42,
+    "anchovas": {
+      "name": "Filete de Anchoas Alconfirosa LI 495 g",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 9.99,
+      "total": 19.98
+    },
+    "status": 200
+  },
+  {
+    "crop": "full",
+    "run": 2,
+    "elapsed_s": 13.8,
+    "item_count": 8,
+    "items": [
+      {
+        "name": "Filete de Anchoas Alconfirosa LI 495 g",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 9.99,
+        "total": 19.98
+      },
+      {
+        "name": "Ovo Líquido Past.Gema Dovo 1 Kg",
+        "quantity": 6,
+        "unit": "un",
+        "unit_price": 10.49,
+        "total": 62.94
+      },
+      {
+        "name": "Pepinos Extra Uli Frasco 6x720 g",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 22.49,
+        "total": 22.49
+      },
+      {
+        "name": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 13.1,
+        "total": 13.1
+      },
+      {
+        "name": "Arroz Agulha Metro Chef 12x1 kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 13.95,
+        "total": 13.95
+      },
+      {
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 29.99,
+        "total": 59.98
+      },
+      {
+        "name": "Açucar Branco METRO Chef 10x1 Kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 9.99,
+        "total": 9.99
+      },
+      {
+        "name": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+        "quantity": 5,
+        "unit": "cx",
+        "unit_price": 18.89,
+        "total": 94.45
+      }
+    ],
+    "supplier": null,
+    "total": 330.42,
+    "anchovas": {
+      "name": "Filete de Anchoas Alconfirosa LI 495 g",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 9.99,
+      "total": 19.98
+    },
+    "status": 200
+  },
+  {
+    "crop": "full",
+    "run": 3,
+    "elapsed_s": 13,
+    "item_count": 8,
+    "items": [
+      {
+        "name": "Filete de Anchoas Alconfirosa LI 495 g",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 9.99,
+        "total": 19.98
+      },
+      {
+        "name": "Ovo Líquido Past.Gema Dovo 1 Kg",
+        "quantity": 6,
+        "unit": "un",
+        "unit_price": 10.49,
+        "total": 62.94
+      },
+      {
+        "name": "Pepinos Extra Uli Frasco 6x720 g",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 22.49,
+        "total": 22.49
+      },
+      {
+        "name": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 13.1,
+        "total": 13.1
+      },
+      {
+        "name": "Arroz Agulha Metro Chef 12x1 kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 13.95,
+        "total": 13.95
+      },
+      {
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 29.99,
+        "total": 59.98
+      },
+      {
+        "name": "Açucar Branco METRO Chef 10x1 Kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 9.99,
+        "total": 9.99
+      },
+      {
+        "name": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+        "quantity": 5,
+        "unit": "cx",
+        "unit_price": 18.89,
+        "total": 94.45
+      }
+    ],
+    "supplier": null,
+    "total": 330.42,
+    "anchovas": {
+      "name": "Filete de Anchoas Alconfirosa LI 495 g",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 9.99,
+      "total": 19.98
+    },
+    "status": 200
+  },
+  {
+    "crop": "full",
+    "run": 4,
+    "elapsed_s": 15,
+    "item_count": 8,
+    "items": [
+      {
+        "name": "Filete de Anchoas Alconfirosa LI 495 g",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 9.99,
+        "total": 19.98
+      },
+      {
+        "name": "Ovo Líquido Past.Gema Dovo 1 Kg",
+        "quantity": 6,
+        "unit": "un",
+        "unit_price": 10.49,
+        "total": 62.94
+      },
+      {
+        "name": "Pepinos Extra Uli Frasco 6x720 g",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 22.49,
+        "total": 22.49
+      },
+      {
+        "name": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 13.1,
+        "total": 13.1
+      },
+      {
+        "name": "Arroz Agulha Metro Chef 12x1 kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 13.95,
+        "total": 13.95
+      },
+      {
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 29.99,
+        "total": 59.98
+      },
+      {
+        "name": "Açucar Branco METRO Chef 10x1 Kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 9.99,
+        "total": 9.99
+      },
+      {
+        "name": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+        "quantity": 5,
+        "unit": "cx",
+        "unit_price": 18.89,
+        "total": 94.45
+      }
+    ],
+    "supplier": null,
+    "total": 330.42,
+    "anchovas": {
+      "name": "Filete de Anchoas Alconfirosa LI 495 g",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 9.99,
+      "total": 19.98
+    },
+    "status": 200
+  },
+  {
+    "crop": "full",
+    "run": 5,
+    "elapsed_s": 15.1,
+    "item_count": 8,
+    "items": [
+      {
+        "name": "Filete de Anchoas Alconfirosa LI 495 g",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 9.99,
+        "total": 19.98
+      },
+      {
+        "name": "Ovo Líquido Past.Gema Dovo 1 Kg",
+        "quantity": 6,
+        "unit": "un",
+        "unit_price": 10.49,
+        "total": 62.94
+      },
+      {
+        "name": "Pepinos Extra Uli Frasco 6x720 g",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 22.49,
+        "total": 22.49
+      },
+      {
+        "name": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 13.1,
+        "total": 13.1
+      },
+      {
+        "name": "Arroz Agulha Metro Chef 12x1 kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 13.95,
+        "total": 13.95
+      },
+      {
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 29.99,
+        "total": 59.98
+      },
+      {
+        "name": "Açucar Branco METRO Chef 10x1 Kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 9.99,
+        "total": 9.99
+      },
+      {
+        "name": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+        "quantity": 5,
+        "unit": "cx",
+        "unit_price": 18.89,
+        "total": 94.45
+      }
+    ],
+    "supplier": null,
+    "total": 330.42,
+    "anchovas": {
+      "name": "Filete de Anchoas Alconfirosa LI 495 g",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 9.99,
+      "total": 19.98
+    },
+    "status": 200
+  }
+]

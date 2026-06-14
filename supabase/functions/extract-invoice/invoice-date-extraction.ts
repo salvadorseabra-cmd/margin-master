@@ -45,11 +45,25 @@ export type OpenAiResponseFormat =
       };
     };
 
+/** Shared sampling controls for all invoice OCR passes (gpt-4.1 vision). */
+export const OPENAI_OCR_MODEL = "gpt-4.1";
+export const OPENAI_OCR_TEMPERATURE = 0;
+/** Fixed seed for reproducible OCR; supported on gpt-4.1 chat completions. */
+export const OPENAI_OCR_SEED = 42;
+
 export async function callOpenAiJson(
   apiKey: string,
   messages: OpenAiMessage[],
   responseFormat: OpenAiResponseFormat = { type: "json_object" },
 ): Promise<Record<string, unknown>> {
+  console.log("[invoice-ocr] openai-request", {
+    model: OPENAI_OCR_MODEL,
+    temperature: OPENAI_OCR_TEMPERATURE,
+    top_p: null,
+    seed: OPENAI_OCR_SEED,
+    response_format: responseFormat.type,
+  });
+
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -57,7 +71,9 @@ export async function callOpenAiJson(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "gpt-4.1",
+      model: OPENAI_OCR_MODEL,
+      temperature: OPENAI_OCR_TEMPERATURE,
+      seed: OPENAI_OCR_SEED,
       response_format: responseFormat,
       messages,
     }),
