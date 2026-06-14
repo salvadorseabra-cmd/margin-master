@@ -242,4 +242,19 @@ describe("match-lifecycle-service", () => {
     expect(result.data?.previous_ingredient_id).toBe("ing-confirmed");
     expect(rows.get("item-1")?.status).toBe("unmatched");
   });
+
+  it("markUnmatched writes even when dual-write flag is disabled", async () => {
+    vi.spyOn(matchLifecycleFlags, "isMatchLifecycleDualWriteEnabled").mockReturnValue(false);
+    const { client, rows, getWriteCount } = createMockSupabase([confirmedRow]);
+
+    const result = await markUnmatched(client, {
+      ...baseContext,
+      previousIngredientId: "ing-confirmed",
+    });
+
+    expect(result.skipped).toBe(false);
+    expect(result.data?.status).toBe("unmatched");
+    expect(getWriteCount()).toBeGreaterThan(0);
+    expect(rows.get("item-1")?.status).toBe("unmatched");
+  });
 });

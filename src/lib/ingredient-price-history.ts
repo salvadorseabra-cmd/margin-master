@@ -580,6 +580,72 @@ export async function appendIngredientPriceHistoryFromInvoiceLine(
   return { inserted: true, error: null };
 }
 
+/** Deletes the attributable history row for `(invoice_id, ingredient_id)`. */
+export async function deleteIngredientPriceHistoryForInvoiceIngredient(
+  client: AppSupabaseClient,
+  invoiceId: string,
+  ingredientId: string,
+): Promise<{ deleted: boolean; error: PostgrestError | null }> {
+  const inv = invoiceId.trim();
+  const ing = ingredientId.trim();
+  if (!inv || !ing) return { deleted: false, error: null };
+
+  try {
+    const { data, error } = await client
+      .from("ingredient_price_history")
+      .delete()
+      .eq("invoice_id", inv)
+      .eq("ingredient_id", ing)
+      .select("id");
+    if (error) {
+      logSupabaseError("deleteIngredientPriceHistoryForInvoiceIngredient", error);
+      return { deleted: false, error };
+    }
+    return { deleted: (data?.length ?? 0) > 0, error: null };
+  } catch (err) {
+    console.error(
+      `${LOG_PREFIX} deleteIngredientPriceHistoryForInvoiceIngredient threw: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
+    );
+    return { deleted: false, error: null };
+  }
+}
+
+/** Reverts `ingredients.current_price` from latest linked history after subtractive cleanup. */
+export async function revertIngredientCurrentPriceFromHistory(
+  client: AppSupabaseClient,
+  ingredientId: string,
+): Promise<{ updated: boolean; error: PostgrestError | null }> {
+  const id = ingredientId.trim();
+  if (!id) return { updated: false, error: null };
+
+  const snapshot = await fetchIngredientPriceSnapshot(client, id);
+  if (!snapshot) return { updated: false, error: null };
+
+  const latestOperational = await fetchLatestHistoryNewPrice(client, id);
+  let current_price: number | null = null;
+  if (latestOperational != null && Number.isFinite(latestOperational)) {
+    current_price = latestOperational * purchaseQuantityDenom(snapshot.purchase_quantity);
+  }
+
+  try {
+    const { error } = await client.from("ingredients").update({ current_price }).eq("id", id);
+    if (error) {
+      logSupabaseError("revertIngredientCurrentPriceFromHistory", error);
+      return { updated: false, error };
+    }
+    return { updated: true, error: null };
+  } catch (err) {
+    console.error(
+      `${LOG_PREFIX} revertIngredientCurrentPriceFromHistory threw: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
+    );
+    return { updated: false, error: null };
+  }
+}
+
 /**
  * Chronological series (oldest → newest) for charting. Fetches the latest `limit`
  * rows by time, then reverses so X-axis time increases left-to-right.

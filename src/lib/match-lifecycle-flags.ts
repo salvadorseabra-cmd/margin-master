@@ -78,3 +78,15 @@ export function isMatchLifecycleReadCutoverEnabled(
   const raw = readLifecycleFlag("VITE_MATCH_LIFECYCLE_READ_CUTOVER", env);
   return raw === "true" || raw === "1" || raw === "on";
 }
+
+/**
+ * Phase 5 subtractive pricing: delete history + reconcile on unmatch/correct-away.
+ * Default ON — disable with VITE_MATCH_LIFECYCLE_SUBTRACTIVE_PRICING=false|0|off
+ */
+export function isMatchLifecycleSubtractivePricingEnabled(
+  env: Record<string, string | undefined> = import.meta.env,
+): boolean {
+  const raw = readLifecycleFlag("VITE_MATCH_LIFECYCLE_SUBTRACTIVE_PRICING", env);
+  if (raw === "false" || raw === "0" || raw === "off") return false;
+  return true;
+}

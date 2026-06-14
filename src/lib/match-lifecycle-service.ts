@@ -250,8 +250,7 @@ export async function markUnmatched(
     now?: string;
   },
 ): Promise<MatchLifecycleWriteResult> {
-  if (!isMatchLifecycleDualWriteEnabled()) return skippedWrite();
-
+  const now = params.now ?? new Date().toISOString();
   const { data: existing, error: loadError } = await getInvoiceItemMatchByInvoiceItemId(
     client,
     params.invoiceItemId,
@@ -274,7 +273,11 @@ export async function markUnmatched(
       params.invoiceItemId,
       {
         status: "unmatched",
+        ingredient_id: null,
         previous_ingredient_id: previousIngredientId,
+        corrected_at: previousIngredientId ? now : null,
+        match_kind: null,
+        confirmed_at: null,
       },
       existing,
     );

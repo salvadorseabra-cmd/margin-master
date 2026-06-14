@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, Plus } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -7,6 +7,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,13 @@ import {
 } from "@/lib/ingredient-picker-options";
 import { traceIngredientPickerOptionsStage } from "@/lib/ingredient-picker-trace";
 
+/** Sentinel value for "Remove match" — not a real ingredient id. */
+export const INVOICE_INGREDIENT_CORRECTION_NO_MATCH = "__invoice_no_match__" as const;
+
+export function isInvoiceIngredientCorrectionNoMatch(value: string): boolean {
+  return value === INVOICE_INGREDIENT_CORRECTION_NO_MATCH;
+}
+
 type InvoiceIngredientCorrectionPickerProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -24,6 +32,9 @@ type InvoiceIngredientCorrectionPickerProps = {
   ingredients: IngredientPickerOption[];
   selectedIngredientId?: string | null;
   onSelect: (ingredientId: string) => void;
+  onSelectNoMatch?: () => void;
+  onCreateIngredient?: () => void;
+  createIngredientDisabled?: boolean;
   disabled?: boolean;
   /** Readonly chip label, e.g. "Matched to: Novilho acém sem osso". */
   matchLabel?: string | null;
@@ -41,6 +52,9 @@ export function InvoiceIngredientCorrectionPicker({
   ingredients,
   selectedIngredientId,
   onSelect,
+  onSelectNoMatch,
+  onCreateIngredient,
+  createIngredientDisabled,
   disabled,
   matchLabel,
   ingredientId,
@@ -90,7 +104,41 @@ export function InvoiceIngredientCorrectionPicker({
           <CommandInput placeholder="Search ingredients…" className="h-9" />
           <CommandList>
             <CommandEmpty>No ingredient found.</CommandEmpty>
-            <CommandGroup>
+            {(onSelectNoMatch || onCreateIngredient) && (
+              <>
+                <CommandGroup heading="Actions">
+                  {onSelectNoMatch && (
+                    <CommandItem
+                      value="no match remove"
+                      keywords={["no", "match", "none", "unmatch", "remove"]}
+                      onSelect={() => {
+                        onSelectNoMatch();
+                        onOpenChange(false);
+                      }}
+                    >
+                      <span className="text-muted-foreground">No match</span>
+                    </CommandItem>
+                  )}
+                  {onCreateIngredient && (
+                    <CommandItem
+                      value="create ingredient new"
+                      keywords={["create", "new", "ingredient"]}
+                      disabled={createIngredientDisabled}
+                      onSelect={() => {
+                        if (createIngredientDisabled) return;
+                        onCreateIngredient();
+                        onOpenChange(false);
+                      }}
+                    >
+                      <Plus className="mr-1.5 h-3.5 w-3.5 shrink-0 opacity-70" />
+                      <span>Create ingredient</span>
+                    </CommandItem>
+                  )}
+                </CommandGroup>
+                <CommandSeparator />
+              </>
+            )}
+            <CommandGroup heading="Existing ingredients">
               {sorted.map((row) => (
                 <CommandItem
                   key={row.id}

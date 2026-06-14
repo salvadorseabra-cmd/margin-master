@@ -178,6 +178,7 @@ import {
   correctMatch,
   reassignMatch,
 } from "@/lib/match-lifecycle-service";
+import { unmatchInvoiceLineMatch } from "@/lib/match-lifecycle-unmatch";
 import { dispatchOperationalIngredientCostChanged } from "@/lib/resolve-operational-ingredient-cost";
 import {
   fileNameFromInvoicePath,
@@ -2142,6 +2143,57 @@ function InvoicesPage() {
     return result;
   };
 
+  const unmatchInvoiceLine = async (
+    item: ItemRow,
+    invoiceId: string,
+    supplierName: string | null | undefined,
+    options: {
+      previousIngredientId?: string | null;
+      wasConfirmed?: boolean;
+      rawItemName?: string | null;
+    },
+  ): Promise<{ ok: boolean; error?: string }> => {
+    if (!user) return { ok: false, error: "Not signed in" };
+
+    const result = await unmatchInvoiceLineMatch({
+      client: supabase,
+      invoiceItemId: item.id,
+      invoiceId,
+      userId: user.id,
+      itemName: item.name,
+      supplierName,
+      rawItemName: options.rawItemName ?? item.name,
+      previousIngredientId: options.previousIngredientId,
+      wasConfirmed: options.wasConfirmed,
+    });
+
+    if (!result.ok) {
+      return { ok: false, error: result.error ?? "Could not remove match" };
+    }
+
+    if (isMatchLifecycleReadCutoverEnabled()) {
+      setPersistedMatchByItemId((current) => {
+        const next = new Map(current);
+        next.set(item.id, {
+          ingredient_id: null,
+          status: "unmatched",
+          match_kind: null,
+        });
+        persistedMatchByItemIdRef.current = next;
+        return next;
+      });
+    }
+
+    if (options.previousIngredientId) {
+      dispatchOperationalIngredientCostChanged({
+        trigger: "invoice_unmatch",
+        ingredientId: options.previousIngredientId,
+      });
+    }
+
+    return { ok: true };
+  };
+
   const canonicalCreateDefaults = useMemo(() => {
     if (!canonicalCreateContext) return null;
     return buildCanonicalIngredientCreateDefaults(canonicalCreateContext.item, {
@@ -2737,6 +2789,9 @@ function InvoicesPage() {
                                   lifecycle,
                                 )
                               }
+                              onUnmatchInvoiceLine={(item, options) =>
+                                unmatchInvoiceLine(item, r.id, r.supplier_name, options)
+                              }
                               onBulkCreateIngredients={(submissions, candidates) =>
                                 saveBulkCanonicalIngredientsFromInvoice(
                                   r.id,
@@ -3054,6 +3109,7 @@ function ItemsTable({
   onCreateIngredient,
   onConfirmIngredientMatch,
   onSelectIngredientForItem,
+  onUnmatchInvoiceLine,
   onBulkCreateIngredients,
   rejectedMatchItemIds,
   onRejectedMatchItemIdsChange,
@@ -3084,6 +3140,14 @@ function ItemsTable({
     item: ItemRow,
     ingredientId: string,
     lifecycle?: IngredientSelectLifecycleOptions,
+  ) => Promise<{ ok: boolean; error?: string }>;
+  onUnmatchInvoiceLine: (
+    item: ItemRow,
+    options: {
+      previousIngredientId?: string | null;
+      wasConfirmed?: boolean;
+      rawItemName?: string | null;
+    },
   ) => Promise<{ ok: boolean; error?: string }>;
   onBulkCreateIngredients: (
     submissions: BulkCanonicalIngredientCreateSubmitRow[],
@@ -3202,6 +3266,33 @@ function ItemsTable({
     setSavingCorrectionLineId(null);
     if (result.ok) {
       toast("Ingredient mapping saved");
+      return;
+    }
+    if (result.error) {
+      toast.error(result.error);
+    }
+  };
+
+  const handleRemoveCorrectionMatch = async (item: ItemRow, rawName: string) => {
+    const snapshot = correctionSnapshotRef.current.get(item.id);
+    const previousIngredientId = snapshot?.previousIngredientId ?? null;
+    const wasConfirmed = snapshot?.wasConfirmed ?? false;
+    correctionSnapshotRef.current.delete(item.id);
+    setEditingMatchRowId(null);
+
+    if (!previousIngredientId) {
+      return;
+    }
+
+    setSavingCorrectionLineId(item.id);
+    const result = await onUnmatchInvoiceLine(item, {
+      previousIngredientId,
+      wasConfirmed,
+      rawItemName: rawName,
+    });
+    setSavingCorrectionLineId(null);
+    if (result.ok) {
+      toast("Match removed");
       return;
     }
     if (result.error) {
@@ -3629,6 +3720,13 @@ function ItemsTable({
                                 ingredientId,
                                 rawName,
                               )
+                            }
+                            onSelectNoMatch={() =>
+                              void handleRemoveCorrectionMatch(renderItem, rawName)
+                            }
+                            onCreateIngredient={() => onCreateIngredient(renderItem)}
+                            createIngredientDisabled={
+                              creatingIngredient || !canCreateIngredient
                             }
                             disabled={correctionBusy}
                           />
