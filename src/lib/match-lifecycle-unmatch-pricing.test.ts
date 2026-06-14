@@ -2,7 +2,10 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import * as priceHistory from "@/lib/ingredient-price-history";
 import * as reconcile from "@/lib/ingredient-price-history-reconcile";
 import * as matchLifecycleFlags from "@/lib/match-lifecycle-flags";
-import { subtractivePricingCleanupForUnmatch } from "@/lib/match-lifecycle-unmatch-pricing";
+import {
+  subtractivePricingCleanupForPreviousIngredient,
+  subtractivePricingCleanupForUnmatch,
+} from "@/lib/match-lifecycle-unmatch-pricing";
 
 describe("subtractivePricingCleanupForUnmatch", () => {
   const client = {} as priceHistory.AppSupabaseClient;
@@ -76,5 +79,18 @@ describe("subtractivePricingCleanupForUnmatch", () => {
 
     expect(result.cleaned).toBe(false);
     expect(priceHistory.deleteIngredientPriceHistoryForInvoiceIngredient).not.toHaveBeenCalled();
+  });
+
+  it("shared previous-ingredient cleanup deletes history without flag gate", async () => {
+    vi.spyOn(matchLifecycleFlags, "isMatchLifecycleSubtractivePricingEnabled").mockReturnValue(false);
+
+    const result = await subtractivePricingCleanupForPreviousIngredient(client, {
+      invoiceId: "inv-1",
+      ingredientId: "ing-pepino",
+      wasConfirmed: true,
+    });
+
+    expect(result.cleaned).toBe(true);
+    expect(priceHistory.deleteIngredientPriceHistoryForInvoiceIngredient).toHaveBeenCalled();
   });
 });

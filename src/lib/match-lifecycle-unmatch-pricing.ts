@@ -11,31 +11,33 @@ import { isMatchLifecycleSubtractivePricingEnabled } from "@/lib/match-lifecycle
 
 const LOG_PREFIX = "[match-lifecycle-unmatch-pricing]";
 
-export type SubtractiveUnmatchPricingParams = {
+export type SubtractivePreviousIngredientParams = {
   invoiceId: string;
   ingredientId: string;
-  /** T5 confirmed→unmatched always cleans; T4 only when a legacy row exists. */
+  /** Confirmed transitions always clean; suggested only when a legacy row exists. */
   wasConfirmed: boolean;
 };
 
-export type SubtractiveUnmatchPricingResult = {
+/** @deprecated Use {@link SubtractivePreviousIngredientParams} */
+export type SubtractiveUnmatchPricingParams = SubtractivePreviousIngredientParams;
+
+export type SubtractivePricingCleanupResult = {
   cleaned: boolean;
   historyDeleted: boolean;
   error: PostgrestError | null;
 };
 
-/**
- * T4/T5 subtractive cleanup: delete `(invoice_id, ingredient_id)` history, rechains,
- * and reverts `ingredients.current_price` from surviving history.
- */
-export async function subtractivePricingCleanupForUnmatch(
-  client: AppSupabaseClient,
-  params: SubtractiveUnmatchPricingParams,
-): Promise<SubtractiveUnmatchPricingResult> {
-  if (!isMatchLifecycleSubtractivePricingEnabled()) {
-    return { cleaned: false, historyDeleted: false, error: null };
-  }
+/** @deprecated Use {@link SubtractivePricingCleanupResult} */
+export type SubtractiveUnmatchPricingResult = SubtractivePricingCleanupResult;
 
+/**
+ * Shared subtractive cleanup: delete `(invoice_id, ingredient_id)` history, rechain,
+ * and revert `ingredients.current_price` from surviving history.
+ */
+export async function subtractivePricingCleanupForPreviousIngredient(
+  client: AppSupabaseClient,
+  params: SubtractivePreviousIngredientParams,
+): Promise<SubtractivePricingCleanupResult> {
   const invoiceId = params.invoiceId.trim();
   const ingredientId = params.ingredientId.trim();
   if (!invoiceId || !ingredientId) {
@@ -81,4 +83,18 @@ export async function subtractivePricingCleanupForUnmatch(
     historyDeleted: deleteResult.deleted,
     error: null,
   };
+}
+
+/**
+ * T4/T5 subtractive cleanup on unmatch.
+ */
+export async function subtractivePricingCleanupForUnmatch(
+  client: AppSupabaseClient,
+  params: SubtractiveUnmatchPricingParams,
+): Promise<SubtractiveUnmatchPricingResult> {
+  if (!isMatchLifecycleSubtractivePricingEnabled()) {
+    return { cleaned: false, historyDeleted: false, error: null };
+  }
+
+  return subtractivePricingCleanupForPreviousIngredient(client, params);
 }

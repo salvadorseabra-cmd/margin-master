@@ -178,6 +178,7 @@ import {
   correctMatch,
   reassignMatch,
 } from "@/lib/match-lifecycle-service";
+import { subtractivePricingCleanupForReassign } from "@/lib/match-lifecycle-reassign-pricing";
 import { unmatchInvoiceLineMatch } from "@/lib/match-lifecycle-unmatch";
 import { dispatchOperationalIngredientCostChanged } from "@/lib/resolve-operational-ingredient-cost";
 import {
@@ -2112,6 +2113,28 @@ function InvoicesPage() {
       blocked: true,
       blockReason: "ingredient_aliases_only",
     });
+    if (
+      lifecycle?.previousIngredientId &&
+      lifecycle.previousIngredientId !== ingredientId
+    ) {
+      const cleanupResult = await subtractivePricingCleanupForReassign(supabase, {
+        invoiceId,
+        previousIngredientId: lifecycle.previousIngredientId,
+        wasConfirmed: lifecycle.wasConfirmed === true,
+      });
+      if (cleanupResult.error) {
+        console.error(
+          "[invoices] reassign subtractive cleanup failed:",
+          lifecycle.previousIngredientId,
+          cleanupResult.error.message,
+        );
+      }
+      dispatchOperationalIngredientCostChanged({
+        trigger: "invoice_reassign",
+        ingredientId: lifecycle.previousIngredientId,
+      });
+    }
+
     const result = await persistIngredientCorrectionForItem(
       item,
       ingredientId,

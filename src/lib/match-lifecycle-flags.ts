@@ -80,13 +80,26 @@ export function isMatchLifecycleReadCutoverEnabled(
 }
 
 /**
- * Phase 5 subtractive pricing: delete history + reconcile on unmatch/correct-away.
+ * Phase 5 subtractive pricing: delete history + reconcile on unmatch and reassign-away.
  * Default ON — disable with VITE_MATCH_LIFECYCLE_SUBTRACTIVE_PRICING=false|0|off
  */
 export function isMatchLifecycleSubtractivePricingEnabled(
   env: Record<string, string | undefined> = import.meta.env,
 ): boolean {
   const raw = readLifecycleFlag("VITE_MATCH_LIFECYCLE_SUBTRACTIVE_PRICING", env);
+  if (raw === "false" || raw === "0" || raw === "off") return false;
+  return true;
+}
+
+/**
+ * Phase 5B reassign subtractive: delete history + reconcile on A→B before forward writes to B.
+ * Default ON — disable with VITE_MATCH_LIFECYCLE_REASSIGN_SUBTRACTIVE=false|0|off
+ * Requires {@link isMatchLifecycleSubtractivePricingEnabled} for the underlying delete/reconcile APIs.
+ */
+export function isMatchLifecycleReassignSubtractiveEnabled(
+  env: Record<string, string | undefined> = import.meta.env,
+): boolean {
+  const raw = readLifecycleFlag("VITE_MATCH_LIFECYCLE_REASSIGN_SUBTRACTIVE", env);
   if (raw === "false" || raw === "0" || raw === "off") return false;
   return true;
 }
