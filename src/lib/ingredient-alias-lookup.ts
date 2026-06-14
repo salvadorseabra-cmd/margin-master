@@ -1,4 +1,5 @@
 import type { IngredientAliasMap } from "@/lib/ingredient-canonical";
+import { fuzzyLookupIngredientIdFromAliasMap } from "@/lib/ingredient-alias-fuzzy-lookup";
 import { buildOverrideKeysFromInvoiceLine } from "@/lib/ingredient-match-override";
 import { traceManualIngredientMatch } from "@/lib/manual-ingredient-match-trace";
 import { normalizeInvoiceAliasMemoryKey } from "@/lib/normalize-ingredient-name";
@@ -119,6 +120,60 @@ export function lookupIngredientIdFromAliasMap(
       normalizedItemName,
     });
     return globalHit;
+  }
+
+  if (normalizeSupplierScope(supplierName)) {
+    const fuzzyCandidates = new Set<string>();
+    for (const name of [rawItemName, normalizedItemName]) {
+      if (!name?.trim()) continue;
+      const keys = buildOverrideKeysFromInvoiceLine(name, supplierName);
+      if (keys?.rawNormalized) fuzzyCandidates.add(keys.rawNormalized);
+    }
+    fuzzyCandidates.add(normalizedItemName);
+
+    for (const candidateKey of fuzzyCandidates) {
+      const fuzzyHit = fuzzyLookupIngredientIdFromAliasMap(
+        aliases,
+        candidateKey,
+        supplierName,
+      );
+      if (!fuzzyHit) continue;
+
+      if (import.meta.env.DEV) {
+        console.debug("[fuzzy-alias-recovery]", {
+          supplier: normalizeSupplierScope(supplierName),
+          candidateKey: fuzzyHit.candidateKey,
+          matchedKey: fuzzyHit.matchedKey,
+          distance: fuzzyHit.distance,
+          ingredientId: fuzzyHit.ingredientId,
+        });
+      }
+      debugAliasLog("alias lookup hit (supplier-scoped fuzzy)", {
+        normalizedItemName,
+        candidateKey: fuzzyHit.candidateKey,
+        matchedKey: fuzzyHit.matchedKey,
+        distance: fuzzyHit.distance,
+        ingredientId: fuzzyHit.ingredientId,
+      });
+      traceManualIngredientMatch("[alias_link_lookup]", {
+        hit: true,
+        ingredientId: fuzzyHit.ingredientId,
+        lookupKey: fuzzyHit.matchedKey,
+        keysTried: [...keysTried, `fuzzy:${fuzzyHit.candidateKey}`],
+        normalizeInvoiceAliasMemoryKey: normalizeInvoiceAliasMemoryKey(
+          rawItemName ?? normalizedItemName,
+        ),
+        supplierScope: normalizeSupplierScope(supplierName),
+        rawItemName: rawItemName ?? null,
+        normalizedItemName,
+        fuzzyRecovery: {
+          candidateKey: fuzzyHit.candidateKey,
+          matchedKey: fuzzyHit.matchedKey,
+          distance: fuzzyHit.distance,
+        },
+      });
+      return fuzzyHit.ingredientId;
+    }
   }
 
   debugAliasLog("alias lookup miss", { normalizedItemName, supplierKey });

@@ -92,6 +92,155 @@ function extractPreservedWeightTokens(expanded: string): string[] {
   return tokens;
 }
 
+/** Common tokens that must not be joined as OCR brand suffixes. */
+const BRAND_TOKEN_JOIN_STOP_WORDS = new Set([
+  "a",
+  "com",
+  "da",
+  "das",
+  "de",
+  "di",
+  "do",
+  "dos",
+  "down",
+  "e",
+  "em",
+  "extra",
+  "o",
+  "para",
+  "por",
+  "top",
+]);
+
+const PACK_FORMAT_TOKEN_RE = /^\d+x\d+$/;
+const PACK_UNIT_TOKEN_RE = /^(kg|kgs|g|gr|grs|mg|ml|cl|l|lt|lts|li|ltr|ltrs)$/;
+const PACK_FORMAT_IN_TEXT_RE =
+  /\b\d+\s*x\s*\d+(?:\s*(?:kg|kgs|g|gr|grs|mg|ml|cl|l|lt|lts|li|ltr|ltrs))?\b/gi;
+
+/** Unit/format tokens that follow brand names — never OCR suffix joins. */
+const UNIT_OR_FORMAT_SUFFIX = new Set([
+  "g",
+  "gr",
+  "grs",
+  "kg",
+  "kgs",
+  "l",
+  "l1",
+  "l4",
+  "li",
+  "lt",
+  "ltr",
+  "ltrs",
+  "lts",
+  "mg",
+  "ml",
+  "cl",
+]);
+
+/** Explicit OCR split pairs where suffix is 4 chars (generic rule covers ≤3 only). */
+const EXPLICIT_OCR_JOIN_PAIRS = new Set(["metro|chef"]);
+
+function isAlphaBrandFragment(token: string): boolean {
+  return /^[a-z]+$/.test(token);
+}
+
+function shouldCollapseOcrAlphaSplit(first: string, second: string): boolean {
+  if (EXPLICIT_OCR_JOIN_PAIRS.has(`${first}|${second}`)) return true;
+
+  if (!isAlphaBrandFragment(first) || !isAlphaBrandFragment(second)) return false;
+  if (BRAND_TOKEN_JOIN_STOP_WORDS.has(first) || BRAND_TOKEN_JOIN_STOP_WORDS.has(second)) {
+    return false;
+  }
+  if (UNIT_OR_FORMAT_SUFFIX.has(second)) return false;
+
+  // OCR split: partial brand stem + short suffix (e.g. alconfi + sta).
+  if (first.length >= 6 && first.length <= 10 && second.length >= 2 && second.length <= 3) {
+    return true;
+  }
+
+  return false;
+}
+
+function shouldCollapsePackFormat(first: string, second: string): boolean {
+  return PACK_FORMAT_TOKEN_RE.test(first) && PACK_UNIT_TOKEN_RE.test(second);
+}
+
+export type NormalizeBrandTokenOptions = {
+  /** When false, skip pack-format joins (use before supplier shorthand). Default true. */
+  packFormat?: boolean;
+};
+
+/**
+ * Collapse obvious OCR whitespace splits in brand/pack tokens for alias lookup keys.
+ * Whitespace-only — no fuzzy matching or character substitution.
+ */
+export function normalizeBrandToken(
+  tokens: string[],
+  options: NormalizeBrandTokenOptions = {},
+): string[] {
+  const includePackFormat = options.packFormat !== false;
+  const result: string[] = [];
+  let i = 0;
+  while (i < tokens.length) {
+    const current = tokens[i]!;
+    const next = tokens[i + 1];
+    const shouldCollapse =
+      (includePackFormat && next && shouldCollapsePackFormat(current, next)) ||
+      (next && shouldCollapseOcrAlphaSplit(current, next));
+    if (next && shouldCollapse) {
+      result.push(current + next);
+      i += 2;
+    } else {
+      result.push(current);
+      i += 1;
+    }
+  }
+  return result;
+}
+
+function extractPreservedPackFormatTokens(expanded: string): string[] {
+  const seen = new Set<string>();
+  const tokens: string[] = [];
+  for (const match of expanded.match(PACK_FORMAT_IN_TEXT_RE) ?? []) {
+    const token = match.toLowerCase().replace(/\s+/g, "");
+    if (!token || seen.has(token)) continue;
+    seen.add(token);
+    tokens.push(token);
+  }
+  return tokens;
+}
+
+function stripPackFormatFromText(value: string): { text: string; tokens: string[] } {
+  const tokens = extractPreservedPackFormatTokens(value);
+  const text = value.replace(PACK_FORMAT_IN_TEXT_RE, " ").replace(/\s+/g, " ").trim();
+  return { text, tokens };
+}
+
+function dedupePackFormatTokens(tokens: string[]): string[] {
+  const sorted = [...new Set(tokens)].sort((a, b) => b.length - a.length);
+  const kept: string[] = [];
+  for (const token of sorted) {
+    if (kept.some((existing) => existing.startsWith(token) && existing !== token)) continue;
+    const shorterIdx = kept.findIndex((existing) => token.startsWith(existing) && existing !== token);
+    if (shorterIdx >= 0) {
+      kept[shorterIdx] = token;
+      continue;
+    }
+    kept.push(token);
+  }
+  return kept;
+}
+
+function tokenizeForBrandPreCollapse(raw: string): string[] {
+  return raw
+    .normalize("NFD")
+    .replace(DIACRITIC_RE, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]+/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
 /**
  * Compact alias/operational lookup key: shorthand → {@link normalizeInvoiceAliasMemoryKey} →
  * lowercase collapsed text with product weights / grid cuts preserved.
@@ -100,11 +249,17 @@ export function normalizeOperationalAliasKey(raw: string): string {
   const trimmed = raw?.trim();
   if (!trimmed) return "";
 
-  const expanded = normalizeSupplierShorthand(trimmed);
-  const weightTokens = extractPreservedWeightTokens(expanded || trimmed);
-  const normalized = normalizeInvoiceAliasMemoryKey(expanded || trimmed);
+  const preCollapsed = normalizeBrandToken(tokenizeForBrandPreCollapse(trimmed), {
+    packFormat: false,
+  }).join(" ");
+  const { text: withoutPack, tokens: packFormatTokens } = stripPackFormatFromText(
+    preCollapsed || trimmed,
+  );
+  const expanded = normalizeSupplierShorthand(withoutPack || preCollapsed || trimmed);
+  const weightTokens = extractPreservedWeightTokens(expanded || withoutPack || trimmed);
+  const normalized = normalizeInvoiceAliasMemoryKey(expanded || withoutPack || trimmed);
 
-  let compact = (normalized || expanded || trimmed)
+  let compact = (normalized || expanded || withoutPack || preCollapsed || trimmed)
     .normalize("NFD")
     .replace(DIACRITIC_RE, "")
     .toLowerCase()
@@ -114,7 +269,10 @@ export function normalizeOperationalAliasKey(raw: string): string {
   compact = compact.replace(/\s+/g, " ").trim();
   compact = restoreGridCutToken(compact);
 
-  const parts = [...compact.split(/\s+/).filter(Boolean), ...weightTokens];
+  const brandTokens = normalizeBrandToken(compact.split(/\s+/).filter(Boolean)).filter(
+    (token) => !packFormatTokens.some((pack) => pack.startsWith(token) && pack !== token),
+  );
+  const parts = [...brandTokens, ...weightTokens, ...dedupePackFormatTokens(packFormatTokens)];
   return [...new Set(parts)].join(" ").trim();
 }
 

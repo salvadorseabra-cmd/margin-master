@@ -7,6 +7,7 @@ import {
   clearOperationalAliasMemoryForTests,
   hydrateOperationalAliasMemoryFromConfirmedMap,
   lookupOperationalAlias,
+  normalizeBrandToken,
   normalizeOperationalAliasKey,
   rememberOperationalAlias,
 } from "./ingredient-operational-alias-memory";
@@ -34,6 +35,56 @@ describe("normalizeOperationalAliasKey", () => {
       ["CHK BREADED"],
     );
     expect(keys).toContain("chicken breaded");
+  });
+
+  it("collapses OCR-split brand tokens (alconfi sta)", () => {
+    expect(normalizeOperationalAliasKey("Filete de Anchovas Alconfi sta Lt 495 g")).toBe(
+      "filete de anchovas alconfista 495",
+    );
+  });
+
+  it("does not merge alconfrista with alconfi sta normalization", () => {
+    const split = normalizeOperationalAliasKey("Filete de Anchovas Alconfi sta Lt 495 g");
+    const intact = normalizeOperationalAliasKey("Filete de Anchovas Alconfrista Lt 495 g");
+    expect(split).toBe("filete de anchovas alconfista 495");
+    expect(intact).toBe("filete de anchovas alconfrista 495");
+    expect(split).not.toBe(intact);
+  });
+
+  it("collapses metro chef brand spacing", () => {
+    expect(normalizeOperationalAliasKey("Acucar Branco Metro Chef")).toBe(
+      "acucar branco metrochef",
+    );
+    expect(normalizeOperationalAliasKey("acucar branco metrochef")).toBe("acucar branco metrochef");
+  });
+
+  it("collapses pack format spacing (12x1 kg)", () => {
+    expect(normalizeOperationalAliasKey("Arroz Agulha Metro Chef 12x1 kg")).toBe(
+      "arroz agulha metrochef 12x1kg",
+    );
+    expect(normalizeOperationalAliasKey("arroz agulha metro chef 12x1kg")).toBe(
+      "arroz agulha metrochef 12x1kg",
+    );
+  });
+});
+
+describe("normalizeBrandToken", () => {
+  it("joins adjacent OCR split fragments", () => {
+    expect(normalizeBrandToken(["alconfi", "sta"])).toEqual(["alconfista"]);
+    expect(normalizeBrandToken(["metro", "chef"])).toEqual(["metrochef"]);
+  });
+
+  it("joins pack format with unit token", () => {
+    expect(normalizeBrandToken(["12x1", "kg"])).toEqual(["12x1kg"]);
+  });
+
+  it("does not join stop words or short prefixes", () => {
+    expect(normalizeBrandToken(["filete", "de", "anchovas"])).toEqual([
+      "filete",
+      "de",
+      "anchovas",
+    ]);
+    expect(normalizeBrandToken(["alconfrista"])).toEqual(["alconfrista"]);
   });
 });
 
