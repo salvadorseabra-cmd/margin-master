@@ -5,6 +5,7 @@ import {
   isInvoiceItemMatchStatus,
   mapMatcherOutputToInitialMatchRecord,
   normalizeMatchStatusUpdate,
+  resolvePersistedMatchStatusFromMatcher,
   validateMatchRecordFields,
 } from "./invoice-item-match-helpers";
 
@@ -177,15 +178,48 @@ describe("mapMatcherOutputToInitialMatchRecord", () => {
     });
   });
 
-  it("maps bare exact match to confirmed display state (Phase 0 shape only)", () => {
+  it("maps bare exact match to suggested (conservative V1 seed policy)", () => {
     const match = {
       kind: "exact",
       ingredient: { id: "ing-pepino", name: "Pepino", normalized_name: "pepino" },
     } as IngredientCanonicalMatch;
 
     const record = mapMatcherOutputToInitialMatchRecord({ ...baseParams, match });
-    expect(record.status).toBe("confirmed");
+    expect(record.status).toBe("suggested");
     expect(record.match_kind).toBe("exact");
-    expect(record.confirmed_at).toBe("2024-06-01T12:00:00.000Z");
+    expect(record.confirmed_at).toBeNull();
+    expect(record.ingredient_id).toBe("ing-pepino");
+  });
+
+  it("maps unmatched when matcher returns null", () => {
+    expect(
+      mapMatcherOutputToInitialMatchRecord({ ...baseParams, match: null }).status,
+    ).toBe("unmatched");
+  });
+});
+
+describe("resolvePersistedMatchStatusFromMatcher", () => {
+  it("classifies alias-backed kinds as confirmed", () => {
+    expect(
+      resolvePersistedMatchStatusFromMatcher({
+        kind: "confirmed-alias",
+        ingredient: { id: "ing-a", name: "A", normalized_name: "a" },
+      } as IngredientCanonicalMatch),
+    ).toBe("confirmed");
+  });
+
+  it("classifies bare exact and operational-memory as suggested", () => {
+    expect(
+      resolvePersistedMatchStatusFromMatcher({
+        kind: "exact",
+        ingredient: { id: "ing-pepino", name: "Pepino", normalized_name: "pepino" },
+      } as IngredientCanonicalMatch),
+    ).toBe("suggested");
+    expect(
+      resolvePersistedMatchStatusFromMatcher({
+        kind: "operational-memory",
+        ingredient: { id: "ing-pepino", name: "Pepino", normalized_name: "pepino" },
+      } as IngredientCanonicalMatch),
+    ).toBe("suggested");
   });
 });

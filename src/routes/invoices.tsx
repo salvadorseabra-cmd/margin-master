@@ -163,6 +163,7 @@ import {
   clearIngredientMatchedInvoiceProductsCache,
   syncOperationalIngredientCostsFromInvoiceLines,
 } from "@/lib/ingredient-operational-intelligence";
+import { shadowSeedInvoiceItemMatchesAfterExtract } from "@/lib/invoice-item-match-shadow-seed";
 import { dispatchOperationalIngredientCostChanged } from "@/lib/resolve-operational-ingredient-cost";
 import {
   fileNameFromInvoicePath,
@@ -1382,6 +1383,27 @@ function InvoicesPage() {
           trigger: "invoice_extract_cost_sync",
         });
       }
+
+      const { data: persistedItemRows, error: persistedItemsLoadError } = await supabase
+        .from("invoice_items")
+        .select("id,name")
+        .eq("invoice_id", invoiceId);
+      if (persistedItemsLoadError) {
+        console.error("[invoice_item_matches] persisted-items-load-failed", {
+          invoiceId,
+          error: persistedItemsLoadError.message,
+        });
+      } else {
+        await shadowSeedInvoiceItemMatchesAfterExtract(supabase, {
+          invoiceId,
+          userId: user.id,
+          items: persistedItemRows ?? [],
+          ingredientCatalog,
+          confirmedAliases: confirmedIngredientAliasesRef.current,
+          supplierName: supplierForSync,
+        });
+      }
+
       const supplier = normalizeSupplierDisplayName(data?.supplier);
       const invoiceNumber = normalizeInvoiceNumber(data?.invoice_number);
       const rawInvoiceDate = data?.invoice_date ?? data?.invoiceDate;

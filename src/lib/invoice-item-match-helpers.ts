@@ -1,8 +1,5 @@
 import type { IngredientCanonicalMatch } from "@/lib/ingredient-canonical";
-import {
-  resolveInvoiceIngredientDisplayState,
-  type InvoiceIngredientDisplayState,
-} from "@/lib/ingredient-match-explanation";
+import type { InvoiceIngredientDisplayState } from "@/lib/ingredient-match-explanation";
 import {
   INVOICE_ITEM_MATCH_STATUSES,
   type InvoiceItemMatchInsert,
@@ -98,6 +95,24 @@ export function normalizeMatchStatusUpdate(
   };
 }
 
+const PERSISTED_CONFIRMED_MATCH_KINDS = new Set<string>([
+  "confirmed-alias",
+  "confirmed-override",
+]);
+
+/**
+ * Conservative V1 persisted status from matcher output (shadow seed / extract seed).
+ * Only alias-backed high-trust kinds become confirmed; bare exact and memory paths stay suggested.
+ */
+export function resolvePersistedMatchStatusFromMatcher(
+  match: IngredientCanonicalMatch | null | undefined,
+): InvoiceItemMatchStatus {
+  if (!match) return "unmatched";
+  if (PERSISTED_CONFIRMED_MATCH_KINDS.has(match.kind)) return "confirmed";
+  if (match.ingredient?.id?.trim()) return "suggested";
+  return "unmatched";
+}
+
 export type MapMatcherToInitialMatchRecordParams = {
   invoiceItemId: string;
   invoiceId: string;
@@ -115,7 +130,7 @@ export type MapMatcherToInitialMatchRecordParams = {
 export function mapMatcherOutputToInitialMatchRecord(
   params: MapMatcherToInitialMatchRecordParams,
 ): InvoiceItemMatchInsert {
-  const status = resolveInvoiceIngredientDisplayState(params.match);
+  const status = resolvePersistedMatchStatusFromMatcher(params.match);
   const ingredientId =
     status === "unmatched" ? null : (params.match?.ingredient.id ?? null);
   const matchKind = params.match?.kind ?? null;
