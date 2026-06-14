@@ -213,10 +213,9 @@ const updateResults: Array<{ id: string; ok: boolean; error?: string }> = [];
 for (const id of REPAIR_IDS) {
   const { error, count } = await sb
     .from("ingredient_price_history")
-    .update({ created_at: TARGET_CREATED_AT })
+    .update({ created_at: TARGET_CREATED_AT }, { count: "exact" })
     .eq("id", id)
-    .eq("invoice_id", INVOICE_ID)
-    .like("created_at", `${WRONG_CREATED_AT_PREFIX}%`);
+    .eq("invoice_id", INVOICE_ID);
   updateResults.push({
     id,
     ok: !error && (count ?? 0) === 1,
