@@ -341,7 +341,6 @@ export async function persistManualIngredientCorrection({
 
 export type IngredientCorrectionUiState = {
   showConfirm: boolean;
-  showWrongMatch: boolean;
   showPicker: boolean;
   suppressMatchPresentation: boolean;
 };
@@ -419,7 +418,6 @@ export function resolveIngredientCorrectionUiState(
   if (rejected) {
     return {
       showConfirm: false,
-      showWrongMatch: false,
       showPicker: true,
       suppressMatchPresentation: true,
     };
@@ -428,7 +426,6 @@ export function resolveIngredientCorrectionUiState(
   if (matchState.displayState === "suggested" && matchState.possibleMatch) {
     return {
       showConfirm: true,
-      showWrongMatch: true,
       showPicker: false,
       suppressMatchPresentation: false,
     };
@@ -437,7 +434,6 @@ export function resolveIngredientCorrectionUiState(
   if (matchState.displayState === "confirmed") {
     return {
       showConfirm: false,
-      showWrongMatch: true,
       showPicker: false,
       suppressMatchPresentation: false,
     };
@@ -445,7 +441,6 @@ export function resolveIngredientCorrectionUiState(
 
   return {
     showConfirm: false,
-    showWrongMatch: false,
     showPicker: true,
     suppressMatchPresentation: false,
   };

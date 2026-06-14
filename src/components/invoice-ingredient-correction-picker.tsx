@@ -18,13 +18,6 @@ import {
 } from "@/lib/ingredient-picker-options";
 import { traceIngredientPickerOptionsStage } from "@/lib/ingredient-picker-trace";
 
-/** Sentinel value for "Remove match" — not a real ingredient id. */
-export const INVOICE_INGREDIENT_CORRECTION_NO_MATCH = "__invoice_no_match__" as const;
-
-export function isInvoiceIngredientCorrectionNoMatch(value: string): boolean {
-  return value === INVOICE_INGREDIENT_CORRECTION_NO_MATCH;
-}
-
 type InvoiceIngredientCorrectionPickerProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;

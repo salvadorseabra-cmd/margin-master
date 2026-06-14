@@ -3693,11 +3693,6 @@ function ItemsTable({
                 });
                 const correctionOpen = editingMatchRowId === renderItem.id;
                 const correctionBusy = savingCorrectionLineId === renderItem.id;
-                const showCorrectionTrigger =
-                  correctionUi.showWrongMatch ||
-                  correctionUi.showPicker ||
-                  unmatchedIngredient ||
-                  showSuggestedMatch;
                 const showIngredientMatchPicker =
                   Boolean(matchTargetLabel) ||
                   correctionUi.showPicker ||
@@ -3766,42 +3761,14 @@ function ItemsTable({
                             ))}
                           </div>
                         )}
-                        {(correctionUi.showConfirm || showCorrectionTrigger) && (
+                        {correctionUi.showConfirm && possibleIngredientMatch && (
                           <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                             <IngredientCorrectionActions
-                              showConfirm={correctionUi.showConfirm}
-                              showCorrectionTrigger={showCorrectionTrigger}
-                              correctionOpen={correctionOpen}
-                              correctionDisabled={correctionBusy}
-                              onConfirm={
-                                correctionUi.showConfirm && possibleIngredientMatch
-                                  ? () =>
-                                      onConfirmIngredientMatch(renderItem, possibleIngredientMatch)
-                                  : undefined
-                              }
-                              onOpenCorrection={() =>
-                                openIngredientCorrection(renderItem, {
-                                  ingredientMatch,
-                                  possibleIngredientMatch,
-                                })
+                              showConfirm
+                              onConfirm={() =>
+                                onConfirmIngredientMatch(renderItem, possibleIngredientMatch)
                               }
                             />
-                            {(unmatchedIngredient || correctionUi.suppressMatchPresentation) && (
-                              <button
-                                type="button"
-                                onClick={() => onCreateIngredient(renderItem)}
-                                disabled={creatingIngredient || !canCreateIngredient}
-                                title={
-                                  canCreateIngredient
-                                    ? "Create ingredient from this extracted row"
-                                    : "Confirm the extracted name before creating an ingredient"
-                                }
-                                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground transition hover:bg-muted/70 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-                              >
-                                {creatingIngredient && <Loader2 className="h-3 w-3 animate-spin" />}
-                                Create new ingredient
-                              </button>
-                            )}
                           </div>
                         )}
                         {creationError && (

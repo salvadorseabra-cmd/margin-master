@@ -144,12 +144,39 @@ describe("resolveIngredientCorrectionUiState", () => {
     reason: "test",
   } as IngredientCanonicalMatch;
 
-  it("shows confirm and wrong for suggestions", () => {
+  const confirmedMatch = {
+    kind: "confirmed-alias",
+    ingredient: { id: "b", name: "Beta", normalized_name: "beta", unit: "kg" },
+    scoreBreakdown: {},
+    reason: "test",
+    normalizedItemName: "beta",
+    normalizedIngredientName: "beta",
+  } as IngredientCanonicalMatch;
+
+  it("shows confirm only for suggestions (no correct-match trigger)", () => {
     const state = getInvoiceRowIngredientMatchState(semanticMatch);
     const ui = resolveIngredientCorrectionUiState("row-1", state, new Set());
     expect(ui.showConfirm).toBe(true);
-    expect(ui.showWrongMatch).toBe(true);
     expect(ui.showPicker).toBe(false);
+    expect(ui.suppressMatchPresentation).toBe(false);
+    expect("showWrongMatch" in ui).toBe(false);
+  });
+
+  it("shows picker chip only for confirmed rows", () => {
+    const state = getInvoiceRowIngredientMatchState(confirmedMatch);
+    const ui = resolveIngredientCorrectionUiState("row-2", state, new Set());
+    expect(ui.showConfirm).toBe(false);
+    expect(ui.showPicker).toBe(false);
+    expect(ui.suppressMatchPresentation).toBe(false);
+    expect("showWrongMatch" in ui).toBe(false);
+  });
+
+  it("shows picker for unmatched rows", () => {
+    const state = getInvoiceRowIngredientMatchState(null);
+    const ui = resolveIngredientCorrectionUiState("row-3", state, new Set());
+    expect(ui.showConfirm).toBe(false);
+    expect(ui.showPicker).toBe(true);
+    expect(ui.suppressMatchPresentation).toBe(false);
   });
 
   it("shows picker after session rejection", () => {
