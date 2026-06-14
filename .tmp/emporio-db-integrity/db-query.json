@@ -1,0 +1,117 @@
+{
+  "queriedAt": "2026-06-13T18:08:48.792Z",
+  "errors": {
+    "invErr": null,
+    "itemsErr": null,
+    "phErr": null
+  },
+  "emporioItemCount": 0,
+  "emporioItems": [],
+  "emporioPriceHistory": [],
+  "emporioAliases": [],
+  "affectedInvoices": [
+    {
+      "label": "Bidfood",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "itemCount": 11,
+      "invoice": {
+        "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+        "total": 292.7,
+        "file_url": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781044599758-Screenshot_2026-06-07_at_21.04.40.png",
+        "created_at": "2026-06-09T22:36:41.424691+00:00",
+        "supplier_name": "Bidfood Portugal",
+        "invoice_date": "2026-05-25",
+        "settlement_status": "pending"
+      },
+      "priceHistoryRows": 1,
+      "createdAtBuckets": {
+        "2026-06-12T22:54:35": 11
+      }
+    },
+    {
+      "label": "Aviludo April",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "itemCount": 9,
+      "invoice": {
+        "id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+        "total": 370.17,
+        "file_url": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781011281053-Aviludo_Historico_2026_04_with_total.pdf",
+        "created_at": "2026-06-09T13:21:21.573648+00:00",
+        "supplier_name": "AVILUDO",
+        "invoice_date": "2026-04-17",
+        "settlement_status": "pending"
+      },
+      "priceHistoryRows": 10,
+      "createdAtBuckets": {
+        "2026-06-12T22:53:48": 9
+      }
+    },
+    {
+      "label": "Aviludo May",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "itemCount": 8,
+      "invoice": {
+        "id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+        "total": 330.42,
+        "file_url": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1780870127518-Screenshot_2026-06-07_at_21.05.11.png",
+        "created_at": "2026-06-07T22:08:48.354666+00:00",
+        "supplier_name": "AVILUDO",
+        "invoice_date": "2026-05-19",
+        "settlement_status": "pending"
+      },
+      "priceHistoryRows": 8,
+      "createdAtBuckets": {
+        "2026-06-11T22:42:40": 8
+      }
+    },
+    {
+      "label": "Bocconcino",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "itemCount": 7,
+      "invoice": {
+        "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+        "total": 290.64,
+        "file_url": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781113610714-Screenshot_2026-06-07_at_21.04.58.png",
+        "created_at": "2026-06-10T17:46:51.553519+00:00",
+        "supplier_name": "IL BOCCONCINO Distribuição ALIMENTAR",
+        "invoice_date": "2026-05-08",
+        "settlement_status": "pending"
+      },
+      "priceHistoryRows": 1,
+      "createdAtBuckets": {
+        "2026-06-11T22:44:21": 7
+      }
+    },
+    {
+      "label": "Emporio",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "itemCount": 0,
+      "invoice": null,
+      "priceHistoryRows": 0,
+      "createdAtBuckets": {}
+    },
+    {
+      "label": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "itemCount": 8,
+      "invoice": {
+        "id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+        "total": 415.96,
+        "file_url": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781124591362-Screenshot_2026-06-07_at_21.05.02.png",
+        "created_at": "2026-06-10T20:49:53.458608+00:00",
+        "supplier_name": "Mammafiore Portugal",
+        "invoice_date": "2026-05-19",
+        "settlement_status": "pending"
+      },
+      "priceHistoryRows": 0,
+      "createdAtBuckets": {
+        "2026-06-11T22:41:12": 8
+      }
+    }
+  ]
+}

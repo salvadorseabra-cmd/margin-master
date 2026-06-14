@@ -1,0 +1,351 @@
+{
+  "generated_at": "2026-06-13T17:39:58.595Z",
+  "deployVersion": 31,
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "product": "Farina Speciale pizza 25kg Amoruso",
+  "image": ".tmp/geometry-audit/images/36c99d19-6f9f-413f-8c2d-ae3526291a2d.png",
+  "runs": 20,
+  "groundTruth": {
+    "qty": 1,
+    "gross_unit_price": 33.154,
+    "discount_pct": 20,
+    "line_total_net": 26.52,
+    "unit_price": 26.52,
+    "total": 26.52
+  },
+  "correctnessPct": 95,
+  "correctRuns": 19,
+  "incorrectRuns": 1,
+  "totalsUnique": [
+    26.52,
+    25.52
+  ],
+  "avgErrorEuro": 0.05,
+  "variancePctOnTotals": 0.82,
+  "classification": "B",
+  "classificationLabel": "gpt_variance_mostly_fixed",
+  "perRun": [
+    {
+      "run": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 2,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 3,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 4,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 5,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 25.52,
+      "unit_price": 26.52,
+      "total": 25.52,
+      "unit_price_gt_total": true,
+      "correctVsGt": false,
+      "passCInference": "binder_derived_net_unit_gross_discount_ok_line_total_wrong"
+    },
+    {
+      "run": 6,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 7,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 8,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 9,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 10,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 11,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 12,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 13,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 14,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 15,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 16,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 17,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 18,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 19,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    {
+      "run": 20,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    }
+  ],
+  "fieldComparisonCorrectVsIncorrect": {
+    "gross_unit_price": {
+      "correctUnique": [
+        33.154
+      ],
+      "incorrectUnique": [
+        33.154
+      ],
+      "differs": false
+    },
+    "discount_pct": {
+      "correctUnique": [
+        20
+      ],
+      "incorrectUnique": [
+        20
+      ],
+      "differs": false
+    },
+    "line_total_net": {
+      "correctUnique": [
+        26.52
+      ],
+      "incorrectUnique": [
+        25.52
+      ],
+      "differs": true
+    },
+    "unit_price": {
+      "correctUnique": [
+        26.52
+      ],
+      "incorrectUnique": [
+        26.52
+      ],
+      "differs": false
+    },
+    "total": {
+      "correctUnique": [
+        26.52
+      ],
+      "incorrectUnique": [
+        25.52
+      ],
+      "differs": true
+    }
+  },
+  "passCAnalysis": {
+    "passCEmits2552OnIncorrect": true,
+    "binderDerivesUnitPricePreservesWrongTotal": true,
+    "correctRunsConsistent": true,
+    "wrongField": "line_total_net",
+    "stableCorrectFields": [
+      "quantity",
+      "gross_unit_price",
+      "discount_pct",
+      "unit_price (binder-derived)"
+    ]
+  },
+  "neighbourCorrelation": {
+    "correctNeighbourSignatures": [
+      "guanciale=64.93|birra=25.69|rulo=10.86|aceto=16.09"
+    ],
+    "incorrectNeighbourSignatures": [
+      "guanciale=64.93|birra=25.69|rulo=10.86|aceto=16.09"
+    ],
+    "correlated": "NONE — identical neighbour signatures in correct/incorrect runs",
+    "note": "Guanciale/Birra/Rulo totals identical across all runs; no neighbour bleed"
+  },
+  "binderSafeguard": {
+    "rule": "qty=1 AND discount_pct>0 AND unit_price > total → set total = unit_price (or re-derive from gross×discount)",
+    "applicableOnIncorrectRuns": 0,
+    "wouldRecoverRuns": 1,
+    "falsePositiveRisk": "low — unit_price>total on qty=1 discounted row is signature of Valor digit drift",
+    "feasibility": "HIGH"
+  },
+  "versionComparison": {
+    "v30": {
+      "runs": 10,
+      "correctPct": 0,
+      "stableTotal": 25.52,
+      "avgErrorEuro": 1,
+      "classification": "A"
+    },
+    "v31Prior5Run": {
+      "runs": 5,
+      "correctPct": 60,
+      "avgErrorEuro": 0.4,
+      "totalsUnique": [
+        26.52,
+        25.52
+      ]
+    },
+    "v31Final20Run": {
+      "correctPct": 95,
+      "avgErrorEuro": 0.05,
+      "totalsUnique": [
+        26.52,
+        25.52
+      ]
+    }
+  }
+}

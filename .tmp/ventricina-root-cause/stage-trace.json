@@ -1,0 +1,140 @@
+{
+  "generated_at": "2026-06-12T22:45:00.000Z",
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "row": "Rovagnati - Salame Ventricina 2,5 Kg",
+  "deployment": { "version": 24, "updatedAtUtc": "2026-06-12T22:07:19.107Z" },
+  "visibleInvoice": {
+    "qty": 2.6,
+    "grossUnit": 16.6,
+    "discountPct": 8.5,
+    "netUnit": 15.19,
+    "lineTotal": 39.49,
+    "source": "invoice-full.png row crop y=746 (ventricina-row-y746.png)"
+  },
+  "vlGroundTruth": {
+    "qty": 2.6,
+    "unit": 16.6,
+    "total": 39.49,
+    "source": "field-accuracy-audit/ground-truth.json",
+    "note": "VL GT stores visible gross unit; total matches visible Preço Total"
+  },
+  "v24ApiRuns": {
+    "source": ".tmp/emporio-discount-column-audit/post-hardening-3run-validation.json",
+    "runs": [
+      { "run": 1, "unit_price": 21, "total": 54.6, "qty": 2.6, "pattern": "qty_times_gross" },
+      { "run": 2, "unit_price": 20.2, "total": 52.52, "qty": 2.6, "pattern": "qty_times_gross" },
+      { "run": 3, "unit_price": 17.72, "total": 46.09, "qty": 2.6, "pattern": "qty_times_gross" }
+    ]
+  },
+  "pipeline": "Crop image → Pass C GPT vision → parseMonetaryLineItems → bindMonetaryColumns → API",
+  "stages": [
+    {
+      "order": 1,
+      "stage": "visible_invoice",
+      "discount_pct": { "value": "8,50", "header": "Desc.(%)", "visible": true },
+      "gross_unit_price": { "value": "16,60 €", "header": "Preço Unit.", "visible": true },
+      "line_total_net": { "value": "39,49 €", "header": "Preço Total", "visible": true },
+      "status": "PASS"
+    },
+    {
+      "order": 2,
+      "stage": "geometry_crop",
+      "tableBounds": { "top": 456, "bottom": 851, "headerClipped": true },
+      "ventricinaRowY": 746,
+      "discountHeaderInCrop": false,
+      "discountValueInCrop": true,
+      "status": "PARTIAL",
+      "contributesToFailure": true,
+      "note": "Same header-clipping as Prosciutto; not Ventricina-specific geometry regression"
+    },
+    {
+      "order": 3,
+      "stage": "pass_c_prompt_v24",
+      "emporioRules": [
+        "Desc.(%) plain decimals → discount_pct",
+        "Full worked example: Prosciutto 17,50 only",
+        "Format examples include 8,50 → 8.5 (no full Ventricina row)"
+      ],
+      "status": "INSUFFICIENT_FOR_VENTRICINA",
+      "contributesToFailure": true,
+      "note": "Prosciutto row example anchors 17,50; Ventricina 8,50 lacks positional worked example"
+    },
+    {
+      "order": 4,
+      "stage": "pass_c_gpt_structured",
+      "firstFailure": true,
+      "inferredPerRun": [
+        {
+          "run": 1,
+          "discount_pct": null,
+          "gross_unit_price": 21,
+          "line_total_net": null,
+          "inferenceMethod": "binder reverse-sim: gross=21 → unit 21, total 54.6",
+          "status": "FAIL"
+        },
+        {
+          "run": 2,
+          "discount_pct": null,
+          "gross_unit_price": 20.2,
+          "line_total_net": null,
+          "inferenceMethod": "binder reverse-sim: gross=20.2 → unit 20.2, total 52.52",
+          "status": "FAIL"
+        },
+        {
+          "run": 3,
+          "discount_pct": null,
+          "gross_unit_price": 17.72,
+          "line_total_net": null,
+          "inferenceMethod": "binder reverse-sim: gross=17.72 → unit 17.72, total 46.07≈46.09",
+          "status": "FAIL",
+          "note": "17.72≈Prosciutto Desc 17,50 — residual neighbour-discount magnitude bleed"
+        }
+      ],
+      "discount_pct_extracted": false,
+      "gross_unit_price_correct": false,
+      "line_total_net_extracted": false,
+      "status": "FAIL",
+      "issueType": "GPT column mis-identification on gross + discount"
+    },
+    {
+      "order": 5,
+      "stage": "json_schema_v24",
+      "discount_pctRequired": true,
+      "nullable": true,
+      "status": "PASS_CONTRACT_WEAK",
+      "note": "GPT satisfies schema with discount_pct:null"
+    },
+    {
+      "order": 6,
+      "stage": "bindMonetaryColumns",
+      "input": "discount_pct null + wrong gross_unit_price",
+      "behaviour": "unit_price = gross; total = qty × gross when line_total_net null",
+      "amplifiesError": true,
+      "status": "DOWNSTREAM_AMPLIFIER",
+      "binderSimulationSource": ".tmp/ventricina-root-cause/binder-simulation.json"
+    },
+    {
+      "order": 7,
+      "stage": "api_output",
+      "ventricina": { "unit_price": "21|20.2|17.72", "total": "54.6|52.52|46.09" },
+      "structuredFieldsExposed": false,
+      "status": "FAIL"
+    }
+  ],
+  "prosciuttoComparison": {
+    "v24Result": "3/3 discount inferred present; unit 8.50, total 36.54",
+    "whyDifferent": [
+      "Prompt has full Prosciutto worked row (17,50 between 10,30€ and 36,54€)",
+      "17,50 > 10,30 — visually implausible as euro unit price",
+      "Ventricina 8,50 < 16,60 — plausibly mistaken for partial euro amount",
+      "Mortadella 10,00 matches format example exactly — improved on v24"
+    ]
+  },
+  "firstDeviationStage": "pass_c_gpt_structured",
+  "eightFiftyInterpretation": {
+    "correct": "discount_pct: 8.5 from Desc.(%) column",
+    "observed_v24": "not mapped to discount_pct; gross column misread instead",
+    "historical_v23": "17.50 neighbour bleed into unit_price (Prosciutto Desc magnitude)",
+    "ruleBNote": "If GPT sets discount_pct=8.5 AND unit_price=8.5, Rule B rebinds correctly to 15.19/39.49 — failure is discount null, not binder"
+  }
+}

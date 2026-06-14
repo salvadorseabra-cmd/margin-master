@@ -1,0 +1,380 @@
+{
+  "generated_at": "2026-06-13T12:20:42.592Z",
+  "deployVersion": 29,
+  "deployVerified": true,
+  "promptVersion": "v29",
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "groundTruth": {
+    "qty": 3.11,
+    "unit_price": 10.1,
+    "total": 31.07,
+    "gross_unit": 11.1,
+    "discount_pct": 10
+  },
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "elapsedMs": 15995,
+      "mortadella": {
+        "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg\nProduto de Stock",
+        "quantity": 3.11,
+        "unit": null,
+        "unit_price": 9.99,
+        "total": 31.07
+      },
+      "mortadellaErrorEuro": 0,
+      "mortadellaTotalCorrect": true,
+      "emporioResidualEuro": 36.18,
+      "emporioRowErrors": [
+        {
+          "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g\nProduto de Stock",
+          "gt": 50.2,
+          "extracted": 50.4,
+          "error": 0.2
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrotta 1/8 - 1,5kg\nProduto de Stock",
+          "gt": 13.44,
+          "extracted": 45.7,
+          "error": 32.26
+        },
+        {
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg\nProduto de Stock",
+          "gt": 35.14,
+          "extracted": 36.54,
+          "error": 1.4
+        },
+        {
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg\nProduto de Stock",
+          "gt": 31.07,
+          "extracted": 31.07,
+          "error": 0
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud\nProduto de Stock",
+          "gt": 38.56,
+          "extracted": 38.56,
+          "error": 0
+        },
+        {
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg\nProduto de Stock",
+          "gt": 49.48,
+          "extracted": 49.48,
+          "error": 0
+        },
+        {
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "gt": 19.38,
+          "extracted": 21.7,
+          "error": 2.32
+        },
+        {
+          "name": "Rovagnati - Salame Ventricina 2,5 Kg\nProduto de Stock",
+          "gt": 39.49,
+          "extracted": 39.49,
+          "error": 0
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "elapsedMs": 16295,
+      "mortadella": {
+        "name": "Rovagnati - Mortadella IGP “Massima” con Pistacchio 1,2 – 3,5Kg Produto de Stock",
+        "quantity": 3.11,
+        "unit": null,
+        "unit_price": 9.99,
+        "total": 31.07
+      },
+      "mortadellaErrorEuro": 0,
+      "mortadellaTotalCorrect": true,
+      "emporioResidualEuro": 1.75,
+      "emporioRowErrors": [
+        {
+          "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+          "gt": 50.2,
+          "extracted": 50.4,
+          "error": 0.2
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello “18” - 1,5Kg Produto de Stock",
+          "gt": 13.44,
+          "extracted": 13.44,
+          "error": 0
+        },
+        {
+          "name": "Assaporami Prosciutto Cotto Scelto HC - 4,25Kg Produto de Stock",
+          "gt": 35.14,
+          "extracted": 36.54,
+          "error": 1.4
+        },
+        {
+          "name": "Rovagnati - Mortadella IGP “Massima” con Pistacchio 1,2 – 3,5Kg Produto de Stock",
+          "gt": 31.07,
+          "extracted": 31.07,
+          "error": 0
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+          "gt": 38.56,
+          "extracted": 38.56,
+          "error": 0
+        },
+        {
+          "name": "Riginalmti - Bresaola Punta d’Anca Oro 1/2 - 1,5Kg Produto de Stock",
+          "gt": 49.48,
+          "extracted": 49.48,
+          "error": 0
+        },
+        {
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "gt": 19.38,
+          "extracted": 19.53,
+          "error": 0.15
+        },
+        {
+          "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+          "gt": 39.49,
+          "extracted": 39.49,
+          "error": 0
+        }
+      ]
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "elapsedMs": 16101,
+      "mortadella": {
+        "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3.5Kg Produto de Stock",
+        "quantity": 3.11,
+        "unit": null,
+        "unit_price": 9.99,
+        "total": 31.07
+      },
+      "mortadellaErrorEuro": 0,
+      "mortadellaTotalCorrect": true,
+      "emporioResidualEuro": 16.18,
+      "emporioRowErrors": [
+        {
+          "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+          "gt": 50.2,
+          "extracted": 50.4,
+          "error": 0.2
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrico 1/8 - 1.5kg Produto de Stock",
+          "gt": 13.44,
+          "extracted": 25.7,
+          "error": 12.26
+        },
+        {
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4.3-4.5Kg Produto de Stock",
+          "gt": 35.14,
+          "extracted": 36.54,
+          "error": 1.4
+        },
+        {
+          "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3.5Kg Produto de Stock",
+          "gt": 31.07,
+          "extracted": 31.07,
+          "error": 0
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+          "gt": 38.56,
+          "extracted": 38.56,
+          "error": 0
+        },
+        {
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1.5Kg Produto de Stock",
+          "gt": 49.48,
+          "extracted": 49.48,
+          "error": 0
+        },
+        {
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "gt": 19.38,
+          "extracted": 21.7,
+          "error": 2.32
+        },
+        {
+          "name": "Rovagnati - Salame Ventricina 2.5 Kg Produto de Stock",
+          "gt": 39.49,
+          "extracted": 39.49,
+          "error": 0
+        }
+      ]
+    },
+    {
+      "run": 4,
+      "status": 200,
+      "elapsedMs": 16219,
+      "mortadella": {
+        "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 – 3,5Kg Produto de Stock",
+        "quantity": 3.11,
+        "unit": null,
+        "unit_price": 9.99,
+        "total": 31.07
+      },
+      "mortadellaErrorEuro": 0,
+      "mortadellaTotalCorrect": true,
+      "emporioResidualEuro": 1.75,
+      "emporioRowErrors": [
+        {
+          "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+          "gt": 50.2,
+          "extracted": 50.4,
+          "error": 0.2
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8ª - 1,85kg Produto de Stock",
+          "gt": 13.44,
+          "extracted": 13.44,
+          "error": 0
+        },
+        {
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,25KG Produto de Stock",
+          "gt": 35.14,
+          "extracted": 36.54,
+          "error": 1.4
+        },
+        {
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 – 3,5Kg Produto de Stock",
+          "gt": 31.07,
+          "extracted": 31.07,
+          "error": 0
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+          "gt": 38.56,
+          "extracted": 38.56,
+          "error": 0
+        },
+        {
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock",
+          "gt": 49.48,
+          "extracted": 49.48,
+          "error": 0
+        },
+        {
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "gt": 19.38,
+          "extracted": 19.53,
+          "error": 0.15
+        },
+        {
+          "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+          "gt": 39.49,
+          "extracted": 39.49,
+          "error": 0
+        }
+      ]
+    },
+    {
+      "run": 5,
+      "status": 200,
+      "elapsedMs": 17541,
+      "mortadella": {
+        "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 2,7-3,5kg Produto de Stock",
+        "quantity": 3.11,
+        "unit": null,
+        "unit_price": 9.99,
+        "total": 31.07
+      },
+      "mortadellaErrorEuro": 0,
+      "mortadellaTotalCorrect": true,
+      "emporioResidualEuro": 13.46,
+      "emporioRowErrors": [
+        {
+          "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+          "gt": 50.2,
+          "extracted": 50.4,
+          "error": 0.2
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelmagi '18+ 1,5-1,9kg Produto de Stock",
+          "gt": 13.44,
+          "extracted": 25.3,
+          "error": 11.86
+        },
+        {
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG Produto de Stock",
+          "gt": 35.14,
+          "extracted": 36.54,
+          "error": 1.4
+        },
+        {
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 2,7-3,5kg Produto de Stock",
+          "gt": 31.07,
+          "extracted": 31.07,
+          "error": 0
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+          "gt": 38.56,
+          "extracted": 38.56,
+          "error": 0
+        },
+        {
+          "name": "Rugamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5-1,9KG Produto de Stock",
+          "gt": 49.48,
+          "extracted": 49.48,
+          "error": 0
+        },
+        {
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "gt": 19.38,
+          "extracted": 19.38,
+          "error": 0
+        },
+        {
+          "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+          "gt": 39.49,
+          "extracted": 39.49,
+          "error": 0
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "mortadella": {
+      "perfectTotalRuns": "5/5",
+      "stabilityPercent": 100,
+      "totalUnique": [
+        31.07
+      ],
+      "avgFinancialErrorEuro": 0
+    },
+    "emporio": {
+      "avgResidualEuro": 13.86,
+      "v28LabRerunResidualEuro": 5.1
+    }
+  },
+  "comparisonVsV28": {
+    "v28Stability3Run": {
+      "perfectTotalRuns": "0/3",
+      "stabilityPercent": 0,
+      "totalUnique": [
+        26.66,
+        26.65,
+        27.62
+      ],
+      "avgFinancialErrorEuro": 4.09
+    },
+    "v28LabRerun": {
+      "total": 27.57,
+      "financialErrorEuro": 3.5,
+      "unit_price": 8.88
+    },
+    "v29": {
+      "stabilityPercent": 100,
+      "avgFinancialErrorEuro": 0
+    },
+    "recoveryEuro": {
+      "vsV28LabRerun": 3.5,
+      "vsV28StabilityAvg": 4.09
+    }
+  }
+}

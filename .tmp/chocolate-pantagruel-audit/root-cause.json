@@ -1,0 +1,72 @@
+{
+  "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+  "label": "Aviludo May",
+  "product": "Chocolate Culinaria Pantagruel 10x200 g",
+  "adjacentRow": "Açucar Branco METRO Chef 10x1 Kg",
+  "deployVersion": 25,
+  "investigatedAt": "2026-06-12T23:55:00.000Z",
+  "verdict": "PASS_C_ADJACENT_ROW_PRICE_BLEED",
+  "rootCause": "Pass C GPT copies gross_unit_price 9,99 from the Açúcar row directly below Chocolate into Chocolate's Preço Unitário field, then computes line_total_net as 2×9,99=19,98. The extracted 9,99 is exactly Açúcar's unit price — not Chocolate's printed 29,99. Dense Aviludo METRO Chef table rows are closely spaced; vertical column misalignment causes downward price bleed. Binder Rule E does not correct because the wrong triple (qty 2, price 9.99, total 19.98) is arithmetically consistent.",
+  "firstFailingStage": "passC_table_extraction",
+  "confidencePercent": 94,
+  "isolationFailureMechanism": {
+    "type": "adjacent_row_price_bleed_vertical",
+    "direction": "row_below_to_row_above",
+    "fieldAffected": "gross_unit_price",
+    "valueBorrowed": 9.99,
+    "valueSource": "Açúcar row Preço Unitário 9,99",
+    "correctValue": 29.99,
+    "correctSource": "Chocolate row Preço Unitário 29,99",
+    "arithmeticWhenWrong": "2 × 9.99 = 19.98 (internally consistent — binder cannot detect)"
+  },
+  "whyAcucarFixDidNotGeneralize": {
+    "acucarFixScope": "QUANTITY COLUMN ISOLATION only — prevents leading digit of 9,99 entering quantity field",
+    "acucarFailureMode": "horizontal cross-column bleed: price digit 9 → qty field on SAME row",
+    "chocolateFailureMode": "vertical adjacent-row bleed: entire price 9,99 → gross_unit_price on row ABOVE",
+    "promptGap": "No rule forbids borrowing gross_unit_price from adjacent row below; Açúcar BAD example addresses qty not price; MONETARY COLUMN BINDING says 'copy digit by digit' but lacks adjacent-row isolation for Preço Unitário",
+    "binderGap": "Rule E (neighbour bleed) requires qty×unit_price ≠ total; Chocolate wrong triple is consistent so Rule E never fires"
+  },
+  "rowComparison": {
+    "chocolate": {
+      "groundTruth": { "qty": 2, "unit": "cx", "unit_price": 29.99, "total": 59.98 },
+      "v25Extracted": { "qty": 2, "unit": "cx", "unit_price": 9.99, "total": 19.98 },
+      "visibleInvoice": { "artigo": 16796, "qty": 2, "embal": "CX", "precoUnit": "29,99", "valor": "59,98" },
+      "deltas": { "qty": 0, "unit_price": -20.0, "total": -40.0 },
+      "financialErrorEuro": 40.0
+    },
+    "acucar": {
+      "groundTruth": { "qty": 1, "unit": "cx", "unit_price": 9.99, "total": 9.99 },
+      "v25Extracted": { "qty": 1, "unit": "cx", "unit_price": 9.99, "total": 9.99 },
+      "visibleInvoice": { "artigo": 16847, "qty": 1, "embal": "CX", "precoUnit": "9,99", "valor": "9,99" },
+      "financialErrorEuro": 0,
+      "note": "Açúcar correct on v25; its 9,99 price is the bleed source for Chocolate"
+    }
+  },
+  "stability": {
+    "v25ProbeRuns": 3,
+    "wrongUnitPriceCount": 3,
+    "stableWrongValue": 9.99,
+    "correctUnitPriceCount": 0,
+    "passcRefinementBaseline": { "unit_price": 29.99, "total": 59.98, "correct": true },
+    "source": ".tmp/chocolate-pantagruel-audit/v25-chocolate-stability.json"
+  },
+  "smallestFixCategory": {
+    "category": "pass_c_prompt_adjacent_row_price_isolation",
+    "scope": "prompt only — invoice-table-extraction.ts TABLE_EXTRACTION_SYSTEM_PROMPT",
+    "recommendation": "Add Chocolate BAD/GOOD example immediately after Açúcar qty rule: Chocolate 2 CX Preço 29,99 Total 59,98 — BAD if gross_unit_price reads 9,99 from Açúcar row below. Generic rule: gross_unit_price and line_total_net must come from the SAME row's columns — never from an adjacent line above or below.",
+    "notRecommended": ["Binder Rule E extension (consistent wrong triples slip through)", "Geometry/crop change (rows fully visible)", "Schema enforcement change"]
+  },
+  "expectedFinancialImprovement": {
+    "aviludoMay": 40.0,
+    "globalAfterAprilHarnessFix": 40.0,
+    "note": "Chocolate is sole € contributor on May; fixing recovers full May error and ~€40 of corrected global VL (~€49 post-April-fix baseline)"
+  },
+  "evidenceFiles": [
+    ".tmp/chocolate-pantagruel-audit/v25-chocolate-stability.json",
+    ".tmp/chocolate-pantagruel-audit/stage-trace.json",
+    ".tmp/geometry-audit/images/3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.png",
+    ".tmp/aviludo-may-final-audit/error-breakdown.json",
+    ".tmp/passc-refinement-audit/pack-notation-audit.json",
+    ".tmp/passc-refinement-validation/reextract/3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json"
+  ]
+}

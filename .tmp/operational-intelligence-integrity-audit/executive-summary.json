@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-06-13T20:50:27.592Z",
+  "finalQuestion": "Can Marginly safely expose Operational Intelligence to real restaurants today?",
+  "answer": "NOT YET — /alerts OI is partial; home dashboard is mock-only",
+  "operationalIntelligenceStatus": "PARTIAL",
+  "confidencePercent": 76,
+  "productionSafeToday": false,
+  "headline": "Synthesis code math is sound, but outputs inherit identity-collapsed price_history and stale Jun 11 DB. Home dashboard (/) shows mock data only — not production intelligence.",
+  "trustedOutputs": [
+    "Recipe margin metrics (catalog current_price × recipe lines)",
+    "Recipe below-target alerts (when selling_price set)",
+    "Cost concentration / prep cascade (recipe graph)",
+    "Atum em óleo +4.1% movement (single-format chain)",
+    "Operational health panel structure (invoice freshness counts)"
+  ],
+  "untrustedOutputs": [
+    "Mozzarella +1341% price increase / financial risk",
+    "Pepino −99.95% price decrease opportunity",
+    "Supplier watchlist spike notes on mixed-format ingredients",
+    "Home dashboard KPIs and charts (mock-data.ts)"
+  ],
+  "staleOutputs": [
+    "14/20 price_history ghost rows feeding supplier counts",
+    "5/6 VL invoices DB rows from Jun 11–12 era",
+    "Emporio live: 8 items, 0 price_history — no OI contribution",
+    "Weekly snapshot supplier increase/decrease counts"
+  ],
+  "classification": {
+    "math_logic_bugs": 0,
+    "stale_db_data": 4,
+    "identity_collapse": 2,
+    "volume_parse": 1,
+    "extraction_residue": 0,
+    "mock_dashboard": 1
+  },
+  "priorityOrder": [
+    "Fix ingredient identity (pack variants) before trusting opportunities",
+    "Block cross-format price_history chaining in synthesis inputs",
+    "VL re-read to refresh stale DB",
+    "Wire home dashboard to real data or hide mock KPIs",
+    "Ginger Beer volume parse guard"
+  ]
+}

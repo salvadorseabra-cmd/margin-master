@@ -1,0 +1,74 @@
+{
+  "generated_at": "2026-06-14T09:10:00.000Z",
+  "ten_questions": {
+    "1_code_path_when_match_changed": {
+      "answer": "handleSelectCorrectionIngredient → rejectIngredientMatchPair (old) → selectIngredientForItem → persistIngredientCorrectionForItem → persistManualIngredientCorrection + persistOperationalIngredientCostFromInvoiceLine",
+      "file": "src/routes/invoices.tsx",
+      "functions": ["handleSelectCorrectionIngredient", "selectIngredientForItem", "persistIngredientCorrectionForItem"]
+    },
+    "2_tables_updated": {
+      "answer": ["ingredient_aliases", "ingredients (new target)", "ingredient_price_history (new target row)", "localStorage rejected-ingredient-matches", "localStorage invoice-ingredient-aliases"],
+      "not_updated": ["invoice_items", "ingredient_price_history (old target)", "ingredients (old target revert)"]
+    },
+    "3_ingredient_price_history": {
+      "answer": "Old target (635a1189): UNTOUCHED. New target: INSERT or UPDATE for same invoice_id. Reconcile chain only on refreshExisting UPDATE or invoice delete — not on correction.",
+      "file": "src/lib/ingredient-price-history.ts appendIngredientPriceHistoryFromInvoiceLine"
+    },
+    "4_ingredients_current_price": {
+      "answer": "New target: updated IMMEDIATELY in persistOperationalIngredientCostFromInvoiceLine. Old target (635a1189): NEVER reverted by correction path.",
+      "timing": "immediate for new; never for old"
+    },
+    "5_supplier_intel_recalculated": {
+      "answer": "PARTIALLY — live scan (buildMatchedInvoiceProductsFromScan) stops attributing line to old ingredient after reject pair; DB history row for old ingredient still feeds history-based reads",
+      "immediate": "read-path only on next scan",
+      "file": "src/lib/ingredient-operational-intelligence.ts"
+    },
+    "6_oi_recalculated": {
+      "answer": "PARTIALLY — dispatchOperationalIngredientCostChanged fires for NEW ingredient only; OI inputs from raw price_history on 635a1189 unchanged; P0 guard blocks incompatible alert output",
+      "file": "src/lib/resolve-operational-ingredient-cost.ts dispatchOperationalIngredientCostChanged"
+    },
+    "7_aliases_modified": {
+      "answer": "YES for new target — UPSERT Pepino→newIngredientId via upsertConfirmedAlias. NO delete/modify of old wrong link (none existed for bare Pepino on conserva). Jar aliases on conserva unchanged.",
+      "file": "src/lib/ingredient-alias-memory.ts upsertConfirmedAlias"
+    },
+    "8_historical_pricing_chains_repaired": {
+      "answer": "NO — reconcileIngredientPriceHistoryChain not called on match correction",
+      "file": "src/lib/ingredient-price-history-reconcile.ts"
+    },
+    "9_orphaned_records_left": {
+      "answer": "YES — poisoned history a689bd91 on 635a1189; possible dual invoice_id history if new row written; localStorage-only rejection",
+      "details": "data-not-reverted.json orphaned_records_after_correction_A"
+    },
+    "10_correction_fully_reverses_contamination": {
+      "answer": "NO",
+      "verdict_code": 2,
+      "verdict_label": "partially_reverses"
+    }
+  },
+  "verdict": {
+    "code": 2,
+    "label": "partially_reverses",
+    "confidence_percent": 93,
+    "summary": "Correction changes forward-looking virtual match and writes new-target cost state, but does NOT delete, revert, or rebuild old-ingredient price_history or current_price. Pepino→conserva poison row a689bd91 persists.",
+    "scenario_A": {
+      "code": 2,
+      "stops_future_live_match_to_conserva": true,
+      "cleans_historical_poison_on_conserva": false
+    },
+    "scenario_B_no_match": {
+      "code": 3,
+      "label": "does_not_reverse",
+      "ui_exists": false,
+      "note": "No production handler; initial contamination fully persists"
+    }
+  },
+  "pepino_evidence_snapshot": {
+    "source": ".tmp/pepino-contamination-timeline/query-raw.json",
+    "poison_row": "a689bd91",
+    "wrong_ingredient": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+    "after_hypothetical_correction_to_new_id": {
+      "rows_on_da472b7f": "potentially 2 — a689bd91 (conserva orphan) + new row on new ingredient",
+      "conserva_chain": "still contains 0.00177 operational price in history"
+    }
+  }
+}

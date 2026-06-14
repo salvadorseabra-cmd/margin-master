@@ -1,0 +1,95 @@
+{
+  "generated_at": "2026-06-12T01:00:00.000Z",
+  "title": "Phase 2 Structured Extraction Failure — Root Cause",
+  "rootCause": "Phase 2 'schema' exists only in the prompt text. The OpenAI API call uses response_format: { type: 'json_object' } with no json_schema enforcement. Legacy unit_price/total remain valid output paths in the prompt (explicit escape hatch + 7 legacy positive examples). GPT satisfies extraction with legacy-only JSON — a valid response per current contract.",
+  "classification": {
+    "answer": "B + D (primary), C (contributing)",
+    "breakdown": {
+      "A_gpt_ignoring_optional_fields": {
+        "selected": false,
+        "asPrimary": false,
+        "note": "Symptom of unconstrained schema — model is not 'ignoring' required fields because none are required"
+      },
+      "B_schema_allows_legacy_only": {
+        "selected": true,
+        "asPrimary": true,
+        "evidence": "Prompt JSON example includes unit_price/total; line 52 legacy fallback; no property-level enforcement"
+      },
+      "C_prompt_ambiguity": {
+        "selected": true,
+        "asPrimary": false,
+        "evidence": "7 legacy examples vs 1 structured-only; qty=1=total rule conflicts with discounted structured extraction"
+      },
+      "D_validation_schema_issue": {
+        "selected": true,
+        "asPrimary": true,
+        "evidence": "callOpenAiJson sends only json_object; no strict json_schema; no post-parse rejection of legacy-only items"
+      }
+    }
+  },
+  "confidencePct": 92,
+  "confidenceBasis": {
+    "codeVerified": true,
+    "liveGptRawLogged": false,
+    "outputMatchesLegacyPath": true,
+    "phase2DidNotAddApiSchema": true
+  },
+  "filesAndFunctions": [
+    {
+      "file": "supabase/functions/extract-invoice/invoice-date-extraction.ts",
+      "function": "callOpenAiJson",
+      "role": "Sends json_object only — no structured field enforcement"
+    },
+    {
+      "file": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+      "function": "TABLE_EXTRACTION_SYSTEM_PROMPT",
+      "role": "Documents dual schema; permits legacy-only output"
+    },
+    {
+      "file": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+      "function": "extractTableItemsFromImage",
+      "role": "Calls callOpenAiJson without Pass-C-specific schema"
+    },
+    {
+      "file": "supabase/functions/extract-invoice/invoice-monetary-binding.ts",
+      "function": "parseMonetaryLineItems / bindMonetaryColumns",
+      "role": "Downstream — correctly handles null structured input (not root cause)"
+    }
+  ],
+  "firstFailurePoint": {
+    "stage": "OpenAI request construction",
+    "before": "GPT inference",
+    "reason": "Request does not constrain output shape; model free to emit legacy fields"
+  },
+  "recommendedMinimalFix": {
+    "summary": "Add Pass-C-specific strict JSON Schema to the OpenAI call; remove unit_price/total from item properties",
+    "changeScope": "2 files, ~40 lines",
+    "steps": [
+      {
+        "priority": 1,
+        "file": "invoice-table-extraction.ts",
+        "change": "Pass response_format with type json_schema, strict: true, item properties: name, quantity, unit, gross_unit_price, discount_pct, line_total_net only (all in required array, nullable via type: [number, null])",
+        "why": "Forces model to emit structured keys; legacy path no longer valid JSON per schema"
+      },
+      {
+        "priority": 2,
+        "file": "invoice-date-extraction.ts OR invoice-table-extraction.ts",
+        "change": "Add optional responseFormat param to callOpenAiJson OR inline fetch in extractTableItemsFromImage",
+        "why": "Other passes (date, footer) should keep json_object"
+      },
+      {
+        "priority": 3,
+        "optional": true,
+        "file": "invoice-table-extraction.ts",
+        "change": "Remove unit_price/total from prompt JSON example + update positive examples to structured-only",
+        "why": "Aligns prompt with enforced schema; reduces model confusion"
+      }
+    ],
+    "smallestSingleChange": "In extractTableItemsFromImage, replace generic callOpenAiJson with a call that passes response_format: { type: 'json_schema', json_schema: { name: 'invoice_items', strict: true, schema: { ... } } } omitting unit_price and total from item.properties",
+    "notRecommendedAsSufficientAlone": "Prompt-only changes without json_schema enforcement — model already has clear structured instructions and still returns legacy"
+  },
+  "relatedPriorWork": {
+    "structuredMonetaryTrace": ".tmp/structured-monetary-trace/REPORT.md",
+    "conclusion": "Downstream pipeline works when structured fields present; failure is upstream at GPT request"
+  }
+}

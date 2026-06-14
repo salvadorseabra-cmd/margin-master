@@ -1,0 +1,141 @@
+{
+  "generated_at": "2026-06-13T21:00:00.000Z",
+  "mode": "READ-ONLY_COMPATIBILITY_AUDIT",
+  "scoringScale": "1 (poor) – 5 (excellent)",
+  "recipeBindingOptions": {
+    "A_concept": {
+      "id": "A",
+      "name": "Recipes reference Ingredient Concept",
+      "description": "recipe_ingredients.ingredient_id → ingredients (concept). Costing via concept.default_pack_variant_id or derived current_price mirror.",
+      "scores": {
+        "costingCorrectness": 4,
+        "prepSubRecipeCompatibility": 5,
+        "historicalPricingCompatibility": 4,
+        "migrationRisk": 5,
+        "uxComplexity": 5,
+        "operationalComplexity": 4
+      },
+      "weightedTotal": 4.5,
+      "verdict": "RECOMMENDED — aligns with Option E design",
+      "notes": [
+        "ingredient_id FK preserved — semantic upgrade only",
+        "Costing reads default variant; optional line-level override in P3",
+        "Menu thinks in culinary terms not supplier SKUs"
+      ]
+    },
+    "B_supplierProduct": {
+      "id": "B",
+      "name": "Recipes reference Supplier Product",
+      "description": "recipe_ingredients.supplier_product_id → locks recipe to one supplier SKU",
+      "scores": {
+        "costingCorrectness": 2,
+        "prepSubRecipeCompatibility": 3,
+        "historicalPricingCompatibility": 5,
+        "migrationRisk": 2,
+        "uxComplexity": 2,
+        "operationalComplexity": 2
+      },
+      "weightedTotal": 2.7,
+      "verdict": "REJECT for recipes — correct layer for purchasing only",
+      "notes": [
+        "Menu recipes should not break when supplier switches",
+        "Would require recipe rewrite on every supplier change",
+        "Conflicts with equivalence_group substitution model"
+      ]
+    },
+    "C_packVariant": {
+      "id": "C",
+      "name": "Recipes reference Pack Variant",
+      "description": "recipe_ingredients.pack_variant_id → locks recipe to specific purchase contract",
+      "scores": {
+        "costingCorrectness": 5,
+        "prepSubRecipeCompatibility": 4,
+        "historicalPricingCompatibility": 5,
+        "migrationRisk": 3,
+        "uxComplexity": 2,
+        "operationalComplexity": 3
+      },
+      "weightedTotal": 3.7,
+      "verdict": "OPTIONAL override only — not primary binding",
+      "notes": [
+        "Best for power users pinning exact pack (e.g. always Bocconcino tray)",
+        "Too granular for default menu recipe UX",
+        "Nullable pack_variant_id on line is forward-compatible add-on"
+      ]
+    }
+  },
+  "recommendedModels": {
+    "recipeIdentity": "A — Ingredient Concept (current ingredient_id, future concept role)",
+    "purchasingIdentity": "D/E — Supplier Product → Pack Variant (invoice match, price_history, aliases)",
+    "separationPrinciple": "Recipes own culinary ontology; purchasing owns commercial contracts"
+  },
+  "currentCodebaseAlignment": {
+    "recipeSchema": {
+      "recipe_ingredients": "ingredient_id XOR sub_recipe_id — already concept-level + prep graph",
+      "prepSupport": "sub_recipe_id FK recipes(id), output_quantity/output_unit on recipes",
+      "uniqueConstraints": "partial unique on (recipe_id, ingredient_id) and (recipe_id, sub_recipe_id)"
+    },
+    "costingPath": [
+      "recipe_ingredients.ingredients embed → buildOperationalIngredientCostById",
+      "resolveRecipeLineOperationalCost(ingredient_id, qty, catalog)",
+      "resolvedOperationalUnitCostEur(current_price / purchase_quantity)",
+      "sub_recipe: resolvePrepUsageLineOperationalCost → recursive recipe-merge walk"
+    ],
+    "identityCoupling": "Costing reads ingredients.current_price — will become derived from default_pack_variant",
+    "oiCoupling": "getRecipeMetrics uses same resolver — benefits from variant layer without schema change",
+    "noPackVariantInCode": true
+  },
+  "vlFailureSchemaImpact": {
+    "mozzarella": {
+      "requiresRecipeSchemaChange": false,
+      "requiresPurchasingHistoryChange": true,
+      "detail": "Recipe binds to concept 'Mozzarella'; Bocconcino vs Aviludo split is pack_variant + supplier_product. Recipe costing uses default_pack_variant_id (e.g. block for kitchen). Wrong cost today is purchasing overwrite on concept.current_price, not recipe FK."
+    },
+    "pepino": {
+      "requiresRecipeSchemaChange": false,
+      "requiresPurchasingHistoryChange": true,
+      "detail": "Recipe for pickles uses 'Pepino conserva' concept; fresh Bidfood line should not match that concept. Form guard / concept split is purchasing layer."
+    },
+    "gingerBeer": {
+      "requiresRecipeSchemaChange": false,
+      "requiresPurchasingHistoryChange": true,
+      "detail": "Recipe uses concept 'Ginger Beer'; volume SKU is pack_variant with volume_ml_per_unit. Extraction parse is purchasing normalization."
+    }
+  },
+  "coreQuestions": {
+    "1_whatBreaksWhenVariantsIntroduced": {
+      "answer": "Minimal if recipes stay on concept: costing resolver must read default_pack_variant instead of ingredients.current_price. recipe_ingredients rows unchanged. Breaks only if recipes were bound to supplier_product (option B) or if code bypasses resolver and reads raw current_price.",
+      "confidencePercent": 87,
+      "breaks": [
+        "resolve-operational-ingredient-cost.ts — redirect price source (adapter, not rewrite)",
+        "buildOperationalIngredientCostById — include variant fields",
+        "ingredients.current_price dual-write deprecation"
+      ],
+      "doesNotBreak": [
+        "recipe_ingredients.ingredient_id FK",
+        "sub_recipe_id prep graph",
+        "recipe-merge recursive walk",
+        "recipe margin formula (foodCost / selling_price)",
+        "margin-alerts recipe impact by ingredient_id"
+      ]
+    },
+    "2_conceptRecipesVariantPurchases": {
+      "answer": "YES — this is the intended Option E separation and lowest migration risk path.",
+      "confidencePercent": 91
+    },
+    "3_costingCorrectWhenPriceDerived": {
+      "answer": "YES when default_pack_variant_id is set and stable; RISK when multiple formats exist and default is wrong (VL Mozzarella: catalog €13.69 block vs kitchen using pieces).",
+      "confidencePercent": 80,
+      "mitigation": "Per-concept default variant + optional recipe line pack_variant_id override (P3)"
+    },
+    "4_prepNowWithoutRewrites": {
+      "answer": "YES — prep/sub-recipe architecture is orthogonal to pack variants. sub_recipe_id, output_quantity, recipe-merge walk, prep propagation are already implemented.",
+      "confidencePercent": 88
+    },
+    "5_technicalDebtIfRecipesNow": {
+      "answer": "LOW–MEDIUM if following concept binding + existing resolvers. HIGH only if binding recipes to supplier products or hardcoding ingredients.current_price outside resolver.",
+      "confidencePercent": 82,
+      "debtLevel": "low_medium"
+    }
+  }
+}

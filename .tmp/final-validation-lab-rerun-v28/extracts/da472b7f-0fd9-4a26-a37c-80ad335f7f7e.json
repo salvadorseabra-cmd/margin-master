@@ -1,0 +1,90 @@
+{
+  "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+  "label": "Bidfood",
+  "extractedAt": "2026-06-12T23:58:02.556Z",
+  "deployVersion": 28,
+  "imageSource": ".tmp/footer-validation-4dc40c3/bidfood-final.b64.txt",
+  "status": 200,
+  "supplier": "Bidfood Portugal, SA",
+  "invoice_date": "25/05/2026",
+  "total": 292.7,
+  "items": [
+    {
+      "name": "Manteiga Coimbra s/Sal EMB 1 Kg",
+      "quantity": 8,
+      "unit": "kg",
+      "unit_price": 8.9,
+      "total": 71.2
+    },
+    {
+      "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 38.44,
+      "total": 38.44
+    },
+    {
+      "name": "Tomilho",
+      "quantity": 1,
+      "unit": "mo",
+      "unit_price": 2.06,
+      "total": 2.06
+    },
+    {
+      "name": "Salada Ibérica FSTK EMB. 250g",
+      "quantity": 4,
+      "unit": "em",
+      "unit_price": 2.33,
+      "total": 8.76
+    },
+    {
+      "name": "Manjericão",
+      "quantity": 5,
+      "unit": "mo",
+      "unit_price": 2.57,
+      "total": 10.28
+    },
+    {
+      "name": "Hortelã",
+      "quantity": 0.5,
+      "unit": "kg",
+      "unit_price": 6.74,
+      "total": 2.7
+    },
+    {
+      "name": "Pepino",
+      "quantity": 3.36,
+      "unit": "kg",
+      "unit_price": 1.77,
+      "total": 4.76
+    },
+    {
+      "name": "Pêra Abacate Hasse",
+      "quantity": 3.28,
+      "unit": "kg",
+      "unit_price": 5.32,
+      "total": 13.96
+    },
+    {
+      "name": "Courgettes",
+      "quantity": 3.3,
+      "unit": "kg",
+      "unit_price": 1.95,
+      "total": 5.15
+    },
+    {
+      "name": "Alho Francês",
+      "quantity": 5.42,
+      "unit": "kg",
+      "unit_price": 1.77,
+      "total": 7.67
+    },
+    {
+      "name": "Abóbora Butternut",
+      "quantity": 5.42,
+      "unit": "kg",
+      "unit_price": 1.24,
+      "total": 5.59
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "generated_at": "2026-06-13T20:51:10.562Z",
+  "deployVersion": 31,
+  "perInvoice": [
+    {
+      "label": "Bidfood",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "exists": false,
+      "dbItemCount": 11,
+      "v31ExtractRowCount": 11,
+      "countMatch": true,
+      "linkedIngredientLines": 0,
+      "priceHistoryRows": 1,
+      "headerTotal": null,
+      "lineSum": 170.57,
+      "oldestItemCreatedAt": "2026-06-12T22:54:35.252817+00:00",
+      "stale": false,
+      "invoiceCreatedAt": null
+    },
+    {
+      "label": "Aviludo April",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "exists": false,
+      "dbItemCount": 9,
+      "v31ExtractRowCount": 9,
+      "countMatch": true,
+      "linkedIngredientLines": 0,
+      "priceHistoryRows": 10,
+      "headerTotal": null,
+      "lineSum": 300.95,
+      "oldestItemCreatedAt": "2026-06-12T22:53:48.674914+00:00",
+      "stale": false,
+      "invoiceCreatedAt": null
+    },
+    {
+      "label": "Aviludo May",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "exists": false,
+      "dbItemCount": 8,
+      "v31ExtractRowCount": 8,
+      "countMatch": true,
+      "linkedIngredientLines": 0,
+      "priceHistoryRows": 8,
+      "headerTotal": null,
+      "lineSum": 296.88,
+      "oldestItemCreatedAt": "2026-06-11T22:42:40.507953+00:00",
+      "stale": true,
+      "invoiceCreatedAt": null
+    },
+    {
+      "label": "Bocconcino",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "exists": false,
+      "dbItemCount": 7,
+      "v31ExtractRowCount": 7,
+      "countMatch": true,
+      "linkedIngredientLines": 0,
+      "priceHistoryRows": 1,
+      "headerTotal": null,
+      "lineSum": 295.82,
+      "oldestItemCreatedAt": "2026-06-11T22:44:21.33838+00:00",
+      "stale": true,
+      "invoiceCreatedAt": null
+    },
+    {
+      "label": "Emporio (live)",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "exists": false,
+      "dbItemCount": 8,
+      "v31ExtractRowCount": null,
+      "countMatch": false,
+      "linkedIngredientLines": 0,
+      "priceHistoryRows": 0,
+      "headerTotal": null,
+      "lineSum": 281,
+      "oldestItemCreatedAt": "2026-06-11T23:37:47.971756+00:00",
+      "stale": true,
+      "invoiceCreatedAt": null
+    },
+    {
+      "label": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "exists": false,
+      "dbItemCount": 8,
+      "v31ExtractRowCount": 8,
+      "countMatch": true,
+      "linkedIngredientLines": 0,
+      "priceHistoryRows": 0,
+      "headerTotal": null,
+      "lineSum": 374.94,
+      "oldestItemCreatedAt": "2026-06-11T22:41:12.800441+00:00",
+      "stale": true,
+      "invoiceCreatedAt": null
+    }
+  ],
+  "deletedEmporioVl": {
+    "invoiceExists": false,
+    "itemCount": 0,
+    "priceHistoryRows": 0
+  },
+  "totals": {
+    "vlInvoices": 6,
+    "staleInvoices": 4,
+    "countMismatches": 1,
+    "totalPriceHistoryRows": 20,
+    "ghostHistoryOnDeletedEmporio": 0,
+    "totalAliases": 32,
+    "linkedLines": 0,
+    "unmatchedLines": 51
+  }
+}

@@ -1,0 +1,267 @@
+{
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "label": "Bocconcino",
+  "deployVersion": 31,
+  "operationalStatus": "DEGRADED",
+  "issues": [
+    "field_drift: 6 row(s) differ numerically",
+    "ghost_price_history: 1 row(s)",
+    "dashboard_header_mismatch: header €290.64 vs lines €295.82"
+  ],
+  "checks": {
+    "invoiceItemsCount": {
+      "db": 7,
+      "v31Extract": 7,
+      "expected": 7,
+      "match": true,
+      "dbMatchesExtract": true
+    },
+    "ingredientMatching": {
+      "matchedLines": 0,
+      "unmatchedLines": 7,
+      "totalLines": 7
+    },
+    "historicalPricing": {
+      "historyRows": 1,
+      "staleHistoryRows": 0,
+      "ghostHistoryRows": 1,
+      "staleDetails": []
+    },
+    "dashboardTotals": {
+      "dbLineSum": 295.82,
+      "extractLineSum": 267.87,
+      "headerTotal": 290.64,
+      "extractHeaderTotal": 290.64,
+      "dbLineSumMatchesExtract": false,
+      "headerMatchesDbLines": false
+    },
+    "opportunities": {
+      "stalePriceSignals": 0,
+      "note": "Opportunity/margin alerts derive from ingredient_price_history — stale rows propagate wrong inflation signals"
+    },
+    "supplierIntelligence": {
+      "supplierName": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "lineCount": 7,
+      "matchedPct": 0
+    },
+    "staleRows": {
+      "count": 6,
+      "dbOnly": [],
+      "extractOnly": [],
+      "fieldDrift": [
+        {
+          "name": "MOZZARELLA FIOR DI LATTE 'IL BOCCONCINO' 125GR*8",
+          "diffs": [
+            "unit_price"
+          ],
+          "db": {
+            "id": "2171e23b-6cb8-4376-83f7-7c2571518224",
+            "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+            "name": "MOZZARELLA FIOR DI LATTE 'IL BOCCONCINO' 125GR*8",
+            "quantity": 10,
+            "unit": "un",
+            "unit_price": 9.5,
+            "total": 81.23,
+            "created_at": "2026-06-11T22:44:21.33838+00:00"
+          },
+          "extract": {
+            "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+            "quantity": 10,
+            "unit": "un",
+            "unit_price": 8.12,
+            "total": 81.23
+          }
+        },
+        {
+          "name": "STRACCIATELLA 250 GR",
+          "diffs": [
+            "unit_price"
+          ],
+          "db": {
+            "id": "abab22b0-6c2e-4505-beb9-877c3be9acd4",
+            "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+            "name": "STRACCIATELLA 250 GR",
+            "quantity": 24,
+            "unit": "un",
+            "unit_price": 4.141,
+            "total": 74.54,
+            "created_at": "2026-06-11T22:44:21.33838+00:00"
+          },
+          "extract": {
+            "name": "STRACCIATELLA 250 GR",
+            "quantity": 24,
+            "unit": "un",
+            "unit_price": 3.11,
+            "total": 74.54
+          }
+        },
+        {
+          "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+          "diffs": [
+            "quantity",
+            "unit_price"
+          ],
+          "db": {
+            "id": "2a6228eb-2c77-4fae-b59a-a4bace19c5d3",
+            "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+            "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 27.56,
+            "total": 27.3,
+            "created_at": "2026-06-11T22:44:21.33838+00:00"
+          },
+          "extract": {
+            "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+            "quantity": 2,
+            "unit": "un",
+            "unit_price": 27.306,
+            "total": 27.3
+          }
+        },
+        {
+          "name": "POMODORO PELATI (CX 2.5KG*6)",
+          "diffs": [
+            "quantity",
+            "unit_price",
+            "total"
+          ],
+          "db": {
+            "id": "dbe476b3-49f4-4c57-be26-e3cf4a989d78",
+            "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+            "name": "POMODORO PELATI (CX 2.5KG*6)",
+            "quantity": 2,
+            "unit": "un",
+            "unit_price": 25,
+            "total": 50,
+            "created_at": "2026-06-11T22:44:21.33838+00:00"
+          },
+          "extract": {
+            "name": "POMODORI PELATI (CX 2,5KG*6)",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 22.05,
+            "total": 22.05
+          }
+        },
+        {
+          "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+          "diffs": [
+            "unit_price"
+          ],
+          "db": {
+            "id": "c56a836c-a065-4f5f-9e69-42ffe816bd8e",
+            "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+            "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+            "quantity": 2,
+            "unit": "un",
+            "unit_price": 20.295,
+            "total": 42.07,
+            "created_at": "2026-06-11T22:44:21.33838+00:00"
+          },
+          "extract": {
+            "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+            "quantity": 2,
+            "unit": "un",
+            "unit_price": 23.29,
+            "total": 42.07
+          }
+        },
+        {
+          "name": "RICOTTA TREVIGIANA 1,5KG",
+          "diffs": [
+            "quantity"
+          ],
+          "db": {
+            "id": "32f17c53-9cda-4b50-b700-4126e831246a",
+            "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+            "name": "RICOTTA TREVIGIANA 1,5KG",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 7.97,
+            "total": 7.97,
+            "created_at": "2026-06-11T22:44:21.33838+00:00"
+          },
+          "extract": {
+            "name": "RICOTTA TREVIGIANA 1,5KG",
+            "quantity": 2,
+            "unit": "un",
+            "unit_price": 7.967,
+            "total": 7.97
+          }
+        }
+      ]
+    },
+    "duplicatePurchases": {
+      "count": 0,
+      "duplicates": []
+    },
+    "ghostPurchases": {
+      "count": 1,
+      "details": [
+        {
+          "historyId": "18bdb0c5-0370-4bc7-878d-85957b8ba946",
+          "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+          "newPrice": 0.95,
+          "reason": "price_history row with no v31 extract line match"
+        }
+      ]
+    }
+  },
+  "extraction": {
+    "status": 200,
+    "itemCountRaw": 7,
+    "itemCountNormalized": 7,
+    "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+    "total": 290.64
+  },
+  "db": {
+    "itemCount": 7,
+    "oldestItemCreatedAt": "2026-06-11T22:44:21.33838+00:00",
+    "newestItemCreatedAt": "2026-06-11T22:44:21.33838+00:00"
+  },
+  "matching": [
+    {
+      "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "STRACCIATELLA 250 GR",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "POMODORI PELATI (CX 2,5KG*6)",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "RICOTTA TREVIGIANA 1,5KG",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "ROLO DE CABRA E VACA 1KG",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    }
+  ]
+}

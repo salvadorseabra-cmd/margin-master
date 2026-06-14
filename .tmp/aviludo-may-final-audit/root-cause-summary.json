@@ -1,0 +1,81 @@
+{
+  "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+  "label": "Aviludo May",
+  "deployVersion": 25,
+  "totalFinancialErrorEuro": 40.0,
+  "confidencePercent": 92,
+  "verdict": "SINGLE_ROW_MONETARY_COLUMN_BLEED",
+  "topErrorDrivers": [
+    {
+      "rank": 1,
+      "product": "Chocolate Culinaria Pantagruel 10x200 g",
+      "financialErrorEuro": 40.0,
+      "pctOfTotal": 100,
+      "mechanism": "GPT reads Preço Unitário 9,99 from adjacent Açúcar row (row below) instead of correct 29,99 on Chocolate row",
+      "category": "monetary_column",
+      "stability": "9,99 unit_price in 3/3 v25 PDF probes; qty stable at 2 in runs 1-2, dropped to 1 in run 3"
+    },
+    {
+      "rank": 2,
+      "product": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+      "financialErrorEuro": 0,
+      "pctOfTotal": 0,
+      "mechanism": "Line total 13,10 used as unit_price with qty=1 instead of qty=2 × 6,55",
+      "category": "quantity_unit_parsing",
+      "stability": "Identical wrong parse in 3/3 probes; total preserved so no € impact"
+    },
+    {
+      "rank": 3,
+      "product": "Filete de Anchoas Alcofinosa L4 495 g",
+      "financialErrorEuro": 0,
+      "pctOfTotal": 0,
+      "mechanism": "Description OCR drift (Anchovas→Anchoivas, Alconfrisa→Alcoinfoisa)",
+      "category": "ocr",
+      "stability": "Consistent across runs"
+    }
+  ],
+  "structuralFamily": {
+    "name": "Aviludo dense-table column isolation",
+    "type": "structural_family",
+    "relatedCases": [
+      "Açúcar qty bleed (FIXED by Pass C refinement — digit 9 from 9,99 → qty)",
+      "Chocolate price bleed (OPEN — entire 9,99 from adjacent row → unit_price)",
+      "Atum qty/unit conflation (OPEN field-only — line total as unit_price)"
+    ],
+    "isolatedVsFamily": "Chocolate is same structural family as solved Açúcar case but inverted direction (price column bleeds from row below rather than qty digit from price). Not an isolated one-off."
+  },
+  "smallestFixCategory": {
+    "category": "pass_c_prompt_column_isolation",
+    "scope": "invoice-table-extraction.ts TABLE_EXTRACTION_SYSTEM_PROMPT",
+    "recommendation": "Add Aviludo Chocolate worked example adjacent to existing Açúcar rule: Preço Unitário must come from the SAME row; Chocolate 2 CX @ 29,99 = 59,98 — BAD example if unit_price reads 9,99 from Açúcar row below",
+    "alternativesRejected": [
+      "Geometry/crop change — table fully visible, 8/8 rows extracted",
+      "Schema enforcement — structured fields not blocking; wrong values returned",
+      "Pack multiplier — Chocolate unit is CX (case); error is wrong price not pack inference",
+      "Ground-truth issue — visible invoice confirms 29,99 / 59,98"
+    ],
+    "productionCodeSurface": "prompt only (no geometry, binder, or persistence change)"
+  },
+  "expectedVLImprovement": {
+    "aviludoMayErrorNow": 40.0,
+    "aviludoMayErrorAfterFix": 0,
+    "globalErrorBaseline": 389.97,
+    "globalErrorAfterAprilHarnessFix": 89.02,
+    "globalErrorAfterMayChocolateFix": 49.02,
+    "fieldAccuracyImpact": "Recovers 2 wrong fields (Chocolate unit_price + total) on 32 field comparisons → ~+6pp on May invoice; modest global lift",
+    "note": "Atum qty/unit fix would improve field accuracy but not € error (total already matches)"
+  },
+  "timeline": {
+    "preC33a7f1": "Chocolate correct; Açúcar correct",
+    "c33a7f1": "Açúcar regressed qty 9 (€79.92); Chocolate still correct",
+    "passcRefinement": "Açúcar fixed; Chocolate correct; May 0€ error",
+    "v25": "Açúcar still correct; Chocolate regressed to 9,99 (€40); Atum qty regressed (€0)"
+  },
+  "evidence": [
+    ".tmp/aviludo-may-final-audit/error-breakdown.json",
+    ".tmp/aviludo-may-final-audit/v25-stability-runs.json",
+    ".tmp/geometry-audit/images/3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.png",
+    ".tmp/passc-refinement-audit/pack-notation-audit.json",
+    ".tmp/final-validation-lab-rerun/extracts/3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json"
+  ]
+}

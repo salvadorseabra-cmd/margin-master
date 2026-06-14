@@ -1,0 +1,42 @@
+{
+  "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+  "ingredientName": "Pepino conserva",
+  "invoiceLabel": "Bidfood",
+  "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+  "lineName": "Pepino",
+  "trustVerdict": "trusted",
+  "classification": [],
+  "invoiceSource": {
+    "quantity": 3.36,
+    "unit": "kg",
+    "unit_price": 1.77,
+    "total": 4.76
+  },
+  "normalized": {
+    "packPrice": 1.77,
+    "purchaseQuantity": 1000,
+    "operationalUnitCost": 0.00177,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 1.77,
+    "purchase_quantity": 1000,
+    "operationalUnitCost": 0.00177
+  },
+  "priceHistory": [
+    {
+      "id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+      "previous_price": 3.748333333333333,
+      "new_price": 0.00177,
+      "delta": -3.746563333333333,
+      "delta_percent": -99.95277901289462,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
+  "opportunityRisk": [
+    "Large movement -99.9528% — verify equivalent units"
+  ],
+  "notes": []
+}

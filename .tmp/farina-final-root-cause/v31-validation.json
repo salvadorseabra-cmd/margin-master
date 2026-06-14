@@ -1,0 +1,105 @@
+{
+  "generated_at": "2026-06-13T16:52:16.932Z",
+  "deployVersion": 31,
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "product": "Farina Speciale pizza 25kg Amoruso",
+  "groundTruthTotal": 26.52,
+  "runs": 5,
+  "farinaStabilityPct": 60,
+  "correctRuns": 3,
+  "perRun": [
+    {
+      "run": 1,
+      "status": 200,
+      "elapsedMs": 23872,
+      "farina": {
+        "name": "Farine Speciale pizza 25kg Amoruso",
+        "quantity": 1,
+        "unit_price": 26.52,
+        "total": 26.52,
+        "errorEuro": 0,
+        "correctVsGt": true
+      }
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "elapsedMs": 20446,
+      "farina": {
+        "name": "Farine Speciale pizza 25kg Amoruso",
+        "quantity": 1,
+        "unit_price": 26.52,
+        "total": 26.52,
+        "errorEuro": 0,
+        "correctVsGt": true
+      }
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "elapsedMs": 17495,
+      "farina": {
+        "name": "Farine Speciale pizza 25kg Amoruso",
+        "quantity": 1,
+        "unit_price": 26.52,
+        "total": 25.52,
+        "errorEuro": 1,
+        "correctVsGt": false
+      }
+    },
+    {
+      "run": 4,
+      "status": 200,
+      "elapsedMs": 21483,
+      "farina": {
+        "name": "Farine Speciale pizza 25kg Amoruso",
+        "quantity": 1,
+        "unit_price": 26.52,
+        "total": 25.52,
+        "errorEuro": 1,
+        "correctVsGt": false
+      }
+    },
+    {
+      "run": 5,
+      "status": 200,
+      "elapsedMs": 20284,
+      "farina": {
+        "name": "Farine Speciale pizza 25kg Amoruso",
+        "quantity": 1,
+        "unit_price": 26.52,
+        "total": 26.52,
+        "errorEuro": 0,
+        "correctVsGt": true
+      }
+    }
+  ],
+  "totalsUnique": [
+    26.52,
+    25.52
+  ],
+  "avgErrorEuro": 0.4,
+  "recoveryEuro": 0.6,
+  "before": {
+    "deployVersion": 30,
+    "runs": 10,
+    "correctVsGt": 0,
+    "correctnessPct": 0,
+    "stableTotal": 25.52,
+    "avgErrorEuro": 1,
+    "source": ".tmp/final-stability-audit/stability-matrix.json"
+  },
+  "after": {
+    "deployVersion": 31,
+    "runs": 5,
+    "correctVsGt": 3,
+    "correctnessPct": 60,
+    "avgErrorEuro": 0.4
+  },
+  "focusRowClassA": {
+    "farinaFixed": false,
+    "remainingDeterministicBugsEuro": 0.4,
+    "note": "Farina still failing — Class A remains"
+  },
+  "verdict": "FAIL"
+}

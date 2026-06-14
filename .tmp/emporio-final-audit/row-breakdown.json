@@ -1,0 +1,211 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio Italia",
+  "deployVersion": 27,
+  "auditedAt": "2026-06-13T00:30:00.000Z",
+  "v27Source": ".tmp/final-residual-error-audit/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+  "gtSource": ".tmp/field-accuracy-audit/ground-truth.json",
+  "totalFinancialErrorEuro": 29.04,
+  "note": "€29.04 = four focus rows only; Emporio invoice total €30.44 includes Prosciutto €1.40 (GT mismatch, out of scope)",
+  "sumCheck": {
+    "gorgonzola": 13.56,
+    "bresaola": 10.0,
+    "sanpellegrino": 4.7,
+    "mortadella": 0.78,
+    "sum": 29.04,
+    "accountsFor100PctFocusRows": true
+  },
+  "rows": [
+    {
+      "rank": 1,
+      "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+      "financialErrorEuro": 13.56,
+      "classification": "A",
+      "firstFailingStage": "passC_table_extraction",
+      "visible": {
+        "qty": 1.35,
+        "unit": "kg",
+        "unit_price_gross": null,
+        "unit_price_net": 9.82,
+        "discount_pct": "partial — total implies discount",
+        "total": 13.44,
+        "source": "passc-refinement reextract + emporio-footer-fix + discount-accuracy (total stable 13.44 across good runs)",
+        "notes": "v23 audit: PARTIAL — total copied correctly; qty/unit variable (1 or 2)"
+      },
+      "groundTruth": {
+        "qty": 1.35,
+        "unit": "kg",
+        "unit_price": 9.92,
+        "total": 13.44
+      },
+      "v27": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8 - 1,8-1,9kg",
+        "qty": 2,
+        "unit": null,
+        "unit_price": 13.5,
+        "total": 27
+      },
+      "v26Baseline": {
+        "qty": 1.26,
+        "unit_price": 10.5,
+        "total": 13.44,
+        "financialErrorEuro": 0
+      },
+      "refinementBaseline": {
+        "qty": 1.35,
+        "unit_price": 9.82,
+        "total": 13.44,
+        "financialErrorEuro": 0
+      },
+      "deltas": {
+        "qty": 0.65,
+        "unit_price": 3.58,
+        "total": 13.56
+      },
+      "mechanism": "GPT run regression: doubled qty (2 vs visible 1.35) and read wrong Preço Total (€27 vs €13.44). Prior runs (v26, refinement) preserved correct line total.",
+      "stability": "UNSTABLE — v27 bad run; historically total-stable (discount-accuracy PARTIAL 2/2)"
+    },
+    {
+      "rank": 2,
+      "product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+      "financialErrorEuro": 10.0,
+      "classification": "A",
+      "firstFailingStage": "passC_table_extraction",
+      "visible": {
+        "qty": 2.8,
+        "unit": "kg",
+        "unit_price": 17.68,
+        "total": 49.48,
+        "source": "field-accuracy GT aligned with visible Preço Total; passc-refinement total 49.64 (qty 2.28); v23 run1 total 49.48",
+        "notes": "Weight-row: qty and unit_price trade off when total correct (v26: qty 1.83 @ €27.05 = €49.48)"
+      },
+      "groundTruth": {
+        "qty": 2.8,
+        "unit": "kg",
+        "unit_price": 17.68,
+        "total": 49.48
+      },
+      "v27": {
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+        "qty": 2.38,
+        "unit": null,
+        "unit_price": 16.64,
+        "total": 39.48
+      },
+      "v26Baseline": {
+        "qty": 1.83,
+        "unit_price": 27.05,
+        "total": 49.48,
+        "financialErrorEuro": 0
+      },
+      "refinementBaseline": {
+        "qty": 2.28,
+        "unit_price": 21.8,
+        "total": 49.64,
+        "financialErrorEuro": 0.16
+      },
+      "deltas": {
+        "qty": -0.42,
+        "unit_price": -1.04,
+        "total": -10.0
+      },
+      "mechanism": "Preço Total misread (€39.48 vs visible €49.48). v26/refinement preserved total via qty×unit reconciliation; v27 failed total column.",
+      "stability": "UNSTABLE — v27 regression; v26 and refinement kept total within €0.16"
+    },
+    {
+      "rank": 3,
+      "product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "financialErrorEuro": 4.7,
+      "classification": "A",
+      "firstFailingStage": "passC_table_extraction",
+      "visible": {
+        "qty": 2.56,
+        "unit": "cx",
+        "unit_price": 15.06,
+        "total": 38.56,
+        "source": "emporio-footer-fix GT extract + refinement (qty 2, total 38.56 correct)",
+        "notes": "Case/weight hybrid row; integer case reads (2 or 3) common; total 38.56 stable when correct"
+      },
+      "groundTruth": {
+        "qty": 2.56,
+        "unit": "cx",
+        "unit_price": 15.06,
+        "total": 38.56
+      },
+      "v27": {
+        "name": "SanPellegrino - Acqua in Vetro 75cl x 15ud",
+        "qty": 3,
+        "unit": null,
+        "unit_price": 14.42,
+        "total": 43.26
+      },
+      "v26Baseline": {
+        "qty": 2,
+        "unit_price": 14.25,
+        "total": 28.5,
+        "financialErrorEuro": 10.06
+      },
+      "refinementBaseline": {
+        "qty": 2,
+        "unit_price": 19.3,
+        "total": 38.56,
+        "financialErrorEuro": 0
+      },
+      "deltas": {
+        "qty": 0.44,
+        "unit_price": -0.64,
+        "total": 4.7
+      },
+      "mechanism": "Qty over-read (3 vs GT 2.56) and Preço Total wrong (€43.26 vs €38.56). Refinement achieved €0; v26 had €10.06 on different qty/total path.",
+      "stability": "VARIABLE — refinement €0; v26 €10.06; v27 €4.70"
+    },
+    {
+      "rank": 4,
+      "product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+      "financialErrorEuro": 0.78,
+      "classification": "A",
+      "firstFailingStage": "passC_table_extraction",
+      "visible": {
+        "qty": 3.11,
+        "unit": "kg",
+        "unit_price_gross": 11.1,
+        "discount_pct": 10,
+        "unit_price_net": 10.1,
+        "total": 31.07,
+        "source": "ventricina-root-cause/v25-validation.json references.visible.mortadella"
+      },
+      "groundTruth": {
+        "qty": 3.11,
+        "unit": "kg",
+        "unit_price": 10.1,
+        "total": 31.07
+      },
+      "v27": {
+        "name": "Rovagnati - Mortadella IGP 'Massima' con pistacchio tr. 2,3~ 2,5kg",
+        "qty": 3.1,
+        "unit": null,
+        "unit_price": 9.77,
+        "total": 30.29
+      },
+      "v26Baseline": {
+        "qty": 3.11,
+        "unit_price": 9.88,
+        "total": 30.74,
+        "financialErrorEuro": 0.33
+      },
+      "refinementBaseline": {
+        "qty": 3.11,
+        "unit_price": 10,
+        "total": 31.07,
+        "financialErrorEuro": 0
+      },
+      "deltas": {
+        "qty": -0.01,
+        "unit_price": -0.33,
+        "total": -0.78
+      },
+      "mechanism": "Discount column not extracted (discount_pct null); binder uses qty×gross approximation → total €30.29 vs visible €31.07. Same family as Prosciutto/Ventricina (emporio-discount-column-audit).",
+      "stability": "PARTIAL — v25 2/3 runs within €0.5; v26 €0.33; v27 €0.78"
+    }
+  ]
+}

@@ -1,0 +1,255 @@
+[
+  {
+    "scenario": "A_gpt_structured_correct",
+    "stages": [
+      {
+        "stage": "1_gpt_raw_json",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "gross_unit_price": 27.56,
+          "discount_pct": 20,
+          "line_total_net": 22.05,
+          "unit_price": null,
+          "total": null
+        }
+      },
+      {
+        "stage": "2_parseMonetaryLineItems",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "gross_unit_price": 27.56,
+          "discount_pct": 20,
+          "line_total_net": 22.05,
+          "unit_price": null,
+          "total": null
+        }
+      },
+      {
+        "stage": "3_bindMonetaryColumns",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "gross_unit_price": 27.56,
+          "discount_pct": 20,
+          "line_total_net": 22.05,
+          "unit_price": 22.05,
+          "total": 22.05
+        }
+      },
+      {
+        "stage": "4_monetaryToInvoiceLineItem",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "unit_price": 22.05,
+          "total": 22.05
+        }
+      },
+      {
+        "stage": "5_reconcileLineItemAmounts",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "unit_price": 22.05,
+          "total": 22.05
+        }
+      }
+    ]
+  },
+  {
+    "scenario": "B_gpt_legacy_only_v22_actual",
+    "stages": [
+      {
+        "stage": "1_gpt_raw_json",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "unit_price": 22.05,
+          "total": 22.05
+        }
+      },
+      {
+        "stage": "2_parseMonetaryLineItems",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 22.05,
+          "total": 22.05
+        }
+      },
+      {
+        "stage": "3_bindMonetaryColumns",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 22.05,
+          "total": 22.05
+        }
+      },
+      {
+        "stage": "4_monetaryToInvoiceLineItem",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "unit_price": 22.05,
+          "total": 22.05
+        }
+      },
+      {
+        "stage": "5_reconcileLineItemAmounts",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "unit_price": 22.05,
+          "total": 22.05
+        }
+      }
+    ]
+  },
+  {
+    "scenario": "C_gpt_structured_plus_legacy_valor_bleed",
+    "stages": [
+      {
+        "stage": "1_gpt_raw_json",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "gross_unit_price": 27.56,
+          "discount_pct": 20,
+          "line_total_net": 22.05,
+          "unit_price": 22.05,
+          "total": 22.05
+        }
+      },
+      {
+        "stage": "2_parseMonetaryLineItems",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "gross_unit_price": 27.56,
+          "discount_pct": 20,
+          "line_total_net": 22.05,
+          "unit_price": 22.05,
+          "total": 22.05
+        }
+      },
+      {
+        "stage": "3_bindMonetaryColumns",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "gross_unit_price": 27.56,
+          "discount_pct": 20,
+          "line_total_net": 22.05,
+          "unit_price": 22.05,
+          "total": 22.05
+        }
+      },
+      {
+        "stage": "4_monetaryToInvoiceLineItem",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "unit_price": 22.05,
+          "total": 22.05
+        }
+      },
+      {
+        "stage": "5_reconcileLineItemAmounts",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "uni",
+          "unit_price": 22.05,
+          "total": 22.05
+        }
+      }
+    ]
+  },
+  {
+    "scenario": "D_gpt_desc_bleed_with_structured",
+    "stages": [
+      {
+        "stage": "1_gpt_raw_json",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 2,
+          "unit": "uni",
+          "gross_unit_price": 27.56,
+          "discount_pct": 20,
+          "line_total_net": 40,
+          "unit_price": 20,
+          "total": 40
+        }
+      },
+      {
+        "stage": "2_parseMonetaryLineItems",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 2,
+          "unit": "uni",
+          "gross_unit_price": 27.56,
+          "discount_pct": 20,
+          "line_total_net": 40,
+          "unit_price": 20,
+          "total": 40
+        }
+      },
+      {
+        "stage": "3_bindMonetaryColumns",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 2,
+          "unit": "uni",
+          "gross_unit_price": 27.56,
+          "discount_pct": 20,
+          "line_total_net": 40,
+          "unit_price": 22.05,
+          "total": 40
+        }
+      },
+      {
+        "stage": "4_monetaryToInvoiceLineItem",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 2,
+          "unit": "uni",
+          "unit_price": 22.05,
+          "total": 40
+        }
+      },
+      {
+        "stage": "5_reconcileLineItemAmounts",
+        "pomodor": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 2,
+          "unit": "uni",
+          "unit_price": 22.05,
+          "total": 40
+        }
+      }
+    ]
+  }
+]

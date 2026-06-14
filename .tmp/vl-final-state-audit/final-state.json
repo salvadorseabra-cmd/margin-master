@@ -1,0 +1,152 @@
+{
+  "generated_at": "2026-06-13T18:10:00.000Z",
+  "deployVersion": 31,
+  "deployVerified": true,
+  "vlFinalStatus": {
+    "operational": "PARTIAL",
+    "extraction": "MOSTLY_CLOSED",
+    "combined": "PARTIAL",
+    "confidencePercent": 81,
+    "justification": "Extraction pipeline closed (v31, Farina 95% stable). Operational DB is stale on 5/6 invoices and Emporio is wiped (0 rows). No duplicate purchases. Re-read all VL invoices to sync DB; Emporio is urgent."
+  },
+  "aggregate": {
+    "invoicesAudited": 6,
+    "dbRowCountMatchesExtract": 5,
+    "dbFieldFreshVsV31": 0,
+    "criticalWipedInvoices": 1,
+    "duplicateInvoiceCount": 0,
+    "ghostPriceHistoryRaw": 14,
+    "ghostPriceHistoryConfirmed": 0,
+    "lastDbPersistDates": "2026-06-11 (Bocconcino/Mammafiore/Bidfood); Aviludo dates vary"
+  },
+  "rereadSafety": {
+    "mutexValidated": true,
+    "emptyWipePrevented": true,
+    "duplicatePreventionSameSession": true,
+    "crossTabRaceRemaining": true,
+    "emporioWipeLikelyCause": "Prior empty-extraction DELETE before June 12 guard; DB never repopulated",
+    "source": ".tmp/reread-safety-fix-validation/validation-results.json"
+  },
+  "extractionBaseline": {
+    "source": [
+      ".tmp/validation-lab-closure-audit/",
+      ".tmp/farina-stability-final/",
+      ".tmp/final-validation-lab-rerun-v30/"
+    ],
+    "extractionPhase": "MOSTLY CLOSED (83-90% confidence)",
+    "structuralBugsClosed": true,
+    "farinaV31Stability": "19/20 correct (95%)",
+    "remainingExtractionNoise": "Farina 5% GPT variance; Gorgonzola intermittent; Pomodor GT catalog",
+    "auditRunCaveat": "Aviludo April v31 invoke this audit returned column-shift totals (€68.07) — bad single run; DB holds prior correct extraction"
+  },
+  "integrityChecks": {
+    "invoiceItemsCount": {
+      "result": "FAIL — Emporio DB 0 rows; others match count",
+      "duplicates": "PASS — 0 duplicate name groups across all VL invoices"
+    },
+    "ingredientMatching": {
+      "result": "NOT FULLY VERIFIED — audit used simplified alias/catalog matcher; live app matcher in invoices.tsx is authoritative",
+      "note": "Confirmed aliases exist in DB; full match state requires UI load"
+    },
+    "historicalPricing": {
+      "result": "STALE on Bidfood (Pepino unit scaling), Aviludo April/May (qty-normalized prices)",
+      "ghostPurchases": "INCONCLUSIVE — 14 raw ghosts from weak matcher; 0 confirmed after review"
+    },
+    "dashboardTotals": {
+      "result": "EXPECTED header≠lineSum — invoice header includes IVA; line sum is net subtotal",
+      "emporioCritical": "DB line sum €0 — dashboard shows empty invoice"
+    },
+    "opportunities": {
+      "result": "STALE RISK — margin alerts derive from ingredient_price_history tied to old DB unit_prices",
+      "affected": ["Bidfood Pepino", "Aviludo April Atum", "Bocconcino unit_price display rows"]
+    },
+    "supplierIntelligence": {
+      "result": "STALE when DB stale — supplier metrics recompute from invoice_items scan on load"
+    },
+    "noStaleRows": "FAIL — 5/6 invoices DB ≠ v31 field values (persisted 2026-06-11 era)",
+    "noGhostPurchases": "PASS — no invoice_items without parent invoice; no orphan item IDs",
+    "noDuplicatePurchases": "PASS — reread mutex prevents same-session duplication"
+  },
+  "perInvoice": [
+    {
+      "label": "Bidfood",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "operationalStatus": "STALE",
+      "dbCount": 11,
+      "v31Count": 11,
+      "dbPersisted": "2026-06-11",
+      "criticalIssues": [],
+      "staleIssues": ["1 row field drift", "Pepino price_history unit scaling (€0.00177 vs €1.77)"],
+      "extractionNote": "v31 extract viable; DB close to v31"
+    },
+    {
+      "label": "Aviludo April",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "operationalStatus": "STALE",
+      "dbCount": 9,
+      "v31Count": 9,
+      "criticalIssues": [],
+      "staleIssues": ["5 rows field drift vs this audit v31 invoke", "price_history from prior extraction"],
+      "extractionNote": "This audit v31 invoke BAD (totals=unit_price, header €68) — do not persist; re-read when stable"
+    },
+    {
+      "label": "Aviludo May",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "operationalStatus": "STALE",
+      "dbCount": 8,
+      "v31Count": 8,
+      "criticalIssues": [],
+      "staleIssues": ["1 row field drift", "2 stale price_history rows"],
+      "extractionNote": "Line sum matches DB; minor drift"
+    },
+    {
+      "label": "Bocconcino",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "operationalStatus": "STALE",
+      "dbCount": 7,
+      "v31Count": 7,
+      "dbPersisted": "2026-06-11",
+      "criticalIssues": [],
+      "staleIssues": ["6 rows unit_price display drift (gross vs net); totals mostly match", "POMODOR DB still old qty=6 era possible"],
+      "extractionNote": "v31 POMODOR matches visible €22.05; DB may still hold stale qty=6 from persistence-audit"
+    },
+    {
+      "label": "Emporio",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "operationalStatus": "CRITICAL",
+      "dbCount": 0,
+      "v31Count": 8,
+      "criticalIssues": ["ALL invoice_items DELETED — 0 rows in DB", "Likely prior empty-extraction wipe"],
+      "staleIssues": [],
+      "extractionNote": "v31 extract OK (8 rows, €327.46); MUST re-read in UI to repopulate"
+    },
+    {
+      "label": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "operationalStatus": "STALE",
+      "dbCount": 8,
+      "v31Count": 8,
+      "dbPersisted": "2026-06-11",
+      "criticalIssues": [],
+      "staleIssues": [
+        "Farina DB €26.52 CORRECT; v31 this run €25.52 (GPT variance — DB better than this invoke)",
+        "6 rows unit_price gross/net display drift; line totals mostly match",
+        "No phantom Olio in current DB (phantom cleared)"
+      ],
+      "extractionNote": "DB Farina correct; v31 95% stable per farina-stability-final"
+    }
+  ],
+  "recommendations": [
+    "URGENT: Re-read Emporio in UI (0 rows — empty invoice in app)",
+    "Re-read all 5 remaining VL invoices to sync DB with v31 extraction",
+    "Do NOT re-read Aviludo April until extract returns stable totals (this audit got bad invoke)",
+    "Revise Pomodor GT catalog (extraction Class C, not DB issue)",
+    "Extraction Validation Lab can remain paused; operational sync is the remaining gate"
+  ],
+  "artifacts": {
+    "report": ".tmp/vl-final-state-audit/REPORT.md",
+    "perInvoice": ".tmp/vl-final-state-audit/per-invoice/",
+    "extracts": ".tmp/vl-final-state-audit/extracts/",
+    "harness": ".tmp/vl-final-state-audit/run-audit.mts"
+  }
+}

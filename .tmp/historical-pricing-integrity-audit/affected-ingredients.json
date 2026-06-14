@@ -1,0 +1,230 @@
+{
+  "trusted": [
+    {
+      "ingredient": "Pepino conserva",
+      "invoice": "Bidfood",
+      "line": "Pepino"
+    },
+    {
+      "ingredient": "Mozzarella fior di latte",
+      "invoice": "Aviludo April",
+      "line": "Mozzarella Flor di Latte 2Kg"
+    }
+  ],
+  "notTrusted": [
+    {
+      "ingredient": "—",
+      "invoice": "Emporio (live)",
+      "line": "Baladin - Ginger Beer 0.20cl",
+      "reasons": [
+        "math_logic_volume_parse",
+        "unmatched_no_ingredient"
+      ],
+      "notes": [
+        "No catalog ingredient match — no price_history sync"
+      ]
+    }
+  ],
+  "stale": [
+    {
+      "ingredient": "Chocolate culinária",
+      "invoice": "Aviludo May",
+      "reasons": [
+        "stale_db_row"
+      ]
+    },
+    {
+      "ingredient": "Mozzarella fior di latte",
+      "invoice": "Bocconcino",
+      "reasons": [
+        "stale_db_row"
+      ]
+    }
+  ],
+  "unmatched": [
+    {
+      "line": "Manteiga Coimbra s/Sal EMB 1 Kg",
+      "invoice": "Bidfood"
+    },
+    {
+      "line": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "invoice": "Bidfood"
+    },
+    {
+      "line": "Tomilho",
+      "invoice": "Bidfood"
+    },
+    {
+      "line": "Salada Ibérica FSTK EMB. 250g",
+      "invoice": "Bidfood"
+    },
+    {
+      "line": "Manjericão",
+      "invoice": "Bidfood"
+    },
+    {
+      "line": "Hortelã",
+      "invoice": "Bidfood"
+    },
+    {
+      "line": "Pêra Abacate Hasse",
+      "invoice": "Bidfood"
+    },
+    {
+      "line": "Courgettes",
+      "invoice": "Bidfood"
+    },
+    {
+      "line": "Alho Francês",
+      "invoice": "Bidfood"
+    },
+    {
+      "line": "Abóbora Butternut",
+      "invoice": "Bidfood"
+    },
+    {
+      "line": "Nata Reny Picot 22% 6x1L",
+      "invoice": "Aviludo April"
+    },
+    {
+      "line": "Açúcar Branco Metro Chef 10x1Kg",
+      "invoice": "Aviludo April"
+    },
+    {
+      "line": "Chocolate Pantagruel 10x200g",
+      "invoice": "Aviludo April"
+    },
+    {
+      "line": "Arroz Agulha Metro Chef 12x1kg",
+      "invoice": "Aviludo April"
+    },
+    {
+      "line": "Atum Óleo Bolsa Nau Catineta 1 Kg",
+      "invoice": "Aviludo April"
+    },
+    {
+      "line": "Pepinos Extra II Frasco 6X720g",
+      "invoice": "Aviludo April"
+    },
+    {
+      "line": "Ovo Liquido Past.Gema Dovo 1kg",
+      "invoice": "Aviludo April"
+    },
+    {
+      "line": "Filete de Anchovas Alconfrisa Lt 495 g",
+      "invoice": "Aviludo April"
+    },
+    {
+      "line": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+      "invoice": "Aviludo May"
+    },
+    {
+      "line": "Pepinos Extra Uli Frasco 6x720 g",
+      "invoice": "Aviludo May"
+    },
+    {
+      "line": "Ovo Líquido Past.Gema Dovo 1 Kg",
+      "invoice": "Aviludo May"
+    },
+    {
+      "line": "Filete de Anchovas Alcoifinosa Lt 495 g",
+      "invoice": "Aviludo May"
+    },
+    {
+      "line": "Nata Culinaria 22% Remy Picot 6x1 Lt",
+      "invoice": "Aviludo May"
+    },
+    {
+      "line": "Acucar Branco METRO Chef 10x1 Kg",
+      "invoice": "Aviludo May"
+    },
+    {
+      "line": "Arroz Agulha Metro Chef 12x1 kg",
+      "invoice": "Aviludo May"
+    },
+    {
+      "line": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "invoice": "Bocconcino"
+    },
+    {
+      "line": "POMODORO PELATI (CX 2.5KG*6)",
+      "invoice": "Bocconcino"
+    },
+    {
+      "line": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "invoice": "Bocconcino"
+    },
+    {
+      "line": "RICOTTA TREVIGIANA 1,5KG",
+      "invoice": "Bocconcino"
+    },
+    {
+      "line": "ROLO DE CABRA E VACA 1KG",
+      "invoice": "Bocconcino"
+    },
+    {
+      "line": "STRACCIATELLA 250 GR",
+      "invoice": "Bocconcino"
+    },
+    {
+      "line": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello 1/8*1.5kg Produto de Stock",
+      "invoice": "Emporio (live)"
+    },
+    {
+      "line": "Axso Parma! - AxsoParma! Prosciutto Cotto Scelto HC - 4,25Kg Produto de Stock",
+      "invoice": "Emporio (live)"
+    },
+    {
+      "line": "Rovagnati - Mortadella IGP 'Massima' con pistacchi 1/2 - 3,5Kg Produto de Stock",
+      "invoice": "Emporio (live)"
+    },
+    {
+      "line": "SanPellegrino - Água in vitro 75cl x 15ud Produto de Stock",
+      "invoice": "Emporio (live)"
+    },
+    {
+      "line": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg Produto de Stock",
+      "invoice": "Emporio (live)"
+    },
+    {
+      "line": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+      "invoice": "Emporio (live)"
+    },
+    {
+      "line": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+      "invoice": "Emporio (live)"
+    },
+    {
+      "line": "Guanciale di Suino stagionato +/- 1,5kg*7 Sorrentino",
+      "invoice": "Mammafiore"
+    },
+    {
+      "line": "Farina Speciale pizza 25kg Amoruso",
+      "invoice": "Mammafiore"
+    },
+    {
+      "line": "Birra Peroni Nastro Azzurro PNAA 33cl*24 Nastro Azzurro",
+      "invoice": "Mammafiore"
+    },
+    {
+      "line": "Aceto balsamico di moden IGP pet 5l*2 Toschi",
+      "invoice": "Mammafiore"
+    },
+    {
+      "line": "MOZZA Fioc di Latte Expet Julienne 3kg Simonetta",
+      "invoice": "Mammafiore"
+    },
+    {
+      "line": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+      "invoice": "Mammafiore"
+    },
+    {
+      "line": "Rulo Di Capra 1kg*2 Simonetta",
+      "invoice": "Mammafiore"
+    },
+    {
+      "line": "Recargo por combustilvel",
+      "invoice": "Mammafiore"
+    }
+  ]
+}

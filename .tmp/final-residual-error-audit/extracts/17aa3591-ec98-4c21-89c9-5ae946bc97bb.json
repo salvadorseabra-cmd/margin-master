@@ -1,0 +1,61 @@
+{
+  "status": 200,
+  "items": [
+    {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null,
+      "unit_price": 2.08,
+      "total": 50.2
+    },
+    {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8 - 1,8-1,9kg",
+      "quantity": 2,
+      "unit": null,
+      "unit_price": 13.5,
+      "total": 27
+    },
+    {
+      "name": "Assaporami Prosciutto Cotto Scelto HC 4-4,25kg",
+      "quantity": 4.3,
+      "unit": null,
+      "unit_price": 8.5,
+      "total": 36.54
+    },
+    {
+      "name": "Rovagnati - Mortadella IGP 'Massima' con pistacchio tr. 2,3~ 2,5kg",
+      "quantity": 3.1,
+      "unit": null,
+      "unit_price": 9.77,
+      "total": 30.29
+    },
+    {
+      "name": "SanPellegrino - Acqua in Vetro 75cl x 15ud",
+      "quantity": 3,
+      "unit": null,
+      "unit_price": 14.42,
+      "total": 43.26
+    },
+    {
+      "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+      "quantity": 2.38,
+      "unit": null,
+      "unit_price": 16.64,
+      "total": 39.48
+    },
+    {
+      "name": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 2,
+      "unit": null,
+      "unit_price": 9.69,
+      "total": 19.38
+    },
+    {
+      "name": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 15.19,
+      "total": 39.49
+    }
+  ]
+}

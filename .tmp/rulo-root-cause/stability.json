@@ -1,0 +1,133 @@
+{
+  "generated_at": "2026-06-13T12:25:48.634Z",
+  "deployVersion": 29,
+  "deployVerified": true,
+  "promptVersion": "v29",
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "imageSource": ".tmp/mammafiore-investigation/invoice-full.png",
+  "groundTruth": {
+    "qty": 1,
+    "unit_price_list": 15.192,
+    "discount_pct": 28.5,
+    "iva_pct": 6,
+    "total": 10.86
+  },
+  "visibleInvoice": {
+    "qty": 1,
+    "unit": "UN",
+    "pr_unitario": 15.192,
+    "desc_pct": 28.5,
+    "iva_pct": 6,
+    "valor": 10.86,
+    "source": "mammafiore-investigation/invoice-full.png"
+  },
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "elapsedMs": 21306,
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 10.86,
+        "total": 6
+      },
+      "financialErrorEuro": 4.86,
+      "totalCorrect": false,
+      "ivaColumnBleed": true,
+      "unitPriceMatchesList": false,
+      "unitPriceMatchesNet": true
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "elapsedMs": 21547,
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "financialErrorEuro": 0,
+      "totalCorrect": true,
+      "ivaColumnBleed": false,
+      "unitPriceMatchesList": false,
+      "unitPriceMatchesNet": true
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "elapsedMs": 22802,
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 10.86,
+        "total": 6
+      },
+      "financialErrorEuro": 4.86,
+      "totalCorrect": false,
+      "ivaColumnBleed": true,
+      "unitPriceMatchesList": false,
+      "unitPriceMatchesNet": true
+    },
+    {
+      "run": 4,
+      "status": 200,
+      "elapsedMs": 16736,
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 10.86,
+        "total": 6
+      },
+      "financialErrorEuro": 4.86,
+      "totalCorrect": false,
+      "ivaColumnBleed": true,
+      "unitPriceMatchesList": false,
+      "unitPriceMatchesNet": true
+    },
+    {
+      "run": 5,
+      "status": 200,
+      "elapsedMs": 14506,
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 10.86,
+        "total": 6
+      },
+      "financialErrorEuro": 4.86,
+      "totalCorrect": false,
+      "ivaColumnBleed": true,
+      "unitPriceMatchesList": false,
+      "unitPriceMatchesNet": true
+    }
+  ],
+  "summary": {
+    "perfectTotalRuns": "1/5",
+    "stabilityPercent": 20,
+    "ivaBleedRuns": "4/5",
+    "totalUnique": [
+      6,
+      10.86
+    ],
+    "unitPriceUnique": [
+      10.86
+    ],
+    "avgFinancialErrorEuro": 3.89
+  },
+  "comparisonVsV28Lab": {
+    "v28LabRerun": {
+      "unit_price": 10.86,
+      "total": 6,
+      "financialErrorEuro": 4.86
+    },
+    "v29AvgError": 3.89,
+    "unchangedFromV28": false
+  }
+}

@@ -2,6 +2,10 @@ import {
   buildIngredientOperationalSignals,
   type IngredientOperationalSignal,
 } from "@/lib/buildIngredientOperationalSignals";
+import {
+  indexPriorHistoryRowById,
+  isTrustedPriceMovementRow,
+} from "@/lib/ingredient-price-chain-guard";
 import { formatCurrency, formatDecimal, formatPercent } from "@/lib/display-format";
 import type { MarginAlert } from "@/lib/margin-alerts";
 import { scoreMarginAlertSeverity } from "@/lib/margin-alert-severity";
@@ -603,11 +607,18 @@ export function buildOperationalAlertItems(data: MarginAlertData): MarginAlertIt
   const invoiceById = new Map(data.invoices.map((invoice) => [invoice.id, invoice]));
   const usedAlertIds = new Set<string>();
 
+  const priorById = indexPriorHistoryRowById(
+    data.priceHistory.filter((row): row is PriceHistoryRecord & { id: string } => Boolean(row.id)),
+  );
+
   for (const row of latestHistory) {
     const ingredient = ingredientById.get(row.ingredient_id);
     const ingredientName = ingredient?.name?.trim() || row.ingredient_name?.trim() || "Ingredient";
     const current = numberOrNull(row.new_price);
     const previous = numberOrNull(row.previous_price);
+    const priorRow = row.id ? (priorById.get(row.id) ?? null) : null;
+    if (!isTrustedPriceMovementRow(row, priorRow)) continue;
+
     const percent = getHistoryPercent(row);
 
     if (current === null || previous === null) continue;

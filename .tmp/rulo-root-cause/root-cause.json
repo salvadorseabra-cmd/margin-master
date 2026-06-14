@@ -1,0 +1,100 @@
+{
+  "generated_at": "2026-06-13T12:30:00.000Z",
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "label": "Mammafiore",
+  "product": "Rulo Di Capra 1kg*2 Simonetta",
+  "deployVersionAudited": 29,
+  "rootCause": "Pass C misreads the IVA column (6,00) as line_total_net instead of the Valor column (10,86). The €4.86 residual is exactly Valor − IVA. v29 reproduces this on 4/5 stability runs; unit_price is stably copied as the net/discounted amount (10.86) rather than list Pr. Unitário (15.192), but that field mismatch has €0 financial impact when Valor is correct.",
+  "classification": {
+    "primary": "B",
+    "primaryLabel": "total_column",
+    "secondary": "D",
+    "secondaryLabel": "gpt_variance",
+    "rejected": {
+      "A_discount_extraction": "Desc. 28,50% is not extracted, but the €4.86 error is driven by total=6 (IVA), not missing discount math.",
+      "C_row_bleed": "Wrong value (6,00) comes from the same row's IVA cell, not a neighbouring row's Valor.",
+      "D_only": "Failure mode when wrong is deterministic (IVA bleed); 1/5 runs succeed with correct Valor 10.86."
+    }
+  },
+  "confidencePercent": 92,
+  "firstFailingStage": "passC_table_extraction",
+  "visibleInvoice": {
+    "artigo": "1000000032",
+    "description": "Rulo Di Capra 1kg *2 Simonetta",
+    "qty": 1,
+    "unit": "UN",
+    "pr_unitario": 15.192,
+    "desc_pct": 28.5,
+    "iva_pct": 6,
+    "valor": 10.86,
+    "source": ".tmp/mammafiore-investigation/invoice-full.png"
+  },
+  "groundTruth": {
+    "qty": 1,
+    "unit": "un",
+    "unit_price": 15.192,
+    "total": 10.86,
+    "source": ".tmp/field-accuracy-audit/ground-truth.json"
+  },
+  "v29ExtractionTypical": {
+    "qty": 1,
+    "unit": "UN",
+    "unit_price": 10.86,
+    "total": 6,
+    "discount_pct": null
+  },
+  "euroMathTrace": {
+    "gtValor": 10.86,
+    "extractedTotal": 6,
+    "visibleIvaColumn": 6,
+    "financialErrorEuro": 4.86,
+    "formula": "|gtValor - extractedTotal| = |10.86 - 6.00| = 4.86",
+    "verification": "extractedTotal equals printed IVA column 6,00 — not Valor 10,86",
+    "discountCheck": "15.192 × (1 − 0.285) = 10.862 ≈ 10.86 — discount math is correct on invoice; extraction never reaches it because total is wrong column"
+  },
+  "fieldAnalysis": {
+    "gross_unit_price": {
+      "correct": false,
+      "expected": 15.192,
+      "extracted": 10.86,
+      "note": "Net/discounted unit confused with list Pr. Unitário; €0 financial impact when total correct"
+    },
+    "discount_pct": {
+      "correct": false,
+      "expected": 28.5,
+      "extracted": null,
+      "note": "Secondary field gap; not the €4.86 driver"
+    },
+    "line_total_net": {
+      "correct": false,
+      "expected": 10.86,
+      "extracted": 6,
+      "note": "IVA column bleed — primary failure"
+    }
+  },
+  "versionComparison": {
+    "v26LabRerun": { "total": 10.86, "financialErrorEuro": 0 },
+    "v27LabRerun": { "total": 10.86, "financialErrorEuro": 0 },
+    "v27ResidualAudit": { "total": 6, "financialErrorEuro": 4.86 },
+    "v28LabRerun": { "total": 6, "financialErrorEuro": 4.86 },
+    "v29Stability5Run": {
+      "perfectTotalRuns": "1/5",
+      "ivaBleedRuns": "4/5",
+      "avgFinancialErrorEuro": 3.89,
+      "totalsSeen": [6, 10.86]
+    },
+    "discountLineAudit5Run": {
+      "range": "€10.80–€15.19",
+      "dominantBehaviour": "A_copy_invoice_total",
+      "note": "Historical probes rarely hit €6; v27+ residual runs introduced IVA-bleed failure mode"
+    }
+  },
+  "recommendedPromptOnlyFix": {
+    "file": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+    "location": "After existing Rulo pack-notation example (~lines 163–165), before Baladin Ginger Beer block",
+    "smallestChange": "Add MAMMAFIORE COLUMN ISOLATION block: Pr. Unitário | Desc. | IVA | Valor → gross_unit_price | discount_pct | (ignore IVA) | line_total_net, with Rulo negative example showing line_total_net: 6.00 (BAD — IVA) vs 10.86 (GOOD — Valor).",
+    "expectedRecoveryEuro": 4.86,
+    "expectedRecoveryNote": "Per failed run; v29 avg €3.89 across 5 runs implies ~80% failure rate at €4.86"
+  },
+  "stabilitySource": ".tmp/rulo-root-cause/stability.json"
+}

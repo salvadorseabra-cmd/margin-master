@@ -1,0 +1,179 @@
+{
+  "generated_at": "2026-06-13T19:00:00.000Z",
+  "designPrinciples": [
+    "Separate 'what is it' (ingredient concept) from 'how is it bought' (pack/SKU contract)",
+    "Never chain price_history across non-equivalent pack contracts",
+    "Persist identity decisions — do not rely solely on in-memory token scoring",
+    "Supplier intelligence compares within equivalence class only"
+  ],
+  "optionsEvaluated": [
+    {
+      "option": "A_single_ingredient_id_with_pack_variant_children",
+      "description": "Keep ingredients as concept; add ingredient_pack_variants child table with own current_price, purchase_quantity, base_unit",
+      "pros": [
+        "Minimal disruption to recipe_ingredients (bind to concept or preferred variant)",
+        "price_history moves to pack_variant_id",
+        "Natural fit for Mozzarella piece vs 2kg block"
+      ],
+      "cons": [
+        "Recipes must pick variant or use 'preferred/default variant'",
+        "Migration of existing history rows requires variant inference"
+      ],
+      "vlFit": "Excellent — directly fixes Mozzarella and Pepino fresco/conserva split",
+      "recommendation": "PRIMARY"
+    },
+    {
+      "option": "B_separate_sku_product_identity_layer",
+      "description": "New products/skus table; ingredients become abstract concepts; invoices match to SKU",
+      "pros": [
+        "Clearest supplier-intelligence model",
+        "Supports same SKU from multiple suppliers"
+      ],
+      "cons": [
+        "Largest schema and UI change",
+        "Overkill for solo-operator catalog today"
+      ],
+      "vlFit": "Good long-term",
+      "recommendation": "PHASE 2 / enterprise"
+    },
+    {
+      "option": "C_equivalence_groups_with_base_unit_contracts",
+      "description": "equivalence_groups table; members share recipe substitution; each member has explicit base_unit contract",
+      "pros": [
+        "Enables 'use any of these packs in recipe' without false price chaining",
+        "Cross-supplier comparison within group"
+      ],
+      "cons": [
+        "Complex UX for confirming group membership",
+        "Still need variant-level prices"
+      ],
+      "vlFit": "Good for supplier switch opportunities",
+      "recommendation": "COMPLEMENT to A"
+    },
+    {
+      "option": "D_alias_tables_with_confidence_scores",
+      "description": "Extend ingredient_aliases with pack_variant_id, purchase_quantity snapshot, confirmed_format_hash",
+      "pros": [
+        "Incremental — builds on existing table",
+        "Leverages confirmed_by_user + confidence columns"
+      ],
+      "cons": [
+        "Does not fix history chaining alone",
+        "Alias explosion without variant table"
+      ],
+      "vlFit": "Partial — helps matching, not pricing ledger",
+      "recommendation": "INCREMENTAL alongside A"
+    },
+    {
+      "option": "E_block_cross_format_price_history_chaining",
+      "description": "Guard in appendIngredientPriceHistoryFromInvoiceLine: skip delta if purchase_quantity/base_unit contract differs",
+      "pros": [
+        "Fastest code-only mitigation",
+        "Stops ±100% false opportunity signals immediately"
+      ],
+      "cons": [
+        "Does not fix ingredients.current_price overwrite",
+        "Does not improve matching"
+      ],
+      "vlFit": "Stops bleeding on Mozzarella/Pepino history",
+      "recommendation": "IMMEDIATE GUARD (ship before full A)"
+    }
+  ],
+  "recommendedFutureArchitecture": {
+    "phase0_immediate": {
+      "name": "Cross-format history guard (Option E)",
+      "actions": [
+        "Persist purchase_quantity + cost_base_unit on ingredient_price_history rows",
+        "Block storedPrev chain when contract hash differs from new row",
+        "Flag opportunities as 'format_change' not 'price_spike' when contract differs"
+      ],
+      "effort": "small",
+      "vlImpact": "Eliminates +1341% / -99.95% false opportunity signals"
+    },
+    "phase1_foundation": {
+      "name": "Pack variants under ingredient concept (Option A + D)",
+      "schema": {
+        "ingredient_pack_variants": {
+          "id": "uuid PK",
+          "ingredient_id": "FK ingredients",
+          "label": "e.g. Bocconcino 125g×8 tray",
+          "purchase_quantity": "numeric",
+          "purchase_unit": "text",
+          "base_unit": "g|ml|un",
+          "current_price": "numeric",
+          "is_default_for_recipes": "boolean"
+        },
+        "ingredient_aliases": {
+          "add": "pack_variant_id nullable FK"
+        },
+        "ingredient_price_history": {
+          "add": "pack_variant_id FK NOT NULL",
+          "add": "purchase_quantity_snapshot",
+          "add": "base_unit_snapshot"
+        }
+      },
+      "matching": "Resolve invoice line → pack_variant_id (or suggest new variant under concept)",
+      "effort": "medium"
+    },
+    "phase2_intelligence": {
+      "name": "Equivalence groups for supplier intelligence (Option C)",
+      "actions": [
+        "Optional equivalence_group on ingredient_id",
+        "Supplier comparisons only within group + same base_unit contract",
+        "Opportunity: switch supplier only when variants are marked equivalent"
+      ],
+      "effort": "medium"
+    },
+    "phase3_optional": {
+      "name": "SKU layer (Option B)",
+      "when": "Multi-site, distributor integrations, or barcode scanning"
+    }
+  },
+  "migrationNotes": {
+    "mozzarella": "Split 2a99cecd into variants: piece-tray (pq=10, €0.95/op) and block-2kg (pq=1, €13.69)",
+    "pepino": "Split 635a1189: conserva jar (€/kg-op ~3.75) vs fresco kg (€/g-op 0.00177) — or separate ingredient concepts",
+    "gingerBeer": "Variant per volume SKU (20cl, 33cl); volume parse fix still required",
+    "existingHistory": "Backfill pack_variant_id via invoice line replay; mark ambiguous rows non-chainable"
+  },
+  "finalQuestion": {
+    "question": "Is Ingredient Identity now the highest-leverage Marginly foundation problem remaining?",
+    "answer": "YES — for foundation architecture",
+    "confidencePercent": 81,
+    "comparison": {
+      "ingredientIdentity": {
+        "leverage": "highest_foundation",
+        "reason": "Proven VL failures (+1341%, -99.95%) poison opportunities, supplier intel, and recipe costing under one ID; no schema dimension for pack format",
+        "blocks": ["trustworthy opportunities", "cross-supplier comparison", "stable recipe costing"]
+      },
+      "staleDbReread": {
+        "leverage": "highest_immediate_operational",
+        "reason": "Refreshes invoice_items and history from v31 — does not fix cross-format ID collapse",
+        "blocks": ["fresh data only"]
+      },
+      "gingerBeerVolumeParse": {
+        "leverage": "medium_narrow",
+        "reason": "Real math bug but affects beverage SKUs with ambiguous CL tokens; orthogonal to ID schema",
+        "blocks": ["beverage €/L costing"]
+      },
+      "gtCatalogPomodor": {
+        "leverage": "low_production",
+        "reason": "Harness/validation issue; extraction matches visible invoice",
+        "blocks": ["VL metrics only"]
+      },
+      "gptVarianceTails": {
+        "leverage": "diminishing",
+        "reason": "v31 closed structural families; Farina 5% / Gorgonzola intermittent — prompt ROI low per closure audit",
+        "blocks": ["extraction accuracy tails"]
+      }
+    },
+    "recommendation": "Treat Ingredient Identity (pack-variant layer + history chain guard) as the highest-leverage **foundation** work before scaling opportunities/supplier intelligence. Execute stale VL re-read in parallel as a quick operational win — it unblocks data freshness but does not replace identity architecture.",
+    "priorityOrder": [
+      "1. Cross-format history guard (Option E) — stop false opportunity signals",
+      "2. Pack variant schema (Option A) — foundation for trustworthy intelligence",
+      "3. VL DB re-read — operational freshness",
+      "4. Ginger Beer volume parse guard — beverage edge case",
+      "5. GT catalog hygiene — harness only",
+      "6. Further prompt iteration — low ROI"
+    ]
+  }
+}

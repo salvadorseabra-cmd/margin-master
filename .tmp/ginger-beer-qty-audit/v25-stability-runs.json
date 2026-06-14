@@ -1,0 +1,39 @@
+{
+  "deployVersion": 25,
+  "imageSource": ".tmp/emporio-italia-investigation/invoice-full.png",
+  "runs": [
+    {
+      "run": 1,
+      "itemCount": 8,
+      "gingerBeer": {
+        "qty": 2,
+        "unit": null,
+        "unit_price": 9.69,
+        "total": 19.38,
+        "name": "Baladin - Ginger Beer 0.20cl"
+      }
+    },
+    {
+      "run": 2,
+      "itemCount": 8,
+      "gingerBeer": {
+        "qty": 2,
+        "unit": null,
+        "unit_price": 9.69,
+        "total": 19.38,
+        "name": "Baladin - Ginger Beer 0.20cl"
+      }
+    },
+    {
+      "run": 3,
+      "itemCount": 8,
+      "gingerBeer": {
+        "qty": 2,
+        "unit": null,
+        "unit_price": 9.69,
+        "total": 19.38,
+        "name": "Baladin - Ginger Beer 0.20cl"
+      }
+    }
+  ]
+}

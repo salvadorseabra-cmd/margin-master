@@ -1,0 +1,149 @@
+{
+  "generated_at": "2026-06-13T18:00:00.000Z",
+  "latestDeployVersion": 31,
+  "auditScope": "6 Validation Lab invoices · 5 stability focus rows · v28→v30→v31 trajectory",
+  "metricDefinitions": {
+    "singleRun": "One extract-invoice invoke per invoice (v30 VL rerun)",
+    "multiRun": "Repeated invokes on focus rows (10-run stability v30, 5-run validations v28-v31)",
+    "trueExtractionError": "Financial delta vs visible invoice or confirmed extraction bug — excludes GT catalog mismatches (Class C)",
+    "headlineError": "Financial delta vs VL ground-truth catalog (includes GT mismatches)"
+  },
+  "extractionQuality": {
+    "singleRun_v30_labRerun": {
+      "source": ".tmp/final-validation-lab-rerun-v30/executive-summary.json",
+      "deployVersion": 30,
+      "headline": {
+        "classA_extractionBugsEuro": 28.26,
+        "classB_gptVarianceEuro": 24.79,
+        "classC_gtIssuesEuro": 1.4,
+        "classD_businessInterpretation": 21,
+        "totalFinancialErrorEuro": 54.65,
+        "financialAccuracyPct": 96.83
+      },
+      "reclassified_trueExtraction": {
+        "classA_euro": 1.54,
+        "classA_rows": [
+          { "product": "Farina Speciale", "euro": 1.0 },
+          { "product": "ROLO DE CABRA E VACA 1KG", "euro": 0.54 }
+        ],
+        "classB_euro": 26.19,
+        "classB_rows": [
+          { "product": "Gorgonzola", "euro": 24.79 },
+          { "product": "Prosciutto Cotto", "euro": 1.4 }
+        ],
+        "classC_euro": 27.95,
+        "classC_rows": [
+          { "product": "POMODOR PELATI", "euro": 27.95, "note": "GT qty 2/€50 wrong; extraction matches visible €22.05" }
+        ],
+        "note": "Pomodor reclassified from headline Class A to Class C per bocconcino-gt-validation (96% confidence)"
+      }
+    },
+    "multiRun_v30_stabilityAudit": {
+      "source": ".tmp/final-stability-audit/stability-matrix.json",
+      "deployVersion": 30,
+      "runsPerFocusRow": 10,
+      "focusRows": 5,
+      "totalRuns": 50,
+      "headline": {
+        "avgFinancialErrorEuro": 6.89,
+        "p95FinancialErrorEuro": 27.95,
+        "bestCaseErrorEuro": 0,
+        "worstCaseErrorEuro": 32.26,
+        "rowsByClass": { "A": 1, "B": 3, "C": 1 }
+      },
+      "reclassified_trueExtraction": {
+        "classA_totalEuro": 10.0,
+        "classA_avgPerRunEuro": 0.2,
+        "classA_rows": [
+          { "row": "farina", "correctPct": 0, "avgErrorEuro": 1.0, "runs": 10 }
+        ],
+        "classB_totalEuro": 54.85,
+        "classB_avgPerRunEuro": 1.1,
+        "classB_rows": [
+          { "row": "gorgonzola", "correctPct": 60, "avgErrorEuro": 5.49, "runs": 10 },
+          { "row": "bresaola", "correctPct": 100, "avgErrorEuro": 0, "runs": 10 },
+          { "row": "sanpellegrino", "correctPct": 100, "avgErrorEuro": 0, "runs": 10 }
+        ],
+        "classC_totalEuro": 279.5,
+        "classC_avgPerRunEuro": 5.59,
+        "classC_rows": [
+          { "row": "pomodor", "correctVsVisiblePct": 100, "correctVsGtPct": 0, "avgErrorEuro": 27.95, "runs": 10 }
+        ],
+        "trueExtraction_avgEuro": 1.3,
+        "trueExtraction_p95Euro": 32.26,
+        "trueExtraction_bestEuro": 0,
+        "trueExtraction_worstEuro": 32.26,
+        "calculation": "Excludes Pomodor GT delta (10×€27.95); sums Farina €10 + Gorgonzola failure runs €54.85 over 40 non-GT runs"
+      }
+    },
+    "multiRun_v31_farina": {
+      "source": ".tmp/farina-final-root-cause/v31-validation.json",
+      "deployVersion": 31,
+      "runs": 5,
+      "farinaCorrectPct": 60,
+      "avgErrorEuro": 0.4,
+      "recoveryVsV30": 0.6,
+      "verdict": "PARTIAL — prompt hardening improved 0/10→3/5 but not deterministic"
+    }
+  },
+  "stabilityMetrics": {
+    "focusRows_v30_10run": {
+      "gorgonzola": { "correctPct": 60, "class": "B", "avgErrorEuro": 5.49, "variancePct": 51.84 },
+      "bresaola": { "correctPct": 100, "class": "B", "avgErrorEuro": 0, "variancePct": 0 },
+      "sanpellegrino": { "correctPct": 100, "class": "B", "avgErrorEuro": 0, "variancePct": 0 },
+      "farina": { "correctPct": 0, "class": "A", "avgErrorEuro": 1.0, "variancePct": 0 },
+      "pomodor": { "correctVsVisiblePct": 100, "correctVsGtPct": 0, "class": "C", "avgErrorEuro": 27.95 }
+    },
+    "focusRows_v31_farina_5run": {
+      "farina": { "correctPct": 60, "class": "A→B", "avgErrorEuro": 0.4, "totalsUnique": [26.52, 25.52] }
+    },
+    "emporioCluster_v28_5run": {
+      "gorgonzola": { "correctPct": 80, "avgErrorEuro": 2.46 },
+      "bresaola": { "correctPct": 100, "avgErrorEuro": 0 },
+      "sanpellegrino": { "correctPct": 100, "avgErrorEuro": 0 },
+      "allThreeCorrectPct": 80
+    },
+    "validatedFixes": {
+      "mortadella_v29": { "correctPct": 100, "runs": "5/5", "avgErrorEuro": 0 },
+      "rulo_v30": { "correctPct": 100, "runs": "5/5", "avgErrorEuro": 0, "recoveryEuro": 4.86 },
+      "farina_v31": { "correctPct": 60, "runs": "3/5", "avgErrorEuro": 0.4, "recoveryEuro": 0.6 }
+    },
+    "deterministicCorrectnessPct": {
+      "v30_focusRows_exclVariance": 80,
+      "note": "4/5 focus rows deterministic or GT-only; Farina was sole stable-wrong row"
+    },
+    "varianceDrivenCorrectnessPct": {
+      "gorgonzola_v30": 60,
+      "gorgonzola_v28": 80,
+      "farina_v31": 60
+    }
+  },
+  "versionTrajectory": {
+    "v28": {
+      "extractionBugsOnlyEuro": 9.36,
+      "financialErrorEuro": 38.91,
+      "focusRowSumEuro": 9.36,
+      "status": "Class A below €15 threshold"
+    },
+    "v30": {
+      "extractionBugsOnlyEuro": 28.26,
+      "financialErrorEuro": 54.65,
+      "focusRowSumEuro": 1.0,
+      "focusRecoveryVsV28Euro": 8.36,
+      "status": "Headline inflated by single-run variance + Pomodor GT"
+    },
+    "v31": {
+      "farinaAvgErrorEuro": 0.4,
+      "farinaCorrectPct": 60,
+      "status": "Farina partial fix; no full VL rerun"
+    }
+  },
+  "perInvoiceStatus": [
+    { "label": "Bidfood", "status": "CLOSED", "financialErrorEuro": 0, "deploy": "v30" },
+    { "label": "Aviludo April", "status": "CLOSED", "financialErrorEuro": 0, "deploy": "v30" },
+    { "label": "Aviludo May", "status": "PARTIAL", "financialErrorEuro": 0, "note": "Chocolate fixed in harness; field flags only" },
+    { "label": "Emporio", "status": "PARTIAL", "financialErrorEuro": 26.39, "note": "Gorgonzola variance; Bresaola/SanPellegrino stable v30" },
+    { "label": "Bocconcino", "status": "PARTIAL", "financialErrorEuro": 0.54, "note": "Pomodor is GT issue; Rulo €0.54 minor" },
+    { "label": "Mammafiore", "status": "PARTIAL", "financialErrorEuro": 0.4, "note": "Rulo fixed v30; Farina intermittent v31" }
+  ]
+}

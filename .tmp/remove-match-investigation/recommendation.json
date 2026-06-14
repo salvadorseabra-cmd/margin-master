@@ -1,0 +1,101 @@
+{
+  "generated_at": "2026-06-13T22:55:00.000Z",
+  "questions": {
+    "1_technically_feasible": {
+      "answer": true,
+      "confidence_percent": 92,
+      "evidence": [
+        "Unmatched state already exists for 40/51 VL lines with no schema FK",
+        "rejectIngredientMatchPair already blocks matcher re-link for specific pairs",
+        "ingredient_aliases has DELETE RLS policy; no app helper yet but DB supports it",
+        "ingredient_price_history DELETE RLS exists (migration 20260609120000_ingredient_price_history_update_delete_rls.sql)"
+      ],
+      "blocker_note": "ingredient_price_history migration only defines select/insert policies — verify delete policy before history cleanup in app"
+    },
+    "2_backend_supports_unmatched": {
+      "answer": true,
+      "confidence_percent": 95,
+      "evidence": [
+        "invoice_items never stored ingredient_id",
+        "syncOperationalIngredientCostsFromInvoiceLines skips unmatched bucket",
+        "buildMatchedInvoiceProductsFromScan skips unmatched",
+        "bulk create collects only unmatched rows",
+        "46/51 VL lines operate unmatched today without downstream crashes"
+      ]
+    },
+    "3_schema_change_required": {
+      "answer": false,
+      "confidence_percent": 90,
+      "caveat": "Optional rejected-pairs server table for cross-device sync (localStorage today); price history DELETE RLS already present"
+    },
+    "4_historical_cleanup_required": {
+      "answer": true,
+      "confidence_percent": 88,
+      "evidence": [
+        "Pepino Bidfood history row a689bd91 written on extract sync",
+        "rejectIngredientMatchPair explicitly does not remove alias or history",
+        "Removing virtual match alone leaves poisoned ingredients.current_price and delta_percent chain"
+      ],
+      "minimum_cleanup": [
+        "Delete ingredient_price_history for (invoice_id, ingredient_id) when user removes match",
+        "Recompute ingredients.current_price from prior trusted row"
+      ]
+    },
+    "5_smallest_safe_implementation": {
+      "answer": "Option B (dedicated Remove match) + rejectIngredientMatchPair + delete price_history row for that invoice+ingredient + session suppress",
+      "confidence_percent": 85,
+      "rationale": "Explicit UX for Pepino scenario; avoids dropdown accident; addresses poisoned history. Alias delete NOT required for Pepino (no 'Pepino' alias). Defer Option C (extract sync gate) to separate hardening pass.",
+      "estimated_touch_points": [
+        "src/components/invoice-ingredient-correction.tsx — new action",
+        "src/routes/invoices.tsx — removeIngredientMatchForItem handler",
+        "src/lib/ingredient-correction-memory.ts — persistUnmatchForInvoiceLine (new)",
+        "src/lib/ingredient-price-history.ts — deleteHistoryForInvoiceIngredient (new)",
+        "ingredient_price_history RLS delete policy if missing"
+      ]
+    },
+    "6_recommended_ux": {
+      "answer": "Dedicated 'Remove match' link for confirmed/suggested rows, plus optional '— No match —' in picker for power users",
+      "primary_label": "Remove match",
+      "secondary_label": "— No match — (picker sentinel)",
+      "post_action_state": "Row shows as unmatched + 'Create new ingredient' visible",
+      "confirmation_copy": "Stop linking '{line}' to '{ingredient}'? This removes the price update from this invoice for that ingredient."
+    },
+    "7_would_no_match_have_prevented_pepino": {
+      "answer": "PARTIALLY — prevention depends on timing and cleanup depth",
+      "confidence_percent": 86,
+      "scenario_analysis": {
+        "if_no_match_before_bidfood_extract": {
+          "would_prevent": false,
+          "reason": "Extract runs syncOperationalIngredientCostsFromInvoiceLines immediately after insert (~line 1358) with no user review gate. Pepino matched kind:exact → confirmed → auto-sync before any UI interaction."
+        },
+        "if_no_match_after_extract_with_pair_reject_only": {
+          "would_prevent_display": true,
+          "would_prevent_poison": false,
+          "reason": "rejectIngredientMatchPair would block future matcher; history row a689bd91 and current_price already written"
+        },
+        "if_no_match_after_extract_with_full_cleanup": {
+          "would_prevent": true,
+          "reason": "reject pair + delete history row + revert current_price removes contamination from Pepino conserva chain"
+        },
+        "if_extract_sync_gated_option_C": {
+          "would_prevent": true,
+          "reason": "exact match would stay suggested/unconfirmed; no auto history write until user confirms"
+        }
+      },
+      "evidence_summary": [
+        "Live query: Pepino displayState=confirmed, kind=exact, wouldSyncOnExtract=true",
+        "No alias for 'Pepino' alone — 6 aliases all jar product names",
+        "Price history a689bd91: new_price=0.00177 from fresh €1.77/kg line",
+        "identity-expansion-simulation: canonical tier marks Pepino→Pepino conserva as SAFE (matcher blind spot)",
+        "identity-contamination-audit: unit_family_mismatch guard breaks chain — human review was correct fix"
+      ],
+      "verdict": "UI 'No match' alone at review time would NOT have prevented initial contamination without either (a) gating extract sync or (b) post-hoc history cleanup. Full remove-match with cleanup WOULD fix Pepino and prevent re-link."
+    }
+  },
+  "overall_recommendation": {
+    "ship": "Option B + history cleanup (smallest safe user-facing fix)",
+    "follow_up": "Option C extract sync gate (structural prevention)",
+    "pepino_remediation": "Remove match on Bidfood Pepino line + delete history a689bd91 + reject pair (635a1189)",
+    "confidence_percent": 87
+  }
+}

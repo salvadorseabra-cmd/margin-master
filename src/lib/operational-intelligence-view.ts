@@ -1,6 +1,15 @@
 import { marginAlertSeverityLabel } from "@/lib/margin-alert-severity";
 import { formatCurrency, formatPercent } from "@/lib/display-format";
 import { linkedIngredientPriceHistoryRows } from "@/lib/ingredient-price-history";
+import {
+  derivePurchaseContractSnapshot,
+  deriveSnapshotFromHistoryRow,
+  filterHistoryRowsByContractAnchor,
+  indexPriorHistoryRowById,
+  isTrustedPriceMovementRow,
+  purchaseContractsChainCompatible,
+  trustedPriceHistoryDeltaPercent,
+} from "@/lib/ingredient-price-chain-guard";
 import { resolvedOperationalUnitCostEur } from "@/lib/ingredient-unit-cost";
 import {
   getLatestHistoryByIngredient,
@@ -452,15 +461,45 @@ export function buildSupplierIntelligence(
 ): SupplierIntelligenceSnapshot {
   const ingredient = data.ingredients.find((i) => i.id === ingredientId);
   const history = data.priceHistory.filter((r) => r.ingredient_id === ingredientId);
+  const latestRow = getLatestHistoryByIngredient(history).find(
+    (r) => r.ingredient_id === ingredientId,
+  );
+  const catalogUnit = ingredient ? effectiveUnitCost(ingredient) : 0;
+  const catalogAnchor =
+    ingredient != null
+      ? {
+          ingredient_name: ingredient.name,
+          ingredient_unit: ingredient.unit,
+          new_price: catalogUnit > 0 ? catalogUnit : latestRow?.new_price ?? null,
+        }
+      : latestRow;
+  const contractHistory = filterHistoryRowsByContractAnchor(history, catalogAnchor ?? latestRow);
+
+  if (latestRow && ingredient && catalogUnit > 0) {
+    const latestSnap = deriveSnapshotFromHistoryRow(latestRow);
+    latestSnap.operationalUnitPrice = numberOrNull(latestRow.new_price) ?? catalogUnit;
+    const catalogSnap = derivePurchaseContractSnapshot({
+      name: ingredient.name?.trim() || latestRow.ingredient_name?.trim() || "Ingredient",
+      operationalUnitPrice: catalogUnit,
+      purchaseQuantity: ingredient.purchase_quantity,
+      ingredientUnit: ingredient.unit,
+    });
+    if (!purchaseContractsChainCompatible(latestSnap, catalogSnap).compatible) {
+      return {
+        spikeVs3MoPct: null,
+        spikeMonthlyEur: null,
+        betterSupplierLine: null,
+        stabilityLine: null,
+      };
+    }
+  }
+
   const exposure = buildPortfolioCostExposure(data, 50).find((r) => r.ingredientId === ingredientId);
   const monthlyEur =
     exposure?.monthlyModeledExposureEur ??
     estimateMonthlyModeledExposureEur(0, exposure?.recipeCount ?? 0);
 
-  const avg3mo = avgUnitPriceInWindow(history, ingredientId, PRICE_WINDOW_90_DAYS);
-  const latestRow = getLatestHistoryByIngredient(history).find(
-    (r) => r.ingredient_id === ingredientId,
-  );
+  const avg3mo = avgUnitPriceInWindow(contractHistory, ingredientId, PRICE_WINDOW_90_DAYS);
   const latestUnit =
     numberOrNull(latestRow?.new_price) ??
     (ingredient ? effectiveUnitCost(ingredient) : null);
@@ -472,16 +511,29 @@ export function buildSupplierIntelligence(
     spikeMonthlyEur = estimatePriceIncreaseMonthlyEur(data, ingredientId, spikeVs3MoPct);
   }
 
-  const catalogUnit = ingredient ? effectiveUnitCost(ingredient) : 0;
-  const min90d = minUnitPriceInWindow(history, ingredientId, PRICE_WINDOW_90_DAYS);
+  const min90d = minUnitPriceInWindow(contractHistory, ingredientId, PRICE_WINDOW_90_DAYS);
   let betterSupplierLine: string | null = null;
   if (min90d != null && catalogUnit > min90d * 1.02) {
     let cheapestSupplier: string | null = null;
     const cutoff = Date.now() - PRICE_WINDOW_90_DAYS * 86_400_000;
-    for (const row of history) {
+    const catalogSnap =
+      ingredient != null
+        ? derivePurchaseContractSnapshot({
+            name: ingredient.name?.trim() || "Ingredient",
+            operationalUnitPrice: catalogUnit,
+            purchaseQuantity: ingredient.purchase_quantity,
+            ingredientUnit: ingredient.unit,
+          })
+        : null;
+    for (const row of contractHistory) {
       if (new Date(row.created_at).getTime() < cutoff) continue;
       const price = numberOrNull(row.new_price);
       if (price == null || price > min90d + 0.001) continue;
+      if (catalogSnap) {
+        const rowSnap = deriveSnapshotFromHistoryRow(row);
+        rowSnap.operationalUnitPrice = price;
+        if (!purchaseContractsChainCompatible(rowSnap, catalogSnap).compatible) continue;
+      }
       cheapestSupplier = row.supplier_name?.trim() || cheapestSupplier;
     }
     const gapPct = Math.round(((catalogUnit - min90d) / min90d) * 100);
@@ -497,7 +549,7 @@ export function buildSupplierIntelligence(
     }
   }
 
-  const recentPrices = history
+  const recentPrices = contractHistory
     .slice(0, 12)
     .map((r) => numberOrNull(r.new_price))
     .filter((p): p is number => p != null && p > 0);
@@ -827,13 +879,17 @@ function pickImpactLine(alert: MarginAlertItem): string | null {
 export function buildPriceMovementRows(data: MarginAlertData, limit = 8): PriceMovementRow[] {
   const ingredientById = new Map(data.ingredients.map((i) => [i.id, i]));
   const latest = getLatestHistoryByIngredient(data.priceHistory);
+  const priorById = indexPriorHistoryRowById(
+    data.priceHistory.filter((row): row is PriceHistoryRecord & { id: string } => Boolean(row.id)),
+  );
   const cutoff = Date.now() - RECENT_PRICE_DAYS * 86_400_000;
 
   return latest
     .filter((row) => new Date(row.created_at).getTime() >= cutoff)
     .map((row) => {
       const ingredient = ingredientById.get(row.ingredient_id);
-      const pct = getHistoryPercent(row);
+      const prior = row.id ? (priorById.get(row.id) ?? null) : null;
+      const pct = trustedPriceHistoryDeltaPercent(row, prior) ?? 0;
       const unit =
         row.ingredient_unit?.trim() ||
         ingredient?.base_unit?.trim() ||
@@ -895,11 +951,17 @@ export function buildSupplierWatchlist(
     supplierMap.set(key, current);
   }
 
+  const priorById = indexPriorHistoryRowById(
+    data.priceHistory.filter((row): row is PriceHistoryRecord & { id: string } => Boolean(row.id)),
+  );
+
   for (const row of linkedIngredientPriceHistoryRows(data.priceHistory)) {
     const supplier = row.supplier_name?.trim();
     if (!supplier) continue;
     const key = supplier.toLowerCase();
-    const pct = getHistoryPercent(row);
+    const prior = row.id ? (priorById.get(row.id) ?? null) : null;
+    const pct = trustedPriceHistoryDeltaPercent(row, prior) ?? 0;
+    if (pct === 0 && !isTrustedPriceMovementRow(row, prior)) continue;
     const entry: SupplierEntry = supplierMap.get(key) ?? {
       displayName: supplier,
       lastDate: row.created_at,
@@ -1838,11 +1900,23 @@ function minHistoricalUnitPrice(
   ingredientId: string,
   history: PriceHistoryRecord[],
 ): number | null {
-  const prices = history
-    .filter((row) => row.ingredient_id === ingredientId)
+  const rows = history.filter((row) => row.ingredient_id === ingredientId);
+  const priorById = indexPriorHistoryRowById(
+    rows.filter((row): row is PriceHistoryRecord & { id: string } => Boolean(row.id)),
+  );
+  const prices = rows
+    .filter((row) => {
+      const prior = row.id ? (priorById.get(row.id) ?? null) : null;
+      return isTrustedPriceMovementRow(row, prior) || row.delta_percent == null;
+    })
     .map((row) => numberOrNull(row.new_price))
     .filter((p): p is number => p != null && p > 0);
-  if (prices.length === 0) return null;
+  if (prices.length === 0) {
+    return rows
+      .map((row) => numberOrNull(row.new_price))
+      .filter((p): p is number => p != null && p > 0)
+      .reduce<number | null>((min, price) => (min == null || price < min ? price : min), null);
+  }
   return Math.min(...prices);
 }
 

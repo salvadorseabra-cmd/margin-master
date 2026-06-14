@@ -1,0 +1,422 @@
+{
+  "generated_at": "2026-06-13T22:54:53.186Z",
+  "invoice_items": {
+    "has_ingredient_id_column": false,
+    "columns": [
+      "id",
+      "invoice_id",
+      "user_id",
+      "name",
+      "quantity",
+      "unit",
+      "unit_price",
+      "total",
+      "created_at",
+      "updated_at"
+    ],
+    "migration": "supabase/migrations/20260511115814_625d8b2b-28d8-4400-b815-d2e6173f063e.sql",
+    "match_persistence": "none — match resolved at read time via alias map + canonical matcher"
+  },
+  "ingredient_aliases": {
+    "columns": [
+      "id",
+      "ingredient_id",
+      "alias_name",
+      "normalized_alias",
+      "supplier_name",
+      "confidence",
+      "confirmed_by_user",
+      "created_at"
+    ],
+    "migration": "supabase/migrations/20260519130000_ingredient_aliases.sql",
+    "role": "persists invoice wording → ingredient_id for confirmed/manual matches"
+  },
+  "ingredient_price_history": {
+    "columns": [
+      "id",
+      "ingredient_id",
+      "invoice_id",
+      "ingredient_name",
+      "supplier_name",
+      "ingredient_unit",
+      "previous_price",
+      "new_price",
+      "delta",
+      "delta_percent",
+      "created_at"
+    ],
+    "migration": "supabase/migrations/20260513231000_ingredient_price_history.sql",
+    "invoice_id_on_delete": "set null",
+    "role": "append-only audit trail when cost sync runs for matched lines"
+  },
+  "unmatched_state": {
+    "persisted_on_invoice_items": false,
+    "runtime_definition": "matcher returns null OR displayState unmatched",
+    "session_rejection": "rejectedMatchItemIds Set in invoices.tsx — suppresses presentation only",
+    "pair_rejection": "localStorage marginly:rejected-ingredient-matches:{userId} — blocks re-match for pair",
+    "no_delete_alias_api": true
+  },
+  "vl_live_summary": {
+    "generated_at": "2026-06-13T22:54:53.166Z",
+    "invoice_item_count": 51,
+    "eligible_line_count": 51,
+    "display_state_counts": {
+      "confirmed": 7,
+      "suggested": 4,
+      "unmatched": 40
+    },
+    "extract_sync_would_run": 11,
+    "ingredient_alias_count": 32,
+    "confirmed_alias_count": 32,
+    "price_history_rows_on_vl_invoices": 20
+  },
+  "unmatched_examples": [
+    {
+      "invoiceItemId": "a6715684-1af1-4772-83e6-d1d11b89c4ce",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Manteiga Coimbra s/Sal Emb 1 Kg",
+      "displayState": "unmatched",
+      "summaryBucket": "unmatched",
+      "matchKind": null,
+      "ingredientId": null,
+      "ingredientName": null,
+      "wouldSyncOnExtract": false
+    },
+    {
+      "invoiceItemId": "b8ba998e-3732-4f37-a9d2-420eacdc5ecf",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Abóbora Butternut",
+      "displayState": "unmatched",
+      "summaryBucket": "unmatched",
+      "matchKind": null,
+      "ingredientId": null,
+      "ingredientName": null,
+      "wouldSyncOnExtract": false
+    },
+    {
+      "invoiceItemId": "15386e78-2104-4e29-8f5c-e35ffce0140e",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Alho Francês",
+      "displayState": "unmatched",
+      "summaryBucket": "unmatched",
+      "matchKind": null,
+      "ingredientId": null,
+      "ingredientName": null,
+      "wouldSyncOnExtract": false
+    },
+    {
+      "invoiceItemId": "88ab20d7-44e6-49ad-9a0a-ae4e9c93d01f",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Courgettes",
+      "displayState": "unmatched",
+      "summaryBucket": "unmatched",
+      "matchKind": null,
+      "ingredientId": null,
+      "ingredientName": null,
+      "wouldSyncOnExtract": false
+    },
+    {
+      "invoiceItemId": "8fc5c197-7c18-4290-925e-1c0db4dc783e",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Pêra Abacate Hasse",
+      "displayState": "unmatched",
+      "summaryBucket": "unmatched",
+      "matchKind": null,
+      "ingredientId": null,
+      "ingredientName": null,
+      "wouldSyncOnExtract": false
+    },
+    {
+      "invoiceItemId": "15c59e65-31c0-4cfd-a1e9-f3ff763d57c7",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Hortelã",
+      "displayState": "unmatched",
+      "summaryBucket": "unmatched",
+      "matchKind": null,
+      "ingredientId": null,
+      "ingredientName": null,
+      "wouldSyncOnExtract": false
+    },
+    {
+      "invoiceItemId": "eaedd420-9f1f-4576-94a2-f9bf01eb3d59",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Manjericão",
+      "displayState": "unmatched",
+      "summaryBucket": "unmatched",
+      "matchKind": null,
+      "ingredientId": null,
+      "ingredientName": null,
+      "wouldSyncOnExtract": false
+    },
+    {
+      "invoiceItemId": "d1c9e309-885c-4779-b6af-ead001f2c247",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Salada Ibérica FSTK EMB. 250g",
+      "displayState": "unmatched",
+      "summaryBucket": "unmatched",
+      "matchKind": null,
+      "ingredientId": null,
+      "ingredientName": null,
+      "wouldSyncOnExtract": false
+    }
+  ],
+  "matched_examples": [
+    {
+      "invoiceItemId": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Pepino",
+      "displayState": "confirmed",
+      "summaryBucket": "matched",
+      "matchKind": "exact",
+      "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "ingredientName": "Pepino conserva",
+      "wouldSyncOnExtract": true
+    },
+    {
+      "invoiceItemId": "47d9248c-59d1-44a0-a796-b1cb82cca557",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "supplier": "AVIJUDO",
+      "productName": "Atum Oleo Bolsa Nau Catrieta 1 Kg",
+      "displayState": "suggested",
+      "summaryBucket": "suggested",
+      "matchKind": "semantic",
+      "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+      "ingredientName": "Atum em óleo",
+      "wouldSyncOnExtract": true
+    },
+    {
+      "invoiceItemId": "23188760-0cdd-4f37-b2fd-f950c8d55f44",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "supplier": "AVIJUDO",
+      "productName": "Chocolate Culinaria Pantagruel 10x200 g",
+      "displayState": "suggested",
+      "summaryBucket": "suggested",
+      "matchKind": "semantic",
+      "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+      "ingredientName": "Chocolate culinária",
+      "wouldSyncOnExtract": true
+    },
+    {
+      "invoiceItemId": "efb979b3-0a24-41f6-92a8-cb257f27106a",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "supplier": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "productName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "displayState": "suggested",
+      "summaryBucket": "suggested",
+      "matchKind": "semantic",
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "ingredientName": "Mozzarella fior di latte",
+      "wouldSyncOnExtract": true
+    },
+    {
+      "invoiceItemId": "cf79d75e-b648-433b-8458-a3da140c12bb",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "supplier": "AVILUDO",
+      "productName": "Mozzarella Flor di Latte 2Kg",
+      "displayState": "confirmed",
+      "summaryBucket": "matched",
+      "matchKind": "confirmed-alias",
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "ingredientName": "Mozzarella fior di latte",
+      "wouldSyncOnExtract": true
+    },
+    {
+      "invoiceItemId": "f2091768-4a0f-41b1-bcf5-cd3e3ddb9e1d",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "supplier": "AVILUDO",
+      "productName": "Pepinos Extra II Frasco 6X720g",
+      "displayState": "confirmed",
+      "summaryBucket": "matched",
+      "matchKind": "confirmed-alias",
+      "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "ingredientName": "Pepino conserva",
+      "wouldSyncOnExtract": true
+    },
+    {
+      "invoiceItemId": "99fcfb00-6092-48c0-8a1f-8c05da804d4b",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "supplier": "AVILUDO",
+      "productName": "Atum Óleo Bolsa Nau Catrietta 1 Kg",
+      "displayState": "suggested",
+      "summaryBucket": "suggested",
+      "matchKind": "semantic",
+      "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+      "ingredientName": "Atum em óleo",
+      "wouldSyncOnExtract": true
+    },
+    {
+      "invoiceItemId": "f2bb5b8c-3dfa-4968-a381-a25a3b53d871",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "supplier": "AVILUDO",
+      "productName": "Arroz Agulha Metro Chef 12x1kg",
+      "displayState": "confirmed",
+      "summaryBucket": "matched",
+      "matchKind": "confirmed-alias",
+      "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+      "ingredientName": "Arroz agulha",
+      "wouldSyncOnExtract": true
+    }
+  ],
+  "pepino_case": {
+    "invoiceItemId": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+    "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "productName": "Pepino",
+    "raw_item": {
+      "id": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+      "name": "Pepino",
+      "quantity": 3.36,
+      "unit": "kg",
+      "unit_price": 1.77,
+      "total": 4.76,
+      "created_at": "2026-06-13T21:50:38.703943+00:00",
+      "updated_at": "2026-06-13T21:50:38.703943+00:00"
+    },
+    "live_match": {
+      "kind": "exact",
+      "displayState": "confirmed",
+      "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "ingredientName": "Pepino conserva",
+      "isConfirmed": true,
+      "wouldSyncOnExtract": true
+    },
+    "aliases": [
+      {
+        "id": "e97128d5-cedb-4d08-8c1c-cffcb4cdbe44",
+        "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "alias_name": "Pepinos Extra VII Frasco 6x720 g",
+        "normalized_alias": "pepinos extra vii frasco 6x720",
+        "supplier_name": "Avijudo",
+        "confidence": 10,
+        "confirmed_by_user": true,
+        "created_at": "2026-06-07T23:42:43.016656+00:00"
+      },
+      {
+        "id": "d78d5361-e60b-4091-b27c-36ab5a639484",
+        "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "alias_name": "Pepinso Extra ULI Frasco 6x720 g",
+        "normalized_alias": "pepinso extra uli frasco 6x720",
+        "supplier_name": "Avijudo",
+        "confidence": 10,
+        "confirmed_by_user": true,
+        "created_at": "2026-06-08T20:14:24.722211+00:00"
+      },
+      {
+        "id": "b1258bd7-bfec-4bf4-aecf-d8a61b9b0a29",
+        "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "alias_name": "Pepinos Extra II Frasco 6x720g",
+        "normalized_alias": "pepinos extra ii frasco x 720",
+        "supplier_name": "AVILUDO",
+        "confidence": 10,
+        "confirmed_by_user": true,
+        "created_at": "2026-06-08T23:08:06.234325+00:00"
+      },
+      {
+        "id": "b4f8956a-5d61-4373-ab4a-0946ce43bd55",
+        "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "alias_name": "Pepinos Extra Lji Frasco 6x720 g",
+        "normalized_alias": "pepinos extra lji frasco 6x720",
+        "supplier_name": "Avijudo",
+        "confidence": 10,
+        "confirmed_by_user": true,
+        "created_at": "2026-06-09T14:03:00.195699+00:00"
+      },
+      {
+        "id": "c828f9b6-3869-4ec3-8266-1342252ff21e",
+        "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "alias_name": "Pepinos Extra Uil Frasco 6x720 g",
+        "normalized_alias": "pepinos extra uil frasco 6x720",
+        "supplier_name": "Aviludo",
+        "confidence": 10,
+        "confirmed_by_user": true,
+        "created_at": "2026-06-09T15:11:21.124624+00:00"
+      },
+      {
+        "id": "8055aed1-c503-46fc-9080-028d38c37ccf",
+        "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "alias_name": "Pepinos Extra Uli Frasco 6x720 g",
+        "normalized_alias": "pepinos extra uli frasco 6x720",
+        "supplier_name": "Aviludo",
+        "confidence": 10,
+        "confirmed_by_user": true,
+        "created_at": "2026-06-09T15:28:28.1962+00:00"
+      }
+    ],
+    "price_history": [
+      {
+        "id": "5bd9a4e1-713f-4474-9985-f46bdb1b36b0",
+        "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "ingredient_name": "Pepino conserva",
+        "supplier_name": "AVILUDO",
+        "previous_price": 3.6649999999999996,
+        "new_price": 3.748333333333333,
+        "delta": 0.08333333333333348,
+        "delta_percent": 2.273760800363806,
+        "created_at": "2026-05-19T12:00:00+00:00"
+      },
+      {
+        "id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+        "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "ingredient_name": "Pepino conserva",
+        "supplier_name": "Bidfood Portugal",
+        "previous_price": null,
+        "new_price": 0.00177,
+        "delta": null,
+        "delta_percent": null,
+        "created_at": "2026-05-25T12:00:00+00:00"
+      },
+      {
+        "id": "d723199d-a9bd-49e2-9149-b30a91c9c30d",
+        "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "ingredient_name": "Pepino conserva",
+        "supplier_name": "AVILUDO",
+        "previous_price": null,
+        "new_price": 3.6649999999999996,
+        "delta": null,
+        "delta_percent": null,
+        "created_at": "2026-04-17T12:00:00+00:00"
+      }
+    ],
+    "bidfood_history_row": {
+      "id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+      "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "ingredient_name": "Pepino conserva",
+      "supplier_name": "Bidfood Portugal",
+      "previous_price": null,
+      "new_price": 0.00177,
+      "delta": null,
+      "delta_percent": null,
+      "created_at": "2026-05-25T12:00:00+00:00"
+    }
+  }
+}

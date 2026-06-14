@@ -1,0 +1,96 @@
+{
+  "generated_at": "2026-06-13T16:35:39.413Z",
+  "deployVersion": 30,
+  "recommendation": "EXTRACTION MOSTLY CLOSED",
+  "confidencePercent": 85,
+  "justification": "Only farina deterministic bug(s) with low € impact; Emporio rows are GPT variance not structural regression.",
+  "criticalQuestions": {
+    "gorgonzolaFailsAfterV28": {
+      "answer": "YES — intermittent",
+      "correctnessVsGtPct": 60,
+      "avgErrorEuro": 5.49,
+      "classification": {
+        "code": "B",
+        "label": "gpt_variance",
+        "rationale": "Mixed outcomes — GT 60% correct, visible 60%"
+      }
+    },
+    "pomodorMatchesVisible": {
+      "answer": "YES",
+      "correctnessVsVisiblePct": 100,
+      "correctnessVsGtPct": 0,
+      "classification": {
+        "code": "C",
+        "label": "gt_issue",
+        "rationale": "Extraction matches visible on 100% runs; GT catalog differs"
+      }
+    },
+    "farinaOnlyDeterministicBug": {
+      "answer": "YES",
+      "deterministicRows": [
+        "farina"
+      ]
+    },
+    "avgFinancialErrorPerRow": {
+      "gorgonzola": 5.49,
+      "bresaola": 0,
+      "sanpellegrino": 0,
+      "farina": 1,
+      "pomodor": 27.95
+    },
+    "p95FinancialErrorPerRow": {
+      "gorgonzola": 32.26,
+      "bresaola": 0,
+      "sanpellegrino": 0,
+      "farina": 1,
+      "pomodor": 27.95
+    },
+    "aggregateP95": 27.95
+  },
+  "summary": {
+    "deterministicExtractionBugs": [
+      {
+        "row": "farina",
+        "avgErrorEuro": 1,
+        "correctnessVsGtPct": 0
+      }
+    ],
+    "gptVarianceRows": [
+      {
+        "row": "gorgonzola",
+        "avgErrorEuro": 5.49,
+        "correctnessVsGtPct": 60,
+        "totalUnique": [
+          13.44,
+          18.68,
+          26.85,
+          45.7,
+          17.38
+        ]
+      },
+      {
+        "row": "bresaola",
+        "avgErrorEuro": 0,
+        "correctnessVsGtPct": 100,
+        "totalUnique": [
+          49.48
+        ]
+      },
+      {
+        "row": "sanpellegrino",
+        "avgErrorEuro": 0,
+        "correctnessVsGtPct": 100,
+        "totalUnique": [
+          38.56
+        ]
+      }
+    ],
+    "gtIssueRows": [
+      {
+        "row": "pomodor",
+        "correctnessVsVisiblePct": 100,
+        "correctnessVsGtPct": 0
+      }
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "product": "Farina Speciale pizza 25kg Amoruso",
+  "deployVersion": 31,
+  "auditedAt": "2026-06-13T17:39:58.611Z",
+  "verdict": "INTERMITTENT_GPT_VALOR_DIGIT_DRIFT",
+  "classification": "B",
+  "classificationDetail": "Valor column digit misread (26,52 → 25,52) on ~5% of v31 runs; gross/discount read correctly; binder passes through wrong line_total_net",
+  "confidencePercent": 94,
+  "firstFailingStage": "passC_table_extraction",
+  "rootCause": "Pass C intermittently misreads Valor as €25.52 instead of €26.52. On incorrect runs binder derives unit_price=26.52 from gross(33.154)×(1−20%) while preserving wrong line_total_net=25.52 — producing unit_price > total signature.",
+  "fieldDiagnosis": {
+    "gross_unit_price": {
+      "correctUnique": [
+        33.154
+      ],
+      "incorrectUnique": [
+        33.154
+      ],
+      "differs": false
+    },
+    "discount_pct": {
+      "correctUnique": [
+        20
+      ],
+      "incorrectUnique": [
+        20
+      ],
+      "differs": false
+    },
+    "line_total_net": {
+      "correctUnique": [
+        26.52
+      ],
+      "incorrectUnique": [
+        25.52
+      ],
+      "differs": true
+    },
+    "unit_price": {
+      "correctUnique": [
+        26.52
+      ],
+      "incorrectUnique": [
+        26.52
+      ],
+      "differs": false
+    },
+    "total": {
+      "correctUnique": [
+        26.52
+      ],
+      "incorrectUnique": [
+        25.52
+      ],
+      "differs": true
+    }
+  },
+  "deterministic": false,
+  "gptVariance": true,
+  "v30toV31Shift": {
+    "v30": "0/10 at 25.52 — Class A deterministic",
+    "v31Prior5": "3/5 at 26.52 — partial prompt fix",
+    "v31Final20": "19/20 at 26.52 — gpt_variance_mostly_fixed"
+  },
+  "binderSafeguard": {
+    "rule": "qty=1 AND discount_pct>0 AND unit_price > total → set total = unit_price (or re-derive from gross×discount)",
+    "applicableOnIncorrectRuns": 0,
+    "wouldRecoverRuns": 1,
+    "falsePositiveRisk": "low — unit_price>total on qty=1 discounted row is signature of Valor digit drift",
+    "feasibility": "HIGH"
+  },
+  "evidenceFiles": [
+    ".tmp/farina-stability-final/stability-analysis.json",
+    ".tmp/farina-stability-final/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d-all-runs.json",
+    ".tmp/farina-final-root-cause/root-cause.json",
+    ".tmp/farina-final-root-cause/v31-validation.json",
+    ".tmp/final-stability-audit/stability-matrix.json"
+  ]
+}

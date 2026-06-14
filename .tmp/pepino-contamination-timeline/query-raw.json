@@ -1,0 +1,420 @@
+{
+  "generated_at": "2026-06-14T08:49:48.480Z",
+  "ids": {
+    "bidfoodInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "pepinoItemId": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+    "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d"
+  },
+  "bidfood_invoice": null,
+  "pepino_item": {
+    "id": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+    "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "name": "Pepino",
+    "quantity": 3.36,
+    "unit": "kg",
+    "unit_price": 1.77,
+    "total": 4.76,
+    "created_at": "2026-06-13T21:50:38.703943+00:00",
+    "updated_at": "2026-06-13T21:50:38.703943+00:00"
+  },
+  "ingredient": {
+    "id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+    "name": "Pepino conserva",
+    "normalized_name": "pepino conserva",
+    "current_price": 21.99,
+    "purchase_quantity": 6,
+    "purchase_unit": "un",
+    "base_unit": "un",
+    "unit": "un",
+    "created_at": "2026-06-07T23:42:42.893107+00:00",
+    "updated_at": "2026-06-13T21:54:23.387484+00:00"
+  },
+  "aliases": [
+    {
+      "id": "e97128d5-cedb-4d08-8c1c-cffcb4cdbe44",
+      "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "alias_name": "Pepinos Extra VII Frasco 6x720 g",
+      "normalized_alias": "pepinos extra vii frasco 6x720",
+      "supplier_name": "Avijudo",
+      "confidence": 10,
+      "confirmed_by_user": true,
+      "created_at": "2026-06-07T23:42:43.016656+00:00"
+    },
+    {
+      "id": "d78d5361-e60b-4091-b27c-36ab5a639484",
+      "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "alias_name": "Pepinso Extra ULI Frasco 6x720 g",
+      "normalized_alias": "pepinso extra uli frasco 6x720",
+      "supplier_name": "Avijudo",
+      "confidence": 10,
+      "confirmed_by_user": true,
+      "created_at": "2026-06-08T20:14:24.722211+00:00"
+    },
+    {
+      "id": "b1258bd7-bfec-4bf4-aecf-d8a61b9b0a29",
+      "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "alias_name": "Pepinos Extra II Frasco 6x720g",
+      "normalized_alias": "pepinos extra ii frasco x 720",
+      "supplier_name": "AVILUDO",
+      "confidence": 10,
+      "confirmed_by_user": true,
+      "created_at": "2026-06-08T23:08:06.234325+00:00"
+    },
+    {
+      "id": "b4f8956a-5d61-4373-ab4a-0946ce43bd55",
+      "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "alias_name": "Pepinos Extra Lji Frasco 6x720 g",
+      "normalized_alias": "pepinos extra lji frasco 6x720",
+      "supplier_name": "Avijudo",
+      "confidence": 10,
+      "confirmed_by_user": true,
+      "created_at": "2026-06-09T14:03:00.195699+00:00"
+    },
+    {
+      "id": "c828f9b6-3869-4ec3-8266-1342252ff21e",
+      "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "alias_name": "Pepinos Extra Uil Frasco 6x720 g",
+      "normalized_alias": "pepinos extra uil frasco 6x720",
+      "supplier_name": "Aviludo",
+      "confidence": 10,
+      "confirmed_by_user": true,
+      "created_at": "2026-06-09T15:11:21.124624+00:00"
+    },
+    {
+      "id": "8055aed1-c503-46fc-9080-028d38c37ccf",
+      "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "alias_name": "Pepinos Extra Uli Frasco 6x720 g",
+      "normalized_alias": "pepinos extra uli frasco 6x720",
+      "supplier_name": "Aviludo",
+      "confidence": 10,
+      "confirmed_by_user": true,
+      "created_at": "2026-06-09T15:28:28.1962+00:00"
+    }
+  ],
+  "price_history": [
+    {
+      "id": "d723199d-a9bd-49e2-9149-b30a91c9c30d",
+      "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "ingredient_name": "Pepino conserva",
+      "supplier_name": "AVILUDO",
+      "ingredient_unit": "un",
+      "previous_price": null,
+      "new_price": 3.6649999999999996,
+      "delta": null,
+      "delta_percent": null,
+      "created_at": "2026-04-17T12:00:00+00:00"
+    },
+    {
+      "id": "5bd9a4e1-713f-4474-9985-f46bdb1b36b0",
+      "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "ingredient_name": "Pepino conserva",
+      "supplier_name": "AVILUDO",
+      "ingredient_unit": "un",
+      "previous_price": 3.6649999999999996,
+      "new_price": 3.748333333333333,
+      "delta": 0.08333333333333348,
+      "delta_percent": 2.273760800363806,
+      "created_at": "2026-05-19T12:00:00+00:00"
+    },
+    {
+      "id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+      "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "ingredient_name": "Pepino conserva",
+      "supplier_name": "Bidfood Portugal",
+      "ingredient_unit": "un",
+      "previous_price": null,
+      "new_price": 0.00177,
+      "delta": null,
+      "delta_percent": null,
+      "created_at": "2026-05-25T12:00:00+00:00"
+    }
+  ],
+  "related_invoices": null,
+  "related_pepino_items": [
+    {
+      "id": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "name": "Pepino",
+      "created_at": "2026-06-13T21:50:38.703943+00:00"
+    },
+    {
+      "id": "31b818c3-2bbf-48ed-a779-a3b8975750ef",
+      "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "name": "Pepinos Extra Ull Frasco 6x720 g",
+      "created_at": "2026-06-13T21:52:38.139192+00:00"
+    },
+    {
+      "id": "f2091768-4a0f-41b1-bcf5-cd3e3ddb9e1d",
+      "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "name": "Pepinos Extra II Frasco 6X720g",
+      "created_at": "2026-06-13T21:54:21.349129+00:00"
+    }
+  ],
+  "live_match": {
+    "kind": "exact",
+    "displayState": "confirmed",
+    "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d"
+  },
+  "operational_fields_computed": {
+    "current_price": 1.77,
+    "purchase_quantity": 1000,
+    "cost_base_unit": "g"
+  },
+  "events_chronological_by_wall_clock": [
+    {
+      "seq": 1,
+      "phase": "price_history_written",
+      "wallClock": "2026-04-17T12:00:00+00:00",
+      "invoiceDate": null,
+      "source": "ingredient_price_history.created_at (invoice-date anchored)",
+      "writes": [
+        "ingredient_price_history",
+        "ingredients.current_price (same sync transaction)"
+      ],
+      "data": {
+        "id": "d723199d-a9bd-49e2-9149-b30a91c9c30d",
+        "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "previous_price": null,
+        "new_price": 3.6649999999999996,
+        "delta_percent": null,
+        "supplier_name": "AVILUDO"
+      }
+    },
+    {
+      "seq": 2,
+      "phase": "price_history_written",
+      "wallClock": "2026-05-19T12:00:00+00:00",
+      "invoiceDate": null,
+      "source": "ingredient_price_history.created_at (invoice-date anchored)",
+      "writes": [
+        "ingredient_price_history",
+        "ingredients.current_price (same sync transaction)"
+      ],
+      "data": {
+        "id": "5bd9a4e1-713f-4474-9985-f46bdb1b36b0",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "previous_price": 3.6649999999999996,
+        "new_price": 3.748333333333333,
+        "delta_percent": 2.273760800363806,
+        "supplier_name": "AVILUDO"
+      }
+    },
+    {
+      "seq": 3,
+      "phase": "price_history_written",
+      "wallClock": "2026-05-25T12:00:00+00:00",
+      "invoiceDate": null,
+      "source": "ingredient_price_history.created_at (invoice-date anchored)",
+      "writes": [
+        "ingredient_price_history",
+        "ingredients.current_price (same sync transaction)"
+      ],
+      "data": {
+        "id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "previous_price": null,
+        "new_price": 0.00177,
+        "delta_percent": null,
+        "supplier_name": "Bidfood Portugal"
+      }
+    },
+    {
+      "seq": 4,
+      "phase": "ingredient_catalog_created",
+      "wallClock": "2026-06-07T23:42:42.893107+00:00",
+      "invoiceDate": null,
+      "source": "ingredients.created_at",
+      "writes": [
+        "ingredients row"
+      ],
+      "data": {
+        "id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "name": "Pepino conserva"
+      }
+    },
+    {
+      "seq": 5,
+      "phase": "alias_confirmed",
+      "wallClock": "2026-06-07T23:42:43.016656+00:00",
+      "invoiceDate": null,
+      "source": "ingredient_aliases.created_at",
+      "writes": [
+        "ingredient_aliases"
+      ],
+      "data": {
+        "alias_name": "Pepinos Extra VII Frasco 6x720 g",
+        "confirmed_by_user": true,
+        "supplier_name": "Avijudo"
+      }
+    },
+    {
+      "seq": 6,
+      "phase": "alias_confirmed",
+      "wallClock": "2026-06-08T20:14:24.722211+00:00",
+      "invoiceDate": null,
+      "source": "ingredient_aliases.created_at",
+      "writes": [
+        "ingredient_aliases"
+      ],
+      "data": {
+        "alias_name": "Pepinso Extra ULI Frasco 6x720 g",
+        "confirmed_by_user": true,
+        "supplier_name": "Avijudo"
+      }
+    },
+    {
+      "seq": 7,
+      "phase": "alias_confirmed",
+      "wallClock": "2026-06-08T23:08:06.234325+00:00",
+      "invoiceDate": null,
+      "source": "ingredient_aliases.created_at",
+      "writes": [
+        "ingredient_aliases"
+      ],
+      "data": {
+        "alias_name": "Pepinos Extra II Frasco 6x720g",
+        "confirmed_by_user": true,
+        "supplier_name": "AVILUDO"
+      }
+    },
+    {
+      "seq": 8,
+      "phase": "alias_confirmed",
+      "wallClock": "2026-06-09T14:03:00.195699+00:00",
+      "invoiceDate": null,
+      "source": "ingredient_aliases.created_at",
+      "writes": [
+        "ingredient_aliases"
+      ],
+      "data": {
+        "alias_name": "Pepinos Extra Lji Frasco 6x720 g",
+        "confirmed_by_user": true,
+        "supplier_name": "Avijudo"
+      }
+    },
+    {
+      "seq": 9,
+      "phase": "alias_confirmed",
+      "wallClock": "2026-06-09T15:11:21.124624+00:00",
+      "invoiceDate": null,
+      "source": "ingredient_aliases.created_at",
+      "writes": [
+        "ingredient_aliases"
+      ],
+      "data": {
+        "alias_name": "Pepinos Extra Uil Frasco 6x720 g",
+        "confirmed_by_user": true,
+        "supplier_name": "Aviludo"
+      }
+    },
+    {
+      "seq": 10,
+      "phase": "alias_confirmed",
+      "wallClock": "2026-06-09T15:28:28.1962+00:00",
+      "invoiceDate": null,
+      "source": "ingredient_aliases.created_at",
+      "writes": [
+        "ingredient_aliases"
+      ],
+      "data": {
+        "alias_name": "Pepinos Extra Uli Frasco 6x720 g",
+        "confirmed_by_user": true,
+        "supplier_name": "Aviludo"
+      }
+    },
+    {
+      "seq": 11,
+      "phase": "invoice_item_persisted",
+      "wallClock": "2026-06-13T21:50:38.703943+00:00",
+      "invoiceDate": null,
+      "source": "invoice_items.created_at",
+      "writes": [
+        "invoice_items"
+      ],
+      "data": {
+        "id": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+        "name": "Pepino",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e"
+      }
+    },
+    {
+      "seq": 12,
+      "phase": "bidfood_pepino_item_current",
+      "wallClock": "2026-06-13T21:50:38.703943+00:00",
+      "invoiceDate": null,
+      "source": "invoice_items.created_at (latest re-extract)",
+      "writes": [
+        "invoice_items re-insert on re-extract"
+      ],
+      "data": {
+        "note": "Items deleted+reinserted on each OCR re-run; wall clock reflects latest extract"
+      }
+    },
+    {
+      "seq": 13,
+      "phase": "invoice_item_persisted",
+      "wallClock": "2026-06-13T21:52:38.139192+00:00",
+      "invoiceDate": null,
+      "source": "invoice_items.created_at",
+      "writes": [
+        "invoice_items"
+      ],
+      "data": {
+        "id": "31b818c3-2bbf-48ed-a779-a3b8975750ef",
+        "name": "Pepinos Extra Ull Frasco 6x720 g",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2"
+      }
+    },
+    {
+      "seq": 14,
+      "phase": "invoice_item_persisted",
+      "wallClock": "2026-06-13T21:54:21.349129+00:00",
+      "invoiceDate": null,
+      "source": "invoice_items.created_at",
+      "writes": [
+        "invoice_items"
+      ],
+      "data": {
+        "id": "f2091768-4a0f-41b1-bcf5-cd3e3ddb9e1d",
+        "name": "Pepinos Extra II Frasco 6X720g",
+        "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472"
+      }
+    }
+  ],
+  "write_order_analysis": {
+    "bidfood_pepino_contamination": {
+      "first_irreversible_write": "ingredient_price_history + ingredients.current_price",
+      "code_path": "invoices.tsx post-insert → syncOperationalIngredientCostsFromInvoiceLines → persistOperationalIngredientCostFromInvoiceLine → appendIngredientPriceHistoryFromInvoiceLine",
+      "requires_human_action": false,
+      "alias_written_for_pepino": false,
+      "match_at_extract": {
+        "kind": "exact",
+        "displayState": "confirmed",
+        "isConfirmed": true,
+        "wouldSync": true
+      },
+      "operational_price_written": 1.77,
+      "history_row": {
+        "id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+        "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "ingredient_name": "Pepino conserva",
+        "supplier_name": "Bidfood Portugal",
+        "ingredient_unit": "un",
+        "previous_price": null,
+        "new_price": 0.00177,
+        "delta": null,
+        "delta_percent": null,
+        "created_at": "2026-05-25T12:00:00+00:00"
+      }
+    },
+    "chronology_notes": [
+      "price_history.created_at uses invoice_date T12:00:00Z when invoice_date known — NOT wall-clock upload time",
+      "Comparing contamination timing requires invoices.created_at (upload) vs history row existence",
+      "Jar aliases (confirmed_by_user=true) predate Bidfood invoice upload if alias created_at < bidfood invoices.created_at"
+    ]
+  }
+}

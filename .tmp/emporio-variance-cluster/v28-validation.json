@@ -1,0 +1,288 @@
+{
+  "generated_at": "2026-06-12T23:54:19.787Z",
+  "deployVersion": 28,
+  "promptVersion": "v28",
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "groundTruth": {
+    "gorgonzola": {
+      "total": 13.44
+    },
+    "bresaola": {
+      "total": 49.48
+    },
+    "sanpellegrino": {
+      "total": 38.56
+    }
+  },
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "elapsedMs": 20986,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelli/Igor 1/8 - 1.5kg Produto de Stock",
+        "quantity": 1.05,
+        "unit": null,
+        "unit_price": 9.88,
+        "total": 13.44
+      },
+      "bresaola": {
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock",
+        "quantity": 1.83,
+        "unit": null,
+        "unit_price": 27.04,
+        "total": 49.48
+      },
+      "sanpellegrino": {
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 19.28,
+        "total": 38.56
+      },
+      "errors": {
+        "gorgonzola": 0,
+        "bresaola": 0,
+        "sanpellegrino": 0
+      },
+      "allThreeCorrect": true,
+      "focusRowsResidualEuro": 0
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "elapsedMs": 21530,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg Produto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 12.87,
+        "total": 25.73
+      },
+      "bresaola": {
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock",
+        "quantity": 1.83,
+        "unit": null,
+        "unit_price": 27.04,
+        "total": 49.48
+      },
+      "sanpellegrino": {
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 19.28,
+        "total": 38.56
+      },
+      "errors": {
+        "gorgonzola": 12.29,
+        "bresaola": 0,
+        "sanpellegrino": 0
+      },
+      "allThreeCorrect": false,
+      "focusRowsResidualEuro": 12.29
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "elapsedMs": 15227,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castiglioni 1/8 - ±1.5kg Produto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 10.22,
+        "total": 13.44
+      },
+      "bresaola": {
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg Produto de Stock",
+        "quantity": 1.83,
+        "unit": null,
+        "unit_price": 27.04,
+        "total": 49.48
+      },
+      "sanpellegrino": {
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 19.28,
+        "total": 38.56
+      },
+      "errors": {
+        "gorgonzola": 0,
+        "bresaola": 0,
+        "sanpellegrino": 0
+      },
+      "allThreeCorrect": true,
+      "focusRowsResidualEuro": 0
+    },
+    {
+      "run": 4,
+      "status": 200,
+      "elapsedMs": 17189,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 13.22,
+        "total": 13.44
+      },
+      "bresaola": {
+        "name": "Rugamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+        "quantity": 1.83,
+        "unit": null,
+        "unit_price": 27.04,
+        "total": 49.48
+      },
+      "sanpellegrino": {
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 19.28,
+        "total": 38.56
+      },
+      "errors": {
+        "gorgonzola": 0,
+        "bresaola": 0,
+        "sanpellegrino": 0
+      },
+      "allThreeCorrect": true,
+      "focusRowsResidualEuro": 0
+    },
+    {
+      "run": 5,
+      "status": 200,
+      "elapsedMs": 15967,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfoglio 1/8 - 1.5kg Produto de Stock",
+        "quantity": 1.03,
+        "unit": null,
+        "unit_price": 10.73,
+        "total": 13.44
+      },
+      "bresaola": {
+        "name": "Riggiani - Bresaola Punta d’Anca Oro 1/2 - 1,5kg Produto de Stock",
+        "quantity": 1.83,
+        "unit": null,
+        "unit_price": 27.04,
+        "total": 49.48
+      },
+      "sanpellegrino": {
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 19.28,
+        "total": 38.56
+      },
+      "errors": {
+        "gorgonzola": 0,
+        "bresaola": 0,
+        "sanpellegrino": 0
+      },
+      "allThreeCorrect": true,
+      "focusRowsResidualEuro": 0
+    }
+  ],
+  "summary": {
+    "gorgonzola": {
+      "perfectRuns": "4/5",
+      "stabilityPercent": 80,
+      "totalUnique": [
+        13.44,
+        25.73
+      ],
+      "avgFinancialErrorEuro": 2.46
+    },
+    "bresaola": {
+      "perfectRuns": "5/5",
+      "stabilityPercent": 100,
+      "totalUnique": [
+        49.48
+      ],
+      "avgFinancialErrorEuro": 0
+    },
+    "sanpellegrino": {
+      "perfectRuns": "5/5",
+      "stabilityPercent": 100,
+      "totalUnique": [
+        38.56
+      ],
+      "avgFinancialErrorEuro": 0
+    },
+    "clusterAllThreeCorrect": "4/5",
+    "clusterStabilityPercent": 80,
+    "avgFocusRowsResidualEuro": 2.46,
+    "totalFocusRowsResidualEuro": 12.29
+  },
+  "comparisonVsV27": {
+    "v27BaselineSource": "cluster-stability.json",
+    "v27": {
+      "gorgonzola": {
+        "perfectRuns": "5/5",
+        "stabilityPercent": 100,
+        "totalUnique": [
+          13.44
+        ],
+        "avgFinancialErrorEuro": 0
+      },
+      "bresaola": {
+        "perfectRuns": "1/5",
+        "stabilityPercent": 20,
+        "totalUnique": [
+          39.48,
+          49.48,
+          44.54,
+          45.38
+        ],
+        "avgFinancialErrorEuro": 5.81
+      },
+      "sanpellegrino": {
+        "perfectRuns": "0/5",
+        "stabilityPercent": 0,
+        "totalUnique": [
+          12.3,
+          14.82,
+          48.84,
+          26.92,
+          12.04
+        ],
+        "avgFinancialErrorEuro": 19.69
+      },
+      "clusterAllThreeCorrect": "0/5",
+      "avgFocusRowsResidualEuro": 25.5
+    },
+    "v28": {
+      "gorgonzola": {
+        "perfectRuns": "4/5",
+        "stabilityPercent": 80,
+        "totalUnique": [
+          13.44,
+          25.73
+        ],
+        "avgFinancialErrorEuro": 2.46
+      },
+      "bresaola": {
+        "perfectRuns": "5/5",
+        "stabilityPercent": 100,
+        "totalUnique": [
+          49.48
+        ],
+        "avgFinancialErrorEuro": 0
+      },
+      "sanpellegrino": {
+        "perfectRuns": "5/5",
+        "stabilityPercent": 100,
+        "totalUnique": [
+          38.56
+        ],
+        "avgFinancialErrorEuro": 0
+      },
+      "clusterAllThreeCorrect": "4/5",
+      "avgFocusRowsResidualEuro": 2.46
+    },
+    "recoveryVsClusterEstimateEuro": {
+      "estimate": 28.26,
+      "v27AvgResidual": 25.5,
+      "v28AvgResidual": 2.46,
+      "avgRecoveryEuro": 23.04
+    }
+  }
+}

@@ -1,0 +1,287 @@
+{
+  "generated_at": "2026-06-12T22:10:12.168Z",
+  "deployment": {
+    "version": 24,
+    "updatedAtUtc": "2026-06-12T22:07:19.107Z",
+    "ezbrSha256": "db3fc8b835b3b399e9963795765c6ecefb5dff162ee5d0c792676f67a0367a52",
+    "priorVersion": 23,
+    "discountHardeningExpected": true
+  },
+  "references": {
+    "prosciutto": {
+      "visible": {
+        "qty": 4.3,
+        "gross": 10.3,
+        "discount": 17.5,
+        "total": 36.54,
+        "netUnit": 8.5
+      },
+      "vlGt": {
+        "qty": 4.3,
+        "unit": 8.17,
+        "total": 35.14
+      },
+      "v23baseline": {
+        "run1": {
+          "unit": 10.6,
+          "total": 45.58,
+          "discount": "MISSING"
+        },
+        "run2": {
+          "unit": 10.72,
+          "total": 46.1,
+          "discount": "MISSING"
+        }
+      }
+    },
+    "mortadella": {
+      "vlGt": {
+        "qty": 3.11,
+        "unit": 10.1,
+        "total": 31.07
+      },
+      "v23baseline": {
+        "run1": {
+          "unit": 11.1,
+          "total": 34.52,
+          "discount": "MISSING"
+        },
+        "run2": {
+          "unit": 11.1,
+          "total": 34.41,
+          "discount": "MISSING"
+        }
+      }
+    },
+    "ventricina": {
+      "visibleDiscount": 9.29,
+      "vlGt": {
+        "qty": 2.6,
+        "unit": 16.6,
+        "total": 39.49
+      },
+      "v23baseline": {
+        "run1": {
+          "unit": 17.5,
+          "total": 45.5,
+          "discount": "BLEED"
+        },
+        "run2": {
+          "unit": 14,
+          "total": 36.4,
+          "discount": "MISSING"
+        }
+      }
+    }
+  },
+  "v23Baseline": {
+    "source": ".tmp/emporio-discount-column-audit/discount-accuracy.json",
+    "focusRowsDiscountCorrect": "0/6"
+  },
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "elapsedMs": 29951,
+      "prosciutto": {
+        "name": "Assaporami Prosciutto Cotto Scelto HC 4,4-4,5KG Produto de Stock",
+        "quantity": 4.3,
+        "unit_price": 8.41,
+        "total": 36.54,
+        "qtyTimesUnit": 36.16,
+        "discountInferred": {
+          "status": "LIKELY_PRESENT",
+          "confidence": "high",
+          "note": "net unit≈8.5, total≈36.54"
+        }
+      },
+      "mortadella": {
+        "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5Kg Produto de Stock",
+        "quantity": 3.1,
+        "unit_price": 9.43,
+        "total": 29.31,
+        "qtyTimesUnit": 29.23,
+        "discountInferred": {
+          "status": "PARTIAL",
+          "confidence": "low"
+        }
+      },
+      "ventricina": {
+        "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+        "quantity": 2.6,
+        "unit_price": 21,
+        "total": 54.6,
+        "qtyTimesUnit": 54.6,
+        "discountInferred": {
+          "status": "MISSING",
+          "confidence": "medium",
+          "note": "qty×unit=gross path"
+        }
+      }
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "elapsedMs": 20428,
+      "prosciutto": {
+        "name": "Assaporami Prosciutto Cotto Scelto HC 4-4,25KG Produto de Stock",
+        "quantity": 4.3,
+        "unit_price": 8.5,
+        "total": 36.54,
+        "qtyTimesUnit": 36.55,
+        "discountInferred": {
+          "status": "LIKELY_PRESENT",
+          "confidence": "high",
+          "note": "net unit≈8.5, total≈36.54"
+        }
+      },
+      "mortadella": {
+        "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5kg Produto de Stock",
+        "quantity": 3.11,
+        "unit_price": 9.99,
+        "total": 31.06,
+        "qtyTimesUnit": 31.07,
+        "discountInferred": {
+          "status": "MISSING",
+          "confidence": "medium",
+          "note": "qty×unit=gross path"
+        }
+      },
+      "ventricina": {
+        "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+        "quantity": 2.6,
+        "unit_price": 20.2,
+        "total": 52.52,
+        "qtyTimesUnit": 52.52,
+        "discountInferred": {
+          "status": "MISSING",
+          "confidence": "medium",
+          "note": "qty×unit=gross path"
+        }
+      }
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "elapsedMs": 16618,
+      "prosciutto": {
+        "name": "Assaporami Prosciutto Cotto Scelto HC - 4,25KG Produto de Stock",
+        "quantity": 4.3,
+        "unit_price": 8.5,
+        "total": 36.54,
+        "qtyTimesUnit": 36.55,
+        "discountInferred": {
+          "status": "LIKELY_PRESENT",
+          "confidence": "high",
+          "note": "net unit≈8.5, total≈36.54"
+        }
+      },
+      "mortadella": {
+        "name": "Rovagnati - Mortadella IGP “Massima” con pistacchio 1/2 – 3.5kg Produto de Stock",
+        "quantity": 3.11,
+        "unit_price": 10,
+        "total": 31.11,
+        "qtyTimesUnit": 31.1,
+        "discountInferred": {
+          "status": "MISSING",
+          "confidence": "medium",
+          "note": "qty×unit=gross path"
+        }
+      },
+      "ventricina": {
+        "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+        "quantity": 2.6,
+        "unit_price": 17.72,
+        "total": 46.09,
+        "qtyTimesUnit": 46.07,
+        "discountInferred": {
+          "status": "MISSING",
+          "confidence": "medium",
+          "note": "qty×unit=gross path"
+        }
+      }
+    }
+  ],
+  "summary": {
+    "prosciutto": {
+      "likelyPresent": 3,
+      "totalRuns": 3,
+      "statuses": [
+        "LIKELY_PRESENT",
+        "LIKELY_PRESENT",
+        "LIKELY_PRESENT"
+      ],
+      "run1": {
+        "name": "Assaporami Prosciutto Cotto Scelto HC 4,4-4,5KG Produto de Stock",
+        "quantity": 4.3,
+        "unit_price": 8.41,
+        "total": 36.54,
+        "qtyTimesUnit": 36.16,
+        "discountInferred": {
+          "status": "LIKELY_PRESENT",
+          "confidence": "high",
+          "note": "net unit≈8.5, total≈36.54"
+        }
+      },
+      "deltaVsVisible": {
+        "total": 0,
+        "unit": -0.09
+      },
+      "deltaVsVlGt": {
+        "total": 1.4,
+        "unit": 0.24
+      }
+    },
+    "mortadella": {
+      "likelyPresent": 0,
+      "totalRuns": 3,
+      "statuses": [
+        "PARTIAL",
+        "MISSING",
+        "MISSING"
+      ],
+      "run1": {
+        "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5Kg Produto de Stock",
+        "quantity": 3.1,
+        "unit_price": 9.43,
+        "total": 29.31,
+        "qtyTimesUnit": 29.23,
+        "discountInferred": {
+          "status": "PARTIAL",
+          "confidence": "low"
+        }
+      },
+      "deltaVsVisible": null,
+      "deltaVsVlGt": {
+        "total": -1.76,
+        "unit": -0.67
+      }
+    },
+    "ventricina": {
+      "likelyPresent": 0,
+      "totalRuns": 3,
+      "statuses": [
+        "MISSING",
+        "MISSING",
+        "MISSING"
+      ],
+      "run1": {
+        "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+        "quantity": 2.6,
+        "unit_price": 21,
+        "total": 54.6,
+        "qtyTimesUnit": 54.6,
+        "discountInferred": {
+          "status": "MISSING",
+          "confidence": "medium",
+          "note": "qty×unit=gross path"
+        }
+      },
+      "deltaVsVisible": null,
+      "deltaVsVlGt": {
+        "total": 15.11,
+        "unit": 4.4
+      }
+    }
+  }
+}

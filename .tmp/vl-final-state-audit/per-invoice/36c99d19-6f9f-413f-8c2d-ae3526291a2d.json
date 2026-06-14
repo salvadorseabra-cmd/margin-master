@@ -1,0 +1,288 @@
+{
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "label": "Mammafiore",
+  "deployVersion": 31,
+  "operationalStatus": "STALE",
+  "issues": [
+    "field_drift: 7 row(s) differ numerically",
+    "dashboard_header_mismatch: header €415.96 vs lines €374.94"
+  ],
+  "checks": {
+    "invoiceItemsCount": {
+      "db": 8,
+      "v31Extract": 8,
+      "expected": 8,
+      "match": true,
+      "dbMatchesExtract": true
+    },
+    "ingredientMatching": {
+      "matchedLines": 0,
+      "unmatchedLines": 8,
+      "totalLines": 8
+    },
+    "historicalPricing": {
+      "historyRows": 0,
+      "staleHistoryRows": 0,
+      "ghostHistoryRows": 0,
+      "staleDetails": []
+    },
+    "dashboardTotals": {
+      "dbLineSum": 374.94,
+      "extractLineSum": 375.5,
+      "headerTotal": 415.96,
+      "extractHeaderTotal": 415.96,
+      "dbLineSumMatchesExtract": false,
+      "headerMatchesDbLines": false
+    },
+    "opportunities": {
+      "stalePriceSignals": 0,
+      "note": "Opportunity/margin alerts derive from ingredient_price_history — stale rows propagate wrong inflation signals"
+    },
+    "supplierIntelligence": {
+      "supplierName": "Mammafiore Portugal",
+      "lineCount": 8,
+      "matchedPct": 0
+    },
+    "staleRows": {
+      "count": 7,
+      "dbOnly": [],
+      "extractOnly": [],
+      "fieldDrift": [
+        {
+          "name": "Guanciale di Suino stagionato +/- 1,5kg*7 Sorrentino",
+          "diffs": [
+            "unit_price"
+          ],
+          "db": {
+            "id": "1a689262-75c2-48cf-b44e-fbd15326a9eb",
+            "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+            "name": "Guanciale di Suino stagionato +/- 1,5kg*7 Sorrentino",
+            "quantity": 5.996,
+            "unit": "un",
+            "unit_price": 16.922,
+            "total": 64.93,
+            "created_at": "2026-06-11T22:41:12.800441+00:00"
+          },
+          "extract": {
+            "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+            "quantity": 5.996,
+            "unit": "un",
+            "unit_price": 10.83,
+            "total": 64.93
+          }
+        },
+        {
+          "name": "Farina Speciale pizza 25kg Amoruso",
+          "diffs": [
+            "unit_price",
+            "total"
+          ],
+          "db": {
+            "id": "ebe91907-8bea-412c-bcc3-8c757490545d",
+            "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+            "name": "Farina Speciale pizza 25kg Amoruso",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 33.154,
+            "total": 26.52,
+            "created_at": "2026-06-11T22:41:12.800441+00:00"
+          },
+          "extract": {
+            "name": "Farine Speciale pizza 25kg Amoruso",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 26.52,
+            "total": 25.52
+          }
+        },
+        {
+          "name": "Birra Peroni Nastro Azzurro PNAA 33cl*24 Nastro Azzurro",
+          "diffs": [
+            "unit_price"
+          ],
+          "db": {
+            "id": "7c98a82f-5a46-4be0-b32c-e1a88eb6d033",
+            "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+            "name": "Birra Peroni Nastro Azzurro PNAA 33cl*24 Nastro Azzurro",
+            "quantity": 24,
+            "unit": "un",
+            "unit_price": 1.529,
+            "total": 25.69,
+            "created_at": "2026-06-11T22:41:12.800441+00:00"
+          },
+          "extract": {
+            "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+            "quantity": 24,
+            "unit": "un",
+            "unit_price": 1.07,
+            "total": 25.69
+          }
+        },
+        {
+          "name": "Aceto balsamico di moden IGP pet 5l*2 Toschi",
+          "diffs": [
+            "unit_price",
+            "total"
+          ],
+          "db": {
+            "id": "3f7d5597-4db2-4ed3-be1d-2964cb20449f",
+            "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+            "name": "Aceto balsamico di moden IGP pet 5l*2 Toschi",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 18.829,
+            "total": 15.09,
+            "created_at": "2026-06-11T22:41:12.800441+00:00"
+          },
+          "extract": {
+            "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 15.55,
+            "total": 16.09
+          }
+        },
+        {
+          "name": "MOZZA Fioc di Latte Expet Julienne 3kg Simonetta",
+          "diffs": [
+            "unit_price"
+          ],
+          "db": {
+            "id": "f6cc7842-0860-4d2a-91d2-123eb57d43ed",
+            "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+            "name": "MOZZA Fioc di Latte Expet Julienne 3kg Simonetta",
+            "quantity": 10,
+            "unit": "un",
+            "unit_price": 24.728,
+            "total": 200.3,
+            "created_at": "2026-06-11T22:41:12.800441+00:00"
+          },
+          "extract": {
+            "name": "MOZZAR Fioc di Latte Expet Julienne 3kg Simonetta",
+            "quantity": 10,
+            "unit": "un",
+            "unit_price": 20.03,
+            "total": 200.3
+          }
+        },
+        {
+          "name": "Rulo Di Capra 1kg*2 Simonetta",
+          "diffs": [
+            "unit_price",
+            "total"
+          ],
+          "db": {
+            "id": "115b166e-f8e8-48a2-b10a-0a4da0b7e8ba",
+            "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+            "name": "Rulo Di Capra 1kg*2 Simonetta",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 15.192,
+            "total": 10.3,
+            "created_at": "2026-06-11T22:41:12.800441+00:00"
+          },
+          "extract": {
+            "name": "Rulo Di Capra 1kg*2 Simonetta",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 10.86,
+            "total": 10.86
+          }
+        },
+        {
+          "name": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+          "diffs": [
+            "unit_price"
+          ],
+          "db": {
+            "id": "2994cb89-99ef-4b3f-b858-a02ed0087d7f",
+            "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+            "name": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 39.101,
+            "total": 30.11,
+            "created_at": "2026-06-11T22:41:12.800441+00:00"
+          },
+          "extract": {
+            "name": "Farina do pasta fresca e gnocchi25kg Caputo",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 30.11,
+            "total": 30.11
+          }
+        }
+      ]
+    },
+    "duplicatePurchases": {
+      "count": 0,
+      "duplicates": []
+    },
+    "ghostPurchases": {
+      "count": 0,
+      "details": []
+    }
+  },
+  "extraction": {
+    "status": 200,
+    "itemCountRaw": 8,
+    "itemCountNormalized": 8,
+    "supplier": "Mammafiore Portugal, Unipessoal Lda",
+    "total": 415.96
+  },
+  "db": {
+    "itemCount": 8,
+    "oldestItemCreatedAt": "2026-06-11T22:41:12.800441+00:00",
+    "newestItemCreatedAt": "2026-06-11T22:41:12.800441+00:00"
+  },
+  "matching": [
+    {
+      "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "MOZZAR Fioc di Latte Expet Julienne 3kg Simonetta",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Rulo Di Capra 1kg*2 Simonetta",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Recargo por combustivel",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    }
+  ]
+}

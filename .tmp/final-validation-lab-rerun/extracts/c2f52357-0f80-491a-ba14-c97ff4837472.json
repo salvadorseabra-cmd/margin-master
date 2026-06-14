@@ -1,0 +1,12 @@
+{
+  "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+  "label": "Aviludo April",
+  "extractedAt": "2026-06-12T22:44:02.688Z",
+  "deployVersion": 25,
+  "imageSource": ".tmp/footer-validation-4dc40c3/april-historico-png-fixture.b64.txt",
+  "status": 200,
+  "supplier": null,
+  "invoice_date": null,
+  "total": null,
+  "items": []
+}

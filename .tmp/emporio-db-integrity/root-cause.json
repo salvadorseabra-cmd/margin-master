@@ -1,0 +1,72 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio Italia (VL Validation Lab UUID)",
+  "auditedAt": "2026-06-13T18:12:00.000Z",
+  "verdict": "MANUAL_INVOICE_DELETION",
+  "confidencePercent": 91,
+  "summary": "VL Emporio UUID has 0 invoice_items because the entire invoice row was deleted via removeRow() in the UI. This is NOT an empty-extraction wipe. Emporio data exists under replacement invoice ab52796d with 8 items.",
+  "rootCause": {
+    "primary": "Manual invoice deletion (removeRow)",
+    "codePath": "src/routes/invoices.tsx:2186-2189 — supabase.from('invoices').delete().eq('id', row.id)",
+    "cascade": "invoice_items.invoice_id REFERENCES invoices(id) ON DELETE CASCADE — all items removed with parent",
+    "triggeringIncident": "Jun 11 concurrent re-read produced 16 duplicate rows on 17aa3591; user re-uploaded as ab52796d then deleted corrupted original"
+  },
+  "whyDbZeroButV31Eight": {
+    "dbZero": "Invoice 17aa3591 no longer exists in invoices table — queries return 0 items",
+    "v31Eight": "extract-invoice v31 works correctly on Emporio PNG (geometry-audit image); unrelated to deleted DB record",
+    "liveEmporio": "Replacement invoice ab52796d-de1d-418d-86e7-230c8f056f09 has 8 items (created 2026-06-11T23:37:47Z)"
+  },
+  "deletionPathAnalysis": {
+    "emptyExtractionWipe": {
+      "possible": false,
+      "reason": "runExtraction only DELETEs invoice_items, not invoices. Would leave invoice header row."
+    },
+    "manualDelete": {
+      "possible": true,
+      "reason": "removeRow deletes invoices row + storage file; CASCADE removes items",
+      "evidence": "invoice 17aa3591 absent; replacement ab52796d exists same supplier"
+    },
+    "reReadFailureDeleteOnly": {
+      "possible": false,
+      "reason": "DELETE in runExtraction targets invoice_items only"
+    },
+    "concurrentDuplicateRace": {
+      "possible": true,
+      "asContributingFactor": true,
+      "reason": "Jun 11 22:41 produced 16 rows — likely motivated delete + re-upload",
+      "notFinalCause": "Race alone would leave 16 or 8 rows, not 0 with missing invoice"
+    }
+  },
+  "dataLossRisk": {
+    "level": "LOW for operational app",
+    "detail": "Old VL UUID data intentionally removed; replacement invoice has 8 rows. VL harness/fixtures still reference deleted UUID.",
+    "orphanPriceHistory": false,
+    "orphanPurchases": false,
+    "ghostOpportunities": false
+  },
+  "otherInvoicesAffected": {
+    "sameIssue": false,
+    "detail": "5/5 remaining VL invoices exist with 7-11 items each. Aviludo April was previously empty-wiped but recovered Jun 12."
+  },
+  "operationalImpact": {
+    "dashboard": "VL UUID shows nothing; live Emporio (ab52796d) contributes €327.46 header, 8 lines",
+    "opportunities": "No price_history on either Emporio invoice — limited inflation signals from Emporio",
+    "supplierIntelligence": "Emporio scan uses invoice_items — works on ab52796d, absent for deleted UUID",
+    "ingredientMatching": "No confirmed Emporio aliases in DB; matching depends on catalog fuzzy match",
+    "vlHarness": "All .tmp audits referencing 17aa3591 see 0 DB rows — update fixture ID or re-seed"
+  },
+  "recommendations": [
+    "Update VL Validation Lab fixture to use ab52796d OR re-create 17aa3591 if UUID stability required",
+    "Re-read ab52796d with v31 to sync stale Jun 11 extraction to current deploy",
+    "No urgent data recovery — deletion appears intentional after duplicate incident"
+  ],
+  "evidenceFiles": [
+    ".tmp/emporio-db-integrity/db-query.json",
+    ".tmp/emporio-duplicate-audit/REPORT.md",
+    ".tmp/emporio-duplicate-audit/duplicate-trace.json",
+    ".tmp/reread-safety-audit/REPORT.md",
+    ".tmp/vl-final-state-audit/per-invoice/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+    ".tmp/emporio-footer-audit/emporio/db-record.json",
+    "src/routes/invoices.tsx"
+  ]
+}

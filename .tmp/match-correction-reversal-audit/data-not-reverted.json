@@ -1,0 +1,79 @@
+{
+  "generated_at": "2026-06-14T09:10:00.000Z",
+  "scenario_A_change_to_different_ingredient": {
+    "not_reverted": [
+      {
+        "artifact": "ingredient_price_history row a689bd91",
+        "table": "ingredient_price_history",
+        "key": "(invoice_id=da472b7f, ingredient_id=635a1189)",
+        "state_after_correction": "untouched — still new_price=0.00177",
+        "evidence": "No delete/update path in persistIngredientCorrectionForItem or handleSelectCorrectionIngredient"
+      },
+      {
+        "artifact": "ingredients.current_price on Pepino conserva",
+        "table": "ingredients",
+        "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "state_after_correction": "not reverted by correction — may reflect last sync from any source",
+        "evidence": "persistOperationalIngredientCostFromInvoiceLine only updates TARGET ingredientId"
+      },
+      {
+        "artifact": "historical pricing chain on 635a1189",
+        "table": "ingredient_price_history",
+        "state_after_correction": "not rebuilt — reconcileIngredientPriceHistoryChain not invoked on correction",
+        "evidence": "ingredient-price-history-reconcile.ts only on history UPDATE refresh or invoice delete"
+      },
+      {
+        "artifact": "ingredient_aliases on conserva for Pepino",
+        "table": "ingredient_aliases",
+        "state_after_correction": "N/A — no bare Pepino alias existed; jar aliases unchanged",
+        "note": "If alias had existed for wrong pair, rejectIngredientMatchPair would still not delete it per traceAliasUnmatchOrphan"
+      },
+      {
+        "artifact": "invoice_items row",
+        "table": "invoice_items",
+        "state_after_correction": "unchanged — still name Pepino, no ingredient_id column",
+        "note": "Virtual match change only via alias/rejection memory"
+      },
+      {
+        "artifact": "cross-device rejection memory",
+        "storage": "localStorage only",
+        "state_after_correction": "reject pair not synced to Supabase — other browsers may still match Pepino→conserva",
+        "file": "src/lib/ingredient-rejected-match-memory.ts"
+      },
+      {
+        "artifact": "OI raw DB inputs",
+        "state_after_correction": "price_history row still poisons direct history reads; P0 guard may block alert output but DB unchanged",
+        "source": "identity-contamination-audit impact section"
+      },
+      {
+        "artifact": "supplier_intelligence history-based signals",
+        "state_after_correction": "Bidfood Pepino purchase remains in conserva history chain for DB-backed queries",
+        "mitigation": "live matcher scan excludes line from conserva purchase memory on same device"
+      }
+    ]
+  },
+  "scenario_B_no_match": {
+    "not_reverted": [
+      "All contamination artifacts from initial extract — no correction handler exists",
+      "ingredient_price_history a689bd91",
+      "ingredients 635a1189 cost state",
+      "live matcher would still return Pepino→conserva (kind exact) until reject pair added"
+    ]
+  },
+  "orphaned_records_after_correction_A": [
+    {
+      "type": "ghost_price_history",
+      "id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+      "description": "History row links Bidfood invoice to wrong ingredient; line no longer matches conserva in live scan but row persists"
+    },
+    {
+      "type": "stale_ingredient_price",
+      "ingredient_id": "635a1189",
+      "description": "current_price may not reflect true latest jar purchase if fresh line sync had overwritten then later jar re-extract restored"
+    },
+    {
+      "type": "dual_attribution",
+      "description": "Same invoice_id da472b7f may have history on BOTH 635a1189 (orphan) and newIngredientId (if user corrected) — two rows, one invoice, two ingredients"
+    }
+  ]
+}

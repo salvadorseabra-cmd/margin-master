@@ -1,0 +1,235 @@
+[
+  {
+    "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+    "ingredientName": "Arroz agulha",
+    "purchaseA": {
+      "invoice": "Aviludo May",
+      "product": "Arroz Agulha Metro Chef 12x1 kg",
+      "unitPrice": 13.95,
+      "operational": 1.1624999999999999
+    },
+    "purchaseB": {
+      "invoice": "Aviludo April",
+      "product": "Arroz Agulha Metro Chef 12x1kg",
+      "unitPrice": 13.45,
+      "operational": 1.1208333333333333
+    },
+    "guardCompatible": true,
+    "guardReason": null,
+    "guardAction": "chain",
+    "signals": []
+  },
+  {
+    "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+    "ingredientName": "Nata culinária",
+    "purchaseA": {
+      "invoice": "Aviludo May",
+      "product": "Nata Culianria 22% Reny Picot 6x1 Lt",
+      "unitPrice": 18.89,
+      "operational": 3.1483333333333334
+    },
+    "purchaseB": {
+      "invoice": "Aviludo April",
+      "product": "Nata Reny Picot 22% 6x1L",
+      "unitPrice": 18.29,
+      "operational": 3.0483333333333333
+    },
+    "guardCompatible": true,
+    "guardReason": null,
+    "guardAction": "chain",
+    "signals": []
+  },
+  {
+    "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+    "ingredientName": "Anchoas",
+    "purchaseA": {
+      "invoice": "Aviludo May",
+      "product": "Filete de Anchoas Alconfilosa LI 495 g",
+      "unitPrice": 9.99,
+      "operational": 4.995
+    },
+    "purchaseB": {
+      "invoice": "Aviludo April",
+      "product": "Filete de Anchovas Alconfirsta L1 495 g",
+      "unitPrice": 9.49,
+      "operational": 4.745
+    },
+    "guardCompatible": true,
+    "guardReason": null,
+    "guardAction": "chain",
+    "signals": []
+  },
+  {
+    "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+    "ingredientName": "Açúcar branco",
+    "purchaseA": {
+      "invoice": "Aviludo May",
+      "product": "Açucar Branco METRO Chef 10x1 Kg",
+      "unitPrice": 9.99,
+      "operational": 0.999
+    },
+    "purchaseB": {
+      "invoice": "Aviludo April",
+      "product": "Açúcar Branco Metro Chef 10x1Kg",
+      "unitPrice": 9.29,
+      "operational": 0.9289999999999999
+    },
+    "guardCompatible": true,
+    "guardReason": null,
+    "guardAction": "chain",
+    "signals": []
+  },
+  {
+    "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+    "ingredientName": "Atum em óleo",
+    "purchaseA": {
+      "invoice": "Aviludo May",
+      "product": "Atum Oleo Bolsa Nau Catrieta 1 Kg",
+      "unitPrice": 13.1,
+      "operational": 13.1
+    },
+    "purchaseB": {
+      "invoice": "Aviludo April",
+      "product": "Atum Óleo Bolsa Nau Catrietta 1 Kg",
+      "unitPrice": 6.29,
+      "operational": 3.145
+    },
+    "guardCompatible": true,
+    "guardReason": null,
+    "guardAction": "chain",
+    "signals": [
+      "F"
+    ]
+  },
+  {
+    "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+    "ingredientName": "Gema líquida",
+    "purchaseA": {
+      "invoice": "Aviludo May",
+      "product": "Ovo Liquido Past.Gema Dovo 1 Kg",
+      "unitPrice": 10.49,
+      "operational": 1.7483333333333333
+    },
+    "purchaseB": {
+      "invoice": "Aviludo April",
+      "product": "Ovo Liquido Past.Gema Dovo 1kg",
+      "unitPrice": 10.19,
+      "operational": 1.6983333333333333
+    },
+    "guardCompatible": true,
+    "guardReason": null,
+    "guardAction": "chain",
+    "signals": []
+  },
+  {
+    "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+    "ingredientName": "Chocolate culinária",
+    "purchaseA": {
+      "invoice": "Aviludo May",
+      "product": "Chocolate Culinaria Pantagruel 10x200 g",
+      "unitPrice": 29.99,
+      "operational": 2.9989999999999997
+    },
+    "purchaseB": {
+      "invoice": "Aviludo April",
+      "product": "Chocolate Pantagruel 10x200g",
+      "unitPrice": 29.19,
+      "operational": 2.919
+    },
+    "guardCompatible": true,
+    "guardReason": null,
+    "guardAction": "chain",
+    "signals": []
+  },
+  {
+    "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+    "ingredientName": "Mozzarella fior di latte",
+    "purchaseA": {
+      "invoice": "Bocconcino",
+      "product": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "unitPrice": 8.12,
+      "operational": 0.8119999999999999
+    },
+    "purchaseB": {
+      "invoice": "Aviludo April",
+      "product": "Mozzarella Flor di Latte 2Kg",
+      "unitPrice": 13.69,
+      "operational": 13.69
+    },
+    "guardCompatible": false,
+    "guardReason": "pack_weight_magnitude",
+    "guardAction": "break_chain",
+    "signals": [
+      "A",
+      "F"
+    ]
+  },
+  {
+    "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+    "ingredientName": "Pepino conserva",
+    "purchaseA": {
+      "invoice": "Bidfood",
+      "product": "Pepino",
+      "unitPrice": 1.77,
+      "operational": 0.00177
+    },
+    "purchaseB": {
+      "invoice": "Aviludo May",
+      "product": "Pepinos Extra Ull Frasco 6x720 g",
+      "unitPrice": 22.49,
+      "operational": 3.748333333333333
+    },
+    "guardCompatible": false,
+    "guardReason": "unit_family_mismatch",
+    "guardAction": "break_chain",
+    "signals": [
+      "B",
+      "E",
+      "F"
+    ]
+  },
+  {
+    "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+    "ingredientName": "Pepino conserva",
+    "purchaseA": {
+      "invoice": "Bidfood",
+      "product": "Pepino",
+      "unitPrice": 1.77,
+      "operational": 0.00177
+    },
+    "purchaseB": {
+      "invoice": "Aviludo April",
+      "product": "Pepinos Extra II Frasco 6X720g",
+      "unitPrice": 21.99,
+      "operational": 3.6649999999999996
+    },
+    "guardCompatible": false,
+    "guardReason": "unit_family_mismatch",
+    "guardAction": "break_chain",
+    "signals": [
+      "B",
+      "E",
+      "F"
+    ]
+  },
+  {
+    "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+    "ingredientName": "Pepino conserva",
+    "purchaseA": {
+      "invoice": "Aviludo May",
+      "product": "Pepinos Extra Ull Frasco 6x720 g",
+      "unitPrice": 22.49,
+      "operational": 3.748333333333333
+    },
+    "purchaseB": {
+      "invoice": "Aviludo April",
+      "product": "Pepinos Extra II Frasco 6X720g",
+      "unitPrice": 21.99,
+      "operational": 3.6649999999999996
+    },
+    "guardCompatible": true,
+    "guardReason": null,
+    "guardAction": "chain",
+    "signals": []
+  }
+]

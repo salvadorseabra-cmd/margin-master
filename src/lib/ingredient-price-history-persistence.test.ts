@@ -231,7 +231,9 @@ function createPersistenceMockClient(options: {
             }
             if (
               cols === "new_price, invoice_id" ||
-              cols === "new_price, invoice_id, created_at, id, invoices(invoice_date, created_at)"
+              cols === "new_price, invoice_id, created_at, id, invoices(invoice_date, created_at)" ||
+              cols ===
+                "new_price, ingredient_name, ingredient_unit, invoice_id, created_at, id, invoices(invoice_date, created_at)"
             ) {
               return buildHistoryQuery("select");
             }
@@ -431,6 +433,8 @@ describe("appendIngredientPriceHistoryFromInvoiceLine", () => {
           id: "hist-april",
           ingredient_id: "ing-gema",
           invoice_id: "inv-april",
+          ingredient_name: "Gema líquida",
+          ingredient_unit: "kg",
           previous_price: null,
           new_price: 1.698,
           created_at: "2026-04-17T12:00:00.000Z",
@@ -439,6 +443,8 @@ describe("appendIngredientPriceHistoryFromInvoiceLine", () => {
           id: "e143080d",
           ingredient_id: "ing-gema",
           invoice_id: "inv-may",
+          ingredient_name: "Gema líquida",
+          ingredient_unit: "kg",
           previous_price: 1.698,
           new_price: 0.9,
           delta: -0.798,
@@ -451,6 +457,7 @@ describe("appendIngredientPriceHistoryFromInvoiceLine", () => {
       ingredientId: "ing-gema",
       invoiceId: "inv-may",
       ingredientName: "Gema líquida",
+      ingredientUnit: "kg",
       previousPrice: 0.9,
       newPrice: 10.49,
       previousPurchaseQuantity: 6,
@@ -459,10 +466,10 @@ describe("appendIngredientPriceHistoryFromInvoiceLine", () => {
     expect(result.inserted).toBe(false);
     expect(result.updated).toBe(true);
     expect(historyInserts).toHaveLength(0);
-    expect(historyUpdates).toHaveLength(1);
-    expect(historyUpdates[0]?.id).toBe("e143080d");
-    expect(historyUpdates[0]?.payload.new_price).toBeCloseTo(10.49 / 6, 6);
-    expect(historyUpdates[0]?.payload.previous_price).toBeCloseTo(1.698, 4);
+    const mayUpdate = historyUpdates.find((entry) => entry.id === "e143080d");
+    expect(mayUpdate).toBeDefined();
+    expect(mayUpdate?.payload.new_price).toBeCloseTo(10.49 / 6, 6);
+    expect(mayUpdate?.payload.previous_price).toBeCloseTo(1.698, 4);
     const mayRow = historyRows.find((row) => row.id === "e143080d");
     expect(mayRow?.created_at).toBe("2026-05-19T12:00:00.000Z");
   });
@@ -681,6 +688,19 @@ describe("OI supplier movement after persistence", () => {
         { id: "inv-1", supplier_name: "Alpha Foods", total: 120, created_at: "2026-05-01T00:00:00.000Z" },
       ],
       priceHistory: [
+        {
+          id: "h0",
+          ingredient_id: "beef-1",
+          invoice_id: "inv-0",
+          ingredient_name: "Novilho",
+          supplier_name: "Alpha Foods",
+          ingredient_unit: "kg",
+          previous_price: null,
+          new_price: 10,
+          delta: null,
+          delta_percent: null,
+          created_at: "2026-04-01T12:00:00.000Z",
+        },
         {
           id: "h1",
           ingredient_id: "beef-1",

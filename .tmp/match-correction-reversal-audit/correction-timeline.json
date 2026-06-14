@@ -1,0 +1,131 @@
+{
+  "generated_at": "2026-06-14T09:10:00.000Z",
+  "scenario": "Pepino fresco (Bidfood line) initially auto-matched to Pepino conserva (635a1189); user corrects during invoice review",
+  "initial_contamination_state": {
+    "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "invoice_item_id": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+    "wrong_ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+    "poisoned_history_id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+    "pre_review_poison": true,
+    "alias_for_pepino_on_conserva": false
+  },
+  "scenario_A_change_to_different_ingredient": {
+    "ui_entry": "Correct match → InvoiceIngredientCorrectionPicker → select ingredient X",
+    "alternative_create_new": {
+      "ui_available_from_confirmed": false,
+      "reason": "Create new ingredient button only when unmatchedIngredient || suppressMatchPresentation (invoices.tsx ~3437)",
+      "workaround": "User must pick existing catalog entry from picker; new ingredient create requires unmatched state first"
+    },
+    "timeline": [
+      {
+        "order": 1,
+        "phase": "user_opens_correction",
+        "action": "openIngredientCorrection → correctionSnapshotRef stores previousIngredientId=635a1189",
+        "persisted": false,
+        "code": "invoices.tsx openIngredientCorrection ~2924"
+      },
+      {
+        "order": 2,
+        "phase": "user_selects_new_ingredient",
+        "action": "handleSelectCorrectionIngredient(item, newIngredientId, rawName)",
+        "persisted": false,
+        "code": "invoices.tsx ~2944"
+      },
+      {
+        "order": 3,
+        "phase": "reject_old_pair",
+        "action": "rejectIngredientMatchPair({ itemName: Pepino, rejectedIngredientId: 635a1189, supplierName, userId })",
+        "persisted": true,
+        "tables": ["localStorage marginly:rejected-ingredient-matches:{userId}"],
+        "not_persisted": ["ingredient_aliases", "ingredient_price_history", "ingredients"],
+        "code": "ingredient-correction-memory.ts rejectIngredientMatchPair ~371"
+      },
+      {
+        "order": 4,
+        "phase": "alias_write_new_target",
+        "action": "selectIngredientForItem → persistIngredientCorrectionForItem → persistManualIngredientCorrection → upsertConfirmedAlias",
+        "persisted": true,
+        "tables": [
+          "ingredient_aliases (UPSERT Pepino → newIngredientId)",
+          "confirmedIngredientAliases React state",
+          "localStorage marginly:invoice-ingredient-aliases:{userId}",
+          "in-memory ingredient_match_override",
+          "in-memory operational alias memory"
+        ],
+        "old_alias_on_conserva": "unchanged — no alias existed for bare Pepino on conserva",
+        "code": "ingredient-correction-memory.ts persistManualIngredientCorrection"
+      },
+      {
+        "order": 5,
+        "phase": "cost_sync_new_target",
+        "action": "persistOperationalIngredientCostFromInvoiceLine(supabase, newIngredientId, item, { priceHistory })",
+        "persisted": true,
+        "tables": [
+          "ingredients.current_price (NEW ingredient row)",
+          "ingredient_price_history INSERT or UPDATE for (da472b7f, newIngredientId)"
+        ],
+        "code": "ingredient-auto-persist.ts persistOperationalIngredientCostFromInvoiceLine"
+      },
+      {
+        "order": 6,
+        "phase": "old_ingredient_cleanup",
+        "action": "none in correction path",
+        "persisted": false,
+        "orphans": [
+          "ingredient_price_history a689bd91 still links (da472b7f, 635a1189)",
+          "ingredients 635a1189 current_price not reverted by correction"
+        ]
+      },
+      {
+        "order": 7,
+        "phase": "cache_and_events",
+        "action": "clearIngredientMatchedInvoiceProductsCache(newIngredientId); dispatchOperationalIngredientCostChanged({ trigger: invoice_manual_match, ingredientId: newIngredientId })",
+        "persisted": false,
+        "scope": "new ingredient only — old 635a1189 cache/event not dispatched",
+        "code": "invoices.tsx selectIngredientForItem ~1948"
+      },
+      {
+        "order": 8,
+        "phase": "live_matcher_read_path",
+        "action": "resolveInvoiceTableRowIngredientMatch blocks Pepino→635a1189 via isIngredientMatchPairRejected",
+        "persisted": false,
+        "effect": "Purchase memory / OI scan stops attributing Pepino line to Pepino conserva on this device",
+        "caveat": "price_history row still attributes invoice to conserva in DB queries that read history directly"
+      }
+    ],
+    "scenario_A_create_new_pepino_fresco": {
+      "ui_path": "NOT directly available from confirmed Pepino row",
+      "if_user_reached_unmatched_then_create": [
+        "openCanonicalIngredientCreate → saveCanonicalIngredientFromInvoice",
+        "saveCanonicalIngredientFromInvoiceRow → persistIngredientFromInvoiceItem (INSERT ingredients)",
+        "persistIngredientCorrectionForItem (alias + cost sync for new id)",
+        "dispatchOperationalIngredientCostChanged trigger: invoice_canonical_save"
+      ],
+      "reject_old_pair_on_create": false,
+      "note": "Create flow does not call rejectIngredientMatchPair — old conserva poison untouched unless user had previously used picker to change match"
+    }
+  },
+  "scenario_B_no_match": {
+    "ui_support": false,
+    "documented_gaps": [
+      "InvoiceIngredientCorrectionPicker has no '— No match —' sentinel",
+      "handleSelectCorrectionIngredient requires ingredientId string — no null path",
+      "rejectIngredientMatchSuggestion exists but is NOT called from invoices.tsx (tests only)",
+      "rejectedMatchItemIds Set is only cleared on successful rematch — never populated in production UI code"
+    ],
+    "code_that_exists_but_unwired": {
+      "rejectIngredientMatchPair": "Would block re-match if called with old pair — only invoked when picking DIFFERENT ingredient",
+      "rejectIngredientMatchSuggestion": "Session suppress — no production caller in src/routes",
+      "resolveIngredientCorrectionUiState.rejected": "suppressMatchPresentation — unreachable via current UI"
+    },
+    "hypothetical_if_no_match_existed": {
+      "would_need": [
+        "rejectIngredientMatchPair(Pepino, 635a1189)",
+        "optional alias delete (none for Pepino bare word)",
+        "price_history delete for (da472b7f, 635a1189)",
+        "ingredients.current_price revert for 635a1189"
+      ],
+      "current_code_does": "none of the above without selecting another ingredient"
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "run": 9,
+  "status": 200,
+  "elapsedMs": 17070,
+  "items": [
+    {
+      "name": "MOZZARELLA FIOR DI LATTE 'IL BOCCONCINO' 125GR*8",
+      "quantity": 10,
+      "unit": "uni",
+      "unit_price": 8.12,
+      "total": 81.23
+    },
+    {
+      "name": "STRACCIARELLA 250 GR",
+      "quantity": 24,
+      "unit": "uni",
+      "unit_price": 3.11,
+      "total": 74.54
+    },
+    {
+      "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "quantity": 2,
+      "unit": "uni",
+      "unit_price": 27.36,
+      "total": 27.3
+    },
+    {
+      "name": "POMODORI PELATI (CX 2,5KG*6)",
+      "quantity": 1,
+      "unit": "uni",
+      "unit_price": 22.05,
+      "total": 22.05
+    },
+    {
+      "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "quantity": 1,
+      "unit": "uni",
+      "unit_price": 23.295,
+      "total": 23.3
+    },
+    {
+      "name": "RICOTTA TREVIGIANA 1,5KG",
+      "quantity": 2,
+      "unit": "uni",
+      "unit_price": 7.967,
+      "total": 7.97
+    },
+    {
+      "name": "ROLO DE CABRA E VACA 1KG",
+      "quantity": 1,
+      "unit": "uni",
+      "unit_price": 12.171,
+      "total": 12.17
+    }
+  ],
+  "pomodor": {
+    "name": "POMODORI PELATI (CX 2,5KG*6)",
+    "quantity": 1,
+    "unit_price": 22.05,
+    "total": 22.05,
+    "errorVsGt": 27.95,
+    "errorVsVisible": 0,
+    "correctVsGt": false,
+    "correctVsVisible": true
+  }
+}

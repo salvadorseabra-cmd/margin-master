@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-06-13T20:50:20.795Z",
+  "finalQuestion": "Can Marginly safely use historical pricing and opportunity calculations in production today?",
+  "answer": "YES WITH CAVEATS",
+  "historicalPricingStatus": "PARTIAL",
+  "confidencePercent": 82,
+  "headline": "Core €/base-unit pipeline trusted; isolated stale rows and unmatched lines remain.",
+  "trustedCount": 2,
+  "notTrustedCount": 1,
+  "staleCount": 2,
+  "keyRisks": [
+    "1 math/logic trust failures (volume parse, delta)",
+    "14 ghost price_history rows (old invoice lines)",
+    "2 stale operational mismatches in price_history",
+    "4 stale DB rows from Jun 11 era",
+    "46 unmatched lines — no price_history sync path"
+  ],
+  "recommendations": [
+    "Re-read VL invoices to refresh stale invoice_items + price_history",
+    "Fix or guard 0.20cl volume token parse before trusting beverage €/L opportunities",
+    "Investigate ghost price_history on Aviludo April/May (14 rows from prior extractions)",
+    "Update VL harness Emporio ID to ab52796d"
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio Italia",
+  "product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+  "deployVersionAudited": 27,
+  "generatedAt": "2026-06-13T01:00:00.000Z",
+  "visibleInvoice": {
+    "source": ".tmp/emporio-italia-investigation/invoice-full.png",
+    "productCode": "RMO0000334",
+    "description": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg (Produto de Stock)",
+    "qtdColumn": "1,83",
+    "precoUnitGross": "33,80 €",
+    "discountPct": "20,00",
+    "lineTotal": "49,48 €",
+    "arithmetic": "1.83 × 33.80 × (1 − 0.20) ≈ 49.44 (≈49.48 printed)",
+    "notes": [
+      "Weight row with 20% Desc.(%) — dense Emporio table",
+      "Printed Qtd 1,83 kg — GT normalizes qty to 2.8 for catalog semantics; financial anchor is Preço Total 49,48"
+    ]
+  },
+  "groundTruth": {
+    "source": ".tmp/field-accuracy-audit/ground-truth.json",
+    "qty": 2.8,
+    "unit": "kg",
+    "unit_price": 17.68,
+    "total": 49.48,
+    "qtyNote": "GT qty differs from printed 1,83 — total 49.48 matches visible Preço Total"
+  },
+  "stages": [
+    {
+      "stage": 1,
+      "name": "visible_invoice",
+      "result": {
+        "qtdPrinted": "1,83",
+        "unitPriceGrossPrinted": "33,80 €",
+        "discountPctPrinted": "20,00",
+        "lineTotalPrinted": "49,48 €"
+      },
+      "divergedFromGT": "qty only — total aligns",
+      "status": "PASS"
+    },
+    {
+      "stage": 2,
+      "name": "geometry_crop",
+      "result": {
+        "bounds": { "top": 456, "bottom": 851, "headerTop": 466 },
+        "bresaolaRowVisible": true,
+        "source": ".tmp/geometry-audit/17aa3591-ec98-4c21-89c9-5ae946bc97bb-geometry.json"
+      },
+      "divergedFromGT": false,
+      "status": "PASS"
+    },
+    {
+      "stage": 3,
+      "name": "passC_gpt_extraction",
+      "result": {
+        "outcomeGood_totalFromValor": {
+          "total": 49.48,
+          "qtyRange": [1.8, 2.6],
+          "unit_priceRange": [19.03, 28],
+          "occurrences": [
+            "v26 baseline (qty 1.83, unit 27.05, total 49.48, €0)",
+            "passc-refinement (qty 2.28, unit 21.8, total 49.64, €0.16)",
+            "persistence pass-c-raw (qty 1.8, unit 28, total 49.48)",
+            "v23 run1 (qty 1.13, unit 38, total 49.48)",
+            "v27-stability runs 1–2 (qty 2.5–2.6, total 49.48, €0)"
+          ]
+        },
+        "outcomeBad_qtyTimesUnitOrBleed": {
+          "patterns": [
+            {
+              "total": 39.48,
+              "mechanism": "qty×unit synthesis OR bleed from Ventricina row (visible 39,49 €)",
+              "occurrences": [
+                "v27 audit single run (qty 2.38, unit 16.64 → 2.38×16.64≈39.48)",
+                "v27-stability run 4 (qty 3.3, unit 12 → 3.3×12≈39.6)"
+              ],
+              "financialErrorEuro": 10.0
+            },
+            {
+              "totalRange": [44.83, 45.29],
+              "mechanism": "Partial VALOR misread or wrong qty×unit",
+              "occurrences": ["v27-stability runs 3, 5"],
+              "financialErrorEuro": [4.65, 4.19]
+            }
+          ]
+        }
+      },
+      "divergedFromGT": "FIRST DIVERGENCE on bad runs — total wrong at Pass C",
+      "status": "FAIL_ON_BAD_RUNS",
+      "firstFailingStage": true
+    },
+    {
+      "stage": 4,
+      "name": "binder_monetary",
+      "result": {
+        "behavior": "Forwards Pass C line_total_net when present",
+        "bresaolaObserved": "Wrong totals (39.48, 44.83, 45.29) passed through unchanged"
+      },
+      "divergedFromGT": false,
+      "status": "PASS_THROUGH"
+    },
+    {
+      "stage": 5,
+      "name": "api_response",
+      "result": {
+        "v27AuditBadRun": { "qty": 2.38, "unit_price": 16.64, "total": 39.48, "financialErrorEuro": 10.0 },
+        "v26Baseline": { "qty": 1.83, "unit_price": 27.05, "total": 49.48, "financialErrorEuro": 0 },
+        "refinementBaseline": { "qty": 2.28, "unit_price": 21.8, "total": 49.64, "financialErrorEuro": 0.16 },
+        "v27Stability5Run": {
+          "perfectTotalRuns": "2/5",
+          "stabilityPercent": 40,
+          "euro10ExactRuns": 1,
+          "source": ".tmp/bresaola-root-cause/stability.json"
+        }
+      },
+      "status": "VARIABLE"
+    }
+  ],
+  "oscillation": {
+    "correctIncorrectAlternation": true,
+    "pattern": "Same v27 deploy oscillates 49.48 (correct) vs 39.48/44.83/45.29 (wrong) across independent invokes",
+    "v26SingleRunLucky": "v26 official rerun €0; pre-v26 lab rerun had total 45.26 (€4.22 error) — same variance family"
+  },
+  "sources": [
+    ".tmp/emporio-italia-investigation/invoice-full.png",
+    ".tmp/field-accuracy-audit/ground-truth.json",
+    ".tmp/emporio-final-audit/row-breakdown.json",
+    ".tmp/final-residual-error-audit/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+    ".tmp/final-validation-lab-rerun-v26/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+    ".tmp/passc-refinement-validation/reextract/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+    ".tmp/emporio-discount-column-audit/discount-accuracy.json",
+    ".tmp/bresaola-root-cause/stability.json",
+    ".tmp/gorgonzola-root-cause/root-cause.json"
+  ]
+}

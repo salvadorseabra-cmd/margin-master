@@ -1,0 +1,86 @@
+{
+  "generated_at": "2026-06-13T21:00:00.000Z",
+  "targetArchitecture": "Option E — Concept → Supplier Product → Pack Variant",
+  "layers": {
+    "recipeDomain": {
+      "entities": ["recipes", "recipe_ingredients"],
+      "bindsTo": "ingredient_concept (ingredients.id)",
+      "optionalFuture": "recipe_ingredients.pack_variant_id nullable override",
+      "prepGraph": "recipe_ingredients.sub_recipe_id → recipes(id) type=prep",
+      "costingInput": "default_pack_variant.current_price / purchase_quantity per concept",
+      "doesNotUse": ["supplier_product_id", "price_history", "invoice_items"]
+    },
+    "purchasingDomain": {
+      "entities": ["invoice_items", "ingredient_aliases", "ingredient_price_history"],
+      "bindsTo": "pack_variant_id (future) via supplier_product",
+      "costingOutput": "updates pack_variant.current_price; mirrors to concept.default for recipe resolver",
+      "doesNotUse": ["recipe_ingredients directly"]
+    },
+    "intelligenceDomain": {
+      "entities": ["operational-intelligence-synthesis", "margin-alerts"],
+      "bindsTo": "pack_variant_id for movements; ingredient_concept_id for recipe exposure",
+      "bridges": "recipe impact queries still use ingredient_id (concept)"
+    }
+  },
+  "dataFlow": {
+    "recipeCosting": {
+      "path": "recipe_ingredients.ingredient_id → concept → default_pack_variant → €/base-unit → line cost",
+      "prepPath": "recipe_ingredients.sub_recipe_id → recursive batch total / output_quantity → parent line cost",
+      "unchangedByIdentity": true
+    },
+    "invoicePurchase": {
+      "path": "invoice_items → match → supplier_product → pack_variant → price_history.append",
+      "feedsRecipeVia": "pack_variant.current_price → concept.default_pack_variant mirror",
+      "unchangedRecipeFK": true
+    },
+    "historicalPricing": {
+      "path": "price_history.pack_variant_id chains only within variant",
+      "recipeImpact": "margin-alerts fetch recipes by ingredient_id (concept) — still valid"
+    }
+  },
+  "schemaEvolution": {
+    "current": {
+      "recipe_ingredients": ["id", "recipe_id", "ingredient_id", "sub_recipe_id", "quantity", "unit"],
+      "ingredients": ["id", "name", "current_price", "purchase_quantity", "base_unit"]
+    },
+    "phase1_additive": {
+      "pack_variants": "new table",
+      "ingredients": ["default_pack_variant_id"],
+      "recipe_ingredients": "no change required"
+    },
+    "phase3_optional": {
+      "recipe_ingredients": ["pack_variant_id nullable"],
+      "equivalence_groups": "new tables for substitution"
+    },
+    "breakingChanges": "none for recipe_ingredients FK if concept binding maintained"
+  },
+  "resolverAdapterPattern": {
+    "principle": "Single choke point: resolveOperationalIngredientCost / resolveRecipeLineOperationalCost",
+    "today": "reads ingredients.current_price + purchase_quantity",
+    "future": "reads concept.default_pack_variant OR line.pack_variant_id override",
+    "migration": "Adapter swap in resolver — recipe UI and recipe_ingredients unchanged",
+    "filesToTouch": [
+      "resolve-operational-ingredient-cost.ts",
+      "ingredient-unit-cost.ts",
+      "buildOperationalIngredientCostById"
+    ],
+    "filesUnchanged": [
+      "recipe-merge.ts structure",
+      "recipe-prep-cost.ts prep propagation",
+      "recipe_ingredients schema XOR",
+      "margin-alert-data getRecipeMetrics shape"
+    ]
+  },
+  "prepSubRecipeModel": {
+    "currentImplementation": "COMPLETE foundation",
+    "evidence": [
+      "sub_recipe_id XOR ingredient_id constraint",
+      "recipes.output_quantity + output_unit",
+      "recipe-impact-engine sub_recipe chain expansion",
+      "resolvePrepUsageLineOperationalCost",
+      "recipes.tsx prep picker UI"
+    ],
+    "identityIndependence": "Prep batches are recipes(id); leaf lines use ingredient_id (concept). No pack variant on prep graph edges.",
+    "futureEnhancement": "Prep leaf lines benefit from accurate concept default variant — purchasing fix, not prep rewrite"
+  }
+}

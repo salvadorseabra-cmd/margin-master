@@ -1,0 +1,81 @@
+{
+  "generated_at": "2026-06-13T20:52:00.000Z",
+  "status": "PARTIAL",
+  "confidencePercent": 79,
+  "productionSafeToday": false,
+  "harnessRerun": "2026-06-13T20:50:27.586Z",
+  "sources": [
+    ".tmp/operational-intelligence-integrity-audit/opportunities-audit.json",
+    ".tmp/operational-intelligence-integrity-audit/supplier-intelligence-audit.json",
+    ".tmp/p0-identity-guard-validation/findings.json"
+  ],
+  "postP0OiReplay": {
+    "priceIncreaseAlerts": 0,
+    "priceDecreaseAlerts": 0,
+    "mozzarellaAlerts": 0,
+    "pepinoAlerts": 0,
+    "ownerReviewOpportunities": 0,
+    "libMarginAlerts": 0,
+    "totalAlertItems": 0
+  },
+  "falseOpportunities": {
+    "preP0": {
+      "mozzarella1341": true,
+      "pepino99": true,
+      "mozzarellaOwnerReview": true
+    },
+    "postP0": {
+      "mozzarella1341": false,
+      "pepino99": false,
+      "mozzarellaOwnerReview": false
+    },
+    "status": "SUPPRESSED"
+  },
+  "falseSupplierRecommendations": {
+    "preP0": {
+      "mozzarellaBetterSupplierLine": "+1341% IL BOCCONCINO vs catalog",
+      "supplierWatchlist1341": true
+    },
+    "postP0": {
+      "mozzarellaBetterSupplierLine": null,
+      "pepinoBetterSupplierLine": null,
+      "supplierWatchlist1341": false,
+      "aviludoPricingNote": "No recent basket movement"
+    },
+    "status": "SUPPRESSED"
+  },
+  "contaminatedMovements": {
+    "preP0": "rankIngredientPriceMovements and supplier switch used raw cross-format prices",
+    "postP0": "isTrustedPriceMovementRow + purchaseContractsChainCompatible on switch impacts",
+    "residualInRawDb": true,
+    "surfacedInUi": false
+  },
+  "poisonedWatchlists": {
+    "preP0": "+1341% on Mozzarella in AVILUDO watchlist",
+    "postP0": "No false spike notes; AVILUDO status price_increase without contaminated note"
+  },
+  "trustedSurfaces": [
+    "Recipe margin metrics (catalog current_price × recipe lines)",
+    "Recipe below-target alerts",
+    "Cost concentration / prep cascade graph",
+    "Atum em óleo +4.1% trusted control chain"
+  ],
+  "untrustedSurfaces": [
+    "Home / dashboard KPIs (mock-data.ts)",
+    "Weekly snapshot supplier counts when DB stale (counts may under-report after guard filters)"
+  ],
+  "guardWiringVerified": {
+    "ingredient-price-chain-guard.ts": "derivePurchaseContractSnapshot, purchaseContractsChainCompatible, isTrustedPriceMovementRow",
+    "ingredient-price-history.ts": "append guard, selectChainCompatiblePriorOperationalPrice, shouldBlockHistoryInsert",
+    "margin-alert-data.ts": "isTrustedPriceMovementRow filters buildOperationalAlertItems",
+    "operational-intelligence-view.ts": "trustedPriceHistoryDeltaPercent, buildSupplierIntelligence contract checks",
+    "operational-intelligence-synthesis.ts": "supplier switch guard, trustedPriceHistoryDeltaPercent"
+  },
+  "verdict": {
+    "status": "PARTIAL",
+    "oiMathClosed": true,
+    "oiInputsClosed": false,
+    "oiOutputsSafeForProduction": false,
+    "headline": "P0 guard closes VL false positives on /alerts; foundation not production-ready until P1 + VL re-read"
+  }
+}

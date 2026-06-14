@@ -782,6 +782,7 @@ function InvoicesPage() {
   const [canonicalCreateSaving, setCanonicalCreateSaving] = useState(false);
   const [rejectedMatchItemIds, setRejectedMatchItemIds] = useState<Set<string>>(() => new Set());
   const [extracting, setExtracting] = useState<Record<string, boolean>>({});
+  const extractionInFlightRef = useRef<Record<string, boolean>>({});
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [selectedKpiMonth, setSelectedKpiMonth] = useState<string | null>(null);
   const [settlementByInvoice, setSettlementByInvoice] = useState<Record<string, SettlementState>>(
@@ -1222,6 +1223,14 @@ function InvoicesPage() {
     total?: number;
     itemsCount: number;
   } | null> => {
+    if (extractionInFlightRef.current[invoiceId]) {
+      console.log("[invoice-ocr] extraction-skipped", {
+        invoiceId,
+        reason: "already_in_flight",
+      });
+      return null;
+    }
+    extractionInFlightRef.current[invoiceId] = true;
     console.log("[invoice-ocr] stage=2 ocr-trigger", {
       invoiceId,
       dataUrlLength: dataUrl.length,
@@ -1259,8 +1268,6 @@ function InvoicesPage() {
         const sample = normalizeInvoiceItemFields(items[0] as ItemRow);
         console.debug("[invoice-purchase]", resolveInvoiceLinePurchaseFormat(sample));
       }
-      // wipe prior items then insert fresh
-      await supabase.from("invoice_items").delete().eq("invoice_id", invoiceId);
       const normalizedItems = items
         .map((it: ItemRow) => normalizeInvoiceItemFields(it))
         .filter((it: ItemRow) => !shouldRejectInvoiceIngredientRow(it));
@@ -1279,71 +1286,100 @@ function InvoicesPage() {
         parsedRowsPreview: normalizedItems.slice(0, 5),
       });
       traceUnitForAllItems("NORMALIZED", normalizedItems, { invoiceId });
-      if (items.length && user) {
-        traceInvoiceQuantityStage("insert-normalized:first-item", normalizedItems[0], {
-          invoiceId,
-        });
-        traceUnitResolveForAllItems(normalizedItems, { invoiceId });
-        const insertRows = normalizedItems.map((it: ItemRow) => {
-          const name = String(it.name ?? "Unknown");
-          const unit = resolveInvoiceItemUnit({ name, unit: it.unit });
-          return {
-            invoice_id: invoiceId,
-            user_id: user.id,
-            name: name.slice(0, 200),
-            quantity: it.quantity ?? null,
-            unit: unit ? unit.slice(0, 20) : null,
-            unit_price: it.unit_price ?? null,
-            total: it.total ?? null,
-          };
-        });
-        traceInvoiceQuantityStage("insert-payload:first-item", insertRows[0], { invoiceId });
-        traceUnitForAllItems("INSERT", insertRows, { invoiceId });
-        const { error: insertError } = await supabase.from("invoice_items").insert(insertRows);
-        console.log("[invoice-ocr] stage=9 persistence-result", {
-          invoiceId,
-          insertRowCount: insertRows.length,
-          success: !insertError,
-          error: insertError?.message ?? null,
-        });
-        if (insertError) throw insertError;
-
-        const supplierForSync = normalizeSupplierDisplayName(data?.supplier);
-        const rawInvoiceDateForHistory = data?.invoice_date ?? data?.invoiceDate;
-        const invoiceDateForHistory = normalizeInvoiceDate(rawInvoiceDateForHistory);
-        const invoiceRowForHistory = rows.find((row) => row.id === invoiceId);
-        const costSync = await syncOperationalIngredientCostsFromInvoiceLines(
-          supabase,
-          ingredientCatalog,
-          confirmedIngredientAliasesRef.current,
-          normalizedItems.map((it: ItemRow) => ({
-            name: String(it.name ?? ""),
-            quantity: it.quantity ?? null,
-            unit: it.unit ?? null,
-            unit_price: it.unit_price ?? null,
-            supplierName: supplierForSync,
-          })),
-          {
-            isGenericUnit,
-            priceHistory: {
-              invoiceId,
-              supplierName: supplierForSync,
-              invoiceDate: invoiceDateForHistory,
-              invoiceCreatedAt: invoiceRowForHistory?.created_at ?? null,
-            },
-          },
-        );
-        if (costSync.updatedIngredientIds.length > 0) {
-          clearIngredientMatchedInvoiceProductsCache();
-          dispatchOperationalIngredientCostChanged({
-            trigger: "invoice_extract_cost_sync",
-          });
-        }
-      } else {
+      if (normalizedItems.length === 0) {
         console.log("[invoice-ocr] stage=9 persistence-skipped", {
           invoiceId,
-          reason: !items.length ? "no items from extraction" : "no user session",
+          reason: "no accepted rows after normalization",
           rawItemsCount: items.length,
+          rejectedItemsCount: rejectedCount,
+        });
+        toast.error("Extraction returned no line items — existing rows kept.");
+        return null;
+      }
+      if (!user) {
+        console.log("[invoice-ocr] stage=9 persistence-skipped", {
+          invoiceId,
+          reason: "no user session",
+          acceptedItemsCount: normalizedItems.length,
+        });
+        return null;
+      }
+      const { error: deleteError } = await supabase
+        .from("invoice_items")
+        .delete()
+        .eq("invoice_id", invoiceId);
+      if (deleteError) {
+        console.error("[invoice-ocr] persistence-delete-failed", {
+          invoiceId,
+          error: deleteError.message,
+        });
+        toast.error(`Could not replace invoice rows: ${deleteError.message}`);
+        return null;
+      }
+      traceInvoiceQuantityStage("insert-normalized:first-item", normalizedItems[0], {
+        invoiceId,
+      });
+      traceUnitResolveForAllItems(normalizedItems, { invoiceId });
+      const insertRows = normalizedItems.map((it: ItemRow) => {
+        const name = String(it.name ?? "Unknown");
+        const unit = resolveInvoiceItemUnit({ name, unit: it.unit });
+        return {
+          invoice_id: invoiceId,
+          user_id: user.id,
+          name: name.slice(0, 200),
+          quantity: it.quantity ?? null,
+          unit: unit ? unit.slice(0, 20) : null,
+          unit_price: it.unit_price ?? null,
+          total: it.total ?? null,
+        };
+      });
+      traceInvoiceQuantityStage("insert-payload:first-item", insertRows[0], { invoiceId });
+      traceUnitForAllItems("INSERT", insertRows, { invoiceId });
+      const { error: insertError } = await supabase.from("invoice_items").insert(insertRows);
+      console.log("[invoice-ocr] stage=9 persistence-result", {
+        invoiceId,
+        insertRowCount: insertRows.length,
+        success: !insertError,
+        error: insertError?.message ?? null,
+      });
+      if (insertError) {
+        console.error("[invoice-ocr] persistence-insert-failed", {
+          invoiceId,
+          error: insertError.message,
+        });
+        toast.error(`Could not save extracted rows: ${insertError.message}`);
+        return null;
+      }
+
+      const supplierForSync = normalizeSupplierDisplayName(data?.supplier);
+      const rawInvoiceDateForHistory = data?.invoice_date ?? data?.invoiceDate;
+      const invoiceDateForHistory = normalizeInvoiceDate(rawInvoiceDateForHistory);
+      const invoiceRowForHistory = rows.find((row) => row.id === invoiceId);
+      const costSync = await syncOperationalIngredientCostsFromInvoiceLines(
+        supabase,
+        ingredientCatalog,
+        confirmedIngredientAliasesRef.current,
+        normalizedItems.map((it: ItemRow) => ({
+          name: String(it.name ?? ""),
+          quantity: it.quantity ?? null,
+          unit: it.unit ?? null,
+          unit_price: it.unit_price ?? null,
+          supplierName: supplierForSync,
+        })),
+        {
+          isGenericUnit,
+          priceHistory: {
+            invoiceId,
+            supplierName: supplierForSync,
+            invoiceDate: invoiceDateForHistory,
+            invoiceCreatedAt: invoiceRowForHistory?.created_at ?? null,
+          },
+        },
+      );
+      if (costSync.updatedIngredientIds.length > 0) {
+        clearIngredientMatchedInvoiceProductsCache();
+        dispatchOperationalIngredientCostChanged({
+          trigger: "invoice_extract_cost_sync",
         });
       }
       const supplier = normalizeSupplierDisplayName(data?.supplier);
@@ -1382,15 +1418,17 @@ function InvoicesPage() {
         invoiceNumber,
         invoiceDate,
         total: typeof data?.total === "number" ? data.total : undefined,
-        itemsCount: items.length,
+        itemsCount: normalizedItems.length,
       };
     } catch (err) {
       console.error("[invoice-ocr] extraction-failed", {
         invoiceId,
         error: err instanceof Error ? err.message : String(err),
       });
+      toast.error(err instanceof Error ? err.message : "Invoice extraction failed");
       return null;
     } finally {
+      delete extractionInFlightRef.current[invoiceId];
       setExtracting((s) => ({ ...s, [invoiceId]: false }));
     }
   };

@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-06-14T08:52:00.000Z",
+  "review_timing": {
+    "contamination_completed_before_review_opens": true,
+    "confidence_percent": 91,
+    "rationale": "Extract handler runs insert + syncOperationalIngredientCostsFromInvoiceLines synchronously in one async function before returning to UI. Bidfood uploaded 2026-06-09T22:36:41; history row a689bd91 exists; no Pepino alias with confirmed_by_user."
+  },
+  "ui_state_at_review": {
+    "displayState": "confirmed",
+    "match_kind": "exact",
+    "match_label": "Matched to: Pepino conserva",
+    "showConfirm": false,
+    "showWrongMatch": true,
+    "showPicker": false,
+    "showCreateNewIngredient": false,
+    "available_actions": ["Correct match (must pick another ingredient)"],
+    "unavailable_actions": ["Remove match", "No match", "Confirm match (suggested-only)"]
+  },
+  "ui_resolver": {
+    "file": "src/lib/ingredient-correction-memory.ts",
+    "function": "resolveIngredientCorrectionUiState",
+    "confirmed_branch": "showConfirm=false, showWrongMatch=true — user sees match as already confirmed"
+  },
+  "user_prevention_with_existing_ui": {
+    "could_prevent_at_upload": false,
+    "could_prevent_after_opening_invoice": false,
+    "could_prevent_without_picking_other_ingredient": false,
+    "only_mitigation": "Correct match → select different ingredient (does not support no-match)"
+  },
+  "hypothetical_preventions": {
+    "no_match_button_after_extract": {
+      "would_fix_display": true,
+      "would_fix_poison_without_cleanup": false,
+      "note": "History a689bd91 already written on first upload"
+    },
+    "pending_match_confirm_gate": {
+      "would_prevent_if_exact_demoted_to_suggested": true,
+      "implementation": "Gate syncOperationalIngredientCostsFromInvoiceLines to confirmed-alias/override only",
+      "pepino_would_be": "suggested or unmatched if matcher demoted — no auto history write"
+    }
+  },
+  "components": {
+    "ItemsTable": "src/routes/invoices.tsx ~3263+",
+    "InvoiceIngredientCorrectionPicker": "src/components/invoice-ingredient-correction-picker.tsx",
+    "IngredientCorrectionActions": "src/components/invoice-ingredient-correction.tsx"
+  }
+}

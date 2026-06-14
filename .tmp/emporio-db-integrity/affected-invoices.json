@@ -1,0 +1,92 @@
+{
+  "generated_at": "2026-06-13T18:12:00.000Z",
+  "vlInvoiceIds": [
+    "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "c2f52357-0f80-491a-ba14-c97ff4837472",
+    "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+    "f0aa5a08-86a3-4938-99f0-711e86073968",
+    "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+    "36c99d19-6f9f-413f-8c2d-ae3526291a2d"
+  ],
+  "summary": {
+    "deletedInvoices": 1,
+    "zeroItemInvoices": 0,
+    "healthyInvoices": 5,
+    "replacementInvoices": 1
+  },
+  "invoices": [
+    {
+      "label": "Bidfood",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "status": "HEALTHY",
+      "invoiceExists": true,
+      "itemCount": 11,
+      "itemsCreatedAt": "2026-06-12T22:54:35",
+      "priceHistoryRows": 1,
+      "notes": "Re-read Jun 12 post safety-fix"
+    },
+    {
+      "label": "Aviludo April",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "status": "HEALTHY",
+      "invoiceExists": true,
+      "itemCount": 9,
+      "itemsCreatedAt": "2026-06-12T22:53:48",
+      "priceHistoryRows": 10,
+      "notes": "Previously wiped by empty-extraction re-read (Jun 11); recovered Jun 12 re-read"
+    },
+    {
+      "label": "Aviludo May",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "status": "HEALTHY",
+      "invoiceExists": true,
+      "itemCount": 8,
+      "itemsCreatedAt": "2026-06-11T22:42:40",
+      "priceHistoryRows": 8,
+      "notes": "Stable 8 rows"
+    },
+    {
+      "label": "Bocconcino",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "status": "HEALTHY",
+      "invoiceExists": true,
+      "itemCount": 7,
+      "itemsCreatedAt": "2026-06-11T22:44:21",
+      "priceHistoryRows": 1,
+      "notes": "Stable 7 rows; stale vs v31 but present"
+    },
+    {
+      "label": "Emporio (VL ID)",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "status": "DELETED",
+      "invoiceExists": false,
+      "itemCount": 0,
+      "priceHistoryRows": 0,
+      "replacementInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "notes": "Entire invoice row deleted — not an empty-items wipe. CASCADE removed items. Replaced by new upload."
+    },
+    {
+      "label": "Emporio (live replacement)",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "status": "HEALTHY",
+      "invoiceExists": true,
+      "itemCount": 8,
+      "itemsCreatedAt": "2026-06-11T23:37:47",
+      "priceHistoryRows": 0,
+      "replaces": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "notes": "Same supplier/screenshot re-uploaded after duplicate-row incident"
+    },
+    {
+      "label": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "status": "HEALTHY",
+      "invoiceExists": true,
+      "itemCount": 8,
+      "itemsCreatedAt": "2026-06-11T22:41:12",
+      "priceHistoryRows": 0,
+      "notes": "Stable 8 rows; stale vs v31 but present"
+    }
+  ],
+  "otherInvoicesAffected": false,
+  "detail": "Only Emporio VL UUID was deleted. Five other VL invoices exist with expected row counts. Emporio operational data lives under replacement UUID ab52796d."
+}

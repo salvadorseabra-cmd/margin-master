@@ -1,0 +1,100 @@
+{
+  "generated_at": "2026-06-12T23:43:53.771Z",
+  "deployVersion": 27,
+  "groundTruth": {
+    "qty": 2.8,
+    "unit_price": 17.68,
+    "total": 49.48
+  },
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "elapsedMs": 26068,
+      "bresaola": {
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock",
+        "quantity": 2.5,
+        "unit": null,
+        "unit_price": 19.79,
+        "total": 49.48
+      },
+      "financialErrorEuro": 0,
+      "totalCorrect": true
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "elapsedMs": 15987,
+      "bresaola": {
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+        "quantity": 2.6,
+        "unit": null,
+        "unit_price": 19.03,
+        "total": 49.48
+      },
+      "financialErrorEuro": 0,
+      "totalCorrect": true
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "elapsedMs": 13696,
+      "bresaola": {
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock",
+        "quantity": 2.3,
+        "unit": null,
+        "unit_price": 19.49,
+        "total": 44.83
+      },
+      "financialErrorEuro": 4.65,
+      "totalCorrect": false
+    },
+    {
+      "run": 4,
+      "status": 200,
+      "elapsedMs": 15176,
+      "bresaola": {
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+        "quantity": 3.3,
+        "unit": null,
+        "unit_price": 12,
+        "total": 39.48
+      },
+      "financialErrorEuro": 10,
+      "totalCorrect": false
+    },
+    {
+      "run": 5,
+      "status": 200,
+      "elapsedMs": 13255,
+      "bresaola": {
+        "name": "Rigamonti - Bresaola Punta d’Anca Oro 1/2 - 1,5kg Produto de Stock",
+        "quantity": 2.3,
+        "unit": null,
+        "unit_price": 19.71,
+        "total": 45.29
+      },
+      "financialErrorEuro": 4.19,
+      "totalCorrect": false
+    }
+  ],
+  "summary": {
+    "perfectTotalRuns": "2/5",
+    "stabilityPercent": 40,
+    "totalUnique": [
+      49.48,
+      44.83,
+      39.48,
+      45.29
+    ],
+    "qtyUnique": [
+      2.5,
+      2.6,
+      2.3,
+      3.3
+    ],
+    "deterministic": false,
+    "avgFinancialErrorEuro": 3.77,
+    "euro10Reproducible": 1
+  }
+}

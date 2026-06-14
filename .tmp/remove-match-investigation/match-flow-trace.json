@@ -1,0 +1,142 @@
+{
+  "generated_at": "2026-06-13T22:55:00.000Z",
+  "architecture_summary": "Invoice line ↔ ingredient linkage is virtual. `invoice_items` stores OCR/extraction fields only (no ingredient_id). Match is resolved at read time by `resolveInvoiceTableRowIngredientMatch` using confirmed alias map + canonical matcher. Persistence layers are separate.",
+  "persistence_layers": [
+    {
+      "layer": "ingredient_aliases (Supabase)",
+      "scope": "invoice wording → ingredient_id",
+      "fields": ["ingredient_id", "alias_name", "normalized_alias", "supplier_name", "confidence", "confirmed_by_user"],
+      "written_by": ["persistManualIngredientCorrection", "persistInvoiceLineAliasMemory", "upsertConfirmedAlias"],
+      "read_by": ["loadConfirmedIngredientAliasMap", "resolveInvoiceRowIngredientMatch", "buildMatchedInvoiceProductsFromScan"],
+      "delete_api_exists": false
+    },
+    {
+      "layer": "confirmedIngredientAliases (React state + localStorage)",
+      "scope": "in-memory alias map mirror",
+      "key": "marginly:invoice-ingredient-aliases:{userId}",
+      "written_by": ["persistIngredientCorrectionForItem", "load on invoices mount"],
+      "read_by": ["ItemsTable matcher", "syncOperationalIngredientCostsFromInvoiceLines"]
+    },
+    {
+      "layer": "ingredient_match_override (in-memory)",
+      "scope": "session override for manual picks",
+      "written_by": ["applyManualIngredientCorrection → rememberIngredientMatchOverride"],
+      "read_by": ["canonical matcher"]
+    },
+    {
+      "layer": "rejected-ingredient-matches (localStorage)",
+      "scope": "wrong pair memory — blocks re-match only",
+      "key": "marginly:rejected-ingredient-matches:{userId}",
+      "written_by": ["rejectIngredientMatchPair → rememberRejectedIngredientMatch"],
+      "read_by": ["isIngredientMatchPairRejected in ingredient-canonical matcher"],
+      "note": "Does NOT remove alias rows; traceAliasUnmatchOrphan documents orphan alias risk"
+    },
+    {
+      "layer": "rejectedMatchItemIds (React session Set)",
+      "scope": "suppress match presentation for a row id",
+      "written_by": ["rejectIngredientMatchSuggestion (session only)", "cleared on successful rematch"],
+      "read_by": ["resolveIngredientCorrectionUiState"]
+    },
+    {
+      "layer": "ingredient_price_history + ingredients.current_price (Supabase)",
+      "scope": "cost side-effect of match",
+      "written_by": [
+        "persistOperationalIngredientCostFromInvoiceLine",
+        "syncOperationalIngredientCostsFromInvoiceLines (post-extract)",
+        "persistIngredientCorrectionForItem (manual confirm/pick)"
+      ],
+      "read_by": ["OI", "alerts", "ingredient detail", "purchase memory"]
+    }
+  ],
+  "flows": {
+    "A_auto_match_on_extract": {
+      "trigger": "Invoice OCR/extraction completes; invoice_items inserted",
+      "entry": "src/routes/invoices.tsx — post-insert syncOperationalIngredientCostsFromInvoiceLines (~line 1358)",
+      "matcher": "resolveInvoiceTableRowIngredientMatch per line",
+      "alias_write": false,
+      "cost_write": true,
+      "conditions": "Runs for displayState confirmed OR suggested (skips only unmatched bucket)",
+      "evidence": {
+        "file": "src/lib/ingredient-operational-intelligence.ts",
+        "function": "syncOperationalIngredientCostsFromInvoiceLines",
+        "skip_condition": "invoiceRowMatchSummaryBucket(state.displayState) === 'unmatched'"
+      },
+      "match_fields_persisted": {
+        "invoice_item_id": "stored in invoice_items only",
+        "ingredient_id": "NOT on invoice_items — implied by matcher at sync time",
+        "match_type": "NOT persisted — match.kind ephemeral (e.g. exact, semantic, confirmed-alias)",
+        "match_confidence": "NOT persisted on invoice_items; alias.confidence written only on manual confirm",
+        "alias": "NOT written on auto extract sync",
+        "supplier_linkage": "supplier_name on invoice + ingredient_price_history row"
+      },
+      "pepino_evidence": {
+        "bidfood_line": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+        "live_match_kind": "exact",
+        "displayState": "confirmed",
+        "wouldSyncOnExtract": true,
+        "price_history_row": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+        "alias_for_pepino_alone": false,
+        "note": "Contamination persisted via extract cost sync without user confirm or alias for 'Pepino'"
+      }
+    },
+    "B_manual_change_match": {
+      "trigger": "User opens picker via 'Correct match' chip or unmatched picker; selects different ingredient",
+      "ui_entry": [
+        "InvoiceIngredientCorrectionPicker.onSelect → handleSelectCorrectionIngredient",
+        "IngredientCorrectionActions 'Correct match' → openIngredientCorrection (same picker)"
+      ],
+      "backend_chain": [
+        "handleSelectCorrectionIngredient: if previousIngredientId !== ingredientId → rejectIngredientMatchPair(old)",
+        "selectIngredientForItem → persistIngredientCorrectionForItem",
+        "persistManualIngredientCorrection → applyManualIngredientCorrection + upsertConfirmedAlias",
+        "persistOperationalIngredientCostFromInvoiceLine (price history + ingredients update)",
+        "dispatchOperationalIngredientCostChanged"
+      ],
+      "match_fields_persisted": {
+        "invoice_item_id": "unchanged on invoice_items",
+        "ingredient_id": "via ingredient_aliases.ingredient_id for alias_name = invoice line text",
+        "match_type": "confirmed-alias / confirmed-override after persist",
+        "match_confidence": "MANUAL_CONFIRMATION_CONFIDENCE in operational alias memory; alias.confidence=10 on upsert",
+        "alias": "alias_name + normalized_alias + optional supplier_name",
+        "supplier_linkage": "supplier_name on alias row + price_history.supplier_name"
+      },
+      "wrong_match_on_change_only": "rejectIngredientMatchPair called only when picking a DIFFERENT ingredient — not when removing match entirely"
+    },
+    "C_create_new_ingredient_from_review": {
+      "trigger": "User clicks 'Create new ingredient' (shown when unmatched or suppressMatchPresentation)",
+      "ui_entry": "openCanonicalIngredientCreate → CanonicalIngredientCreateSheet → saveCanonicalIngredientFromInvoice",
+      "backend_chain": [
+        "saveCanonicalIngredientFromInvoiceRow",
+        "persistIngredientFromInvoiceItem (explicit_user only — inserts ingredients row)",
+        "persistIngredientCorrectionForItem (links line to new ingredient via alias)",
+        "persistOperationalIngredientCostFromInvoiceLine",
+        "dispatchOperationalIngredientCostChanged"
+      ],
+      "match_fields_persisted": {
+        "invoice_item_id": "unchanged",
+        "ingredient_id": "new ingredients.id + alias",
+        "match_type": "confirmed-alias after link",
+        "alias": "created for invoice line text → new ingredient",
+        "supplier_linkage": "on alias + price history"
+      }
+    },
+    "D_confirm_suggested_match": {
+      "trigger": "User clicks 'Confirm match' on suggested row",
+      "backend_chain": [
+        "confirmIngredientMatch → persistIngredientCorrectionForItem (alias-only path)",
+        "persistOperationalIngredientCostFromInvoiceLine",
+        "dispatchOperationalIngredientCostChanged"
+      ],
+      "note": "Same persist path as manual pick; writes alias + cost history"
+    }
+  },
+  "virtual_match_resolution": {
+    "resolver": "resolveInvoiceTableRowIngredientMatch",
+    "display_states": {
+      "confirmed": ["exact", "confirmed-override", "confirmed-alias", "operational-memory", "operational-alias"],
+      "suggested": ["semantic", "operational-equivalent"],
+      "unmatched": ["null match"]
+    },
+    "documentation": "src/lib/catalog-review-current-matches.ts lines 1-7"
+  }
+}

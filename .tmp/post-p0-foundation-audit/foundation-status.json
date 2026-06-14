@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-06-13T20:52:00.000Z",
+  "auditMode": "READ-ONLY",
+  "postP0IdentityGuard": true,
+  "deployVersion": 31,
+  "finalDecision": "FOUNDATION MOSTLY CLOSED",
+  "confidencePercent": 81,
+  "recommendation": "Continue Ingredient Identity work",
+  "pillars": {
+    "extraction": {
+      "status": "PARTIAL",
+      "confidencePercent": 83,
+      "label": "MOSTLY_CLOSED",
+      "evidence": [
+        "validation-lab-closure-audit: structural families closed v28–v31",
+        "Farina 95% stable on v31 (20-run)",
+        "Bidfood + Aviludo April CLOSED on v30 rerun",
+        "Residual: Gorgonzola GPT variance, Ginger Beer volume parse, GT Pomodor catalog"
+      ]
+    },
+    "invoicePersistence": {
+      "status": "PARTIAL",
+      "confidencePercent": 78,
+      "evidence": [
+        "VL live query: 51 invoice_items across 6 invoices",
+        "5/6 row counts match v31 extract artifacts",
+        "Emporio live ab52796d: 8 items, 0 price_history",
+        "4/6 invoices stale (items persisted before 2026-06-12)",
+        "Invoice header rows not returned in snapshot query (items + history present)"
+      ]
+    },
+    "rereadSafety": {
+      "status": "CLOSED",
+      "confidencePercent": 90,
+      "evidence": [
+        "vl-final-state-audit: mutex validated, empty-wipe prevented",
+        "DELETE-before-INSERT race fixed",
+        "Emporio 17aa3591 deletion = intentional manual removeRow, not extraction wipe"
+      ]
+    },
+    "ingredientMatching": {
+      "status": "PARTIAL",
+      "confidencePercent": 72,
+      "evidence": [
+        "historical-pricing-audit: 46/51 VL lines unmatched to catalog",
+        "32 ingredient_aliases in DB",
+        "Auto-persist guards exist; multi-format collapse still possible without P1 variants",
+        "P0 guard blocks false chains but does not fix match-time identity"
+      ]
+    },
+    "historicalPricing": {
+      "status": "PARTIAL",
+      "confidencePercent": 84,
+      "evidence": [
+        "Math pipeline trusted (82% pre-P0, unchanged)",
+        "P0 guard: 4/4 VL design cases pass",
+        "Raw DB: 14 ghost history rows, 2 non_equivalent_unit_chain rows (Mozzarella)",
+        "Read-path guard suppresses false movement; DB reconcile optional"
+      ]
+    },
+    "supplierIntelligence": {
+      "status": "PARTIAL",
+      "confidencePercent": 80,
+      "evidence": [
+        "Post-P0: mozzarella/pepino betterSupplierLine null",
+        "Supplier watchlist: no +1341% note (was poisoned pre-P0)",
+        "Structural: per-ingredient_id aggregation without pack_variant_id",
+        "P2 supplier_products needed for clean multi-supplier intel"
+      ]
+    },
+    "opportunities": {
+      "status": "PARTIAL",
+      "confidencePercent": 82,
+      "evidence": [
+        "Post-P0 OI replay: 0 price_increase/decrease alerts, 0 owner-review opps",
+        "Raw DB still stores poisoned deltas (provenFalseOpportunities in harness)",
+        "New writes guarded; stale rows filtered on read"
+      ]
+    },
+    "operationalIntelligence": {
+      "status": "PARTIAL",
+      "confidencePercent": 79,
+      "evidence": [
+        "Synthesis math sound; P0 guard wired in margin-alert-data, OI view, synthesis",
+        "Trusted: recipe margins, cost concentration, Atum +4.1% control chain",
+        "Untrusted: home / dashboard mock-data.ts",
+        "Stale DB + generic history names limit production enablement"
+      ]
+    }
+  },
+  "ingredientsPlusInvoicesFoundationClosed": false,
+  "reasonNotFullyClosed": [
+    "Identity architecture incomplete — P1 pack_variant_id not shipped",
+    "46/51 VL invoice lines unmatched — persist path incomplete",
+    "4/6 VL invoices DB stale vs v31 field values",
+    "20 price_history rows with 14 ghost + poisoned cross-format metadata",
+    "Mock home dashboard not connected to Supabase"
+  ],
+  "p0GuardImpact": {
+    "vlFalsePositivesSuppressed": true,
+    "mozzarella1341Alert": false,
+    "pepino99Alert": false,
+    "crossFormatSupplierRecs": false,
+    "gingerBeerInsertBlocked": true
+  }
+}

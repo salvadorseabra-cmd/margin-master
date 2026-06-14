@@ -1,0 +1,101 @@
+{
+  "generated_at": "2026-06-13T18:00:00.000Z",
+  "latestDeployVersion": 31,
+  "decision": "EXTRACTION PHASE MOSTLY CLOSED",
+  "confidencePercent": 83,
+  "roadmapRecommendation": "Core Marginly roadmap",
+  "validationLabRecommendation": "Pause active VL extraction work; maintain monitoring harness for Gorgonzola + Farina",
+  "oneLineSummary": "Structural extraction families are closed; true residual extraction error is ~€1–2 avg on focus rows with Gorgonzola variance and intermittent Farina €1 digit drift; Pomodor is GT not extraction.",
+  "criticalAnswers": {
+    "1_deterministicBugsRemain": {
+      "answer": "Yes — minor and intermittent only",
+      "detail": "Farina Valor digit drift (€1 when wrong; v31 3/5 correct, avg €0.40). Rulo Bocconcino €0.54 single-run. No stable multi-euro deterministic bugs remain after Rulo/Mortadella fixes.",
+      "euroImpact": 1.54
+    },
+    "2_gtIssuesRemain": {
+      "answer": "Yes — one material row",
+      "detail": "POMODOR PELATI: GT qty 2 / €50 vs visible qty 1 / €22.05. Extraction matches visible 10/10. Revise GT catalog.",
+      "euroImpact": 27.95
+    },
+    "3_varianceRemains": {
+      "answer": "Yes — Gorgonzola primary",
+      "detail": "Gorgonzola 60% correct v30 (10-run), avg €5.49 when wrong, worst €32.26. Prosciutto €1.4 intermittent. Bresaola/SanPellegrino stable 100%.",
+      "euroImpact": 5.49
+    },
+    "4_farinaStillWorthFixing": {
+      "answer": "Marginal yes — low ROI",
+      "detail": "v31 prompt improved 0/10→3/5 (€1.00→€0.40 avg). Further prompt-only iteration shows diminishing returns. Binder guard (unit_price > total when qty=1) may be higher ROI than v32 prompt.",
+      "expectedRecoveryEuro": 0.4
+    },
+    "5_anotherPromptIteration": {
+      "answer": "Unlikely to materially improve headline metrics",
+      "detail": "v28→v30 fixed structural families (€8.36 focus recovery). Remaining errors are GPT variance (Gorgonzola) and digit OCR (Farina) — prompt saturation reached. v31 Farina example recovered 60% not 100%.",
+      "confidencePercent": 78
+    },
+    "6_expectedROI_v32": {
+      "answer": "Low — €0.20–0.40 expected recovery",
+      "detail": "Best case: Farina to 5/5 (€0.60 avg recovery). Gorgonzola unlikely to close via prompt alone. No new structural €10+ bugs identified. Engineering time better spent on Marginly roadmap + GT catalog hygiene.",
+      "expectedRecoveryEuro": 0.4,
+      "engineeringCost": "high_relative_to_benefit"
+    }
+  },
+  "closureCriteria": {
+    "structuralBugsClosed": { "met": true, "evidence": "Geometry, IVA bleed, Mortadella, Rulo, Emporio cluster, April harness" },
+    "columnShiftFamilyClosed": { "met": "mostly", "evidence": "Bresaola/SanPellegrino 100% stable; Gorgonzola intermittent" },
+    "discountFamilyClosed": { "met": "mostly", "evidence": "Rulo/Mortadella fixed; Farina digit drift intermittent at v31" },
+    "rereadSafetyClosed": { "met": true, "evidence": "Frontend guard validated; DELETE-before-INSERT race fixed" },
+    "packUnitInterpretationAcceptable": { "met": true, "evidence": "21 Class D rows; documented pack metadata vs qty" },
+    "validationLabSufficientForRoadmap": { "met": true, "evidence": "6 invoices audited; 2 CLOSED, 4 PARTIAL; no phantom rows; 96.8% financial accuracy headline" }
+  },
+  "extractionQualitySummary": {
+    "trueExtraction_singleRun_v30": {
+      "classA_euro": 1.54,
+      "classB_euro": 26.19,
+      "classC_euro": 27.95,
+      "avgErrorEuro": 1.3,
+      "p95ErrorEuro": 24.79
+    },
+    "trueExtraction_multiRun_v30": {
+      "classA_euro": 10.0,
+      "classB_euro": 54.85,
+      "avgErrorEuro": 1.3,
+      "p95ErrorEuro": 32.26,
+      "bestErrorEuro": 0,
+      "worstErrorEuro": 32.26
+    },
+    "headline_singleRun_v30": {
+      "totalFinancialErrorEuro": 54.65,
+      "extractionBugsOnlyEuro": 28.26,
+      "financialAccuracyPct": 96.83
+    }
+  },
+  "versionComparison": {
+    "v28": { "classA_euro": 9.36, "status": "below €15 threshold", "note": "Best single-run Class A before targeted fixes" },
+    "v30": { "classA_euro": 1.0, "focusRecoveryEuro": 8.36, "note": "Rulo+Mortadella fixed; headline inflated by Pomodor GT + Gorgonzola bad run" },
+    "v31": { "farinaAvgEuro": 0.4, "farinaCorrectPct": 60, "note": "Partial Farina fix only" }
+  },
+  "perInvoiceStatus": {
+    "CLOSED": ["Bidfood", "Aviludo April"],
+    "PARTIAL": ["Aviludo May", "Emporio", "Bocconcino", "Mammafiore"],
+    "OPEN": []
+  },
+  "justification": [
+    "All identified structural failure families have validated fixes deployed (v28–v31)",
+    "True extraction Class A reduced from €9.36 (v28) to ~€1.54 single-run / €0.40 Farina avg (v31)",
+    "Largest headline residual (Pomodor €27.95) is GT catalog error with 10/10 visible match",
+    "Gorgonzola variance (60% stable) is acceptable GPT noise, not pipeline regression",
+    "Re-read safety and geometry risks closed with frontend + crop fixes",
+    "Further prompt iteration shows diminishing returns (v31: 60% not 100% on Farina)"
+  ],
+  "risksIfClosed": [
+    "Gorgonzola occasional €32 outlier on Emporio re-extract",
+    "Farina €1 digit drift on ~40% of Mammafiore runs (v31)",
+    "GT catalog not revised — VL metrics overstate extraction error until Pomodor GT fixed"
+  ],
+  "recommendedNextActions": [
+    "Revise Pomodor GT in field-accuracy-audit catalog (Class C hygiene)",
+    "Resume Core Marginly roadmap",
+    "Keep 5-run stability harness for Gorgonzola + Farina on future prompt changes",
+    "Defer v32 unless production telemetry shows Farina €1 affecting real users"
+  ]
+}

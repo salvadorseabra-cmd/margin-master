@@ -1,0 +1,9 @@
+{
+  "status": 200,
+  "body": {
+    "supplier": null,
+    "invoice_date": null,
+    "total": null,
+    "items": []
+  }
+}

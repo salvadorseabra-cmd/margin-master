@@ -1,0 +1,120 @@
+{
+  "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+  "label": "Aviludo May",
+  "product": "Chocolate Culinaria Pantagruel 10x200 g",
+  "deployVersion": 25,
+  "generatedAt": "2026-06-12T23:55:00.000Z",
+  "visibleInvoice": {
+    "source": ".tmp/geometry-audit/images/3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.png",
+    "chocolateRow": {
+      "rowIndex": 6,
+      "artigo": 16796,
+      "qty": 2,
+      "embal": "CX",
+      "designacao": "Chocolate Culinaria Pantagruel 10x200 g",
+      "precoUnitario": "29,99",
+      "valorMercadoria": "59,98"
+    },
+    "acucarRowBelow": {
+      "rowIndex": 7,
+      "artigo": 16847,
+      "qty": 1,
+      "embal": "CX",
+      "designacao": "Acucar Branco METRO Chef 10x1 Kg",
+      "precoUnitario": "9,99",
+      "valorMercadoria": "9,99"
+    },
+    "layoutNote": "Preço Unitário 9,99 (Açúcar) vertically aligned directly under 29,99 (Chocolate) in dense METRO Chef table"
+  },
+  "stages": [
+    {
+      "stage": 1,
+      "name": "visible_invoice",
+      "chocolate": { "precoUnit": "29,99", "valor": "59,98", "qty": 2 },
+      "acucar": { "precoUnit": "9,99", "valor": "9,99", "qty": 1 },
+      "divergedFromGT": false
+    },
+    {
+      "stage": 2,
+      "name": "geometry_crop",
+      "result": {
+        "bounds": { "top": 218, "bottom": 448, "headerTop": 228, "cropHeight": 230 },
+        "bothRowsInCrop": true,
+        "fallbackUsed": false,
+        "source": ".tmp/geometry-audit/3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2-geometry.json"
+      },
+      "divergedFromGT": false
+    },
+    {
+      "stage": 3,
+      "name": "passC_gpt_extraction",
+      "gptStructuredOutput": {
+        "chocolate": {
+          "name": "Chocolate Culinaria Pantagruel 10x200 g",
+          "quantity": 2,
+          "unit": "cx",
+          "gross_unit_price": 9.99,
+          "line_total_net": 19.98,
+          "error": "gross_unit_price = Açúcar 9,99 not Chocolate 29,99"
+        },
+        "acucar": {
+          "quantity": 1,
+          "gross_unit_price": 9.99,
+          "line_total_net": 9.99,
+          "correct": true
+        }
+      },
+      "divergedFromGT": true,
+      "firstDivergence": true,
+      "note": "Error born here — GPT reads wrong Preço Unitário for Chocolate before binder"
+    },
+    {
+      "stage": 4,
+      "name": "binder_monetary",
+      "input": { "chocolate_gross_unit_price": 9.99, "qty": 2, "line_total_net": 19.98 },
+      "ruleB_triggered": false,
+      "ruleE_triggered": false,
+      "ruleE_skipReason": "2 × 9.99 = 19.98 — arithmetically consistent; neighbour bleed rule requires inconsistency",
+      "output": { "unit_price": 9.99, "total": 19.98 },
+      "qtyModified": false,
+      "priceCorrected": false,
+      "divergedFromGT": true,
+      "note": "Binder passes through Pass C error unchanged"
+    },
+    {
+      "stage": 5,
+      "name": "reconcile_finalize",
+      "qtyModified": false,
+      "totalModified": false,
+      "divergedFromGT": true
+    },
+    {
+      "stage": 6,
+      "name": "final_api_output",
+      "chocolate": { "qty": 2, "unit_price": 9.99, "total": 19.98 },
+      "acucar": { "qty": 1, "unit_price": 9.99, "total": 9.99 },
+      "financialErrorEuro": 40.0,
+      "divergedFromGT": true
+    }
+  ],
+  "acucarFixVsChocolateGap": {
+    "acucarPromptRule": "QUANTITY COLUMN ISOLATION — do not take leading digit of 9,99 as quantity",
+    "acucarBleedDirection": "price → qty (same row, horizontal)",
+    "chocolateBleedDirection": "row below price → row above gross_unit_price (vertical)",
+    "whyNotCovered": "Açúcar example fixes qty field only; no symmetric rule for gross_unit_price from adjacent rows"
+  },
+  "historicalTimeline": {
+    "passcImplementation_c33a7f1": { "chocolate": { "unit_price": 29.99, "total": 59.98 }, "acucar": { "qty": 9, "wrong": true } },
+    "passcRefinement": { "chocolate": { "unit_price": 29.99, "total": 59.98 }, "acucar": { "qty": 1, "fixed": true } },
+    "v25": { "chocolate": { "unit_price": 9.99, "total": 19.98, "regressed": true }, "acucar": { "qty": 1, "still_correct": true } }
+  },
+  "stability": {
+    "source": ".tmp/chocolate-pantagruel-audit/v25-chocolate-stability.json",
+    "runs": [
+      { "run": 1, "unit_price": 9.99, "total": 19.98, "financialErrorEuro": 40 },
+      { "run": 2, "unit_price": 9.99, "total": 19.98, "financialErrorEuro": 40 },
+      { "run": 3, "unit_price": 9.99, "total": 19.98, "financialErrorEuro": 40 }
+    ],
+    "stableWrong": "3/3 runs return 9.99 — systematic not variance"
+  }
+}

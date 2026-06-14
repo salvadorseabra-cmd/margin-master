@@ -1,0 +1,72 @@
+{
+  "generated_at": "2026-06-13T12:16:26.772Z",
+  "deployVersion": 28,
+  "groundTruth": {
+    "qty": 3.11,
+    "unit_price": 10.1,
+    "total": 31.07
+  },
+  "visible": {
+    "qty": 3.11,
+    "gross_unit": 11.1,
+    "discount_pct": 10,
+    "total": 31.07
+  },
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "elapsedMs": 16502,
+      "mortadella": {
+        "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio d. Bronte 1/2 - 3.5kg Produto de Stock",
+        "quantity": 3.11,
+        "unit": null,
+        "unit_price": 8.56,
+        "total": 26.66
+      },
+      "financialErrorEuro": 4.41,
+      "totalCorrect": false,
+      "appearsQtyTimesUnit": true
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "elapsedMs": 13594,
+      "mortadella": {
+        "name": "Rovagnati - Mortadella IGP 'Massima' con pistacchio 1/2 - 3,5Kg Produto de Stock",
+        "quantity": 3.11,
+        "unit": null,
+        "unit_price": 8.56,
+        "total": 26.65
+      },
+      "financialErrorEuro": 4.42,
+      "totalCorrect": false,
+      "appearsQtyTimesUnit": true
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "elapsedMs": 22500,
+      "mortadella": {
+        "name": "Rovagnati Mortadella IGP \"Massima\" con pistacchio 1/2 - 3,5kg Produto de Stock",
+        "quantity": 3.11,
+        "unit": null,
+        "unit_price": 8.88,
+        "total": 27.62
+      },
+      "financialErrorEuro": 3.45,
+      "totalCorrect": false,
+      "appearsQtyTimesUnit": true
+    }
+  ],
+  "summary": {
+    "perfectTotalRuns": "0/3",
+    "stabilityPercent": 0,
+    "totalUnique": [
+      26.66,
+      26.65,
+      27.62
+    ],
+    "avgFinancialErrorEuro": 4.09
+  }
+}

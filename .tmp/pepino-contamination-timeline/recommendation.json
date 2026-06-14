@@ -1,0 +1,55 @@
+{
+  "generated_at": "2026-06-14T08:52:00.000Z",
+  "executive_answer": "Pepino contamination was created BEFORE human review on the Pepino line — during first Bidfood extract on 2026-06-09, via automatic post-insert cost sync.",
+  "what_must_be_fixed_first_before_pack_variants": {
+    "answer": "Persistence workflow correction",
+    "confidence_percent": 89,
+    "rationale": [
+      "Pack Variants (P1) splits formats at catalog level but does NOT stop extract auto-sync writing poisoned history to shared ingredient_id before review",
+      "Pepino contamination persisted without alias and without user click — workflow gate is the first irreversible-write control point",
+      "Matching improvements alone are insufficient while syncOperationalIngredientCostsFromInvoiceLines writes on confirmed+exact without confirm"
+    ],
+    "minimum_workflow_fixes": [
+      "Gate extract cost sync to user-confirmed matches only (or suggested → pending)",
+      "Add Remove match + price_history cleanup for wrong confirmed matches",
+      "Remediate existing a689bd91 poison row for VL Pepino conserva"
+    ]
+  },
+  "next_work_ranking": [
+    {
+      "rank": 1,
+      "workstream": "Persistence workflow correction",
+      "priority": "P0",
+      "items": [
+        "Gate syncOperationalIngredientCostsFromInvoiceLines on extract",
+        "Remove match / No match UI + history cleanup",
+        "Demote high-risk exact matches to suggested pending confirm"
+      ],
+      "blocks": "All trustworthy costing on multi-format catalogs"
+    },
+    {
+      "rank": 2,
+      "workstream": "Matching improvements",
+      "priority": "P1",
+      "items": [
+        "Block exact promotion on preservation_class mismatch (fresh vs conserva)",
+        "Token-subset guard for catalog names with modifier tokens (conserva, seco, etc.)"
+      ],
+      "blocks": "Recurrence even after workflow gate if matcher still suggests wrong link"
+    },
+    {
+      "rank": 3,
+      "workstream": "Pack Variants P1",
+      "priority": "P1",
+      "items": [
+        "default_pack_variant on ingredients",
+        "Resolver adapter for recipe costing"
+      ],
+      "blocks": "Production-grade multi-format €/line after workflow+matcher prevent wrong links"
+    }
+  ],
+  "pack_variants_without_workflow_fix": {
+    "safe": false,
+    "reason": "Wrong-format lines can still auto-persist cost to parent ingredient_id on extract before variant resolution exists"
+  }
+}

@@ -1,0 +1,1520 @@
+{
+  "generated_at": "2026-06-13T22:44:13.222Z",
+  "unmatchedLines": [
+    {
+      "invoiceItemId": "a6715684-1af1-4772-83e6-d1d11b89c4ce",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Manteiga Coimbra s/Sal Emb 1 Kg",
+      "quantity": 8,
+      "unit": "kg",
+      "invoiceUnitPrice": 8.9,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "b8ba998e-3732-4f37-a9d2-420eacdc5ecf",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Abóbora Butternut",
+      "quantity": 5.42,
+      "unit": "kg",
+      "invoiceUnitPrice": 1.24,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "15386e78-2104-4e29-8f5c-e35ffce0140e",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Alho Francês",
+      "quantity": 5.42,
+      "unit": "kg",
+      "invoiceUnitPrice": 1.77,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "88ab20d7-44e6-49ad-9a0a-ae4e9c93d01f",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Courgettes",
+      "quantity": 3.3,
+      "unit": "kg",
+      "invoiceUnitPrice": 1.95,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "8fc5c197-7c18-4290-925e-1c0db4dc783e",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Pêra Abacate Hasse",
+      "quantity": 3.28,
+      "unit": "kg",
+      "invoiceUnitPrice": 5.32,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "15c59e65-31c0-4cfd-a1e9-f3ff763d57c7",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Hortelã",
+      "quantity": 0.5,
+      "unit": "kg",
+      "invoiceUnitPrice": 6.74,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "eaedd420-9f1f-4576-94a2-f9bf01eb3d59",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Manjericão",
+      "quantity": 5,
+      "unit": "mo",
+      "invoiceUnitPrice": 2.057,
+      "packageDescription": "inferred",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "d1c9e309-885c-4779-b6af-ead001f2c247",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Salada Ibérica FSTK EMB. 250g",
+      "quantity": 4,
+      "unit": "em",
+      "invoiceUnitPrice": 2.33,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "72053171-5ecc-418d-a1f0-ca7e6e885a0f",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Tomilho",
+      "quantity": 1,
+      "unit": "mo",
+      "invoiceUnitPrice": 2.06,
+      "packageDescription": "row_only",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "d144a9fc-04f5-42c3-981c-390d2db3d700",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "quantity": 1,
+      "unit": "cx",
+      "invoiceUnitPrice": 38.44,
+      "packageDescription": "row_only",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "e943b649-0555-433e-8eee-c59de763c5eb",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "quantity": 2.6,
+      "unit": "g",
+      "invoiceUnitPrice": 15.19,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "761f52d5-50a6-49e9-b301-8a1daeefb248",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": "g",
+      "invoiceUnitPrice": 2.35,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "366a3213-e4c5-46b9-9238-0d33fdbfbe8a",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello 1/8 - 1,85kg",
+      "quantity": 2,
+      "unit": "g",
+      "invoiceUnitPrice": 13.58,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "a9587078-a164-48c1-8be9-60107af001df",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+      "quantity": 4.3,
+      "unit": "g",
+      "invoiceUnitPrice": 8.5,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "80c88b2d-6e55-4a81-a046-a87bc28d3cb3",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5Kg",
+      "quantity": 3.11,
+      "unit": "g",
+      "invoiceUnitPrice": 9.99,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "d0865af8-97e6-4324-a652-82e25ee05f99",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "quantity": 2,
+      "unit": "ml",
+      "invoiceUnitPrice": 19.28,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "3ba29880-39c7-4d41-8217-5466bf96e437",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg",
+      "quantity": 1.83,
+      "unit": "g",
+      "invoiceUnitPrice": 27.04,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "67d21734-e307-4eab-98b6-c8c2db38ef0a",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 24,
+      "unit": "ml",
+      "invoiceUnitPrice": 0.85,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "b4464221-be95-45d7-8a11-39533e6294c5",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "quantity": 5.996,
+      "unit": "un",
+      "invoiceUnitPrice": 10.83,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "335c498e-66f5-4f58-a276-beec9a71426f",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "Rulo Di Capra 1kg*2 Simonetta",
+      "quantity": 1,
+      "unit": "un",
+      "invoiceUnitPrice": 10.86,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "5187d803-a0aa-448e-8565-d4e2348b9f1f",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "Recargo por combustibili",
+      "quantity": 1,
+      "unit": "un",
+      "invoiceUnitPrice": 2,
+      "packageDescription": "unit_count",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "b5baae1f-e648-48fd-9896-9c5126612a92",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "quantity": 1,
+      "unit": "un",
+      "invoiceUnitPrice": 30.11,
+      "packageDescription": "inferred",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "fedcd32e-f36f-4c66-82c3-1b9ba8286cf4",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "quantity": 10,
+      "unit": "un",
+      "invoiceUnitPrice": 20.03,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": "Mozzarella fior di latte",
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": {
+        "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+        "ingredientName": "Mozzarella fior di latte",
+        "confidencePercent": 77,
+        "kind": "expanded-family",
+        "canonicalIdentity": null,
+        "matchTier": "expanded-family"
+      },
+      "contaminationIfMatched": {
+        "wouldContaminate": true,
+        "signals": [
+          "A"
+        ],
+        "guardReasons": [
+          "pack_weight_magnitude"
+        ],
+        "breaksAgainst": [
+          {
+            "existingProduct": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+            "existingInvoice": "Bocconcino",
+            "guardReason": "pack_weight_magnitude",
+            "signals": [
+              "A"
+            ]
+          }
+        ],
+        "mozzarellaPepinoStyle": true
+      },
+      "autoMatchSafety": "UNSAFE"
+    },
+    {
+      "invoiceItemId": "c5903d22-7b3a-4bc6-83c3-a4b7897c694b",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "quantity": 1,
+      "unit": "un",
+      "invoiceUnitPrice": 15.55,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "dc251c05-201e-4e7d-b917-649358f42401",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "quantity": 24,
+      "unit": "un",
+      "invoiceUnitPrice": 1.07,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "cfd924c5-6c7e-4854-bff6-8cefb5d28b97",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "unit": "un",
+      "invoiceUnitPrice": 26.52,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "6028845c-6e80-44e8-b74f-e750b30fd19b",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "supplier": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "productName": "ROLO DE CABRA E VACA 1KG",
+      "quantity": 1,
+      "unit": "un",
+      "invoiceUnitPrice": 12.871,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "5693ba25-48f8-47c1-9951-1f0edcdc6d25",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "supplier": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "productName": "RICOTTA TREVIGIANA 1,5KG",
+      "quantity": 2,
+      "unit": "un",
+      "invoiceUnitPrice": 7.967,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "9914dbc6-e83e-4e43-9988-00c0d1f5728d",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "supplier": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "productName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "quantity": 2,
+      "unit": "un",
+      "invoiceUnitPrice": 23.795,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "0d74774f-1b30-4485-bca0-da9015bcf178",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "supplier": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "productName": "POMODORI PELATI (CX 2,5KG*6)",
+      "quantity": 1,
+      "unit": "un",
+      "invoiceUnitPrice": 22.05,
+      "packageDescription": "multi_unit_pack",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "b3188904-2087-4bcd-8ba4-b1067358a794",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "supplier": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "productName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "quantity": 2,
+      "unit": "un",
+      "invoiceUnitPrice": 27.306,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "07728ca8-ab8b-48ac-82a6-fbcbfcc0bdd1",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "supplier": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "productName": "STRACCIATELLA 250 GR",
+      "quantity": 24,
+      "unit": "un",
+      "invoiceUnitPrice": 3.11,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "6f416cf6-f172-4b72-809b-ff1a2dd3aabc",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "supplier": "AVILUDO",
+      "productName": "Filete de Anchovas Alconfirsta L1 495 g",
+      "quantity": 2,
+      "unit": "un",
+      "invoiceUnitPrice": 9.49,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    }
+  ],
+  "unsafePredictions": [
+    {
+      "invoiceItemId": "fedcd32e-f36f-4c66-82c3-1b9ba8286cf4",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "quantity": 10,
+      "unit": "un",
+      "invoiceUnitPrice": 20.03,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": "Mozzarella fior di latte",
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": {
+        "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+        "ingredientName": "Mozzarella fior di latte",
+        "confidencePercent": 77,
+        "kind": "expanded-family",
+        "canonicalIdentity": null,
+        "matchTier": "expanded-family"
+      },
+      "contaminationIfMatched": {
+        "wouldContaminate": true,
+        "signals": [
+          "A"
+        ],
+        "guardReasons": [
+          "pack_weight_magnitude"
+        ],
+        "breaksAgainst": [
+          {
+            "existingProduct": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+            "existingInvoice": "Bocconcino",
+            "guardReason": "pack_weight_magnitude",
+            "signals": [
+              "A"
+            ]
+          }
+        ],
+        "mozzarellaPepinoStyle": true
+      },
+      "autoMatchSafety": "UNSAFE"
+    }
+  ],
+  "safePredictions": [],
+  "noPrediction": [
+    {
+      "invoiceItemId": "a6715684-1af1-4772-83e6-d1d11b89c4ce",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Manteiga Coimbra s/Sal Emb 1 Kg",
+      "quantity": 8,
+      "unit": "kg",
+      "invoiceUnitPrice": 8.9,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "b8ba998e-3732-4f37-a9d2-420eacdc5ecf",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Abóbora Butternut",
+      "quantity": 5.42,
+      "unit": "kg",
+      "invoiceUnitPrice": 1.24,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "15386e78-2104-4e29-8f5c-e35ffce0140e",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Alho Francês",
+      "quantity": 5.42,
+      "unit": "kg",
+      "invoiceUnitPrice": 1.77,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "88ab20d7-44e6-49ad-9a0a-ae4e9c93d01f",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Courgettes",
+      "quantity": 3.3,
+      "unit": "kg",
+      "invoiceUnitPrice": 1.95,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "8fc5c197-7c18-4290-925e-1c0db4dc783e",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Pêra Abacate Hasse",
+      "quantity": 3.28,
+      "unit": "kg",
+      "invoiceUnitPrice": 5.32,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "15c59e65-31c0-4cfd-a1e9-f3ff763d57c7",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Hortelã",
+      "quantity": 0.5,
+      "unit": "kg",
+      "invoiceUnitPrice": 6.74,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "eaedd420-9f1f-4576-94a2-f9bf01eb3d59",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Manjericão",
+      "quantity": 5,
+      "unit": "mo",
+      "invoiceUnitPrice": 2.057,
+      "packageDescription": "inferred",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "d1c9e309-885c-4779-b6af-ead001f2c247",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Salada Ibérica FSTK EMB. 250g",
+      "quantity": 4,
+      "unit": "em",
+      "invoiceUnitPrice": 2.33,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "72053171-5ecc-418d-a1f0-ca7e6e885a0f",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Tomilho",
+      "quantity": 1,
+      "unit": "mo",
+      "invoiceUnitPrice": 2.06,
+      "packageDescription": "row_only",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "d144a9fc-04f5-42c3-981c-390d2db3d700",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "supplier": "Bidfood Portugal",
+      "productName": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "quantity": 1,
+      "unit": "cx",
+      "invoiceUnitPrice": 38.44,
+      "packageDescription": "row_only",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "e943b649-0555-433e-8eee-c59de763c5eb",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "quantity": 2.6,
+      "unit": "g",
+      "invoiceUnitPrice": 15.19,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "761f52d5-50a6-49e9-b301-8a1daeefb248",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": "g",
+      "invoiceUnitPrice": 2.35,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "366a3213-e4c5-46b9-9238-0d33fdbfbe8a",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello 1/8 - 1,85kg",
+      "quantity": 2,
+      "unit": "g",
+      "invoiceUnitPrice": 13.58,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "a9587078-a164-48c1-8be9-60107af001df",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+      "quantity": 4.3,
+      "unit": "g",
+      "invoiceUnitPrice": 8.5,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "80c88b2d-6e55-4a81-a046-a87bc28d3cb3",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5Kg",
+      "quantity": 3.11,
+      "unit": "g",
+      "invoiceUnitPrice": 9.99,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "d0865af8-97e6-4324-a652-82e25ee05f99",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "quantity": 2,
+      "unit": "ml",
+      "invoiceUnitPrice": 19.28,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "3ba29880-39c7-4d41-8217-5466bf96e437",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg",
+      "quantity": 1.83,
+      "unit": "g",
+      "invoiceUnitPrice": 27.04,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "67d21734-e307-4eab-98b6-c8c2db38ef0a",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "supplier": "Emporio Italia",
+      "productName": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 24,
+      "unit": "ml",
+      "invoiceUnitPrice": 0.85,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "b4464221-be95-45d7-8a11-39533e6294c5",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "quantity": 5.996,
+      "unit": "un",
+      "invoiceUnitPrice": 10.83,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "335c498e-66f5-4f58-a276-beec9a71426f",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "Rulo Di Capra 1kg*2 Simonetta",
+      "quantity": 1,
+      "unit": "un",
+      "invoiceUnitPrice": 10.86,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "5187d803-a0aa-448e-8565-d4e2348b9f1f",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "Recargo por combustibili",
+      "quantity": 1,
+      "unit": "un",
+      "invoiceUnitPrice": 2,
+      "packageDescription": "unit_count",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "b5baae1f-e648-48fd-9896-9c5126612a92",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "quantity": 1,
+      "unit": "un",
+      "invoiceUnitPrice": 30.11,
+      "packageDescription": "inferred",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "c5903d22-7b3a-4bc6-83c3-a4b7897c694b",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "quantity": 1,
+      "unit": "un",
+      "invoiceUnitPrice": 15.55,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "dc251c05-201e-4e7d-b917-649358f42401",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "quantity": 24,
+      "unit": "un",
+      "invoiceUnitPrice": 1.07,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "cfd924c5-6c7e-4854-bff6-8cefb5d28b97",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "supplier": "Mammafiore Portugal",
+      "productName": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "unit": "un",
+      "invoiceUnitPrice": 26.52,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "6028845c-6e80-44e8-b74f-e750b30fd19b",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "supplier": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "productName": "ROLO DE CABRA E VACA 1KG",
+      "quantity": 1,
+      "unit": "un",
+      "invoiceUnitPrice": 12.871,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "5693ba25-48f8-47c1-9951-1f0edcdc6d25",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "supplier": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "productName": "RICOTTA TREVIGIANA 1,5KG",
+      "quantity": 2,
+      "unit": "un",
+      "invoiceUnitPrice": 7.967,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "9914dbc6-e83e-4e43-9988-00c0d1f5728d",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "supplier": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "productName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "quantity": 2,
+      "unit": "un",
+      "invoiceUnitPrice": 23.795,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "0d74774f-1b30-4485-bca0-da9015bcf178",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "supplier": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "productName": "POMODORI PELATI (CX 2,5KG*6)",
+      "quantity": 1,
+      "unit": "un",
+      "invoiceUnitPrice": 22.05,
+      "packageDescription": "multi_unit_pack",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "b3188904-2087-4bcd-8ba4-b1067358a794",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "supplier": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "productName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "quantity": 2,
+      "unit": "un",
+      "invoiceUnitPrice": 27.306,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "07728ca8-ab8b-48ac-82a6-fbcbfcc0bdd1",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "supplier": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "productName": "STRACCIATELLA 250 GR",
+      "quantity": 24,
+      "unit": "un",
+      "invoiceUnitPrice": 3.11,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    },
+    {
+      "invoiceItemId": "6f416cf6-f172-4b72-809b-ff1a2dd3aabc",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "supplier": "AVILUDO",
+      "productName": "Filete de Anchovas Alconfirsta L1 495 g",
+      "quantity": 2,
+      "unit": "un",
+      "invoiceUnitPrice": 9.49,
+      "packageDescription": "weight_or_volume",
+      "currentPersisted": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "kind": null,
+        "confidencePercent": 0,
+        "reason": null
+      },
+      "predictedMatch": null,
+      "contaminationIfMatched": null,
+      "autoMatchSafety": "NO_PREDICTION"
+    }
+  ],
+  "summary": {
+    "unmatched": 33,
+    "wouldMatch": 1,
+    "wouldContaminate": 1,
+    "wouldStayClean": 0
+  }
+}

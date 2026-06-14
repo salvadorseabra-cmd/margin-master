@@ -1,0 +1,96 @@
+{
+  "generated_at": "2026-06-13T22:34:50.112Z",
+  "auditQuestion": "How widespread is Ingredient Identity contamination on VL?",
+  "mozzarellaPepinoIsolated": true,
+  "contaminationVerdict": "PROVEN_CASES_ONLY_IN_VL_SAMPLE — STRUCTURAL_ARCHITECTURE_RISK",
+  "totalCatalogIngredients": 9,
+  "ingredientsWithPurchases": 9,
+  "ingredientsWithMultiPurchase": 9,
+  "ingredientsWithPriceHistory": 9,
+  "totalContaminated": 2,
+  "confidenceCounts": {
+    "HIGH": 2,
+    "MEDIUM": 0,
+    "LOW": 0
+  },
+  "safeForPricingHistory": 7,
+  "unsafeForPricingHistory": 2,
+  "safeIngredients": [
+    {
+      "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+      "ingredientName": "Arroz agulha",
+      "purchaseCount": 2,
+      "reason": "2 purchases — all P0 guard pairs compatible"
+    },
+    {
+      "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+      "ingredientName": "Nata culinária",
+      "purchaseCount": 2,
+      "reason": "2 purchases — all P0 guard pairs compatible"
+    },
+    {
+      "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+      "ingredientName": "Anchoas",
+      "purchaseCount": 2,
+      "reason": "2 purchases — all P0 guard pairs compatible"
+    },
+    {
+      "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+      "ingredientName": "Açúcar branco",
+      "purchaseCount": 2,
+      "reason": "2 purchases — all P0 guard pairs compatible"
+    },
+    {
+      "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+      "ingredientName": "Atum em óleo",
+      "purchaseCount": 2,
+      "reason": "2 purchases — all P0 guard pairs compatible"
+    },
+    {
+      "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+      "ingredientName": "Gema líquida",
+      "purchaseCount": 2,
+      "reason": "2 purchases — all P0 guard pairs compatible"
+    },
+    {
+      "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+      "ingredientName": "Chocolate culinária",
+      "purchaseCount": 2,
+      "reason": "2 purchases — all P0 guard pairs compatible"
+    }
+  ],
+  "provenContaminated": [
+    "Pepino conserva",
+    "Mozzarella fior di latte"
+  ],
+  "largestFoundationRisk": {
+    "question": "Is Ingredient Identity contamination the largest remaining foundation risk?",
+    "answer": "YES",
+    "confidencePercent": 88,
+    "rationale": [
+      "Only 2 HIGH-confidence contaminated ingredients in VL (Mozzarella, Pepino) — 100% of P0-guard-broken multi-format chains",
+      "P0 guard suppresses OI false positives but does not fix catalog collapse or ingredient-panel purchase fallback",
+      "46/51 invoice lines unmatched — contamination latent until persist improves",
+      "Extraction pipeline mostly closed; identity is dominant blocker per post-p0-foundation-audit"
+    ]
+  },
+  "movementWatchlist": [
+    {
+      "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+      "ingredientName": "Atum em óleo",
+      "note": "P0 guard compatible — large invoice unit_price spread may be real price change, not identity collapse",
+      "purchaseA": "Aviludo May",
+      "purchaseB": "Aviludo April",
+      "signals": [
+        "F"
+      ]
+    }
+  ],
+  "p0GuardCoverage": {
+    "blocksOiAlerts": true,
+    "blocksIngredientPanelFallback": false,
+    "rawDbStillPoisoned": true,
+    "ghostHistoryRows": 14
+  },
+  "headline": "2/9 VL multi-purchase ingredients contaminated today (Mozzarella, Pepino). Problem is STRUCTURAL — 100% of P0-guard-broken chains are identity collapse, not isolated data errors."
+}

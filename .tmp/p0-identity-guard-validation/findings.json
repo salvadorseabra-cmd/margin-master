@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-06-13T20:50:31.920Z",
+  "guardModule": "src/lib/ingredient-price-chain-guard.ts",
+  "designRulesVersion": "P0-v1",
+  "unitTests": {
+    "passed": true,
+    "file": "ingredient-price-chain-guard.test.ts"
+  },
+  "vlGuardCases": [
+    {
+      "id": "TC-MOZZARELLA",
+      "compatible": false,
+      "expected": false
+    },
+    {
+      "id": "TC-PEPINO",
+      "compatible": false,
+      "expected": false
+    },
+    {
+      "id": "TC-GINGER-BEER",
+      "blocked": true,
+      "expected": true
+    },
+    {
+      "id": "TC-ATUM-TRUSTED",
+      "compatible": true,
+      "expected": true
+    }
+  ],
+  "vlFailureChecks": {
+    "mozzarella1341pctAlert": false,
+    "pepino99pctDecreaseAlert": false,
+    "gingerBeerAbsurdEurPerLiterInOi": false,
+    "crossFormatOwnerReviewOpportunity": false,
+    "crossFormatSupplierRecommendation": false,
+    "supplierWatchlistFalseSpike": false,
+    "gingerBeerPersistBlocked": true,
+    "mozzarellaAlertsCount": 0,
+    "pepinoAlertsCount": 0,
+    "ownerReviewOpportunitiesCount": 0,
+    "priceIncreaseAlerts": 0,
+    "priceDecreaseAlerts": 0,
+    "mozzarellaIntel": {
+      "spikeVs3MoPct": null,
+      "spikeMonthlyEur": null,
+      "betterSupplierLine": null,
+      "stabilityLine": null
+    },
+    "pepinoIntel": {
+      "spikeVs3MoPct": null,
+      "spikeMonthlyEur": null,
+      "betterSupplierLine": null,
+      "stabilityLine": null
+    }
+  },
+  "historicalPricing": {
+    "status": "PARTIAL",
+    "confidencePercent": 82,
+    "note": "Read-path guard does not rewrite stale DB rows; math pipeline trusted"
+  },
+  "operationalIntelligence": {
+    "status": "PARTIAL",
+    "confidencePercent": 82,
+    "productionSafeToday": false,
+    "note": "VL identity-collapse outputs suppressed; mock dashboard + stale Jun-11 DB remain"
+  },
+  "packVariantRequiredP1": true,
+  "recommendation": "Continue Identity (P1 pack variants) — P0 guard closes VL false positives on read/write paths"
+}

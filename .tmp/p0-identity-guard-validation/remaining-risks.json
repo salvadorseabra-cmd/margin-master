@@ -1,0 +1,40 @@
+{
+  "generated_at": "2026-06-13T20:50:31.920Z",
+  "risks": [
+    {
+      "id": "R-DB-STALE",
+      "severity": "medium",
+      "class": "stale_db",
+      "description": "14/20 VL price_history rows are ghost/stale from Jun 11 extractions",
+      "mitigation": "VL re-read + optional reconcileIngredientPriceHistoryChain backfill"
+    },
+    {
+      "id": "R-GENERIC-NAME",
+      "severity": "medium",
+      "class": "metadata_loss",
+      "description": "History rows store catalog ingredient_name, not invoice line name — guard relies on unit + price ratio heuristics",
+      "mitigation": "P1 pack_variant_id + line-name snapshot on append"
+    },
+    {
+      "id": "R-GINGER-PARSE",
+      "severity": "low",
+      "class": "volume_parse",
+      "description": "Ginger Beer 0.20cl unmatched; R7 blocks insert if matched but cl→ml parse still wrong",
+      "mitigation": "Orthogonal extraction fix + R7"
+    },
+    {
+      "id": "R-MOCK-DASHBOARD",
+      "severity": "low",
+      "class": "mock_dashboard",
+      "description": "Home / dashboard still uses mock-data.ts",
+      "mitigation": "Wire or hide mock KPIs (out of P0 scope)"
+    },
+    {
+      "id": "R-PACK-VARIANT",
+      "severity": "high",
+      "class": "identity_architecture",
+      "description": "Multi-supplier intel without false positives needs per-variant history",
+      "mitigation": "P1 Pack Variant architecture"
+    }
+  ]
+}

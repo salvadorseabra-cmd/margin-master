@@ -1,0 +1,119 @@
+{
+  "generated_at": "2026-06-12T23:14:32.843Z",
+  "deployVersion": 26,
+  "vlStatus": "OPEN",
+  "invoiceStatusBreakdown": {
+    "closed": 1,
+    "partial": 1,
+    "open": 4
+  },
+  "global": {
+    "invoicesAudited": 6,
+    "fieldAccuracy": 82.65,
+    "quantityAccuracy": 84.23,
+    "financialAccuracy": 87.91,
+    "financialErrorEuro": 220.27,
+    "rowsFullyCorrect": 22,
+    "rowsFullyCorrectPct": 43.14,
+    "phantomRows": 0
+  },
+  "baselineComparison": {
+    "beforeC33": {
+      "fieldAccuracy": 89.41,
+      "quantityAccuracy": 93.75,
+      "financialErrorEuro": 181.24
+    },
+    "afterRefinement": {
+      "fieldAccuracy": 91.8,
+      "quantityAccuracy": 93.75,
+      "financialErrorEuro": 66.34
+    },
+    "fieldAccuracyAudit": {
+      "overallFieldAccuracyLenient": 95,
+      "rowsFullyCorrectPct": 72.55
+    },
+    "v25Rerun": {
+      "fieldAccuracy": 64.13,
+      "quantityAccuracy": 65.77,
+      "financialErrorEuro": 389.97
+    },
+    "now_v26": {
+      "fieldAccuracy": 82.65,
+      "quantityAccuracy": 84.23,
+      "financialErrorEuro": 220.27
+    }
+  },
+  "remainingErrorEuro": 220.27,
+  "structuralFamilies": {
+    "column_shift_or_price": 18,
+    "quantity": 7,
+    "discount_or_column_shift": 4
+  },
+  "perInvoiceSummary": [
+    {
+      "label": "Bidfood",
+      "status": "CLOSED",
+      "fieldAccuracy": 97.73,
+      "qtyAccuracy": 100,
+      "financialErrorEuro": 0,
+      "itemCount": 11,
+      "rowsFullyCorrectPct": 81.82
+    },
+    {
+      "label": "Aviludo May",
+      "status": "PARTIAL",
+      "fieldAccuracy": 93.75,
+      "qtyAccuracy": 87.5,
+      "financialErrorEuro": 0,
+      "itemCount": 8,
+      "rowsFullyCorrectPct": 62.5
+    },
+    {
+      "label": "Aviludo April",
+      "status": "OPEN",
+      "fieldAccuracy": 86.11,
+      "qtyAccuracy": 100,
+      "financialErrorEuro": 169.08,
+      "itemCount": 9,
+      "rowsFullyCorrectPct": 33.33
+    },
+    {
+      "label": "Emporio",
+      "status": "OPEN",
+      "fieldAccuracy": 71.88,
+      "qtyAccuracy": 75,
+      "financialErrorEuro": 11.99,
+      "itemCount": 8,
+      "rowsFullyCorrectPct": 25
+    },
+    {
+      "label": "Bocconcino",
+      "status": "OPEN",
+      "fieldAccuracy": 71.43,
+      "qtyAccuracy": 42.86,
+      "financialErrorEuro": 38.2,
+      "itemCount": 7,
+      "rowsFullyCorrectPct": 28.57
+    },
+    {
+      "label": "Mammafiore",
+      "status": "OPEN",
+      "fieldAccuracy": 75,
+      "qtyAccuracy": 100,
+      "financialErrorEuro": 1,
+      "itemCount": 8,
+      "rowsFullyCorrectPct": 12.5
+    }
+  ],
+  "deltaVsV25": {
+    "fieldAccuracy": 18.52,
+    "quantityAccuracy": 18.46,
+    "financialErrorEuro": -169.7
+  },
+  "notes": [
+    "April harness: normalize b64 data URL (fixes false 0-item regression)",
+    "Chocolate v26: row-isolation monetary prompt deployed",
+    "Emporio discount rows: GT gross vs visible net",
+    "Pomodor GT qty mismatch vs visible invoice"
+  ]
+}

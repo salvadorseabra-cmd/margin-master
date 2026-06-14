@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-06-12T22:05:00.000Z",
+  "implementation": "Pass C prompt hardening in invoice-table-extraction.ts only",
+  "validationStatus": "BLOCKED_LOCAL — OPENAI_API_KEY not configured for local serve; hardened prompt not deployed to VL",
+  "baseline": {
+    "source": ".tmp/emporio-discount-column-audit/discount-accuracy.json",
+    "v23Run1": {
+      "prosciutto": { "qty": 4.3, "unit": 10.6, "total": 45.58, "discount": "MISSING" },
+      "mortadella": { "qty": 3.11, "unit": 11.1, "total": 34.52, "discount": "MISSING" },
+      "ventricina": { "qty": 2.6, "unit": 17.5, "total": 45.5, "discount": "BLEED" }
+    }
+  },
+  "afterHardening": {
+    "localServe": { "status": 500, "reason": "OPENAI_API_KEY not configured" },
+    "vlSingleRunPreDeploy": {
+      "note": "VL v23 still on pre-hardening prompt — GPT variance, not validation of this change",
+      "prosciutto": { "qty": 4.3, "unit": 8.72, "total": 37.46, "inferredDiscount": "LIKELY_PRESENT" },
+      "mortadella": { "qty": 3.1, "unit": 10, "total": 31, "inferredDiscount": "LIKELY_PRESENT" },
+      "ventricina": { "qty": 2.6, "unit": 9.98, "total": 25.78, "inferredDiscount": "PARTIAL" }
+    }
+  },
+  "references": {
+    "vlGt": {
+      "prosciutto": { "qty": 4.3, "unit": 8.17, "total": 35.14 },
+      "mortadella": { "qty": 3.11, "unit": 10.1, "total": 31.07 },
+      "ventricina": { "qty": 2.6, "unit": 16.6, "total": 39.49 }
+    },
+    "visible": {
+      "prosciutto": { "qty": 4.3, "gross": 10.3, "discount": 17.5, "total": 36.54 }
+    }
+  },
+  "expectedIfDiscountExtracted": {
+    "source": "binder simulation with gross 10.3, discount 17.5, net 36.54",
+    "prosciutto": { "unit": 8.5, "total": 36.54 },
+    "deltaVsVisible": 0,
+    "deltaVsVlGt": 1.4
+  },
+  "financialDelta": {
+    "baselineWorstProsciuttoVsGt": 10.44,
+    "vlPreDeployProsciuttoVsGt": 2.32,
+    "visibleProsciuttoTarget": 36.54
+  },
+  "nextStep": "Deploy extract-invoice to VL or run local extractTableItemsFromImage with OPENAI_API_KEY; re-run 2-3 invokes on focus rows"
+}

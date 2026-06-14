@@ -1,0 +1,128 @@
+{
+  "generated_at": "2026-06-12T23:25:38.387Z",
+  "deployVersion": 27,
+  "deployVersionOk": true,
+  "baseline": {
+    "v26FinancialErrorEuro": 220.27,
+    "v26FieldAccuracy": 82.65,
+    "aprilFixedEuro": 169.08,
+    "expectedResidualEuro": 51.19
+  },
+  "v27Actual": {
+    "financialErrorEuro": 64.25,
+    "fieldAccuracy": 82.84,
+    "deltaVsExpected": 13.06
+  },
+  "sumCheck": {
+    "v26TotalEuro": 220.27,
+    "aprilFixEuro": 169.08,
+    "theoreticalPostAprilEuro": 51.19,
+    "v27MeasuredEuro": 64.25,
+    "runVarianceEuro": 13.06,
+    "decomposition": {
+      "extractionBugsEuro": 34.9,
+      "gtIssuesEuro": 29.35,
+      "sum": 64.25,
+      "accountsFor100Pct": true
+    },
+    "note": "€64.25 = €34.90 extraction + €29.35 GT; +€13.06 vs €51.19 is Emporio run variance + Pomodor reclassification"
+  },
+  "perInvoice": [
+    {
+      "label": "Bidfood",
+      "financialErrorEuro": 0,
+      "fieldAccuracy": 95.45,
+      "status": "CLOSED"
+    },
+    {
+      "label": "Aviludo May",
+      "financialErrorEuro": 0,
+      "fieldAccuracy": 93.75,
+      "status": "PARTIAL"
+    },
+    {
+      "label": "Aviludo April",
+      "financialErrorEuro": 0,
+      "fieldAccuracy": 100,
+      "status": "CLOSED"
+    },
+    {
+      "label": "Emporio",
+      "financialErrorEuro": 30.44,
+      "fieldAccuracy": 56.25,
+      "status": "OPEN"
+    },
+    {
+      "label": "Bocconcino",
+      "financialErrorEuro": 27.95,
+      "fieldAccuracy": 71.43,
+      "status": "OPEN"
+    },
+    {
+      "label": "Mammafiore",
+      "financialErrorEuro": 5.86,
+      "fieldAccuracy": 71.88,
+      "status": "PARTIAL"
+    }
+  ],
+  "remainingExtractionBugs": [
+    {
+      "label": "Emporio",
+      "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+      "euro": 13.56
+    },
+    {
+      "label": "Emporio",
+      "product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+      "euro": 10
+    },
+    {
+      "label": "Mammafiore",
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "euro": 4.86
+    },
+    {
+      "label": "Emporio",
+      "product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "euro": 4.7
+    },
+    {
+      "label": "Mammafiore",
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "euro": 1
+    },
+    {
+      "label": "Emporio",
+      "product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+      "euro": 0.78
+    },
+    {
+      "label": "Bocconcino",
+      "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "euro": 0
+    },
+    {
+      "label": "Bocconcino",
+      "product": "RICOTTA TREVIGIANA 1,5KG",
+      "euro": 0
+    }
+  ],
+  "remainingGtIssues": [
+    {
+      "label": "Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "euro": 27.95
+    },
+    {
+      "label": "Emporio",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "euro": 1.4
+    }
+  ],
+  "projectedIfBugsFixed": {
+    "fieldAccuracyPct": 84.8,
+    "financialErrorEuro": 29.35,
+    "note": "Removes extraction-bug € only; GT/catalog mismatches remain"
+  },
+  "vlStatus": "OPEN"
+}

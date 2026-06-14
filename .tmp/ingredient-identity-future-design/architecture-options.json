@@ -1,0 +1,216 @@
+{
+  "generated_at": "2026-06-13T20:00:00.000Z",
+  "mode": "READ-ONLY_DESIGN",
+  "scoringScale": "1 (poor) – 5 (excellent)",
+  "vlEvidenceBaseline": {
+    "mozzarellaFalseInflation": "+1341% (Bocconcino €0.95/piece → Aviludo €13.69/2kg), OI shows €744/mo false opportunity",
+    "pepinoFalseDeflation": "-99.95% (conserva jar → fresh kg), OI shows -100% opportunity",
+    "gingerBeerVolume": "0.20cl → €575/L if matched without SKU disambiguation",
+    "oiProductionSafe": false,
+    "historicalPricingStatus": "PARTIAL",
+    "extractionPhase": "MOSTLY_CLOSED (v31, 83%)"
+  },
+  "options": [
+    {
+      "id": "A",
+      "name": "Single ingredient_id only (status quo)",
+      "description": "One ingredients row holds name, current_price, purchase_quantity, base_unit. All history, recipes, OI keyed on ingredient_id.",
+      "scores": {
+        "correctness": 1,
+        "complexity": 5,
+        "migrationCost": 5,
+        "recipeImpact": 5,
+        "opportunities": 1,
+        "supplierIntelligence": 1,
+        "futureScalability": 1,
+        "weightedTotal": 2.0
+      },
+      "solvesVLFailures": {
+        "mozzarella": false,
+        "pepino": false,
+        "gingerBeer": false,
+        "aliasContamination": false
+      },
+      "verdict": "REJECT — proven production failures"
+    },
+    {
+      "id": "B",
+      "name": "Ingredient + Pack Variant",
+      "description": "ingredients = culinary concept; ingredient_pack_variants hold purchase contract (pq, base_unit, current_price). History and invoice match resolve to pack_variant_id. Recipes bind to concept with optional preferred_variant_id.",
+      "scores": {
+        "correctness": 4,
+        "complexity": 4,
+        "migrationCost": 3,
+        "recipeImpact": 4,
+        "opportunities": 4,
+        "supplierIntelligence": 3,
+        "futureScalability": 3,
+        "weightedTotal": 3.6
+      },
+      "solvesVLFailures": {
+        "mozzarella": true,
+        "pepino": true,
+        "gingerBeer": "partial — needs volume token on variant label",
+        "aliasContamination": "partial — alias → variant_id helps"
+      },
+      "gaps": [
+        "No explicit supplier-product dimension — same variant label from two suppliers collides",
+        "Supplier switch intel still heuristic without product layer"
+      ],
+      "verdict": "VIABLE Phase 1 foundation — insufficient alone for multi-supplier product intelligence"
+    },
+    {
+      "id": "C",
+      "name": "Ingredient + Supplier Product",
+      "description": "ingredients = concept; supplier_products = (supplier_id, concept_id, commercial_description). Single price per product — pack format embedded in product row.",
+      "scores": {
+        "correctness": 3,
+        "complexity": 3,
+        "migrationCost": 3,
+        "recipeImpact": 4,
+        "opportunities": 3,
+        "supplierIntelligence": 4,
+        "futureScalability": 3,
+        "weightedTotal": 3.3
+      },
+      "solvesVLFailures": {
+        "mozzarella": "partial — Bocconcino vs Aviludo split by supplier product, but piece vs block same supplier still collides",
+        "pepino": true,
+        "gingerBeer": true,
+        "aliasContamination": true
+      },
+      "gaps": [
+        "Pack format changes (case vs unit) require new supplier_product row",
+        "History equivalence still ambiguous when one product has multiple purchase formats"
+      ],
+      "verdict": "GOOD for supplier naming — incomplete for pack-format equivalence"
+    },
+    {
+      "id": "D",
+      "name": "Ingredient + Supplier Product + Pack Variant",
+      "description": "Three-level: concept → supplier_product (who sells what SKU) → pack_variant (how it is bought: pq, base_unit, price). price_history keyed on pack_variant_id. Aliases map invoice text → supplier_product or pack_variant.",
+      "scores": {
+        "correctness": 5,
+        "complexity": 3,
+        "migrationCost": 2,
+        "recipeImpact": 4,
+        "opportunities": 5,
+        "supplierIntelligence": 5,
+        "futureScalability": 4,
+        "weightedTotal": 4.0
+      },
+      "solvesVLFailures": {
+        "mozzarella": true,
+        "pepino": true,
+        "gingerBeer": true,
+        "aliasContamination": true
+      },
+      "verdict": "STRONG practical target — balances correctness and deliverability"
+    },
+    {
+      "id": "E",
+      "name": "Ingredient Concept + Product Layer + Pack Variant Layer",
+      "description": "Explicit culinary concept (recipe ontology) separate from commercial product identity and purchase pack contract. Adds equivalence_groups for substitutable variants, form_dimension (fresh/preserved/processed), and forecasting hooks. Supplier product optional cross-supplier canonical product bridge.",
+      "scores": {
+        "correctness": 5,
+        "complexity": 2,
+        "migrationCost": 1,
+        "recipeImpact": 5,
+        "opportunities": 5,
+        "supplierIntelligence": 5,
+        "futureScalability": 5,
+        "weightedTotal": 4.1
+      },
+      "solvesVLFailures": {
+        "mozzarella": true,
+        "pepino": true,
+        "gingerBeer": true,
+        "aliasContamination": true
+      },
+      "extensions": [
+        "equivalence_groups for recipe substitution without false price chain",
+        "form_dimension blocks fresh↔preserved matching",
+        "canonical_product bridge for same SKU multiple distributors",
+        "forecasting_time_series per pack_variant_id"
+      ],
+      "verdict": "RECOMMENDED north-star — implement via phased path that lands D first, then E extensions"
+    }
+  ],
+  "recommendedArchitecture": {
+    "choice": "E",
+    "practicalDeliveryPath": "E via D-core phases (Phase 0 guard → Phase 1 B-layer → Phase 2 D-layer → Phase 3 E extensions)",
+    "confidencePercent": 84,
+    "justification": [
+      "VL proves single-ID collapse poisons OI (+1341%, -100%, €744/mo false opportunity) — status quo (A) is disqualified",
+      "B fixes pack-format chaining but not supplier-product intelligence requirements",
+      "D satisfies all 7 design requirements with acceptable complexity",
+      "E adds equivalence_groups and form ontology needed for forecasting and prep substitution without false deltas",
+      "Phased delivery avoids big-bang migration; Phase 0 guard stops bleeding before schema work"
+    ],
+    "whyNotA": "Proven false opportunities in production OI replay",
+    "whyNotBAlone": "Multi-supplier same-SKU and supplier switch intel need product layer",
+    "whyNotCAlone": "Pack format equivalence still breaks without variant layer",
+    "whyDvsE": "D is sufficient for production trust; E extensions (equivalence, form, forecast) are Phase 3 not launch blockers"
+  },
+  "targetEntityModel": {
+    "layers": [
+      {
+        "entity": "ingredient_concept",
+        "role": "Recipe costing anchor, menu ontology, prep leaf reference",
+        "mapsFrom": "ingredients (today)",
+        "keyFields": ["id", "name", "normalized_name", "ingredient_kind", "form_family", "default_pack_variant_id"]
+      },
+      {
+        "entity": "supplier_product",
+        "role": "Commercial SKU identity per supplier",
+        "keyFields": ["id", "ingredient_concept_id", "supplier_name", "supplier_sku", "description_normalized", "is_active"]
+      },
+      {
+        "entity": "pack_variant",
+        "role": "Purchase contract — sole key for price_history",
+        "keyFields": ["id", "supplier_product_id", "label", "purchase_quantity", "purchase_unit", "base_unit", "current_price", "contract_hash", "volume_ml_per_unit"]
+      },
+      {
+        "entity": "equivalence_group",
+        "role": "Optional substitutable set for recipes and supplier switch (E extension)",
+        "keyFields": ["id", "ingredient_concept_id", "substitution_policy"]
+      }
+    ],
+    "historyRule": "price_history.pack_variant_id NOT NULL; previous_price chains only within same pack_variant_id",
+    "aliasRule": "ingredient_aliases → (supplier_product_id | pack_variant_id) + format snapshot at confirm time",
+    "recipeRule": "recipe_ingredients.ingredient_concept_id + optional pack_variant_id override; sub_recipe_id unchanged"
+  },
+  "vlFailureResolution": {
+    "mozzarella": {
+      "today": "2a99cecd single ID; Bocconcino tray vs Aviludo 2kg block chained",
+      "future": "One concept 'Mozzarella fior di latte'; two supplier_products; two pack_variants (piece-tray pq=10, block pq=2000g); history never crosses variants",
+      "oiImpact": "Opportunity compares block-to-block only; supplier watch shows real +4% not +1341%"
+    },
+    "pepino": {
+      "today": "635a1189 'Pepino conserva' absorbs fresh 'Pepino' kg line",
+      "future": "Two concepts OR one concept with form_dimension=preserved vs fresh blocking match; separate pack_variants; alias cannot cross form",
+      "oiImpact": "No -100% false decrease"
+    },
+    "gingerBeer": {
+      "today": "0.20cl parsed as 2ml; unmatched",
+      "future": "pack_variant.volume_ml_per_unit=200 (20cl) required for beverage; OCR disambiguation creates variant before match; extraction guard rejects implausible ml/unit",
+      "oiImpact": "€/L computed on correct volume contract"
+    },
+    "aliasContamination": {
+      "today": "alias → ingredient_id without pack context",
+      "future": "alias → pack_variant_id with confirmed contract_hash; re-match creates new variant instead of overwriting"
+    }
+  },
+  "recipeAndPrepImpact": {
+    "recipeCosting": "Recipes bind to ingredient_concept; costing uses default_pack_variant or explicit variant on line. Cascading cost unchanged for sub_recipe_id graph.",
+    "prepSubRecipes": "Prep batches remain recipes(id) referenced by sub_recipe_id; leaf lines use concept_id. Prep cost rolls up from variant prices on leaf pack_variants.",
+    "cascading": "recipe-merge walk unchanged structurally; resolveOperationalIngredientCost reads variant price not concept aggregate",
+    "migrationUX": "Existing recipe_ingredients keep working via default_pack_variant backfill per concept"
+  },
+  "supplierIntelligenceImpact": {
+    "perIngredient": "Aggregate across equivalence_group members only",
+    "perProduct": "supplier_product level spend, stability, switch candidates",
+    "perVariant": "price_history deltas, opportunities, forecasting series",
+    "vlFix": "AVILUDO +1341% note becomes block-variant +2% or format_change flag, not spike"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-06-13T20:00:00.000Z",
+  "recommendedArchitecture": "E — Ingredient Concept + Supplier Product + Pack Variant (+ equivalence extensions)",
+  "deliveryPath": "Phase 0 guard → B (variants) → D (supplier products) → E (equivalence/form)",
+  "confidencePercent": 84,
+  "finalQuestions": {
+    "1_isIdentityHighestLeverage": {
+      "question": "Is Ingredient Identity truly the highest-leverage remaining foundation problem?",
+      "answer": "YES",
+      "confidencePercent": 83,
+      "evidence": [
+        "OI replay: Mozzarella €744/mo false opportunity, AVILUDO +1341% supplier watch",
+        "Historical pricing PARTIAL despite sound math — input identity collapse",
+        "Extraction MOSTLY CLOSED (83%); stale DB and identity are now dominant blockers",
+        "Ginger Beer, GT Pomodor, GPT tails are narrower or harness-only"
+      ]
+    },
+    "2_recipeCostingBeforeIdentity": {
+      "question": "Can recipe costing be safely built before new identity architecture?",
+      "answer": "PARTIALLY — yes for single-format catalogs; NO for multi-supplier production",
+      "confidencePercent": 78,
+      "detail": "Recipe graph (sub_recipe_id XOR) is sound. Costing math works when one pack format per concept. VL proves last-write-wins on ingredients.current_price corrupts costing when formats mix (Mozzarella catalog shows €13.69 block while Bocconcino history at €0.95/piece). Safe for pilot with manual catalog hygiene; not safe at scale without P1 variants."
+    },
+    "3_minimumBeforeOI": {
+      "question": "Minimum identity improvements before enabling Historical Pricing / Opportunities / Supplier Intelligence?",
+      "answer": "P0 + P1 minimum; P2 for supplier intelligence",
+      "confidencePercent": 86,
+      "minimum": [
+        "P0: Cross-format history chain guard (blocks false ±100% signals)",
+        "P1: pack_variant_id on price_history + invoice match to variant",
+        "VL re-read to refresh stale rows",
+        "Ginger Beer volume guard before beverage SKUs"
+      ],
+      "forFullSupplierIntel": [
+        "P2: supplier_products layer",
+        "Alias → variant mapping with confirm UX"
+      ],
+      "doNotEnableBefore": [
+        "Opportunities on ingredients with >1 pack format history",
+        "Supplier switch recommendations without equivalence check"
+      ]
+    },
+    "4_whatToBuildNext": {
+      "question": "What should be built NEXT after this design?",
+      "answer": "Phase 0 cross-format history guard, then pack variant schema (P1)",
+      "confidencePercent": 88,
+      "ordered": [
+        "1. P0 history chain guard + OI format_change classification",
+        "2. P1 pack_variants + matching resolution + VL backfill",
+        "3. VL re-read (parallel)",
+        "4. P2 supplier_products + alias hardening",
+        "5. Ginger Beer volume parse",
+        "6. P3 equivalence_groups",
+        "7. P4 OI production enablement + dashboard wire"
+      ]
+    }
+  },
+  "vlEvidenceSummary": {
+    "mozzarella": "+1341% false inflation, €744/mo OI opportunity",
+    "pepino": "-99.95% / -100% false deflation",
+    "gingerBeer": "€575/L volume parse latent",
+    "oiStatus": "PARTIAL 76% — NOT production safe",
+    "extractionStatus": "MOSTLY_CLOSED 83%",
+    "ghostHistoryRows": "14/20"
+  },
+  "headline": "Adopt Option E as north-star; ship P0 guard immediately, then P1 pack variants and P2 supplier products. Do not enable production OI until identity-collapse cases are structurally impossible."
+}

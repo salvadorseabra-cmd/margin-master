@@ -1,0 +1,211 @@
+[
+  {
+    "scenario": "v24_run1_gross21",
+    "input": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "gross_unit_price": 21,
+      "discount_pct": null,
+      "line_total_net": null,
+      "unit_price": null,
+      "total": null
+    },
+    "output": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 21,
+      "total": 54.6
+    }
+  },
+  {
+    "scenario": "v24_run2_gross20_2",
+    "input": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "gross_unit_price": 20.2,
+      "discount_pct": null,
+      "line_total_net": null,
+      "unit_price": null,
+      "total": null
+    },
+    "output": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 20.2,
+      "total": 52.52
+    }
+  },
+  {
+    "scenario": "v24_run3_wrong_total",
+    "input": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "gross_unit_price": 16.6,
+      "discount_pct": null,
+      "line_total_net": 46.09,
+      "unit_price": null,
+      "total": null
+    },
+    "output": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 16.6,
+      "total": 46.09
+    }
+  },
+  {
+    "scenario": "v23_bleed_17_5_legacy",
+    "input": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "gross_unit_price": 16.6,
+      "discount_pct": null,
+      "line_total_net": null,
+      "unit_price": 17.5,
+      "total": 45.5
+    },
+    "output": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 16.6,
+      "total": 45.5
+    }
+  },
+  {
+    "scenario": "v23_bleed_structured",
+    "input": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "gross_unit_price": 16.6,
+      "discount_pct": 17.5,
+      "line_total_net": null,
+      "unit_price": 17.5,
+      "total": null
+    },
+    "output": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 13.7,
+      "total": 35.62
+    }
+  },
+  {
+    "scenario": "correct_structured",
+    "input": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "gross_unit_price": 16.6,
+      "discount_pct": 8.5,
+      "line_total_net": 39.49,
+      "unit_price": null,
+      "total": null
+    },
+    "output": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 15.19,
+      "total": 39.49
+    }
+  },
+  {
+    "scenario": "discount_null_total_correct",
+    "input": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "gross_unit_price": 16.6,
+      "discount_pct": null,
+      "line_total_net": 39.49,
+      "unit_price": null,
+      "total": null
+    },
+    "output": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 16.6,
+      "total": 39.49
+    }
+  },
+  {
+    "scenario": "8_5_as_gross",
+    "input": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "gross_unit_price": 8.5,
+      "discount_pct": null,
+      "line_total_net": null,
+      "unit_price": null,
+      "total": null
+    },
+    "output": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 8.5,
+      "total": 22.1
+    }
+  },
+  {
+    "scenario": "8_5_ruleB_bleed",
+    "input": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "gross_unit_price": 16.6,
+      "discount_pct": 8.5,
+      "line_total_net": 39.49,
+      "unit_price": 8.5,
+      "total": 39.49
+    },
+    "output": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 15.19,
+      "total": 39.49
+    }
+  },
+  {
+    "scenario": "prosciutto_neighbour_bleed",
+    "input": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "gross_unit_price": 16.6,
+      "discount_pct": 17.5,
+      "line_total_net": 39.49,
+      "unit_price": 17.5,
+      "total": 39.49
+    },
+    "output": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 13.7,
+      "total": 39.49
+    }
+  },
+  {
+    "scenario": "gross_only_no_discount",
+    "input": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "gross_unit_price": 16.6,
+      "discount_pct": null,
+      "line_total_net": null,
+      "unit_price": null,
+      "total": null
+    },
+    "output": {
+      "name": "Ventricina",
+      "quantity": 2.6,
+      "unit": null,
+      "unit_price": 16.6,
+      "total": 43.16
+    }
+  }
+]

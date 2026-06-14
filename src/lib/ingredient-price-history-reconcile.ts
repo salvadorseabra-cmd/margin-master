@@ -5,6 +5,10 @@ import {
   type IngredientPriceHistoryRow,
 } from "@/lib/ingredient-price-history";
 import {
+  deriveSnapshotFromHistoryRow,
+  purchaseContractsChainCompatible,
+} from "@/lib/ingredient-price-chain-guard";
+import {
   compareInvoiceChronologyAsc,
   resolveInvoiceChronology,
 } from "@/lib/invoice-chronology";
@@ -12,7 +16,7 @@ import {
 const LOG_PREFIX = "[ingredient_price_history_reconcile]";
 
 const CHAIN_SELECT =
-  "id,ingredient_id,invoice_id,previous_price,new_price,delta,delta_percent,created_at" as const;
+  "id,ingredient_id,invoice_id,ingredient_name,ingredient_unit,previous_price,new_price,delta,delta_percent,created_at" as const;
 
 export type ReconcileChainResult = {
   orphansDeleted: number;
@@ -160,12 +164,26 @@ export async function reconcileIngredientPriceHistoryChain(
     );
     result.linkedRowCount = linked.length;
 
-    let prevNew: number | null = null;
+    let prevRow: IngredientPriceHistoryRow | null = null;
     for (const row of linked) {
       const newPrice = numericOrNull(row.new_price);
       if (newPrice == null) continue;
 
-      const storedPrev = prevNew;
+      let storedPrev: number | null = null;
+      if (prevRow != null) {
+        const priorSnap = deriveSnapshotFromHistoryRow(
+          prevRow,
+          null,
+          row.ingredient_name,
+        );
+        priorSnap.operationalUnitPrice = numericOrNull(prevRow.new_price) ?? 0;
+        const nextSnap = deriveSnapshotFromHistoryRow(row);
+        nextSnap.operationalUnitPrice = newPrice;
+        if (purchaseContractsChainCompatible(priorSnap, nextSnap).compatible) {
+          storedPrev = numericOrNull(prevRow.new_price);
+        }
+      }
+
       const { delta, delta_percent } = computePriceHistoryDelta(storedPrev, newPrice);
 
       if (!chainFieldsMatch(row, storedPrev, delta, delta_percent)) {
@@ -187,7 +205,7 @@ export async function reconcileIngredientPriceHistoryChain(
         }
       }
 
-      prevNew = newPrice;
+      prevRow = row;
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

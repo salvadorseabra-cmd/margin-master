@@ -1,0 +1,193 @@
+{
+  "generated_at": "2026-06-12T00:01:47.947Z",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "product": "POMODOR PELATI (CX 2.5KG*6)",
+  "deployment": {
+    "vlVersion": 22,
+    "vlUpdatedAtUtc": "2026-06-11T23:35:30.577Z",
+    "ezbrSha256": "696a5e491cde5be17d68e399031ade81ce7bf7ab055c4941a06ae561090bb878",
+    "localHead": "de556e0",
+    "localHeadFull": "de556e0bd41a615cb0f727f9dfd3c648fb7db2a3",
+    "schemaEnforcementDeployed": false,
+    "schemaEnforcementLocalUncommitted": true,
+    "expectedVersion": "v23+",
+    "actualVersion": "v22",
+    "bundleMatchesV22": true,
+    "deployedComponents": {
+      "phase1HeaderAnchoredCrop": true,
+      "phase2StructuredMonetaryPrompt": true,
+      "phase3Binder": true,
+      "structuredContractEnforcement": false
+    }
+  },
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "elapsedMs": 14290,
+      "itemCount": 7,
+      "itemKeys": [
+        "name",
+        "quantity",
+        "unit",
+        "unit_price",
+        "total"
+      ],
+      "hasStructuredFieldsInApi": false,
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      }
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "elapsedMs": 14135,
+      "itemCount": 7,
+      "itemKeys": [
+        "name",
+        "quantity",
+        "unit",
+        "unit_price",
+        "total"
+      ],
+      "hasStructuredFieldsInApi": false,
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      }
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "elapsedMs": 15611,
+      "itemCount": 7,
+      "itemKeys": [
+        "name",
+        "quantity",
+        "unit",
+        "unit_price",
+        "total"
+      ],
+      "hasStructuredFieldsInApi": false,
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      }
+    },
+    {
+      "run": 4,
+      "status": 200,
+      "elapsedMs": 12172,
+      "itemCount": 7,
+      "itemKeys": [
+        "name",
+        "quantity",
+        "unit",
+        "unit_price",
+        "total"
+      ],
+      "hasStructuredFieldsInApi": false,
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      }
+    },
+    {
+      "run": 5,
+      "status": 200,
+      "elapsedMs": 13535,
+      "itemCount": 7,
+      "itemKeys": [
+        "name",
+        "quantity",
+        "unit",
+        "unit_price",
+        "total"
+      ],
+      "hasStructuredFieldsInApi": false,
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      }
+    }
+  ],
+  "summary": {
+    "deterministic": true,
+    "modalValues": {
+      "quantity": 1,
+      "unit_price": 22.05,
+      "total": 22.05
+    },
+    "structuredFieldsInApi": false,
+    "structuredFieldsPresent": "NO",
+    "binderReceivedStructured": "NO",
+    "binderInferenceConfidencePct": 90,
+    "qtyUnique": [1],
+    "unitPriceUnique": [22.05],
+    "totalUnique": [22.05],
+    "correctVsVlGt": 0,
+    "incorrectVsVlGt": 5,
+    "stabilityPctVsVlGt": 0
+  },
+  "baselines": {
+    "visibleInvoice": { "quantity": 1, "gross_unit_price": 27.56, "discount_pct": 20, "line_total_net": 22.05 },
+    "vlCatalogGt": { "quantity": 2, "unit_price": 25, "total": 50 },
+    "phase12v21": { "quantity": 1, "unit_price": 22.05, "total": 22.05 },
+    "phase3v22": { "quantity": 1, "unit_price": 22.05, "total": 22.05 }
+  },
+  "financialDelta": {
+    "vsVlGt": { "totalDelta": -27.95, "absTotalErrorEuro": 27.95 },
+    "vsV22": { "quantityDelta": 0, "unitPriceDelta": 0, "totalDelta": 0, "changed": false }
+  },
+  "remainingColumnShiftRows": [
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI",
+      "status": "OPEN",
+      "pattern": "VALOR_net_as_unit_and_total_qty1",
+      "euroImpactVsVlGt": 27.95
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati Prosciutto Cotto",
+      "status": "NOT_RETESTED",
+      "priorEuroImpact": 1.4
+    }
+  ],
+  "familyVerdict": {
+    "monetaryColumnBinding": "OPEN",
+    "reason": "Schema enforcement not deployed; v22 output unchanged; binder starved of structured GPT input",
+    "confidencePct": 92
+  }
+}

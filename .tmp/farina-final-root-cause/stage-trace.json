@@ -1,0 +1,115 @@
+{
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "label": "Mammafiore",
+  "product": "Farina Speciale pizza 25kg Amoruso",
+  "deployVersion": 30,
+  "firstFailingStage": "passC_table_extraction",
+  "stages": [
+    {
+      "stage": "visible_invoice",
+      "status": "PASS",
+      "fields": {
+        "qty": 1,
+        "pr_unitario": 33.154,
+        "desc_pct": 20,
+        "iva_pct": 6,
+        "valor": 26.52
+      },
+      "notes": "Manual transcription from invoice-full.png; Desc. 20,00% · Valor 26,52 printed clearly",
+      "evidence": [
+        ".tmp/mammafiore-investigation/invoice-full.png",
+        ".tmp/mammafiore-investigation/ocr-row-first.png",
+        ".tmp/mammafiore-line-audit/ground-truth.json"
+      ]
+    },
+    {
+      "stage": "geometry_crop",
+      "status": "PASS",
+      "notes": "Post-fix crop top=386 includes Farina row (mammafiore-investigation). Row-band OCR on correct region returns total 26.52.",
+      "evidence": [
+        ".tmp/mammafiore-investigation/ocr-table.json",
+        ".tmp/mammafiore-line-audit/pass-c-raw.json"
+      ]
+    },
+    {
+      "stage": "passC_gpt_structured",
+      "status": "FAIL",
+      "inferredPassCOutput": {
+        "quantity": 1,
+        "gross_unit_price": 33.154,
+        "discount_pct": 20,
+        "line_total_net": 25.52,
+        "inferenceMethod": "binder_replay_exact_match",
+        "inferenceConfidence": "high"
+      },
+      "fieldDiagnosis": {
+        "quantity": { "status": "PASS", "visible": 1, "extracted": 1 },
+        "gross_unit_price": { "status": "PASS", "visible": 33.154, "inferred": 33.154 },
+        "discount_pct": { "status": "PASS", "visible": 20, "inferred": 20 },
+        "line_total_net": {
+          "status": "FAIL",
+          "visible": 26.52,
+          "extracted": 25.52,
+          "failureType": "valor_digit_drift",
+          "digitError": "26 → 25 in euros digit of Valor column"
+        },
+        "iva_column": {
+          "status": "NOT_BLEED",
+          "visible": 6,
+          "extracted_total": 25.52,
+          "note": "Unlike Rulo (IVA 6,00 copied as total), Farina total is NOT 6.00"
+        }
+      },
+      "notes": "Pass C reads Pr. Unitário and Desc. correctly but misreads Valor 26,52 as 25,52. Binder derives unit_price=26.52 from gross+discount while preserving wrong line_total_net."
+    },
+    {
+      "stage": "binder_bindMonetaryColumns",
+      "status": "PASS_THROUGH_WRONG_TOTAL",
+      "input": {
+        "gross_unit_price": 33.154,
+        "discount_pct": 20,
+        "line_total_net": 25.52
+      },
+      "output": {
+        "unit_price": 26.52,
+        "total": 25.52
+      },
+      "notes": "Binder correctly derives net unit (33.154 × 0.80 = 26.52) but copies wrong line_total_net to total. No Rule B/E correction — arithmetic is internally inconsistent (unit > total) but not caught.",
+      "evidence": "Local deno replay — scenario gross+discount+wrong_valor"
+    },
+    {
+      "stage": "reconcile_normalize",
+      "status": "PASS",
+      "notes": "reconcileLineItemAmounts does not alter Farina total (discount-line-audit confirmed for Mammafiore discounted rows)"
+    },
+    {
+      "stage": "final_api_response",
+      "status": "FAIL",
+      "output": {
+        "quantity": 1,
+        "unit_price": 26.52,
+        "total": 25.52
+      },
+      "financialErrorEuro": 1
+    }
+  ],
+  "mathTrace": {
+    "visibleValor": 26.52,
+    "extractedTotal": 25.52,
+    "deltaEuro": 1,
+    "formula": "|26.52 − 25.52| = 1.00",
+    "discountCheck": "33.154 × (1 − 0.20) = 26.5232 ≈ 26.52 — confirms visible Valor is net after 20% discount",
+    "wrongTotalNotFrom": [
+      "IVA column (would be 6.00)",
+      "Desc column (would be 20 as unit_price)",
+      "qty×gross without discount (would be 33.15)",
+      "25% discount math (33.154 × 0.75 = 24.87)"
+    ]
+  },
+  "comparisonToRuloFix": {
+    "ruloFailure": "IVA 6,00 copied as line_total_net instead of Valor 10,86",
+    "farinaFailure": "Valor digit drift 26,52 → 25,52; IVA column NOT involved",
+    "v30RuloStatus": "FIXED — MAMMAFIORE COLUMN ISOLATION prompt added for Rulo example",
+    "farinaGap": "No Farina-specific Valor digit example; PRICE ACCURACY generic rule insufficient for stable 26→25 drift"
+  }
+}

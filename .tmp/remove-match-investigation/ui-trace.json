@@ -1,0 +1,104 @@
+{
+  "generated_at": "2026-06-13T22:55:00.000Z",
+  "primary_route": "src/routes/invoices.tsx",
+  "table_component": "ItemsTable (inline, ~line 2846+)",
+  "components": {
+    "match_label_chip": {
+      "component": "InvoiceIngredientCorrectionPicker",
+      "file": "src/components/invoice-ingredient-correction-picker.tsx",
+      "label_format": "formatMatchTargetLabel(buildMatchTargetLabel(...)) → prefix 'Matched to:' + ingredient name",
+      "prop": "matchLabel",
+      "readonly_when_closed": true,
+      "opens_dropdown_on_click": true
+    },
+    "dropdown_picker": {
+      "component": "InvoiceIngredientCorrectionPicker",
+      "options": "ingredientPickerOptions — full catalog sorted A-Z",
+      "no_match_option": false,
+      "empty_state": "CommandEmpty: 'No ingredient found.'",
+      "onSelect": "handleSelectCorrectionIngredient(item, ingredientId, rawName)"
+    },
+    "confirm_match_button": {
+      "component": "IngredientCorrectionActions",
+      "file": "src/components/invoice-ingredient-correction.tsx",
+      "label": "Confirm match",
+      "visible_when": "resolveIngredientCorrectionUiState.showConfirm (suggested match, not rejected)",
+      "handler": "onConfirmIngredientMatch → confirmIngredientMatch → persistIngredientCorrectionForItem"
+    },
+    "correct_match_link": {
+      "component": "IngredientCorrectionActions",
+      "label": "Correct match",
+      "visible_when": "showCorrectionTrigger (confirmed, suggested, unmatched, or picker state)",
+      "handler": "onOpenCorrection → openIngredientCorrection → sets editingMatchRowId, opens same picker"
+    },
+    "create_new_ingredient_button": {
+      "location": "ItemsTable row actions (~line 3437)",
+      "label": "Create new ingredient",
+      "visible_when": "unmatchedIngredient OR correctionUi.suppressMatchPresentation",
+      "handler": "onCreateIngredient → openCanonicalIngredientCreate"
+    }
+  },
+  "ui_state_machine": {
+    "resolver": "resolveIngredientCorrectionUiState (ingredient-correction-memory.ts)",
+    "states": {
+      "suggested_not_rejected": {
+        "showConfirm": true,
+        "showWrongMatch": true,
+        "showPicker": false,
+        "suppressMatchPresentation": false
+      },
+      "confirmed": {
+        "showConfirm": false,
+        "showWrongMatch": true,
+        "showPicker": false,
+        "suppressMatchPresentation": false
+      },
+      "unmatched": {
+        "showConfirm": false,
+        "showWrongMatch": false,
+        "showPicker": true,
+        "suppressMatchPresentation": false
+      },
+      "rejected_item_id": {
+        "showConfirm": false,
+        "showWrongMatch": false,
+        "showPicker": true,
+        "suppressMatchPresentation": true
+      }
+    },
+    "gap": "No state or action for 'remove match / no match' without selecting another ingredient"
+  },
+  "dropdown_vs_correct_match": {
+    "same_operation_on_select": true,
+    "analysis": "NOT duplicate persist paths. 'Correct match' is a link that opens the same InvoiceIngredientCorrectionPicker dropdown. Selecting an ingredient always calls handleSelectCorrectionIngredient → onSelectIngredientForItem → persistIngredientCorrectionForItem. 'Confirm match' is a separate one-click path for suggested rows only (skips picker).",
+    "divergence_points": [
+      {
+        "action": "Confirm match",
+        "path": "confirmIngredientMatch",
+        "reject_old_pair": false,
+        "writes_alias": true,
+        "writes_price_history": true
+      },
+      {
+        "action": "Picker select (from Correct match or unmatched picker)",
+        "path": "handleSelectCorrectionIngredient → selectIngredientForItem",
+        "reject_old_pair": true,
+        "condition": "only if previousIngredientId exists and differs",
+        "writes_alias": true,
+        "writes_price_history": true
+      },
+      {
+        "action": "Correct match link alone",
+        "path": "openIngredientCorrection only",
+        "persist": false
+      }
+    ]
+  },
+  "pepino_ui_scenario": {
+    "displayState": "confirmed",
+    "match_kind": "exact",
+    "visible_actions": ["Correct match (opens picker)", "Matched to: Pepino conserva chip"],
+    "not_visible": ["Confirm match", "Create new ingredient"],
+    "user_cannot": "Clear match without picking another catalog ingredient"
+  }
+}

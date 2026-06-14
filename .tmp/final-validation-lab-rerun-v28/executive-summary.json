@@ -1,0 +1,223 @@
+{
+  "generated_at": "2026-06-12T23:59:58.139Z",
+  "deployVersion": 28,
+  "deployVerified": true,
+  "vlStatus": "PARTIAL",
+  "invoiceStatusBreakdown": {
+    "closed": 2,
+    "partial": 1,
+    "open": 3
+  },
+  "global": {
+    "invoicesAudited": 6,
+    "fieldAccuracy": 81.77,
+    "quantityAccuracy": 82.44,
+    "financialAccuracy": 98.05,
+    "financialErrorEuro": 38.91,
+    "rowsFullyCorrect": 26,
+    "rowsFullyCorrectPct": 50.98,
+    "phantomRows": 0,
+    "extractionBugsOnlyEuro": 9.36,
+    "gtIssuesOnlyEuro": 29.35,
+    "gptVarianceEuro": 0,
+    "extractionBugsBelow15Euro": true
+  },
+  "keyQuestion": {
+    "extractionBugsOnlyEuro": 9.36,
+    "below15EuroThreshold": true,
+    "answer": "YES — Class A extraction bugs below €15"
+  },
+  "classificationSummary": {
+    "A_extraction_bugs": {
+      "count": 3,
+      "euro": 9.36
+    },
+    "B_gt_issues": {
+      "count": 2,
+      "euro": 29.35
+    },
+    "C_gpt_variance": {
+      "count": 0,
+      "euro": 0
+    },
+    "D_business_interpretation": {
+      "count": 20
+    }
+  },
+  "baselineComparison": {
+    "beforeC33": {
+      "fieldAccuracy": 89.41,
+      "quantityAccuracy": 93.75,
+      "financialErrorEuro": 181.24
+    },
+    "afterRefinement": {
+      "fieldAccuracy": 91.8,
+      "quantityAccuracy": 93.75,
+      "financialErrorEuro": 66.34
+    },
+    "v26": {
+      "fieldAccuracy": 82.65,
+      "quantityAccuracy": 84.23,
+      "financialErrorEuro": 220.27
+    },
+    "v27": {
+      "fieldAccuracy": 82.84,
+      "financialErrorEuro": 64.25
+    },
+    "v28": {
+      "fieldAccuracy": 81.77,
+      "quantityAccuracy": 82.44,
+      "financialErrorEuro": 38.91
+    }
+  },
+  "deltaVsV27": {
+    "financialErrorEuro": -25.34,
+    "fieldAccuracy": -1.07
+  },
+  "deltaVsV26": {
+    "financialErrorEuro": -181.36
+  },
+  "perInvoiceSummary": [
+    {
+      "label": "Bidfood",
+      "status": "CLOSED",
+      "fieldAccuracy": 97.73,
+      "qtyAccuracy": 100,
+      "financialErrorEuro": 0,
+      "rowsFullyCorrectPct": 81.82,
+      "wrongRowCount": 2
+    },
+    {
+      "label": "Aviludo May",
+      "status": "PARTIAL",
+      "fieldAccuracy": 93.75,
+      "qtyAccuracy": 87.5,
+      "financialErrorEuro": 0,
+      "rowsFullyCorrectPct": 75,
+      "wrongRowCount": 2
+    },
+    {
+      "label": "Aviludo April",
+      "status": "CLOSED",
+      "fieldAccuracy": 100,
+      "qtyAccuracy": 100,
+      "financialErrorEuro": 0,
+      "rowsFullyCorrectPct": 88.89,
+      "wrongRowCount": 1
+    },
+    {
+      "label": "Emporio",
+      "status": "OPEN",
+      "fieldAccuracy": 59.38,
+      "qtyAccuracy": 50,
+      "financialErrorEuro": 5.1,
+      "rowsFullyCorrectPct": 12.5,
+      "wrongRowCount": 7
+    },
+    {
+      "label": "Bocconcino",
+      "status": "OPEN",
+      "fieldAccuracy": 67.86,
+      "qtyAccuracy": 57.14,
+      "financialErrorEuro": 27.95,
+      "rowsFullyCorrectPct": 14.29,
+      "wrongRowCount": 6
+    },
+    {
+      "label": "Mammafiore",
+      "status": "OPEN",
+      "fieldAccuracy": 71.88,
+      "qtyAccuracy": 100,
+      "financialErrorEuro": 5.86,
+      "rowsFullyCorrectPct": 12.5,
+      "wrongRowCount": 7
+    }
+  ],
+  "topRemainingErrors": [
+    {
+      "rank": 1,
+      "invoice": "Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "euro": 27.95,
+      "class": "B"
+    },
+    {
+      "rank": 2,
+      "invoice": "Mammafiore",
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "euro": 4.86,
+      "class": "A"
+    },
+    {
+      "rank": 3,
+      "invoice": "Emporio",
+      "product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+      "euro": 3.5,
+      "class": "A"
+    },
+    {
+      "rank": 4,
+      "invoice": "Emporio",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "euro": 1.4,
+      "class": "B"
+    },
+    {
+      "rank": 5,
+      "invoice": "Mammafiore",
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "euro": 1,
+      "class": "A"
+    },
+    {
+      "rank": 6,
+      "invoice": "Bidfood",
+      "product": "Manjericão",
+      "euro": 0,
+      "class": "D"
+    },
+    {
+      "rank": 7,
+      "invoice": "Bidfood",
+      "product": "Abóbora Butternut",
+      "euro": 0,
+      "class": "D"
+    },
+    {
+      "rank": 8,
+      "invoice": "Aviludo May",
+      "product": "Filete de Anchoas Alcofinosa L4 495 g",
+      "euro": 0,
+      "class": "D"
+    },
+    {
+      "rank": 9,
+      "invoice": "Aviludo May",
+      "product": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+      "euro": 0,
+      "class": "D"
+    },
+    {
+      "rank": 10,
+      "invoice": "Aviludo April",
+      "product": "Mozzarella Flor di Latte 2Kg",
+      "euro": 0,
+      "class": "D"
+    },
+    {
+      "rank": 11,
+      "invoice": "Emporio",
+      "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+      "euro": 0,
+      "class": "D"
+    },
+    {
+      "rank": 12,
+      "invoice": "Emporio",
+      "product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "euro": 0,
+      "class": "D"
+    }
+  ],
+  "closureRecommendation": "PARTIAL CLOSURE — Class A extraction bugs €9.36 (< €15); fix GT (Pomodor €27.95) and Mammafiore/Mortadella discount lines for full financial closure"
+}

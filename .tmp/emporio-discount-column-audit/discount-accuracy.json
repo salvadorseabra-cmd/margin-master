@@ -1,0 +1,123 @@
+{
+  "generated_at": "2026-06-12T02:30:00.000Z",
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "deployment": { "version": 23 },
+  "method": "v23 live invoke (2 runs) + historical audits; discount_pct never exposed in API — inferred from arithmetic patterns and column-shift history",
+  "discountColumnVisible": {
+    "inFullInvoice": true,
+    "inRowCrop": true,
+    "inPassCTableCropHeaders": false,
+    "xRange": { "x0": 548, "x1": 612 },
+    "header": "Desc.(%)",
+    "valueFormat": "plain decimal without % symbol (e.g. 17,50 not 17,50%)",
+    "source": "column-selection-deep-dive/column-reconstruction.json"
+  },
+  "confusionChecks": {
+    "taxColumnIVA23": {
+      "column": "imposto",
+      "xRange": "392-438",
+      "confusedWithDiscount": false,
+      "note": "IVA23 is text label in separate column left of qty"
+    },
+    "lotesExpiry": {
+      "column": "lotes",
+      "xRange": "52-108",
+      "value": "03-12-2026",
+      "confusedWithDiscount": false
+    },
+    "discountBleedToUnit": {
+      "observed": true,
+      "examples": [
+        "Prosciutto historical run 3: unit 17.00 ≈ Desc 17,50",
+        "Ventricina v23 run 1: unit 17.50 (likely discount magnitude as unit)",
+        "Emporio duplicate batch A: Prosciutto unit 17.00"
+      ]
+    }
+  },
+  "rowAccuracy": [
+    {
+      "product": "Rovagnati Assaporami Prosciutto Cotto",
+      "focus": true,
+      "visibleDiscountPct": 17.5,
+      "visibleGross": 10.3,
+      "visibleTotal": 36.54,
+      "vlGtNetUnit": 8.17,
+      "vlGtTotal": 35.14,
+      "v23Run1": { "qty": 4.3, "unit": 10.6, "total": 45.58, "inferredDiscount": "MISSING", "pattern": "qty_times_gross" },
+      "v23Run2": { "qty": 4.3, "unit": 10.72, "total": 46.1, "inferredDiscount": "MISSING", "pattern": "qty_times_gross" },
+      "historical5Run": "unit shifts 8.17–17.00; total usually 36.54",
+      "discountExtractionAccuracy": "0/2 runs (0%)"
+    },
+    {
+      "product": "Rovagnati Mortadella IGP Massima",
+      "focus": true,
+      "visibleDiscountPct": "unknown_transcribed",
+      "vlGtUnit": 10.1,
+      "vlGtTotal": 31.07,
+      "v23Run1": { "qty": 3.11, "unit": 11.1, "total": 34.52, "inferredDiscount": "MISSING", "pattern": "qty_times_gross" },
+      "v23Run2": { "qty": 3.1, "unit": 11.1, "total": 34.41, "inferredDiscount": "MISSING", "pattern": "qty_times_gross" },
+      "discountExtractionAccuracy": "0/2 runs (0%)"
+    },
+    {
+      "product": "Rovagnati Salame Ventricina",
+      "focus": true,
+      "visibleDiscountPct": 9.29,
+      "visibleNote": "implied from GT qty×unit vs total",
+      "vlGtUnit": 16.6,
+      "vlGtTotal": 39.49,
+      "v23Run1": { "qty": 2.6, "unit": 17.5, "total": 45.5, "inferredDiscount": "BLEED", "pattern": "discount_as_unit_then_qty_multiply" },
+      "v23Run2": { "qty": 2.6, "unit": 14, "total": 36.4, "inferredDiscount": "MISSING", "pattern": "qty_times_gross" },
+      "historicalRefined": { "unit": 16.6, "total": 39.49, "note": "copied gross unit, total correct — discount not structured" },
+      "discountExtractionAccuracy": "0/2 runs (0%)"
+    },
+    {
+      "product": "De Cecco Paccheri",
+      "focus": false,
+      "visibleDiscountPct": 12.35,
+      "vlGtTotal": 50.2,
+      "v23Run1": { "qty": 24, "unit": 2.35, "total": 50.4, "inferredDiscount": "PARTIAL", "pattern": "total_near_gt_not_qty_times_unit" },
+      "v23Run2": { "qty": 24, "unit": 2.35, "total": 50.4, "inferredDiscount": "PARTIAL", "pattern": "total_near_gt_not_qty_times_unit" },
+      "discountExtractionAccuracy": "partial 2/2 — total copied, unit may be gross"
+    },
+    {
+      "product": "Arrigoni Gorgonzola",
+      "focus": false,
+      "v23Run1": { "qty": 1, "unit": 9.9, "total": 13.44, "inferredDiscount": "PARTIAL" },
+      "v23Run2": { "qty": 2, "unit": 10.62, "total": 13.44, "inferredDiscount": "PARTIAL" },
+      "discountExtractionAccuracy": "partial — total stable, qty/unit variable"
+    },
+    {
+      "product": "SanPellegrino Acqua",
+      "focus": false,
+      "vlGtQty": 2.56,
+      "v23Run1": { "qty": 1, "unit": 19.2, "total": 19.2, "inferredDiscount": "N/A_or_missing" },
+      "v23Run2": { "qty": 1, "unit": 13.7, "total": 13.7, "inferredDiscount": "N/A" },
+      "discountExtractionAccuracy": "N/A — qty extraction also wrong"
+    },
+    {
+      "product": "Rigamonti Bresaola",
+      "focus": false,
+      "v23Run1": { "qty": 1.13, "unit": 38, "total": 49.48, "inferredDiscount": "PARTIAL" },
+      "v23Run2": { "qty": 2, "unit": 24.94, "total": 49.88, "inferredDiscount": "MISSING", "pattern": "qty_times_unit" },
+      "discountExtractionAccuracy": "0-1/2"
+    },
+    {
+      "product": "Baladin Ginger Beer",
+      "focus": false,
+      "vlGt": { "qty": 2, "unit": 9.69, "total": 19.38 },
+      "v23Run1": { "qty": 24, "unit": 0.85, "total": 20.4, "inferredDiscount": "N/A" },
+      "v23Run2": { "qty": 2, "unit": 9.69, "total": 19.38, "inferredDiscount": "N/A", "note": "run2 matches GT — no discount column on row" },
+      "discountExtractionAccuracy": "N/A"
+    }
+  ],
+  "summary": {
+    "focusRowsDiscountCorrect": "0/6 run-slots (Prosciutto 2, Mortadella 2, Ventricina 2)",
+    "focusRowsDiscountMissing": 4,
+    "focusRowsDiscountBleed": 1,
+    "focusRowsDiscountPartial": 0,
+    "allRowsStructuredDiscountInApi": 0,
+    "issueIsProsciuttoOnly": false,
+    "issueIsEmporioWide": true,
+    "meatDiscountRowsAffected": ["Prosciutto", "Mortadella", "Ventricina"]
+  }
+}

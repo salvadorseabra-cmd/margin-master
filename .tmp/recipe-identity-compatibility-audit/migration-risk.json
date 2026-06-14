@@ -1,0 +1,132 @@
+{
+  "generated_at": "2026-06-13T21:00:00.000Z",
+  "overallMigrationRisk": "LOW for recipe architecture if concept binding maintained",
+  "confidencePercent": 85,
+  "riskMatrix": [
+    {
+      "area": "recipe_ingredients schema",
+      "risk": "low",
+      "probabilityPercent": 10,
+      "impact": "low",
+      "mitigation": "Keep ingredient_id as concept FK; add nullable pack_variant_id later only",
+      "rewriteRequired": false
+    },
+    {
+      "area": "sub_recipe prep graph",
+      "risk": "none",
+      "probabilityPercent": 2,
+      "impact": "none",
+      "mitigation": "Prep graph orthogonal to purchasing identity",
+      "rewriteRequired": false
+    },
+    {
+      "area": "costing resolver layer",
+      "risk": "medium",
+      "probabilityPercent": 40,
+      "impact": "medium",
+      "mitigation": "Centralize in resolve-operational-ingredient-cost; avoid scattered current_price reads",
+      "rewriteRequired": "adapter refactor, not architecture rewrite"
+    },
+    {
+      "area": "recipe UI (recipes.tsx)",
+      "risk": "low",
+      "probabilityPercent": 15,
+      "impact": "low",
+      "mitigation": "Ingredient picker stays concept-level; advanced variant picker is additive",
+      "rewriteRequired": false
+    },
+    {
+      "area": "margin alerts / OI recipe exposure",
+      "risk": "low",
+      "probabilityPercent": 12,
+      "impact": "low",
+      "mitigation": "getRecipeMetrics already uses ingredient_id; variant layer improves accuracy",
+      "rewriteRequired": false
+    },
+    {
+      "area": "canonical ingredient merge",
+      "risk": "low",
+      "probabilityPercent": 20,
+      "impact": "medium",
+      "mitigation": "Merge at concept level; repoint pack_variants on merge",
+      "rewriteRequired": "extend merge script for variants"
+    },
+    {
+      "area": "legacy embed snapshots on recipe lines",
+      "risk": "medium",
+      "probabilityPercent": 35,
+      "impact": "medium",
+      "mitigation": "recipe-canonical-integrity already flags stale embeds; continue resolver-first",
+      "rewriteRequired": false
+    },
+    {
+      "area": "binding recipes to supplier product",
+      "risk": "critical",
+      "probabilityPercent": 90,
+      "impact": "critical",
+      "mitigation": "DO NOT — rejected binding option B",
+      "rewriteRequired": true
+    }
+  ],
+  "ifPrepBuiltNow": {
+    "safeToBuild": [
+      "Prep recipe type CRUD",
+      "sub_recipe_id line picker",
+      "output_quantity / output_unit",
+      "Prep batch cost display",
+      "Parent recipe prep usage costing",
+      "Circular prep detection",
+      "Prep cascade in margin alerts"
+    ],
+    "buildWithCaution": [
+      "Recipe food cost when concept has multiple pack formats (use manual default until P1)",
+      "Ingredient price change → recipe recalc (accurate after P0+P1)"
+    ],
+    "deferUntilIdentity": [
+      "Recipe-level supplier switch recommendations",
+      "Historical price movement on recipe cards",
+      "Auto-suggest ingredient from invoice match on recipe add"
+    ]
+  },
+  "ifIdentityBuiltFirst": {
+    "recipeBenefit": "Accurate default variant costing from day one",
+    "prepBenefit": "Leaf ingredient costs trustworthy in prep batches",
+    "parallelOk": "P0 guard can ship while prep UI work continues"
+  },
+  "technicalDebtScenarios": [
+    {
+      "scenario": "Prep/sub-recipes on concept binding + resolver",
+      "debtLevel": "low",
+      "rewriteProbabilityPercent": 12
+    },
+    {
+      "scenario": "Recipe work + direct ingredients.current_price in components",
+      "debtLevel": "medium",
+      "rewriteProbabilityPercent": 35
+    },
+    {
+      "scenario": "Recipe lines bound to supplier_product",
+      "debtLevel": "critical",
+      "rewriteProbabilityPercent": 85
+    },
+    {
+      "scenario": "Recipe lines bound to pack_variant as required FK",
+      "debtLevel": "medium",
+      "rewriteProbabilityPercent": 45
+    }
+  ],
+  "migrationImpactSummary": {
+    "recipes": {
+      "schemaChangeRequired": false,
+      "codeChangeRequired": "resolver adapter only",
+      "dataMigration": "default_pack_variant backfill per concept",
+      "userImpact": "optional advanced variant picker in P3"
+    },
+    "prepSubRecipes": {
+      "schemaChangeRequired": false,
+      "codeChangeRequired": "none for graph; leaf costing via same resolver adapter",
+      "dataMigration": "none",
+      "userImpact": "none"
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+  "deployVersion": 25,
+  "pdfSizeBytes": 1148541,
+  "groundTruth": {
+    "qty": 2,
+    "unit_price": 29.99,
+    "total": 59.98
+  },
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "chocolate": {
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "qty": 2,
+        "unit": "cx",
+        "unit_price": 9.99,
+        "total": 19.98
+      },
+      "acucar": {
+        "qty": 1,
+        "unit_price": 9.99,
+        "total": 9.99
+      },
+      "financialErrorEuro": 40
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "chocolate": {
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "qty": 2,
+        "unit": "cx",
+        "unit_price": 9.99,
+        "total": 19.98
+      },
+      "acucar": {
+        "qty": 1,
+        "unit_price": 9.99,
+        "total": 9.99
+      },
+      "financialErrorEuro": 40
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "chocolate": {
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "qty": 2,
+        "unit": "cx",
+        "unit_price": 9.99,
+        "total": 19.98
+      },
+      "acucar": {
+        "qty": 1,
+        "unit_price": 9.99,
+        "total": 9.99
+      },
+      "financialErrorEuro": 40
+    }
+  ]
+}

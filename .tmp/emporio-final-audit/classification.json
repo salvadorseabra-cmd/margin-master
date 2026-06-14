@@ -1,0 +1,79 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio Italia",
+  "deployVersion": 27,
+  "auditedAt": "2026-06-13T00:30:00.000Z",
+  "taxonomy": {
+    "A": "extraction_bug — Pass C GPT misread vs visible invoice or GT",
+    "B": "gt_issue — extraction matches visible; GT catalog differs",
+    "C": "normalization_issue — binder/reconcile altered correct Pass C output"
+  },
+  "financialAccounting": {
+    "focusRowsTotalEuro": 29.04,
+    "byClass": {
+      "A_extraction_bug": 29.04,
+      "B_gt_issue": 0,
+      "C_normalization": 0
+    },
+    "sumCheck": true,
+    "note": "Prosciutto €1.40 (Class B) excluded from focus-four scope"
+  },
+  "counts": {
+    "focusRows": 4,
+    "extractionBugs": 4,
+    "gtIssues": 0,
+    "normalizationIssues": 0
+  },
+  "firstFailingStageSummary": {
+    "passC_table_extraction": 4,
+    "binder": 0,
+    "reconcile": 0,
+    "note": "All four rows fail at Pass C; Mortadella additionally suffers discount_pct null → binder gross path"
+  },
+  "extractionBugs": [
+    {
+      "rank": 1,
+      "product": "Gorgonzola Castelgrottto",
+      "euro": 13.56,
+      "pattern": "qty_doubling_and_total_misread",
+      "visibleMatch": false,
+      "priorRunHadZeroError": true
+    },
+    {
+      "rank": 2,
+      "product": "Bresaola Punta d'Anca",
+      "euro": 10.0,
+      "pattern": "preço_total_column_misread",
+      "visibleMatch": false,
+      "priorRunHadZeroError": true
+    },
+    {
+      "rank": 3,
+      "product": "SanPellegrino Acqua",
+      "euro": 4.7,
+      "pattern": "case_qty_overread_and_total_wrong",
+      "visibleMatch": false,
+      "priorRunHadZeroError": true
+    },
+    {
+      "rank": 4,
+      "product": "Mortadella IGP",
+      "euro": 0.78,
+      "pattern": "discount_column_missing_qty_times_gross",
+      "visibleMatch": false,
+      "priorRunHadZeroError": true
+    }
+  ],
+  "gtIssues": [],
+  "normalizationIssues": [],
+  "structuralFamilies": {
+    "column_shift_dense_table": ["Gorgonzola", "Bresaola", "SanPellegrino"],
+    "discount_column_failure": ["Mortadella"],
+    "sharedRootCause": "Pass C GPT vision on Emporio dense 8-column layout; Desc.(%) header often clipped from crop (emporio-discount-column-audit)"
+  },
+  "projectedIfFixed": {
+    "focusRowsFinancialEuro": 0,
+    "invoiceFinancialEuro": 1.4,
+    "note": "Fixing four extraction bugs leaves only Prosciutto GT mismatch (visible total €36.54 vs GT €35.14)"
+  }
+}

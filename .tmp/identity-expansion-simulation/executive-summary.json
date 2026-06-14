@@ -1,0 +1,87 @@
+{
+  "generated_at": "2026-06-13T22:44:13.220Z",
+  "simulationQuestion": "If matching improves tomorrow, does contamination spread?",
+  "liveCounts": {
+    "totalInvoiceLines": 51,
+    "persistedMatchedLines": 18,
+    "unmatchedLines": 33,
+    "postP0AuditClaim": 46,
+    "verifiedUnmatched": 33,
+    "canonicalMatcherWouldMatch": 11,
+    "expandedMatcherWouldMatch": 1,
+    "totalWouldMatchIfImproved": 1,
+    "canonicalMatcherWouldMiss": 39
+  },
+  "expansionResults": {
+    "newLatentContaminationLines": 1,
+    "newMozzarellaPepinoStyleSituations": 1,
+    "safeNewMatches": 0,
+    "unsafeNewMatches": 1,
+    "pctUnmatchedUnsafeToAutoMatch": 3,
+    "pctPredictedUnsafe": 100
+  },
+  "explicitAnswers": {
+    "q1_newMozzarellaPepinoSituations": 1,
+    "q1_details": [
+      {
+        "product": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+        "invoice": "Mammafiore",
+        "target": "Mozzarella fior di latte",
+        "guardReasons": [
+          "pack_weight_magnitude"
+        ]
+      }
+    ],
+    "q2_currentContaminationIsolated": "NO — structural; only 2 proven today because 90% lines unpersisted",
+    "q3_packVariantArchitectureJustified": "YES",
+    "q3_confidencePercent": 91,
+    "q4_pctUnmatchedUnsafeToAutoMatch": 3,
+    "q5_largestFutureRisks": [
+      "Mozzarella fior di latte",
+      "Pepino conserva"
+    ],
+    "q6_mostDangerousConcepts": [
+      {
+        "name": "Mozzarella fior di latte",
+        "riskLevel": "HIGH",
+        "latentContaminationLines": 1
+      },
+      {
+        "name": "Pepino conserva",
+        "riskLevel": "HIGH",
+        "latentContaminationLines": 0
+      },
+      {
+        "name": "Nata culinária",
+        "riskLevel": "LOW",
+        "latentContaminationLines": 0
+      },
+      {
+        "name": "Gema líquida",
+        "riskLevel": "LOW",
+        "latentContaminationLines": 0
+      },
+      {
+        "name": "Atum em óleo",
+        "riskLevel": "LOW",
+        "latentContaminationLines": 0
+      }
+    ]
+  },
+  "criticalQuestion": {
+    "question": "If matching becomes excellent tomorrow, would current ingredient architecture remain trustworthy?",
+    "answer": "NO",
+    "confidencePercent": 87,
+    "rationale": [
+      "1 new Mozzarella/Pepino-style guard breaks predicted among 33 unpersisted lines",
+      "100% of newly matchable lines would be UNSAFE to auto-attach",
+      "Single ingredient_id per concept cannot represent multi-format SKUs"
+    ]
+  },
+  "improvingMatchingEffect": {
+    "verdict": "EXPOSE_MORE_IDENTITY_PROBLEMS",
+    "detail": "Better matching improves coverage but surfaces latent cross-format collapse — net trust decreases without P1 pack variants.",
+    "confidencePercent": 89
+  },
+  "headline": "1 new Mozzarella/Pepino-style situations predicted; 100% of matchable unpersisted lines unsafe under current architecture."
+}

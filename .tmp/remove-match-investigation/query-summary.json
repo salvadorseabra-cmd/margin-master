@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-06-13T22:54:53.166Z",
+  "invoice_item_count": 51,
+  "eligible_line_count": 51,
+  "display_state_counts": {
+    "confirmed": 7,
+    "suggested": 4,
+    "unmatched": 40
+  },
+  "extract_sync_would_run": 11,
+  "ingredient_alias_count": 32,
+  "confirmed_alias_count": 32,
+  "price_history_rows_on_vl_invoices": 20
+}

@@ -1,0 +1,79 @@
+{
+  "generated_at": "2026-06-13T22:55:00.000Z",
+  "removal_scope_definition": "User clears invoice line → ingredient linkage so line presents as unmatched and stops contributing to that ingredient's cost chain",
+  "downstream_systems": [
+    {
+      "system": "ingredient_price_history",
+      "current_behavior": "Append-only rows keyed by ingredient_id + invoice_id; written on extract sync and manual confirm",
+      "remove_match_effect": "B — requires historical cleanup for already-synced lines",
+      "evidence": "Pepino Bidfood row a689bd91 persists after matcher rejection; no delete API in ingredient-price-history.ts",
+      "orphan_risk": "Ghost/stale rows if match removed but history remains (14/20 VL rows already ghost per historical-pricing audit)"
+    },
+    {
+      "system": "ingredients.current_price / purchase_quantity",
+      "current_behavior": "Last-write-wins on persistOperationalIngredientCostFromInvoiceLine",
+      "remove_match_effect": "B — may need recalc from remaining trusted history rows",
+      "evidence": "Pepino conserva current_price poisoned by fresh Pepino €0.00177/g operational price"
+    },
+    {
+      "system": "purchase_history / ingredient detail panel",
+      "current_behavior": "buildMatchedInvoiceProductsFromScan — live matcher over invoice_items; skips unmatched bucket",
+      "remove_match_effect": "A — stops future inclusion once matcher returns null",
+      "caveat": "Rejected pair memory must block re-match; session rejectedMatchItemIds alone insufficient across devices"
+    },
+    {
+      "system": "supplier_intelligence / supplier switch signals",
+      "current_behavior": "Compares purchase memory across suppliers for same ingredient_id",
+      "remove_match_effect": "A for future; B for historical comparisons already stored in price_history",
+      "pepino_evidence": "Bidfood fresh vs Aviludo jar compared under same ingredient_id — unit_family_mismatch"
+    },
+    {
+      "system": "operational_intelligence / opportunities",
+      "current_behavior": "Reads price_history + live matcher; P0 guard blocks alerts on incompatible chains",
+      "remove_match_effect": "A for future OI reads if line unmatched; B raw DB still poisoned until history cleanup",
+      "evidence": "identity-contamination-audit: opportunities BLOCKED post-P0 on OI read path; raw DB still poisoned"
+    },
+    {
+      "system": "recipe_costing / food cost",
+      "current_behavior": "Uses ingredients.current_price; dispatchOperationalIngredientCostChanged on match events",
+      "remove_match_effect": "B if current_price was set from removed line — needs price revert",
+      "note": "Recipes unaffected structurally — no FK from invoice_items to recipes"
+    },
+    {
+      "system": "ingredient_costs / margin alerts",
+      "current_behavior": "alerts.tsx loads priceHistory array; margin calculations use ingredient prices",
+      "remove_match_effect": "B for stale history rows; A once current_price corrected",
+      "schema_fk": "ingredient_price_history.invoice_id ON DELETE SET NULL — deleting invoice does not delete history"
+    },
+    {
+      "system": "catalog_review",
+      "current_behavior": "buildCatalogReviewCurrentMatchCountsFromScan — live matcher, same as ItemsTable",
+      "remove_match_effect": "A — line drops from ingredient match counts when unmatched",
+      "file": "src/lib/catalog-review-current-matches.ts"
+    },
+    {
+      "system": "ingredient_aliases",
+      "current_behavior": "Persists wording → ingredient; no delete helper in codebase",
+      "remove_match_effect": "Conditional B — delete alias only if line was linked via alias",
+      "pepino_note": "Bidfood 'Pepino' has NO alias row — matched via kind:exact token overlap; reject pair sufficient"
+    },
+    {
+      "system": "auto_persist_unmatched",
+      "current_behavior": "autoPersistUnmatchedInvoiceItems on invoice expand — creates new ingredients for eligible unmatched lines",
+      "remove_match_effect": "A — unmatched line may become auto-persist candidate (watch for re-creation)",
+      "file": "src/routes/invoices.tsx ~line 1023"
+    }
+  ],
+  "overall_verdict": {
+    "future_calcs_only": false,
+    "historical_cleanup_required": true,
+    "confidence_percent": 88,
+    "rationale": "Virtual match removal stops live matcher inclusion (A) but extract/manual sync already wrote ingredient_price_history and ingredients.current_price (B). Pepino proves poison persists without alias delete."
+  },
+  "pepino_contamination_artifacts": {
+    "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+    "poisoned_history_id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+    "stored_delta_percent": -99.95277901289462,
+    "guard_break": "unit_family_mismatch between fresh weight and preserved jar lines"
+  }
+}

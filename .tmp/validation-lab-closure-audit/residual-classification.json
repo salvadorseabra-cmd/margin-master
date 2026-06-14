@@ -1,0 +1,176 @@
+{
+  "generated_at": "2026-06-13T18:00:00.000Z",
+  "latestDeployVersion": 31,
+  "classificationLegend": {
+    "A": "Deterministic extraction bug — stable wrong across runs",
+    "B": "GPT variance — intermittent Pass C outcomes",
+    "C": "Ground-truth issue — VL catalog wrong vs visible invoice",
+    "D": "Business interpretation difference — field display mismatch, €0 financial impact"
+  },
+  "residuals": [
+    {
+      "rank": 1,
+      "invoice": "Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "class": "C",
+      "classLabel": "gt_issue",
+      "headlineErrorEuro": 27.95,
+      "trueExtractionErrorEuro": 0,
+      "stability": { "correctVsVisiblePct": 100, "correctVsGtPct": 0, "runs": "10/10 v30", "deterministic": true },
+      "rootCause": "GT qty 2 / €50 inferred from pack notation; visible QUANT 1 / VALOR €22.05",
+      "source": ".tmp/bocconcino-gt-validation/verdict.json",
+      "action": "Revise GT catalog — not extraction work"
+    },
+    {
+      "rank": 2,
+      "invoice": "Emporio",
+      "product": "Gorgonzola DOP Dolce",
+      "class": "B",
+      "classLabel": "gpt_variance",
+      "headlineErrorEuro": 24.79,
+      "trueExtractionErrorEuro": 5.49,
+      "stability": { "correctPct": 60, "runs": "6/10 v30", "avgErrorEuro": 5.49, "worstEuro": 32.26 },
+      "rootCause": "Intermittent Preço Total misread / qty×unit synthesis on discounted weight row",
+      "source": ".tmp/final-stability-audit/stability-matrix.json",
+      "action": "Monitor; optional prompt iteration — diminishing returns"
+    },
+    {
+      "rank": 3,
+      "invoice": "Mammafiore",
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "class": "A",
+      "classLabel": "deterministic_extraction_bug",
+      "subClass_v31": "intermittent_after_v31",
+      "headlineErrorEuro": 1.0,
+      "trueExtractionErrorEuro": 0.4,
+      "stability": {
+        "v30": { "correctPct": 0, "runs": "0/10", "avgErrorEuro": 1.0, "deterministic": true },
+        "v31": { "correctPct": 60, "runs": "3/5", "avgErrorEuro": 0.4, "deterministic": false }
+      },
+      "rootCause": "Valor digit drift 26,52→25,52; v31 prompt partial fix",
+      "source": ".tmp/farina-final-root-cause/",
+      "action": "Optional v32 binder guard or accept €0.40 avg"
+    },
+    {
+      "rank": 4,
+      "invoice": "Emporio",
+      "product": "Assaporami Prosciutto Cotto Scelto HC",
+      "class": "B",
+      "classLabel": "gpt_variance",
+      "headlineErrorEuro": 1.4,
+      "trueExtractionErrorEuro": 1.4,
+      "stability": { "note": "Single-run v30; intermittent in Emporio probes" },
+      "rootCause": "Pass C total variance on discounted Emporio row",
+      "action": "Low priority — within noise"
+    },
+    {
+      "rank": 5,
+      "invoice": "Bocconcino",
+      "product": "ROLO DE CABRA E VACA 1KG",
+      "class": "A",
+      "classLabel": "deterministic_extraction_bug",
+      "headlineErrorEuro": 0.54,
+      "trueExtractionErrorEuro": 0.54,
+      "stability": { "note": "Single-run v30 only" },
+      "rootCause": "Minor column/price drift",
+      "action": "Low priority — sub-euro"
+    }
+  ],
+  "resolved_residuals": [
+    {
+      "product": "Mortadella IGP Massima",
+      "invoice": "Emporio",
+      "class": "RESOLVED",
+      "fixVersion": 29,
+      "validation": "5/5 at €31.07",
+      "recoveryEuro": 3.5
+    },
+    {
+      "product": "Rulo Di Capra 1kg*2",
+      "invoice": "Mammafiore",
+      "class": "RESOLVED",
+      "fixVersion": 30,
+      "validation": "5/5 at €10.86",
+      "recoveryEuro": 4.86
+    },
+    {
+      "product": "Emporio Bresaola cluster",
+      "invoice": "Emporio",
+      "class": "RESOLVED",
+      "fixVersion": 28,
+      "validation": "10/10 v30 stability at €49.48",
+      "recoveryEuro": 10.0
+    },
+    {
+      "product": "Emporio SanPellegrino cluster",
+      "invoice": "Emporio",
+      "class": "RESOLVED",
+      "fixVersion": 28,
+      "validation": "10/10 v30 stability at €38.56",
+      "recoveryEuro": 19.69
+    },
+    {
+      "product": "Aviludo April harness",
+      "invoice": "Aviludo April",
+      "class": "RESOLVED",
+      "fixVersion": "geometry+v26",
+      "validation": "€0 financial error",
+      "recoveryEuro": 169.08
+    },
+    {
+      "product": "Chocolate Pantagruel (Aviludo May)",
+      "invoice": "Aviludo May",
+      "class": "RESOLVED",
+      "fixVersion": "harness",
+      "validation": "€0 financial error post-fix",
+      "recoveryEuro": 40.0
+    }
+  ],
+  "classTotals_reclassified": {
+    "A_deterministic_extraction": {
+      "count": 2,
+      "euro_singleRun": 1.54,
+      "euro_multiRun_avg": 0.3,
+      "rows": ["Farina Speciale (intermittent v31)", "Rulo Bocconcino €0.54"]
+    },
+    "B_gpt_variance": {
+      "count": 2,
+      "euro_singleRun": 26.19,
+      "euro_multiRun_avg": 1.1,
+      "rows": ["Gorgonzola", "Prosciutto"]
+    },
+    "C_gt_issue": {
+      "count": 1,
+      "euro_headline": 27.95,
+      "euro_trueExtraction": 0,
+      "rows": ["POMODOR PELATI"]
+    },
+    "D_business_interpretation": {
+      "count": 21,
+      "euro": 0,
+      "note": "Net vs list unit_price display; pack metadata; no financial delta"
+    }
+  },
+  "noRemainingStructuralFamilies": [
+    "geometry_crop_placement",
+    "iva_valor_bleed_mammafiore",
+    "mortadella_desc_pct_bleed",
+    "emporio_bresaola_sanpellegrino_cluster",
+    "aviludo_april_zero_items",
+    "pomodor_desc_bleed_pre_v21"
+  ],
+  "openFamilies": [
+    {
+      "family": "emporio_gorgonzola_variance",
+      "class": "B",
+      "avgEuro": 5.49,
+      "closure": "acceptable_with_monitoring"
+    },
+    {
+      "family": "mammafiore_farina_valor_digit",
+      "class": "A→B",
+      "avgEuro": 0.4,
+      "closure": "diminishing_returns"
+    }
+  ]
+}

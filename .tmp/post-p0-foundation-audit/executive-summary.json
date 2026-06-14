@@ -1,0 +1,76 @@
+{
+  "generated_at": "2026-06-13T20:52:00.000Z",
+  "auditQuestion": "Can Ingredients + Invoices foundation be considered CLOSED after P0 Identity Guard?",
+  "finalDecision": "FOUNDATION MOSTLY CLOSED",
+  "confidencePercent": 81,
+  "recommendation": "Continue Ingredient Identity work",
+  "recommendationDetail": "Ship P1 pack variants + VL re-read before treating foundation CLOSED or enabling production OI at scale. Prep/Sub-Recipes structural work may proceed in parallel on concept binding with documented costing caveats.",
+  "criticalQuestions": {
+    "1_knownFoundationIssuesRemaining": {
+      "answer": "YES — 5 material issues",
+      "confidencePercent": 88,
+      "issues": [
+        "P1 pack_variant architecture not deployed",
+        "46/51 VL lines unmatched to catalog",
+        "4/6 VL invoices DB stale (Jun 11 era)",
+        "14 ghost price_history rows in raw DB",
+        "Home dashboard mock-only"
+      ]
+    },
+    "2_structuralVsOperational": {
+      "answer": "Both — extraction/re-read safety structural CLOSED; identity + DB sync operational PARTIAL",
+      "confidencePercent": 85,
+      "structuralClosed": ["Extraction pipeline v31", "Re-read mutex", "Invoice geometry/IVA families", "P0 chain guard code"],
+      "operationalOpen": ["VL DB staleness", "Unmatched persist path", "Ghost history metadata", "Mock dashboard"]
+    },
+    "3_forceRecipeRewrites": {
+      "answer": "NO — if recipes bind to ingredient_id (concept) and costing uses resolver adapter",
+      "confidencePercent": 87,
+      "majorRewriteProbability": "12% with recommended path; 45% if pack_variant required on every line today",
+      "source": ".tmp/recipe-identity-compatibility-audit/executive-summary.json"
+    },
+    "4_packVariantRequiredBeforePrep": {
+      "answer": "YES for production-grade multi-format costing; NO for prep/sub-recipe graph structure",
+      "confidencePercent": 84,
+      "detail": "Prep XOR graph, output_quantity, cascade propagation ready. Trustworthy €/line on Mozzarella-class multi-format catalogs needs P1 default_pack_variant."
+    },
+    "5_recipeCostingSafelyBeginNow": {
+      "answer": "PARTIALLY YES",
+      "confidencePercent": 82,
+      "safeNow": ["Single-format catalog ingredients", "Recipe margin from current_price", "Prep graph without supplier coupling"],
+      "notSafeUntilP1": ["Cost alerts tied to price_history on multi-format concepts", "Supplier switch recommendations", "Opportunity €/mo on mixed-format SKUs"]
+    },
+    "6_validationLabFormallyClosed": {
+      "answer": "EXTRACTION PHASE MOSTLY CLOSED — not formally CLOSED on headline v30 Class A",
+      "confidencePercent": 83,
+      "detail": "validation-lab-closure-audit: pause active VL extraction; maintain Gorgonzola+Farina harness. True residual Class A ~€1–2 focus rows. Structural families closed."
+    }
+  },
+  "p0GuardOutcome": {
+    "status": "DELIVERED",
+    "vlFalsePositivesEliminated": true,
+    "testsPassing": 29,
+    "historicalPricingAfterGuard": "PARTIAL (math CLOSED, DB PARTIAL)",
+    "operationalIntelligenceAfterGuard": "PARTIAL (outputs guarded, inputs stale)"
+  },
+  "vlLiveState": {
+    "source": ".tmp/post-p0-foundation-audit/vl-state-snapshot.json",
+    "invoiceItems": 51,
+    "priceHistoryRows": 20,
+    "staleInvoices": 4,
+    "countMatchV31": "5/6",
+    "emporioLive": "ab52796d — 8 items, 0 price_history",
+    "deletedEmporio": "17aa3591 — 0 items (manual deletion confirmed)"
+  },
+  "pillarSummary": {
+    "extraction": "PARTIAL (83%)",
+    "invoicePersistence": "PARTIAL (78%)",
+    "rereadSafety": "CLOSED (90%)",
+    "ingredientMatching": "PARTIAL (72%)",
+    "historicalPricing": "PARTIAL (84%)",
+    "supplierIntelligence": "PARTIAL (80%)",
+    "opportunities": "PARTIAL (82%)",
+    "operationalIntelligence": "PARTIAL (79%)"
+  },
+  "headline": "P0 Identity Guard successfully suppresses VL false positives, but Ingredients + Invoices foundation remains MOSTLY CLOSED — not CLOSED — due to P1 identity architecture, unmatched persist path, and stale VL DB."
+}

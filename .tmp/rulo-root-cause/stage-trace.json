@@ -1,0 +1,86 @@
+{
+  "generated_at": "2026-06-13T12:30:00.000Z",
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "product": "Rulo Di Capra 1kg*2 Simonetta",
+  "firstFailingStage": "passC_table_extraction",
+  "stages": [
+    {
+      "stage": "passC_table_extraction",
+      "status": "FAIL",
+      "role": "GPT structured extraction from table crop",
+      "input": "Mammafiore 8-column table: Pr. Unitário 15,192 | Desc. 28,50 | IVA 6,00 | Valor 10,86",
+      "typicalGptOutput": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit": "UN",
+        "gross_unit_price": 10.86,
+        "discount_pct": null,
+        "line_total_net": 6
+      },
+      "failureMechanism": "line_total_net reads IVA column (6,00) instead of Valor (10,86). gross_unit_price reads net/discounted amount (10.86) instead of Pr. Unitário (15.192).",
+      "evidence": [
+        "v29 stability: 4/5 runs total=6 with ivaColumnBleed=true",
+        "Visible invoice IVA cell = 6,00 exactly matches extracted total",
+        "€4.86 = 10.86 − 6.00",
+        "mammafiore-final-audit: firstFailingStage passC_table_extraction"
+      ]
+    },
+    {
+      "stage": "monetary_binding",
+      "status": "PASS_THROUGH_ERROR",
+      "role": "Map gross_unit_price/discount_pct/line_total_net → unit_price/total",
+      "input": "line_total_net=6 from Pass C",
+      "output": {
+        "unit_price": 10.86,
+        "total": 6
+      },
+      "failureMechanism": "Binder faithfully maps line_total_net to total; does not correct IVA bleed.",
+      "evidence": [
+        "invoice-monetary-binding.ts: total = line_total_net when present",
+        "discount-line-audit: binder/reconcile do not introduce discount total divergence"
+      ]
+    },
+    {
+      "stage": "line_reconcile",
+      "status": "PASS_THROUGH_ERROR",
+      "role": "Reconcile line items to invoice net subtotal",
+      "input": "total=6",
+      "output": { "total": 6 },
+      "failureMechanism": "Reconcile preserves Pass C total; no Valor correction.",
+      "evidence": ["mammafiore-final-audit: No normalization issues"]
+    },
+    {
+      "stage": "api_response_strip",
+      "status": "PASS_THROUGH_ERROR",
+      "role": "Return items[] to client",
+      "output": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit": "UN",
+        "unit_price": 10.86,
+        "total": 6
+      },
+      "failureMechanism": "API returns bound values unchanged."
+    }
+  ],
+  "historicalPassCRaw": {
+    "source": ".tmp/mammafiore-line-audit/pass-c-raw.json",
+    "note": "Earlier probe showed qty=2 pack-notation confusion (Rub Di Capra, total 10.28); current v27+ failure is different — qty=1 correct, IVA total bleed.",
+    "passCRaw": {
+      "name": "Rub Di Capra 1kg*2 Simonetta",
+      "quantity": 2,
+      "unit": "kg",
+      "unit_price": 15.192,
+      "total": 10.28
+    }
+  },
+  "goodRunExample": {
+    "source": "v29 stability run 2",
+    "passCOutput": {
+      "quantity": 1,
+      "unit_price": 10.86,
+      "total": 10.86
+    },
+    "note": "Even on success, unit_price still net (10.86) not list (15.192); total correct so financial error €0"
+  }
+}

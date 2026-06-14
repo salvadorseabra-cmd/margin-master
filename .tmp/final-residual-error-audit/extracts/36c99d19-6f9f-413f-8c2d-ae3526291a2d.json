@@ -1,0 +1,61 @@
+{
+  "status": 200,
+  "items": [
+    {
+      "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "quantity": 5.996,
+      "unit": "UN",
+      "unit_price": 10.83,
+      "total": 64.93
+    },
+    {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 26.52,
+      "total": 25.52
+    },
+    {
+      "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "quantity": 24,
+      "unit": "UN",
+      "unit_price": 1.07,
+      "total": 25.69
+    },
+    {
+      "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 15.55,
+      "total": 16.09
+    },
+    {
+      "name": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "quantity": 10,
+      "unit": "UN",
+      "unit_price": 20.03,
+      "total": 200.3
+    },
+    {
+      "name": "Rulo Di Capra 1kg*2 Simonetta",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 10.86,
+      "total": 6
+    },
+    {
+      "name": "Recarga por combustivel",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 2,
+      "total": 2
+    },
+    {
+      "name": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "quantity": 1,
+      "unit": "UN",
+      "unit_price": 30.11,
+      "total": 30.11
+    }
+  ]
+}

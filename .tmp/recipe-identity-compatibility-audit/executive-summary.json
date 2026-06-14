@@ -1,0 +1,59 @@
+{
+  "generated_at": "2026-06-13T21:00:00.000Z",
+  "primaryQuestion": "Will future Ingredient Identity changes require recipe architecture rewrites?",
+  "answer": "NO — not if recipes bind to Ingredient Concept (Option A binding). Adapter refactor in costing resolver only.",
+  "confidencePercent": 87,
+  "recommendations": {
+    "recipeIdentityModel": "A — Ingredient Concept (current ingredient_id)",
+    "purchasingIdentityModel": "D/E — Supplier Product → Pack Variant",
+    "separation": "Recipes = culinary ontology; Purchasing = commercial contracts + price_history"
+  },
+  "finalQuestions": {
+    "1_startPrepSubRecipesNow": {
+      "question": "Can Marginly safely start Prep/Sub-Recipes now?",
+      "answer": "YES — with costing caveats for multi-format concepts",
+      "confidencePercent": 86,
+      "conditions": [
+        "Bind recipe lines to ingredient_id (concept) only",
+        "Use resolveRecipeLineOperationalCost / recipe-merge — never raw current_price in UI",
+        "Accept costing drift on multi-format concepts until P1 default_pack_variant",
+        "Do not build recipe→supplier coupling"
+      ]
+    },
+    "2_identityBlockerForRecipeArchitecture": {
+      "question": "Is Ingredient Identity a blocker for Recipe Architecture?",
+      "answer": "NO for prep/sub-recipe structure; PARTIAL for production-grade costing accuracy",
+      "confidencePercent": 84,
+      "detail": "sub_recipe_id XOR graph, output_quantity, prep propagation — ready now. Trustworthy €/line on multi-supplier catalogs needs P0+P1."
+    },
+    "3_majorRewriteProbability": {
+      "question": "Probability recipe work today requires major rewrites after Pack Variants?",
+      "answer": "12% major rewrite if concept binding + resolver pattern followed; 45% if pack_variant required on every line; 85% if supplier_product binding",
+      "confidencePercent": 83,
+      "recommendedPathProbability": 12
+    },
+    "4_nextDevSession": {
+      "question": "Next dev session: Ingredient Identity OR Prep/Sub-Recipes?",
+      "answer": "P0 Ingredient Identity guard FIRST (1–2 days), then Prep/Sub-Recipes in parallel with P1",
+      "confidencePercent": 88,
+      "rationale": [
+        "Aligns with ingredient-identity-future-design: P0 stops OI false signals",
+        "P0 is small and does not block prep structural work",
+        "Prep graph can proceed while P1 schema is built",
+        "Do not enable recipe cost alerts tied to price_history until P0+P1"
+      ],
+      "sequencing": [
+        "Session 1: P0 history chain guard",
+        "Session 2+: Prep/sub-recipe features (parallel track)",
+        "Session N: P1 pack_variants schema",
+        "After P1: wire recipe resolver to default_pack_variant"
+      ]
+    }
+  },
+  "vlValidation": {
+    "mozzarella": "Purchasing/history only — no recipe schema change",
+    "pepino": "Purchasing/matching only — recipe uses conserva concept",
+    "gingerBeer": "Purchasing/normalization only — recipe uses beverage concept"
+  },
+  "headline": "Recipe architecture is compatible with Option E. Start prep/sub-recipes now on concept binding; ship P0 identity guard first; expect resolver adapter not rewrite when pack variants land."
+}

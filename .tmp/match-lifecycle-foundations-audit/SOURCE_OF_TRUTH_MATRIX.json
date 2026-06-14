@@ -1,0 +1,245 @@
+{
+  "generated_at": "2026-06-14T12:00:00.000Z",
+  "audit_mode": "read_only",
+  "effective_match_source_of_truth": "none_persisted — computed at read time via resolveInvoiceTableRowIngredientMatch",
+  "entities": [
+    {
+      "entity": "invoice_items",
+      "storage": "supabase",
+      "table": "invoice_items",
+      "role": "line_text_facts",
+      "source_of_truth": true,
+      "projection": false,
+      "cache": false,
+      "derived": false,
+      "match_fields": [],
+      "evidence": "supabase/migrations/20260511115814_*.sql — no ingredient_id column"
+    },
+    {
+      "entity": "virtual_match_resolution",
+      "storage": "runtime",
+      "role": "effective_match_state",
+      "source_of_truth": false,
+      "projection": true,
+      "cache": false,
+      "derived": true,
+      "derived_from": [
+        "invoice_items.name",
+        "ingredient_aliases",
+        "ingredients catalog",
+        "ingredient-canonical.ts matcher rules",
+        "rejected-ingredient-matches localStorage"
+      ],
+      "evidence": "src/lib/invoice-ingredient-row-display.ts resolveInvoiceTableRowIngredientMatch; catalog-review-current-matches.ts documents virtual resolution"
+    },
+    {
+      "entity": "ingredients",
+      "storage": "supabase",
+      "table": "ingredients",
+      "role": "catalog_identity_and_current_price_snapshot",
+      "source_of_truth": true,
+      "projection": false,
+      "cache": false,
+      "derived": false,
+      "match_related_fields": ["current_price", "purchase_quantity", "purchase_unit", "base_unit"],
+      "evidence": "ingredient-auto-persist.ts persistOperationalIngredientCostFromInvoiceLine"
+    },
+    {
+      "entity": "ingredient_aliases",
+      "storage": "supabase",
+      "table": "ingredient_aliases",
+      "role": "confirmed_wording_to_ingredient_memory",
+      "source_of_truth": true,
+      "projection": false,
+      "cache": false,
+      "derived": false,
+      "written_when": "manual confirm, correct, create-ingredient link only",
+      "not_written_when": "auto exact match at extract",
+      "evidence": "ingredient-correction-memory.ts upsertConfirmedAlias; syncOperationalIngredientCostsFromInvoiceLines does not write aliases"
+    },
+    {
+      "entity": "ingredient_price_history",
+      "storage": "supabase",
+      "table": "ingredient_price_history",
+      "role": "cost_audit_trail_per_invoice_ingredient_pair",
+      "source_of_truth": true,
+      "projection": false,
+      "cache": false,
+      "derived": false,
+      "key": ["invoice_id", "ingredient_id"],
+      "no_fk": "invoice_item_id",
+      "evidence": "ingredient-price-history.ts appendIngredientPriceHistoryFromInvoiceLine; Pepino row a689bd91 persists after correction"
+    },
+    {
+      "entity": "confirmedIngredientAliases_map",
+      "storage": "client",
+      "locations": ["React state", "localStorage marginly:invoice-ingredient-aliases:{userId}"],
+      "role": "alias_mirror_for_matcher",
+      "source_of_truth": false,
+      "projection": false,
+      "cache": true,
+      "derived": true,
+      "derived_from": ["ingredient_aliases"],
+      "evidence": "ingredient-correction-memory.ts load on invoices mount"
+    },
+    {
+      "entity": "ingredient_match_override",
+      "storage": "client_in_memory",
+      "role": "session_override_highest_priority",
+      "source_of_truth": false,
+      "projection": false,
+      "cache": true,
+      "derived": true,
+      "evidence": "ingredient-match-override.ts rememberIngredientMatchOverride"
+    },
+    {
+      "entity": "operational_alias_memory",
+      "storage": "client_in_memory",
+      "role": "operational_lookup_tier",
+      "source_of_truth": false,
+      "projection": false,
+      "cache": true,
+      "derived": true,
+      "evidence": "ingredient-operational-alias-memory.ts"
+    },
+    {
+      "entity": "rejected_ingredient_matches",
+      "storage": "client_localStorage",
+      "key": "marginly:rejected-ingredient-matches:{userId}",
+      "role": "wrong_pair_blocklist",
+      "source_of_truth": false,
+      "projection": false,
+      "cache": true,
+      "derived": true,
+      "cross_device": false,
+      "evidence": "ingredient-rejected-match-memory.ts rejectIngredientMatchPair; ingredient-correction-memory.ts traceAliasUnmatchOrphan"
+    },
+    {
+      "entity": "rejectedMatchItemIds",
+      "storage": "client_session",
+      "role": "row_presentation_suppress",
+      "source_of_truth": false,
+      "projection": false,
+      "cache": true,
+      "derived": true,
+      "production_use": "cleared_only — rejectIngredientMatchSuggestion has zero route callers",
+      "evidence": "remove-match-investigation/REPORT.md"
+    },
+    {
+      "entity": "matched_invoice_products_cache",
+      "storage": "client_in_memory",
+      "role": "derived_purchase_memory_cache",
+      "source_of_truth": false,
+      "projection": false,
+      "cache": true,
+      "derived": true,
+      "evidence": "ingredient-operational-intelligence.ts MATCHED_INVOICE_PRODUCTS_CACHE_TTL_MS"
+    },
+    {
+      "entity": "buildMatchedInvoiceProductsFromScan",
+      "storage": "runtime_computed",
+      "role": "supplier_intelligence_purchase_memory",
+      "source_of_truth": false,
+      "projection": true,
+      "cache": false,
+      "derived": true,
+      "derived_from": ["invoice_items", "ingredient_aliases", "matcher", "rejected pairs"],
+      "evidence": "ingredient-operational-intelligence.ts buildMatchedInvoiceProductsFromScan"
+    },
+    {
+      "entity": "margin_alert_data",
+      "storage": "runtime_computed",
+      "role": "price_movement_alerts",
+      "source_of_truth": false,
+      "projection": true,
+      "cache": false,
+      "derived": true,
+      "derived_from": ["ingredient_price_history", "ingredients", "recipes", "isTrustedPriceMovementRow"],
+      "evidence": "margin-alert-data.ts"
+    },
+    {
+      "entity": "operational_intelligence_synthesis",
+      "storage": "runtime_computed",
+      "role": "operational_intelligence_aggregates",
+      "source_of_truth": false,
+      "projection": true,
+      "cache": false,
+      "derived": true,
+      "derived_from": ["margin-alert-data", "recipe costs", "price history"],
+      "evidence": "operational-intelligence-synthesis.ts"
+    },
+    {
+      "entity": "invoice_operational_metadata",
+      "storage": "runtime_computed",
+      "role": "invoice_row_signals",
+      "source_of_truth": false,
+      "projection": true,
+      "cache": false,
+      "derived": true,
+      "derived_from": ["ingredient_price_history", "ingredient_aliases", "recipes"],
+      "evidence": "invoice-operational-metadata.ts"
+    },
+    {
+      "entity": "catalog_review_match_counts",
+      "storage": "runtime_computed",
+      "role": "live_matcher_aggregation",
+      "source_of_truth": false,
+      "projection": true,
+      "cache": false,
+      "derived": true,
+      "derived_from": ["live matcher scan"],
+      "evidence": "catalog-review-current-matches.ts"
+    },
+    {
+      "entity": "operational_ingredient_cost_changed_event",
+      "storage": "client_event",
+      "role": "downstream_invalidation_signal",
+      "source_of_truth": false,
+      "projection": false,
+      "cache": false,
+      "derived": true,
+      "consumers": ["recipes.tsx"],
+      "scope_on_correction": "new_ingredient_id_only",
+      "evidence": "resolve-operational-ingredient-cost.ts dispatchOperationalIngredientCostChanged"
+    },
+    {
+      "entity": "ingredient_price_chain_guard",
+      "storage": "runtime_read_guard",
+      "role": "P0_read_path_guard",
+      "source_of_truth": false,
+      "projection": true,
+      "cache": false,
+      "derived": true,
+      "mutates_data": false,
+      "evidence": "ingredient-price-chain-guard.ts"
+    }
+  ],
+  "persisted_match_state_summary": {
+    "unified_match_record": false,
+    "partial_persistence": [
+      {
+        "artifact": "ingredient_aliases",
+        "condition": "manual confirm, correct, or create-ingredient link"
+      },
+      {
+        "artifact": "ingredient_price_history",
+        "condition": "extract sync for matched and suggested; manual correction adds new-target row"
+      },
+      {
+        "artifact": "ingredients.current_price",
+        "condition": "same cost sync path as history"
+      },
+      {
+        "artifact": "rejected_ingredient_matches",
+        "condition": "rejectIngredientMatchPair on rematch to different ingredient; localStorage only"
+      }
+    ],
+    "not_persisted": [
+      "match kind",
+      "match confidence",
+      "displayState suggested vs confirmed",
+      "invoice_item → ingredient_id binding",
+      "match correction audit trail"
+    ]
+  }
+}

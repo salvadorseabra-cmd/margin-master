@@ -1,0 +1,27 @@
+[
+  {
+    "invoiceItemId": "fedcd32e-f36f-4c66-82c3-1b9ba8286cf4",
+    "invoiceLabel": "Mammafiore",
+    "productName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+    "predictedIngredient": "Mozzarella fior di latte",
+    "predictedIngredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+    "confidencePercent": 77,
+    "signals": [
+      "A"
+    ],
+    "guardReasons": [
+      "pack_weight_magnitude"
+    ],
+    "matchTier": "expanded-family",
+    "breaksAgainst": [
+      {
+        "existingProduct": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "existingInvoice": "Bocconcino",
+        "guardReason": "pack_weight_magnitude",
+        "signals": [
+          "A"
+        ]
+      }
+    ]
+  }
+]

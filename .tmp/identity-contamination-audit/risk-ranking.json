@@ -1,0 +1,31 @@
+[
+  {
+    "rank": 1,
+    "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+    "ingredientName": "Pepino conserva",
+    "confidence": "HIGH",
+    "riskScore": 109,
+    "signals": [
+      "B",
+      "E",
+      "F"
+    ],
+    "purchaseCount": 3,
+    "topImpact": "UNSAFE — best-buy / % change on invoice unit_price not €/kg equivalent",
+    "provenCase": true
+  },
+  {
+    "rank": 2,
+    "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+    "ingredientName": "Mozzarella fior di latte",
+    "confidence": "HIGH",
+    "riskScore": 101,
+    "signals": [
+      "A",
+      "F"
+    ],
+    "purchaseCount": 2,
+    "topImpact": "UNSAFE — best-buy / % change on invoice unit_price not €/kg equivalent",
+    "provenCase": true
+  }
+]

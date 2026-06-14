@@ -1,0 +1,78 @@
+{
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "label": "IL Bocconcino",
+  "product": "POMODOR PELATI (CX 2.5KG*6)",
+  "auditedAt": "2026-06-13T01:00:00.000Z",
+  "verdict": "B",
+  "verdictLabel": "gt_bug",
+  "confidencePercent": 96,
+  "financialErrorVsGtEuro": 27.95,
+  "financialErrorVsVisibleEuro": 0,
+  "question": "Is Pomodor PELATI residual error an extraction bug or GT bug?",
+  "answer": "GT bug — VL ground truth qty 2 / €50 / €25 does not match the visible invoice; v27 extraction matches visible values.",
+  "sources": {
+    "visible": [
+      "column-shift-audit/ground-truth.json",
+      "column-selection-deep-dive/column-reconstruction.json",
+      "bocconcino-investigation/REPORT.md (DB row)"
+    ],
+    "gt": "field-accuracy-audit/ground-truth.json",
+    "v27": ".tmp/final-residual-error-audit/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+    "stability": "monetary-binding-final-validation/pomodor-5run-stability.json"
+  },
+  "comparison": {
+    "visible": {
+      "qty": 1,
+      "unit": "UNI",
+      "p_venda_gross": 27.56,
+      "discount_pct": 20,
+      "valor_liquido_net": 22.05,
+      "qty_times_gross": 27.56,
+      "qty_times_net": 22.05,
+      "transcriptionSource": "Manual image inspection — QUANT.=1,000; P.VENDA=27,560 EUR; DESC=20,00%; VALOR LÍQUIDO=22,05 EUR"
+    },
+    "vlGroundTruth": {
+      "qty": 2,
+      "unit": "un",
+      "unit_price": 25,
+      "total": 50,
+      "qty_times_unit": 50,
+      "source": "bocconcino-investigation OCR + post-geometry re-extract",
+      "matchesVisibleColumn": false
+    },
+    "v27Extraction": {
+      "qty": 1,
+      "unit": "uni",
+      "unit_price": 22.05,
+      "total": 22.05,
+      "matchesVisible": {
+        "qty": true,
+        "total": true,
+        "unit_price_field": "partial — copies VALOR net (22.05) not P.VENDA gross (27.56); €0 impact when qty=1"
+      },
+      "matchesGt": false
+    },
+    "fiveRunStability": {
+      "deployVersion": 21,
+      "runs": 5,
+      "deterministic": true,
+      "allRuns": { "qty": 1, "unit_price": 22.05, "total": 22.05 },
+      "correctVsVlGt": "0/5",
+      "correctVsVisible": "5/5 on qty and total"
+    }
+  },
+  "evidenceAnswers": {
+    "visibleQty1or2": "qty **1** — QUANT. column prints 1,000 (column-reconstruction, column-shift-audit, DB record)",
+    "valorShows2205ForSingleUnit": "yes — VALOR LÍQUIDO **22,05 EUR** for qty 1; math: 27.56 × (1−20%) ≈ 22.05",
+    "gtQty2Total50MatchesVisibleColumn": "no — no column shows qty 2, unit €25, or total €50; 2×25=50 is inferred not printed",
+    "gtOrigin": "Post-geometry re-extract likely interpreted pack notation (CX 2.5KG*6) as purchased qty 2"
+  },
+  "extractionCaveat": {
+    "note": "v27 copies VALOR €22.05 into unit_price field (not P.VENDA €27.56). This is a field-semantics / column-binding issue with €0 financial impact when qty=1 and total=22.05. It does NOT explain the €27.95 GT delta.",
+    "preV21Errors": "Pre-hybrid runs showed DESC €20 bleed and qty 2 inference — different failure modes"
+  },
+  "recommendation": {
+    "gtRevision": "Revise GT to qty 1, gross/list unit 27.56 or net 22.05, total 22.05",
+    "vlMetricImpact": "Revising GT removes €27.95 from global financial error bucket for this row"
+  }
+}

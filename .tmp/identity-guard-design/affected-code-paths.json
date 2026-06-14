@@ -1,0 +1,311 @@
+{
+  "generated_at": "2026-06-13T22:00:00.000Z",
+  "pipeline": {
+    "description": "Purchase A → ingredient_id → Purchase B chain through price_history into OI",
+    "stages": [
+      {
+        "stage": 1,
+        "name": "Invoice persist → history append",
+        "file": "src/lib/ingredient-auto-persist.ts",
+        "function": "persistOperationalIngredientCostFromInvoiceLine",
+        "lines": "98-164",
+        "role": "Triggers history append after ingredients.current_price update",
+        "guardPoint": "before appendIngredientPriceHistoryFromInvoiceLine call",
+        "guardAction": "Pass purchase contract snapshots into append params"
+      },
+      {
+        "stage": 2,
+        "name": "History append / prior selection",
+        "file": "src/lib/ingredient-price-history.ts",
+        "functions": [
+          "fetchPriorLinkedHistoryNewPrice",
+          "storedPriceHistoryFieldsFromParams",
+          "appendIngredientPriceHistoryFromInvoiceLine",
+          "computePriceHistoryDelta"
+        ],
+        "lines": "229-485",
+        "role": "Selects prior operational price, computes delta, inserts/updates row",
+        "comparisonStarts": "storedPriceHistoryFieldsFromParams — prior vs new operational €/base-unit",
+        "priorSelection": "fetchPriorLinkedHistoryNewPrice — latest linked new_price by invoice chronology (NO format check today)",
+        "movementCalculation": "computePriceHistoryDelta(storedPrev, storedNew) → delta_percent",
+        "guardPoint": "PRIMARY — replace naive prior pick with selectChainCompatiblePriorPrice; null delta on break",
+        "guardAction": "P0 write-path enforcement",
+        "severity": "P0_REQUIRED"
+      },
+      {
+        "stage": 3,
+        "name": "History chain reconcile",
+        "file": "src/lib/ingredient-price-history-reconcile.ts",
+        "function": "reconcileIngredientPriceHistoryChain",
+        "lines": "120-199",
+        "role": "Rechains all linked rows after re-extract or invoice delete",
+        "comparisonStarts": "Loop: storedPrev = prevNew from prior row",
+        "priorSelection": "Sequential chronological chain — blind to format",
+        "movementCalculation": "computePriceHistoryDelta per row",
+        "guardPoint": "Inside loop — skip incompatible prior propagation",
+        "guardAction": "Break chain when purchaseContractsChainCompatible fails",
+        "severity": "P0_REQUIRED"
+      },
+      {
+        "stage": 4,
+        "name": "History backfill",
+        "file": "src/lib/ingredient-price-history-backfill.ts",
+        "function": "backfillIngredientPriceHistory (via appendIngredientPriceHistoryFromInvoiceLine)",
+        "role": "Bulk rebuild from invoice_items",
+        "guardPoint": "Inherited from stage 2 once append is guarded",
+        "severity": "P0_INHERITED"
+      },
+      {
+        "stage": 5,
+        "name": "Linked row filter (read defense)",
+        "file": "src/lib/ingredient-price-history.ts",
+        "function": "linkedIngredientPriceHistoryRows",
+        "lines": "179-184",
+        "role": "Excludes orphan rows (invoice_id null) from intelligence",
+        "guardPoint": "Extend or wrap with isTrustedPriceMovementRow filter",
+        "guardAction": "Defense-in-depth for existing bad rows until reconcile backfill",
+        "severity": "P0_RECOMMENDED"
+      },
+      {
+        "stage": 6,
+        "name": "Margin alerts from history",
+        "file": "src/lib/margin-alert-data.ts",
+        "functions": [
+          "buildOperationalAlertItems",
+          "getHistoryPercent"
+        ],
+        "lines": "595-675",
+        "role": "Generates price_increase / price_decrease alerts from latest history per ingredient",
+        "comparisonStarts": "row.previous_price vs row.new_price",
+        "priorSelection": "getLatestHistoryByIngredient",
+        "movementCalculation": "getHistoryPercent(row) from delta_percent",
+        "opportunityGeneration": "price_decrease alerts feed recovery recommendations",
+        "guardPoint": "Skip rows where delta_percent is null OR isTrustedPriceMovementRow false",
+        "severity": "P0_REQUIRED"
+      },
+      {
+        "stage": 7,
+        "name": "Ingredient price movements ranking",
+        "file": "src/lib/operational-intelligence-synthesis.ts",
+        "function": "rankIngredientPriceMovements",
+        "lines": "2987-3015",
+        "role": "Ranks largest % moves per ingredient in window",
+        "comparisonStarts": "priceHistoryDeltaPct(row)",
+        "priorSelection": "Each history row's stored previous_price",
+        "movementCalculation": "priceHistoryDeltaPct",
+        "opportunityGeneration": "Feeds buildOwnerReviewFinancialRisks (increases) and buildOwnerReviewOpportunities (decreases)",
+        "guardPoint": "Filter untrusted rows before pct aggregation",
+        "severity": "P0_REQUIRED"
+      },
+      {
+        "stage": 8,
+        "name": "Supplier movement groups",
+        "file": "src/lib/operational-intelligence-synthesis.ts",
+        "function": "buildSupplierMovementGroups",
+        "lines": "4435-4540",
+        "role": "Aggregates avg % change per supplier",
+        "comparisonStarts": "Each price_history row delta_percent",
+        "movementCalculation": "priceHistoryDeltaPct per row → avg",
+        "supplierIntelligence": "Feeds supplier watch narratives (+1341% Mozzarella note)",
+        "guardPoint": "Exclude untrusted rows from changes[]",
+        "severity": "P0_REQUIRED"
+      },
+      {
+        "stage": 9,
+        "name": "Supplier window aggregates",
+        "file": "src/lib/operational-intelligence-synthesis.ts",
+        "function": "aggregateSuppliersInWindow",
+        "lines": "2654-2734",
+        "role": "Weekly snapshot supplier ↑/↓ counts, top ingredient deltas per supplier",
+        "comparisonStarts": "priceHistoryDeltaPct(row) in window",
+        "supplierIntelligence": "buildOwnerReviewSuppliersToWatch, weeklySnapshot counts",
+        "guardPoint": "Filter untrusted rows",
+        "severity": "P0_REQUIRED"
+      },
+      {
+        "stage": 10,
+        "name": "Owner review surfaces",
+        "file": "src/lib/operational-intelligence-synthesis.ts",
+        "functions": [
+          "buildOwnerReviewFinancialRisks",
+          "buildOwnerReviewOpportunities",
+          "buildOwnerReviewSuppliersToWatch",
+          "collectSupplierIngredientChanges"
+        ],
+        "lines": "4961-5271",
+        "role": "Executive OI cards — risks, opportunities, supplier watch",
+        "opportunityGeneration": "ingredientDecreases → opp-ingredient:* (Pepino −100%)",
+        "supplierIntelligence": "supplier watch +1341% Mozzarella, Bidfood −100% Pepino",
+        "guardPoint": "Inherited from stages 7-9 filters",
+        "severity": "P0_INHERITED"
+      },
+      {
+        "stage": 11,
+        "name": "Supplier intelligence snapshot",
+        "file": "src/lib/operational-intelligence-view.ts",
+        "function": "buildSupplierIntelligence",
+        "lines": "449-516",
+        "role": "spikeVs3MoPct, betterSupplierLine, stabilityLine per ingredient_id",
+        "comparisonStarts": "latestUnit vs avg3mo min90d — all history rows same ingredient_id",
+        "priorSelection": "minUnitPriceInWindow, getLatestHistoryByIngredient",
+        "movementCalculation": "gapPct catalog vs min historical",
+        "supplierIntelligence": "IL BOCCONCINO ~€0.95 vs catalog (+1341%) false line",
+        "guardPoint": "Filter history to trusted rows only; exclude cross-format min prices",
+        "severity": "P0_REQUIRED"
+      },
+      {
+        "stage": 12,
+        "name": "Supplier competitiveness recommendations",
+        "file": "src/lib/operational-intelligence-view.ts",
+        "function": "collectSupplierCompetitivenessRecommendations",
+        "lines": "1884-1960",
+        "role": "Re-quote / catalog above invoice low opportunities",
+        "comparisonStarts": "catalogUnit vs minHistoricalUnitPrice",
+        "guardPoint": "minHistorical from trusted rows only",
+        "severity": "P0_REQUIRED"
+      },
+      {
+        "stage": 13,
+        "name": "Price movement rows / purchasing feed",
+        "file": "src/lib/operational-intelligence-view.ts",
+        "functions": [
+          "buildPriceMovementRows",
+          "buildPurchasingMovements"
+        ],
+        "lines": "827-1580",
+        "role": "Purchasing movement headlines on /alerts",
+        "guardPoint": "Filter untrusted history rows",
+        "severity": "P0_RECOMMENDED"
+      },
+      {
+        "stage": 14,
+        "name": "Recipe margin previous price",
+        "file": "src/lib/recipe-impact.ts",
+        "function": "resolvePreviousUnitPriceEur",
+        "lines": "172-187",
+        "role": "Models recipe margin delta from history chain",
+        "guardPoint": "Use guarded chain when resolving previous unit price",
+        "severity": "P1_RECOMMENDED"
+      },
+      {
+        "stage": 15,
+        "name": "Exposure drill-down",
+        "file": "src/lib/exposure-drill-down.ts",
+        "role": "Ingredient exposure panels consume price_history",
+        "guardPoint": "Filter untrusted rows in movement sections",
+        "severity": "P1_RECOMMENDED"
+      },
+      {
+        "stage": 16,
+        "name": "Ingredient matching (preventive)",
+        "file": "src/lib/ingredient-identity.ts",
+        "functions": [
+          "computeMatchScoreBreakdown",
+          "hasCompatibleCanonicalForms"
+        ],
+        "role": "Blocks bad matches at invoice confirm — upstream of history",
+        "guardPoint": "NOT P0 scope but R5 preservation tokens should extend matching",
+        "severity": "P1_OPTIONAL",
+        "note": "P0 guard is downstream safety net; matching hardening reduces bad rows entering history"
+      }
+    ]
+  },
+  "vlFailureTrace": {
+    "mozzarella_piece_vs_block": {
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "chain": [
+        "Bocconcino invoice → history new_price=0.95 (piece)",
+        "Aviludo April → fetchPriorLinkedHistoryNewPrice returns 0.95",
+        "appendIngredientPriceHistoryFromInvoiceLine → delta_percent=+1341%",
+        "rankIngredientPriceMovements → financial risk",
+        "buildSupplierIntelligence → betterSupplierLine inverted",
+        "aggregateSuppliersInWindow → AVILUDO +1341% watch"
+      ],
+      "breakPoint": "Stage 2 — prior selection without format check",
+      "guardFix": "R1+R2 break chain → storedPrev=null"
+    },
+    "pepino_fresco_vs_conserva": {
+      "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "chain": [
+        "Bidfood Pepinos jar → new_price=3.748/kg-op",
+        "Bidfood Pepino fresh kg → previous=3.748 → new=0.00177/g-op",
+        "delta_percent=−99.95%",
+        "buildOwnerReviewOpportunities → opp-ingredient Pepino −100% €744/mo class",
+        "aggregateSuppliersInWindow → Bidfood −100% watch"
+      ],
+      "breakPoint": "Stage 2 + Stage 3 reconcile — same weight family, different product",
+      "guardFix": "R3+R5 break chain"
+    },
+    "ginger_beer_020cl": {
+      "ingredientId": null,
+      "chain": [
+        "Emporio line unmatched → no price_history",
+        "If matched: operationalUnitPriceForPriceHistory → €575/L",
+        "Would flow to price_increase alert and OI"
+      ],
+      "breakPoint": "Stage 1 persist — volume parse",
+      "guardFix": "R7 block_insert at append"
+    }
+  },
+  "filesRequiringChanges": {
+    "P0_required": [
+      {
+        "path": "src/lib/ingredient-price-chain-guard.ts",
+        "change": "NEW — guard module (design only in this audit)",
+        "estimatedLOC": 180
+      },
+      {
+        "path": "src/lib/ingredient-price-history.ts",
+        "change": "Wire guard in fetchPriorLinkedHistoryNewPrice, storedPriceHistoryFieldsFromParams, appendIngredientPriceHistoryFromInvoiceLine",
+        "estimatedLOC": 45
+      },
+      {
+        "path": "src/lib/ingredient-price-history-reconcile.ts",
+        "change": "Break chain in reconcile loop when incompatible",
+        "estimatedLOC": 25
+      },
+      {
+        "path": "src/lib/operational-intelligence-synthesis.ts",
+        "change": "Filter untrusted rows in rankIngredientPriceMovements, buildSupplierMovementGroups, aggregateSuppliersInWindow, priceHistoryDeltaPct wrapper",
+        "estimatedLOC": 35
+      },
+      {
+        "path": "src/lib/margin-alert-data.ts",
+        "change": "Skip price_increase/decrease when movement untrusted",
+        "estimatedLOC": 15
+      },
+      {
+        "path": "src/lib/operational-intelligence-view.ts",
+        "change": "Trusted-only history in buildSupplierIntelligence, minHistoricalUnitPrice",
+        "estimatedLOC": 20
+      }
+    ],
+    "P0_tests": [
+      {
+        "path": "src/lib/ingredient-price-chain-guard.test.ts",
+        "change": "TC-MOZZARELLA, TC-PEPINO, TC-GINGER-BEER, TC-ATUM-TRUSTED",
+        "estimatedLOC": 120
+      },
+      {
+        "path": "src/lib/ingredient-price-history-persistence.test.ts",
+        "change": "Extend append tests for break_chain behavior",
+        "estimatedLOC": 40
+      },
+      {
+        "path": "src/lib/operational-intelligence-synthesis.test.ts",
+        "change": "Assert Mozzarella/Pepino not in ownerReview after guard",
+        "estimatedLOC": 50
+      }
+    ],
+    "P0_backfill": [
+      {
+        "path": "scripts/reconcile-vl-price-history.mts (or harness extension)",
+        "change": "One-time reconcile all VL ingredients with guard to fix existing rows",
+        "estimatedLOC": 60
+      }
+    ],
+    "totalFiles": 9,
+    "totalNewLOC": "~510",
+    "totalModifiedLOC": "~140"
+  }
+}

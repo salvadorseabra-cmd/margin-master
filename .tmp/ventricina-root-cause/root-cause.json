@@ -1,0 +1,73 @@
+{
+  "generated_at": "2026-06-12T22:45:00.000Z",
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "row": "Rovagnati - Salame Ventricina 2,5 Kg",
+  "verdict": {
+    "firstFailingStage": "pass_c_gpt_structured",
+    "exactFieldCausingFailure": "discount_pct",
+    "secondaryField": "gross_unit_price",
+    "confidencePct": 88,
+    "recommendedFixCategory": "Prompt",
+    "secondaryFixCategory": "Geometry"
+  },
+  "investigationAnswers": {
+    "discount_pct_extracted": false,
+    "gross_unit_price_extracted": false,
+    "eightFiftyInterpretation": "NOT mapped to discount_pct on v24 (0/3 runs). Value 8,50 visible in Desc.(%) column between 16,60€ and 39,49€ but GPT misreads gross_unit_price instead (21 / 20.2 / 17.72). Historical v23 sometimes read 17,50 (Prosciutto neighbour) as unit_price.",
+    "whyProsciuttoSucceedsVentricinaFails": "v24 prompt hardening added a full Prosciutto worked example (17,50) but only a format line for 8,50→8.5 without a Ventricina row. Prosciutto discount (17.50) exceeds gross (10.30) — unambiguous as %. Ventricina discount (8.50) is smaller than gross (16.60) and resembles a euro magnitude; GPT defaults to gross-column misread when discount_pct stays null."
+  },
+  "evidence": {
+    "v24Runs": {
+      "source": ".tmp/emporio-discount-column-audit/post-hardening-3run-validation.json",
+      "discountInferredPresent": "0/3",
+      "apiOutputs": [
+        { "run": 1, "unit": 21, "total": 54.6, "deltaVsVisible": 15.11 },
+        { "run": 2, "unit": 20.2, "total": 52.52, "deltaVsVisible": 13.03 },
+        { "run": 3, "unit": 17.72, "total": 46.09, "deltaVsVisible": 6.6 }
+      ]
+    },
+    "binderReverseSimulation": {
+      "source": ".tmp/ventricina-root-cause/binder-simulation.json",
+      "matches": [
+        "gross=21, disc=null → 21/54.6 (run 1 exact)",
+        "gross=20.2, disc=null → 20.2/52.52 (run 2 exact)",
+        "gross=17.72, disc=null → 17.72/46.07 (run 3 ≈46.09)",
+        "correct: gross=16.6, disc=8.5, net=39.49 → 15.19/39.49",
+        "ruleB: disc=8.5 + unit=8.5 bleed → 15.19/39.49 (binder would fix if discount extracted)"
+      ]
+    },
+    "visibleRowCrop": ".tmp/ventricina-root-cause/ventricina-row-y746.png",
+    "promptAsymmetry": {
+      "file": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+      "prosciuttoWorkedExample": "lines 99-103 (full row)",
+      "ventricinaCoverage": "line 108 format example only (8,50 → 8.5)"
+    }
+  },
+  "failureMechanism": {
+    "classification": "GPT Pass C column mis-identification — discount omission + gross misread",
+    "notCausedBy": ["Binder logic bug", "Schema enforcement", "Tax/lot confusion", "Geometry-only (same crop as fixed Prosciutto)"],
+    "amplifiedBy": "bindMonetaryColumns gross-without-discount path (total = qty × wrong gross)"
+  },
+  "v23ToV24Shift": {
+    "v23Pattern": "BLEED 17.50 (Prosciutto Desc magnitude) or MISSING gross path",
+    "v24Pattern": "MISSING discount + gross misread (21 / 20.2 / 17.72)",
+    "interpretation": "Prosciutto fix reduced neighbour bleed but Ventricina still lacks row-specific prompt anchor; failure mode shifted to gross OCR/column drift"
+  },
+  "recommendedActions": [
+    {
+      "category": "Prompt",
+      "priority": "PRIMARY",
+      "action": "Add full Emporio Ventricina negative example: Qtd 2,60, Preço Unit 16,30€, Desc.(%) 8,50, Preço Total 39,49€ → discount_pct 8.5"
+    },
+    {
+      "category": "Geometry",
+      "priority": "SECONDARY",
+      "action": "Include Desc.(%) header in Pass C crop (same fix benefits all Emporio rows)"
+    },
+    {
+      "category": "Binder",
+      "priority": "LOW",
+      "action": "No change needed — Rule B already corrects 8.5 bleed when discount_pct present"
+    }
+  ]
+}

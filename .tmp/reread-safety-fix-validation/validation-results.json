@@ -1,0 +1,142 @@
+{
+  "generated_at": "2026-06-12T22:36:30.305Z",
+  "source": "src/routes/invoices.tsx runExtraction guards (simulated)",
+  "scenarios": [
+    {
+      "id": "A_empty_extraction",
+      "description": "items=[] → DELETE not executed, items preserved",
+      "input": {
+        "inFlight": false,
+        "rawItems": [],
+        "normalizedCount": 0,
+        "hasUser": true
+      },
+      "expect": {
+        "outcome": "SKIP_EMPTY",
+        "deleteExecuted": false,
+        "insertExecuted": false
+      },
+      "actual": {
+        "outcome": "SKIP_EMPTY",
+        "deleteExecuted": false,
+        "insertExecuted": false
+      },
+      "pass": true
+    },
+    {
+      "id": "B_double_trigger",
+      "description": "Second call while in-flight exits immediately",
+      "input": {
+        "inFlight": true,
+        "rawItems": [
+          {
+            "name": "x"
+          }
+        ],
+        "normalizedCount": 1,
+        "hasUser": true
+      },
+      "expect": {
+        "outcome": "SKIP_MUTEX",
+        "deleteExecuted": false,
+        "insertExecuted": false
+      },
+      "actual": {
+        "outcome": "SKIP_MUTEX",
+        "deleteExecuted": false,
+        "insertExecuted": false
+      },
+      "pass": true
+    },
+    {
+      "id": "C_delete_error",
+      "description": "Delete error → abort before insert",
+      "input": {
+        "inFlight": false,
+        "rawItems": [
+          {
+            "name": "x"
+          }
+        ],
+        "normalizedCount": 1,
+        "hasUser": true,
+        "deleteError": "RLS denied"
+      },
+      "expect": {
+        "outcome": "ABORT_DELETE_ERROR",
+        "deleteExecuted": true,
+        "insertExecuted": false
+      },
+      "actual": {
+        "outcome": "ABORT_DELETE_ERROR",
+        "deleteExecuted": true,
+        "insertExecuted": false
+      },
+      "pass": true
+    },
+    {
+      "id": "D_insert_error",
+      "description": "Insert error → surfaced, no success path",
+      "input": {
+        "inFlight": false,
+        "rawItems": [
+          {
+            "name": "x"
+          }
+        ],
+        "normalizedCount": 1,
+        "hasUser": true,
+        "insertError": "duplicate key"
+      },
+      "expect": {
+        "outcome": "ABORT_INSERT_ERROR",
+        "deleteExecuted": true,
+        "insertExecuted": true
+      },
+      "actual": {
+        "outcome": "ABORT_INSERT_ERROR",
+        "deleteExecuted": true,
+        "insertExecuted": true
+      },
+      "pass": true
+    },
+    {
+      "id": "E_happy_path",
+      "description": "Normalized rows persist via delete+insert",
+      "input": {
+        "inFlight": false,
+        "rawItems": [
+          {
+            "name": "Prosciutto"
+          }
+        ],
+        "normalizedCount": 1,
+        "hasUser": true
+      },
+      "expect": {
+        "outcome": "PERSIST_OK",
+        "deleteExecuted": true,
+        "insertExecuted": true
+      },
+      "actual": {
+        "outcome": "PERSIST_OK",
+        "deleteExecuted": true,
+        "insertExecuted": true
+      },
+      "pass": true
+    }
+  ],
+  "allPass": true,
+  "codeTrace": {
+    "mutex": "extractionInFlightRef.current[invoiceId] checked before await; cleared in finally",
+    "emptyGuard": "normalizedItems.length === 0 → return null before DELETE",
+    "deleteError": "deleteError → toast.error + return null",
+    "insertError": "insertError → toast.error + return null (not silent success)",
+    "reExtract": "if (result) guard — null return preserves UI items and skips header update"
+  },
+  "regressionAnswers": {
+    "aviludoWipeNowImpossible": "YES — empty extraction cannot reach DELETE",
+    "emporioDuplicationNowImpossible": "YES — per-invoice mutex blocks concurrent runExtraction in same session",
+    "emporioDuplicationCaveat": "Cross-tab race still possible without DB lock (phase 2)"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-06-12T01:00:00.000Z",
+  "file": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+  "systemPrompt": {
+    "name": "TABLE_EXTRACTION_SYSTEM_PROMPT",
+    "lengthChars": 6847,
+    "structuredFieldInstructions": {
+      "columnMapping": {
+        "gross_unit_price": "PREÇO UNITÁRIO / P.VENDA / list unit price column",
+        "discount_pct": "DESC / Desc.(%) / discount column",
+        "line_total_net": "VALOR / Preço Total / line total column"
+      },
+      "explicitNullLegacyRule": "unit_price and total: leave null when gross_unit_price / line_total_net are populated",
+      "discountedLinesRule": "Populate gross_unit_price, discount_pct, and line_total_net from their separate columns"
+    },
+    "legacyFieldInstructions": {
+      "escapeHatch": "If no discount column → copy unit_price from unit price column instead of gross_unit_price",
+      "positiveExamplesUsingLegacy": [
+        "Açúcar Branco → unit_price: 9.99, total: from VALOR",
+        "Hortelã → unit_price: from PREÇO UNITÁRIO, total: from VALOR",
+        "Aceto → unit_price and total: from their columns only",
+        "Ginger Beer → unit_price/total from column",
+        "Tomilho/Manjericão → unit_price: from column, total: from column",
+        "Aceto discounted → unit_price=18,83, total=16,09"
+      ],
+      "structuredOnlyExample": [
+        "POMODORI PELATI negative example → gross_unit_price/discount_pct/line_total_net populated, unit_price/total null"
+      ]
+    },
+    "exampleBalance": {
+      "structuredMentions": 23,
+      "legacyMentions": 30,
+      "workedExamplesStructuredOnly": 1,
+      "workedExamplesLegacyOrMixed": 7,
+      "ratio": "Model sees 7× more legacy-pattern examples than structured-only pattern"
+    },
+    "contradictions": [
+      {
+        "id": "dual-path",
+        "severity": "high",
+        "description": "Prompt mandates structured columns but retains unit_price/total in JSON schema and provides explicit legacy fallback when discount column absent"
+      },
+      {
+        "id": "example-drift",
+        "severity": "high",
+        "description": "POSITIVE EXAMPLES section still teaches unit_price/total extraction; only NEGATIVE EXAMPLES section shows structured-only for Pomodor"
+      },
+      {
+        "id": "qty1-equals-total",
+        "severity": "medium",
+        "description": "Rule 'When quantity is 1, unit_price usually equals line total' reinforces copying VALOR into unit_price — exactly the v22 Pomodor failure mode (22.05/22.05)"
+      },
+      {
+        "id": "pre-phase2-inertia",
+        "severity": "medium",
+        "description": "Pre-65452a9 prompt trained model on unit_price/total only; Phase 2 added fields to text but not to API schema or example corpus"
+      }
+    ]
+  },
+  "userMessage": {
+    "text": "Extract each visible invoice line item. Copy quantity, gross_unit_price, discount_pct, and line_total_net from their labeled table columns.",
+    "mentionsStructured": true,
+    "mentionsLegacy": false,
+    "weight": "Single sentence vs 6800-char system prompt with legacy examples"
+  },
+  "modelInstructionToOutputBoth": {
+    "answer": false,
+    "evidence": "Prompt says leave unit_price/total null when structured populated — mutually exclusive paths, not both. Model chooses legacy path because it is easier and explicitly permitted."
+  },
+  "pomodorFailureMechanism": {
+    "visibleColumns": "qty=1, P.VENDA=27.56, DESC=20%, VALOR=22.05",
+    "modelOutput": "unit_price=22.05, total=22.05",
+    "interpretation": [
+      "Model copies VALOR (22.05) into both unit_price and total",
+      "Triggered by qty=1 rule and legacy positive examples",
+      "Ignores structured column mapping despite Pomodor negative example",
+      "No API schema forces gross_unit_price/discount_pct/line_total_net keys"
+    ]
+  }
+}

@@ -1,0 +1,305 @@
+[
+  {
+    "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+    "ingredientName": "Pepino conserva",
+    "confidence": "HIGH",
+    "purchaseCount": 3,
+    "priceHistoryRowCount": 3,
+    "signals": [
+      "B",
+      "E",
+      "F"
+    ],
+    "guardReasons": [
+      "unit_family_mismatch",
+      "extreme_price_ratio"
+    ],
+    "whyContaminated": "countable vs weight unit family; supplier-product / naming mismatch; extreme price movement (>50% or ratio ceiling)",
+    "purchases": [
+      {
+        "invoiceItemId": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoiceLabel": "Bidfood",
+        "invoiceDate": "2026-05-25",
+        "supplier": "Bidfood Portugal",
+        "productName": "Pepino",
+        "quantity": 3.36,
+        "unit": "kg",
+        "invoiceUnitPrice": 1.77,
+        "lineTotal": 4.76,
+        "packageDescription": "weight_or_volume",
+        "structuredKind": "weight_or_volume",
+        "usableQuantityUnit": "g",
+        "normalizedUsableQuantity": 3360,
+        "operationalUnitPrice": 0.00177,
+        "purchaseQuantity": 1000,
+        "costBaseUnit": "g",
+        "usableWeightGrams": null,
+        "preservationClass": "unknown",
+        "unitFamily": "weight",
+        "contractSnapshot": {
+          "name": "Pepino",
+          "ingredientUnit": "g",
+          "purchaseQuantity": 1000,
+          "operationalUnitPrice": 0.00177,
+          "unitFamily": "weight",
+          "canonicalForm": null,
+          "preservationClass": "unknown",
+          "contractKey": "weight:g:none:unknown"
+        },
+        "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "ingredientName": "Pepino conserva",
+        "matchMethod": "price_history"
+      },
+      {
+        "invoiceItemId": "31b818c3-2bbf-48ed-a779-a3b8975750ef",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "invoiceLabel": "Aviludo May",
+        "invoiceDate": "2026-05-19",
+        "supplier": "AVIJUDO",
+        "productName": "Pepinos Extra Ull Frasco 6x720 g",
+        "quantity": 1,
+        "unit": "cx",
+        "invoiceUnitPrice": 22.49,
+        "lineTotal": 22.49,
+        "packageDescription": "multi_unit_pack",
+        "structuredKind": "multi_unit_pack",
+        "usableQuantityUnit": "g",
+        "normalizedUsableQuantity": 4320,
+        "operationalUnitPrice": 3.748333333333333,
+        "purchaseQuantity": 6,
+        "costBaseUnit": "un",
+        "usableWeightGrams": 4320,
+        "preservationClass": "preserved",
+        "unitFamily": "countable",
+        "contractSnapshot": {
+          "name": "Pepinos Extra Ull Frasco 6x720 g",
+          "ingredientUnit": "un",
+          "purchaseQuantity": 6,
+          "operationalUnitPrice": 3.748333333333333,
+          "unitFamily": "countable",
+          "canonicalForm": null,
+          "preservationClass": "preserved",
+          "contractKey": "countable:un:none:preserved"
+        },
+        "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "ingredientName": "Pepino conserva",
+        "matchMethod": "price_history"
+      },
+      {
+        "invoiceItemId": "f2091768-4a0f-41b1-bcf5-cd3e3ddb9e1d",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "invoiceLabel": "Aviludo April",
+        "invoiceDate": "2026-04-17",
+        "supplier": "AVILUDO",
+        "productName": "Pepinos Extra II Frasco 6X720g",
+        "quantity": 1,
+        "unit": "cx",
+        "invoiceUnitPrice": 21.99,
+        "lineTotal": 21.99,
+        "packageDescription": "multi_unit_pack",
+        "structuredKind": "multi_unit_pack",
+        "usableQuantityUnit": "g",
+        "normalizedUsableQuantity": 4320,
+        "operationalUnitPrice": 3.6649999999999996,
+        "purchaseQuantity": 6,
+        "costBaseUnit": "un",
+        "usableWeightGrams": 4320,
+        "preservationClass": "preserved",
+        "unitFamily": "countable",
+        "contractSnapshot": {
+          "name": "Pepinos Extra II Frasco 6X720g",
+          "ingredientUnit": "un",
+          "purchaseQuantity": 6,
+          "operationalUnitPrice": 3.6649999999999996,
+          "unitFamily": "countable",
+          "canonicalForm": null,
+          "preservationClass": "preserved",
+          "contractKey": "countable:un:none:preserved"
+        },
+        "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "ingredientName": "Pepino conserva",
+        "matchMethod": "alias_exact"
+      }
+    ],
+    "incompatiblePairs": [
+      {
+        "purchaseA": {
+          "invoiceLabel": "Bidfood",
+          "productName": "Pepino",
+          "invoiceUnitPrice": 1.77,
+          "operationalUnitPrice": 0.00177
+        },
+        "purchaseB": {
+          "invoiceLabel": "Aviludo May",
+          "productName": "Pepinos Extra Ull Frasco 6x720 g",
+          "invoiceUnitPrice": 22.49,
+          "operationalUnitPrice": 3.748333333333333
+        },
+        "guardResult": {
+          "compatible": false,
+          "reason": "unit_family_mismatch",
+          "action": "break_chain"
+        },
+        "signals": [
+          "B",
+          "E",
+          "F"
+        ]
+      },
+      {
+        "purchaseA": {
+          "invoiceLabel": "Bidfood",
+          "productName": "Pepino",
+          "invoiceUnitPrice": 1.77,
+          "operationalUnitPrice": 0.00177
+        },
+        "purchaseB": {
+          "invoiceLabel": "Aviludo April",
+          "productName": "Pepinos Extra II Frasco 6X720g",
+          "invoiceUnitPrice": 21.99,
+          "operationalUnitPrice": 3.6649999999999996
+        },
+        "guardResult": {
+          "compatible": false,
+          "reason": "unit_family_mismatch",
+          "action": "break_chain"
+        },
+        "signals": [
+          "B",
+          "E",
+          "F"
+        ]
+      }
+    ],
+    "impact": {
+      "historicalPricing": "UNSAFE — poisoned delta_percent chains and false best/worst",
+      "opportunities": "BLOCKED post-P0 on OI read path; raw DB still poisoned",
+      "supplierIntelligence": "UNSAFE — supplier switch signals compare incompatible packs",
+      "recipeCosting": "UNSAFE — ingredients.current_price last-write-wins across formats",
+      "purchasingDecisions": "UNSAFE — best-buy / % change on invoice unit_price not €/kg equivalent"
+    },
+    "p0GuardWouldBlock": true
+  },
+  {
+    "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+    "ingredientName": "Mozzarella fior di latte",
+    "confidence": "HIGH",
+    "purchaseCount": 2,
+    "priceHistoryRowCount": 3,
+    "signals": [
+      "A",
+      "F"
+    ],
+    "guardReasons": [
+      "pack_weight_magnitude",
+      "extreme_price_ratio"
+    ],
+    "whyContaminated": "weight contract mismatch (pack magnitude); extreme price movement (>50% or ratio ceiling)",
+    "purchases": [
+      {
+        "invoiceItemId": "efb979b3-0a24-41f6-92a8-cb257f27106a",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "invoiceLabel": "Bocconcino",
+        "invoiceDate": "2026-05-08",
+        "supplier": "IL BOCCONCINO Distribuição ALIMENTAR",
+        "productName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "quantity": 10,
+        "unit": "un",
+        "invoiceUnitPrice": 8.12,
+        "lineTotal": 81.23,
+        "packageDescription": "weight_or_volume",
+        "structuredKind": "weight_or_volume",
+        "usableQuantityUnit": "g",
+        "normalizedUsableQuantity": 1250,
+        "operationalUnitPrice": 0.8119999999999999,
+        "purchaseQuantity": 10,
+        "costBaseUnit": "un",
+        "usableWeightGrams": 125,
+        "preservationClass": "unknown",
+        "unitFamily": "countable",
+        "contractSnapshot": {
+          "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+          "ingredientUnit": "un",
+          "purchaseQuantity": 10,
+          "operationalUnitPrice": 0.8119999999999999,
+          "unitFamily": "countable",
+          "canonicalForm": null,
+          "preservationClass": "unknown",
+          "contractKey": "countable:un:none:unknown"
+        },
+        "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+        "ingredientName": "Mozzarella fior di latte",
+        "matchMethod": "price_history"
+      },
+      {
+        "invoiceItemId": "cf79d75e-b648-433b-8458-a3da140c12bb",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "invoiceLabel": "Aviludo April",
+        "invoiceDate": "2026-04-17",
+        "supplier": "AVILUDO",
+        "productName": "Mozzarella Flor di Latte 2Kg",
+        "quantity": 1,
+        "unit": "un",
+        "invoiceUnitPrice": 13.69,
+        "lineTotal": 13.69,
+        "packageDescription": "weight_or_volume",
+        "structuredKind": "weight_or_volume",
+        "usableQuantityUnit": "g",
+        "normalizedUsableQuantity": 2000,
+        "operationalUnitPrice": 13.69,
+        "purchaseQuantity": 1,
+        "costBaseUnit": "un",
+        "usableWeightGrams": 2000,
+        "preservationClass": "unknown",
+        "unitFamily": "countable",
+        "contractSnapshot": {
+          "name": "Mozzarella Flor di Latte 2Kg",
+          "ingredientUnit": "un",
+          "purchaseQuantity": 1,
+          "operationalUnitPrice": 13.69,
+          "unitFamily": "countable",
+          "canonicalForm": null,
+          "preservationClass": "unknown",
+          "contractKey": "countable:un:none:unknown"
+        },
+        "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+        "ingredientName": "Mozzarella fior di latte",
+        "matchMethod": "alias_exact"
+      }
+    ],
+    "incompatiblePairs": [
+      {
+        "purchaseA": {
+          "invoiceLabel": "Bocconcino",
+          "productName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+          "invoiceUnitPrice": 8.12,
+          "operationalUnitPrice": 0.8119999999999999
+        },
+        "purchaseB": {
+          "invoiceLabel": "Aviludo April",
+          "productName": "Mozzarella Flor di Latte 2Kg",
+          "invoiceUnitPrice": 13.69,
+          "operationalUnitPrice": 13.69
+        },
+        "guardResult": {
+          "compatible": false,
+          "reason": "pack_weight_magnitude",
+          "action": "break_chain"
+        },
+        "signals": [
+          "A",
+          "F"
+        ]
+      }
+    ],
+    "impact": {
+      "historicalPricing": "UNSAFE — poisoned delta_percent chains and false best/worst",
+      "opportunities": "BLOCKED post-P0 on OI read path; raw DB still poisoned",
+      "supplierIntelligence": "UNSAFE — supplier switch signals compare incompatible packs",
+      "recipeCosting": "UNSAFE — ingredients.current_price last-write-wins across formats",
+      "purchasingDecisions": "UNSAFE — best-buy / % change on invoice unit_price not €/kg equivalent"
+    },
+    "p0GuardWouldBlock": true
+  }
+]

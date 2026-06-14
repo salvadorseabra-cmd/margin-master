@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-06-13T17:39:58.611Z",
+  "deployVersion": 31,
+  "verdict": "CLOSE EXTRACTION",
+  "confidencePercent": 90,
+  "rationale": "Farina 95% stable on v31 (20-run). Residual 5% is acceptable GPT noise at €0.05 avg.",
+  "criticalAnswers": {
+    "realBug": {
+      "answer": "PARTIAL — intermittent Pass C Valor digit drift, not structural",
+      "evidence": "1/20 runs at 25.52; unit_price always 26.52 on discounted row"
+    },
+    "pureGptVariance": {
+      "answer": "YES — primary cause",
+      "evidence": "v30 0/10 → v31 95% — prompt-sensitive digit OCR, not geometry/binder regression"
+    },
+    "promptV32Roi": {
+      "answer": "LOW",
+      "expectedRecoveryEuro": 0.03,
+      "note": "v31 example recovered 0%→60% in 5-run; diminishing returns; binder guard may outperform"
+    },
+    "binderSafeguard": {
+      "answer": "HIGH",
+      "wouldRecover": "1/1 incorrect runs",
+      "rule": "qty=1 AND discount_pct>0 AND unit_price > total → set total = unit_price (or re-derive from gross×discount)"
+    },
+    "v32ExpectedRecovery": {
+      "bestCasePct": 97.5,
+      "expectedAvgErrorEuro": 0.03,
+      "note": "Assumes 50% recovery of remaining incorrect runs — optimistic"
+    }
+  },
+  "metrics": {
+    "correctPct": 95,
+    "avgErrorEuro": 0.05,
+    "totalsUnique": [
+      26.52,
+      25.52
+    ],
+    "classification": "B"
+  }
+}

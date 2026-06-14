@@ -1,0 +1,122 @@
+{
+  "generated_at": "2026-06-12T00:45:00.000Z",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "product": "POMODOR PELATI (CX 2.5KG*6)",
+  "v22ObservedApiOutput": {
+    "quantity": 1,
+    "unit_price": 22.05,
+    "total": 22.05,
+    "gross_unit_price": null,
+    "discount_pct": null,
+    "line_total_net": null,
+    "source": "pomodor-5run-v22-stability.json (5/5 identical)"
+  },
+  "pipelineStages": {
+    "description": "Code path in extractTableItemsFromImage → index.ts",
+    "stages": [
+      {
+        "order": 1,
+        "stage": "gpt_raw_json",
+        "function": "callOpenAiJson() → JSON.parse(content)",
+        "file": "invoice-date-extraction.ts",
+        "structuredFieldsPresent": "UNKNOWN_LIVE (not logged)",
+        "inferredForV22": false,
+        "evidence": "Scenario B trace: GPT items lack gross_unit_price/discount_pct/line_total_net keys"
+      },
+      {
+        "order": 2,
+        "stage": "parseMonetaryLineItems",
+        "function": "parseMonetaryLineItems(parsed.items)",
+        "file": "invoice-monetary-binding.ts",
+        "preservesStructuredIfPresent": true,
+        "dropsStructured": false,
+        "v22Inferred": {
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 22.05,
+          "total": 22.05
+        }
+      },
+      {
+        "order": 3,
+        "stage": "bindMonetaryColumns",
+        "function": "bindMonetaryColumns(...)",
+        "file": "invoice-monetary-binding.ts",
+        "requiresStructuredToAct": true,
+        "noOpWhenStructuredNull": true,
+        "v22Inferred": "unchanged — applyStructuredBinding early-return when all structured null"
+      },
+      {
+        "order": 4,
+        "stage": "monetaryToInvoiceLineItem",
+        "function": "boundItems.map(monetaryToInvoiceLineItem)",
+        "file": "invoice-monetary-binding.ts",
+        "stripsStructuredFields": true,
+        "byDesign": true,
+        "outputKeys": ["name", "quantity", "unit", "unit_price", "total"]
+      },
+      {
+        "order": 5,
+        "stage": "reconcileLineItemAmounts",
+        "function": "reconcileLineItemAmounts(...)",
+        "file": "invoice-line-reconcile.ts",
+        "touchesStructuredFields": false,
+        "v22Inferred": "unchanged when unit+total both present"
+      },
+      {
+        "order": 6,
+        "stage": "finalizeExtractedLineItems",
+        "function": "reconcileLineItemsToNetSubtotal(...)",
+        "file": "invoice-line-reconcile.ts via index.ts",
+        "touchesStructuredFields": false
+      },
+      {
+        "order": 7,
+        "stage": "api_response",
+        "function": "json({ items: reconciledItems })",
+        "file": "index.ts",
+        "type": "InvoiceLineItem — no structured fields in type"
+      }
+    ]
+  },
+  "mockTraceScenarios": {
+    "A_if_gpt_returns_structured_correctly": {
+      "afterBinder": { "unit_price": 22.05, "total": 22.05, "gross_unit_price": 27.56, "discount_pct": 20 },
+      "afterApiStrip": { "unit_price": 22.05, "total": 22.05 },
+      "binderWorked": true
+    },
+    "B_v22_inferred_gpt_legacy_only": {
+      "structuredNullFromStage2": true,
+      "binderWorked": false,
+      "matchesLiveOutput": true
+    },
+    "D_if_gpt_returns_structured_plus_desc_bleed": {
+      "gptUnit": 20,
+      "afterBinder": { "unit_price": 22.05, "total": 40 },
+      "binderWorked": true,
+      "rule": "Rule B"
+    }
+  },
+  "firstDisappearancePoint": {
+    "forBinderEffectiveness": {
+      "stage": "1_gpt_raw_json",
+      "reason": "GPT returns legacy unit_price/total only; never populates gross_unit_price, discount_pct, line_total_net despite Phase 2 prompt schema",
+      "classification": "A_prompt_extraction"
+    },
+    "forApiResponseNullStructured": {
+      "stage": "4_monetaryToInvoiceLineItem",
+      "reason": "Intentional strip to InvoiceLineItem legacy shape before HTTP response",
+      "classification": "D_response_serialization",
+      "note": "Separate from binder ineffectiveness — API would show null even if binder ran correctly"
+    }
+  },
+  "verdict": {
+    "primaryCause": "A",
+    "primaryCauseLabel": "GPT extraction — model does not populate structured schema fields",
+    "secondaryCause": "D",
+    "secondaryCauseLabel": "Response serialization strips structured fields from API (by design)",
+    "notResponsible": ["B JSON parsing", "C normalizeItems (removed; replaced by parseMonetaryLineItems)", "reconcile"],
+    "confidencePct": 88
+  }
+}

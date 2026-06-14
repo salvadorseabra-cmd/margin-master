@@ -1,0 +1,176 @@
+{
+  "generated_at": "2026-06-14T08:52:00.000Z",
+  "case": {
+    "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+    "ingredientName": "Pepino conserva",
+    "bidfoodInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "bidfoodItemId": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+    "bidfoodLineName": "Pepino",
+    "poisonedHistoryId": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4"
+  },
+  "verdict": {
+    "contamination_before_human_review": true,
+    "confidence_percent": 91,
+    "human_confirmed_pepino_line": false,
+    "first_upload_wall_clock": "2026-06-09T22:36:41.424691+00:00",
+    "latest_reextract_wall_clock": "2026-06-13T21:50:38.703943+00:00"
+  },
+  "chronology_caveat": "ingredient_price_history.created_at is anchored to invoice_date (T12:00:00Z), NOT upload wall-clock. Wall-clock ordering uses ingredients/aliases/invoices/invoice_items.created_at.",
+  "steps": [
+    {
+      "step": 1,
+      "name": "Invoice uploaded",
+      "wall_clock": "2026-06-09T22:36:41.424691+00:00",
+      "invoice_date": "2026-05-25",
+      "data_before": null,
+      "data_changed": "invoices row created (Bidfood Portugal)",
+      "written": ["invoices"],
+      "human_action": false,
+      "source": "Supabase invoices.created_at"
+    },
+    {
+      "step": 2,
+      "name": "OCR extraction",
+      "wall_clock": "2026-06-09T22:36:41+ (same session, synchronous)",
+      "invoice_date": "2026-05-25",
+      "data_before": "file_url stored on invoice",
+      "data_changed": "normalized line items including { name: 'Pepino', qty: 3.36, unit: kg, unit_price: 1.77 }",
+      "written": [],
+      "human_action": false,
+      "source": "invoices.tsx extract pipeline stage 7-8",
+      "code": "src/routes/invoices.tsx — runExtraction / OCR persist handler"
+    },
+    {
+      "step": 3,
+      "name": "Invoice item created",
+      "wall_clock": "2026-06-09T22:36:41+ (first extract); latest 2026-06-13T21:50:38.703943+00:00",
+      "invoice_date": "2026-05-25",
+      "data_before": "no invoice_items for Pepino on Bidfood (or deleted on re-extract)",
+      "data_changed": "invoice_items row 8e9e727a — name Pepino, no ingredient_id column",
+      "written": ["invoice_items"],
+      "human_action": false,
+      "source": "Supabase invoice_items.created_at; re-insert on each re-extract deletes prior rows",
+      "code": "invoices.tsx ~1307-1338 delete+insert"
+    },
+    {
+      "step": 4,
+      "name": "Matching decision",
+      "wall_clock": "2026-06-09T22:36:41+ (immediate, in-process)",
+      "invoice_date": null,
+      "data_before": "catalog: Pepino conserva; 6 jar aliases (no 'Pepino' alias)",
+      "data_changed": "runtime match resolved: kind=exact, displayState=confirmed, ingredient 635a1189",
+      "written": [],
+      "human_action": false,
+      "matcher_evidence": {
+        "alias_lookup": "MISS for normalized 'pepino'",
+        "matchedIngredient": "Pepino conserva",
+        "similarityScore": 0.88,
+        "canonicalIdentityScore": 0.88,
+        "rejectionReason": null
+      },
+      "source": "run-timeline.mts live matcher + invoice-ingredient-match log",
+      "code": "resolveInvoiceTableRowIngredientMatch → ingredient-canonical exact promotion"
+    },
+    {
+      "step": 5,
+      "name": "Alias lookup",
+      "wall_clock": "n/a — lookup only",
+      "data_before": "6 confirmed jar aliases on 635a1189 (earliest 2026-06-07T23:42:43)",
+      "data_changed": "none — alias miss for bare 'Pepino'",
+      "written": [],
+      "human_action": false,
+      "note": "Jar aliases were human-confirmed earlier; they do NOT cause Pepino line match directly"
+    },
+    {
+      "step": 6,
+      "name": "Ingredient selection",
+      "wall_clock": "2026-06-09T22:36:41+ (virtual, not persisted)",
+      "data_before": "ingredients 635a1189 current_price from prior jar syncs",
+      "data_changed": "virtual link Pepino line → 635a1189 (not stored on invoice_items)",
+      "written": [],
+      "human_action": false,
+      "note": "No ingredient_aliases row created for 'Pepino' — confirmed_by_user never set for this line"
+    },
+    {
+      "step": 7,
+      "name": "Price history write",
+      "wall_clock": "2026-06-09T22:36:41+ (upload time); stored created_at 2026-05-25T12:00:00+00:00",
+      "invoice_date": "2026-05-25",
+      "data_before": "no history row for (da472b7f, 635a1189) OR refresh on re-extract",
+      "data_changed": "ingredient_price_history a689bd91: new_price=0.00177, previous_price=null, delta_percent=null",
+      "written": ["ingredient_price_history"],
+      "human_action": false,
+      "first_irreversible_contamination": true,
+      "source": "Supabase query-raw.json",
+      "code": "appendIngredientPriceHistoryFromInvoiceLine"
+    },
+    {
+      "step": 8,
+      "name": "Current price update",
+      "wall_clock": "2026-06-09T22:36:41+ (same transaction as step 7)",
+      "data_before": "ingredients.current_price reflected jar catalog pricing",
+      "data_changed": "ingredients.current_price updated to operational 0.00177 €/g equivalent (pack 1.77, qty 1000g)",
+      "written": ["ingredients.current_price", "ingredients.purchase_quantity"],
+      "human_action": false,
+      "latest_state": { "current_price": 21.99, "updated_at": "2026-06-13T21:54:23.387484+00:00", "note": "overwritten by later jar re-extracts" },
+      "code": "persistOperationalIngredientCostFromInvoiceLine"
+    },
+    {
+      "step": 9,
+      "name": "Supplier intelligence impact",
+      "wall_clock": "2026-06-09T22:36:41+ (read-time aggregation; no separate write)",
+      "data_before": "purchase memory for 635a1189 = jar lines only",
+      "data_changed": "Bidfood Pepino fresh line included in live matcher scan as purchase under Pepino conserva",
+      "written": [],
+      "human_action": false,
+      "downstream": "OI scan + purchase glance + opportunities input chain gains incompatible fresh weight line",
+      "guard": "P0 unit_family_mismatch blocks OI alert output post-hoc; raw DB chain poisoned",
+      "code": "buildMatchedInvoiceProductsFromScan / buildLatestPurchaseGlanceByIngredientIdFromScan"
+    },
+    {
+      "step": 10,
+      "name": "Invoice review screen",
+      "wall_clock": "after steps 1-9 complete — user opens invoice later",
+      "data_before": "contamination already persisted",
+      "data_changed": "UI renders 'Matched to: Pepino conserva' (confirmed); shows 'Correct match' only",
+      "written": [],
+      "human_action": false,
+      "ui_gap": "No 'Remove match'; user cannot undo without picking another ingredient",
+      "code": "ItemsTable + resolveIngredientCorrectionUiState (confirmed → showWrongMatch, not showConfirm)"
+    }
+  ],
+  "prior_context_events": [
+    {
+      "event": "ingredient_catalog_created",
+      "wall_clock": "2026-06-07T23:42:42.893107+00:00",
+      "human_action": true,
+      "note": "Pepino conserva ingredient created with first jar alias in same second"
+    },
+    {
+      "event": "jar_aliases_human_confirmed",
+      "wall_clock_range": ["2026-06-07T23:42:43", "2026-06-09T15:28:28"],
+      "count": 6,
+      "human_action": true,
+      "note": "All confirmed_by_user=true; enables catalog identity but not Pepino bare-word alias"
+    },
+    {
+      "event": "aviludo_april_jar_history",
+      "history_id": "d723199d",
+      "invoice_date_anchored": "2026-04-17T12:00:00+00:00",
+      "human_action": "partial — alias confirmed; history from extract sync not separate confirm click"
+    },
+    {
+      "event": "aviludo_may_jar_history",
+      "history_id": "5bd9a4e1",
+      "invoice_date_anchored": "2026-05-19T12:00:00+00:00",
+      "new_price": 3.748333333333333
+    }
+  ],
+  "wall_clock_order_summary": [
+    "2026-06-07 — Ingredient + jar aliases (HUMAN)",
+    "2026-06-08/09 — More jar aliases (HUMAN)",
+    "2026-06-09 22:36 — Bidfood upload → extract → Pepino match → history+price (AUTOMATIC, BEFORE REVIEW)",
+    "2026-06-13 21:50 — Bidfood re-extract (items recreated; history refresh path exists)",
+    "2026-06-13 21:54 — Ingredient updated_at (later invoice re-extract sync)"
+  ]
+}

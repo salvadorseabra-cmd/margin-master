@@ -1,0 +1,170 @@
+{
+  "generated_at": "2026-06-14T09:30:00.000Z",
+  "lifecycle_events": {
+    "suggested_match_at_extract": {
+      "displayState": "suggested",
+      "match_kinds": ["semantic", "operational-equivalent"],
+      "persisted_on_extract": ["ingredient_price_history", "ingredients.current_price"],
+      "not_persisted": ["ingredient_aliases", "match_status"],
+      "ui": "Confirm match button shown",
+      "reversible": "partial"
+    },
+    "confirmed_match_at_extract": {
+      "displayState": "confirmed",
+      "match_kinds": ["exact", "confirmed-alias", "operational-memory", "operational-alias", "confirmed-override"],
+      "persisted_on_extract": ["ingredient_price_history", "ingredients.current_price"],
+      "not_persisted": ["ingredient_aliases unless kind is confirmed-alias"],
+      "ui": "Matched to chip; Correct match only",
+      "pepino_case": "exact→confirmed; alias NOT written; history a689bd91 written",
+      "reversible": "partial"
+    },
+    "user_confirm_suggested": {
+      "path": "confirmIngredientMatch → persistIngredientCorrectionForItem",
+      "adds": ["ingredient_aliases", "override memory", "price_history refresh", "current_price"],
+      "reversible": "partial"
+    },
+    "user_correct_to_different": {
+      "path": "handleSelectCorrectionIngredient → persistIngredientCorrectionForItem",
+      "adds": ["reject pair localStorage", "alias upsert new", "price_history new target", "current_price new"],
+      "removes": [],
+      "reversible": "partial — forward only"
+    },
+    "user_unmatch": {
+      "path": "none_production",
+      "reversible": "not_supported"
+    },
+    "invoice_delete": {
+      "path": "removeRow → reconcileAfterInvoiceDelete",
+      "rechains": "surviving ingredient history",
+      "deletes": "orphan history rows invoice_id IS NULL",
+      "does_not": "delete linked rows for other invoices"
+    }
+  },
+  "matrix": [
+    {
+      "artifact": "invoice_items",
+      "on_unmatch_should": "unchanged",
+      "on_unmatch_actual": "unchanged",
+      "on_reassign_should": "unchanged",
+      "on_reassign_actual": "unchanged",
+      "reversal_complete": true
+    },
+    {
+      "artifact": "virtual_match",
+      "on_unmatch_should": "null match",
+      "on_unmatch_actual": "no_handler",
+      "on_reassign_should": "new ingredient_id virtual",
+      "on_reassign_actual": "yes_via_alias_and_reject_pair",
+      "reversal_complete": "partial"
+    },
+    {
+      "artifact": "ingredient_aliases",
+      "on_unmatch_should": "delete_or_tombstone line alias",
+      "on_unmatch_actual": "no_change",
+      "on_reassign_should": "upsert new target",
+      "on_reassign_actual": "upsert_new_only",
+      "reversal_complete": false
+    },
+    {
+      "artifact": "ingredient_price_history_old_target",
+      "on_unmatch_should": "delete (invoice_id, old_ingredient_id)",
+      "on_unmatch_actual": "untouched",
+      "on_reassign_should": "delete old + insert new OR move",
+      "on_reassign_actual": "insert_new_orphan_old",
+      "reversal_complete": false,
+      "pepino": "a689bd91 remains on 635a1189"
+    },
+    {
+      "artifact": "ingredient_price_history_new_target",
+      "on_reassign_actual": "insert_or_update",
+      "reversal_complete": "n/a"
+    },
+    {
+      "artifact": "ingredients.current_price_old",
+      "on_unmatch_should": "revert from prior trusted history",
+      "on_unmatch_actual": "never_reverted",
+      "on_reassign_should": "revert old; update new",
+      "on_reassign_actual": "update_new_only",
+      "reversal_complete": false
+    },
+    {
+      "artifact": "rejected_ingredient_matches",
+      "on_reassign_actual": "append_old_pair_block",
+      "on_unmatch_should": "append_old_pair_block",
+      "on_unmatch_actual": "no_ui_path",
+      "reversal_complete": "partial_local_only"
+    },
+    {
+      "artifact": "matched_invoice_products_cache",
+      "on_reassign_actual": "clear_new_target_cache_only",
+      "recalculable": true,
+      "reversal_complete": "partial"
+    },
+    {
+      "artifact": "margin_alerts_oi",
+      "on_correction_actual": "partial_recompute_on_reload",
+      "blocked_by_poisoned_history": true,
+      "reversal_complete": false
+    },
+    {
+      "artifact": "historical_pricing_chain_deltas",
+      "on_unmatch_should": "rechain after row removal",
+      "on_unmatch_actual": "reconcile_not_invoked",
+      "rechain_service": "reconcileIngredientPriceHistoryChain",
+      "rechain_triggered_by": ["history UPDATE refresh", "invoice DELETE only"],
+      "reversal_complete": false
+    }
+  ],
+  "twelve_questions": {
+    "1_artifacts_on_match_assignment": [
+      "ingredient_price_history (always on extract sync if not unmatched)",
+      "ingredients.current_price + purchase_quantity",
+      "ingredient_aliases (only manual confirm/correct/create)",
+      "in-memory overrides + operational alias (manual only)",
+      "virtual match (never persisted)"
+    ],
+    "2_source_of_truth_vs_derived": {
+      "source_of_truth": ["invoice_items (line text)", "ingredient_aliases", "ingredient_price_history", "ingredients.current_price"],
+      "derived": ["virtual match", "purchase memory scan", "OI", "margin alerts", "catalog review counts", "client alias mirrors"]
+    },
+    "3_derived_artifacts": ["virtual_match_resolution", "buildMatchedInvoiceProductsFromScan", "margin-alert-data", "operational-intelligence-synthesis", "invoice_operational_metadata", "matched_invoice_products_cache"],
+    "4_append_only": {
+      "mostly_append_only": ["ingredient_price_history"],
+      "upsert_not_append": ["ingredient_aliases", "ingredients.current_price"],
+      "ephemeral": ["virtual match"]
+    },
+    "5_recalculable_today": ["virtual_match", "purchase_memory_scan", "matched_invoice_products_cache", "catalog_review_counts", "OI/alerts_if_inputs_clean"],
+    "6_not_recalculable_without_delete": ["ingredient_price_history wrong row", "historical delta_percent on poisoned chain", "ingredients.current_price without explicit revert logic"],
+    "7_if_match_removed_delete_rebuild_recalc": {
+      "should_delete": ["ingredient_price_history (invoice, ingredient)", "alias if exists"],
+      "should_rebuild": ["price_history chain via reconcileIngredientPriceHistoryChain", "ingredients.current_price from last trusted row"],
+      "should_recalc": ["virtual match", "purchase scan", "OI", "recipe costs"],
+      "actually_happens": "none — no unmatch handler"
+    },
+    "8_if_reassigned_move_regenerate": {
+      "moves": [],
+      "regenerates": ["alias to new id", "price_history row on new id", "current_price on new id", "reject pair block on old"],
+      "orphans": ["price_history on old id", "current_price on old id"]
+    },
+    "9_services_supporting_history_rebuild": {
+      "exists": ["reconcileIngredientPriceHistoryChain", "reconcileAfterInvoiceDelete", "backfillIngredientPriceHistoryFromInvoices"],
+      "invoked_on_correction": false,
+      "invoked_on_invoice_delete": true,
+      "invoked_on_reextract_update": true
+    },
+    "10_artifacts_no_reversal_path": ["ingredient_price_history on wrong assignment", "ingredients.current_price without revert", "bare Pepino auto-match poison without alias to delete"],
+    "11_suggested_vs_confirmed": {
+      "distinction_persisted": false,
+      "distinction_runtime": true,
+      "ui": "Confirm button only for suggested",
+      "extract_sync": "BOTH confirmed and suggested sync cost — only unmatched skipped",
+      "file": "ingredient-match-explanation.ts isConfirmedIngredientMatch / isSuggestedIngredientMatch",
+      "sync_gate": "invoiceRowMatchSummaryBucket !== unmatched"
+    },
+    "12_supports_unmatch_reassign_rebuild": {
+      "unmatch": false,
+      "reassign": "partial_forward_only",
+      "rebuild_history": "partial_invoice_delete_or_reextract_only"
+    }
+  }
+}

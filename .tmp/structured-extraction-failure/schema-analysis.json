@@ -1,0 +1,104 @@
+{
+  "generated_at": "2026-06-12T01:00:00.000Z",
+  "investigation": "Phase 2 structured extraction failure — schema layer",
+  "files": {
+    "promptSchema": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+    "openAiCall": "supabase/functions/extract-invoice/invoice-date-extraction.ts",
+    "consumer": "supabase/functions/extract-invoice/invoice-table-extraction.ts::extractTableItemsFromImage"
+  },
+  "promptDeclaredSchema": {
+    "location": "TABLE_EXTRACTION_SYSTEM_PROMPT lines 20-32",
+    "format": "Markdown code block in system prompt (documentation only)",
+    "itemProperties": [
+      "name",
+      "quantity",
+      "unit",
+      "gross_unit_price",
+      "discount_pct",
+      "line_total_net",
+      "unit_price",
+      "total"
+    ],
+    "allFieldsNullable": true,
+    "requiredFields": [],
+    "structuredFieldsRequired": false,
+    "legacyFieldsPresent": true,
+    "legacyEscapeHatch": {
+      "line": 52,
+      "text": "If a row has no discount column, set discount_pct to null and copy unit_price from the unit price column instead of gross_unit_price."
+    }
+  },
+  "openAiApiPayload": {
+    "function": "callOpenAiJson",
+    "file": "invoice-date-extraction.ts",
+    "endpoint": "https://api.openai.com/v1/chat/completions",
+    "model": "gpt-4.1",
+    "response_format": {
+      "type": "json_object"
+    },
+    "json_schema": null,
+    "strict": null,
+    "propertyEnforcement": false,
+    "note": "json_object only guarantees valid JSON object — NOT property names, NOT required keys, NOT type constraints"
+  },
+  "postParseValidation": {
+    "exists": false,
+    "schemaTransform": false,
+    "rejectsLegacyOnly": false,
+    "parseMonetaryLineItems": {
+      "file": "invoice-monetary-binding.ts",
+      "behavior": "Accepts any subset of keys; missing structured keys → null via normalizeNumberField",
+      "stripsStructured": false
+    }
+  },
+  "expectedVsActual": {
+    "expected": {
+      "gross_unit_price": 27.56,
+      "discount_pct": 20,
+      "line_total_net": 22.05,
+      "unit_price": null,
+      "total": null
+    },
+    "actual_v22_pomodor": {
+      "gross_unit_price": "absent",
+      "discount_pct": "absent",
+      "line_total_net": "absent",
+      "unit_price": 22.05,
+      "total": 22.05
+    },
+    "satisfiesPromptSchema": true,
+    "satisfiesEnforcedSchema": "N/A — no enforced schema exists"
+  },
+  "phase2Commit": {
+    "hash": "65452a9",
+    "changed": "Added structured fields to PROMPT text + normalizeItems mapping",
+    "didNotChange": "callOpenAiJson response_format (still json_object only)"
+  },
+  "classificationScores": {
+    "A_gpt_ignoring_optional_fields": {
+      "applies": true,
+      "role": "symptom",
+      "reason": "Model chooses familiar legacy path when both paths are valid per prompt"
+    },
+    "B_schema_allows_legacy_only": {
+      "applies": true,
+      "role": "primary",
+      "reason": "Legacy unit_price/total remain in prompt schema; escape hatch explicitly permits legacy path; no API enforcement"
+    },
+    "C_prompt_ambiguity": {
+      "applies": true,
+      "role": "contributing",
+      "reason": "7/8 worked examples use unit_price/total; only 1 negative example shows structured-only output"
+    },
+    "D_validation_schema_issue": {
+      "applies": true,
+      "role": "primary",
+      "reason": "No json_schema in OpenAI request; Phase 2 schema is prompt documentation only"
+    }
+  },
+  "verdict": {
+    "primary": ["B", "D"],
+    "contributing": ["C"],
+    "symptom": ["A"]
+  }
+}

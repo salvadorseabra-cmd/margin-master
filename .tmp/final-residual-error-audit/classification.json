@@ -1,0 +1,146 @@
+{
+  "generated_at": "2026-06-12T23:25:38.370Z",
+  "deployVersion": 27,
+  "methodology": "v27 single-run invoke per invoice vs field-accuracy-audit ground truth",
+  "taxonomy": {
+    "A": "extraction_bug — Pass C / model error vs visible or GT",
+    "B": "gt_mismatch — extraction matches visible invoice, GT catalog differs",
+    "C": "normalization_mismatch — binder/reconcile altered Pass C (none observed v27)",
+    "D": "business_interpretation — unit semantics, gross/net display, €0 impact fields"
+  },
+  "counts": {
+    "totalWrongRows": 26,
+    "extractionBugs": 8,
+    "gtIssues": 2,
+    "normalization": 0,
+    "businessInterpretation": 16
+  },
+  "financialAccounting": {
+    "totalResidualEuro": 64.25,
+    "extractionBugsEuro": 34.9,
+    "gtIssuesEuro": 29.35,
+    "businessInterpretationEuro": 0,
+    "normalizationEuro": 0,
+    "sumCheck": true
+  },
+  "extractionBugs": [
+    {
+      "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+      "label": "Emporio",
+      "euro": 13.56,
+      "rationale": "Financial delta vs GT — extraction does not match expected totals"
+    },
+    {
+      "product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+      "label": "Emporio",
+      "euro": 10,
+      "rationale": "Financial delta vs GT — extraction does not match expected totals"
+    },
+    {
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "label": "Mammafiore",
+      "euro": 4.86,
+      "rationale": "Financial delta vs GT — extraction does not match expected totals"
+    },
+    {
+      "product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "label": "Emporio",
+      "euro": 4.7,
+      "rationale": "Financial delta vs GT — extraction does not match expected totals"
+    },
+    {
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "label": "Mammafiore",
+      "euro": 1,
+      "rationale": "Financial delta vs GT — extraction does not match expected totals"
+    },
+    {
+      "product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+      "label": "Emporio",
+      "euro": 0.78,
+      "rationale": "Pass C column misread (discount/P.VENDA/VALOR confusion) — visible values not reached"
+    },
+    {
+      "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "label": "Bocconcino",
+      "euro": 0,
+      "rationale": "Quantity field wrong vs GT; €0 impact because total preserved or qty×unit reconciled"
+    },
+    {
+      "product": "RICOTTA TREVIGIANA 1,5KG",
+      "label": "Bocconcino",
+      "euro": 0,
+      "rationale": "Quantity field wrong vs GT; €0 impact because total preserved or qty×unit reconciled"
+    }
+  ],
+  "gtIssues": [
+    {
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "label": "Bocconcino",
+      "euro": 27.95,
+      "rationale": "Extraction aligns with visible invoice (column-shift-audit: QUANT 1, P.VENDA 27.56, VALOR LÍQUIDO 22.05) but GT differs"
+    },
+    {
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "label": "Emporio",
+      "euro": 1.4,
+      "rationale": "Extraction aligns with visible invoice (column-shift-audit: Preço Unit 10.30, Desc 17.50%, Preço Total 36.54) but GT differs"
+    }
+  ],
+  "businessInterpretation": [
+    {
+      "product": "Manjericão",
+      "label": "Bidfood",
+      "euro": 0,
+      "rationale": "Total correct; unit_price field reflects net/discounted column vs GT gross catalog"
+    },
+    {
+      "product": "Abóbora Butternut",
+      "label": "Bidfood",
+      "euro": 0,
+      "rationale": "Field-level mismatch with €0 financial impact (OCR/name/unit display)"
+    },
+    {
+      "product": "Mozzarella Flor di Latte 2Kg",
+      "label": "Aviludo April",
+      "euro": 0,
+      "rationale": "Field-level mismatch with €0 financial impact (OCR/name/unit display)"
+    },
+    {
+      "product": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "label": "Emporio",
+      "euro": 0,
+      "rationale": "Extracted net/discounted unit matches visible total; GT stores list/gross unit_price"
+    },
+    {
+      "product": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "label": "Bocconcino",
+      "euro": 0,
+      "rationale": "Total correct; unit_price field reflects net/discounted column vs GT gross catalog"
+    },
+    {
+      "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "label": "Mammafiore",
+      "euro": 0,
+      "rationale": "Total correct; unit_price field reflects net/discounted column vs GT gross catalog"
+    },
+    {
+      "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "label": "Mammafiore",
+      "euro": 0,
+      "rationale": "Total correct; unit_price field reflects net/discounted column vs GT gross catalog"
+    },
+    {
+      "product": "Aceto balsamico di Modena IGP pet 5l*2 Toschi",
+      "label": "Mammafiore",
+      "euro": 0,
+      "rationale": "Total correct; unit_price field reflects net/discounted column vs GT gross catalog"
+    },
+    {
+      "product": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+      "label": "Mammafiore",
+      "euro": 0,
+      "rationale": "Total correct; unit_price field reflects net/discounted column vs GT gross catalog"
+    }
+  ]
+}

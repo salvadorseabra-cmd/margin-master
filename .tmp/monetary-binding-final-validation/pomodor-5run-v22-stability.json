@@ -1,0 +1,187 @@
+{
+  "generated_at": "2026-06-12T00:40:00.000Z",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "product": "POMODOR PELATI (CX 2.5KG*6)",
+  "deployment": {
+    "version": 22,
+    "updatedAtUtc": "2026-06-11T23:35:30.577Z",
+    "ezbrSha256": "696a5e491cde5be17d68e399031ade81ce7bf7ab055c4941a06ae561090bb878",
+    "priorVersion": 21,
+    "priorEzbrSha256": "0f65cdbe9dada0c8cf6bb05d857d885f600daf01e825f5f5d70a99c74219e4ff",
+    "localHead": "de556e0",
+    "phase3Commit": "de556e0",
+    "v22Confirmed": true,
+    "bundleChanged": true
+  },
+  "baselines": {
+    "visibleInvoice": {
+      "quantity": 1,
+      "gross_unit_price": 27.56,
+      "discount_pct": 20,
+      "line_total_net": 22.05,
+      "note": "P.VENDA 27.56, DESC 20%, VALOR 22.05"
+    },
+    "vlCatalogGt": {
+      "quantity": 2,
+      "unit_price": 25,
+      "total": 50
+    },
+    "preHybridRefined": {
+      "quantity": 2,
+      "unit_price": 20,
+      "total": 40,
+      "pattern": "DESC_20_bleed_variable"
+    },
+    "phase12v21": {
+      "modal": { "quantity": 1, "unit_price": 22.05, "total": 22.05 },
+      "stabilityPctVsVlGt": 0,
+      "deterministic": true,
+      "source": "pomodor-5run-stability.json"
+    }
+  },
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "elapsedMs": null,
+      "itemCount": 7,
+      "hasStructuredFields": false,
+      "itemKeys": ["name", "quantity", "unit", "unit_price", "total"],
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      },
+      "vsVlGt": "Incorrect",
+      "vsVisible": "Match (net row)"
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      },
+      "vsVlGt": "Incorrect"
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      },
+      "vsVlGt": "Incorrect"
+    },
+    {
+      "run": 4,
+      "status": 200,
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      },
+      "vsVlGt": "Incorrect"
+    },
+    {
+      "run": 5,
+      "status": 200,
+      "pomodor": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "uni",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 22.05,
+        "total": 22.05
+      },
+      "vsVlGt": "Incorrect"
+    }
+  ],
+  "summary": {
+    "correctVsVlGt": { "count": 0, "runNumbers": [] },
+    "incorrectVsVlGt": { "count": 5, "runNumbers": [1, 2, 3, 4, 5] },
+    "stabilityPctVsVlGt": 0,
+    "deterministic": true,
+    "unitPriceUnique": [22.05],
+    "totalUnique": [22.05],
+    "qtyUnique": [1],
+    "structuredFieldsInResponse": false,
+    "modalValues": { "quantity": 1, "unit_price": 22.05, "total": 22.05 }
+  },
+  "financialDelta": {
+    "vsVlGt": {
+      "quantityDelta": -1,
+      "unitPriceDelta": -2.95,
+      "totalDelta": -27.95,
+      "absTotalErrorEuro": 27.95
+    },
+    "vsPhase12v21": {
+      "quantityDelta": 0,
+      "unitPriceDelta": 0,
+      "totalDelta": 0,
+      "changed": false,
+      "note": "v22 output identical to Phase 1+2 v21 5-run modal"
+    }
+  },
+  "remainingColumnShiftRows": [
+    {
+      "invoice": "IL Bocconcino",
+      "product": "POMODOR PELATI",
+      "status": "OPEN",
+      "pattern": "VALOR_net_as_unit_and_total_qty1",
+      "euroImpactVsVlGt": 27.95,
+      "binderEffectObserved": false,
+      "reason": "GPT returns legacy-only fields; binder cannot apply Rule B/E without structured gross/discount/net"
+    },
+    {
+      "invoice": "Emporio Italia",
+      "product": "Rovagnati Prosciutto Cotto",
+      "status": "NOT_RETESTED_V22",
+      "priorAudit": {
+        "source": "passc-refinement-validation/reextract/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+        "extracted": { "quantity": 4, "unit_price": 9.17, "total": 36.54 },
+        "vlGt": { "unit_price": 8.17, "total": 35.14 },
+        "euroImpact": 1.4,
+        "phase12Improvement": "User-reported; headers visible after Phase 1 TABLE_TOP_MARGIN=36"
+      }
+    }
+  ],
+  "familyVerdict": {
+    "status": "OPEN",
+    "confidencePct": 85,
+    "evidence": [
+      "v22 deploy confirmed (version 22, new ezbr_sha256, updated 23:35:30 UTC)",
+      "0/5 correct vs VL GT (qty 2, unit €25, total €50)",
+      "5/5 deterministic — modal qty=1, unit=€22.05, total=€22.05",
+      "Output identical to Phase 1+2 v21 — €0 financial delta",
+      "Structured fields absent in API response — binder deployed but GPT not supplying gross/discount/net",
+      "Matches visible invoice net row (qty 1, VALOR 22.05) not VL catalog GT",
+      "Emporio Prosciutto not re-tested on v22; prior ~€1.4 residual"
+    ],
+    "recommendation": "Family not closed. Phase 3 binder active in bundle but ineffective without structured Pass C output. Consider: expose structured fields in debug mode, Phase 4 row retry, or GT reconciliation for qty interpretation."
+  }
+}

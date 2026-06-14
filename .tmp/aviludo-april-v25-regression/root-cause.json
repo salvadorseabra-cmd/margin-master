@@ -1,0 +1,66 @@
+{
+  "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+  "label": "Aviludo April",
+  "investigatedAt": "2026-06-12T23:30:00.000Z",
+  "deployVersion": 25,
+  "verdict": "FALSE_REGRESSION",
+  "rootCause": "VL audit harness double-prefixed the PNG fixture data URL. The file `.tmp/footer-validation-4dc40c3/april-historico-png-fixture.b64.txt` already contains `data:image/png;base64,` but `.tmp/final-validation-lab-rerun/run-audit.mts` unconditionally prepends another prefix, producing `data:image/png;base64,data:image/png;base64,...`. ImageScript cannot decode this corrupt URL; all GPT passes return null and Pass C returns an empty items array with HTTP 200.",
+  "firstDivergenceStage": "image_input_decode",
+  "firstDivergenceDetail": "Corrupt double-prefixed data URL fails image decode before geometry, crop, or any GPT pass can run. Symptom: supplier=null, invoice_date=null, total=null, items=[] — identical to prior PDF-decode failure pattern documented in aviludo-regression-audit.",
+  "confidencePercent": 97,
+  "hypothesesEvaluated": {
+    "strict_json_schema_rejects_aviludo": {
+      "status": "REJECTED",
+      "evidence": "v25 with correct PNG URL returns 9/9 items in 3/3 runs; Aviludo simple table (no discount columns) extracts fine under current schema."
+    },
+    "schema_requires_gross_discount_net": {
+      "status": "REJECTED",
+      "evidence": "Extracted items use legacy name/qty/unit/unit_price/total fields; nullable structured keys do not block Aviludo."
+    },
+    "v24_v25_prompt_changes_broke_pass_c": {
+      "status": "REJECTED",
+      "evidence": "Same v25 deployment returns 9 items when image URL is valid; prompt bloat affects Emporio discount rows only."
+    },
+    "geometry_crop_change": {
+      "status": "REJECTED",
+      "evidence": "Geometry never reached on corrupt image path. Local geometry bounds unchanged (top=184, bottom=439, headerTop=194)."
+    },
+    "gpt_returns_empty_under_strict_schema": {
+      "status": "REJECTED",
+      "evidence": "GPT returns full 9-item table when given decodable image on v25."
+    },
+    "double_prefix_corrupt_url": {
+      "status": "CONFIRMED",
+      "evidence": "Controlled A/B: double_prefix_bug 0/3 runs (all null); correct URL 9/3 runs (AVILUDO, 2026-04-17, 9 items). See prefix-comparison.json."
+    }
+  },
+  "gitCommitAssessment": {
+    "04c0d88_pass_c_fractional_qty": "NOT_CAUSE — Aviludo April uses integer qty; works on v25 with valid PNG.",
+    "65452a9_phase1_phase2": "NOT_CAUSE — geometry margin change does not explain 0 rows on corrupt image.",
+    "de556e0_phase3_binder": "NOT_CAUSE — binder runs after GPT; never reached on corrupt image.",
+    "ec5f42f_schema_enforcement": "NOT_CAUSE — schema works for Aviludo on valid PNG at v25.",
+    "792adb8_v25_ventricina_prompt": "NOT_CAUSE — Emporio-specific prompt; Aviludo unaffected.",
+    "likelyIntroducingCommit": null,
+    "note": "No production commit introduced 0-row behavior. Failure is confined to audit harness URL construction."
+  },
+  "smallestFixRecommendation": {
+    "scope": "audit_harness_only",
+    "change": "In any script loading `.b64.txt` fixtures, normalize URL: if file starts with `data:`, use as-is; otherwise prepend `data:image/png;base64,` after stripping any embedded prefix. Pattern already correct in `.tmp/aviludo-regression-audit/run-audit.mts` line 83.",
+    "productionCodeChangeRequired": false,
+    "example": "const raw = readFileSync(path, 'utf8').trim();\nconst imageDataUrl = raw.startsWith('data:') ? raw : `data:image/png;base64,${raw.replace(/^data:image\\/[^;]+;base64,/, '')}`;"
+  },
+  "expectedImpactOnVLMetrics": {
+    "aprilCurrentError": 300.95,
+    "aprilExpectedAfterFix": "near 0 if GT alignment holds (9 rows, historical match)",
+    "globalErrorCurrent": 389.97,
+    "globalErrorExpectedAfterFix": "~89 (excluding April recovery)",
+    "fieldAccuracyImpact": "April contributes 9 GT rows; recovering them should raise global field accuracy materially above 64%"
+  },
+  "evidenceFiles": [
+    ".tmp/aviludo-april-v25-regression/prefix-comparison.json",
+    ".tmp/aviludo-april-v25-regression/v25-correct-png-extract.json",
+    ".tmp/final-validation-lab-rerun/extracts/c2f52357-0f80-491a-ba14-c97ff4837472.json",
+    ".tmp/passc-refinement-validation/reextract/c2f52357-0f80-491a-ba14-c97ff4837472.json",
+    ".tmp/aviludo-regression-audit/REPORT.md"
+  ]
+}

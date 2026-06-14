@@ -1,0 +1,127 @@
+{
+  "generated_at": "2026-06-12T00:35:00.000Z",
+  "audit": "Why Phase 3 (de556e0) is not on VL extract-invoice edge",
+  "vlProjectRef": "bjhnlrgodcqoyzddbpbd",
+
+  "deployed": {
+    "function": "extract-invoice",
+    "version": 21,
+    "updatedAtUtc": "2026-06-11T23:19:43.825Z",
+    "updatedAtLocal": "2026-06-12T00:19:43+0100",
+    "ezbrSha256": "0f65cdbe9dada0c8cf6bb05d857d885f600daf01e825f5f5d70a99c74219e4ff",
+    "entrypoint": "file:///Users/salvadorseabra1/margin-master/supabase/functions/extract-invoice/index.ts",
+    "inferredCommit": "65452a9",
+    "inferredCommitMessage": "feat: hybrid h phase 1 and phase 2",
+    "phase": "Phase 1+2 only"
+  },
+
+  "local": {
+    "headCommit": "de556e0",
+    "headCommitFull": "de556e0bd41a615cb0f727f9dfd3c648fb7db2a3",
+    "headCommitMessage": "feat: implement hybrid h phase 3 monetary binder",
+    "committedAt": "2026-06-12T00:28:06+0100",
+    "workingTreeClean": true,
+    "commitsAheadOfDeployed": 1
+  },
+
+  "timeline": [
+    {
+      "event": "Phase 1+2 committed",
+      "commit": "65452a9",
+      "time": "2026-06-12T00:19:30+0100"
+    },
+    {
+      "event": "VL extract-invoice deployed (v21)",
+      "version": 21,
+      "time": "2026-06-11T23:19:43Z / 2026-06-12T00:19:43+0100",
+      "note": "13 seconds after 65452a9 commit — Phase 1+2 deploy succeeded"
+    },
+    {
+      "event": "Phase 3 committed",
+      "commit": "de556e0",
+      "time": "2026-06-12T00:28:06+0100",
+      "note": "8m 23s AFTER v21 deploy — no subsequent deploy found"
+    },
+    {
+      "event": "Phase 3 deploy to VL",
+      "status": "NOT_EXECUTED",
+      "evidence": "VL still v21; no deploy logs in .tmp/ or agent transcripts after de556e0"
+    }
+  ],
+
+  "deployExecutionAudit": {
+    "phase12DeployExecuted": true,
+    "phase12DeploySucceeded": true,
+    "phase12Evidence": "v21 timestamp aligns with 65452a9 commit; pomodor-5run-stability shows Phase 1+2 behavior",
+    "phase3DeployExecuted": false,
+    "phase3DeploySucceeded": null,
+    "phase3Evidence": "No supabase functions deploy command found after de556e0; version unchanged at 21; ezbr SHA unchanged"
+  },
+
+  "missingFromDeployedBundle": [
+    {
+      "file": "supabase/functions/extract-invoice/invoice-monetary-binding.ts",
+      "addedIn": "de556e0",
+      "presentAt65452a9": false,
+      "presentLocally": true
+    },
+    {
+      "file": "supabase/functions/extract-invoice/invoice-monetary-binding.test.ts",
+      "addedIn": "de556e0",
+      "presentAt65452a9": false,
+      "presentLocally": true,
+      "note": "Test file not bundled to edge (expected)"
+    },
+    {
+      "file": "supabase/functions/extract-invoice/invoice-table-extraction.ts (binder wiring)",
+      "change": "imports bindMonetaryColumns; calls bindMonetaryColumns(parseMonetaryLineItems(...))",
+      "presentAt65452a9": false,
+      "presentLocally": true
+    }
+  ],
+
+  "localPipelineWiring": {
+    "indexTsImportsBinder": false,
+    "indexTsCallsBinder": false,
+    "binderWiredVia": "index.ts → extractTableItemsFromImage() in invoice-table-extraction.ts",
+    "tableExtractionImports": [
+      "bindMonetaryColumns",
+      "monetaryToInvoiceLineItem",
+      "parseMonetaryLineItems",
+      "from ./invoice-monetary-binding.ts"
+    ],
+    "pipelineOrder": [
+      "Pass C GPT",
+      "parseMonetaryLineItems",
+      "bindMonetaryColumns (Phase 3)",
+      "monetaryToInvoiceLineItem",
+      "reconcileLineItemAmounts",
+      "finalizeExtractedLineItems (index.ts)"
+    ],
+    "binderActiveLocally": true,
+    "binderActiveOnVlEdge": false
+  },
+
+  "cacheOrVersionMismatch": {
+    "detected": false,
+    "explanation": "Not a cache issue. VL version frozen at 21 because no deploy ran after de556e0. Linked project-ref (bjhnlrgodcqoyzddbpbd) matches VL; config.toml project_id (lhackrnlnrsiamorzmkb) is a different project but prior deploys correctly used --project-ref flag."
+  },
+
+  "invokeBehaviorEvidence": {
+    "phase3ValidationRuns": 5,
+    "modalPomodor": { "quantity": 1, "unit_price": 22.05, "total": 22.05 },
+    "identicalToPhase12v21": true,
+    "structuredFieldsInResponse": false,
+    "source": "pomodor-5run-phase3-stability.json"
+  },
+
+  "exactReasonPhase3NotActive": "Phase 3 code was committed locally (de556e0) but supabase functions deploy was never executed after that commit. VL edge remains at v21 deployed from 65452a9 (Phase 1+2). invoice-monetary-binding.ts does not exist in the v21 bundle.",
+
+  "commandsToDeployCorrectly": [
+    "cd /Users/salvadorseabra1/margin-master",
+    ".tmp/deno/bin/deno test --allow-read=. --allow-net supabase/functions/extract-invoice/invoice-monetary-binding.test.ts supabase/functions/extract-invoice/invoice-image-crop.test.ts",
+    "supabase functions deploy extract-invoice --project-ref bjhnlrgodcqoyzddbpbd",
+    "supabase functions list --project-ref bjhnlrgodcqoyzddbpbd  # expect v22+",
+    "# Re-run 5-invoke Pomodor stability validation"
+  ]
+}

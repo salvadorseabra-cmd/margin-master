@@ -1,0 +1,66 @@
+{
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "label": "Mammafiore",
+  "product": "Farina Speciale pizza 25kg Amoruso",
+  "deployVersion": 30,
+  "auditedAt": "2026-06-13T17:00:00.000Z",
+  "source": ".tmp/final-stability-audit/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d-all-runs.json",
+  "runs": 10,
+  "deterministic": true,
+  "classification": "A",
+  "allRunsIdentical": true,
+  "perRunSnapshot": {
+    "quantity": 1,
+    "unit_price": 26.52,
+    "total": 25.52
+  },
+  "groundTruth": {
+    "qty": 1,
+    "unit_price_list": 33.154,
+    "total": 26.52,
+    "discount_pct_visible": 20
+  },
+  "visible": {
+    "qty": 1,
+    "pr_unitario": 33.154,
+    "desc_pct": 20,
+    "iva_pct": 6,
+    "valor": 26.52,
+    "source": ".tmp/mammafiore-investigation/invoice-full.png"
+  },
+  "correctness": {
+    "vsGtPct": 0,
+    "vsVisiblePct": 0,
+    "avgErrorEuro": 1,
+    "worstErrorEuro": 1,
+    "bestErrorEuro": 1,
+    "variancePctOnTotals": 0
+  },
+  "versionHistory": {
+    "v26": { "total": 25.52, "errorEuro": 1, "stable": true },
+    "v27": { "total": 25.52, "errorEuro": 1, "stable": true },
+    "v30": { "total": 25.52, "errorEuro": 1, "stable": true },
+    "discountLine5Run": {
+      "correctAt2652": "4/5",
+      "wrongAt3315": "1/5 behaviour B",
+      "note": "Pre-structured-schema runs could hit correct €26.52; v26+ stable at €25.52"
+    },
+    "passCRawBaseline": {
+      "source": ".tmp/mammafiore-line-audit/pass-c-raw.json",
+      "total": 26.52,
+      "note": "Older prompt variant on same crop achieved correct Valor"
+    }
+  },
+  "perRun": [
+    { "run": 1, "qty": 1, "unit_price": 26.52, "total": 25.52, "errorEuro": 1 },
+    { "run": 2, "qty": 1, "unit_price": 26.52, "total": 25.52, "errorEuro": 1 },
+    { "run": 3, "qty": 1, "unit_price": 26.52, "total": 25.52, "errorEuro": 1 },
+    { "run": 4, "qty": 1, "unit_price": 26.52, "total": 25.52, "errorEuro": 1 },
+    { "run": 5, "qty": 1, "unit_price": 26.52, "total": 25.52, "errorEuro": 1 },
+    { "run": 6, "qty": 1, "unit_price": 26.52, "total": 25.52, "errorEuro": 1 },
+    { "run": 7, "qty": 1, "unit_price": 26.52, "total": 25.52, "errorEuro": 1 },
+    { "run": 8, "qty": 1, "unit_price": 26.52, "total": 25.52, "errorEuro": 1 },
+    { "run": 9, "qty": 1, "unit_price": 26.52, "total": 25.52, "errorEuro": 1 },
+    { "run": 10, "qty": 1, "unit_price": 26.52, "total": 25.52, "errorEuro": 1 }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-06-12T23:00:00.000Z",
+  "auditMode": "READ-ONLY design",
+  "failureModes": [
+    {
+      "id": "EMPTY_WIPE",
+      "severity": "CRITICAL",
+      "likelihood": "MEDIUM",
+      "observedIn": ".tmp/aviludo-reread-audit/",
+      "mechanism": "extract-invoice returns HTTP 200 with items:[] → runExtraction DELETE at line 1263 runs unconditionally → INSERT skipped because items.length===0",
+      "dataImpact": "All existing invoice_items deleted; invoice header may still update",
+      "userSymptom": "Re-read appears broken; line items vanish with no error toast",
+      "codeLocation": "src/routes/invoices.tsx:1263-1347"
+    },
+    {
+      "id": "CONCURRENT_DOUBLE_INSERT",
+      "severity": "HIGH",
+      "likelihood": "LOW",
+      "observedIn": ".tmp/emporio-duplicate-audit/",
+      "mechanism": "Two overlapping runExtraction calls (double-click or list+panel buttons) → both DELETE → both INSERT → 2× row count (8+8=16)",
+      "dataImpact": "Duplicate line items with GPT variance between batches",
+      "userSymptom": "Inflated row count; duplicate product names with different amounts",
+      "codeLocation": "src/routes/invoices.tsx:1215-1395, 2080-2134",
+      "guardGap": "UI disables button via extracting state but runExtraction has no entry mutex; setExtracting is async state update"
+    },
+    {
+      "id": "INSERT_FAILURE_WIPE",
+      "severity": "CRITICAL",
+      "likelihood": "LOW",
+      "mechanism": "DELETE succeeds → INSERT throws (RLS, network, validation) → catch returns null → rows already gone",
+      "dataImpact": "Total data loss on transient insert failure",
+      "userSymptom": "Silent failure; items empty after re-read",
+      "codeLocation": "src/routes/invoices.tsx:1263-1309, 1387-1392"
+    },
+    {
+      "id": "ALL_FILTERED_WIPE",
+      "severity": "HIGH",
+      "likelihood": "LOW",
+      "mechanism": "items.length>0 but normalizedItems.length===0 after shouldRejectInvoiceIngredientRow → DELETE runs, INSERT skipped (same guard as empty)",
+      "dataImpact": "Wipe despite non-empty GPT response",
+      "userSymptom": "Same as empty wipe",
+      "codeLocation": "src/routes/invoices.tsx:1264-1282"
+    },
+    {
+      "id": "PARTIAL_REPLACE",
+      "severity": "MEDIUM",
+      "likelihood": "MEDIUM",
+      "mechanism": "By design: fewer extracted rows replace full prior set (e.g. 3 rows replace 9)",
+      "dataImpact": "Intentional replace semantics; may lose rows on bad extraction",
+      "userSymptom": "Fewer items than before without explicit warning",
+      "codeLocation": "src/routes/invoices.tsx:1263-1302",
+      "note": "Not a persistence bug per se; separate product decision"
+    },
+    {
+      "id": "UNCHECKED_DELETE",
+      "severity": "MEDIUM",
+      "likelihood": "LOW",
+      "mechanism": "DELETE result/error never inspected; silent delete failure could leave stale rows then insert duplicates",
+      "dataImpact": "Stale+new mix if delete fails and insert succeeds",
+      "codeLocation": "src/routes/invoices.tsx:1263"
+    }
+  ],
+  "timingDiagram": {
+    "currentOrder": [
+      "1. setExtracting(true)",
+      "2. await extract-invoice invoke",
+      "3. DELETE all invoice_items (unconditional)",
+      "4. normalize + filter rows",
+      "5. IF items.length && user → INSERT",
+      "6. ELSE skip insert (log only)",
+      "7. update invoice metadata (reExtract)",
+      "8. setExtracting(false) in finally"
+    ],
+    "safeOrder": [
+      "1. in-flight mutex check (sync ref)",
+      "2. setExtracting(true)",
+      "3. await extract-invoice invoke",
+      "4. normalize + filter rows",
+      "5. IF normalizedItems.length === 0 → abort persistence, preserve DB, surface warning",
+      "6. DELETE only when replacement rows confirmed",
+      "7. INSERT replacement rows",
+      "8. check delete+insert errors; rollback strategy or abort before delete"
+    ]
+  },
+  "guardsToday": {
+    "uiButtonDisabled": {
+      "present": true,
+      "locations": ["invoices.tsx:2438", "ItemsTable:3093"],
+      "effectiveAgainstDoubleClick": "PARTIAL — race window before setExtracting; two entry points can overlap"
+    },
+    "runExtractionEntryGuard": false,
+    "emptyExtractionGuard": false,
+    "deleteErrorCheck": false,
+    "transaction": false,
+    "dbUniqueConstraint": false
+  },
+  "corruptionPossibleToday": true,
+  "corruptionManifestations": [
+    "Zero items after failed/empty re-read (Aviludo April: 9→0)",
+    "Duplicate items after concurrent re-read (Emporio: 8→16)",
+    "Zero items after insert failure post-delete",
+    "Partial row count reduction on under-extraction (by design)"
+  ],
+  "fixBelongs": "frontend",
+  "fixBelongsRationale": "All invoice_items persistence is client-side in runExtraction; extract-invoice edge function is read-only for DB (index.ts:204 handoff note)"
+}

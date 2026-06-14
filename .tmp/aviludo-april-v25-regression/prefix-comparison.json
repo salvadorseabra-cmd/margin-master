@@ -1,0 +1,57 @@
+{
+  "b64FileStartsWithDataPrefix": true,
+  "results": {
+    "double_prefix_bug": [
+      {
+        "run": 1,
+        "prefix": "data:image/png;base64,data:image/png;base64,iVBO",
+        "itemCount": 0,
+        "supplier": null,
+        "invoice_date": null,
+        "total": null
+      },
+      {
+        "run": 2,
+        "prefix": "data:image/png;base64,data:image/png;base64,iVBO",
+        "itemCount": 0,
+        "supplier": null,
+        "invoice_date": null,
+        "total": null
+      },
+      {
+        "run": 3,
+        "prefix": "data:image/png;base64,data:image/png;base64,iVBO",
+        "itemCount": 0,
+        "supplier": null,
+        "invoice_date": null,
+        "total": null
+      }
+    ],
+    "correct": [
+      {
+        "run": 1,
+        "prefix": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA1",
+        "itemCount": 9,
+        "supplier": "AVILUDO",
+        "invoice_date": "2026-04-17",
+        "total": 687.07
+      },
+      {
+        "run": 2,
+        "prefix": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA1",
+        "itemCount": 9,
+        "supplier": "AVILUDO",
+        "invoice_date": "2026-04-17",
+        "total": 680.77
+      },
+      {
+        "run": 3,
+        "prefix": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA1",
+        "itemCount": 9,
+        "supplier": "AVILUDO",
+        "invoice_date": "2026-04-17",
+        "total": 687.07
+      }
+    ]
+  }
+}

@@ -1,0 +1,715 @@
+{
+  "generated_at": "2026-06-13T16:35:39.396Z",
+  "deployVersion": 30,
+  "aggregate": {
+    "totalInvokes": 30,
+    "focusRows": 5,
+    "avgFinancialErrorAllRuns": 6.89,
+    "p95FinancialErrorAllRuns": 27.95,
+    "worstSingleRunError": 32.26,
+    "rowsByClassification": {
+      "A": 1,
+      "B": 3,
+      "C": 1
+    }
+  },
+  "matrix": {
+    "gorgonzola": {
+      "deployVersion": 30,
+      "invoice": "Emporio",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "product": "Gorgonzola DOP Dolce",
+      "runs": 10,
+      "groundTruth": {
+        "qty": 1.35,
+        "unit_price": 9.92,
+        "total": 13.44
+      },
+      "visible": {
+        "qty": 1.35,
+        "total": 13.44,
+        "notes": "Preço Total 13,44"
+      },
+      "perRun": [
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8*1,8...1,9kg",
+          "quantity": 1.05,
+          "unit_price": 9.88,
+          "total": 13.44,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8* 1,5-1,9kg Produto de Stock",
+          "quantity": 2,
+          "unit_price": 9.35,
+          "total": 18.68,
+          "errorVsGt": 5.24,
+          "errorVsVisible": 5.24,
+          "correctVsGt": false,
+          "correctVsVisible": false
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Casaleggio 1/8* 1.5kg Produto de Stock",
+          "quantity": 2,
+          "unit_price": 10.22,
+          "total": 13.44,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello 1/8* 1,8-1,9kg Produto de Stock",
+          "quantity": 2,
+          "unit_price": 8.43,
+          "total": 13.44,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg Produto de Stock",
+          "quantity": 2,
+          "unit_price": 10.2,
+          "total": 13.44,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelformaggi 1/8 - 1,8-1,9kg Produto de Stock",
+          "quantity": 2,
+          "unit_price": 13.43,
+          "total": 26.85,
+          "errorVsGt": 13.41,
+          "errorVsVisible": 13.41,
+          "correctVsGt": false,
+          "correctVsVisible": false
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castiglione 1/8* 1,8-1,9kg Produto de Stock",
+          "quantity": 2,
+          "unit_price": 10.22,
+          "total": 13.44,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1.5kg",
+          "quantity": 2,
+          "unit_price": 22.85,
+          "total": 45.7,
+          "errorVsGt": 32.26,
+          "errorVsVisible": 32.26,
+          "correctVsGt": false,
+          "correctVsVisible": false
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello \"1/8\" - 1,5kg Produto de Stock",
+          "quantity": 2,
+          "unit_price": 13.22,
+          "total": 13.44,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8*1,5kg Produto de Stock",
+          "quantity": 2,
+          "unit_price": 8.69,
+          "total": 17.38,
+          "errorVsGt": 3.94,
+          "errorVsVisible": 3.94,
+          "correctVsGt": false,
+          "correctVsVisible": false
+        }
+      ],
+      "correctnessVsGtPct": 60,
+      "correctnessVsVisiblePct": 60,
+      "avgErrorEuroVsGt": 5.49,
+      "avgErrorEuroVsVisible": 5.49,
+      "worstErrorEuroVsGt": 32.26,
+      "bestErrorEuroVsGt": 0,
+      "p95ErrorEuroVsGt": 32.26,
+      "totalUnique": [
+        13.44,
+        18.68,
+        26.85,
+        45.7,
+        17.38
+      ],
+      "qtyUnique": [
+        1.05,
+        2
+      ],
+      "variancePctOnTotals": 51.84,
+      "classification": {
+        "code": "B",
+        "label": "gpt_variance",
+        "rationale": "Mixed outcomes — GT 60% correct, visible 60%"
+      }
+    },
+    "bresaola": {
+      "deployVersion": 30,
+      "invoice": "Emporio",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "product": "Bresaola Punta d'Anca Oro",
+      "runs": 10,
+      "groundTruth": {
+        "qty": 2.8,
+        "unit_price": 17.68,
+        "total": 49.48
+      },
+      "visible": {
+        "qty": 1.83,
+        "total": 49.48,
+        "notes": "printed Qtd 1,83; GT qty 2.8 normalized"
+      },
+      "perRun": [
+        {
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+          "quantity": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2, 1,5Kg Produto de Stock",
+          "quantity": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Rigamonti - Bresaola Punta d’Anca Oro 1/2 - 1.5Kg Produto de Stock",
+          "quantity": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Rugamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock",
+          "quantity": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock",
+          "quantity": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Riganatti - Bresaola Punta d’Anca Oro 1/2 - 1,5Kg Produto de Stock",
+          "quantity": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg Produto de Stock",
+          "quantity": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+          "quantity": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg Produto de Stock",
+          "quantity": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "Rigamonti - Bresaola Punta d’Anca Oro 1/2 - 1,5kg Produto de Stock",
+          "quantity": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        }
+      ],
+      "correctnessVsGtPct": 100,
+      "correctnessVsVisiblePct": 100,
+      "avgErrorEuroVsGt": 0,
+      "avgErrorEuroVsVisible": 0,
+      "worstErrorEuroVsGt": 0,
+      "bestErrorEuroVsGt": 0,
+      "p95ErrorEuroVsGt": 0,
+      "totalUnique": [
+        49.48
+      ],
+      "qtyUnique": [
+        1.83
+      ],
+      "variancePctOnTotals": 0,
+      "classification": {
+        "code": "B",
+        "label": "gpt_variance",
+        "rationale": "Intermittent — 100% correct; 1 distinct totals"
+      }
+    },
+    "sanpellegrino": {
+      "deployVersion": 30,
+      "invoice": "Emporio",
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "product": "SanPellegrino Acqua in vitro",
+      "runs": 10,
+      "groundTruth": {
+        "qty": 2.56,
+        "unit_price": 15.06,
+        "total": 38.56
+      },
+      "visible": {
+        "qty": 2,
+        "total": 38.56,
+        "notes": "printed Qtd 2,00; x15ud is pack metadata"
+      },
+      "perRun": [
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit_price": 19.28,
+          "total": 38.56,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+          "quantity": 2,
+          "unit_price": 19.28,
+          "total": 38.56,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+          "quantity": 2,
+          "unit_price": 19.28,
+          "total": 38.56,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+          "quantity": 2,
+          "unit_price": 19.28,
+          "total": 38.56,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+          "quantity": 2,
+          "unit_price": 19.28,
+          "total": 38.56,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+          "quantity": 2,
+          "unit_price": 19.28,
+          "total": 38.56,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit_price": 19.28,
+          "total": 38.56,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit_price": 19.28,
+          "total": 38.56,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+          "quantity": 2,
+          "unit_price": 19.28,
+          "total": 38.56,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+          "quantity": 2,
+          "unit_price": 19.28,
+          "total": 38.56,
+          "errorVsGt": 0,
+          "errorVsVisible": 0,
+          "correctVsGt": true,
+          "correctVsVisible": true
+        }
+      ],
+      "correctnessVsGtPct": 100,
+      "correctnessVsVisiblePct": 100,
+      "avgErrorEuroVsGt": 0,
+      "avgErrorEuroVsVisible": 0,
+      "worstErrorEuroVsGt": 0,
+      "bestErrorEuroVsGt": 0,
+      "p95ErrorEuroVsGt": 0,
+      "totalUnique": [
+        38.56
+      ],
+      "qtyUnique": [
+        2
+      ],
+      "variancePctOnTotals": 0,
+      "classification": {
+        "code": "B",
+        "label": "gpt_variance",
+        "rationale": "Intermittent — 100% correct; 1 distinct totals"
+      }
+    },
+    "farina": {
+      "deployVersion": 30,
+      "invoice": "Mammafiore",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "product": "Farina Speciale pizza 25kg",
+      "runs": 10,
+      "groundTruth": {
+        "qty": 1,
+        "unit_price": 33.154,
+        "total": 26.52
+      },
+      "visible": {
+        "qty": 1,
+        "unit_price": 33.154,
+        "total": 26.52,
+        "notes": "Valor 26,52"
+      },
+      "perRun": [
+        {
+          "name": "Farina Speciale pizza 25kg Amoruso",
+          "quantity": 1,
+          "unit_price": 26.52,
+          "total": 25.52,
+          "errorVsGt": 1,
+          "errorVsVisible": 1,
+          "correctVsGt": false,
+          "correctVsVisible": false
+        },
+        {
+          "name": "Farine Speciale pizza 25kg Amoruso",
+          "quantity": 1,
+          "unit_price": 26.52,
+          "total": 25.52,
+          "errorVsGt": 1,
+          "errorVsVisible": 1,
+          "correctVsGt": false,
+          "correctVsVisible": false
+        },
+        {
+          "name": "Farine Speciale pizza 25kg Amoruso",
+          "quantity": 1,
+          "unit_price": 26.52,
+          "total": 25.52,
+          "errorVsGt": 1,
+          "errorVsVisible": 1,
+          "correctVsGt": false,
+          "correctVsVisible": false
+        },
+        {
+          "name": "Farine Speciale pizza 25kg Amoruso",
+          "quantity": 1,
+          "unit_price": 26.52,
+          "total": 25.52,
+          "errorVsGt": 1,
+          "errorVsVisible": 1,
+          "correctVsGt": false,
+          "correctVsVisible": false
+        },
+        {
+          "name": "Farine Speciale pizza 25kg Amoruso",
+          "quantity": 1,
+          "unit_price": 26.52,
+          "total": 25.52,
+          "errorVsGt": 1,
+          "errorVsVisible": 1,
+          "correctVsGt": false,
+          "correctVsVisible": false
+        },
+        {
+          "name": "Farine Speciale pizza 25kg Amoruso",
+          "quantity": 1,
+          "unit_price": 26.52,
+          "total": 25.52,
+          "errorVsGt": 1,
+          "errorVsVisible": 1,
+          "correctVsGt": false,
+          "correctVsVisible": false
+        },
+        {
+          "name": "Farine Speciale pizza 25kg Amoruso",
+          "quantity": 1,
+          "unit_price": 26.52,
+          "total": 25.52,
+          "errorVsGt": 1,
+          "errorVsVisible": 1,
+          "correctVsGt": false,
+          "correctVsVisible": false
+        },
+        {
+          "name": "Farine Speciale pizza 25kg Amoruso",
+          "quantity": 1,
+          "unit_price": 26.52,
+          "total": 25.52,
+          "errorVsGt": 1,
+          "errorVsVisible": 1,
+          "correctVsGt": false,
+          "correctVsVisible": false
+        },
+        {
+          "name": "Farine Speciale pizza 25kg Amoruso",
+          "quantity": 1,
+          "unit_price": 26.52,
+          "total": 25.52,
+          "errorVsGt": 1,
+          "errorVsVisible": 1,
+          "correctVsGt": false,
+          "correctVsVisible": false
+        },
+        {
+          "name": "Farine Speciale pizza 25kg Amoruso",
+          "quantity": 1,
+          "unit_price": 26.52,
+          "total": 25.52,
+          "errorVsGt": 1,
+          "errorVsVisible": 1,
+          "correctVsGt": false,
+          "correctVsVisible": false
+        }
+      ],
+      "correctnessVsGtPct": 0,
+      "correctnessVsVisiblePct": 0,
+      "avgErrorEuroVsGt": 1,
+      "avgErrorEuroVsVisible": 1,
+      "worstErrorEuroVsGt": 1,
+      "bestErrorEuroVsGt": 1,
+      "p95ErrorEuroVsGt": 1,
+      "totalUnique": [
+        25.52
+      ],
+      "qtyUnique": [
+        1
+      ],
+      "variancePctOnTotals": 0,
+      "classification": {
+        "code": "A",
+        "label": "deterministic_extraction_bug",
+        "rationale": "Consistently wrong — 0% correct vs GT, 0% vs visible"
+      }
+    },
+    "pomodor": {
+      "deployVersion": 30,
+      "invoice": "Bocconcino",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "product": "POMODOR PELATI",
+      "runs": 10,
+      "groundTruth": {
+        "qty": 2,
+        "unit_price": 25,
+        "total": 50
+      },
+      "visible": {
+        "qty": 1,
+        "unit_price": 27.56,
+        "total": 22.05,
+        "notes": "QUANT 1, VALOR 22,05"
+      },
+      "perRun": [
+        {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit_price": 22.05,
+          "total": 22.05,
+          "errorVsGt": 27.95,
+          "errorVsVisible": 0,
+          "correctVsGt": false,
+          "correctVsVisible": true
+        },
+        {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit_price": 22.05,
+          "total": 22.05,
+          "errorVsGt": 27.95,
+          "errorVsVisible": 0,
+          "correctVsGt": false,
+          "correctVsVisible": true
+        },
+        {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit_price": 22.05,
+          "total": 22.05,
+          "errorVsGt": 27.95,
+          "errorVsVisible": 0,
+          "correctVsGt": false,
+          "correctVsVisible": true
+        },
+        {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit_price": 22.05,
+          "total": 22.05,
+          "errorVsGt": 27.95,
+          "errorVsVisible": 0,
+          "correctVsGt": false,
+          "correctVsVisible": true
+        },
+        {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit_price": 22.05,
+          "total": 22.05,
+          "errorVsGt": 27.95,
+          "errorVsVisible": 0,
+          "correctVsGt": false,
+          "correctVsVisible": true
+        },
+        {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit_price": 22.05,
+          "total": 22.05,
+          "errorVsGt": 27.95,
+          "errorVsVisible": 0,
+          "correctVsGt": false,
+          "correctVsVisible": true
+        },
+        {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit_price": 22.05,
+          "total": 22.05,
+          "errorVsGt": 27.95,
+          "errorVsVisible": 0,
+          "correctVsGt": false,
+          "correctVsVisible": true
+        },
+        {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit_price": 22.05,
+          "total": 22.05,
+          "errorVsGt": 27.95,
+          "errorVsVisible": 0,
+          "correctVsGt": false,
+          "correctVsVisible": true
+        },
+        {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit_price": 22.05,
+          "total": 22.05,
+          "errorVsGt": 27.95,
+          "errorVsVisible": 0,
+          "correctVsGt": false,
+          "correctVsVisible": true
+        },
+        {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit_price": 22.05,
+          "total": 22.05,
+          "errorVsGt": 27.95,
+          "errorVsVisible": 0,
+          "correctVsGt": false,
+          "correctVsVisible": true
+        }
+      ],
+      "correctnessVsGtPct": 0,
+      "correctnessVsVisiblePct": 100,
+      "avgErrorEuroVsGt": 27.95,
+      "avgErrorEuroVsVisible": 0,
+      "worstErrorEuroVsGt": 27.95,
+      "bestErrorEuroVsGt": 27.95,
+      "p95ErrorEuroVsGt": 27.95,
+      "totalUnique": [
+        22.05
+      ],
+      "qtyUnique": [
+        1
+      ],
+      "variancePctOnTotals": 0,
+      "classification": {
+        "code": "C",
+        "label": "gt_issue",
+        "rationale": "Extraction matches visible on 100% runs; GT catalog differs"
+      }
+    }
+  }
+}

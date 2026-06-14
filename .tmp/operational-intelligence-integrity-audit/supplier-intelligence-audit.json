@@ -1,0 +1,182 @@
+{
+  "generated_at": "2026-06-13T20:50:27.592Z",
+  "pipeline": [
+    "buildSupplierIntelligence(ingredient_id) — latest vs 90d avg/min on price_history",
+    "buildSupplierWatchlist — aggregates invoice suppliers + history pct moves",
+    "buildOwnerReviewSuppliersToWatch — supplier movement groups from synthesis",
+    "countSupplierMovementDirections — weekly snapshot increase/decrease counts"
+  ],
+  "supplierWatchlist": [
+    {
+      "supplierName": "AVILUDO",
+      "status": "price_increase",
+      "statusLabel": "Price increase",
+      "lastInvoiceDate": "6/9/2026",
+      "pricingNote": "No recent basket movement",
+      "riskLevel": "medium",
+      "classification": {
+        "verdict": "stale",
+        "reasons": [
+          "stale_db:jun_11_era"
+        ]
+      }
+    },
+    {
+      "supplierName": "Emporio Italia",
+      "status": "stable",
+      "statusLabel": "Stable",
+      "lastInvoiceDate": "6/11/2026",
+      "pricingNote": "No recent basket movement",
+      "riskLevel": "low",
+      "classification": {
+        "verdict": "stale",
+        "reasons": [
+          "stale_db:jun_11_era"
+        ]
+      }
+    },
+    {
+      "supplierName": "Mammafiore Portugal",
+      "status": "stable",
+      "statusLabel": "Stable",
+      "lastInvoiceDate": "6/10/2026",
+      "pricingNote": "No recent basket movement",
+      "riskLevel": "low",
+      "classification": {
+        "verdict": "stale",
+        "reasons": [
+          "stale_db:jun_11_era"
+        ]
+      }
+    },
+    {
+      "supplierName": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "status": "stable",
+      "statusLabel": "Stable",
+      "lastInvoiceDate": "6/10/2026",
+      "pricingNote": "No recent basket movement",
+      "riskLevel": "low",
+      "classification": {
+        "verdict": "stale",
+        "reasons": [
+          "stale_db:jun_11_era"
+        ]
+      }
+    },
+    {
+      "supplierName": "Bidfood Portugal",
+      "status": "stable",
+      "statusLabel": "Stable",
+      "lastInvoiceDate": "6/9/2026",
+      "pricingNote": "No recent basket movement",
+      "riskLevel": "low",
+      "classification": {
+        "verdict": "stale",
+        "reasons": [
+          "stale_db:jun_11_era"
+        ]
+      }
+    }
+  ],
+  "suppliersToWatch": [
+    {
+      "id": "supplier-watch:AVILUDO",
+      "classification": {
+        "verdict": "stale",
+        "reasons": [
+          "stale_db:jun_11_era"
+        ]
+      }
+    }
+  ],
+  "perIngredientIntelligence": [
+    {
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "ingredientName": "Mozzarella fior di latte",
+      "historyRowCount": 3,
+      "supplierIntelligence": {
+        "spikeVs3MoPct": null,
+        "spikeMonthlyEur": null,
+        "betterSupplierLine": null,
+        "stabilityLine": null
+      },
+      "classification": {
+        "verdict": "untrusted",
+        "reasons": [
+          "identity_collapse:mozzarella_pack_formats",
+          "stale_db:jun_11_era"
+        ]
+      }
+    },
+    {
+      "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "ingredientName": "Pepino conserva",
+      "historyRowCount": 3,
+      "supplierIntelligence": {
+        "spikeVs3MoPct": null,
+        "spikeMonthlyEur": null,
+        "betterSupplierLine": null,
+        "stabilityLine": null
+      },
+      "classification": {
+        "verdict": "untrusted",
+        "reasons": [
+          "identity_collapse:pepino_fresh_vs_conserva",
+          "stale_db:jun_11_era"
+        ]
+      }
+    },
+    {
+      "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+      "ingredientName": "Atum em óleo",
+      "historyRowCount": 1,
+      "supplierIntelligence": {
+        "spikeVs3MoPct": null,
+        "spikeMonthlyEur": null,
+        "betterSupplierLine": null,
+        "stabilityLine": null
+      },
+      "classification": {
+        "verdict": "stale",
+        "reasons": [
+          "stale_db:jun_11_era"
+        ]
+      }
+    }
+  ],
+  "supplierIntelligenceBugs": [
+    {
+      "id": "SI-MOZZ-SPIKE",
+      "issue": "Mozzarella spikeVs3MoPct / betterSupplierLine computed on mixed pack-format history",
+      "evidence": {
+        "spikeVs3MoPct": null,
+        "spikeMonthlyEur": null,
+        "betterSupplierLine": null,
+        "stabilityLine": null
+      },
+      "class": "identity_collapse"
+    },
+    {
+      "id": "SI-PEPINO-DEFLATION",
+      "issue": "Pepino min90d vs catalog compares conserva jar vs fresh cucumber operational units",
+      "class": "identity_collapse"
+    },
+    {
+      "id": "SI-GHOST-HISTORY",
+      "issue": "14/20 price_history rows are ghost/stale metadata — supplier counts include prior extraction lines",
+      "class": "stale_data"
+    }
+  ],
+  "trustedOutputs": [
+    {
+      "ingredient": "Atum em óleo",
+      "intel": {
+        "spikeVs3MoPct": null,
+        "spikeMonthlyEur": null,
+        "betterSupplierLine": null,
+        "stabilityLine": null
+      },
+      "reason": "Single-format tuna chain +4.1%"
+    }
+  ]
+}

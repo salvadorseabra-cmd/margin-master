@@ -1,0 +1,339 @@
+{
+  "generated_at": "2026-06-13T22:00:00.000Z",
+  "version": "P0-v1",
+  "mode": "design-only",
+  "alignsWith": "ingredient-identity-future-design Option E, Phase P0",
+  "summary": "Cross-format history chain guard — break incompatible prior links, null movement deltas, filter OI consumption. No new schema required.",
+  "module": {
+    "proposedPath": "src/lib/ingredient-price-chain-guard.ts",
+    "exports": [
+      "derivePurchaseContractSnapshot",
+      "purchaseContractsChainCompatible",
+      "selectChainCompatiblePriorPrice",
+      "isTrustedPriceMovementRow",
+      "reconcileChainWithGuard"
+    ]
+  },
+  "inputsAvailableToday": {
+    "atAppend": [
+      "ingredientId",
+      "ingredientName (catalog + invoice line)",
+      "ingredientUnit (catalog unit / base_unit)",
+      "previousPrice / newPrice (pack)",
+      "previousPurchaseQuantity / newPurchaseQuantity",
+      "previousOperationalPrice / storedNew (€/base-unit)",
+      "invoice line name (AppendIngredientPriceHistoryParams.ingredientName)"
+    ],
+    "onHistoryRow": [
+      "ingredient_id",
+      "ingredient_name",
+      "ingredient_unit",
+      "previous_price",
+      "new_price",
+      "delta",
+      "delta_percent",
+      "invoice_id",
+      "supplier_name",
+      "created_at"
+    ],
+    "fromCatalog": [
+      "ingredients.unit",
+      "ingredients.base_unit",
+      "ingredients.purchase_quantity",
+      "ingredients.purchase_unit",
+      "ingredients.ingredient_kind"
+    ],
+    "fromRuntimeParsers": [
+      "resolveInvoiceLinePurchaseFormat(name)",
+      "inferUnitFamily(rowUnit, opts)",
+      "canonicalizeIngredientIdentity(rawName)",
+      "hasCompatibleCanonicalForms",
+      "extractLineWeightGrams(rawName)",
+      "resolvePackagedLiquidPackMl(fields)"
+    ],
+    "notAvailableP0": [
+      "pack_variant_id",
+      "contract_hash column on price_history",
+      "per-row persisted purchase_quantity on history"
+    ]
+  },
+  "contractSnapshot": {
+    "description": "Ephemeral fingerprint computed at append/reconcile/read — not persisted in P0",
+    "fields": {
+      "unitFamily": "weight | volume | countable (inferUnitFamily + base_unit)",
+      "baseUnit": "g | ml | un from catalog or inferred",
+      "purchaseQuantity": "number | null",
+      "packWeightGrams": "extractLineWeightGrams primary pack size",
+      "canonicalForm": "form id from canonicalizeIngredientIdentity",
+      "preservationClass": "fresh | preserved | unknown (token scan)",
+      "operationalUnitPrice": "€/base-unit after normalization",
+      "contractKey": "string hash: unitFamily:baseUnit:pqBucket:form:preservation"
+    },
+    "pqBucket": "round purchase_quantity to nearest power-of-10 bucket for tolerance (1, 10, 100, 1000)"
+  },
+  "rules": [
+    {
+      "id": "R1",
+      "name": "unit_family_mismatch",
+      "priority": 1,
+      "action": "break_chain",
+      "severity": "block",
+      "description": "Do not chain when operational unit families differ (weight vs countable vs volume).",
+      "signals": [
+        "inferUnitFamily(prior.unit) !== inferUnitFamily(next.unit)",
+        "ingredients.base_unit family mismatch (g vs un vs ml)"
+      ],
+      "pseudocode": "if prior.unitFamily !== next.unitFamily: return { compatible: false, reason: 'unit_family_mismatch', action: 'break_chain' }",
+      "vlCases": ["mozzarella_piece_vs_block"],
+      "confidencePercent": 95
+    },
+    {
+      "id": "R2",
+      "name": "countable_vs_weight_contract",
+      "priority": 2,
+      "action": "break_chain",
+      "severity": "block",
+      "description": "Block piece/case-priced lines chaining to weight-priced catalog (pq semantics differ).",
+      "signals": [
+        "prior.unitFamily === 'countable' && next.unitFamily === 'weight'",
+        "prior.purchaseQuantity >= 2 && next.baseUnit === 'g' with pq >= 100",
+        "invoice line has *N pack pattern vs single kg block"
+      ],
+      "pseudocode": "if (prior.unitFamily==='countable' && next.unitFamily==='weight') || (next.unitFamily==='countable' && prior.unitFamily==='weight'): return break",
+      "vlCases": ["mozzarella_piece_vs_block"],
+      "confidencePercent": 93
+    },
+    {
+      "id": "R3",
+      "name": "extreme_operational_price_ratio",
+      "priority": 3,
+      "action": "break_chain",
+      "severity": "block",
+      "description": "When operational €/base-unit ratio exceeds plausible single-invoice repricing, treat as format change not movement.",
+      "signals": [
+        "ratio = max(prior.op, next.op) / min(prior.op, next.op)",
+        "ratio > 25 AND (unitFamily mismatch OR form mismatch OR preservation mismatch)",
+        "ratio > 100 regardless of family (hard ceiling)"
+      ],
+      "thresholds": {
+        "ratioWithMismatch": 25,
+        "ratioHardCeiling": 100,
+        "minOperationalPrice": 1e-6
+      },
+      "pseudocode": "ratio = max(a,b)/min(a,b); if ratio > 100: break; if ratio > 25 && (R1||R4||R5): break",
+      "vlCases": ["pepino_fresco_vs_conserva", "mozzarella_piece_vs_block"],
+      "confidencePercent": 91
+    },
+    {
+      "id": "R4",
+      "name": "product_form_mismatch",
+      "priority": 4,
+      "action": "break_chain",
+      "severity": "block",
+      "description": "Block chains across incompatible preparation/product forms using ingredient-identity.ts ontology.",
+      "signals": [
+        "!hasCompatibleCanonicalForms(prior.form, next.form)",
+        "block vs sliced vs molho (existing INCOMPATIBLE_FORM_PAIRS)",
+        "mozzarella block token vs piece/multi-pack without shared form"
+      ],
+      "pseudocode": "idA = canonicalizeIngredientIdentity(prior.name); idB = canonicalizeIngredientIdentity(next.name); if !hasCompatibleCanonicalForms(idA.form, idB.form): break",
+      "vlCases": ["mozzarella_piece_vs_block"],
+      "confidencePercent": 88
+    },
+    {
+      "id": "R5",
+      "name": "preservation_class_mismatch",
+      "priority": 5,
+      "action": "break_chain",
+      "severity": "block",
+      "description": "Fresh vs preserved (conserva/em conserva/pickled) must not chain even under same weight family.",
+      "signals": [
+        "preservationClass(prior.name) !== preservationClass(next.name)",
+        "tokens: conserva, em conserva, pickled, escabeche vs fresco, fresh",
+        "jar/frasco/garrafa on one side only"
+      ],
+      "preservationTokens": {
+        "preserved": ["conserva", "em conserva", "pickled", "escabeche", "frasco", "jar"],
+        "fresh": ["fresco", "fresh", "extra ii", "kg line without conserva"]
+      },
+      "pseudocode": "if preservation(prior) !== preservation(next) && both !== 'unknown': break",
+      "vlCases": ["pepino_fresco_vs_conserva"],
+      "confidencePercent": 90
+    },
+    {
+      "id": "R6",
+      "name": "package_weight_order_of_magnitude",
+      "priority": 6,
+      "action": "break_chain",
+      "severity": "flag",
+      "description": "Pack size extracted from names differs by >10x (125g piece pack vs 2kg block).",
+      "signals": [
+        "extractLineWeightGrams on both names",
+        "grams ratio > 10 without matching form"
+      ],
+      "thresholds": { "weightGramsRatio": 10 },
+      "pseudocode": "wA = extractLineWeightGrams(prior.name); wB = extractLineWeightGrams(next.name); if both && max/min > 10: break",
+      "vlCases": ["mozzarella_piece_vs_block"],
+      "confidencePercent": 87
+    },
+    {
+      "id": "R7",
+      "name": "beverage_volume_sanity",
+      "priority": 7,
+      "action": "block_insert_or_break",
+      "severity": "block",
+      "description": "Reject or break chains when beverage operational cost implies implausible €/L (volume parse errors).",
+      "signals": [
+        "unitFamily === 'volume' OR ingredient_kind beverage",
+        "operational €/ml implies €/L > 50",
+        "resolvePackagedLiquidPackMl < 50ml (0.20cl parse)",
+        "resolveInvoiceLinePurchaseFormat confidence < 0.86 on volume lines"
+      ],
+      "thresholds": { "maxEurPerLiter": 50, "minPackMl": 50 },
+      "pseudocode": "if volume line && (eurPerLiter > 50 || packMl < 50): action = block_insert; on chain compare also break",
+      "vlCases": ["ginger_beer_020cl"],
+      "confidencePercent": 85,
+      "note": "Primarily persist-time guard; unmatched lines never reach history"
+    },
+    {
+      "id": "R8",
+      "name": "contract_key_mismatch",
+      "priority": 8,
+      "action": "break_chain",
+      "severity": "flag",
+      "description": "Composite contract fingerprint differs — format_change baseline reset.",
+      "signals": [
+        "prior.contractKey !== next.contractKey",
+        "purchase_quantity bucket change with same unit family"
+      ],
+      "pseudocode": "if prior.contractKey !== next.contractKey: return { compatible: false, reason: 'format_change', action: 'break_chain' }",
+      "vlCases": ["future_pack_format_contamination"],
+      "confidencePercent": 82
+    }
+  ],
+  "actions": {
+    "break_chain": {
+      "onAppend": "storedPrev = null; delta = null; delta_percent = null; still insert new_price",
+      "onReconcile": "do not propagate prevNew from incompatible prior row; restart chain at this row",
+      "onRead": "isTrustedPriceMovementRow(row) === false; exclude from movement/opportunity aggregations",
+      "semanticLabel": "format_change"
+    },
+    "block_insert": {
+      "description": "Skip history insert entirely when volume sanity fails (R7 only)",
+      "onAppend": "return skippedReason: 'implausible_volume_contract'"
+    }
+  },
+  "chainSelection": {
+    "description": "Replace fetchPriorLinkedHistoryNewPrice naive latest-pick",
+    "pseudocode": "function selectChainCompatiblePriorPrice(rows, candidate): sort chron desc; for row in rows: snap = deriveSnapshot(row); if purchaseContractsChainCompatible(snap, candidate).compatible: return row.new_price; return null"
+  },
+  "testCases": [
+    {
+      "id": "TC-MOZZARELLA",
+      "vlCase": "mozzarella_piece_vs_block",
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "prior": {
+        "name": "MOZZARELLA FIOR DI LATTE 'IL BOCCONCINO' 125GR*8",
+        "operationalPrice": 0.95,
+        "purchaseQuantity": 10,
+        "unitFamily": "countable",
+        "baseUnit": "un"
+      },
+      "next": {
+        "name": "Mozzarella Flor di Latte 2Kg",
+        "operationalPrice": 13.69,
+        "purchaseQuantity": 1,
+        "unitFamily": "weight",
+        "baseUnit": "g"
+      },
+      "triggeredRules": ["R1", "R2", "R3", "R6"],
+      "expected": {
+        "chainCompatible": false,
+        "storedPrev": null,
+        "delta_percent": null,
+        "oiMovement": false,
+        "opportunity": false
+      }
+    },
+    {
+      "id": "TC-PEPINO",
+      "vlCase": "pepino_fresco_vs_conserva",
+      "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "prior": {
+        "name": "Pepinos Extra Uli Frasco 6x720 g",
+        "operationalPrice": 3.748333333333333,
+        "purchaseQuantity": 4320,
+        "unitFamily": "weight",
+        "preservation": "preserved"
+      },
+      "next": {
+        "name": "Pepino",
+        "operationalPrice": 0.00177,
+        "purchaseQuantity": 1000,
+        "unitFamily": "weight",
+        "preservation": "fresh"
+      },
+      "triggeredRules": ["R3", "R5", "R8"],
+      "expected": {
+        "chainCompatible": false,
+        "storedPrev": null,
+        "delta_percent": null,
+        "oiMovement": false,
+        "opportunity": false
+      }
+    },
+    {
+      "id": "TC-GINGER-BEER",
+      "vlCase": "ginger_beer_020cl",
+      "ingredientId": null,
+      "prior": null,
+      "next": {
+        "name": "Ginger Beer 0.20cl",
+        "operationalPrice": 0.575,
+        "purchaseQuantity": 2,
+        "unitFamily": "volume",
+        "eurPerLiter": 575
+      },
+      "triggeredRules": ["R7"],
+      "expected": {
+        "historyInsert": "skipped",
+        "oiMovement": false,
+        "note": "Line currently unmatched; guard fires at persist if matched"
+      }
+    },
+    {
+      "id": "TC-ATUM-TRUSTED",
+      "vlCase": "control_trusted_chain",
+      "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+      "prior": { "operationalPrice": 3.145, "unitFamily": "weight" },
+      "next": { "operationalPrice": 3.275, "unitFamily": "weight" },
+      "triggeredRules": [],
+      "expected": {
+        "chainCompatible": true,
+        "delta_percent": 4.13,
+        "oiMovement": true
+      }
+    }
+  ],
+  "answers": {
+    "smallestGuardPreventingAllVLFailures": {
+      "answer": "R1 + R2 + R3 + R5 + R7 (unit family, countable/weight, extreme ratio, preservation class, beverage sanity). R4/R6/R8 add defense-in-depth.",
+      "confidencePercent": 89,
+      "note": "Ginger Beer also needs extraction parse fix (orthogonal); R7 prevents poisoned history if matched"
+    },
+    "vlFailuresFixedImmediately": [
+      "mozzarella_piece_vs_block",
+      "pepino_fresco_vs_conserva"
+    ],
+    "vlFailuresPartialP0": [
+      "ginger_beer_020cl — R7 blocks bad history; full SKU disambiguation needs P1/P2"
+    ],
+    "requiresPackVariantArchitecture": [
+      "clean multi-supplier intel without false betterSupplierLine",
+      "per-variant history without name-token heuristics",
+      "recipe default variant costing",
+      "alias → variant binding",
+      "ghost row prevention at match time"
+    ]
+  }
+}

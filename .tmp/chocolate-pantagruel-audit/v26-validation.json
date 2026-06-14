@@ -1,0 +1,170 @@
+{
+  "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+  "label": "Aviludo May",
+  "deployVersion": 26,
+  "imageSource": "vl-storage-png",
+  "validatedAt": "2026-06-12T23:10:16.940Z",
+  "groundTruth": {
+    "chocolate": {
+      "qty": 2,
+      "unit_price": 29.99,
+      "total": 59.98
+    },
+    "acucar": {
+      "qty": 1,
+      "unit_price": 9.99,
+      "total": 9.99
+    }
+  },
+  "v25Baseline": {
+    "chocolateUnitPrice": 9.99,
+    "chocolateTotal": 19.98,
+    "financialErrorEuro": 40,
+    "stableWrongRuns": "3/3"
+  },
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "itemCount": 8,
+      "chocolate": {
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 29.99,
+        "total": 59.98,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "financialErrorEuro": 0
+      },
+      "acucar": {
+        "name": "Acucar Branco METRO Chef 10x1 Kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 9.99,
+        "total": 9.99,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "financialErrorEuro": 0
+      }
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "itemCount": 8,
+      "chocolate": {
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 29.99,
+        "total": 59.98,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "financialErrorEuro": 0
+      },
+      "acucar": {
+        "name": "Acucar Branco METRO Chef 10x1 Kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 9.99,
+        "total": 9.99,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "financialErrorEuro": 0
+      }
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "itemCount": 8,
+      "chocolate": {
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 29.99,
+        "total": 59.98,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "financialErrorEuro": 0
+      },
+      "acucar": {
+        "name": "Açucar Branco METRO Chef 10x1 Kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 9.99,
+        "total": 9.99,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "financialErrorEuro": 0
+      }
+    },
+    {
+      "run": 4,
+      "status": 200,
+      "itemCount": 8,
+      "chocolate": {
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 29.99,
+        "total": 59.98,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "financialErrorEuro": 0
+      },
+      "acucar": {
+        "name": "Açucar Branco METRO Chef 10x1 Kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 9.99,
+        "total": 9.99,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "financialErrorEuro": 0
+      }
+    },
+    {
+      "run": 5,
+      "status": 200,
+      "itemCount": 8,
+      "chocolate": {
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 29.99,
+        "total": 59.98,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "financialErrorEuro": 0
+      },
+      "acucar": {
+        "name": "Açucar Branco METRO Chef 10x1 Kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 9.99,
+        "total": 9.99,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "financialErrorEuro": 0
+      }
+    }
+  ],
+  "summary": {
+    "chocolateCorrectRuns": "5/5",
+    "acucarPreservedRuns": "5/5",
+    "avgChocolateFinancialErrorEuro": 0,
+    "financialImprovementVsV25Euro": 40,
+    "remainingMayFinancialErrorEuro": 0,
+    "aviludoMayStatus": "CLOSED"
+  }
+}

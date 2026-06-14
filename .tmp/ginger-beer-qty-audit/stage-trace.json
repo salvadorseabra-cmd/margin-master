@@ -1,0 +1,121 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio Italia",
+  "product": "Baladin - Ginger Beer 0.20cl",
+  "deployVersion": 25,
+  "generatedAt": "2026-06-12T23:45:00.000Z",
+  "visibleInvoice": {
+    "source": ".tmp/ginger-beer-ground-truth/table-data-crop.png",
+    "productCode": "BBB-GINGER33ITA",
+    "description": "Baladin - Ginger Beer 0.20cl",
+    "qtdColumn": "24,00",
+    "precoUnit": "0,85 €",
+    "discountPct": "5,00",
+    "lineTotal": "19,38 €",
+    "arithmetic": "24 × 0.85 × (1 − 0.05) = 19.38"
+  },
+  "groundTruth": {
+    "qty": 2,
+    "unit": "un",
+    "unit_price": 9.69,
+    "total": 19.38,
+    "interpretation": "2 cases (12 bottles/case at discounted per-bottle €0.8075 → €9.69/case)"
+  },
+  "stages": [
+    {
+      "stage": 1,
+      "name": "visible_invoice",
+      "result": {
+        "qtdPrinted": "24,00",
+        "unitPricePrinted": "0,85 €",
+        "lineTotalPrinted": "19,38 €",
+        "nameContains24": false,
+        "nameContainsPackCount": false
+      },
+      "divergedFromGT": false,
+      "note": "Invoice literally bills 24 bottles — GT case count of 2 is semantic normalization, not printed Qtd"
+    },
+    {
+      "stage": 2,
+      "name": "geometry_crop",
+      "result": {
+        "bounds": { "top": 456, "bottom": 851, "headerTop": 466 },
+        "gingerRowVisible": true,
+        "fallbackUsed": false,
+        "source": ".tmp/geometry-audit/17aa3591-ec98-4c21-89c9-5ae946bc97bb-geometry.json"
+      },
+      "divergedFromGT": false
+    },
+    {
+      "stage": 3,
+      "name": "passC_gpt_extraction",
+      "result": {
+        "outcomeA_columnFaithful": {
+          "qty": 24,
+          "unit": "un",
+          "gross_unit_price": 0.85,
+          "line_total_net": 19.38,
+          "occurrences": ["final-validation-lab-rerun extract", "pass-c-raw historical", "ginger-beer-ground-truth retry"]
+        },
+        "outcomeB_caseNormalized": {
+          "qty": 2,
+          "unit": null,
+          "unit_price": 9.69,
+          "total": 19.38,
+          "occurrences": ["passc-refinement-validation reextract", "fresh v25 probe 3/3 (2026-06-12)"]
+        }
+      },
+      "divergedFromGT": "WHEN outcomeA — FIRST DIVERGENCE",
+      "note": "Pass C is sole stage where qty differs from GT 2; variance between outcomeA and outcomeB"
+    },
+    {
+      "stage": 4,
+      "name": "binder_monetary",
+      "result": {
+        "inputQty": "unchanged from Pass C",
+        "whenQty24": { "unit_price_derived": 0.81, "total": 19.38, "note": "line_total_net / qty or structured binding" },
+        "whenQty2": { "unit_price": 9.69, "total": 19.38 },
+        "qtyModified": false
+      },
+      "divergedFromGT": false,
+      "note": "Binder adjusts unit_price/total pairing; never changes quantity"
+    },
+    {
+      "stage": 5,
+      "name": "reconcile_finalize",
+      "result": {
+        "qtyModified": false,
+        "totalPreserved": 19.38
+      },
+      "divergedFromGT": false
+    },
+    {
+      "stage": 6,
+      "name": "final_api_output",
+      "result": {
+        "finalVLRerun": { "qty": 24, "unit_price": 0.81, "total": 19.38 },
+        "freshV25Probe": { "qty": 2, "unit_price": 9.69, "total": 19.38 }
+      },
+      "divergedFromGT": "depends on Pass C outcome"
+    }
+  ],
+  "firstDivergence": {
+    "stage": "passC_gpt_extraction",
+    "stageNumber": 3,
+    "condition": "when GPT selects column-faithful bottle count (24) over case-normalized count (2)"
+  },
+  "rowComparison": {
+    "chocolateAdjacent": null,
+    "deCeccoRowAbove": {
+      "name": "De Cecco Paccheri",
+      "qty": 24,
+      "note": "Same numeric qty but independent column — not bleed source (Ginger row has own 24,00 cell)"
+    },
+    "sanPellegrinoContrast": {
+      "name": "SanPellegrino 75cl x 15ud",
+      "qtyPrinted": "2,00",
+      "note": "Pack count in description (x15ud) but Qtd shows case count 2 — correct column read"
+    }
+  },
+  "mechanismSummary": "Unit interpretation variance: visible invoice uses bottle-level Qtd (24) with per-bottle price (€0.85); GT uses case-level qty (2) with per-case price (€9.69). Prompt Ginger Beer rule targets case output but conflicts with column-faithful rule when Qtd literally shows 24,00."
+}

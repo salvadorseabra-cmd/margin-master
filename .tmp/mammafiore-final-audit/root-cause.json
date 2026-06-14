@@ -1,0 +1,96 @@
+{
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "label": "Mammafiore",
+  "deployVersion": 27,
+  "auditedAt": "2026-06-13T00:45:00.000Z",
+  "totalResidualEuro": 5.86,
+  "verdict": "ALL_EXTRACTION_BUGS",
+  "gtIssues": 0,
+  "sumCheck": {
+    "ruloDiCapraEuro": 4.86,
+    "farinaSpecialeEuro": 1.0,
+    "sum": 5.86,
+    "percentAccounted": 100
+  },
+  "structuralContext": {
+    "family": "discount_line_handling",
+    "source": "discount-line-audit + root-cause-consolidation",
+    "note": "Mammafiore has 8 discounted rows where qty×unit_price≠total. Primary variance is Pass C choosing behaviour A (copy Valor) vs B (recalculate qty×list). v27 focus errors are partial/catastrophic total misreads, not GT catalog mismatches."
+  },
+  "rows": [
+    {
+      "rank": 1,
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "financialErrorEuro": 4.86,
+      "classification": "extraction_bug",
+      "gtIssue": false,
+      "firstFailingStage": "passC_table_extraction",
+      "rootCause": "Valor column catastrophic misread — total €6.00 vs visible €10.86",
+      "mechanism": {
+        "type": "discounted_line_total_misread",
+        "subtype": "severe_column_digit_error",
+        "passCBehaviour": "Neither A (copy €10.86) nor B (qty×list €15.19)",
+        "unitPriceField": "Net/discounted €10.86 copied correctly into unit_price",
+        "totalField": "Wrong — €6.00",
+        "binderRole": "None — Pass C output already wrong",
+        "reconcileRole": "None",
+        "packNotation": "1kg*2 in description — historical qty confusion risk"
+      },
+      "stability": {
+        "v26": "€0 (total 10.86 correct)",
+        "v27": "€4.86 (regression)",
+        "discountLine5Run": "€0.03–€4.33 range; v27 €4.86 exceeds worst historical €4.33",
+        "deterministic": false
+      },
+      "confidencePercent": 92
+    },
+    {
+      "rank": 2,
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "financialErrorEuro": 1.0,
+      "classification": "extraction_bug",
+      "gtIssue": false,
+      "firstFailingStage": "passC_table_extraction",
+      "rootCause": "Valor column partial misread — total €25.52 vs visible €26.52",
+      "mechanism": {
+        "type": "discounted_line_total_misread",
+        "subtype": "stable_euro_digit_drift",
+        "passCBehaviour": "Partial A — net unit copied, total €1 low",
+        "unitPriceField": "Net/discounted €26.52 (Valor-adjacent, not list €33.154)",
+        "totalField": "€25.52 — likely digit drift 26→25",
+        "binderRole": "None",
+        "reconcileRole": "None"
+      },
+      "stability": {
+        "v26": "€1.00 (identical)",
+        "v27": "€1.00 (stable)",
+        "discountLine5Run": "4/5 correct at €26.52; 1/5 behaviour B at €33.15",
+        "deterministic": "PARTIAL — this specific €1 error stable across v26/v27"
+      },
+      "confidencePercent": 94
+    }
+  ],
+  "pipelineTrace": {
+    "stages": [
+      { "stage": "visible_invoice", "status": "PASS", "note": "Manual transcription in mammafiore-line-audit matches GT" },
+      { "stage": "geometry_crop", "status": "PASS", "note": "Post-fix crop top=386 includes all 8 rows (mammafiore-investigation)" },
+      { "stage": "passC_gpt", "status": "FAIL", "note": "First and only divergence for both focus rows" },
+      { "stage": "binder", "status": "PASS", "note": "Preserves Pass C totals" },
+      { "stage": "reconcile", "status": "PASS", "note": "Does not fix discount totals (discount-line-audit)" },
+      { "stage": "normalization", "status": "N/A", "note": "No normalization issue — not Class C" }
+    ]
+  },
+  "projectedIfFixed": {
+    "mammafioreFinancialEuro": 0,
+    "fieldAccuracyNote": "unit_price field flags remain on discounted rows even when total correct (net vs list display)"
+  },
+  "evidenceFiles": [
+    ".tmp/final-residual-error-audit/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d.json",
+    ".tmp/mammafiore-line-audit/ground-truth.json",
+    ".tmp/mammafiore-line-audit/REPORT.md",
+    ".tmp/discount-line-audit/REPORT.md",
+    ".tmp/discount-line-audit/run-variance.json",
+    ".tmp/discount-line-audit/ground-truth-trace.json",
+    ".tmp/root-cause-consolidation/REPORT.md"
+  ]
+}

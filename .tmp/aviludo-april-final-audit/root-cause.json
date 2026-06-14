@@ -1,0 +1,59 @@
+{
+  "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+  "label": "Aviludo April",
+  "deployVersion": 26,
+  "investigatedAt": "2026-06-13T00:05:00.000Z",
+  "totalFinancialErrorEuro": 169.08,
+  "sumCheckPercent": 100,
+  "verdict": "LINE_TOTAL_NET_COLUMN_BLEED",
+  "rootCause": "On v26 single-run extract, Pass C copies gross_unit_price into line_total_net for every row where qty > 1. Extracted total equals unit_price instead of VALOR (qty × unit_price). All five multi-qty rows fail identically; four single-qty rows are correct because unit_price equals line total. Refinement reextract (2026-06-11, same PNG fixture) achieved €0 — proving GT is reachable and this is real extraction variance, not GT mismatch.",
+  "confidencePercent": 96,
+  "mechanism": {
+    "type": "column_shift",
+    "fieldAffected": "line_total_net",
+    "symptom": "line_total_net = gross_unit_price (ignores quantity multiplier)",
+    "condition": "qty > 1",
+    "firstFailingStage": "passC_table_extraction",
+    "binderImpact": "Binder preserves wrong line_total_net; no Rule B/E trigger when total intentionally equals unit_price"
+  },
+  "errorAccounting": {
+    "rowsWithError": 5,
+    "rowsCorrect": 4,
+    "totalDeltaEuro": 169.08,
+    "rankedContributors": [
+      { "rank": 1, "product": "Nata Reny Picot 22% 6x1L", "euroDelta": 73.16, "pctOfTotal": 43.3 },
+      { "rank": 2, "product": "Ovo Líquido Past.Gema Dovo 1kg", "euroDelta": 50.95, "pctOfTotal": 30.1 },
+      { "rank": 3, "product": "Chocolate Pantagruel 10x200g", "euroDelta": 29.19, "pctOfTotal": 17.3 },
+      { "rank": 4, "product": "Filete de Anchovas Alconfrisa Lt 495 g", "euroDelta": 9.49, "pctOfTotal": 5.6 },
+      { "rank": 5, "product": "Atum Óleo Bolsa Nau Catrineta 1 Kg", "euroDelta": 6.29, "pctOfTotal": 3.7 }
+    ],
+    "zeroErrorRows": [
+      "Mozzarella Flor di Latte 2Kg",
+      "Açúcar Branco Metro Chef 10x1Kg",
+      "Arroz Agulha Metro Chef 12x1kg",
+      "Pepinos Extra II Frasco 6x720g"
+    ]
+  },
+  "baselineComparison": {
+    "beforeC33_postAudit": { "financialErrorEuro": 169.08, "note": "Same failure mode on April PNG fixture" },
+    "afterC33_postAudit": { "financialErrorEuro": 0 },
+    "passcRefinementReextract": { "financialErrorEuro": 0, "allLineTotalsCorrect": true, "source": ".tmp/passc-refinement-validation/reextract/c2f52357-....json" },
+    "v26FinalRerun": { "financialErrorEuro": 169.08, "itemCount": 9, "harnessUrlCorrect": true }
+  },
+  "expectedImprovementIfFixed": {
+    "aviludoAprilEuro": "169.08 → 0",
+    "globalV26Euro": "220.27 → 51.19",
+    "aviludoAprilStatus": "OPEN → CLOSED or PARTIAL"
+  },
+  "smallestFixCategory": {
+    "category": "pass_c_prompt_line_total_isolation",
+    "recommendation": "Add Aviludo April BAD/GOOD examples: when qty > 1, line_total_net must come from VALOR column (e.g. Ovo 6 × 10,19 = 61,14) — BAD if line_total_net equals gross_unit_price (10,19). Complements v26 Chocolate row-isolation rule (price bleed) with total-column rule.",
+    "notGTRevision": true
+  },
+  "evidenceFiles": [
+    ".tmp/aviludo-april-final-audit/row-breakdown.json",
+    ".tmp/final-validation-lab-rerun-v26/extracts/c2f52357-0f80-491a-ba14-c97ff4837472.json",
+    ".tmp/passc-refinement-validation/reextract/c2f52357-0f80-491a-ba14-c97ff4837472.json",
+    ".tmp/field-accuracy-audit/ground-truth.json"
+  ]
+}

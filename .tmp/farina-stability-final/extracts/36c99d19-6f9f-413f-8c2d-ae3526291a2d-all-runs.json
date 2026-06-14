@@ -1,0 +1,902 @@
+[
+  {
+    "run": 1,
+    "status": 200,
+    "elapsedMs": 22241,
+    "farina": {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 2,
+    "status": 200,
+    "elapsedMs": 18928,
+    "farina": {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 3,
+    "status": 200,
+    "elapsedMs": 20080,
+    "farina": {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 4,
+    "status": 200,
+    "elapsedMs": 17430,
+    "farina": {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birre Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 5,
+    "status": 200,
+    "elapsedMs": 15098,
+    "farina": {
+      "name": "Farina Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 25.52,
+      "unit_price": 26.52,
+      "total": 25.52,
+      "unit_price_gt_total": true,
+      "errorEuro": 1,
+      "correctVsGt": false,
+      "passCInference": "binder_derived_net_unit_gross_discount_ok_line_total_wrong"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 6,
+    "status": 200,
+    "elapsedMs": 18167,
+    "farina": {
+      "name": "Farina Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birre Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 7,
+    "status": 200,
+    "elapsedMs": 19748,
+    "farina": {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birre Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 8,
+    "status": 200,
+    "elapsedMs": 16554,
+    "farina": {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 9,
+    "status": 200,
+    "elapsedMs": 15152,
+    "farina": {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birre Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 10,
+    "status": 200,
+    "elapsedMs": 27668,
+    "farina": {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 11,
+    "status": 200,
+    "elapsedMs": 18187,
+    "farina": {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 12,
+    "status": 200,
+    "elapsedMs": 21351,
+    "farina": {
+      "name": "Farina Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 13,
+    "status": 200,
+    "elapsedMs": 20011,
+    "farina": {
+      "name": "Farina Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 14,
+    "status": 200,
+    "elapsedMs": 19899,
+    "farina": {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 15,
+    "status": 200,
+    "elapsedMs": 25086,
+    "farina": {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birre Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 16,
+    "status": 200,
+    "elapsedMs": 30871,
+    "farina": {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birre Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 17,
+    "status": 200,
+    "elapsedMs": 20670,
+    "farina": {
+      "name": "Farina Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 18,
+    "status": 200,
+    "elapsedMs": 27330,
+    "farina": {
+      "name": "Farina Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 19,
+    "status": 200,
+    "elapsedMs": 21921,
+    "farina": {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  },
+  {
+    "run": 20,
+    "status": 200,
+    "elapsedMs": 49018,
+    "farina": {
+      "name": "Farine Speciale pizza 25kg Amoruso",
+      "quantity": 1,
+      "gross_unit_price": 33.154,
+      "discount_pct": 20,
+      "line_total_net": 26.52,
+      "unit_price": 26.52,
+      "total": 26.52,
+      "unit_price_gt_total": false,
+      "errorEuro": 0,
+      "correctVsGt": true,
+      "passCInference": "binder_derived_net_unit_all_consistent"
+    },
+    "neighbours": {
+      "guanciale": {
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "birra": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "rulo": {
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "aceto": {
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit_price": 15.55,
+        "total": 16.09
+      }
+    },
+    "itemCount": 8
+  }
+]

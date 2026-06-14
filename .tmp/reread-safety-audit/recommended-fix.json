@@ -1,0 +1,130 @@
+{
+  "generated_at": "2026-06-12T23:00:00.000Z",
+  "auditMode": "READ-ONLY design — no implementation",
+  "exactFailureMechanism": {
+    "primary": "Destructive delete-then-conditional-insert in runExtraction: DELETE always runs after successful extract-invoice response, but INSERT only runs when items.length > 0. Empty extraction (HTTP 200, items:[]) wipes existing rows with no replacement.",
+    "secondary": "Non-atomic replace allows concurrent runExtraction calls to interleave DELETE/INSERT, producing duplicate row batches (Emporio 8+8=16).",
+    "tertiary": "INSERT failure after DELETE leaves invoice_items empty; catch swallows error and returns null.",
+    "codePath": [
+      "reExtract() → invoices.tsx:2080",
+      "runExtraction() → invoices.tsx:1215",
+      "supabase.functions.invoke('extract-invoice') → invoices.tsx:1236",
+      "DELETE invoice_items → invoices.tsx:1263",
+      "normalize + shouldRejectInvoiceIngredientRow → invoices.tsx:1264-1266",
+      "INSERT invoice_items (conditional) → invoices.tsx:1282-1309",
+      "reExtract metadata update if result truthy → invoices.tsx:2091-2133"
+    ]
+  },
+  "preferredFix": {
+    "name": "Replace-only-when-ready guard + in-flight mutex",
+    "summary": "Smallest safe frontend change in runExtraction: never DELETE unless normalized replacement rows exist; reject concurrent extractions for the same invoiceId via synchronous ref lock; surface empty/partial persistence skip to user.",
+    "steps": [
+      {
+        "step": 1,
+        "action": "Add extractionInFlightRef: Record<string, boolean> (or Set) at component level",
+        "location": "src/routes/invoices.tsx near extracting state (~784)",
+        "detail": "At runExtraction entry (before any await): if ref[invoiceId] is true, return null immediately. Set ref[invoiceId]=true synchronously; clear in finally alongside setExtracting."
+      },
+      {
+        "step": 2,
+        "action": "Reorder persistence: normalize/filter BEFORE delete",
+        "location": "src/routes/invoices.tsx:1262-1302",
+        "detail": "Move normalizeInvoiceItemFields + shouldRejectInvoiceIngredientRow filter to immediately after items array is parsed, before any DELETE."
+      },
+      {
+        "step": 3,
+        "action": "Guard DELETE on normalizedItems.length > 0",
+        "location": "src/routes/invoices.tsx persistence block",
+        "detail": "If normalizedItems.length === 0 after successful extract response: skip DELETE and INSERT entirely; return { ..., itemsCount: 0, persistenceSkipped: true, reason: 'no_accepted_rows' }. Existing DB rows preserved."
+      },
+      {
+        "step": 4,
+        "action": "Check DELETE error before INSERT",
+        "location": "same block",
+        "detail": "const { error: deleteError } = await supabase.from('invoice_items').delete()...; if (deleteError) throw deleteError;"
+      },
+      {
+        "step": 5,
+        "action": "User feedback on skipped persistence",
+        "location": "reExtract() ~2090 and optionally uploadOne ~1452",
+        "detail": "When persistenceSkipped or result.itemsCount===0 on re-read of invoice with prior items: show toast 'Re-read returned no line items — existing rows kept.' Do not call loadItems refresh that implies success."
+      },
+      {
+        "step": 6,
+        "action": "Optional threshold warning for partial replace",
+        "location": "reExtract post-run",
+        "detail": "If normalizedItems.length < prior item count by >50%, show confirm-style warning before delete on NEXT run — defer to phase 2; not required for smallest safe fix."
+      }
+    ],
+    "pseudocode": "async function runExtraction(invoiceId, dataUrl) {\n  if (extractionInFlightRef.current[invoiceId]) return null;\n  extractionInFlightRef.current[invoiceId] = true;\n  setExtracting(s => ({...s, [invoiceId]: true}));\n  try {\n    const { data, error } = await invoke(...);\n    if (error) throw error;\n    const items = Array.isArray(data?.items) ? data.items : [];\n    const normalizedItems = items.map(normalize).filter(!shouldReject);\n    if (!normalizedItems.length) {\n      return { itemsCount: 0, persistenceSkipped: true };\n    }\n    const { error: deleteError } = await supabase.from('invoice_items').delete().eq('invoice_id', invoiceId);\n    if (deleteError) throw deleteError;\n    const { error: insertError } = await supabase.from('invoice_items').insert(insertRows);\n    if (insertError) throw insertError;\n    return { ...metadata, itemsCount: normalizedItems.length };\n  } catch { return null; }\n  finally {\n    delete extractionInFlightRef.current[invoiceId];\n    setExtracting(s => ({...s, [invoiceId]: false}));\n  }\n}",
+    "whyNotBackendFirst": "extract-invoice does not persist items; moving replace logic to edge function or RPC would be larger scope (auth, user_id, cost sync). Frontend guard fixes observed bugs with ~15-25 LOC.",
+    "whyNotSchemaChange": "Unique index on (invoice_id, name) would not prevent empty wipe or 8+8 duplicates with GPT-renamed rows; does not address delete-before-insert ordering."
+  },
+  "confidencePct": 92,
+  "confidenceNotes": {
+    "highConfidence": [
+      "Aviludo trace documents exact DELETE→skip INSERT sequence",
+      "Emporio duplicate trace documents 9ms dual-insert batches",
+      "Binder-style reverse simulation not needed — code path is explicit",
+      "extract-invoice index.ts confirms client-only persistence"
+    ],
+    "uncertainty": [
+      "8% — edge cases if product intentionally wants clear-on-empty (none found)",
+      "Insert failure recovery still returns null without row restore (mitigated by delete guard + delete error check, not full transaction)"
+    ]
+  },
+  "affectedFiles": [
+    {
+      "path": "src/routes/invoices.tsx",
+      "changes": ["runExtraction persistence guard", "extractionInFlightRef mutex", "reExtract user feedback"],
+      "required": true
+    },
+    {
+      "path": "src/routes/invoices.tsx",
+      "changes": ["uploadOne first-extract empty handling — optional toast only"],
+      "required": false
+    }
+  ],
+  "regressionRisk": {
+    "overall": "LOW",
+    "items": [
+      {
+        "risk": "First upload with empty extraction leaves 0 items",
+        "severity": "NONE",
+        "note": "Same as today; no prior rows to preserve"
+      },
+      {
+        "risk": "User cannot force-clear bad rows via empty re-read",
+        "severity": "LOW",
+        "mitigation": "Add explicit 'Clear line items' admin action separately if needed"
+      },
+      {
+        "risk": "Concurrent re-read from two tabs still races without ref",
+        "severity": "LOW",
+        "mitigation": "Ref mutex is per-browser-session; cross-tab needs DB advisory lock (phase 2)"
+      },
+      {
+        "risk": "Partial extraction (3 of 9 rows) still replaces all",
+        "severity": "MEDIUM",
+        "note": "Existing behavior; out of scope for smallest fix"
+      }
+    ]
+  },
+  "fixBelongs": "frontend",
+  "existingCorruptionToday": {
+    "answer": true,
+    "evidence": [
+      "Aviludo April c2f52357: 9 items wiped to 0 on empty re-read",
+      "Emporio Italia 17aa3591: 8 items became 16 on concurrent re-read",
+      "Any invoice re-read during extract-invoice 0-item flake is vulnerable",
+      "Insert failure after delete would silently zero items"
+    ],
+    "detection": "Query invoice_items count vs expected; check for duplicate normalized names per invoice_id; compare created_at clusters"
+  },
+  "phase2Optional": [
+    "Supabase RPC: replace_invoice_items(invoice_id, rows[]) in single transaction",
+    "Partial-replace confirmation when new count << prior count",
+    "Cross-tab lock via extraction_generation column on invoices",
+    "Backend validation: reject 0-item replace for invoices with existing items"
+  ]
+}

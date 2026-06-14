@@ -1,0 +1,54 @@
+{
+  "generated_at": "2026-06-13T22:26:18.990Z",
+  "userReportedSummary": "cost decreased 41% since your last invoice",
+  "codePaths": [
+    "buildIngredientOperationalSignals.ts — historyPercent(latestHistoryRow) OR purchase unit_price comparison",
+    "buildRecentPurchases → formatPurchasePrice uses product.unitPrice (normalized.unit_price)",
+    "ingredient-detail-panel.ts — best/worst from min/max parsePriceLabel(priceLabel)"
+  ],
+  "latestHistoryRow": {
+    "id": "18bdb0c5-0370-4bc7-878d-85957b8ba946",
+    "ingredient_id": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+    "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+    "ingredient_name": "Mozzarella fior di latte",
+    "supplier_name": "IL BOCCONCINO Distribuição ALIMENTAR",
+    "ingredient_unit": "un",
+    "previous_price": null,
+    "new_price": 0.8119999999999999,
+    "delta": null,
+    "delta_percent": null,
+    "created_at": "2026-05-08T12:00:00+00:00"
+  },
+  "latestHistoryPercent": null,
+  "purchaseUnitPriceComparison": {
+    "aviludoDisplayUnitPrice": 13.69,
+    "bocconcinoDisplayUnitPrice": 8.12,
+    "formula": "((latest - prior) / prior) * 100 using invoice_items.unit_price display values",
+    "computedPercent": -40.686632578524474,
+    "roundedDisplay": 41
+  },
+  "bestBuyHighestPaid": {
+    "best": {
+      "price": 8.12,
+      "label": "€8.12"
+    },
+    "highest": {
+      "price": 13.69,
+      "label": "€13.69"
+    },
+    "source": "min/max of RecentPurchaseRow.priceLabel from invoice_items.unit_price"
+  },
+  "p0GuardEffect": {
+    "latestHistoryTrusted": false,
+    "oiAlertsSuppressedPostP0": true,
+    "ingredientDetailPanelPassesLatestHistoryRow": false,
+    "note": "ingredient-detail-operational-layout.tsx calls buildIngredientOperationalSignals without latestHistoryRow/priceHistory, so purchase unit_price fallback always runs for -41% display"
+  },
+  "exactDecreaseFormula": {
+    "function": "buildIngredientOperationalSignals costChangeLabel",
+    "latest": "parsePriceLabel(sortedPurchases[0].priceLabel) = 8.12",
+    "prior": "parsePriceLabel(sortedPurchases[1].priceLabel) = 13.69",
+    "pct": "((8.12 - 13.69) / 13.69) * 100 = -40.686632578524474",
+    "display": "Math.abs(Math.round(-40.686...)) = 41 → 'cost decreased 41% since your last invoice'"
+  }
+}

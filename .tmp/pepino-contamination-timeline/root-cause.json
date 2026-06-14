@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-06-14T08:52:00.000Z",
+  "critical_questions": {
+    "1_price_history_written_before_review": {
+      "answer": "YES",
+      "confidence_percent": 92,
+      "evidence": [
+        "Row a689bd91 exists for (da472b7f, 635a1189)",
+        "Written by syncOperationalIngredientCostsFromInvoiceLines in extract handler — no UI await",
+        "No Pepino alias with confirmed_by_user — not a manual confirm path",
+        "Bidfood invoices.created_at 2026-06-09T22:36:41 precedes any review interaction"
+      ]
+    },
+    "2_current_price_updated_before_review": {
+      "answer": "YES",
+      "confidence_percent": 90,
+      "evidence": [
+        "persistOperationalIngredientCostFromInvoiceLine updates ingredients in same call chain as history append",
+        "ingredients.updated_at 2026-06-13T21:54:23 shows later overwrites; initial poison on 2026-06-09 upload session",
+        "operational_fields_computed: current_price=1.77, purchase_quantity=1000, cost_base_unit=g"
+      ]
+    },
+    "3_could_user_prevent_with_existing_ui": {
+      "answer": "NO",
+      "confidence_percent": 94,
+      "evidence": [
+        "Contamination completes during extract before review screen",
+        "Review UI shows confirmed match — no remove/unmatch action",
+        "Correct match requires selecting a different ingredient"
+      ]
+    },
+    "4_would_no_match_button_prevent": {
+      "answer": "NO (at review time); YES (if existed before extract sync with gate)",
+      "confidence_percent": 88,
+      "evidence": [
+        "remove-match-investigation: extract sync runs immediately post-insert",
+        "Post-hoc No Match without history delete leaves poison",
+        "Full No Match + cleanup would remediate but not prevent initial write retroactively"
+      ]
+    },
+    "5_would_pending_match_confirm_prevent": {
+      "answer": "YES",
+      "confidence_percent": 87,
+      "evidence": [
+        "If exact matches demoted to suggested and sync gated to user-confirmed only, auto history write blocked",
+        "Pepino was kind=exact → confirmed → sync ran without Confirm click",
+        "Confirm match button only shown for suggested rows (resolveIngredientCorrectionUiState)"
+      ]
+    },
+    "6_first_irreversible_write": {
+      "answer": "ingredient_price_history INSERT (row a689bd91) + ingredients.current_price UPDATE in same transaction",
+      "code_path": "invoices.tsx:1358 → syncOperationalIngredientCostsFromInvoiceLines → persistOperationalIngredientCostFromInvoiceLine → appendIngredientPriceHistoryFromInvoiceLine",
+      "confidence_percent": 93
+    },
+    "7_true_root_cause": {
+      "answer": "E — Combination",
+      "primary_driver": "B — Premature persistence",
+      "contributing_factors": [
+        "A — Bad matching (exact promotion Pepino → Pepino conserva, score 0.88)",
+        "C — Missing review workflow (no pre-sync gate, no remove match)",
+        "D — Identity architecture (single ingredient_id for fresh + preserved formats)"
+      ],
+      "confidence_percent": 90,
+      "forced_single_label": "B — Premature persistence",
+      "forced_single_rationale": "Bad matching alone is ephemeral until extract sync persists cost side-effects without human gate"
+    }
+  },
+  "contamination_classification": {
+    "before_human_review": true,
+    "after_human_confirmed_action_on_pepino_line": false,
+    "after_human_confirmed_jar_aliases": true,
+    "note": "Jar aliases human-confirmed Jun 7-9 enabled catalog context; Pepino line itself never human-confirmed"
+  },
+  "pepino_matcher_blind_spot": {
+    "source": "identity-expansion-simulation",
+    "canonical_tier": "SAFE (incorrect)",
+    "token_match": "pepino ⊂ pepino conserva",
+    "preservation_class": "fresh weight vs preserved jar — not blocked at match time"
+  }
+}

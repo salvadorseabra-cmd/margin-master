@@ -1,0 +1,88 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio Italia",
+  "generatedAt": "2026-06-13T01:15:00.000Z",
+  "question": "Are Gorgonzola, Bresaola, SanPellegrino the same Pass C failure mode?",
+  "verdict": {
+    "classification": "A",
+    "label": "one_underlying_emporio_variance_family",
+    "notThreeIndependentBugs": true,
+    "summary": "All three rows fail at Pass C on the same Emporio dense 8-column table crop. Shared core: intermittent failure to copy Preço Total (VALOR), replaced by qty×unit synthesis or wrong-column/adjacent-row reads. Sub-patterns differ: Gorgonzola/Bresaola are discounted weight rows; SanPellegrino adds pack-metadata qty confusion (15 from 'x 15ud'). Not discount-column confusion on these three."
+  },
+  "proveMatrix": {
+    "A_one_variance_family": {
+      "evidence": [
+        "Same invoice, same geometry crop, same Pass C stage for all three",
+        "0/5 cluster runs got all three rows correct; 4/5 had ≥2 rows wrong on same invoke",
+        "Shared primary failure: line_total_net not from VALOR",
+        "All classified extraction_bug Class A in emporio-final-audit",
+        "emporio-discount-column-audit: dense Desc.(%) layout affects whole table",
+        "Gorgonzola and Bresaola root-cause audits both confirmed GPT variance (B), not GT"
+      ],
+      "result": "CONFIRMED"
+    },
+    "B_three_independent_bugs": {
+      "evidence_against": [
+        "Different sub-mechanisms (weight vs case/pack) but same pipeline stage and prompt gap",
+        "Bresaola 39.48 bleed from Ventricina is adjacent-row variant of same VALOR failure class",
+        "SanPellegrino 48.84≈Bresaola 49.48 shows cross-row value reuse on same invoke",
+        "Single Emporio prompt block with 3 examples addresses all three"
+      ],
+      "result": "REJECTED as primary framing — treat as sub-patterns within one family"
+    }
+  },
+  "failureModeAnswers": {
+    "wrongValuesFrom": {
+      "adjacent_bleed": { "applies": true, "rows": ["Bresaola", "SanPellegrino"], "examples": ["Bresaola 39.48←Ventricina 39.49", "SanPellegrino 48.84≈Bresaola 49.48"] },
+      "valor_confusion": { "applies": true, "rows": ["Gorgonzola", "Bresaola", "SanPellegrino"], "note": "Primary — total not copied from Preço Total column" },
+      "qty_confusion": { "applies": true, "rows": ["Gorgonzola", "Bresaola", "SanPellegrino"], "note": "Gorgonzola 1/8~1,5kg; Bresaola weight; SanPellegrino x 15ud pack count" },
+      "discount_confusion": { "applies": false, "rows": [], "note": "Desc.(%) not misread as price on these three; discount_pct usually null but total failure independent" },
+      "weight_row_interpretation": { "applies": true, "rows": ["Gorgonzola", "Bresaola"], "note": "Fractional kg qty trade-off when total correct" }
+    },
+    "badRunsReuseNearbyRowValues": true,
+    "sameInvoiceRegion": true,
+    "singlePromptExampleImprovesAllThree": {
+      "answer": "partial — one shared Emporio block, three row-specific positive examples required",
+      "sharedRules": [
+        "Copy line_total_net from Preço Total only — never qty×unit when VALOR visible",
+        "Desc.(%) plain decimals are discount_pct, not unit or total",
+        "Emporio dense table row isolation"
+      ],
+      "rowSpecificExamples": [
+        "Gorgonzola: fractional kg 1,35 + Desc 22,85 → total 13,44",
+        "Bresaola: weight kg 1,83 + Desc 20,00 → total 49,48 (not Ventricina 39,49)",
+        "SanPellegrino: case qty 2,00 + Desc 10,00 → total 38,56; x 15ud is NOT quantity"
+      ]
+    }
+  },
+  "confidencePercent": 86,
+  "confidenceRationale": "Strong cross-row correlation on unified 5-run probe; consistent Pass C stage; visible/GT agreement on totals. 14% reserved for SanPellegrino pack-metadata sub-pattern needing distinct example and high run variance between probe batches.",
+  "recommendedNextImplementation": {
+    "target": "prompt",
+    "version": "v28",
+    "blockName": "EMPORIO_DENSE_TABLE_VALOR_ISOLATION",
+    "description": "Single prompt section after v27 TOTAL COLUMN ISOLATION with three Emporio positive examples (Gorgonzola, Bresaola, SanPellegrino) plus shared negative rules for qty×unit and adjacent-row totals",
+    "priorityOrder": [
+      "SanPellegrino pack-metadata negative (highest avg error €19.69, 0% stability)",
+      "Bresaola VALOR vs Ventricina distinction",
+      "Gorgonzola fractional kg VALOR anchor"
+    ],
+    "notRecommended": ["geometry change", "per-row binder logic", "GT qty normalization changes"]
+  },
+  "estimatedRecoveryEuro": {
+    "worstCaseSingleRun": 28.26,
+    "breakdown": { "gorgonzola": 13.56, "bresaola": 10.0, "sanpellegrino": 4.7 },
+    "realisticFromClusterAvgErrors": 25.5,
+    "clusterAvgBreakdown": { "gorgonzola": 0, "bresaola": 5.81, "sanpellegrino": 19.69 },
+    "note": "Worst-case €28.26 is single-run audit tail; cluster probe shows SanPellegrino worse than audit (avg €19.69 vs €4.70). Full prompt hardening target ~€25–28 at 90%+ stability."
+  },
+  "sources": [
+    ".tmp/gorgonzola-root-cause/",
+    ".tmp/bresaola-root-cause/",
+    ".tmp/emporio-final-audit/",
+    ".tmp/final-residual-error-audit/",
+    ".tmp/emporio-discount-column-audit/",
+    ".tmp/column-shift-audit/",
+    ".tmp/emporio-variance-cluster/cluster-stability.json"
+  ]
+}

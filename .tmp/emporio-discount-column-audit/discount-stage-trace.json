@@ -1,0 +1,91 @@
+{
+  "generated_at": "2026-06-12T02:30:00.000Z",
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "pipeline": "Crop image → Visible invoice → GPT vision (Pass C) → parseMonetaryLineItems → bindMonetaryColumns → API",
+  "stages": [
+    {
+      "order": 1,
+      "stage": "visible_invoice",
+      "discountColumn": {
+        "header": "Desc.(%)",
+        "prosciuttoValue": "17,50",
+        "hasPercentSymbol": false,
+        "xPixels": "548-612",
+        "adjacentColumns": ["Preço Unit 10,30€ (478-548)", "Preço Total 36,54€ (612-724)"]
+      },
+      "status": "PASS"
+    },
+    {
+      "order": 2,
+      "stage": "geometry_crop",
+      "tableBounds": { "top": 456, "headerTop": 466, "headerBottom": 502, "imageWidth": 724 },
+      "discountHeaderInCrop": false,
+      "discountValuesInCrop": true,
+      "note": "column-selection-deep-dive: Pass C crop historically clips headers at y≈430; data row pixels include discount values",
+      "TABLE_TOP_MARGIN": 36,
+      "status": "PARTIAL",
+      "contributesToFailure": true,
+      "contribution": "GPT lacks Desc.(%) column label anchor; must infer from value position alone"
+    },
+    {
+      "order": 3,
+      "stage": "ocr_vision",
+      "separateOcrStage": false,
+      "note": "GPT-4.1 vision reads cropped image directly",
+      "discountDigitsReadable": true,
+      "percentSymbolAbsent": true,
+      "status": "PARTIAL",
+      "contributesToFailure": true
+    },
+    {
+      "order": 4,
+      "stage": "pass_c_prompt",
+      "instructions": [
+        "DESC / Desc.(%) / discount column → discount_pct",
+        "Strip % symbol",
+        "Never put discount in gross_unit_price",
+        "If no discount column set discount_pct null"
+      ],
+      "emporioAmbiguity": "Values like 17,50 look like prices; no % suffix unlike Bocconcino 20,00%",
+      "positiveExamplesWithEmporioFormat": 0,
+      "status": "INSUFFICIENT_FOR_EMPORIO_LAYOUT"
+    },
+    {
+      "order": 5,
+      "stage": "pass_c_gpt_structured",
+      "firstDiscountDisappears": true,
+      "inferredGptOutput": {
+        "quantity": "extracted reliably",
+        "gross_unit_price": "extracted (~10.3±0.4)",
+        "discount_pct": "null or omitted on focus rows",
+        "line_total_net": "intermittent (sometimes ~36.54, often null)"
+      },
+      "status": "FAIL",
+      "issueType": "GPT extraction / column mis-identification"
+    },
+    {
+      "order": 6,
+      "stage": "json_schema_v23",
+      "discount_pctRequired": true,
+      "nullable": true,
+      "note": "Schema requires key but allows null — GPT satisfies with null",
+      "status": "PASS_CONTRACT_WEAK"
+    },
+    {
+      "order": 7,
+      "stage": "bindMonetaryColumns",
+      "whenDiscountNull": "unit_price = gross_unit_price; total = qty × gross if net null",
+      "amplifiesError": true,
+      "status": "DOWNSTREAM_AMPLIFIER"
+    },
+    {
+      "order": 8,
+      "stage": "api_output",
+      "structuredFieldsExposed": false,
+      "status": "STRIPPED_BY_DESIGN"
+    }
+  ],
+  "firstDeviationStage": "pass_c_gpt_structured",
+  "notConfusedWith": ["IVA23 tax column (imposto)", "Lotes/Séries expiry dates"],
+  "sometimesConfusedWith": ["Preço Unit gross price", "discount value copied into unit_price (Rule B pattern)"]
+}

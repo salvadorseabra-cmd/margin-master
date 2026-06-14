@@ -1,0 +1,379 @@
+{
+  "generated_at": "2026-06-13T12:46:03.338Z",
+  "deployVersion": 30,
+  "deployVerified": true,
+  "vlStatus": "PARTIAL",
+  "invoiceStatusBreakdown": {
+    "closed": 2,
+    "partial": 1,
+    "open": 3
+  },
+  "global": {
+    "invoicesAudited": 6,
+    "fieldAccuracy": 82.21,
+    "quantityAccuracy": 82.44,
+    "financialAccuracy": 96.83,
+    "financialErrorEuro": 54.65,
+    "rowsFullyCorrect": 25,
+    "rowsFullyCorrectPct": 49.02,
+    "phantomRows": 0,
+    "extractionBugsOnlyEuro": 28.26,
+    "gtIssuesOnlyEuro": 1.4,
+    "gptVarianceEuro": 24.79,
+    "extractionBugsBelow5Euro": false,
+    "extractionBugsBelow15Euro": false
+  },
+  "criticalQuestions": {
+    "extractionBugsBelow5Euro": {
+      "value": 28.26,
+      "answer": "NO",
+      "detail": "Class A extraction bugs €28.26 ≥ €5"
+    },
+    "farinaStillExtractionBug": {
+      "answer": "YES — still Class A on this run",
+      "detail": {
+        "invoice": "Mammafiore",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "product": "Farina Speciale pizza 25kg Amoruso",
+        "visible": {
+          "qty": 1,
+          "unit_price": 33.154,
+          "total": 26.52,
+          "notes": "visible Pr. Unitário 33,154 · Valor 26,52"
+        },
+        "gt": {
+          "description": "Farina Speciale pizza 25kg Amoruso",
+          "qty": 1,
+          "unit": "un",
+          "unit_price": 33.154,
+          "total": 26.52,
+          "source": "mammafiore-line-audit manual transcription"
+        },
+        "extracted": {
+          "name": "Farine Speciale pizza 25kg Amoruso",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 26.52,
+          "total": 25.52
+        },
+        "fields": {
+          "description": "MINOR_VARIATION",
+          "quantity": "MATCH",
+          "unit_price": "WRONG",
+          "total": "WRONG"
+        },
+        "financialErrorEuro": 1,
+        "classification": {
+          "code": "A",
+          "label": "extraction_bug",
+          "rationale": "Financial delta vs GT — extraction does not match expected totals"
+        },
+        "failureFamilies": [
+          "column_shift_or_price"
+        ]
+      }
+    },
+    "pomodorDominantGtIssue": {
+      "answer": "NO",
+      "detail": "Pomodor is largest Class B row when present"
+    },
+    "validationLabClosedForExtraction": {
+      "answer": "OPEN",
+      "justification": "Class A €28.26; Class B €1.4; 2 invoices CLOSED"
+    }
+  },
+  "keyQuestion": {
+    "extractionBugsOnlyEuro": 28.26,
+    "below5EuroThreshold": false,
+    "below15EuroThreshold": false,
+    "answer": "NO — Class A extraction bugs still ≥ €15"
+  },
+  "fixesValidated": {
+    "mortadellaV29": "v29 Mortadella 5/5 at total 31.07 (mortadella-root-cause/v29-validation.json)",
+    "ruloV30": "v30 Rulo 5/5 at total 10.86 (rulo-root-cause/v30-validation.json)"
+  },
+  "classificationSummary": {
+    "A_extraction_bugs": {
+      "count": 3,
+      "euro": 28.26
+    },
+    "B_gt_issues": {
+      "count": 1,
+      "euro": 1.4
+    },
+    "C_gpt_variance": {
+      "count": 1,
+      "euro": 24.79
+    },
+    "D_business_interpretation": {
+      "count": 21
+    }
+  },
+  "baselineComparison": {
+    "beforeC33": {
+      "fieldAccuracy": 89.41,
+      "quantityAccuracy": 93.75,
+      "financialErrorEuro": 181.24
+    },
+    "afterRefinement": {
+      "fieldAccuracy": 91.8,
+      "quantityAccuracy": 93.75,
+      "financialErrorEuro": 66.34
+    },
+    "v26": {
+      "fieldAccuracy": 82.65,
+      "quantityAccuracy": 84.23,
+      "financialErrorEuro": 220.27
+    },
+    "v27": {
+      "fieldAccuracy": 82.84,
+      "financialErrorEuro": 64.25
+    },
+    "v28": {
+      "fieldAccuracy": 81.77,
+      "quantityAccuracy": 82.44,
+      "financialErrorEuro": 38.91,
+      "extractionBugsOnlyEuro": 9.36
+    },
+    "v30": {
+      "fieldAccuracy": 82.21,
+      "quantityAccuracy": 82.44,
+      "financialErrorEuro": 54.65,
+      "extractionBugsOnlyEuro": 28.26
+    }
+  },
+  "deltaVsV28": {
+    "financialErrorEuro": 15.74,
+    "extractionBugsOnlyEuro": 18.9,
+    "fieldAccuracy": 0.44
+  },
+  "deltaVsV27": {
+    "financialErrorEuro": -9.6,
+    "fieldAccuracy": -0.63
+  },
+  "deltaVsV26": {
+    "financialErrorEuro": -165.62
+  },
+  "perInvoiceSummary": [
+    {
+      "label": "Bidfood",
+      "status": "CLOSED",
+      "fieldAccuracy": 97.73,
+      "qtyAccuracy": 100,
+      "financialErrorEuro": 0,
+      "rowsFullyCorrectPct": 81.82,
+      "wrongRowCount": 2
+    },
+    {
+      "label": "Aviludo May",
+      "status": "PARTIAL",
+      "fieldAccuracy": 93.75,
+      "qtyAccuracy": 87.5,
+      "financialErrorEuro": 0,
+      "rowsFullyCorrectPct": 75,
+      "wrongRowCount": 2
+    },
+    {
+      "label": "Aviludo April",
+      "status": "CLOSED",
+      "fieldAccuracy": 100,
+      "qtyAccuracy": 100,
+      "financialErrorEuro": 0,
+      "rowsFullyCorrectPct": 88.89,
+      "wrongRowCount": 1
+    },
+    {
+      "label": "Emporio",
+      "status": "OPEN",
+      "fieldAccuracy": 62.5,
+      "qtyAccuracy": 50,
+      "financialErrorEuro": 26.39,
+      "rowsFullyCorrectPct": 12.5,
+      "wrongRowCount": 7
+    },
+    {
+      "label": "Bocconcino",
+      "status": "OPEN",
+      "fieldAccuracy": 64.29,
+      "qtyAccuracy": 57.14,
+      "financialErrorEuro": 27.26,
+      "rowsFullyCorrectPct": 0,
+      "wrongRowCount": 7
+    },
+    {
+      "label": "Mammafiore",
+      "status": "OPEN",
+      "fieldAccuracy": 75,
+      "qtyAccuracy": 100,
+      "financialErrorEuro": 1,
+      "rowsFullyCorrectPct": 12.5,
+      "wrongRowCount": 7
+    }
+  ],
+  "topRemainingErrors": [
+    {
+      "rank": 1,
+      "invoice": "Bocconcino",
+      "product": "POMODOR PELATI (CX 2.5KG*6)",
+      "euro": 26.72,
+      "class": "A",
+      "visible": {
+        "qty": 1,
+        "unit_price": 27.56,
+        "total": 22.05,
+        "notes": "visible: QUANT 1, P.VENDA 27.56, VALOR 22.05"
+      }
+    },
+    {
+      "rank": 2,
+      "invoice": "Emporio",
+      "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrottto 1/8 - 1,5kg",
+      "euro": 24.79,
+      "class": "C",
+      "visible": {
+        "qty": 1.35,
+        "total": 13.44,
+        "notes": "visible Qtd 1,35 · Preço Total 13,44"
+      }
+    },
+    {
+      "rank": 3,
+      "invoice": "Emporio",
+      "product": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4-4,25KG",
+      "euro": 1.4,
+      "class": "B",
+      "visible": {
+        "qty": 4.3,
+        "unit_price": 10.3,
+        "total": 36.54,
+        "notes": "visible Preço Total 36.54"
+      }
+    },
+    {
+      "rank": 4,
+      "invoice": "Mammafiore",
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "euro": 1,
+      "class": "A",
+      "visible": {
+        "qty": 1,
+        "unit_price": 33.154,
+        "total": 26.52,
+        "notes": "visible Pr. Unitário 33,154 · Valor 26,52"
+      }
+    },
+    {
+      "rank": 5,
+      "invoice": "Bocconcino",
+      "product": "ROLO DE CABRA E VACA 1KG",
+      "euro": 0.54,
+      "class": "A",
+      "visible": null
+    },
+    {
+      "rank": 6,
+      "invoice": "Bidfood",
+      "product": "Manjericão",
+      "euro": 0,
+      "class": "D",
+      "visible": null
+    },
+    {
+      "rank": 7,
+      "invoice": "Bidfood",
+      "product": "Abóbora Butternut",
+      "euro": 0,
+      "class": "D",
+      "visible": null
+    },
+    {
+      "rank": 8,
+      "invoice": "Aviludo May",
+      "product": "Filete de Anchoas Alcofinosa L4 495 g",
+      "euro": 0,
+      "class": "D",
+      "visible": null
+    },
+    {
+      "rank": 9,
+      "invoice": "Aviludo May",
+      "product": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+      "euro": 0,
+      "class": "D",
+      "visible": null
+    },
+    {
+      "rank": 10,
+      "invoice": "Aviludo April",
+      "product": "Mozzarella Flor di Latte 2Kg",
+      "euro": 0,
+      "class": "D",
+      "visible": null
+    },
+    {
+      "rank": 11,
+      "invoice": "Emporio",
+      "product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+      "euro": 0,
+      "class": "D",
+      "visible": null
+    },
+    {
+      "rank": 12,
+      "invoice": "Emporio",
+      "product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "euro": 0,
+      "class": "D",
+      "visible": {
+        "qty": 2,
+        "total": 38.56,
+        "notes": "visible Qtd 2,00 · Preço Total 38,56"
+      }
+    },
+    {
+      "rank": 13,
+      "invoice": "Emporio",
+      "product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+      "euro": 0,
+      "class": "D",
+      "visible": {
+        "qty": 1.83,
+        "total": 49.48,
+        "notes": "visible Preço Total 49,48"
+      }
+    },
+    {
+      "rank": 14,
+      "invoice": "Emporio",
+      "product": "Baladin - Ginger Beer 0.20cl",
+      "euro": 0,
+      "class": "D",
+      "visible": {
+        "qty": 24,
+        "unit_price": 0.85,
+        "total": 19.38,
+        "notes": "visible Qtd 24; GT case qty 2"
+      }
+    },
+    {
+      "rank": 15,
+      "invoice": "Emporio",
+      "product": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "euro": 0,
+      "class": "D",
+      "visible": null
+    }
+  ],
+  "closureRecommendation": "VALIDATION LAB PARTIAL — v29/v30 focus fixes validated (Rulo+Mortadella €0); headline Class A inflated by single-run Pomodor/Gorgonzola variance; focus-target Class A €1.00",
+  "focusRowComparison": {
+    "v28FocusSumEuro": 9.36,
+    "v30FocusSumEuro": 1.0,
+    "recoveryEuro": 8.36,
+    "rows": [
+      { "product": "Rulo Di Capra", "v28Euro": 4.86, "v30Euro": 0, "fixed": true },
+      { "product": "Mortadella IGP", "v28Euro": 3.5, "v30Euro": 0, "fixed": true },
+      { "product": "Farina Speciale", "v28Euro": 1.0, "v30Euro": 1.0, "fixed": false }
+    ]
+  },
+  "singleRunVarianceNote": "Gorgonzola Class C €24.79 + Pomodor reclassified A (bad run) inflate headline Class A vs v28"
+}

@@ -1,0 +1,60 @@
+{
+  "generated_at": "2026-06-14T09:10:00.000Z",
+  "scenario_A_change_to_different_ingredient": {
+    "reverted_or_updated": [
+      {
+        "layer": "live_matcher_attribution",
+        "mechanism": "rejectIngredientMatchPair → isIngredientMatchPairRejected in ingredient-canonical.ts",
+        "effect": "Pepino line no longer resolves to 635a1189 on subsequent matcher runs (same browser, hydrated localStorage)",
+        "scope": "read-time virtual match only",
+        "immediate": true
+      },
+      {
+        "layer": "confirmedIngredientAliases map",
+        "mechanism": "rememberConfirmedAliasInMap overwrites key for Pepino → newIngredientId",
+        "effect": "Alias memory points Pepino line text to new ingredient",
+        "tables": ["ingredient_aliases UPSERT"],
+        "immediate": true
+      },
+      {
+        "layer": "rejectedMatchItemIds session",
+        "mechanism": "onRejectedMatchItemIdsChange deletes item.id from Set on successful rematch",
+        "effect": "Clears session suppress if previously set",
+        "immediate": true
+      },
+      {
+        "layer": "new_ingredient_cost_state",
+        "mechanism": "persistOperationalIngredientCostFromInvoiceLine for newIngredientId",
+        "tables": ["ingredients (new row)", "ingredient_price_history (da472b7f, newIngredientId)"],
+        "immediate": true
+      },
+      {
+        "layer": "purchase_memory_cache",
+        "mechanism": "clearIngredientMatchedInvoiceProductsCache(newIngredientId)",
+        "effect": "Invalidates cached scan for new target only",
+        "immediate": true
+      },
+      {
+        "layer": "downstream_cost_listeners",
+        "mechanism": "dispatchOperationalIngredientCostChanged({ ingredientId: newIngredientId })",
+        "effect": "Recipes route listens and reloads cost for new ingredient",
+        "file": "src/routes/recipes.tsx",
+        "immediate": true
+      },
+      {
+        "layer": "clearRejectedIngredientMatchPair",
+        "mechanism": "persistManualIngredientCorrection clears rejection for NEW (Pepino, newIngredientId) pair if previously rejected",
+        "file": "src/lib/ingredient-correction-memory.ts",
+        "immediate": true
+      }
+    ]
+  },
+  "scenario_B_no_match": {
+    "reverted_or_updated": [],
+    "note": "No production code path — nothing reverted"
+  },
+  "invoice_delete_only_full_rechain": {
+    "note": "Deleting entire invoice triggers reconcileAfterInvoiceDelete which rechains surviving ingredients; not equivalent to line-level correction",
+    "file": "src/routes/invoices.tsx removeRow"
+  }
+}

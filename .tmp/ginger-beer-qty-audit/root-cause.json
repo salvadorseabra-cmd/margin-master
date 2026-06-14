@@ -1,0 +1,79 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio Italia",
+  "product": "Baladin - Ginger Beer 0.20cl",
+  "deployVersion": 25,
+  "investigatedAt": "2026-06-12T23:45:00.000Z",
+  "verdict": "PASS_C_UNIT_SEMANTICS_VARIANCE",
+  "rootCause": "Ginger Beer Qtd column on the visible invoice prints 24,00 (individual bottles at €0,85 with 5% discount = €19,38). Ground truth expects qty 2 at €9.69/case — same purchase, different unit semantics (2 cases × 12 bottles). When v25 returns qty 24, Pass C performs a column-faithful bottle-count read. When it returns qty 2, Pass C applies case normalization (2 × €9.69 = €19.38). This is GPT run variance on unit interpretation, not pack notation inference from the product name.",
+  "firstFailingStage": "passC_table_extraction",
+  "firstFailingStageDetail": "Error appears at GPT table extraction when run outputs qty=24 @ €0.81 instead of GT qty=2 @ €9.69. Crop, geometry, binder, and reconcile do not change quantity — binder only derives unit_price from total/qty.",
+  "confidencePercent": 88,
+  "hypothesesEvaluated": {
+    "pack_multiplier_from_name": {
+      "status": "REJECTED",
+      "evidence": "Description is '0.20cl' — no 24, x12, or pack count token. Product code BBB-GINGER33ITA embeds 33 (cl), not 24."
+    },
+    "ocr_misread_qty_column": {
+      "status": "REJECTED",
+      "evidence": "Visible Qtd column explicitly prints 24,00 (table-data-crop.png, row-ocr-result.json). OCR is not misreading 2 as 24 — the invoice prints 24."
+    },
+    "product_name_contamination": {
+      "status": "REJECTED",
+      "evidence": "No '24' substring in name. 0.20cl is volume token, not quantity."
+    },
+    "adjacent_row_qty_bleed": {
+      "status": "REJECTED",
+      "evidence": "De Cecco row above also has qty 24, but Ginger Beer row independently shows 24,00 in its own Qtd cell with matching arithmetic (24×0.85×0.95=19.38)."
+    },
+    "unit_interpretation_case_vs_bottle": {
+      "status": "CONFIRMED",
+      "evidence": "GT qty 2 @ €9.69 = 2 cases; visible 24,00 @ €0.85 = 24 bottles. €9.69 = 12 × (€0.85 × 0.95) — 12-pack case price. Same €19.38 total, different unit framing."
+    },
+    "prompt_rule_variance": {
+      "status": "CONFIRMED",
+      "evidence": "Pass C prompt has Ginger Beer rule (qty 2 NOT 24). Refinement got 2/3; fresh v25 probe 2026-06-12 got 2/3; final VL rerun single shot got 24. GPT sometimes follows prompt case rule, sometimes column-faithful 24."
+    }
+  },
+  "visibleInvoice": {
+    "fullRow": "BBB-GINGER33ITA | 30-06-2027 | Baladin - Ginger Beer 0.20cl | IVA23 | 24,00 | 0,85 € | 5.00 | 19,38 €",
+    "qtdColumn": "24,00",
+    "unitPrice": "0,85 €",
+    "discountPct": 5,
+    "lineTotal": "19,38 €",
+    "arithmeticCheck": "24 × 0.85 × 0.95 = 19.38 ✓"
+  },
+  "groundTruth": {
+    "qty": 2,
+    "unit": "un",
+    "unit_price": 9.69,
+    "total": 19.38,
+    "source": "emporio-footer-fix post-geometry validated",
+    "semanticNote": "Catalog case count (2 cx equivalent), not bottle count from Qtd column"
+  },
+  "stability": {
+    "finalVLRerun": { "qty": 24, "unit_price": 0.81, "total": 19.38, "source": ".tmp/final-validation-lab-rerun/extracts/17aa3591-....json" },
+    "passcRefinement": { "qty": 2, "unit_price": 9.69, "total": 19.38, "runsCorrect": "3/3 per REPORT" },
+    "freshV25Probe": { "qty": 2, "unit_price": 9.69, "total": 19.38, "runsCorrect": "3/3", "source": ".tmp/ginger-beer-qty-audit/v25-stability-runs.json" },
+    "historicalPassCRaw": { "qty": 24, "unit_price": 0.85, "total": 19.38, "source": ".tmp/persistence-audit/pass-c-raw/17aa3591-....json" }
+  },
+  "smallestFixCategory": {
+    "category": "pass_c_prompt_unit_semantics",
+    "scope": "prompt only",
+    "recommendation": "Strengthen Ginger Beer / Emporio beverage case rule: when Qtd shows bottle count at per-bottle price but line total implies case pricing (qty×unit×(1-discount) = total), prefer case count if total/qty_unit ≈ 12× discounted bottle price. Add explicit worked example with visible 24,00 column → output qty 2 @ €9.69 (NOT column-faithful 24 @ €0.85).",
+    "alternative": "Revise ground truth to accept qty 24 @ €0.85 as column-faithful correct if VL metrics should match visible invoice literally",
+    "notRecommended": ["Geometry/crop change", "Binder change", "Pack parser change for 0.20cl volume token (separate bug)"]
+  },
+  "financialImpact": {
+    "whenQty24": { "fieldError": true, "financialErrorEuro": 0, "reason": "Line total €19.38 matches in both representations" },
+    "downstreamVolumeBug": "Separate issue: 0.20cl in name → 2ml/bottle usable cost (ginger-beer-audit). Not caused by qty 24 vs 2."
+  },
+  "evidenceFiles": [
+    ".tmp/ginger-beer-qty-audit/v25-stability-runs.json",
+    ".tmp/ginger-beer-ground-truth/stage-table.json",
+    ".tmp/ginger-beer-ground-truth/row-ocr-result.json",
+    ".tmp/ginger-beer-audit/extraction-trace.json",
+    ".tmp/final-validation-lab-rerun/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+    ".tmp/passc-refinement-validation/reextract/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json"
+  ]
+}

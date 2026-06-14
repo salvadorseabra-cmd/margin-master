@@ -1,0 +1,139 @@
+{
+  "generated_at": "2026-06-12T22:50:00.000Z",
+  "deployVersion": 25,
+  "vlStatus": "PARTIAL",
+  "vlStatusNote": "OPEN on strict single-run aggregate due to Aviludo April v25 0-item regression; 5/6 invoices return rows",
+  "invoiceStatusBreakdown": {
+    "closed": 1,
+    "partial": 0,
+    "open": 5
+  },
+  "global": {
+    "invoicesAudited": 6,
+    "fieldAccuracy": 64.13,
+    "quantityAccuracy": 65.77,
+    "financialAccuracy": 78.43,
+    "financialErrorEuro": 389.97,
+    "rowsFullyCorrect": 16,
+    "rowsFullyCorrectPct": 31.37,
+    "phantomRows": 0
+  },
+  "globalExcludingAprilFlake": {
+    "fieldAccuracy": 76.96,
+    "quantityAccuracy": 78.93,
+    "financialErrorEuro": 89.02,
+    "note": "April 0-item v25 regression contributes €300.95 missing-row error"
+  },
+  "baselineComparison": {
+    "beforeC33": {
+      "fieldAccuracy": 89.41,
+      "quantityAccuracy": 93.75,
+      "financialErrorEuro": 181.24
+    },
+    "afterRefinement": {
+      "fieldAccuracy": 91.8,
+      "quantityAccuracy": 93.75,
+      "financialErrorEuro": 66.34
+    },
+    "fieldAccuracyAudit": {
+      "overallFieldAccuracyLenient": 95,
+      "rowsFullyCorrectPct": 72.55,
+      "financialErrorEuro": null
+    },
+    "now_v25_singleRun": {
+      "fieldAccuracy": 64.13,
+      "quantityAccuracy": 65.77,
+      "financialErrorEuro": 389.97
+    },
+    "deltaVsRefinement": {
+      "fieldAccuracy": -27.67,
+      "quantityAccuracy": -27.98,
+      "financialErrorEuro": 323.63
+    }
+  },
+  "perInvoiceSummary": [
+    {
+      "label": "Bidfood",
+      "status": "CLOSED",
+      "fieldAccuracy": 97.73,
+      "qtyAccuracy": 100,
+      "financialErrorEuro": 0,
+      "itemCount": 11
+    },
+    {
+      "label": "Aviludo May",
+      "status": "OPEN",
+      "fieldAccuracy": 84.38,
+      "qtyAccuracy": 87.5,
+      "financialErrorEuro": 40,
+      "itemCount": 8,
+      "note": "OCR name drift + Atum qty 1 vs GT 2"
+    },
+    {
+      "label": "Aviludo April",
+      "status": "OPEN",
+      "fieldAccuracy": 0,
+      "qtyAccuracy": 0,
+      "financialErrorEuro": 300.95,
+      "itemCount": 0,
+      "note": "v25 PNG fixture 0/3 invokes — regression vs refined baseline 100%"
+    },
+    {
+      "label": "Emporio",
+      "status": "OPEN",
+      "fieldAccuracy": 56.25,
+      "qtyAccuracy": 62.5,
+      "financialErrorEuro": 19.27,
+      "itemCount": 8,
+      "discountHardening": {
+        "prosciutto": "8.50/36.54 — matches visible; GT net 8.17/35.14",
+        "ventricina": "15.19/39.48 — matches visible; GT gross unit 16.60",
+        "mortadella": "9.88/30.62 — €0.45 from visible 31.07"
+      }
+    },
+    {
+      "label": "Bocconcino",
+      "status": "OPEN",
+      "fieldAccuracy": 71.43,
+      "qtyAccuracy": 71.43,
+      "financialErrorEuro": 28.75,
+      "itemCount": 7,
+      "note": "Pomodor qty=1 €22.05 matches visible; GT qty=2 €50"
+    },
+    {
+      "label": "Mammafiore",
+      "status": "OPEN",
+      "fieldAccuracy": 75,
+      "qtyAccuracy": 75,
+      "financialErrorEuro": 1,
+      "itemCount": 8,
+      "note": "Low € error; unit_price variance on several rows"
+    }
+  ],
+  "remainingErrorEuro": 389.97,
+  "remainingErrorEuroExcludingApril": 89.02,
+  "structuralFamilies": {
+    "column_shift_or_price": 17,
+    "quantity": 8,
+    "missing_row": 9,
+    "discount_or_column_shift": 4
+  },
+  "keyImprovementsSinceRefinement": [
+    "Emporio Prosciutto discount: net 8.50 / total 36.54 stable (v24/v25)",
+    "Emporio Ventricina discount: net 15.19 / total 39.48 stable (v25)",
+    "Bocconcino Pomodor: qty=1 unit=22.05 total=22.05 matches visible net row",
+    "Mammafiore financial error down to €1 (vs €54.78 refined)"
+  ],
+  "keyRegressionsSinceRefinement": [
+    "Aviludo April PNG fixture returns 0 items on v25 (3/3 retries)",
+    "Aviludo May financial error €40 (Atum qty, Chocolate total variance)",
+    "Emporio Ginger Beer qty 24 vs GT 2 (persistent)"
+  ],
+  "notes": [
+    "Deploy v25 confirmed",
+    "Re-read safety fix: frontend persistence only — no extraction impact",
+    "GT catalog uses gross units for some Emporio rows; visible-invoice comparison more favorable for discount rows",
+    "Pomodor VL GT qty=2 vs visible qty=1 — not extraction regression",
+    "April uses PNG fixture; PDF/storage path known flake"
+  ]
+}

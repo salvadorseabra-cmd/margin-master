@@ -1,0 +1,178 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio Italia",
+  "deployVersion": 27,
+  "generatedAt": "2026-06-13T01:15:00.000Z",
+  "focusRows": ["Gorgonzola", "Bresaola", "SanPellegrino"],
+  "combinedFinancialErrorWorstCaseEuro": 28.26,
+  "rows": {
+    "gorgonzola": {
+      "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelregio 1/8 ~1,5kg",
+      "tableRowIndex": 2,
+      "visible": {
+        "qty": 1.35,
+        "unit": "kg",
+        "precoUnitGross": 12.9,
+        "discountPct": 22.85,
+        "total": 13.44,
+        "source": "invoice-full.png"
+      },
+      "groundTruth": { "qty": 1.35, "unit": "kg", "unit_price": 9.92, "total": 13.44 },
+      "bestRun": {
+        "label": "refinement / v26 / cluster-stability 5/5",
+        "qty": 1.35,
+        "unit_price": 9.82,
+        "total": 13.44,
+        "financialErrorEuro": 0,
+        "source": "passc-refinement-validation; cluster-stability.json runs 1-5"
+      },
+      "worstRun": {
+        "label": "v27 audit single",
+        "qty": 2,
+        "unit_price": 13.5,
+        "total": 27,
+        "financialErrorEuro": 13.56,
+        "source": "final-residual-error-audit/extracts"
+      },
+      "errorDistribution": {
+        "gorgonzolaOnlyStability5Run": { "perfect": "4/5", "stabilityPercent": 80, "totals": [13.44, 33.14], "avgErrorEuro": 3.94 },
+        "clusterStability5Run": { "perfect": "5/5", "stabilityPercent": 100, "totals": [13.44], "avgErrorEuro": 0 },
+        "historicalV23": { "perfect": "2/2 on total", "qtyVariable": [1, 2] }
+      },
+      "passCBehaviour": {
+        "firstFailingStage": "passC_table_extraction",
+        "goodRuns": "Copies VALOR 13,44; qty/unit trade off (2×6.65≈13.44)",
+        "badRuns": "qty×unit synthesis (2×13.5=27) or tail 33.14",
+        "failureModes": ["qty_confusion", "valor_synthesis_qty_times_unit"],
+        "adjacentBleed": false,
+        "discountConfusion": false,
+        "weightRowInterpretation": true
+      }
+    },
+    "bresaola": {
+      "product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+      "tableRowIndex": 6,
+      "visible": {
+        "qty": 1.83,
+        "unit": "kg",
+        "precoUnitGross": 33.8,
+        "discountPct": 20.0,
+        "total": 49.48,
+        "source": "invoice-full.png",
+        "gtQtyNote": "GT qty 2.8 is catalog normalization; printed Qtd 1,83"
+      },
+      "groundTruth": { "qty": 2.8, "unit": "kg", "unit_price": 17.68, "total": 49.48 },
+      "bestRun": {
+        "label": "v26 / cluster-stability run 2",
+        "qty": 2.3,
+        "unit_price": 21.52,
+        "total": 49.48,
+        "financialErrorEuro": 0
+      },
+      "worstRun": {
+        "label": "v27 audit / cluster runs 1,3",
+        "qty": 2.6,
+        "unit_price": 15.19,
+        "total": 39.48,
+        "financialErrorEuro": 10.0,
+        "note": "39.48 ≈ Ventricina visible 39,49 € (row 8)"
+      },
+      "errorDistribution": {
+        "bresaolaOnlyStability5Run": { "perfect": "2/5", "stabilityPercent": 40, "totals": [49.48, 44.83, 39.48, 45.29], "avgErrorEuro": 3.77 },
+        "clusterStability5Run": { "perfect": "1/5", "stabilityPercent": 20, "totals": [39.48, 49.48, 39.48, 44.54, 45.38], "avgErrorEuro": 5.81 },
+        "historicalV23": { "run1Total": 49.48, "run2Total": 49.88 }
+      },
+      "passCBehaviour": {
+        "firstFailingStage": "passC_table_extraction",
+        "goodRuns": "Copies VALOR 49,48; qty/unit trade (2.3×21.52≈49.48)",
+        "badRuns": "qty×unit (2.38×16.64≈39.48) or VALOR misread 39.48",
+        "failureModes": ["valor_confusion", "valor_synthesis_qty_times_unit", "adjacent_bleed"],
+        "adjacentBleed": true,
+        "adjacentBleedTarget": "Ventricina Preço Total 39,49 €",
+        "discountConfusion": false,
+        "weightRowInterpretation": true
+      }
+    },
+    "sanpellegrino": {
+      "product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "tableRowIndex": 5,
+      "visible": {
+        "qty": 2.0,
+        "unit": "cx",
+        "precoUnitGross": 21.42,
+        "discountPct": 10.0,
+        "total": 38.56,
+        "source": "invoice-full.png",
+        "gtQtyNote": "GT qty 2.56 is catalog normalization; printed Qtd 2,00"
+      },
+      "groundTruth": { "qty": 2.56, "unit": "cx", "unit_price": 15.06, "total": 38.56 },
+      "bestRun": {
+        "label": "refinement",
+        "qty": 2,
+        "unit_price": 19.3,
+        "total": 38.56,
+        "financialErrorEuro": 0
+      },
+      "worstRun": {
+        "label": "cluster-stability run 1",
+        "qty": 15,
+        "unit_price": 0.82,
+        "total": 12.3,
+        "financialErrorEuro": 26.26,
+        "note": "qty 15 from description pack 'x 15ud'"
+      },
+      "errorDistribution": {
+        "v27AuditSingle": { "perfect": "0/1", "total": 43.26, "errorEuro": 4.7, "qty": 3 },
+        "clusterStability5Run": { "perfect": "0/5", "stabilityPercent": 0, "totals": [12.3, 14.82, 48.84, 26.92, 12.04], "avgErrorEuro": 19.69 },
+        "historicalV23": { "run1": { "qty": 1, "total": 19.2 }, "run2": { "qty": 1, "total": 13.7 } },
+        "v26Single": { "total": 28.5, "errorEuro": 10.06 }
+      },
+      "passCBehaviour": {
+        "firstFailingStage": "passC_table_extraction",
+        "goodRuns": "Copies VALOR 38,56 (refinement qty 2)",
+        "badRuns": "Pack-count as qty (15), case over-read (3), qty×unit totals, possible Bresaola bleed (48.84≈49.48)",
+        "failureModes": ["qty_confusion_pack_metadata", "valor_synthesis_qty_times_unit", "adjacent_bleed"],
+        "adjacentBleed": true,
+        "adjacentBleedTarget": "Bresaola 49,48 € (run 3 total 48.84)",
+        "discountConfusion": false,
+        "weightRowInterpretation": false,
+        "caseRowInterpretation": true
+      }
+    }
+  },
+  "crossRowAnalysis": {
+    "sameInvoiceRegion": true,
+    "sameCropBounds": { "top": 456, "bottom": 851, "source": "geometry-audit" },
+    "samePassCInvocation": true,
+    "allThreeCorrectRuns": "0/5",
+    "correlatedBadRuns": "4/5 (≥2 rows wrong)",
+    "badRunsReuseNearbyValues": {
+      "observed": true,
+      "examples": [
+        { "row": "Bresaola", "wrongTotal": 39.48, "nearbyRow": "Ventricina", "nearbyTotal": 39.49 },
+        { "row": "SanPellegrino", "wrongTotal": 48.84, "nearbyRow": "Bresaola", "nearbyTotal": 49.48 }
+      ]
+    },
+    "sharedFailureModeRanking": [
+      { "mode": "valor_synthesis_or_misread", "rows": ["Gorgonzola", "Bresaola", "SanPellegrino"], "weight": "primary" },
+      { "mode": "qty_confusion", "rows": ["Gorgonzola", "Bresaola", "SanPellegrino"], "weight": "secondary" },
+      { "mode": "adjacent_row_bleed", "rows": ["Bresaola", "SanPellegrino"], "weight": "tertiary" },
+      { "mode": "discount_confusion", "rows": [], "weight": "none_on_these_three" },
+      { "mode": "weight_row_only", "rows": ["Gorgonzola", "Bresaola"], "weight": "sub-pattern" },
+      { "mode": "pack_metadata_qty", "rows": ["SanPellegrino"], "weight": "sub-pattern" }
+    ]
+  },
+  "stabilitySummary": {
+    "sources": [
+      ".tmp/gorgonzola-root-cause/v27-stability.json",
+      ".tmp/bresaola-root-cause/stability.json",
+      ".tmp/emporio-variance-cluster/cluster-stability.json"
+    ],
+    "note": "Per-row-only probes and unified cluster probe differ (GPT variance); cluster probe is authoritative for cross-row correlation",
+    "clusterProbe": {
+      "gorgonzola": { "stabilityPercent": 100, "avgErrorEuro": 0 },
+      "bresaola": { "stabilityPercent": 20, "avgErrorEuro": 5.81 },
+      "sanpellegrino": { "stabilityPercent": 0, "avgErrorEuro": 19.69 }
+    }
+  }
+}

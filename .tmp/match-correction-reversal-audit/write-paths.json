@@ -1,0 +1,90 @@
+{
+  "generated_at": "2026-06-14T09:10:00.000Z",
+  "correction_entry_points": {
+    "picker_select_different": {
+      "file": "src/routes/invoices.tsx",
+      "handler": "handleSelectCorrectionIngredient",
+      "line_approx": 2944,
+      "precondition": "previousIngredientId from correctionSnapshotRef"
+    },
+    "confirm_suggested_match": {
+      "file": "src/routes/invoices.tsx",
+      "handler": "confirmIngredientMatch",
+      "line_approx": 1882,
+      "reject_old_pair": false,
+      "note": "No prior ingredient rejection — first-time confirm only"
+    },
+    "create_new_ingredient": {
+      "file": "src/lib/bulk-canonical-ingredient-create.ts",
+      "handler": "saveCanonicalIngredientFromInvoiceRow",
+      "line_approx": 146,
+      "chains_to": "persistIngredientCorrectionForItem via deps.persistIngredientCorrection"
+    }
+  },
+  "shared_persist_chain": {
+    "function": "persistIngredientCorrectionForItem",
+    "file": "src/routes/invoices.tsx",
+    "line_approx": 1702,
+    "steps": [
+      {
+        "order": 1,
+        "function": "persistManualIngredientCorrection",
+        "file": "src/lib/ingredient-correction-memory.ts",
+        "writes": ["ingredient_aliases via upsertConfirmedAlias", "in-memory alias maps", "clearRejectedIngredientMatchPair for NEW target pair"]
+      },
+      {
+        "order": 2,
+        "function": "persistOperationalIngredientCostFromInvoiceLine",
+        "file": "src/lib/ingredient-auto-persist.ts",
+        "writes": ["ingredients.update", "appendIngredientPriceHistoryFromInvoiceLine"]
+      },
+      {
+        "order": 3,
+        "function": "loadConfirmedIngredientAliasMap + merge",
+        "writes": ["React confirmedIngredientAliases", "localStorage alias map"]
+      }
+    ]
+  },
+  "scenario_B_no_match_paths": {
+    "production_ui": "none",
+    "dead_code_candidates": [
+      {
+        "function": "rejectIngredientMatchSuggestion",
+        "file": "src/lib/ingredient-correction-memory.ts",
+        "line_approx": 350,
+        "callers_in_src": "ingredient-correction-memory.test.ts only"
+      }
+    ],
+    "partial_unmatch_via_reject_pair": {
+      "function": "rejectIngredientMatchPair",
+      "file": "src/lib/ingredient-correction-memory.ts",
+      "line_approx": 371,
+      "trigger": "only inside handleSelectCorrectionIngredient when previousIngredientId !== newIngredientId",
+      "storage": "ingredient-rejected-match-memory.ts → localStorage",
+      "explicitly_does_not": ["delete alias", "delete price_history", "revert current_price"]
+    }
+  },
+  "reconcile_paths_not_used_by_correction": {
+    "reconcileIngredientPriceHistoryChain": {
+      "file": "src/lib/ingredient-price-history-reconcile.ts",
+      "line_approx": 124,
+      "triggered_by": [
+        "appendIngredientPriceHistoryFromInvoiceLine when refreshExisting=true (re-extract UPDATE same ingredient)",
+        "reconcileAfterInvoiceDelete on invoice row delete"
+      ],
+      "not_triggered_by": "match correction to different ingredient or no-match"
+    },
+    "reconcileAfterInvoiceDelete": {
+      "file": "src/lib/ingredient-price-history-reconcile.ts",
+      "line_approx": 220,
+      "triggered_by": "invoices.tsx removeRow ~2195",
+      "deletes": "orphan history rows (invoice_id IS NULL) only — not linked rows on correction"
+    }
+  },
+  "extract_auto_sync_not_correction": {
+    "file": "src/routes/invoices.tsx",
+    "line_approx": 1358,
+    "function": "syncOperationalIngredientCostsFromInvoiceLines",
+    "note": "Initial Pepino poison path — separate from review correction"
+  }
+}

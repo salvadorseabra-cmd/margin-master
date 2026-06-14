@@ -1,0 +1,64 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio",
+  "deployVersion": 28,
+  "visibleInvoice": {
+    "source": ".tmp/emporio-italia-investigation/invoice-full.png",
+    "qty": 3.11,
+    "precoUnitGross": 11.1,
+    "discountPct": 10.0,
+    "precoTotal": 31.07,
+    "arithmetic": "3.11 × 11.10 × (1 − 0.10) ≈ 31.07"
+  },
+  "groundTruth": {
+    "source": ".tmp/field-accuracy-audit/ground-truth.json",
+    "qty": 3.11,
+    "unit": "kg",
+    "unit_price": 10.1,
+    "total": 31.07
+  },
+  "extractions": {
+    "refinement": { "qty": 3.11, "unit_price": 10, "total": 31.07, "financialErrorEuro": 0 },
+    "passcRaw": { "qty": 3.11, "unit_price": 10.1, "total": 31.07, "financialErrorEuro": 0 },
+    "v26": { "qty": 3.11, "unit_price": 9.88, "total": 30.74, "financialErrorEuro": 0.33 },
+    "v27": { "qty": 3.1, "unit_price": 9.77, "total": 30.29, "financialErrorEuro": 0.78 },
+    "v28LabRerun": { "qty": 3.11, "unit_price": 8.88, "total": 27.57, "financialErrorEuro": 3.5 },
+    "v28Stability3Run": {
+      "perfectRuns": "0/3",
+      "totals": [26.66, 26.65, 27.62],
+      "avgFinancialErrorEuro": 4.09,
+      "source": ".tmp/mortadella-root-cause/stability.json"
+    }
+  },
+  "structuredFieldAnalysis": {
+    "discount_pct": { "visible": 10.0, "v28Inferred": "null (not in API)", "correct": false },
+    "gross_unit_price": { "visible": 11.1, "v28Inferred": "~8.56–8.88", "correct": false },
+    "line_total_net": { "visible": 31.07, "v28Extracted": "27.57", "correct": false },
+    "quantity": { "visible": 3.11, "v28Extracted": 3.11, "correct": true }
+  },
+  "mathTrace": {
+    "v27ErrorEuro": 0.78,
+    "v27Mechanism": "31.07 − 30.29 = 0.78; 3.1 × 9.77 ≈ 30.29 (qty×unit, not VALOR)",
+    "v28ErrorEuro": 3.5,
+    "v28Mechanism": "31.07 − 27.57 = 3.50; 3.11 × 8.88 ≈ 27.62 (qty×unit, not VALOR)",
+    "primaryFinancialDriver": "total (line_total_net / Preço Total)"
+  },
+  "stages": [
+    { "stage": "visible_invoice", "status": "PASS", "note": "Desc.(%) 10,00 plain decimal without % symbol" },
+    { "stage": "geometry_crop", "status": "PASS", "note": "Row visible; Desc header may be clipped (emporio-discount-column-audit)" },
+    { "stage": "passC_gpt_extraction", "status": "FAIL", "firstFailingStage": true, "note": "discount_pct omitted; wrong unit; total synthesized" },
+    { "stage": "binder_monetary", "status": "PASS_THROUGH", "note": "Uses line_total_net from Pass C when present; does not fix wrong 27.57" },
+    { "stage": "api_response", "status": "FAIL", "note": "Legacy unit_price/total forwarded from binder" }
+  ],
+  "whyProsciuttoVentricinaClosed": {
+    "prosciuttoV28": { "total": 36.54, "financialErrorEuro": 0, "promptExample": "v25 Assaporami Prosciutto block (Desc 17,50)" },
+    "ventricinaV28": { "total": 39.49, "financialErrorEuro": 0, "promptExample": "v25 Salame Ventricina block (Desc 8,50)" },
+    "mortadellaGap": "No Mortadella positive example; Desc 10,00 same plain-decimal family as Ventricina 8,50 but unworked"
+  },
+  "recommendedPromptFix": {
+    "file": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+    "location": "After Emporio Prosciutto/Ventricina examples (~line 143), before NEGATIVE EXAMPLES",
+    "block": "Emporio — Mortadella IGP Massima with Qtd 3,11, Preço Unit 11,10 €, Desc.(%) 10,00, Preço Total 31,07 € → gross 11.1, discount_pct 10, line_total_net 31.07",
+    "negative": "BAD: total 27.57 from qty×unit when Preço Total prints 31,07"
+  }
+}

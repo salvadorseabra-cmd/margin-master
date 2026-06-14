@@ -1,0 +1,144 @@
+{
+  "generated_at": "2026-06-13T19:00:00.000Z",
+  "canonicalizationPipeline": {
+    "stages": [
+      {
+        "stage": 1,
+        "name": "Invoice text normalization",
+        "location": "normalizeInvoiceIngredientName / normalizeIngredientName",
+        "persists": false,
+        "risk": "Strips pack tokens inconsistently — '125GR*8' vs '2Kg' may normalize to similar cheese tokens"
+      },
+      {
+        "stage": 2,
+        "name": "Canonical identity extraction",
+        "location": "ingredient-identity.ts → canonicalizeIngredientIdentity",
+        "persists": false,
+        "risk": "family=cheese for both mozzarella formats; form detection may miss block vs piece"
+      },
+      {
+        "stage": 3,
+        "name": "Operational family guard",
+        "location": "ingredient-operational-families.ts",
+        "persists": false,
+        "risk": "Registry covers fried potato, burger bread, sliced cheese — mozzarella block vs tray not in registry"
+      },
+      {
+        "stage": 4,
+        "name": "Parent-form hierarchy",
+        "location": "ingredient-parent-form.ts",
+        "persists": false,
+        "risk": "Only cheddar family enabled; cheese pack variants explicitly out of scope"
+      },
+      {
+        "stage": 5,
+        "name": "Matcher scoring + confirm",
+        "location": "findCanonicalIngredientMatch → findInvoiceItemIngredientMatch",
+        "persists": "ingredient_aliases on user confirm",
+        "risk": "User/supplier alias confirms wording→ID without pack contract; semantic fallback can bridge distant formats"
+      },
+      {
+        "stage": 6,
+        "name": "Auto-persist eligibility",
+        "location": "evaluateAutoPersistEligibility",
+        "persists": "new ingredients row",
+        "risk": "Blocks duplicate_normalized_name but not 'same name different pack' if normalized names differ"
+      },
+      {
+        "stage": 7,
+        "name": "Operational cost persist",
+        "location": "persistOperationalIngredientCostFromInvoiceLine",
+        "persists": "ingredients.current_price + ingredient_price_history",
+        "risk": "Overwrites single catalog price; chains history from any prior row on same ID"
+      }
+    ]
+  },
+  "canonicalizationRisks": [
+    {
+      "id": "R1",
+      "risk": "normalized_name collision",
+      "likelihood": "medium",
+      "impact": "high",
+      "description": "Different supplier pack wordings collapse to same normalized_name or match via family token",
+      "vlEvidence": "Mozzarella Bocconcino vs Aviludo — same ingredient_id 2a99cecd"
+    },
+    {
+      "id": "R2",
+      "risk": "form_blind_matching",
+      "likelihood": "high",
+      "impact": "critical",
+      "description": "Fresh vs preserved (pepino fresco vs conserva) not blocked at match or history chain",
+      "vlEvidence": "Bidfood Pepino → Pepino conserva ID 635a1189"
+    },
+    {
+      "id": "R3",
+      "risk": "operational_unit_without_pack_context",
+      "likelihood": "high",
+      "impact": "high",
+      "description": "History stores €/base-unit but base unit context (g per piece vs g per kg block) is implicit in purchase_quantity only on ingredients row, not on history row",
+      "vlEvidence": "Pepino history: 3.748/kg-op vs 0.00177/g-op — math correct per row, chain invalid"
+    },
+    {
+      "id": "R4",
+      "risk": "alias_confirms_ambiguous_id",
+      "likelihood": "medium",
+      "impact": "high",
+      "description": "confirmed_by_user alias locks supplier shorthand to catalog row without variant disambiguation",
+      "mitigation": "ingredient_aliases.confidence exists but no pack_variant_id target"
+    },
+    {
+      "id": "R5",
+      "risk": "synthetic_cluster_ephemeral",
+      "likelihood": "low",
+      "impact": "medium",
+      "description": "Virtual catalog entries from invoice clustering never persisted — re-match can drift",
+      "location": "ingredient-canonical-synthesis.ts"
+    },
+    {
+      "id": "R6",
+      "risk": "volume_token_in_name",
+      "likelihood": "medium",
+      "impact": "medium",
+      "description": "Pack volume parsed from description affects operational cost but not identity split — 0.20cl vs 33cl would share ID if matched",
+      "vlEvidence": "Ginger Beer 0.20cl → €575/L"
+    },
+    {
+      "id": "R7",
+      "risk": "cross_supplier_equivalence_assumed",
+      "likelihood": "high",
+      "impact": "high",
+      "description": "Supplier intelligence treats all history rows on ingredient_id as comparable supplier quotes",
+      "vlEvidence": "buildSupplierIntelligence min90d vs catalogUnit on mixed-format history"
+    },
+    {
+      "id": "R8",
+      "risk": "recipe_single_price_source",
+      "likelihood": "high",
+      "impact": "medium",
+      "description": "All recipes using ingredient_id share one current_price — no recipe-level pack preference",
+      "location": "effectiveUnitCost(line.ingredients)"
+    }
+  ],
+  "ambiguityHotspots": {
+    "invoiceMatching": [
+      "Token-family overlap promotes cheese/meat matches without pack check",
+      "Supplier shorthand path runs before canonical — can short-circuit to wrong ID",
+      "46/51 VL lines unmatched — under-matching avoids some collisions but blocks history sync"
+    ],
+    "aliasPersistence": [
+      "ingredient_aliases keyed by normalized_alias + optional supplier_name",
+      "No recorded purchase_quantity or base_unit at alias confirmation time"
+    ],
+    "priceHistoryLinkage": [
+      "UNIQUE (invoice_id, ingredient_id) — one history row per invoice per catalog ID",
+      "previous_price sourced from latest other-invoice operational price — no format gate"
+    ]
+  },
+  "whatWorksToday": [
+    "Auto-persist blocks obvious operational_family_conflict (e.g. fried potato vs potato bread)",
+    "duplicate_normalized_name prevents exact duplicate catalog inserts",
+    "Delta math on stored operational values is correct",
+    "Sub-recipe graph has clean XOR ingredient_id / sub_recipe_id",
+    "Alias table has confidence + confirmed_by_user columns (underutilized for pack disambiguation)"
+  ]
+}

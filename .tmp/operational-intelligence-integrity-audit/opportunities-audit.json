@@ -1,0 +1,74 @@
+{
+  "generated_at": "2026-06-13T20:50:27.586Z",
+  "pipeline": [
+    "invoice_items (on ingredient match persist) → ingredient_price_history",
+    "getRecentPriceChanges(180d) → MarginAlertData.priceHistory",
+    "buildOperationalAlertItems → price_increase / price_decrease per ingredient (latest history)",
+    "buildMarginAlertsFromSupabase → ingredient_inflation_spike, supplier_trend, volatile",
+    "buildSynthesisViewModel → buildOwnerReviewOpportunities + groupedRecovery"
+  ],
+  "ownerReviewOpportunities": [],
+  "priceDecreaseAlerts": [],
+  "priceIncreaseAlerts": [],
+  "libMarginAlerts": [],
+  "provenFalseOpportunities": [
+    {
+      "ingredient": "Baladin - Ginger Beer 0.20cl",
+      "invoice": "Emporio (live)",
+      "issue": "opportunity_inflation_volume_parse",
+      "costPerLiter": 575
+    },
+    {
+      "ingredient": "Mozzarella fior di latte",
+      "invoice": "Aviludo April",
+      "issue": "non_equivalent_unit_comparison",
+      "previousOperational": 0.95,
+      "newOperational": 13.69,
+      "deltaPercent": 1341.0526
+    },
+    {
+      "ingredient": "Mozzarella fior di latte",
+      "invoice": "Aviludo April",
+      "issue": "non_equivalent_unit_comparison",
+      "previousOperational": 0.95,
+      "newOperational": 13.69,
+      "deltaPercent": 1341.0526
+    }
+  ],
+  "mozzarellaAlerts": [],
+  "pepinoAlerts": [],
+  "trustedOutputs": [],
+  "opportunityBugs": [
+    {
+      "id": "OPP-MOZZ-1341",
+      "ingredient": "Mozzarella fior di latte",
+      "issue": "False inflation opportunity from Bocconcino piece → Aviludo block on same ingredient_id",
+      "deltaPercent": 1341,
+      "uiSurface": [
+        "price_increase alert",
+        "financialRisks",
+        "supplierIncreases count",
+        "priceMovementRows"
+      ],
+      "class": "identity_collapse"
+    },
+    {
+      "id": "OPP-PEPINO-9995",
+      "ingredient": "Pepino conserva",
+      "issue": "False deflation opportunity — fresh kg matched to conserva jar history",
+      "deltaPercent": -99.95,
+      "uiSurface": [
+        "price_decrease alert",
+        "opportunities section",
+        "supplierDecreases count"
+      ],
+      "class": "identity_collapse"
+    },
+    {
+      "id": "OPP-GINGER-VOL",
+      "ingredient": "Ginger Beer",
+      "issue": "Would show €575/L if matched — volume parse not in OI until ingredient exists",
+      "class": "volume_parse_latent"
+    }
+  ]
+}

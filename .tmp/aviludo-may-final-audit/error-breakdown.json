@@ -1,0 +1,120 @@
+{
+  "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+  "label": "Aviludo May",
+  "deployVersion": 25,
+  "groundTruthSource": ".tmp/field-accuracy-audit/ground-truth.json",
+  "extractSource": ".tmp/final-validation-lab-rerun/extracts/3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json",
+  "stabilitySource": ".tmp/aviludo-may-final-audit/v25-stability-runs.json",
+  "invoiceTotalExpected": 330.42,
+  "lineSumExpected": 296.88,
+  "totalFinancialErrorEuro": 40.0,
+  "rows": [
+    {
+      "rowIndex": 1,
+      "product": "Filete de Anchoas Alcofinosa L4 495 g",
+      "groundTruth": { "qty": 2, "unit": "un", "unit_price": 9.99, "total": 19.98 },
+      "v25Extracted": { "name": "Filete de Anchoivas Alcoinfoisa LI 495 g", "qty": 2, "unit": "un", "unit_price": 9.99, "total": 19.98 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": 0 },
+      "fieldStatus": { "description": "WRONG", "quantity": "MATCH", "unit_price": "MATCH", "total": "MATCH" },
+      "financialErrorEuro": 0,
+      "rootCauseCategory": "ocr",
+      "notes": "Name OCR drift only; all monetary fields correct"
+    },
+    {
+      "rowIndex": 2,
+      "product": "Ovo Líquido Past.Gema Dovo 1 Kg",
+      "groundTruth": { "qty": 6, "unit": "un", "unit_price": 10.49, "total": 62.94 },
+      "v25Extracted": { "name": "Ovo Liquido Past.Gema Dovo 1 Kg", "qty": 6, "unit": "un", "unit_price": 10.49, "total": 62.94 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": 0 },
+      "fieldStatus": { "description": "MATCH", "quantity": "MATCH", "unit_price": "MATCH", "total": "MATCH" },
+      "financialErrorEuro": 0,
+      "rootCauseCategory": "none",
+      "notes": "Fully correct"
+    },
+    {
+      "rowIndex": 3,
+      "product": "Pepinos Extra Uli Frasco 6x720 g",
+      "groundTruth": { "qty": 1, "unit": "cx", "unit_price": 22.49, "total": 22.49 },
+      "v25Extracted": { "name": "Pepinos Extra Uli Frasco 6x720 g", "qty": 1, "unit": "cx", "unit_price": 22.49, "total": 22.49 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": 0 },
+      "fieldStatus": { "description": "MATCH", "quantity": "MATCH", "unit_price": "MATCH", "total": "MATCH" },
+      "financialErrorEuro": 0,
+      "rootCauseCategory": "none",
+      "notes": "Fully correct"
+    },
+    {
+      "rowIndex": 4,
+      "product": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+      "groundTruth": { "qty": 2, "unit": "un", "unit_price": 6.55, "total": 13.1 },
+      "v25Extracted": { "name": "Atum Oleo Bolsa Nau Cafrintea 1 Kg", "qty": 1, "unit": "un", "unit_price": 13.1, "total": 13.1 },
+      "deltas": { "qty": -1, "unit_price": 6.55, "total": 0 },
+      "fieldStatus": { "description": "MINOR_VARIATION", "quantity": "WRONG", "unit_price": "WRONG", "total": "MATCH" },
+      "financialErrorEuro": 0,
+      "rootCauseCategory": "quantity_unit_parsing",
+      "notes": "Line total 13,10 absorbed into unit_price; qty halved to 1. Internally consistent (1×13.10=13.10). Visible invoice: Qtd 2, Preço 6,55, Total 13,10. Zero € impact because line total preserved."
+    },
+    {
+      "rowIndex": 5,
+      "product": "Arroz Agulha Metro Chef 12x1 kg",
+      "groundTruth": { "qty": 1, "unit": "cx", "unit_price": 13.95, "total": 13.95 },
+      "v25Extracted": { "name": "Arroz Agulha Metro Chef 12x1 kg", "qty": 1, "unit": "cx", "unit_price": 13.95, "total": 13.95 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": 0 },
+      "fieldStatus": { "description": "MATCH", "quantity": "MATCH", "unit_price": "MATCH", "total": "MATCH" },
+      "financialErrorEuro": 0,
+      "rootCauseCategory": "none",
+      "notes": "Fully correct"
+    },
+    {
+      "rowIndex": 6,
+      "product": "Chocolate Culinaria Pantagruel 10x200 g",
+      "groundTruth": { "qty": 2, "unit": "cx", "unit_price": 29.99, "total": 59.98 },
+      "v25Extracted": { "name": "Chocolate Culinaria Pantagruel 10x200 g", "qty": 2, "unit": "cx", "unit_price": 9.99, "total": 19.98 },
+      "deltas": { "qty": 0, "unit_price": -20.0, "total": -40.0 },
+      "fieldStatus": { "description": "MATCH", "quantity": "MATCH", "unit_price": "WRONG", "total": "WRONG" },
+      "financialErrorEuro": 40.0,
+      "rootCauseCategory": "monetary_column",
+      "notes": "SOLE € CONTRIBUTOR. GPT reads unit_price 9,99 (= adjacent Açúcar row Preço Unitário) instead of 29,99. Visible invoice: Qtd 2 CX, Preço 29,99, Total 59,98. Arithmetic 2×9,99=19,98 internally consistent but wrong column. Stable 9,99 in 3/3 v25 probes (runs 1-2); run 3 also dropped qty to 1 (€50 error)."
+    },
+    {
+      "rowIndex": 7,
+      "product": "Açucar Branco METRO Chef 10x1 Kg",
+      "groundTruth": { "qty": 1, "unit": "cx", "unit_price": 9.99, "total": 9.99 },
+      "v25Extracted": { "name": "Acuçar Branco METRO Chef 10x1 Kg", "qty": 1, "unit": "cx", "unit_price": 9.99, "total": 9.99 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": 0 },
+      "fieldStatus": { "description": "MATCH", "quantity": "MATCH", "unit_price": "MATCH", "total": "MATCH" },
+      "financialErrorEuro": 0,
+      "rootCauseCategory": "none",
+      "notes": "Açúcar column-isolation fix from Pass C refinement preserved on v25 (was €79.92 error pre-refinement)"
+    },
+    {
+      "rowIndex": 8,
+      "product": "Nata Culinária 22% Reny Picot 6x1 L",
+      "groundTruth": { "qty": 5, "unit": "cx", "unit_price": 18.89, "total": 94.45 },
+      "v25Extracted": { "name": "Nata Culinaria 22% Reny Picot 6x1 LI", "qty": 5, "unit": "cx", "unit_price": 18.89, "total": 94.45 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": 0 },
+      "fieldStatus": { "description": "MATCH", "quantity": "MATCH", "unit_price": "MATCH", "total": "MATCH" },
+      "financialErrorEuro": 0,
+      "rootCauseCategory": "ocr",
+      "notes": "Minor name OCR (Lt→LI); amounts correct"
+    }
+  ],
+  "errorContributionTable": [
+    { "product": "Chocolate Culinaria Pantagruel 10x200 g", "financialErrorEuro": 40.0, "pctOfInvoiceError": 100 },
+    { "product": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg", "financialErrorEuro": 0, "pctOfInvoiceError": 0, "fieldErrorsOnly": true },
+    { "product": "Filete de Anchoas Alcofinosa L4 495 g", "financialErrorEuro": 0, "pctOfInvoiceError": 0, "fieldErrorsOnly": true }
+  ],
+  "historicalComparison": {
+    "passcRefinementValidation": {
+      "source": ".tmp/passc-refinement-validation/reextract/3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json",
+      "financialErrorEuro": 0,
+      "chocolate": { "unit_price": 29.99, "total": 59.98 },
+      "acucar": { "qty": 1, "total": 9.99 },
+      "atum": { "qty": 2, "unit_price": 6.55, "total": 13.1 }
+    },
+    "v25FinalRerun": {
+      "financialErrorEuro": 40.0,
+      "chocolate": { "unit_price": 9.99, "total": 19.98 },
+      "regressionFromRefinement": "Chocolate price column only"
+    }
+  }
+}

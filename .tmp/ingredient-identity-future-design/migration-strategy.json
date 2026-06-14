@@ -1,0 +1,143 @@
+{
+  "generated_at": "2026-06-13T20:00:00.000Z",
+  "mode": "CONCEPTUAL_ONLY",
+  "note": "Phased migration strategy — no executable SQL or code. Design-level approach only.",
+  "principles": [
+    "Never break recipe_ingredients XOR integrity during migration",
+    "Backfill from invoice line replay, not heuristic name matching alone",
+    "Run Phase 0 guard before any schema migration to stop false OI signals",
+    "Dual-write period: old ingredient_id paths work while new variant paths populate",
+    "Ambiguous rows marked non_chainable rather than guessed"
+  ],
+  "phases": [
+    {
+      "phase": 0,
+      "name": "Cross-format history guard (no schema)",
+      "duration": "1 sprint",
+      "goal": "Stop ±100% false opportunities immediately",
+      "actions": [
+        "Persist purchase_quantity_snapshot + base_unit_snapshot on new price_history rows (app layer if column not yet added)",
+        "Block previous_price chain when contract_hash(pq, base_unit) differs",
+        "Classify OI outputs as format_change vs price_spike",
+        "Suppress Mozzarella/Pepino-class deltas from opportunity ranking"
+      ],
+      "rollback": "Feature flag on chain guard",
+      "vlValidation": "Re-run operational-intelligence-integrity-audit; expect 0 untrusted opportunities from identity collapse",
+      "risk": "Low"
+    },
+    {
+      "phase": 1,
+      "name": "Concept + Pack Variant (Option B core)",
+      "duration": "2–3 sprints",
+      "goal": "Separate purchase contracts from culinary concept",
+      "schemaConcepts": [
+        "Rename mental model: ingredients → ingredient_concepts (may keep table name initially)",
+        "Add pack_variants table FK ingredient_id",
+        "Move current_price + purchase_quantity to pack_variants",
+        "Add ingredients.default_pack_variant_id"
+      ],
+      "dataMigration": [
+        "For each ingredient: create one default pack_variant from current_price/purchase_quantity/base_unit",
+        "Replay VL invoice_items → infer additional variants where pq or base_unit differs (Mozzarella, Pepino)",
+        "Backfill price_history.pack_variant_id via (invoice_id, ingredient_id) join + line normalization replay",
+        "Mark unresolvable history rows chain_blocked=true"
+      ],
+      "appMigration": [
+        "persistOperationalIngredientCostFromInvoiceLine → resolve/create variant first",
+        "appendIngredientPriceHistoryFromInvoiceLine → variant-scoped chain",
+        "Matching: resolve to variant_id; suggest new variant when contract differs"
+      ],
+      "dualWrite": "ingredients.current_price mirrors default variant for legacy readers",
+      "rollback": "Revert to ingredient-level price if variant table empty"
+    },
+    {
+      "phase": 2,
+      "name": "Supplier Product layer (Option D)",
+      "duration": "2 sprints",
+      "goal": "Supplier-scoped commercial identity + alias hardening",
+      "schemaConcepts": [
+        "Add supplier_products (ingredient_concept_id, supplier_name, description_key)",
+        "Reparent pack_variants under supplier_products",
+        "Extend ingredient_aliases with supplier_product_id and pack_variant_id"
+      ],
+      "dataMigration": [
+        "Cluster existing variants by supplier_name from price_history",
+        "Split Mozzarella into Bocconcino product + Aviludo product each with own variants",
+        "Re-link aliases to supplier_product or pack_variant with confidence",
+        "Ginger Beer: create supplier_product per Emporio with volume-specific variants"
+      ],
+      "appMigration": [
+        "findCanonicalIngredientMatch returns (concept, supplier_product, pack_variant)",
+        "buildSupplierIntelligence operates at supplier_product and variant levels",
+        "Invoice match confirmation UI shows three-level hierarchy"
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "Equivalence + Form ontology (Option E extensions)",
+      "duration": "2 sprints",
+      "goal": "Recipe substitution and forecasting without false price chains",
+      "schemaConcepts": [
+        "equivalence_groups + equivalence_group_members (pack_variant_ids)",
+        "form_dimension on concept or supplier_product (fresh, preserved, processed, beverage)",
+        "forecasting_series keyed on pack_variant_id (placeholder for future ML)"
+      ],
+      "dataMigration": [
+        "Pepino: either split concepts (fresco vs conserva) OR equivalence_group with substitution_policy=never_for_pricing",
+        "Mozzarella piece/block: equivalence_group for recipe substitution only if caterer confirms interchangeable",
+        "Beverage variants: require volume_ml_per_unit on all pack_variants"
+      ],
+      "appMigration": [
+        "Recipe picker shows concept; advanced picker selects variant",
+        "OI opportunities only within equivalence_group with same contract_hash",
+        "Supplier switch recommends only equivalent variants"
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "Deprecation + cleanup",
+      "duration": "1 sprint",
+      "goal": "Remove dual-write and ingredient-level price_history",
+      "actions": [
+        "Make pack_variant_id NOT NULL on price_history",
+        "Stop writing ingredients.current_price (read through default variant)",
+        "Archive chain_blocked history rows",
+        "VL full re-read to refresh all variant prices from v31"
+      ]
+    }
+  ],
+  "vlCaseMigrationPlan": {
+    "mozzarella_2a99cecd": {
+      "concept": "Mozzarella fior di latte (keep ID)",
+      "supplierProducts": [
+        { "supplier": "IL BOCCONCINO", "variant": "125g×8 tray, pq=10, €0.95/op" },
+        { "supplier": "AVILUDO", "variant": "2kg block, pq=2000g, €13.69/kg-op" }
+      ],
+      "historyAction": "Split existing 3 rows to correct variants; recompute deltas within variant only"
+    },
+    "pepino_635a1189": {
+      "concept": "Split recommended: Pepino fresco vs Pepino conserva (two concepts)",
+      "alternative": "Single concept with form guard blocking fresh↔preserved match",
+      "supplierProducts": [
+        { "supplier": "Bidfood", "product": "Pepino fresco kg" },
+        { "supplier": "Aviludo", "product": "Pepinos Extra jar" }
+      ]
+    },
+    "gingerBeer": {
+      "concept": "Ginger Beer (new)",
+      "supplierProducts": [{ "supplier": "Emporio Italia", "variants": ["20cl bottle 200ml", "33cl bottle 330ml"] }],
+      "extractionDependency": "Volume parse fix must land with variant creation"
+    }
+  },
+  "riskMitigation": [
+    { "risk": "Wrong variant backfill", "mitigation": "Invoice line replay + user confirm for ambiguous" },
+    { "risk": "Recipe cost drift", "mitigation": "default_pack_variant preserves current costing until user opts in" },
+    { "risk": "Ghost history rows", "mitigation": "VL re-read after Phase 1; delete orphan variant-less history" },
+    { "risk": "UX complexity", "mitigation": "Progressive disclosure — concept in recipes, variant in invoice match" }
+  ],
+  "parallelWork": [
+    "VL DB re-read (stale Jun 11) — independent, run after Phase 0",
+    "Ginger Beer volume parse guard — required before beverage variants trusted",
+    "Home dashboard wire to real data — independent of identity schema"
+  ]
+}

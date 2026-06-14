@@ -1,0 +1,85 @@
+{
+  "generated_at": "2026-06-14T08:52:00.000Z",
+  "tables_touched": {
+    "invoice_items": {
+      "pepino_row": {
+        "id": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+        "name": "Pepino",
+        "ingredient_id_column": false,
+        "created_at": "2026-06-13T21:50:38.703943+00:00",
+        "first_write_on_upload": "2026-06-09T22:36:41+ (estimated same session)"
+      }
+    },
+    "ingredient_aliases": {
+      "pepino_bare_alias": null,
+      "jar_aliases_count": 6,
+      "all_confirmed_by_user": true,
+      "earliest": "2026-06-07T23:42:43.016656+00:00",
+      "latest": "2026-06-09T15:28:28.1962+00:00",
+      "conclusion": "Human-confirmed aliases exist for jar SKUs only — NOT for Bidfood 'Pepino'"
+    },
+    "ingredient_price_history": {
+      "rows_for_635a1189": [
+        {
+          "id": "d723199d-a9bd-49e2-9149-b30a91c9c30d",
+          "invoice_id": "c2f52357 (Aviludo April)",
+          "created_at_stored": "2026-04-17T12:00:00+00:00",
+          "new_price": 3.665,
+          "write_path": "extract sync on April upload"
+        },
+        {
+          "id": "5bd9a4e1-713f-4474-9985-f46bdb1b36b0",
+          "invoice_id": "3b4cb21f (Aviludo May)",
+          "created_at_stored": "2026-05-19T12:00:00+00:00",
+          "new_price": 3.748333333333333,
+          "previous_price": 3.665,
+          "write_path": "extract sync on May upload"
+        },
+        {
+          "id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+          "invoice_id": "da472b7f (Bidfood)",
+          "created_at_stored": "2026-05-25T12:00:00+00:00",
+          "new_price": 0.00177,
+          "previous_price": null,
+          "delta_percent": null,
+          "write_path": "extract sync on Bidfood upload 2026-06-09 — CONTAMINATION ROW",
+          "human_confirmed": false
+        }
+      ],
+      "first_write_for_bidfood_pepino": "a689bd91 on first Bidfood extract (wall-clock 2026-06-09)"
+    },
+    "ingredients": {
+      "id": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "name": "Pepino conserva",
+      "created_at": "2026-06-07T23:42:42.893107+00:00",
+      "updated_at": "2026-06-13T21:54:23.387484+00:00",
+      "current_price_latest": 21.99,
+      "purchase_quantity_latest": 6,
+      "note": "current_price overwritten by later jar re-extracts; contamination in history chain remains"
+    },
+    "invoices": {
+      "bidfood": {
+        "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "created_at": "2026-06-09T22:36:41.424691+00:00",
+        "invoice_date": "2026-05-25",
+        "supplier_name": "Bidfood Portugal"
+      }
+    }
+  },
+  "write_order_for_bidfood_contamination": [
+    { "order": 1, "table": "invoices", "when": "2026-06-09T22:36:41" },
+    { "order": 2, "table": "invoice_items", "when": "2026-06-09T22:36:41+" },
+    { "order": 3, "table": "ingredients", "when": "2026-06-09T22:36:41+", "field": "current_price" },
+    { "order": 4, "table": "ingredient_price_history", "when": "2026-06-09T22:36:41+", "row": "a689bd91" }
+  ],
+  "not_written": [
+    "ingredient_aliases for 'Pepino'",
+    "invoice_items.ingredient_id (column does not exist)",
+    "rejected-ingredient-matches localStorage entry (no user wrong-match action)"
+  ],
+  "audit_trail_gaps": [
+    "No DB table logging match decisions or sync triggers",
+    "price_history.created_at is invoice-date anchored — obscures upload ordering in raw DB",
+    "invoice_items.created_at resets on every re-extract"
+  ]
+}

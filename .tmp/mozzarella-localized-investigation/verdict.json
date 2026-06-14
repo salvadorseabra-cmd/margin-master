@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-06-13T22:26:18.990Z",
+  "comparisonValidity": "INVALID",
+  "confidencePercent": 92,
+  "evidence": [
+    "Single ingredient_id 2a99cecd-08fb-48d5-87cf-cc9ea5282a6d for both purchases (live Supabase query 2026-06-13)",
+    "Aviludo invoice_items: qty=1 un, unit_price=€13.69, total=€13.69 (2kg block); history new_price=€13.69",
+    "Bocconcino invoice_items: qty=10 un, unit_price=€8.12, total=€81.23; history new_price=€0.812 (=8.12/10 via operationalUnitPriceForPriceHistory)",
+    "Purchase history UI shows €8.12 vs €13.69 from invoice_items.unit_price (formatPurchasePrice), not history new_price",
+    "41% decrease = round(abs((8.12-13.69)/13.69*100)) = 41 via buildIngredientOperationalSignals purchase fallback",
+    "Ingredient detail panel omits latestHistoryRow so history delta_percent=null does not block purchase comparison",
+    "NOT equivalent €/kg (2kg block vs 125g tray); NOT equivalent pack price (€13.69/block vs €8.12/tray)",
+    "P0 guard purchaseContractsChainCompatible=false (pack_weight_magnitude); OI alerts suppressed post-P0"
+  ],
+  "economicallyEquivalentUnits": false,
+  "economicallyEquivalentPackagePrices": false
+}

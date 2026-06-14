@@ -1,5 +1,12 @@
 import { formatCurrency, formatPercent } from "@/lib/display-format";
 import { linkedIngredientPriceHistoryRows } from "@/lib/ingredient-price-history";
+import {
+  deriveSnapshotFromHistoryRow,
+  indexPriorHistoryRowById,
+  isTrustedPriceMovementRow,
+  purchaseContractsChainCompatible,
+  trustedPriceHistoryDeltaPercent,
+} from "@/lib/ingredient-price-chain-guard";
 import { detectOperationalFamily } from "@/lib/ingredient-operational-families";
 import {
   getRecipeMetrics,
@@ -2300,13 +2307,24 @@ function isInOperationalWindow(
   return eventMs >= new Date(window.startsAtIso).getTime();
 }
 
-function priceHistoryDeltaPct(row: MarginAlertData["priceHistory"][number]): number {
-  return (
-    row.delta_percent ??
-    ((row.new_price ?? 0) > 0 && (row.previous_price ?? 0) > 0
-      ? (((row.new_price ?? 0) - (row.previous_price ?? 0)) / (row.previous_price ?? 1)) * 100
-      : 0)
+function priceHistoryDeltaPct(
+  row: MarginAlertData["priceHistory"][number],
+  priorById: Map<string, MarginAlertData["priceHistory"][number] | null>,
+): number {
+  const prior = row.id ? (priorById.get(row.id) ?? null) : null;
+  const trusted = trustedPriceHistoryDeltaPercent(row, prior);
+  if (trusted != null) return trusted;
+  return 0;
+}
+
+function priorHistoryRowIndex(
+  data: MarginAlertData,
+): Map<string, MarginAlertData["priceHistory"][number] | null> {
+  const rows = data.priceHistory.filter(
+    (row): row is MarginAlertData["priceHistory"][number] & { id: string } =>
+      Boolean(row.id),
   );
+  return indexPriorHistoryRowById(rows);
 }
 
 function marginAlertDataForOperationalIntelligence(data: MarginAlertData): MarginAlertData {
@@ -2679,10 +2697,12 @@ function aggregateSuppliersInWindow(input: {
     }
   >();
 
+  const priorById = priorHistoryRowIndex(input.data);
+
   for (const row of historyInWindow) {
     const supplier = row.supplier_name?.trim();
     if (!supplier) continue;
-    const pct = priceHistoryDeltaPct(row);
+    const pct = priceHistoryDeltaPct(row, priorById);
     const bucket = bySupplier.get(supplier) ?? {
       changes: [],
       ingredientIds: new Set<string>(),
@@ -2989,13 +3009,14 @@ function rankIngredientPriceMovements(input: {
   data: MarginAlertData;
   windows: OperationalWindow[];
 }): IngredientPriceMovement[] {
+  const priorById = priorHistoryRowIndex(input.data);
   const historyInWindow = input.data.priceHistory.filter((row) =>
     isInOperationalWindow(row.created_at, input.windowKey, input.windows),
   );
 
   const byIngredient = new Map<string, IngredientPriceMovement>();
   for (const row of historyInWindow) {
-    const pct = priceHistoryDeltaPct(row);
+    const pct = priceHistoryDeltaPct(row, priorById);
     if (Math.abs(pct) < MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT) continue;
     const label = ingredientLabel(row.ingredient_id, row.ingredient_name, input.data.ingredients);
     const existing = byIngredient.get(row.ingredient_id);
@@ -4437,15 +4458,12 @@ function buildSupplierMovementGroups(
   windows: OperationalWindow[],
   expensiveSuppliers: Set<string> = new Set(),
 ): OperationalSynthesisGroups["supplierMovements"] {
+  const priorById = priorHistoryRowIndex(data);
   const bySupplier = new Map<string, SupplierMovementAccumulator>();
   for (const row of data.priceHistory) {
     const supplier = row.supplier_name?.trim();
     if (!supplier) continue;
-    const pct =
-      row.delta_percent ??
-      ((row.new_price ?? 0) > 0 && (row.previous_price ?? 0) > 0
-        ? (((row.new_price ?? 0) - (row.previous_price ?? 0)) / (row.previous_price ?? 1)) * 100
-        : 0);
+    const pct = priceHistoryDeltaPct(row, priorById);
     const current = bySupplier.get(supplier) ?? {
       supplierName: supplier,
       changes: [],
@@ -4631,6 +4649,11 @@ function buildSupplierSwitchImpactGroups(
       const toSupplier = next.supplier_name?.trim();
       if (!fromSupplier || !toSupplier || fromSupplier === toSupplier) continue;
       if ((prev.new_price ?? 0) <= 0 || (next.new_price ?? 0) <= 0) continue;
+      const priorSnap = deriveSnapshotFromHistoryRow(prev);
+      priorSnap.operationalUnitPrice = Number(prev.new_price);
+      const nextSnap = deriveSnapshotFromHistoryRow(next);
+      nextSnap.operationalUnitPrice = Number(next.new_price);
+      if (!purchaseContractsChainCompatible(priorSnap, nextSnap).compatible) continue;
       const changePct = (((next.new_price ?? 0) - (prev.new_price ?? 0)) / (prev.new_price ?? 1)) * 100;
       const monthlyImpact = Math.round(Math.abs(changePct) * 8);
       const switchWindow = resolveWindowFromDate(next.created_at, windows);
@@ -4964,11 +4987,12 @@ function collectSupplierIngredientChanges(
   windowKey: OperationalWindowKey,
   windows: OperationalWindow[],
 ): SupplierIngredientChange[] {
+  const priorById = priorHistoryRowIndex(data);
   const byIngredient = new Map<string, SupplierIngredientChange>();
   for (const row of data.priceHistory) {
     if (row.supplier_name?.trim() !== supplierName) continue;
     if (!isInOperationalWindow(row.created_at, windowKey, windows)) continue;
-    const pct = priceHistoryDeltaPct(row);
+    const pct = priceHistoryDeltaPct(row, priorById);
     if (Math.abs(pct) < MIN_MEANINGFUL_SUPPLIER_CHANGE_PCT) continue;
     const name = ingredientLabel(row.ingredient_id, row.ingredient_name, data.ingredients);
     const existing = byIngredient.get(row.ingredient_id);

@@ -1,0 +1,609 @@
+{
+  "generated_at": "2026-06-13T20:50:20.793Z",
+  "vlInvoices": [
+    {
+      "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "label": "Bidfood"
+    },
+    {
+      "id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "label": "Aviludo April"
+    },
+    {
+      "id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "label": "Aviludo May"
+    },
+    {
+      "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "label": "Bocconcino"
+    },
+    {
+      "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "label": "Emporio (live)"
+    },
+    {
+      "id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "label": "Mammafiore"
+    }
+  ],
+  "deletedEmporioVlId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "summary": {
+    "totalLineAudits": 51,
+    "trusted": 2,
+    "notTrusted": 1,
+    "stale": 2,
+    "unmatched": 46,
+    "priceHistoryRows": 20,
+    "priceHistoryTrusted": 4,
+    "priceHistoryStale": 2,
+    "priceHistoryGhost": 14,
+    "priceHistoryNotTrusted": 0,
+    "orphanHistoryDeletedEmporio": 0,
+    "mathInvalidComparisons": 0,
+    "opportunityErrors": 3
+  },
+  "historicalPricingStatus": "PARTIAL",
+  "confidencePercent": 82,
+  "productionSafeToday": true,
+  "justification": "Core €/base-unit pipeline trusted; isolated stale rows and unmatched lines remain.",
+  "problemClassCounts": {
+    "math_logic": 1,
+    "stale_data": 2,
+    "extraction_residue": 0,
+    "gt_catalog": 0,
+    "gross_vs_net": 0,
+    "no_history": 0,
+    "unit_scaling": 0
+  },
+  "fullyTrustedIngredients": [
+    {
+      "ingredient": "Pepino conserva",
+      "invoice": "Bidfood",
+      "line": "Pepino"
+    },
+    {
+      "ingredient": "Mozzarella fior di latte",
+      "invoice": "Aviludo April",
+      "line": "Mozzarella Flor di Latte 2Kg"
+    }
+  ],
+  "notTrustedIngredients": [
+    {
+      "ingredient": "—",
+      "invoice": "Emporio (live)",
+      "line": "Baladin - Ginger Beer 0.20cl",
+      "reasons": [
+        "math_logic_volume_parse",
+        "unmatched_no_ingredient"
+      ],
+      "notes": [
+        "No catalog ingredient match — no price_history sync"
+      ]
+    }
+  ],
+  "staleIngredients": [
+    {
+      "ingredient": "Chocolate culinária",
+      "invoice": "Aviludo May",
+      "reasons": [
+        "stale_db_row"
+      ]
+    },
+    {
+      "ingredient": "Mozzarella fior di latte",
+      "invoice": "Bocconcino",
+      "reasons": [
+        "stale_db_row"
+      ]
+    }
+  ],
+  "mathInvalidComparisons": [],
+  "opportunityCalculationErrors": [
+    {
+      "ingredient": "Baladin - Ginger Beer 0.20cl",
+      "invoice": "Emporio (live)",
+      "issue": "opportunity_inflation_volume_parse",
+      "costPerLiter": 575
+    },
+    {
+      "ingredient": "Mozzarella fior di latte",
+      "invoice": "Aviludo April",
+      "issue": "non_equivalent_unit_comparison",
+      "previousOperational": 0.95,
+      "newOperational": 13.69,
+      "deltaPercent": 1341.0526
+    },
+    {
+      "ingredient": "Mozzarella fior di latte",
+      "invoice": "Aviludo April",
+      "issue": "non_equivalent_unit_comparison",
+      "previousOperational": 0.95,
+      "newOperational": 13.69,
+      "deltaPercent": 1341.0526
+    }
+  ],
+  "priceHistoryRowAudits": [
+    {
+      "historyId": "781ab1ac-39d2-4462-9106-635e5603c466",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+      "ingredientName": "Atum em óleo",
+      "historyIngredientName": "Atum em óleo",
+      "matchedLineName": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": 3.145,
+        "new_price": 3.275,
+        "delta": 0.1299999999999999,
+        "delta_percent": 4.133545310015895
+      },
+      "computed": {
+        "expectedOperationalNew": 3.275,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "edc6c627-d934-40de-8eb8-cc0a25d36755",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+      "ingredientName": "Arroz agulha",
+      "historyIngredientName": "Arroz agulha",
+      "matchedLineName": "Arroz Agulha Metro Chef 12x1 kg",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": 1.1208333333333333,
+        "new_price": 1.1624999999999999,
+        "delta": 0.04166666666666652,
+        "delta_percent": 3.717472118959095
+      },
+      "computed": {
+        "expectedOperationalNew": 1.1624999999999999,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "14330aad-cce1-4569-aa2f-4976dd1ac336",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+      "ingredientName": "Nata culinária",
+      "historyIngredientName": "Nata culinária",
+      "matchedLineName": "Nata Culinaria 22% Remy Picot 6x1 Lt",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": 3.0483333333333333,
+        "new_price": 3.1483333333333334,
+        "delta": 0.10000000000000009,
+        "delta_percent": 3.2804811372334637
+      },
+      "computed": {
+        "expectedOperationalNew": 3.1483333333333334,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "908de185-e61a-4f41-af4c-3b70f69bd08f",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+      "ingredientName": "Anchoas",
+      "historyIngredientName": "Anchoas",
+      "matchedLineName": null,
+      "trustVerdict": "ghost",
+      "classification": [
+        "ghost_price_history",
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": 4.745,
+        "new_price": 4.995,
+        "delta": 0.25,
+        "delta_percent": 5.268703898840886
+      },
+      "computed": {
+        "expectedOperationalNew": null,
+        "deltaMathValid": true
+      },
+      "notes": [
+        "No matching invoice_items line on current invoice"
+      ]
+    },
+    {
+      "historyId": "1d9d5133-724b-461c-b141-605392f2b64d",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+      "ingredientName": "Açúcar branco",
+      "historyIngredientName": "Açúcar branco",
+      "matchedLineName": "Acucar Branco METRO Chef 10x1 Kg",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": 0.9289999999999999,
+        "new_price": 0.999,
+        "delta": 0.07000000000000006,
+        "delta_percent": 7.534983853606035
+      },
+      "computed": {
+        "expectedOperationalNew": 0.999,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "e143080d-511b-4c37-9018-11949343aedc",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+      "ingredientName": "Gema líquida",
+      "historyIngredientName": "Gema líquida",
+      "matchedLineName": "Ovo Líquido Past.Gema Dovo 1 Kg",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": 1.6983333333333333,
+        "new_price": 1.7483333333333333,
+        "delta": 0.050000000000000044,
+        "delta_percent": 2.9440628066732115
+      },
+      "computed": {
+        "expectedOperationalNew": 1.7483333333333333,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "bf250ee4-388a-480f-96d7-e8c0e8e8dfb2",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+      "ingredientName": "Chocolate culinária",
+      "historyIngredientName": "Chocolate culinária",
+      "matchedLineName": "Chocolate Culinaria Pantagruel 10x200 g",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": 2.919,
+        "new_price": 2.9989999999999997,
+        "delta": 0.07999999999999963,
+        "delta_percent": 2.7406646111681954
+      },
+      "computed": {
+        "expectedOperationalNew": 2.9989999999999997,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "e967f673-1dc5-4390-90e6-464b66ec2a4b",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+      "ingredientName": "Gema líquida",
+      "historyIngredientName": "Gema líquida",
+      "matchedLineName": "Ovo Liquido Past.Gema Dovo 1kg",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": null,
+        "new_price": 1.6983333333333333,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 1.6983333333333333,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "73df8387-6906-4341-8e33-0864f70f502a",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+      "ingredientName": "Açúcar branco",
+      "historyIngredientName": "Açúcar branco",
+      "matchedLineName": "Açúcar Branco Metro Chef 10x1Kg",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": null,
+        "new_price": 0.9289999999999999,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 0.9289999999999999,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "952119dc-8645-4a5f-a3ff-191ae1a57ea8",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+      "ingredientName": "Anchoas",
+      "historyIngredientName": "Anchoas",
+      "matchedLineName": null,
+      "trustVerdict": "ghost",
+      "classification": [
+        "ghost_price_history",
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": null,
+        "new_price": 4.745,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": null,
+        "deltaMathValid": true
+      },
+      "notes": [
+        "No matching invoice_items line on current invoice"
+      ]
+    },
+    {
+      "historyId": "2767b722-0985-45a8-9c80-9e9dae611142",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+      "ingredientName": "Nata culinária",
+      "historyIngredientName": "Nata culinária",
+      "matchedLineName": "Nata Reny Picot 22% 6x1L",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": null,
+        "new_price": 3.0483333333333333,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 3.0483333333333333,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "d723199d-a9bd-49e2-9149-b30a91c9c30d",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "ingredientName": "Pepino conserva",
+      "historyIngredientName": "Pepino conserva",
+      "matchedLineName": "Pepinos Extra II Frasco 6X720g",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": null,
+        "new_price": 3.6649999999999996,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 3.6649999999999996,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "61c51696-acd8-4a58-878f-a588c1878af0",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+      "ingredientName": "Atum em óleo",
+      "historyIngredientName": "Atum em óleo",
+      "matchedLineName": "Atum Óleo Bolsa Nau Catineta 1 Kg",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 3.145,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 3.145,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "bc6b61db-7e1f-477e-9b9f-a8103bfd3db2",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+      "ingredientName": "Arroz agulha",
+      "historyIngredientName": "Arroz agulha",
+      "matchedLineName": "Arroz Agulha Metro Chef 12x1kg",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": null,
+        "new_price": 1.1208333333333333,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 1.1208333333333333,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "9ee1b793-974d-4a6b-b656-c7b5e8febfaa",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "ingredientName": "Mozzarella fior di latte",
+      "historyIngredientName": "Mozzarella fior di latte",
+      "matchedLineName": "Mozzarella Flor di Latte 2Kg",
+      "trustVerdict": "stale",
+      "classification": [
+        "non_equivalent_unit_chain"
+      ],
+      "stored": {
+        "previous_price": 0.95,
+        "new_price": 13.69,
+        "delta": 12.74,
+        "delta_percent": 1341.0526315789475
+      },
+      "computed": {
+        "expectedOperationalNew": 13.69,
+        "deltaMathValid": true
+      },
+      "notes": [
+        "Large cross-format delta 1341.0526% — prior/new may be different pack bases"
+      ]
+    },
+    {
+      "historyId": "3c508a43-68bd-4b69-9205-61ddbbfb26a7",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "ingredientName": "Mozzarella fior di latte",
+      "historyIngredientName": "Mozzarella fior di latte",
+      "matchedLineName": "Mozzarella Flor di Latte 2Kg",
+      "trustVerdict": "stale",
+      "classification": [
+        "non_equivalent_unit_chain"
+      ],
+      "stored": {
+        "previous_price": 0.95,
+        "new_price": 13.69,
+        "delta": 12.74,
+        "delta_percent": 1341.0526315789475
+      },
+      "computed": {
+        "expectedOperationalNew": 13.69,
+        "deltaMathValid": true
+      },
+      "notes": [
+        "Large cross-format delta 1341.0526% — prior/new may be different pack bases"
+      ]
+    },
+    {
+      "historyId": "d72bf77a-eb4c-4ade-a26f-e01c0b7e6a5b",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+      "ingredientName": "Chocolate culinária",
+      "historyIngredientName": "Chocolate culinária",
+      "matchedLineName": "Chocolate Pantagruel 10x200g",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": null,
+        "new_price": 2.919,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 2.919,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "18bdb0c5-0370-4bc7-878d-85957b8ba946",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "ingredientName": "Mozzarella fior di latte",
+      "historyIngredientName": "Mozzarella fior di latte",
+      "matchedLineName": "MOZZARELLA FIOR DI LATTE 'IL BOCCONCINO' 125GR*8",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": null,
+        "new_price": 0.95,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 0.95,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "5bd9a4e1-713f-4474-9985-f46bdb1b36b0",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "ingredientName": "Pepino conserva",
+      "historyIngredientName": "Pepino conserva",
+      "matchedLineName": "Pepinos Extra Uli Frasco 6x720 g",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": 3.6649999999999996,
+        "new_price": 3.748333333333333,
+        "delta": 0.08333333333333348,
+        "delta_percent": 2.273760800363806
+      },
+      "computed": {
+        "expectedOperationalNew": 3.748333333333333,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "ingredientName": "Pepino conserva",
+      "historyIngredientName": "Pepino conserva",
+      "matchedLineName": "Pepino",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": 3.748333333333333,
+        "new_price": 0.00177,
+        "delta": -3.746563333333333,
+        "delta_percent": -99.95277901289462
+      },
+      "computed": {
+        "expectedOperationalNew": 0.00177,
+        "deltaMathValid": true
+      },
+      "notes": []
+    }
+  ]
+}

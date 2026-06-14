@@ -1,0 +1,89 @@
+{
+  "generated_at": "2026-06-12T23:37:26.905Z",
+  "deployVersion": 27,
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "elapsedMs": 19791,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelli 1/8 - 1,5kg",
+        "quantity": 2.6,
+        "unit": null,
+        "unit_price": 10.22,
+        "total": 13.44
+      },
+      "financialErrorEuro": 0,
+      "totalCorrect": true
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "elapsedMs": 31024,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castiglieri 1/8 - 1,5kg Produto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 13.22,
+        "total": 13.44
+      },
+      "financialErrorEuro": 0,
+      "totalCorrect": true
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "elapsedMs": 26858,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfedro 1/8 - 1,5kg Produto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 9.45,
+        "total": 13.44
+      },
+      "financialErrorEuro": 0,
+      "totalCorrect": true
+    },
+    {
+      "run": 4,
+      "status": 200,
+      "elapsedMs": 18082,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8* 1,5-1,9kg",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 12.2,
+        "total": 13.44
+      },
+      "financialErrorEuro": 0,
+      "totalCorrect": true
+    },
+    {
+      "run": 5,
+      "status": 200,
+      "elapsedMs": 17498,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8* -1.8-1.9kg Produto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 16.55,
+        "total": 33.14
+      },
+      "financialErrorEuro": 19.7,
+      "totalCorrect": false
+    }
+  ],
+  "summary": {
+    "perfectTotalRuns": "4/5",
+    "totalUnique": [
+      13.44,
+      33.14
+    ],
+    "qtyUnique": [
+      2.6,
+      2
+    ],
+    "deterministic": false,
+    "avgFinancialError": 3.94
+  }
+}

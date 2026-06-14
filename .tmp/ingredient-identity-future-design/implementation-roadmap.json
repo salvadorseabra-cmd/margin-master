@@ -1,0 +1,118 @@
+{
+  "generated_at": "2026-06-13T20:00:00.000Z",
+  "recommendedPath": "E (north-star) delivered as Phase 0 → B → D → E",
+  "confidencePercent": 84,
+  "phases": [
+    {
+      "id": "P0",
+      "name": "History chain guard",
+      "timeline": "Week 1–2",
+      "deliverables": [
+        "Contract hash on price_history append",
+        "Cross-format chain blocker in ingredient-price-history.ts",
+        "OI synthesis: format_change classification",
+        "Audit harness green on Mozzarella/Pepino false opportunities"
+      ],
+      "successCriteria": [
+        "operational-intelligence-integrity-audit: 0 identity-collapse untrusted opportunities",
+        "historical-pricing-integrity-audit: cross-format chains flagged not spiked"
+      ],
+      "blocks": "Production OI exposure",
+      "effort": "S"
+    },
+    {
+      "id": "P1",
+      "name": "Pack variant foundation",
+      "timeline": "Week 3–6",
+      "deliverables": [
+        "pack_variants schema concept + API types",
+        "Invoice match → variant resolution",
+        "price_history.pack_variant_id",
+        "Default variant backfill for existing ingredients",
+        "VL Mozzarella/Pepino variant split"
+      ],
+      "successCriteria": [
+        "Mozzarella histories chain only within matching variant",
+        "Recipe costing uses default_pack_variant_id",
+        "Matching suggests new variant on format mismatch"
+      ],
+      "blocks": "Trustworthy historical pricing",
+      "effort": "M"
+    },
+    {
+      "id": "P2",
+      "name": "Supplier product layer",
+      "timeline": "Week 7–10",
+      "deliverables": [
+        "supplier_products schema concept",
+        "Aliases → supplier_product / pack_variant",
+        "buildSupplierIntelligence per product + variant",
+        "Invoice confirmation UI three-level display",
+        "Ginger Beer variant with volume_ml_per_unit"
+      ],
+      "successCriteria": [
+        "AVILUDO vs Bocconcino intel separated",
+        "Supplier watch notes reference correct product",
+        "Cross-supplier alias without contamination"
+      ],
+      "blocks": "Supplier intelligence production trust",
+      "effort": "M"
+    },
+    {
+      "id": "P3",
+      "name": "Equivalence + form ontology",
+      "timeline": "Week 11–14",
+      "deliverables": [
+        "equivalence_groups for substitutable variants",
+        "form_dimension guards (fresh/preserved/beverage)",
+        "Recipe variant picker (optional override)",
+        "Forecasting series hook on pack_variant_id"
+      ],
+      "successCriteria": [
+        "Recipe substitution without false price delta",
+        "Pepino fresco/conserva never chains",
+        "OI switch opportunities only on equivalent variants"
+      ],
+      "blocks": "Forecasting, advanced prep substitution",
+      "effort": "M"
+    },
+    {
+      "id": "P4",
+      "name": "OI production enablement",
+      "timeline": "Week 15–16",
+      "deliverables": [
+        "Re-enable /alerts opportunities after audit green",
+        "Wire home dashboard to real MarginAlertData (or hide mock)",
+        "VL full re-read + identity audit closure",
+        "Remove dual-write legacy paths"
+      ],
+      "successCriteria": [
+        "operational-intelligence-integrity-audit: CLOSED or PARTIAL >90%",
+        "historical-pricing-integrity-audit: CLOSED",
+        "Restaurant pilot with 3+ suppliers"
+      ],
+      "blocks": "Public OI launch",
+      "effort": "S"
+    }
+  ],
+  "dependencies": {
+    "P1": ["P0"],
+    "P2": ["P1"],
+    "P3": ["P2"],
+    "P4": ["P0", "P1", "P2"],
+    "gingerBeerVolumeFix": ["before P2 beverage variants"],
+    "vlDbReread": ["parallel after P0", "required before P4"]
+  },
+  "whatToBuildNext": {
+    "immediate": "P0 — cross-format history guard (highest ROI, no schema)",
+    "then": "P1 — pack_variants schema + matching",
+    "parallel": ["VL re-read all invoices", "Ginger Beer CL parse guard", "Hide or wire mock home dashboard"],
+    "defer": ["Forecasting ML", "Barcode SKU scan", "Multi-site distributor integrations"]
+  },
+  "teamFocus": {
+    "backend": "price_history chain guard, variant schema, persist paths",
+    "matching": "invoice → variant resolution, alias extension",
+    "frontend": "invoice match confirm UI, recipe variant picker (P3)",
+    "oi": "synthesis filters for format_change, supplier_product aggregates"
+  }
+}

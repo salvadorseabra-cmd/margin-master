@@ -1,0 +1,144 @@
+{
+  "generated_at": "2026-06-14T09:30:00.000Z",
+  "match_assignment_services": [
+    {
+      "name": "resolveInvoiceTableRowIngredientMatch",
+      "file": "src/lib/invoice-ingredient-row-display.ts",
+      "role": "resolve virtual match + display state",
+      "writes": [],
+      "reads": ["invoice_items", "ingredients", "ingredient_aliases map", "rejected pairs", "matcher"]
+    },
+    {
+      "name": "syncOperationalIngredientCostsFromInvoiceLines",
+      "file": "src/lib/ingredient-operational-intelligence.ts",
+      "role": "post-extract cost persist for matched/suggested lines",
+      "writes": ["ingredients", "ingredient_price_history"],
+      "trigger": "invoices.tsx ~1358"
+    },
+    {
+      "name": "persistOperationalIngredientCostFromInvoiceLine",
+      "file": "src/lib/ingredient-auto-persist.ts",
+      "role": "update current_price + append history",
+      "writes": ["ingredients", "ingredient_price_history"]
+    },
+    {
+      "name": "appendIngredientPriceHistoryFromInvoiceLine",
+      "file": "src/lib/ingredient-price-history.ts",
+      "role": "insert or refresh history row per (invoice_id, ingredient_id)",
+      "on_refresh": "calls reconcileIngredientPriceHistoryChain"
+    },
+    {
+      "name": "persistManualIngredientCorrection",
+      "file": "src/lib/ingredient-correction-memory.ts",
+      "role": "manual confirm/correct alias persist",
+      "writes": ["ingredient_aliases", "in-memory maps", "localStorage aliases"]
+    },
+    {
+      "name": "rejectIngredientMatchPair",
+      "file": "src/lib/ingredient-correction-memory.ts",
+      "role": "block wrong pair on rematch",
+      "writes": ["localStorage rejected-ingredient-matches"],
+      "does_not_write": ["ingredient_aliases", "ingredient_price_history"]
+    },
+    {
+      "name": "reconcileIngredientPriceHistoryChain",
+      "file": "src/lib/ingredient-price-history-reconcile.ts",
+      "role": "orphan delete + delta rechaining",
+      "trigger": ["history UPDATE refresh", "reconcileAfterInvoiceDelete"],
+      "not_triggered_by": ["match correction", "unmatch"]
+    },
+    {
+      "name": "reconcileAfterInvoiceDelete",
+      "file": "src/lib/ingredient-price-history-reconcile.ts",
+      "role": "rechain all ingredients that had history on deleted invoice",
+      "trigger": "invoices.tsx removeRow"
+    },
+    {
+      "name": "backfillIngredientPriceHistoryFromInvoices",
+      "file": "src/lib/ingredient-price-history-backfill.ts",
+      "role": "idempotent missing history insert from invoice scan",
+      "uses": "same matcher + append rules as live import"
+    },
+    {
+      "name": "buildMatchedInvoiceProductsFromScan",
+      "file": "src/lib/ingredient-operational-intelligence.ts",
+      "role": "purchase memory / supplier intel input",
+      "derived": true
+    },
+    {
+      "name": "dispatchOperationalIngredientCostChanged",
+      "file": "src/lib/resolve-operational-ingredient-cost.ts",
+      "role": "invalidate recipe cost listeners",
+      "consumer": "recipes.tsx"
+    }
+  ],
+  "downstream_consumers": [
+    {
+      "consumer": "margin-alert-data",
+      "file": "src/lib/margin-alert-data.ts",
+      "depends_on": ["ingredient_price_history", "ingredients", "recipes", "isTrustedPriceMovementRow"],
+      "match_aware": "indirect via history rows tied to ingredient_id"
+    },
+    {
+      "consumer": "operational-intelligence-synthesis",
+      "file": "src/lib/operational-intelligence-synthesis.ts",
+      "depends_on": ["margin-alert-data outputs", "recipe costs", "price history"],
+      "match_aware": "derived"
+    },
+    {
+      "consumer": "operational-intelligence-view",
+      "file": "src/lib/operational-intelligence-view.ts",
+      "depends_on": ["margin-alert-data", "operational-intelligence-synthesis"]
+    },
+    {
+      "consumer": "resolveOperationalIngredientCostFields",
+      "file": "src/lib/resolve-operational-ingredient-cost.ts",
+      "depends_on": ["ingredients.current_price", "invoice purchase fallback"],
+      "match_aware": "uses catalog + optional invoice embed"
+    },
+    {
+      "consumer": "ingredient-detail-panel",
+      "file": "src/lib/ingredient-detail-panel.ts",
+      "depends_on": ["ingredient_price_history", "purchase memory"]
+    },
+    {
+      "consumer": "catalog-review-current-matches",
+      "file": "src/lib/catalog-review-current-matches.ts",
+      "depends_on": ["live matcher scan"]
+    },
+    {
+      "consumer": "ingredient-orphan-diagnostics",
+      "file": "src/lib/ingredient-orphan-diagnostics.ts",
+      "depends_on": ["ingredient_aliases", "ingredient_price_history", "buildMatchedInvoiceProductsFromScan"]
+    },
+    {
+      "consumer": "ingredient-price-chain-guard",
+      "file": "src/lib/ingredient-price-chain-guard.ts",
+      "depends_on": ["ingredient_price_history chains"],
+      "role": "P0 read-path guard — does not mutate data"
+    },
+    {
+      "consumer": "alerts route",
+      "file": "src/routes/alerts.tsx",
+      "depends_on": ["priceHistory array loaded from DB"]
+    },
+    {
+      "consumer": "recipes route",
+      "file": "src/routes/recipes.tsx",
+      "depends_on": ["OPERATIONAL_INGREDIENT_COST_CHANGED_EVENT", "resolveOperationalIngredientCostFields"]
+    }
+  ],
+  "dependency_graph_summary": {
+    "extract": "invoice_items → matcher → syncOperationalIngredientCosts → [ingredients, ingredient_price_history]",
+    "manual_confirm": "matcher → persistManualIngredientCorrection → [ingredient_aliases] + cost sync",
+    "correction": "reject pair → persistManualIngredientCorrection (new) + cost sync (new) — old history orphaned",
+    "read_paths": "invoice_items + aliases + matcher → purchase scan / catalog review / UI",
+    "intelligence": "ingredient_price_history + ingredients → margin-alert-data → OI synthesis",
+    "invalidation": "dispatchOperationalIngredientCostChanged → recipes reload (new id only on correction)"
+  },
+  "pepino_dependency_evidence": {
+    "poison_entry_point": "syncOperationalIngredientCostsFromInvoiceLines at extract",
+    "correction_breaks": ["live matcher to conserva via reject pair"],
+    "correction_does_not_break": ["margin-alert-data input row a689bd91", "chain guard input", "ingredient detail history chart"]
+  }
+}

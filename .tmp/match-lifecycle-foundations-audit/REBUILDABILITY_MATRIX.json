@@ -1,0 +1,226 @@
+{
+  "generated_at": "2026-06-14T12:00:00.000Z",
+  "audit_mode": "read_only",
+  "rebuildability_legend": {
+    "rebuildable": "Can be fully regenerated from authoritative inputs using existing services",
+    "partially_rebuildable": "Can be regenerated with gaps, caveats, or manual intervention",
+    "not_rebuildable": "Cannot be corrected without DELETE or logic that does not exist today"
+  },
+  "artifacts": [
+    {
+      "artifact": "virtual_match_resolution",
+      "persisted": false,
+      "rebuildable": true,
+      "partially_rebuildable": false,
+      "not_rebuildable": false,
+      "rebuild_from": ["invoice_items", "ingredient_aliases", "ingredients catalog", "matcher rules", "rejected-ingredient-matches"],
+      "existing_service": "resolveInvoiceTableRowIngredientMatch",
+      "caveat": "Replays same matcher decisions unless aliases/rejections changed"
+    },
+    {
+      "artifact": "invoice_items",
+      "persisted": true,
+      "rebuildable": false,
+      "partially_rebuildable": false,
+      "not_rebuildable": true,
+      "reason": "Primary line facts from OCR/extract; not derived from match state"
+    },
+    {
+      "artifact": "ingredient_aliases",
+      "persisted": true,
+      "rebuildable": false,
+      "partially_rebuildable": false,
+      "not_rebuildable": true,
+      "reason": "User confirmation memory; no automatic regeneration from invoice lines alone"
+    },
+    {
+      "artifact": "ingredient_price_history_missing_rows",
+      "persisted": true,
+      "rebuildable": true,
+      "partially_rebuildable": false,
+      "not_rebuildable": false,
+      "rebuild_from": ["invoice_items", "ingredients", "ingredient_aliases", "live matcher"],
+      "existing_service": "backfillIngredientPriceHistoryFromInvoices (src/lib/ingredient-price-history-backfill.ts)",
+      "follow_up": "reconcileIngredientPriceHistoryChain for delta rechaining",
+      "caveat": "Replays same matcher; wrong auto-matches would be re-poisoned"
+    },
+    {
+      "artifact": "ingredient_price_history_wrong_assignment_row",
+      "persisted": true,
+      "rebuildable": false,
+      "partially_rebuildable": false,
+      "not_rebuildable": true,
+      "reason": "No DELETE on correction/unmatch; orphan rows persist (Pepino a689bd91 on wrong ingredient)",
+      "evidence": "match-correction-reversal-audit/data-not-reverted.json"
+    },
+    {
+      "artifact": "historical_pricing_chain_deltas",
+      "persisted": true,
+      "rebuildable": false,
+      "partially_rebuildable": true,
+      "not_rebuildable": false,
+      "rebuild_from": ["surviving ingredient_price_history rows after row removal"],
+      "existing_service": "reconcileIngredientPriceHistoryChain (src/lib/ingredient-price-history-reconcile.ts)",
+      "caveat": "Requires wrong rows deleted first; reconcile not invoked on correction",
+      "triggered_by": ["history UPDATE refresh", "reconcileAfterInvoiceDelete"],
+      "not_triggered_by": ["match correction", "unmatch"]
+    },
+    {
+      "artifact": "ingredients.current_price",
+      "persisted": true,
+      "rebuildable": true,
+      "partially_rebuildable": false,
+      "not_rebuildable": false,
+      "rebuild_from": [
+        "latest ingredient_price_history.new_price (fetchLatestHistoryNewPrice)",
+        "re-run syncOperationalIngredientCostsFromInvoiceLines over matched lines"
+      ],
+      "existing_services": [
+        "fetchLatestHistoryNewPrice (ingredient-price-history.ts)",
+        "syncOperationalIngredientCostsFromInvoiceLines",
+        "persistOperationalIngredientCostFromInvoiceLine"
+      ],
+      "caveat": "Last-write-wins across formats; no explicit trusted-row selector on correction; old target not reverted on reassign"
+    },
+    {
+      "artifact": "ingredients.current_price_old_target_after_correction",
+      "persisted": true,
+      "rebuildable": false,
+      "partially_rebuildable": true,
+      "not_rebuildable": false,
+      "reason": "No revert path in persistOperationalIngredientCostFromInvoiceLine on correction",
+      "partial_rebuild": "Manual reconcile from prior trusted history row if wrong rows deleted and chain repaired",
+      "evidence": "635a1189 current_price not reverted after Pepino correction"
+    },
+    {
+      "artifact": "confirmedIngredientAliases_client_map",
+      "persisted": true,
+      "rebuildable": true,
+      "partially_rebuildable": false,
+      "not_rebuildable": false,
+      "rebuild_from": ["ingredient_aliases Supabase table"],
+      "existing_service": "loadConfirmedIngredientAliasMap"
+    },
+    {
+      "artifact": "rejected_ingredient_matches",
+      "persisted": true,
+      "rebuildable": false,
+      "partially_rebuildable": false,
+      "not_rebuildable": true,
+      "reason": "Client localStorage only; no server source; cross-device loss"
+    },
+    {
+      "artifact": "matched_invoice_products_cache",
+      "persisted": false,
+      "rebuildable": true,
+      "partially_rebuildable": false,
+      "not_rebuildable": false,
+      "rebuild_from": ["live invoice scan + matcher"],
+      "existing_service": "buildMatchedInvoiceProductsFromScan; clearIngredientMatchedInvoiceProductsCache"
+    },
+    {
+      "artifact": "buildMatchedInvoiceProductsFromScan_output",
+      "persisted": false,
+      "rebuildable": true,
+      "partially_rebuildable": false,
+      "not_rebuildable": false,
+      "rebuild_from": ["invoice_items", "aliases", "matcher", "rejected pairs"],
+      "caveat": "Live scan attribution changes after reject pair; DB history rows still feed history-backed reads"
+    },
+    {
+      "artifact": "margin_alerts_operational_intelligence",
+      "persisted": false,
+      "rebuildable": true,
+      "partially_rebuildable": true,
+      "not_rebuildable": false,
+      "rebuild_from": ["clean ingredient_price_history", "ingredients", "recipes"],
+      "caveat": "Poisoned history rows block or skew output until removed; P0 guard suppresses alerts but raw history remains in inputs"
+    },
+    {
+      "artifact": "catalog_review_match_counts",
+      "persisted": false,
+      "rebuildable": true,
+      "partially_rebuildable": false,
+      "not_rebuildable": false,
+      "rebuild_from": ["live matcher scan"]
+    },
+    {
+      "artifact": "match_correction_audit_trail",
+      "persisted": false,
+      "rebuildable": false,
+      "partially_rebuildable": false,
+      "not_rebuildable": true,
+      "reason": "No audit log exists; historical contamination state not recoverable"
+    }
+  ],
+  "scenario_rebuildability": {
+    "delete_ingredient_price_history_for_one_ingredient": {
+      "reconstructible": "partially",
+      "from_sources": [
+        "invoice_items (all lines)",
+        "ingredients catalog",
+        "ingredient_aliases",
+        "live matcher via backfillIngredientPriceHistoryFromInvoices"
+      ],
+      "post_step": "reconcileIngredientPriceHistoryChain",
+      "caveat": "Replays same matcher decisions; wrong auto-matches re-poison unless aliases/rejections changed"
+    },
+    "delete_current_price_for_one_ingredient": {
+      "reconstructible": "yes",
+      "from_sources": [
+        "latest ingredient_price_history.new_price",
+        "syncOperationalIngredientCostsFromInvoiceLines over matched invoice lines"
+      ],
+      "caveat": "Last-write-wins; no trusted-row selector on correction"
+    }
+  },
+  "existing_rebuild_reconcile_services": [
+    {
+      "service": "reconcileIngredientPriceHistoryChain",
+      "file": "src/lib/ingredient-price-history-reconcile.ts",
+      "capabilities": ["reconcile", "recompute deltas"],
+      "wired_to_match_lifecycle": false,
+      "triggers": ["history UPDATE refresh", "reconcileAfterInvoiceDelete"]
+    },
+    {
+      "service": "reconcileAfterInvoiceDelete",
+      "file": "src/lib/ingredient-price-history-reconcile.ts",
+      "capabilities": ["reconcile", "rebuild chain after invoice delete"],
+      "wired_to_match_lifecycle": false,
+      "triggers": ["invoices.tsx removeRow"]
+    },
+    {
+      "service": "backfillIngredientPriceHistoryFromInvoices",
+      "file": "src/lib/ingredient-price-history-backfill.ts",
+      "capabilities": ["rebuild", "rehydrate missing history"],
+      "wired_to_match_lifecycle": false,
+      "triggers": ["manual/idempotent backfill"]
+    },
+    {
+      "service": "syncOperationalIngredientCostsFromInvoiceLines",
+      "file": "src/lib/ingredient-operational-intelligence.ts",
+      "capabilities": ["recompute current_price and history from matched lines"],
+      "wired_to_match_lifecycle": true,
+      "triggers": ["extract", "manual persistIngredientCorrectionForItem"],
+      "subtractive_on_correction": false
+    },
+    {
+      "service": "buildMatchedInvoiceProductsFromScan",
+      "file": "src/lib/ingredient-operational-intelligence.ts",
+      "capabilities": ["recompute purchase memory"],
+      "wired_to_match_lifecycle": "read-only derived"
+    },
+    {
+      "service": "clearIngredientMatchedInvoiceProductsCache",
+      "file": "src/lib/ingredient-operational-intelligence.ts",
+      "capabilities": ["cache invalidation"],
+      "wired_to_correction": "new target id only"
+    },
+    {
+      "service": "dispatchOperationalIngredientCostChanged",
+      "file": "src/lib/resolve-operational-ingredient-cost.ts",
+      "capabilities": ["downstream rehydrate signal"],
+      "wired_to_correction": "new target id only"
+    }
+  ]
+}

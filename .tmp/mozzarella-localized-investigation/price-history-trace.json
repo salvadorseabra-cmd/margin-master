@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-06-13T22:26:18.988Z",
+  "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+  "rowCount": 3,
+  "rows": [
+    {
+      "id": "3c508a43-68bd-4b69-9205-61ddbbfb26a7",
+      "ingredient_id": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "ingredient_name": "Mozzarella fior di latte",
+      "supplier_name": "AVILUDO",
+      "ingredient_unit": "un",
+      "previous_price": null,
+      "new_price": 13.69,
+      "delta": null,
+      "delta_percent": null,
+      "created_at": "2026-04-17T12:00:00+00:00",
+      "priorRowId": null,
+      "p0GuardTrusted": false,
+      "recomputedDelta": {
+        "delta": null,
+        "delta_percent": null
+      }
+    },
+    {
+      "id": "9ee1b793-974d-4a6b-b656-c7b5e8febfaa",
+      "ingredient_id": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "ingredient_name": "Mozzarella fior di latte",
+      "supplier_name": "AVILUDO",
+      "ingredient_unit": "un",
+      "previous_price": 13.69,
+      "new_price": 13.69,
+      "delta": 0,
+      "delta_percent": 0,
+      "created_at": "2026-04-17T12:00:00+00:00",
+      "priorRowId": "3c508a43-68bd-4b69-9205-61ddbbfb26a7",
+      "p0GuardTrusted": true,
+      "recomputedDelta": {
+        "delta": 0,
+        "delta_percent": 0
+      }
+    },
+    {
+      "id": "18bdb0c5-0370-4bc7-878d-85957b8ba946",
+      "ingredient_id": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "ingredient_name": "Mozzarella fior di latte",
+      "supplier_name": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "ingredient_unit": "un",
+      "previous_price": null,
+      "new_price": 0.8119999999999999,
+      "delta": null,
+      "delta_percent": null,
+      "created_at": "2026-05-08T12:00:00+00:00",
+      "priorRowId": "9ee1b793-974d-4a6b-b656-c7b5e8febfaa",
+      "p0GuardTrusted": false,
+      "recomputedDelta": {
+        "delta": null,
+        "delta_percent": null
+      }
+    }
+  ],
+  "whichRowProduced139": [
+    {
+      "id": "3c508a43-68bd-4b69-9205-61ddbbfb26a7",
+      "ingredient_id": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "ingredient_name": "Mozzarella fior di latte",
+      "supplier_name": "AVILUDO",
+      "ingredient_unit": "un",
+      "previous_price": null,
+      "new_price": 13.69,
+      "delta": null,
+      "delta_percent": null,
+      "created_at": "2026-04-17T12:00:00+00:00",
+      "priorRowId": null,
+      "p0GuardTrusted": false,
+      "recomputedDelta": {
+        "delta": null,
+        "delta_percent": null
+      }
+    },
+    {
+      "id": "9ee1b793-974d-4a6b-b656-c7b5e8febfaa",
+      "ingredient_id": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "ingredient_name": "Mozzarella fior di latte",
+      "supplier_name": "AVILUDO",
+      "ingredient_unit": "un",
+      "previous_price": 13.69,
+      "new_price": 13.69,
+      "delta": 0,
+      "delta_percent": 0,
+      "created_at": "2026-04-17T12:00:00+00:00",
+      "priorRowId": "3c508a43-68bd-4b69-9205-61ddbbfb26a7",
+      "p0GuardTrusted": true,
+      "recomputedDelta": {
+        "delta": 0,
+        "delta_percent": 0
+      }
+    }
+  ],
+  "whichRowProduced095": "No row with new_price=0.95 in live DB (stale audit artifact); live Bocconcino new_price=0.812",
+  "whichRowProduced812": "€8.12 is NOT in ingredient_price_history — it is invoice_items.unit_price (net per-tray display)"
+}

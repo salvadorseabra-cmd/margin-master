@@ -115,3 +115,16 @@ Residual stable financial error on Pomodor vs VL GT: **~€27.95** on total (wor
 2. **Implement Phase 3** binder (`invoice-monetary-binding.ts`) with Rule B/E and row retry.
 3. **Optional:** Extend `index.ts` to expose structured fields in debug/validation mode for future audits.
 4. Re-run 5-run stability after Phase 3 deploy.
+
+---
+
+## Phase 3 Validation (2026-06-11) — see `phase3-validation-report.md`
+
+| Check | Result |
+|-------|--------|
+| Phase 3 deployed to VL | **NO** — still **v21**; local `de556e0` not on edge |
+| 5-run vs VL GT | **0/5 (0%)** — identical to Phase 1+2 v21 |
+| Modal Pomodor | qty 1, €22.05 / €22.05 |
+| Structured fields in API | Absent |
+| Δ vs Phase 1+2 | **€0** — no change |
+| Family closed? | **NO** |

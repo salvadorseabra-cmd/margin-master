@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-06-13T22:26:18.987Z",
+  "hypothesisIngredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+  "verifiedSameRecord": true,
+  "catalogIngredient": {
+    "id": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+    "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+    "name": "Mozzarella fior di latte",
+    "unit": "un",
+    "current_price": 13.69,
+    "supplier": null,
+    "created_at": "2026-06-08T23:08:43.050924+00:00",
+    "updated_at": "2026-06-13T21:54:33.585141+00:00",
+    "normalized_name": "mozzarella fior di latte",
+    "purchase_quantity": 1,
+    "purchase_unit": "un",
+    "base_unit": "un",
+    "canonical_name": null,
+    "is_archived": false,
+    "merged_into_ingredient_id": null,
+    "merged_at": null,
+    "ingredient_kind": "canonical",
+    "archived_at": null,
+    "density_g_per_ml": null
+  },
+  "allMozzarellaCatalogRows": [
+    {
+      "id": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "name": "Mozzarella fior di latte",
+      "normalized_name": "mozzarella fior di latte",
+      "unit": "un",
+      "base_unit": "un",
+      "purchase_unit": "un",
+      "purchase_quantity": 1,
+      "current_price": 13.69
+    }
+  ],
+  "purchases": [
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino 2026-05-08",
+      "invoiceItemId": "efb979b3-0a24-41f6-92a8-cb257f27106a",
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "ingredientName": "Mozzarella fior di latte",
+      "extractedProductName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "note": "invoice_items table has no ingredient_id column — match is runtime via invoice matcher"
+    },
+    {
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April 2026-04-17",
+      "invoiceItemId": "cf79d75e-b648-433b-8458-a3da140c12bb",
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "ingredientName": "Mozzarella fior di latte",
+      "extractedProductName": "Mozzarella Flor di Latte 2Kg",
+      "note": "invoice_items table has no ingredient_id column — match is runtime via invoice matcher"
+    }
+  ],
+  "aliases": [
+    {
+      "id": "f7ca7a36-e503-4184-b49b-102c467f620f",
+      "ingredient_id": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "alias_name": "Mozzarella Fior di Latte 2Kg",
+      "normalized_alias": "mozzarella fior di latte",
+      "supplier_name": "AVILUDO",
+      "confidence": 10,
+      "confirmed_by_user": true,
+      "created_at": "2026-06-08T23:08:43.263175+00:00"
+    },
+    {
+      "id": "e9db3e34-3d97-4161-844e-868a9d0080fa",
+      "ingredient_id": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "alias_name": "Mozzarella Flor di Latte 2Kg",
+      "normalized_alias": "mozzarella flor di latte",
+      "supplier_name": "AVILUDO",
+      "confidence": 10,
+      "confirmed_by_user": true,
+      "created_at": "2026-06-09T13:22:34.833269+00:00"
+    }
+  ]
+}

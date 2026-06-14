@@ -1,0 +1,131 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio Italia",
+  "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelregio 1/8 ~1,5kg",
+  "rowRank": 1,
+  "financialErrorEuro": 13.56,
+  "generatedAt": "2026-06-13T00:45:00.000Z",
+  "question": "Why did Gorgonzola regress from €0 (v26/refinement) to €13.56 (v27 residual-error audit run)?",
+  "verdict": {
+    "classification": "B",
+    "label": "GPT_variance",
+    "notDeterministicV27Regression": true,
+    "notGtIssue": true,
+    "summary": "The €13.56 appears only on an unlucky v27 single-run draw. Fresh 5-run v27 stability shows 4/5 runs with correct total €13.44 (€0 financial error). v26/refinement €0 baselines reflect the same underlying Pass C variance pattern where VALOR is usually copied correctly; the audit run broke total stability by emitting qty×unit (2×13.5=27) instead of Preço Total 13,44."
+  },
+  "proveMatrix": {
+    "A_deterministic_regression": {
+      "hypothesis": "v27 prompt change deterministically broke Gorgonzola on every invoke",
+      "evidence": [
+        "v27-stability 4/5 runs: total 13.44, financialErrorEuro 0",
+        "v26 single run and refinement both €0 on same invoice image",
+        "Bad v27 audit run is outlier vs majority of v27 invokes"
+      ],
+      "result": "REJECTED"
+    },
+    "B_gpt_variance": {
+      "hypothesis": "Pass C non-determinism on Emporio weight/discount rows causes intermittent total misread",
+      "evidence": [
+        "v23 discount-accuracy: Gorgonzola PARTIAL — total stable 13.44 across 2/2 runs, qty variable (1 or 2)",
+        "v27-stability: qty always wrong (2 or 2.6) but total correct 80% of runs",
+        "v27 audit bad run: total 27 = 2×13.5 (classic qty×unit synthesis, not VALOR copy)",
+        "v27-stability run 5 tail: total 33.14 (second failure mode)",
+        "Name OCR varies every run (Castelli, Castiglieri, Castelfrigo…) — same row, unstable GPT read"
+      ],
+      "result": "CONFIRMED"
+    },
+    "C_gt_issue": {
+      "hypothesis": "Ground truth wrong; visible invoice differs from GT total",
+      "evidence": [
+        "Visible invoice: Qtd 1,35 · Preço Total 13,44 € (invoice-full.png)",
+        "GT: qty 1.35 · total 13.44 — matches visible",
+        "Good extraction runs (v26, refinement, 4/5 v27) all hit total 13.44"
+      ],
+      "result": "REJECTED"
+    }
+  },
+  "exactFieldChanged": {
+    "primary": "total",
+    "badV27AuditRun": { "from": 13.44, "to": 27.0, "deltaEuro": 13.56 },
+    "secondary": {
+      "quantity": { "visible": 1.35, "badRun": 2, "note": "Often misread as 2 (description 1/8 ~1,5kg confusion); persists even on €0 runs" },
+      "unit_price": { "visibleGross": 12.9, "gtNet": 9.92, "badRun": 13.5, "note": "Wrong column or implied net when total breaks" }
+    },
+    "mechanismOnBadRun": "Pass C read qty≈2 and unit≈13.5, then set line_total_net to qty×unit (27) instead of copying VALOR 13,44 €"
+  },
+  "firstFailingStage": {
+    "stage": "passC_table_extraction",
+    "stageNumber": 3,
+    "geometryOk": true,
+    "binderAmplifiesOnlyWhenTotalNull": true,
+    "binderObserved": "pass-through — wrong total already present from Pass C"
+  },
+  "promptAttribution": {
+    "likelyCause": "other",
+    "rankedCandidates": [
+      {
+        "promptVersion": "other",
+        "label": "Pre-existing Emporio weight-row + dense-table column-shift variance",
+        "likelihood": "high",
+        "rationale": "Failure predates v27; v23 already showed qty 1/2 variance with total usually stable. Bad audit run is tail where total also broke."
+      },
+      {
+        "promptVersion": "v27_total_column_isolation",
+        "label": "Total column isolation (Ovo/Nata examples)",
+        "likelihood": "protective_not_causal",
+        "rationale": "Added to stop gross_unit_price→line_total_net bleed. 4/5 v27 stability runs copied VALOR 13.44 correctly. Bad run violated this rule (computed 27), not caused by it."
+      },
+      {
+        "promptVersion": "v26_chocolate_row_isolation",
+        "label": "Chocolate row isolation",
+        "likelihood": "none",
+        "rationale": "Targets adjacent-row monetary bleed (Aviludo); Gorgonzola failure is same-row qty/total misread."
+      },
+      {
+        "promptVersion": "v25_ventricina_hardening",
+        "label": "Ventricina / Desc.(%) Emporio hardening",
+        "likelihood": "low",
+        "rationale": "Helps discount_pct disambiguation; Gorgonzola bad run did not bleed discount into unit — it doubled qty and synthesized total."
+      },
+      {
+        "promptVersion": "v24_emporio_discount_hardening",
+        "label": "Emporio discount hardening",
+        "likelihood": "low",
+        "rationale": "Same family as v25; discount_pct still null on many Emporio rows but total 13.44 stable on majority runs."
+      }
+    ]
+  },
+  "stabilityProbe": {
+    "deployVersion": 27,
+    "runs": 5,
+    "source": ".tmp/gorgonzola-root-cause/v27-stability.json",
+    "perfectTotalRuns": "4/5",
+    "totalValues": [13.44, 33.14],
+    "qtyValues": [2.6, 2],
+    "avgFinancialErrorEuro": 3.94,
+    "deterministic": false
+  },
+  "baselineComparison": [
+    { "run": "refinement", "qty": 1.35, "unit_price": 9.82, "total": 13.44, "financialErrorEuro": 0 },
+    { "run": "v26", "qty": 1.26, "unit_price": 10.5, "total": 13.44, "financialErrorEuro": 0 },
+    { "run": "v27_audit_single", "qty": 2, "unit_price": 13.5, "total": 27, "financialErrorEuro": 13.56 },
+    { "run": "v27_stability_median", "qty": 2, "unit_price": "~12", "total": 13.44, "financialErrorEuro": 0 }
+  ],
+  "confidencePercent": 88,
+  "confidenceRationale": "Visible invoice and GT agree; 5-run v27 probe disproves deterministic v27 regression; historical v23 partial stability supports long-standing variance; 12% reserved for unmeasured prompt interaction and small sample size.",
+  "recommendedFix": {
+    "category": "prompt",
+    "secondaryCategory": "binder",
+    "promptActions": [
+      "Add Emporio POSITIVE example: fractional kg row with Desc.(%) and VALOR — Gorgonzola pattern (Qtd 1,35 · Preço Unit 12,90 · Desc 22,85 · Preço Total 13,44)",
+      "Reinforce: line_total_net must be copied from Preço Total even when qty is misread; never qty×unit when VALOR visible",
+      "Negative example: qty 2 × unit 13,50 ≠ 27 when Preço Total prints 13,44"
+    ],
+    "binderActions": [
+      "Optional: when gross×qty differs from line_total_net by >15%, prefer line_total_net from Pass C (low priority — Pass C usually supplies total)"
+    ],
+    "notRecommended": ["geometry change", "GT change"]
+  },
+  "expectedImprovementEuro": 13.56,
+  "expectedImprovementNote": "Full €13.56 recovers when total stabilizes to 13.44 on every run. Current v27 stability already achieves €0 on 80% of invokes; targeted prompt should push toward 95%+ and eliminate tail (run 5 €19.70)."
+}

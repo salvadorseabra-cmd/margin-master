@@ -1,0 +1,69 @@
+{
+  "generated_at": "2026-06-13T20:52:00.000Z",
+  "status": "PARTIAL",
+  "confidencePercent": 84,
+  "productionSafeToday": true,
+  "productionSafeWithCaveats": true,
+  "harnessRerun": "2026-06-13T20:50:20.793Z",
+  "sources": [
+    ".tmp/historical-pricing-integrity-audit/executive-summary.json",
+    ".tmp/p0-identity-guard-validation/findings.json",
+    ".tmp/historical-pricing-integrity-audit/findings.json"
+  ],
+  "summary": {
+    "trustedLineAudits": 2,
+    "notTrustedLineAudits": 1,
+    "staleLineAudits": 2,
+    "unmatchedLines": 46,
+    "priceHistoryRows": 20,
+    "priceHistoryTrusted": 4,
+    "priceHistoryGhost": 14,
+    "priceHistoryStale": 2,
+    "mathInvalidComparisons": 1,
+    "opportunityErrorsInRawDb": 3
+  },
+  "invalidComparisons": {
+    "detectedInRawDb": true,
+    "suppressedByP0GuardOnRead": true,
+    "cases": [
+      {
+        "ingredient": "Mozzarella fior di latte",
+        "issue": "non_equivalent_unit_comparison",
+        "deltaPercent": 1341.05,
+        "previousOperational": 0.95,
+        "newOperational": 13.69,
+        "guardBlocksOi": true
+      },
+      {
+        "ingredient": "Baladin - Ginger Beer 0.20cl",
+        "issue": "opportunity_inflation_volume_parse",
+        "costPerLiter": 575,
+        "guardBlocksInsert": true
+      }
+    ]
+  },
+  "crossFormatChains": {
+    "detectedInDb": true,
+    "blockedOnAppend": true,
+    "filteredOnRead": true,
+    "reconcileAvailable": true,
+    "note": "ingredient_price_history-reconcile.ts applies purchaseContractsChainCompatible"
+  },
+  "movementInflation": {
+    "preP0": "Mozzarella +1341%, Pepino −99.95% surfaced in OI",
+    "postP0": "0 price movement alerts; trustedPriceHistoryDeltaPercent returns null for poisoned rows"
+  },
+  "staleHistory": {
+    "ghostRows": 14,
+    "staleOperationalMismatch": 2,
+    "deletedEmporioOrphans": 0,
+    "mitigation": "VL re-read all 6 invoices; optional reconcileIngredientPriceHistoryChain per ingredient"
+  },
+  "verdict": {
+    "status": "PARTIAL",
+    "canTrustMathPipeline": true,
+    "canTrustRawDbRows": false,
+    "canTrustOiAfterP0Guard": true,
+    "headline": "Core €/base-unit pipeline CLOSED; stored history PARTIAL until re-read/reconcile"
+  }
+}

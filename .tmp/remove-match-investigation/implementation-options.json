@@ -1,0 +1,90 @@
+{
+  "generated_at": "2026-06-13T22:55:00.000Z",
+  "options": [
+    {
+      "id": "A",
+      "name": "Dropdown '— No match —' option",
+      "description": "Add sentinel entry to InvoiceIngredientCorrectionPicker; on select, run unmatch flow without choosing another ingredient",
+      "implementation_sketch": [
+        "Extend handleSelectCorrectionIngredient to accept null ingredientId or dedicated onRemoveMatch handler",
+        "rejectIngredientMatchPair(item.name, previousIngredientId, supplier)",
+        "rejectIngredientMatchSuggestion for item.id (session suppress)",
+        "Remove alias row IF alias exists for this line text (new deleteConfirmedAlias helper)",
+        "Delete or mark ingredient_price_history for (invoice_id, ingredient_id) if exists",
+        "Recompute ingredients.current_price from latest trusted history or prior snapshot"
+      ],
+      "complexity": "medium",
+      "risk": "medium",
+      "ux": "good — discoverable in existing picker; consistent with 'select ingredient' mental model",
+      "data_integrity": "medium-high if history cleanup included; low if only reject pair (orphan history remains)",
+      "schema_change": false,
+      "cross_device": "partial — reject pair persists to localStorage; alias/history cleanup needs Supabase writes"
+    },
+    {
+      "id": "B",
+      "name": "Dedicated 'Remove match' action",
+      "description": "Separate link/button beside 'Correct match' for confirmed/suggested rows",
+      "implementation_sketch": [
+        "Add showRemoveMatch to IngredientCorrectionUiState when displayState confirmed or suggested",
+        "New removeIngredientMatchForItem function mirroring Option A backend steps",
+        "Confirmation dialog: 'Stop linking this line to {ingredient}?'"
+      ],
+      "complexity": "medium",
+      "risk": "low-medium",
+      "ux": "best — explicit intent; avoids accidental unmatch via dropdown scroll",
+      "data_integrity": "same as A depending on cleanup depth",
+      "schema_change": false,
+      "recommended_for": "confirmed matches like Pepino where user intent is 'this is wrong' not 'pick another'"
+    },
+    {
+      "id": "C",
+      "name": "Block extract auto-sync for non-user-confirmed matches",
+      "description": "Change syncOperationalIngredientCostsFromInvoiceLines to sync only confirmed-alias/override rows, not exact/semantic auto matches",
+      "implementation_sketch": [
+        "Gate cost sync on isConfirmedIngredientMatch AND alias persisted OR user confirm flag",
+        "Defer price history until Confirm match or manual pick"
+      ],
+      "complexity": "high",
+      "risk": "high — changes established extract behavior; 4 suggested + 7 confirmed VL lines would not auto-sync",
+      "ux": "indirect — prevents future contamination but does not fix review UX for already-matched rows",
+      "data_integrity": "high for prevention",
+      "schema_change": false,
+      "note": "Complements A/B; does not replace need for remove match on existing bad links"
+    },
+    {
+      "id": "D",
+      "name": "Reject pair only (minimal — extend existing wrong-match memory)",
+      "description": "Expose rejectIngredientMatchPair in UI without alias/history cleanup",
+      "implementation_sketch": [
+        "Call existing rejectIngredientMatchPair + rejectedMatchItemIds",
+        "No Supabase mutations"
+      ],
+      "complexity": "low",
+      "risk": "low for UI; high for data — orphan price_history and current_price remain",
+      "ux": "acceptable for display fix; misleading if costs still poisoned",
+      "data_integrity": "low",
+      "schema_change": false,
+      "verdict": "insufficient for Pepino case — history row a689bd91 would remain"
+    }
+  ],
+  "comparison_matrix": {
+    "prevents_future_pepino_on_same_line": {
+      "A": true,
+      "B": true,
+      "C": true,
+      "D": true
+    },
+    "cleans_existing_pepino_poison": {
+      "A": "if history delete included",
+      "B": "if history delete included",
+      "C": false,
+      "D": false
+    },
+    "no_schema_migration": {
+      "A": true,
+      "B": true,
+      "C": true,
+      "D": true
+    }
+  }
+}

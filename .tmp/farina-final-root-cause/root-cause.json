@@ -1,0 +1,85 @@
+{
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "label": "Mammafiore",
+  "product": "Farina Speciale pizza 25kg Amoruso",
+  "deployVersion": 30,
+  "auditedAt": "2026-06-13T17:00:00.000Z",
+  "verdict": "PASS_C_VALOR_DIGIT_DRIFT",
+  "classification": "B_total_column",
+  "classificationDetail": "Valor column digit misread (26,52 → 25,52) — NOT discount extraction, NOT IVA bleed, NOT row bleed",
+  "confidencePercent": 93,
+  "financialErrorEuro": 1,
+  "deterministic": true,
+  "firstFailingStage": "passC_table_extraction",
+  "rootCause": "Pass C misreads the Valor column as €25.52 instead of the printed €26.52. Gross unit price (33.154) and discount (20%) are read correctly; the binder then derives unit_price=26.52 from gross×(1−discount) while preserving the wrong line_total_net, producing the observed unit_price > total split.",
+  "fieldDiagnosis": {
+    "wrongField": "line_total_net",
+    "correctFields": ["quantity", "gross_unit_price", "discount_pct"],
+    "digitLossLocation": "Valor column — euros digit 6 misread as 5 (26,52 → 25,52)",
+    "notAffected": ["IVA column", "Desc. column", "Pr. Unitário column", "qty column"]
+  },
+  "visibleInvoice": {
+    "qty": 1,
+    "pr_unitario": 33.154,
+    "desc_pct": 20,
+    "iva_pct": 6,
+    "valor": 26.52,
+    "source": ".tmp/mammafiore-investigation/invoice-full.png"
+  },
+  "groundTruth": {
+    "qty": 1,
+    "unit_price_list": 33.154,
+    "total": 26.52,
+    "source": ".tmp/field-accuracy-audit/ground-truth.json"
+  },
+  "v30Extraction": {
+    "qty": 1,
+    "unit_price": 26.52,
+    "total": 25.52,
+    "source": ".tmp/final-stability-audit/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d-all-runs.json"
+  },
+  "inferredPassCStructured": {
+    "quantity": 1,
+    "gross_unit_price": 33.154,
+    "discount_pct": 20,
+    "line_total_net": 25.52,
+    "method": "binder_replay — only input combination that reproduces v30 output exactly",
+    "replayProof": "bindMonetaryColumns({gross:33.154, discount:20, line_total_net:25.52}) → unit_price:26.52, total:25.52"
+  },
+  "mathTrace": {
+    "visibleValor": 26.52,
+    "extractedTotal": 25.52,
+    "deltaEuro": 1,
+    "formula": "26.52 − 25.52 = 1.00",
+    "discountValidation": "33.154 × (1 − 0.20) = 26.5232 ≈ 26.52 ✓"
+  },
+  "smallestFix": {
+    "type": "prompt_only",
+    "file": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+    "location": "MAMMAFIORE COLUMN ISOLATION block (~lines 167–175)",
+    "recommendation": "Add Farina GOOD/BAD example after Rulo example: '\"Farina Speciale pizza 25kg Amoruso\" Qtd 1, Pr. Unitário 33,154, Desc. 20,00, IVA 6,00, Valor 26,52 → line_total_net: 26.52 (GOOD) · line_total_net: 25.52 (BAD — digit drift; read Valor 26,52 not 25,52)'. Reinforce digit-by-digit Valor reading on discounted Mammafiore rows where net total is in the 20–30 EUR band.",
+    "notRecommended": ["Binder change (root cause is Pass C OCR)", "Geometry/crop change", "GT revision"]
+  },
+  "expectedRecoveryEuro": 1,
+  "classAReduction": {
+    "stabilityAuditFocusRows": {
+      "answer": "YES — Farina is the sole Class A row; fixing recovers €1.00 and eliminates all focus-row Class A bugs",
+      "remainingClassA": []
+    },
+    "v30FullVLRerun": {
+      "answer": "PARTIAL — removes €1.00 of €28.26 headline Class A; Pomodor €26.72 is GT reclassification (Class C); Rulo Bocconcino €0.54 remains",
+      "remainingClassAAfterFarinaFix": 27.26,
+      "remainingClassAAfterFarinaAndPomodorReclass": 0.54
+    }
+  },
+  "evidenceFiles": [
+    ".tmp/final-stability-audit/stability-matrix.json",
+    ".tmp/final-stability-audit/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d-all-runs.json",
+    ".tmp/final-validation-lab-rerun-v30/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d.json",
+    ".tmp/mammafiore-final-audit/root-cause.json",
+    ".tmp/mammafiore-investigation/invoice-full.png",
+    ".tmp/mammafiore-line-audit/pass-c-raw.json",
+    ".tmp/discount-line-audit/run-variance.json",
+    ".tmp/rulo-root-cause/REPORT.md"
+  ]
+}

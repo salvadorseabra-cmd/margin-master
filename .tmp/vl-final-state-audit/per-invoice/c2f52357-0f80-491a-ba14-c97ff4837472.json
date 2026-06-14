@@ -1,0 +1,298 @@
+{
+  "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+  "label": "Aviludo April",
+  "deployVersion": 31,
+  "operationalStatus": "DEGRADED",
+  "issues": [
+    "field_drift: 5 row(s) differ numerically",
+    "ghost_price_history: 7 row(s)",
+    "stale_price_history: 1 row(s)",
+    "dashboard_header_mismatch: header €370.17 vs lines €300.95"
+  ],
+  "checks": {
+    "invoiceItemsCount": {
+      "db": 9,
+      "v31Extract": 9,
+      "expected": 9,
+      "match": true,
+      "dbMatchesExtract": true
+    },
+    "ingredientMatching": {
+      "matchedLines": 2,
+      "unmatchedLines": 7,
+      "totalLines": 9
+    },
+    "historicalPricing": {
+      "historyRows": 10,
+      "staleHistoryRows": 1,
+      "ghostHistoryRows": 7,
+      "staleDetails": [
+        {
+          "name": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+          "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+          "extractUnitPrice": 6.29,
+          "historyNewPrice": 3.145,
+          "delta": 3.15
+        }
+      ]
+    },
+    "dashboardTotals": {
+      "dbLineSum": 300.95,
+      "extractLineSum": 131.87,
+      "headerTotal": 370.17,
+      "extractHeaderTotal": 68.07,
+      "dbLineSumMatchesExtract": false,
+      "headerMatchesDbLines": false
+    },
+    "opportunities": {
+      "stalePriceSignals": 1,
+      "note": "Opportunity/margin alerts derive from ingredient_price_history — stale rows propagate wrong inflation signals"
+    },
+    "supplierIntelligence": {
+      "supplierName": "AVILUDO",
+      "lineCount": 9,
+      "matchedPct": 22.22
+    },
+    "staleRows": {
+      "count": 5,
+      "dbOnly": [],
+      "extractOnly": [],
+      "fieldDrift": [
+        {
+          "name": "Filete de Anchovas Alconfrisa Lt 495 g",
+          "diffs": [
+            "total"
+          ],
+          "db": {
+            "id": "ebe7d09a-e81b-4490-9ee3-fdbfdc484a5a",
+            "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+            "name": "Filete de Anchovas Alconfrisa Lt 495 g",
+            "quantity": 2,
+            "unit": "un",
+            "unit_price": 9.49,
+            "total": 18.98,
+            "created_at": "2026-06-12T22:53:48.674914+00:00"
+          },
+          "extract": {
+            "name": "Filete de Anchovas Alconfrisa Lt 495 g",
+            "quantity": 2,
+            "unit": "un",
+            "unit_price": 9.49,
+            "total": 9.49
+          }
+        },
+        {
+          "name": "Ovo Liquido Past.Gema Dovo 1kg",
+          "diffs": [
+            "total"
+          ],
+          "db": {
+            "id": "60f7ebbb-1dff-46e4-9a04-5c6ebd2f8b4a",
+            "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+            "name": "Ovo Liquido Past.Gema Dovo 1kg",
+            "quantity": 6,
+            "unit": "un",
+            "unit_price": 10.19,
+            "total": 61.14,
+            "created_at": "2026-06-12T22:53:48.674914+00:00"
+          },
+          "extract": {
+            "name": "Ovo Líquido Past.Gema Dovo 1kg",
+            "quantity": 6,
+            "unit": "un",
+            "unit_price": 10.19,
+            "total": 10.19
+          }
+        },
+        {
+          "name": "Atum Óleo Bolsa Nau Catineta 1 Kg",
+          "diffs": [
+            "total"
+          ],
+          "db": {
+            "id": "3e2c9fc8-3724-4930-b180-87dfe9db6334",
+            "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+            "name": "Atum Óleo Bolsa Nau Catineta 1 Kg",
+            "quantity": 2,
+            "unit": "un",
+            "unit_price": 6.29,
+            "total": 12.58,
+            "created_at": "2026-06-12T22:53:48.674914+00:00"
+          },
+          "extract": {
+            "name": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+            "quantity": 2,
+            "unit": "un",
+            "unit_price": 6.29,
+            "total": 6.29
+          }
+        },
+        {
+          "name": "Chocolate Pantagruel 10x200g",
+          "diffs": [
+            "total"
+          ],
+          "db": {
+            "id": "37370dbb-2290-40da-8e1c-a248ea1b57a6",
+            "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+            "name": "Chocolate Pantagruel 10x200g",
+            "quantity": 2,
+            "unit": "cx",
+            "unit_price": 29.19,
+            "total": 58.38,
+            "created_at": "2026-06-12T22:53:48.674914+00:00"
+          },
+          "extract": {
+            "name": "Chocolate Pantagruel 10x200g",
+            "quantity": 2,
+            "unit": "cx",
+            "unit_price": 29.19,
+            "total": 29.19
+          }
+        },
+        {
+          "name": "Nata Reny Picot 22% 6x1L",
+          "diffs": [
+            "total"
+          ],
+          "db": {
+            "id": "8afcce6e-fc1c-4065-8f61-ceefda947485",
+            "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+            "name": "Nata Reny Picot 22% 6x1L",
+            "quantity": 5,
+            "unit": "cx",
+            "unit_price": 18.29,
+            "total": 91.45,
+            "created_at": "2026-06-12T22:53:48.674914+00:00"
+          },
+          "extract": {
+            "name": "Nata Reny Picot 22% 6x1L",
+            "quantity": 5,
+            "unit": "cx",
+            "unit_price": 18.29,
+            "total": 18.29
+          }
+        }
+      ]
+    },
+    "duplicatePurchases": {
+      "count": 0,
+      "duplicates": []
+    },
+    "ghostPurchases": {
+      "count": 7,
+      "details": [
+        {
+          "historyId": "d72bf77a-eb4c-4ade-a26f-e01c0b7e6a5b",
+          "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+          "newPrice": 2.919,
+          "reason": "price_history row with no v31 extract line match"
+        },
+        {
+          "historyId": "73df8387-6906-4341-8e33-0864f70f502a",
+          "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+          "newPrice": 0.9289999999999999,
+          "reason": "price_history row with no v31 extract line match"
+        },
+        {
+          "historyId": "2767b722-0985-45a8-9c80-9e9dae611142",
+          "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+          "newPrice": 3.0483333333333333,
+          "reason": "price_history row with no v31 extract line match"
+        },
+        {
+          "historyId": "952119dc-8645-4a5f-a3ff-191ae1a57ea8",
+          "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+          "newPrice": 4.745,
+          "reason": "price_history row with no v31 extract line match"
+        },
+        {
+          "historyId": "e967f673-1dc5-4390-90e6-464b66ec2a4b",
+          "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+          "newPrice": 1.6983333333333333,
+          "reason": "price_history row with no v31 extract line match"
+        },
+        {
+          "historyId": "d723199d-a9bd-49e2-9149-b30a91c9c30d",
+          "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+          "newPrice": 3.6649999999999996,
+          "reason": "price_history row with no v31 extract line match"
+        },
+        {
+          "historyId": "bc6b61db-7e1f-477e-9b9f-a8103bfd3db2",
+          "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+          "newPrice": 1.1208333333333333,
+          "reason": "price_history row with no v31 extract line match"
+        }
+      ]
+    }
+  },
+  "extraction": {
+    "status": 200,
+    "itemCountRaw": 9,
+    "itemCountNormalized": 9,
+    "supplier": "AVILUDO",
+    "total": 68.07
+  },
+  "db": {
+    "itemCount": 9,
+    "oldestItemCreatedAt": "2026-06-12T22:53:48.674914+00:00",
+    "newestItemCreatedAt": "2026-06-12T22:53:48.674914+00:00"
+  },
+  "matching": [
+    {
+      "name": "Filete de Anchovas Alconfrisa Lt 495 g",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Ovo Líquido Past.Gema Dovo 1kg",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Pepinos Extra II Frasco 6x720g",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+      "matched": true,
+      "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+      "method": "confirmed_alias"
+    },
+    {
+      "name": "Arroz Agulha Metro Chef 12x1kg",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Chocolate Pantagruel 10x200g",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Açúcar Branco Metro Chef 10x1Kg",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Nata Reny Picot 22% 6x1L",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Mozzarella Fior di Latte 2Kg",
+      "matched": true,
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "method": "confirmed_alias"
+    }
+  ]
+}

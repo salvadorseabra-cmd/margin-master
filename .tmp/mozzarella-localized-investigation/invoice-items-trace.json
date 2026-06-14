@@ -1,0 +1,105 @@
+{
+  "generated_at": "2026-06-13T22:26:18.988Z",
+  "invoices": [
+    {
+      "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier_name": "IL BOCCONCINO Distribuição ALIMENTAR",
+      "invoice_date": "2026-05-08",
+      "created_at": "2026-06-10T17:46:51.553519+00:00",
+      "total": 290.64
+    },
+    {
+      "id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier_name": "AVILUDO",
+      "invoice_date": "2026-04-17",
+      "created_at": "2026-06-09T13:21:21.573648+00:00",
+      "total": 370.17
+    }
+  ],
+  "items": [
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "itemId": "efb979b3-0a24-41f6-92a8-cb257f27106a",
+      "raw": {
+        "id": "efb979b3-0a24-41f6-92a8-cb257f27106a",
+        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "quantity": 10,
+        "unit": "un",
+        "unit_price": 8.12,
+        "total": 81.23,
+        "created_at": "2026-06-13T21:53:58.238798+00:00"
+      },
+      "normalizedFields": {
+        "id": "replay",
+        "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "quantity": 10,
+        "unit": "un",
+        "unit_price": 8.12,
+        "total": 81.23
+      },
+      "recipeOperationalCostFields": {
+        "current_price": 8.12,
+        "purchase_quantity": 10,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 125
+      },
+      "operationalCostFields": {
+        "current_price": 8.12,
+        "purchase_quantity": 10,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 125
+      },
+      "formula": {
+        "operationalUnitPriceForPriceHistory": "operationalUnitPriceForPriceHistory(packPrice=current_price, purchase_quantity) = current_price / max(purchase_quantity, 1)",
+        "resolvedOperationalUnitCostEur": "resolvedOperationalUnitCostEur = current_price / purchaseQuantityDenom(purchase_quantity)"
+      },
+      "computedStoredNewPrice": 0.8119999999999999,
+      "computedOperationalUnitCost": 0.8119999999999999,
+      "netUnitFromTotal": 8.123000000000001
+    },
+    {
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "itemId": "cf79d75e-b648-433b-8458-a3da140c12bb",
+      "raw": {
+        "id": "cf79d75e-b648-433b-8458-a3da140c12bb",
+        "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "name": "Mozzarella Flor di Latte 2Kg",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 13.69,
+        "total": 13.69,
+        "created_at": "2026-06-13T21:54:21.349129+00:00"
+      },
+      "normalizedFields": {
+        "id": "replay",
+        "name": "Mozzarella Flor di Latte 2Kg",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 13.69,
+        "total": 13.69
+      },
+      "recipeOperationalCostFields": {
+        "current_price": 13.69,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 2000
+      },
+      "operationalCostFields": {
+        "current_price": 13.69,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 2000
+      },
+      "formula": {
+        "operationalUnitPriceForPriceHistory": "operationalUnitPriceForPriceHistory(packPrice=current_price, purchase_quantity) = current_price / max(purchase_quantity, 1)",
+        "resolvedOperationalUnitCostEur": "resolvedOperationalUnitCostEur = current_price / purchaseQuantityDenom(purchase_quantity)"
+      },
+      "computedStoredNewPrice": 13.69,
+      "computedOperationalUnitCost": 13.69,
+      "netUnitFromTotal": 13.69
+    }
+  ]
+}

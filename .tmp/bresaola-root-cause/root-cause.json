@@ -1,0 +1,104 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio Italia",
+  "product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+  "rowRank": 2,
+  "financialErrorEuro": 10.0,
+  "generatedAt": "2026-06-13T01:00:00.000Z",
+  "question": "Is Bresaola €10 residual deterministic extraction bug, GPT variance, or GT issue?",
+  "verdict": {
+    "classification": "B",
+    "label": "GPT_variance",
+    "deterministicBug": false,
+    "gtIssueForEuro10": false,
+    "summary": "€10 is reproducible only intermittently (1/5 v27 stability runs; 40% total stability). Pass C oscillates between copying VALOR 49,48 € correctly and synthesizing wrong totals (notably 39,48 ≈ qty×unit or near Ventricina 39,49). v26 single-run €0 was a lucky draw; historical pre-v26 and v23 runs show the same instability. GT total 49,48 matches visible invoice."
+  },
+  "proveMatrix": {
+    "A_deterministic_extraction_bug": {
+      "hypothesis": "Every v27 invoke returns total 39.48 (€10 error)",
+      "evidence": [
+        "v27-stability: 2/5 runs total 49.48 (€0)",
+        "v27-stability: 3/5 runs wrong with varying totals (44.83, 39.48, 45.29)",
+        "4 unique total values across 5 runs — not deterministic"
+      ],
+      "result": "REJECTED"
+    },
+    "B_gpt_variance": {
+      "hypothesis": "Pass C non-determinism on Emporio weight/discount rows",
+      "evidence": [
+        "5-run stability 40% correct total; oscillates correct/incorrect",
+        "€10 exact on 1/5 runs (run 4) — same failure mode as v27 audit",
+        "v23: run1 total 49.48, run2 total 49.88 — historical variance",
+        "v26 official rerun €0 but pre-v26 lab rerun total 45.26",
+        "Qty/unit trade off when total correct (v26: 1.83×27.05≈49.48; stability: 2.5×19.79≈49.48)",
+        "Bad runs: total ≈ qty×unit (audit 2.38×16.64≈39.48) instead of VALOR 49,48",
+        "Same Emporio variance family as Gorgonzola (gorgonzola-root-cause)"
+      ],
+      "result": "CONFIRMED"
+    },
+    "C_gt_issue": {
+      "hypothesis": "GT total wrong vs visible invoice",
+      "evidence": [
+        "Visible Preço Total: 49,48 €",
+        "GT total: 49.48 — matches visible",
+        "Good runs (v26, refinement, 2/5 v27) all hit 49.48",
+        "GT qty 2.8 vs printed 1,83 is catalog normalization — does not explain €10 total error"
+      ],
+      "result": "REJECTED for €10"
+    }
+  },
+  "exactFieldChanged": {
+    "primary": "total",
+    "visibleAndGt": 49.48,
+    "v27AuditBadRun": { "total": 39.48, "deltaEuro": 10.0 },
+    "secondary": {
+      "quantity": { "visible": 1.83, "gt": 2.8, "badRun": 2.38, "stabilityRange": [2.3, 3.3] },
+      "unit_price": { "visibleGross": 33.8, "gtNet": 17.68, "badRun": 16.64 }
+    },
+    "failureModes": [
+      "qty×unit synthesis (39.48 ≈ 2.38×16.64 or 3.3×12)",
+      "Possible digit bleed 49→39 or row-value confusion with Ventricina 39,49 € (same v27 audit extract)"
+    ]
+  },
+  "firstFailingStage": {
+    "stage": "passC_table_extraction",
+    "stageNumber": 3,
+    "geometryOk": true,
+    "binderRole": "pass-through only"
+  },
+  "stabilityProbe": {
+    "deployVersion": 27,
+    "runs": 5,
+    "source": ".tmp/bresaola-root-cause/stability.json",
+    "perfectTotalRuns": "2/5",
+    "stabilityPercent": 40,
+    "euro10Reproducible": "1/5 (20%)",
+    "totalValues": [49.48, 44.83, 39.48, 45.29],
+    "avgFinancialErrorEuro": 3.77,
+    "deterministic": false
+  },
+  "v26Comparison": {
+    "officialV26Rerun": { "total": 49.48, "financialErrorEuro": 0, "note": "Single lucky draw" },
+    "preV26LabRerun": { "total": 45.26, "financialErrorEuro": 4.22, "source": "final-validation-lab-rerun" },
+    "sameBehaviorAsV27": true,
+    "conclusion": "v26 does not deterministically fix Bresaola — variance predates v27"
+  },
+  "baselineComparison": [
+    { "run": "refinement", "qty": 2.28, "unit_price": 21.8, "total": 49.64, "financialErrorEuro": 0.16 },
+    { "run": "v26", "qty": 1.83, "unit_price": 27.05, "total": 49.48, "financialErrorEuro": 0 },
+    { "run": "v27_audit_single", "qty": 2.38, "unit_price": 16.64, "total": 39.48, "financialErrorEuro": 10.0 },
+    { "run": "v27_stability_run4", "qty": 3.3, "unit_price": 12, "total": 39.48, "financialErrorEuro": 10.0 }
+  ],
+  "confidencePercent": 87,
+  "confidenceRationale": "5-run probe directly disproves determinism; visible/GT total agreement; v23/v26 historical variance; 13% reserved for dual failure-mode ambiguity (bleed vs digit vs qty×unit).",
+  "recommendedFix": {
+    "category": "prompt",
+    "promptActions": [
+      "Emporio POSITIVE: Bresaola weight row — Qtd 1,83 · Preço Unit 33,80 · Desc 20,00 · Preço Total 49,48 → line_total_net 49.48",
+      "NEGATIVE: never emit 39,48 when Preço Total prints 49,48; distinguish from Ventricina row 39,49",
+      "Reinforce VALOR copy over qty×unit on discounted weight rows (extends v27 TOTAL COLUMN ISOLATION)"
+    ],
+    "expectedImprovementEuro": 10.0,
+    "expectedImprovementNote": "Full €10 when total stabilizes to 49.48 every run. Current 40% stability → prompt hardening target 90%+; avg error would drop from €3.77 toward €0."
+  }
+}

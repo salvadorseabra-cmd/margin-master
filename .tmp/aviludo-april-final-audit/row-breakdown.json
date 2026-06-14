@@ -1,0 +1,143 @@
+{
+  "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+  "label": "Aviludo April",
+  "deployVersion": 26,
+  "groundTruthSource": ".tmp/field-accuracy-audit/ground-truth.json",
+  "v26Source": ".tmp/final-validation-lab-rerun-v26/extracts/c2f52357-0f80-491a-ba14-c97ff4837472.json",
+  "refinementSource": ".tmp/passc-refinement-validation/reextract/c2f52357-0f80-491a-ba14-c97ff4837472.json",
+  "totalFinancialErrorEuro": 169.08,
+  "sumCheck": {
+    "rowDeltas": [73.16, 50.95, 29.19, 9.49, 6.29, 0, 0, 0, 0],
+    "sum": 169.08,
+    "accountsFor100Pct": true
+  },
+  "rows": [
+    {
+      "rank": 1,
+      "product": "Nata Reny Picot 22% 6x1L",
+      "groundTruth": { "qty": 5, "unit": "cx", "unit_price": 18.29, "total": 91.45 },
+      "v26": { "qty": 5, "unit": "cx", "unit_price": 18.29, "total": 18.29 },
+      "refinement": { "qty": 5, "unit": "CX", "unit_price": 18.29, "total": 91.45 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": -73.16 },
+      "financialErrorEuro": 73.16,
+      "pctOfTotalError": 43.3,
+      "category": "column_shift",
+      "bugVsGT": "real_extraction_error",
+      "firstFailingStage": "passC_table_extraction",
+      "mechanism": "line_total_net = gross_unit_price (18.29) instead of VALOR 91.45; 5×18.29"
+    },
+    {
+      "rank": 2,
+      "product": "Ovo Líquido Past.Gema Dovo 1kg",
+      "groundTruth": { "qty": 6, "unit": "un", "unit_price": 10.19, "total": 61.14 },
+      "v26": { "qty": 6, "unit": "un", "unit_price": 10.19, "total": 10.19 },
+      "refinement": { "qty": 6, "unit": "UN", "unit_price": 10.19, "total": 61.14 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": -50.95 },
+      "financialErrorEuro": 50.95,
+      "pctOfTotalError": 30.1,
+      "category": "column_shift",
+      "bugVsGT": "real_extraction_error",
+      "firstFailingStage": "passC_table_extraction",
+      "mechanism": "line_total_net = 10.19 (= unit price) instead of 61.14"
+    },
+    {
+      "rank": 3,
+      "product": "Chocolate Pantagruel 10x200g",
+      "groundTruth": { "qty": 2, "unit": "cx", "unit_price": 29.19, "total": 58.38 },
+      "v26": { "qty": 2, "unit": "cx", "unit_price": 29.19, "total": 29.19 },
+      "refinement": { "qty": 2, "unit": "CX", "unit_price": 29.19, "total": 58.38 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": -29.19 },
+      "financialErrorEuro": 29.19,
+      "pctOfTotalError": 17.3,
+      "category": "column_shift",
+      "bugVsGT": "real_extraction_error",
+      "firstFailingStage": "passC_table_extraction",
+      "mechanism": "line_total_net = 29.19 instead of 58.38"
+    },
+    {
+      "rank": 4,
+      "product": "Filete de Anchovas Alconfrisa Lt 495 g",
+      "groundTruth": { "qty": 2, "unit": "un", "unit_price": 9.49, "total": 18.98 },
+      "v26": { "qty": 2, "unit": "un", "unit_price": 9.49, "total": 9.49 },
+      "refinement": { "qty": 2, "unit": "UN", "unit_price": 9.49, "total": 18.98 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": -9.49 },
+      "financialErrorEuro": 9.49,
+      "pctOfTotalError": 5.6,
+      "category": "column_shift",
+      "bugVsGT": "real_extraction_error",
+      "firstFailingStage": "passC_table_extraction",
+      "mechanism": "line_total_net = 9.49 instead of 18.98"
+    },
+    {
+      "rank": 5,
+      "product": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+      "groundTruth": { "qty": 2, "unit": "un", "unit_price": 6.29, "total": 12.58 },
+      "v26": { "qty": 2, "unit": "un", "unit_price": 6.29, "total": 6.29 },
+      "refinement": { "qty": 2, "unit": "UN", "unit_price": 6.29, "total": 12.58 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": -6.29 },
+      "financialErrorEuro": 6.29,
+      "pctOfTotalError": 3.7,
+      "category": "column_shift",
+      "bugVsGT": "real_extraction_error",
+      "firstFailingStage": "passC_table_extraction",
+      "mechanism": "line_total_net = 6.29 instead of 12.58"
+    },
+    {
+      "rank": 6,
+      "product": "Mozzarella Flor di Latte 2Kg",
+      "groundTruth": { "qty": 1, "unit": "un", "unit_price": 13.69, "total": 13.69 },
+      "v26": { "qty": 1, "unit": "un", "unit_price": 13.69, "total": 13.69 },
+      "refinement": { "qty": 1, "unit": "UN", "unit_price": 13.69, "total": 13.69 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": 0 },
+      "financialErrorEuro": 0,
+      "pctOfTotalError": 0,
+      "category": "none",
+      "bugVsGT": "correct",
+      "note": "qty=1: unit_price equals line total — failure mode not triggered"
+    },
+    {
+      "rank": 7,
+      "product": "Açúcar Branco Metro Chef 10x1Kg",
+      "groundTruth": { "qty": 1, "unit": "cx", "unit_price": 9.29, "total": 9.29 },
+      "v26": { "qty": 1, "unit": "cx", "unit_price": 9.29, "total": 9.29 },
+      "refinement": { "qty": 1, "unit": "CX", "unit_price": 9.29, "total": 9.29 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": 0 },
+      "financialErrorEuro": 0,
+      "pctOfTotalError": 0,
+      "category": "none",
+      "bugVsGT": "correct"
+    },
+    {
+      "rank": 8,
+      "product": "Arroz Agulha Metro Chef 12x1kg",
+      "groundTruth": { "qty": 1, "unit": "cx", "unit_price": 13.45, "total": 13.45 },
+      "v26": { "qty": 1, "unit": "cx", "unit_price": 13.45, "total": 13.45 },
+      "refinement": { "qty": 1, "unit": "CX", "unit_price": 13.45, "total": 13.45 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": 0 },
+      "financialErrorEuro": 0,
+      "pctOfTotalError": 0,
+      "category": "none",
+      "bugVsGT": "correct"
+    },
+    {
+      "rank": 9,
+      "product": "Pepinos Extra II Frasco 6x720g",
+      "groundTruth": { "qty": 1, "unit": "cx", "unit_price": 21.99, "total": 21.99 },
+      "v26": { "qty": 1, "unit": "cx", "unit_price": 21.99, "total": 21.99 },
+      "refinement": { "qty": 1, "unit": "CX", "unit_price": 21.99, "total": 21.99 },
+      "deltas": { "qty": 0, "unit_price": 0, "total": 0 },
+      "financialErrorEuro": 0,
+      "pctOfTotalError": 0,
+      "category": "none",
+      "bugVsGT": "correct"
+    }
+  ],
+  "patternSummary": {
+    "failingCondition": "qty > 1",
+    "failureRate": "5/5 multi-qty rows",
+    "correctCondition": "qty = 1",
+    "correctRate": "4/4 single-qty rows",
+    "qtyAndUnitPriceAccuracy": "9/9 MATCH on v26",
+    "onlyFieldWrong": "line_total_net (mapped to total)"
+  }
+}

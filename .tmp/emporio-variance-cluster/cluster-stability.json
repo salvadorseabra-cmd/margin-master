@@ -1,0 +1,212 @@
+{
+  "generated_at": "2026-06-12T23:48:11.959Z",
+  "deployVersion": 27,
+  "groundTruth": {
+    "gorgonzola": {
+      "total": 13.44
+    },
+    "bresaola": {
+      "total": 49.48
+    },
+    "sanpellegrino": {
+      "total": 38.56
+    }
+  },
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "elapsedMs": 20876,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiore 1/8 - 1,5kg",
+        "quantity": 2.2,
+        "unit": null,
+        "unit_price": 7.65,
+        "total": 13.44
+      },
+      "bresaola": {
+        "name": "Rigamonti - Bresaola Punta d’Anca Oro 1/2 - 1,5kg",
+        "quantity": 2.6,
+        "unit": null,
+        "unit_price": 15.19,
+        "total": 39.48
+      },
+      "sanpellegrino": {
+        "name": "SanPellegrino - Água in vitro 75cl x 15ud",
+        "quantity": 15,
+        "unit": null,
+        "unit_price": 0.82,
+        "total": 12.3
+      },
+      "errors": {
+        "gorgonzola": 0,
+        "bresaola": 10,
+        "sanpellegrino": 26.26
+      },
+      "allThreeCorrect": false
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "elapsedMs": 16022,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1.5kg\nProduto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 6.65,
+        "total": 13.44
+      },
+      "bresaola": {
+        "name": "Rigmanti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg\nProduto de Stock",
+        "quantity": 2.3,
+        "unit": null,
+        "unit_price": 21.52,
+        "total": 49.48
+      },
+      "sanpellegrino": {
+        "name": "SanPellegrino - Água in vitro 75cl x 15ud\nProduto de Stock",
+        "quantity": 1,
+        "unit": null,
+        "unit_price": 14.82,
+        "total": 14.82
+      },
+      "errors": {
+        "gorgonzola": 0,
+        "bresaola": 0,
+        "sanpellegrino": 23.74
+      },
+      "allThreeCorrect": false
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "elapsedMs": 20996,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello \"18\" - 1,5kg Produto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 8.25,
+        "total": 13.44
+      },
+      "bresaola": {
+        "name": "Rugamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock",
+        "quantity": 3,
+        "unit": null,
+        "unit_price": 13.16,
+        "total": 39.48
+      },
+      "sanpellegrino": {
+        "name": "SanPellegrino - Acqua in Vetro 75cl x 15ud Produto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 24.42,
+        "total": 48.84
+      },
+      "errors": {
+        "gorgonzola": 0,
+        "bresaola": 10,
+        "sanpellegrino": 10.28
+      },
+      "allThreeCorrect": false
+    },
+    {
+      "run": 4,
+      "status": 200,
+      "elapsedMs": 15144,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrotti 1/8 - 1,5kg\nProduto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 13.22,
+        "total": 13.44
+      },
+      "bresaola": {
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg\nProduto de Stock",
+        "quantity": 2.35,
+        "unit": null,
+        "unit_price": 18.97,
+        "total": 44.54
+      },
+      "sanpellegrino": {
+        "name": "SanPellegrino - Agua in vitro 75cl x 15ud\nProduto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 13.46,
+        "total": 26.92
+      },
+      "errors": {
+        "gorgonzola": 0,
+        "bresaola": 4.94,
+        "sanpellegrino": 11.64
+      },
+      "allThreeCorrect": false
+    },
+    {
+      "run": 5,
+      "status": 200,
+      "elapsedMs": 16797,
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello/gt 1/8 - 1,5kg",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 13.22,
+        "total": 13.44
+      },
+      "bresaola": {
+        "name": "Rigonimenti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+        "quantity": 2.38,
+        "unit": null,
+        "unit_price": 19.03,
+        "total": 45.38
+      },
+      "sanpellegrino": {
+        "name": "SanPellegrino - Acqua in vetro 75cl x 15ud",
+        "quantity": 1,
+        "unit": null,
+        "unit_price": 12.04,
+        "total": 12.04
+      },
+      "errors": {
+        "gorgonzola": 0,
+        "bresaola": 4.1,
+        "sanpellegrino": 26.52
+      },
+      "allThreeCorrect": false
+    }
+  ],
+  "summary": {
+    "allThreeCorrectRuns": 0,
+    "gorgonzola": {
+      "perfectRuns": "5/5",
+      "stabilityPercent": 100,
+      "totalUnique": [
+        13.44
+      ],
+      "avgFinancialErrorEuro": 0
+    },
+    "bresaola": {
+      "perfectRuns": "1/5",
+      "stabilityPercent": 20,
+      "totalUnique": [
+        39.48,
+        49.48,
+        44.54,
+        45.38
+      ],
+      "avgFinancialErrorEuro": 5.81
+    },
+    "sanpellegrino": {
+      "perfectRuns": "0/5",
+      "stabilityPercent": 0,
+      "totalUnique": [
+        12.3,
+        14.82,
+        48.84,
+        26.92,
+        12.04
+      ],
+      "avgFinancialErrorEuro": 19.69
+    },
+    "correlatedBadRuns": 4
+  }
+}

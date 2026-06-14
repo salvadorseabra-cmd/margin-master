@@ -1,0 +1,174 @@
+{
+  "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+  "label": "Bidfood",
+  "deployVersion": 31,
+  "operationalStatus": "STALE",
+  "issues": [
+    "field_drift: 1 row(s) differ numerically",
+    "stale_price_history: 1 row(s)",
+    "dashboard_header_mismatch: header €292.7 vs lines €170.57"
+  ],
+  "checks": {
+    "invoiceItemsCount": {
+      "db": 11,
+      "v31Extract": 11,
+      "expected": 11,
+      "match": true,
+      "dbMatchesExtract": true
+    },
+    "ingredientMatching": {
+      "matchedLines": 1,
+      "unmatchedLines": 10,
+      "totalLines": 11
+    },
+    "historicalPricing": {
+      "historyRows": 1,
+      "staleHistoryRows": 1,
+      "ghostHistoryRows": 0,
+      "staleDetails": [
+        {
+          "name": "Pepino",
+          "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+          "extractUnitPrice": 1.77,
+          "historyNewPrice": 0.00177,
+          "delta": 1.77
+        }
+      ]
+    },
+    "dashboardTotals": {
+      "dbLineSum": 170.57,
+      "extractLineSum": 171.86,
+      "headerTotal": 292.7,
+      "extractHeaderTotal": 292.7,
+      "dbLineSumMatchesExtract": false,
+      "headerMatchesDbLines": false
+    },
+    "opportunities": {
+      "stalePriceSignals": 1,
+      "note": "Opportunity/margin alerts derive from ingredient_price_history — stale rows propagate wrong inflation signals"
+    },
+    "supplierIntelligence": {
+      "supplierName": "Bidfood Portugal",
+      "lineCount": 11,
+      "matchedPct": 9.09
+    },
+    "staleRows": {
+      "count": 1,
+      "dbOnly": [],
+      "extractOnly": [],
+      "fieldDrift": [
+        {
+          "name": "Courgettes",
+          "diffs": [
+            "total"
+          ],
+          "db": {
+            "id": "1637fd11-84fc-49df-8f72-fca69ba98efd",
+            "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+            "name": "Courgettes",
+            "quantity": 3.3,
+            "unit": "kg",
+            "unit_price": 1.95,
+            "total": 5.15,
+            "created_at": "2026-06-12T22:54:35.252817+00:00"
+          },
+          "extract": {
+            "name": "Courgettes",
+            "quantity": 3.3,
+            "unit": "kg",
+            "unit_price": 1.95,
+            "total": 6.44
+          }
+        }
+      ]
+    },
+    "duplicatePurchases": {
+      "count": 0,
+      "duplicates": []
+    },
+    "ghostPurchases": {
+      "count": 0,
+      "details": []
+    }
+  },
+  "extraction": {
+    "status": 200,
+    "itemCountRaw": 11,
+    "itemCountNormalized": 11,
+    "supplier": "Bidfood Portugal, SA",
+    "total": 292.7
+  },
+  "db": {
+    "itemCount": 11,
+    "oldestItemCreatedAt": "2026-06-12T22:54:35.252817+00:00",
+    "newestItemCreatedAt": "2026-06-12T22:54:35.252817+00:00"
+  },
+  "matching": [
+    {
+      "name": "Manteiga Coimbra s/Sal Emb 1 Kg",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Tomilho",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Salada Ibérica FSTK EMB. 250g",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Manjericão",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Hortelã",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Pepino",
+      "matched": true,
+      "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "method": "catalog_fuzzy"
+    },
+    {
+      "name": "Pêra Abacate Hasse",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Courgettes",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Alho Francês",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Abóbora Butternut",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    }
+  ]
+}

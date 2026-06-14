@@ -1,0 +1,106 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio Italia (VL Validation Lab UUID)",
+  "replacementInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "generated_at": "2026-06-13T18:12:00.000Z",
+  "note": "invoice_items has no soft-delete or audit log; timeline reconstructed from DB snapshots and .tmp audits",
+  "events": [
+    {
+      "timestamp": "2026-06-10T18:27:04Z",
+      "event": "invoice_created",
+      "source": ".tmp/emporio-footer-audit/emporio/db-record.json",
+      "detail": "Invoice 17aa3591 uploaded; file Screenshot_2026-06-07_at_21.05.07.png",
+      "itemCount": 0,
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb"
+    },
+    {
+      "timestamp": "2026-06-10T18:27:15Z",
+      "event": "initial_extraction_persisted",
+      "source": ".tmp/emporio-italia-investigation/invoice-items.json",
+      "detail": "First upload extraction → 8 invoice_items inserted",
+      "itemCount": 8,
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb"
+    },
+    {
+      "timestamp": "2026-06-11T22:41:41Z",
+      "event": "concurrent_re_read_duplicate_insert",
+      "source": ".tmp/emporio-duplicate-audit/REPORT.md",
+      "detail": "Two overlapping runExtraction calls: DELETE old 8 → two INSERT batches 9ms apart",
+      "itemCount": 16,
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "path": "runExtraction DELETE + double INSERT race (pre-mutex fix)"
+    },
+    {
+      "timestamp": "2026-06-11T22:48:09Z",
+      "event": "duplicate_audit_confirmed",
+      "source": ".tmp/emporio-duplicate-audit/duplicate-trace.json",
+      "detail": "16 rows in DB; fresh single extract returns 8 — persistence bug not extraction",
+      "itemCount": 16,
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb"
+    },
+    {
+      "timestamp": "2026-06-11T22:53:16Z",
+      "event": "replacement_invoice_created",
+      "source": "live DB query 2026-06-13",
+      "detail": "New invoice ab52796d created — same Emporio supplier, new file upload (1781218392988 screenshot)",
+      "itemCount": 0,
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09"
+    },
+    {
+      "timestamp": "2026-06-11T23:37:47Z",
+      "event": "replacement_extraction_persisted",
+      "source": "live DB query 2026-06-13",
+      "detail": "8 invoice_items inserted on replacement invoice (single batch)",
+      "itemCount": 8,
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "path": "uploadOne → runExtraction happy path"
+    },
+    {
+      "timestamp": "2026-06-11T23:37:47Z to 2026-06-13T18:08:48Z",
+      "event": "original_invoice_deleted",
+      "source": "live DB query — invoice 17aa3591 returns null",
+      "detail": "Entire invoices row deleted; CASCADE removed all invoice_items. No orphan price_history.",
+      "itemCount": 0,
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "path": "removeRow() — invoices.tsx:2186-2189 manual delete",
+      "confidence": "HIGH — only code path that deletes invoice parent row"
+    },
+    {
+      "timestamp": "2026-06-12T00:00:00Z",
+      "event": "reread_safety_fix_deployed",
+      "source": ".tmp/reread-safety-fix-validation/REPORT.md",
+      "detail": "empty-extraction guard + mutex added to runExtraction — would prevent future empty wipes",
+      "appliesTo": "17aa3591 already deleted before this audit"
+    },
+    {
+      "timestamp": "2026-06-13T18:03:44Z",
+      "event": "vl_final_state_audit_v31_extract",
+      "source": ".tmp/vl-final-state-audit/extracts/17aa3591-*.json",
+      "detail": "v31 extract on geometry PNG returns 8 items — extraction works; DB query on deleted UUID returns 0",
+      "itemCount": 8,
+      "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb"
+    }
+  ],
+  "ruledOut": [
+    {
+      "hypothesis": "Empty extraction wipe on 17aa3591",
+      "status": "UNLIKELY for final 0 state",
+      "reason": "Empty wipe deletes items but leaves invoices row. Invoice row is also gone — requires parent DELETE."
+    },
+    {
+      "hypothesis": "Re-read DELETE without INSERT failure",
+      "status": "UNLIKELY for final 0 state",
+      "reason": "runExtraction only deletes invoice_items, not invoices. Parent row deletion = removeRow."
+    },
+    {
+      "hypothesis": "Concurrent duplicate then delete",
+      "status": "PARTIAL — duplicate caused user remediation",
+      "reason": "16-row duplicate triggered re-upload + eventual manual delete of corrupted invoice"
+    },
+    {
+      "hypothesis": "Stale local state only",
+      "status": "RULED OUT",
+      "reason": "service_role DB query confirms invoice absent server-side"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-06-13T20:50:31.920Z",
+  "before": {
+    "operationalIntelligenceStatus": "PARTIAL",
+    "mozzarellaPriceIncreaseAlert": true,
+    "pepinoPriceDecreaseAlert": true,
+    "ownerReviewFalseOpportunity": true,
+    "supplierBetterLine1341": true,
+    "supplierWatchlist1341": true,
+    "alertsCount": 2,
+    "note": "Pre-P0 baseline from operational-intelligence-integrity-audit (identity collapse active)"
+  },
+  "after": {
+    "mozzarellaPriceIncreaseAlert": false,
+    "pepinoPriceDecreaseAlert": false,
+    "ownerReviewFalseOpportunity": false,
+    "supplierBetterLine1341": false,
+    "supplierWatchlist1341": false,
+    "alertsCount": 0,
+    "ownerReviewOpportunitiesCount": 0
+  },
+  "historicalPricing": {
+    "before": {
+      "status": "PARTIAL",
+      "opportunityErrors": 3
+    },
+    "after": {
+      "status": "PARTIAL",
+      "opportunityErrorsInRawDb": 2,
+      "note": "Raw DB rows still carry poisoned deltas; read-path filters OI"
+    }
+  }
+}

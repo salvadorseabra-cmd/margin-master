@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-06-12T02:30:00.000Z",
+  "title": "Emporio Discount Column Failure — Root Cause",
+  "rootCause": "GPT Pass C fails to populate discount_pct on Emporio meat rows because (1) Desc.(%) values are plain decimals without % symbol, visually indistinguishable from prices in a dense 4-number cluster, (2) Pass C table crop clips column headers so GPT lacks Desc.(%) label anchor, (3) prompt examples target Bocconcino-style explicit % suffix not Emporio format. Schema requires discount_pct key but allows null. Result: gross_unit_price and quantity extract reliably; discount_pct null; binder uses gross path.",
+  "firstStageDiscountDisappears": "pass_c_gpt_structured",
+  "issueType": {
+    "primary": "GPT extraction / vision column selection",
+    "contributing": ["Geometry header clip", "Prompt format mismatch"],
+    "notPrimary": ["Schema", "Binder logic", "Tax column confusion", "Lot/expiry confusion"]
+  },
+  "missingOnAllRows": false,
+  "missingOnFocusRows": true,
+  "patternByRow": {
+    "prosciutto": "discount null → gross unit → inflated total (qty×gross)",
+    "mortadella": "same as prosciutto",
+    "ventricina": "discount bleed (17.5 as unit) OR gross path depending on run",
+    "deCecco": "partial — line_total copied, discount effect implicit in total only"
+  },
+  "recommendedFixCategory": {
+    "primary": "Prompt",
+    "secondary": "Geometry",
+    "notNeeded": "Schema",
+    "details": {
+      "prompt": "Emporio-specific negative example: Desc.(%) 17,50 without % → discount_pct 17.5; add positional rule for plain decimals between Preço Unit and Preço Total",
+      "geometry": "Ensure Desc.(%) header visible in Pass C crop (verify top ≤ 430 for Emporio)",
+      "schema": "Already strict; consider post-parse reject when gross+qty×gross≠line_total_net on discounted-layout rows"
+    }
+  },
+  "confidencePct": 86,
+  "financialImpact": {
+    "prosciuttoVsVisible": "+7 to +10 on worst v23 runs",
+    "prosciuttoVsVlGt": "+8 to +11",
+    "ventricinaVsVlGt": "+6 to +6 on worst run",
+    "familyResidual": "€1.40–€11 per affected row depending on run"
+  }
+}

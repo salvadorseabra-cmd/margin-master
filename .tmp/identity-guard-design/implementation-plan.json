@@ -1,0 +1,203 @@
+{
+  "generated_at": "2026-06-13T22:00:00.000Z",
+  "phase": "P0",
+  "name": "Cross-Format History Chain Guard",
+  "mode": "design-only — no implementation in this session",
+  "effort": {
+    "estimatedDays": 1.5,
+    "rangeDays": "1-2",
+    "confidencePercent": 87,
+    "breakdown": [
+      { "task": "Guard module + contract snapshot derivation", "days": 0.5, "files": 1 },
+      { "task": "Write-path wiring (append + reconcile)", "days": 0.5, "files": 2 },
+      { "task": "Read-path filters (OI + alerts + supplier intel)", "days": 0.25, "files": 3 },
+      { "task": "Unit tests (VL cases + regression)", "days": 0.25, "files": 3 },
+      { "task": "VL reconcile backfill + audit re-run", "days": 0.25, "files": 1 }
+    ]
+  },
+  "sequencing": [
+    {
+      "step": 1,
+      "title": "Create guard module",
+      "deliverables": [
+        "derivePurchaseContractSnapshot",
+        "purchaseContractsChainCompatible",
+        "selectChainCompatiblePriorPrice",
+        "isTrustedPriceMovementRow"
+      ],
+      "acceptance": "TC-MOZZARELLA, TC-PEPINO, TC-GINGER-BEER pass in unit tests"
+    },
+    {
+      "step": 2,
+      "title": "Wire write path",
+      "deliverables": [
+        "fetchPriorLinkedHistoryNewPrice uses selectChainCompatiblePriorPrice",
+        "appendIngredientPriceHistoryFromInvoiceLine nulls delta on break",
+        "reconcileIngredientPriceHistoryChain breaks incompatible chains"
+      ],
+      "acceptance": "New invoice persists do not create cross-format delta_percent"
+    },
+    {
+      "step": 3,
+      "title": "Wire read path (defense in depth)",
+      "deliverables": [
+        "rankIngredientPriceMovements filters untrusted",
+        "buildSupplierMovementGroups filters untrusted",
+        "buildOperationalAlertItems skips untrusted movements",
+        "buildSupplierIntelligence uses trusted history only"
+      ],
+      "acceptance": "VL OI replay: 0 identity-collapse opportunities"
+    },
+    {
+      "step": 4,
+      "title": "Backfill existing VL data",
+      "deliverables": [
+        "Run reconcileIngredientPriceHistoryChain for all ingredients with history",
+        "Re-run operational-intelligence-integrity-audit harness",
+        "Re-run historical-pricing-integrity-audit harness"
+      ],
+      "acceptance": "Mozzarella delta_percent null; Pepino delta_percent null; ghost rows unchanged"
+    },
+    {
+      "step": 5,
+      "title": "Document format_change semantics",
+      "deliverables": [
+        "Dev comment on null delta = format_change baseline reset",
+        "Optional: log guard reason in DEV trace only"
+      ],
+      "acceptance": "No schema migration required"
+    }
+  ],
+  "explicitAnswers": {
+    "1_smallestGuardPreventingAllVLFailures": {
+      "answer": "Five-rule core: R1 unit family + R2 countable/weight + R3 extreme ratio (>25 with mismatch, >100 hard) + R5 preservation class + R7 beverage sanity. No schema changes.",
+      "confidencePercent": 89
+    },
+    "2_codePathsNeedingGuard": {
+      "answer": "Write: ingredient-price-history.ts (append + prior pick), ingredient-price-history-reconcile.ts. Read: operational-intelligence-synthesis.ts, margin-alert-data.ts, operational-intelligence-view.ts.",
+      "requiredFiles": 6,
+      "newModule": 1,
+      "confidencePercent": 92
+    },
+    "3_vlFailuresDisappearImmediately": {
+      "mozzarella": {
+        "fixed": true,
+        "mechanism": "R1+R2 break chain → no +1341% delta, no OI risk/opportunity",
+        "confidencePercent": 94
+      },
+      "pepino": {
+        "fixed": true,
+        "mechanism": "R3+R5 break chain → no −99.95% delta, no false opportunity",
+        "confidencePercent": 92
+      },
+      "ginger_beer": {
+        "fixed": "partial",
+        "mechanism": "R7 blocks insert if matched; currently unmatched so latent only",
+        "confidencePercent": 85,
+        "note": "Extraction parse fix still needed for auto-match trust"
+      }
+    },
+    "4_requiresPackVariantArchitecture": {
+      "items": [
+        "Eliminate heuristic name-token guards for routine cases",
+        "Per-supplier Mozzarella intel without concept-level collapse",
+        "Alias memory bound to commercial contract not ingredient_id",
+        "Historical pq/base_unit per row without inference",
+        "Recipe costing default variant selection",
+        "Equivalence groups for intentional substitution"
+      ],
+      "confidencePercent": 88
+    },
+    "5_implementationEffort": {
+      "days": 1.5,
+      "files": 9,
+      "newLOC": 510,
+      "modifiedLOC": 140,
+      "confidencePercent": 87
+    },
+    "6_historicalPricingAuditImpact": {
+      "currentStatus": "PARTIAL",
+      "currentConfidence": 82,
+      "projectedStatus": "PARTIAL → MOSTLY_TRUSTED",
+      "projectedConfidence": 91,
+      "changes": [
+        "Mozzarella rows: non_equivalent_unit_chain → format_change (null delta)",
+        "Pepino Bidfood row: false −99.95% eliminated",
+        "Trusted single-format chains (Atum +4.1%) unchanged",
+        "Ghost rows (14) remain — orthogonal stale DB issue",
+        "Ginger Beer remains not_trusted until parse fix"
+      ],
+      "confidencePercent": 86
+    },
+    "7_operationalIntelligenceAuditImpact": {
+      "currentStatus": "PARTIAL",
+      "currentConfidence": 76,
+      "productionSafeToday": false,
+      "projectedStatus": "PARTIAL → NEAR_PRODUCTION for /alerts",
+      "projectedConfidence": 86,
+      "productionSafeAfterP0": false,
+      "changes": [
+        "Mozzarella €744/mo opportunity: eliminated",
+        "Pepino −100% opportunity: eliminated",
+        "AVILUDO +1341% supplier watch: eliminated",
+        "Bidfood −100% Pepino watch: eliminated",
+        "betterSupplierLine inversion: eliminated for guarded ingredients",
+        "Home dashboard mock data: unchanged (out of P0 scope)",
+        "Ghost row supplier counts: partially reduced after backfill",
+        "Stale Jun 11 DB: unchanged — needs VL re-read"
+      ],
+      "remainingBlockers": [
+        "Home / mock dashboard",
+        "Stale DB re-read",
+        "P1 pack variants for full supplier intel trust"
+      ],
+      "confidencePercent": 84
+    }
+  },
+  "successCriteria": {
+    "unitTests": [
+      "TC-MOZZARELLA: chainCompatible=false, delta_percent=null",
+      "TC-PEPINO: chainCompatible=false, delta_percent=null",
+      "TC-GINGER-BEER: insert skipped or operational blocked",
+      "TC-ATUM-TRUSTED: chainCompatible=true, delta ~4%"
+    ],
+    "integration": [
+      "operational-intelligence-integrity-audit: 0 untrusted identity-collapse opportunities",
+      "historical-pricing-integrity-audit: 0 non_equivalent_unit_chain with non-null delta_percent"
+    ],
+    "nonGoals": [
+      "pack_variants schema",
+      "ingredient_concepts table",
+      "Home dashboard wiring",
+      "Invoice extraction parse fix for 0.20cl",
+      "Ghost row deletion (separate re-read task)"
+    ]
+  },
+  "risks": [
+    {
+      "risk": "False positives on legitimate large price hikes within same format",
+      "mitigation": "R3 threshold 25x only applies WITH mismatch signal; 100x hard ceiling rare in single-format",
+      "severity": "low"
+    },
+    {
+      "risk": "Read-path guard without backfill leaves stale delta_percent in DB",
+      "mitigation": "Step 4 reconcile backfill + read filter dual layer",
+      "severity": "medium"
+    },
+    {
+      "risk": "Pepino fresh/conserva both weight — relies on R5 tokens + R3 ratio",
+      "mitigation": "Extend preservation token list; ratio 2118x catches even if tokens miss",
+      "severity": "low"
+    },
+    {
+      "risk": "ingredient_name on history row may not reflect invoice line wording after catalog rename",
+      "mitigation": "P0 uses operational price ratio as backstop; P1 persists contract_hash",
+      "severity": "medium"
+    }
+  ],
+  "postP0": {
+    "P1": "pack_variants + contract_hash column on price_history",
+    "P2": "supplier_products + alias → variant binding",
+    "P3": "equivalence_groups + form_dimension persisted"
+  }
+}

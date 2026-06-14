@@ -1,0 +1,83 @@
+{
+  "generated_at": "2026-06-13T20:52:00.000Z",
+  "risks": [
+    {
+      "id": "R-IDENTITY-P1",
+      "severity": "high",
+      "class": "structural",
+      "description": "No pack_variant_id on price_history — multi-format concepts still collapse to single ingredient_id",
+      "blocksFoundationClosed": true,
+      "mitigation": "P1 pack_variants schema + match resolution + VL backfill"
+    },
+    {
+      "id": "R-UNMATCHED-LINES",
+      "severity": "high",
+      "class": "operational",
+      "description": "46/51 VL invoice_items have no catalog ingredient match — no price_history sync path",
+      "blocksFoundationClosed": true,
+      "mitigation": "User confirm matches + alias hardening; Emporio/Mammafiore re-read"
+    },
+    {
+      "id": "R-DB-STALE",
+      "severity": "medium",
+      "class": "operational",
+      "description": "4/6 VL invoices have items persisted before 2026-06-12; field values may drift from v31",
+      "blocksFoundationClosed": true,
+      "mitigation": "Re-read all VL invoices on v31 deploy"
+    },
+    {
+      "id": "R-GHOST-HISTORY",
+      "severity": "medium",
+      "class": "operational",
+      "description": "14/20 price_history rows classified ghost/stale — Aviludo April/May prior extraction metadata",
+      "blocksFoundationClosed": false,
+      "mitigation": "P0 read guard filters; optional reconcileIngredientPriceHistoryChain"
+    },
+    {
+      "id": "R-GENERIC-HISTORY-NAME",
+      "severity": "medium",
+      "class": "structural",
+      "description": "History stores catalog ingredient_name not invoice line name — guard uses unit + ratio heuristics",
+      "blocksFoundationClosed": false,
+      "mitigation": "P1 line-name snapshot on append"
+    },
+    {
+      "id": "R-GINGER-VOLUME",
+      "severity": "low",
+      "class": "extraction",
+      "description": "0.20cl → 2ml parse; R7 blocks history insert if matched; line currently unmatched",
+      "blocksFoundationClosed": false,
+      "mitigation": "Volume token fix orthogonal to identity"
+    },
+    {
+      "id": "R-MOCK-DASHBOARD",
+      "severity": "low",
+      "class": "product",
+      "description": "Home / route uses mock-data.ts — not production intelligence",
+      "blocksFoundationClosed": false,
+      "mitigation": "Wire or hide mock KPIs"
+    },
+    {
+      "id": "R-GPT-VARIANCE",
+      "severity": "low",
+      "class": "extraction",
+      "description": "Gorgonzola intermittent GPT variance (~60% stable); Farina 5% digit drift on v31",
+      "blocksFoundationClosed": false,
+      "mitigation": "Monitor harness; binder guard for Farina"
+    },
+    {
+      "id": "R-GT-CATALOG",
+      "severity": "low",
+      "class": "harness",
+      "description": "Pomodor GT catalog mismatch inflates VL headline metrics",
+      "blocksFoundationClosed": false,
+      "mitigation": "Revise field-accuracy ground-truth.json"
+    }
+  ],
+  "structuralVsOperational": {
+    "structural": ["R-IDENTITY-P1", "R-GENERIC-HISTORY-NAME"],
+    "operational": ["R-UNMATCHED-LINES", "R-DB-STALE", "R-GHOST-HISTORY"],
+    "extractionResidual": ["R-GINGER-VOLUME", "R-GPT-VARIANCE"],
+    "product": ["R-MOCK-DASHBOARD"]
+  }
+}

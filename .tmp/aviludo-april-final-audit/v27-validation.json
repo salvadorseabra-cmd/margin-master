@@ -1,0 +1,410 @@
+{
+  "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+  "label": "Aviludo April",
+  "deployVersion": 27,
+  "deployUpdatedAt": 1781306375803,
+  "imageSource": ".tmp/footer-validation-4dc40c3/april-historico-png-fixture.b64.txt",
+  "validatedAt": "2026-06-12T23:20:53.840Z",
+  "groundTruth": {
+    "nata": {
+      "qty": 5,
+      "unit_price": 18.29,
+      "total": 91.45
+    },
+    "ovo": {
+      "qty": 6,
+      "unit_price": 10.19,
+      "total": 61.14
+    },
+    "chocolate": {
+      "qty": 2,
+      "unit_price": 29.19,
+      "total": 58.38
+    },
+    "anchovas": {
+      "qty": 2,
+      "unit_price": 9.49,
+      "total": 18.98
+    },
+    "atum": {
+      "qty": 2,
+      "unit_price": 6.29,
+      "total": 12.58
+    }
+  },
+  "v26Baseline": {
+    "financialErrorEuro": 169.08,
+    "failingRows": [
+      "nata",
+      "ovo",
+      "chocolate",
+      "anchovas",
+      "atum"
+    ],
+    "mechanism": "line_total_net = gross_unit_price when qty > 1"
+  },
+  "runs": [
+    {
+      "run": 1,
+      "status": 200,
+      "elapsedMs": 8128,
+      "itemCount": 9,
+      "nata": {
+        "found": true,
+        "name": "Nata Reny Picot 22% 6x1L",
+        "quantity": 5,
+        "unit_price": 18.29,
+        "total": 91.45,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "ovo": {
+        "found": true,
+        "name": "Ovo Líquido Past.Gema Dovo 1kg",
+        "quantity": 6,
+        "unit_price": 10.19,
+        "total": 61.14,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "chocolate": {
+        "found": true,
+        "name": "Chocolate Pantagruel 10x200g",
+        "quantity": 2,
+        "unit_price": 29.19,
+        "total": 58.38,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "anchovas": {
+        "found": true,
+        "name": "Filete de Anchovas Alconfrisa Lt 495 g",
+        "quantity": 2,
+        "unit_price": 9.49,
+        "total": 18.98,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "atum": {
+        "found": true,
+        "name": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "quantity": 2,
+        "unit_price": 6.29,
+        "total": 12.58,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "runFinancialErrorEuro": 0,
+      "multiQtyCorrect": "5/5",
+      "allMultiQtyCorrect": true
+    },
+    {
+      "run": 2,
+      "status": 200,
+      "elapsedMs": 8781,
+      "itemCount": 9,
+      "nata": {
+        "found": true,
+        "name": "Nata Reny Picot 22% 6x1L",
+        "quantity": 5,
+        "unit_price": 18.29,
+        "total": 91.45,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "ovo": {
+        "found": true,
+        "name": "Ovo Líquido Past.Gema Dovo 1kg",
+        "quantity": 6,
+        "unit_price": 10.19,
+        "total": 61.14,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "chocolate": {
+        "found": true,
+        "name": "Chocolate Pantagruel 10x200g",
+        "quantity": 2,
+        "unit_price": 29.19,
+        "total": 58.38,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "anchovas": {
+        "found": true,
+        "name": "Filete de Anchovas Alconfrisa Lt 495 g",
+        "quantity": 2,
+        "unit_price": 9.49,
+        "total": 18.98,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "atum": {
+        "found": true,
+        "name": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "quantity": 2,
+        "unit_price": 6.29,
+        "total": 12.58,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "runFinancialErrorEuro": 0,
+      "multiQtyCorrect": "5/5",
+      "allMultiQtyCorrect": true
+    },
+    {
+      "run": 3,
+      "status": 200,
+      "elapsedMs": 7042,
+      "itemCount": 9,
+      "nata": {
+        "found": true,
+        "name": "Nata Reny Picot 22% 6x1L",
+        "quantity": 5,
+        "unit_price": 18.29,
+        "total": 91.45,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "ovo": {
+        "found": true,
+        "name": "Ovo Líquido Past.Gema Dovo 1kg",
+        "quantity": 6,
+        "unit_price": 10.19,
+        "total": 61.14,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "chocolate": {
+        "found": true,
+        "name": "Chocolate Pantagruel 10x200g",
+        "quantity": 2,
+        "unit_price": 29.19,
+        "total": 58.38,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "anchovas": {
+        "found": true,
+        "name": "Filete de Anchovas Alconfrisa Lt 495 g",
+        "quantity": 2,
+        "unit_price": 9.49,
+        "total": 18.98,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "atum": {
+        "found": true,
+        "name": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "quantity": 2,
+        "unit_price": 6.29,
+        "total": 12.58,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "runFinancialErrorEuro": 0,
+      "multiQtyCorrect": "5/5",
+      "allMultiQtyCorrect": true
+    },
+    {
+      "run": 4,
+      "status": 200,
+      "elapsedMs": 8762,
+      "itemCount": 9,
+      "nata": {
+        "found": true,
+        "name": "Nata Reny Picot 22% 6x1L",
+        "quantity": 5,
+        "unit_price": 18.29,
+        "total": 91.45,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "ovo": {
+        "found": true,
+        "name": "Ovo Líquido Past.Gema Dovo 1kg",
+        "quantity": 6,
+        "unit_price": 10.19,
+        "total": 61.14,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "chocolate": {
+        "found": true,
+        "name": "Chocolate Pantagruel 10x200g",
+        "quantity": 2,
+        "unit_price": 29.19,
+        "total": 58.38,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "anchovas": {
+        "found": true,
+        "name": "Filete de Anchovas Alconfrisa Lt 495 g",
+        "quantity": 2,
+        "unit_price": 9.49,
+        "total": 18.98,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "atum": {
+        "found": true,
+        "name": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "quantity": 2,
+        "unit_price": 6.29,
+        "total": 12.58,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "runFinancialErrorEuro": 0,
+      "multiQtyCorrect": "5/5",
+      "allMultiQtyCorrect": true
+    },
+    {
+      "run": 5,
+      "status": 200,
+      "elapsedMs": 8199,
+      "itemCount": 9,
+      "nata": {
+        "found": true,
+        "name": "Nata Reny Picot 22% 6x1L",
+        "quantity": 5,
+        "unit_price": 18.29,
+        "total": 91.45,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "ovo": {
+        "found": true,
+        "name": "Ovo Líquido Past.Gema Dovo 1kg",
+        "quantity": 6,
+        "unit_price": 10.19,
+        "total": 61.14,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "chocolate": {
+        "found": true,
+        "name": "Chocolate Pantagruel 10x200g",
+        "quantity": 2,
+        "unit_price": 29.19,
+        "total": 58.38,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "anchovas": {
+        "found": true,
+        "name": "Filete de Anchovas Alconfrisa Lt 495 g",
+        "quantity": 2,
+        "unit_price": 9.49,
+        "total": 18.98,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "atum": {
+        "found": true,
+        "name": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "quantity": 2,
+        "unit_price": 6.29,
+        "total": 12.58,
+        "qtyOk": true,
+        "priceOk": true,
+        "totalOk": true,
+        "columnBleed": false,
+        "financialErrorEuro": 0
+      },
+      "runFinancialErrorEuro": 0,
+      "multiQtyCorrect": "5/5",
+      "allMultiQtyCorrect": true
+    }
+  ],
+  "summary": {
+    "deployVersionOk": true,
+    "perfectRuns": "5/5",
+    "columnBleedRuns": "0/5",
+    "perRowTotalCorrect": {
+      "nata": "5/5",
+      "ovo": "5/5",
+      "chocolate": "5/5",
+      "anchovas": "5/5",
+      "atum": "5/5"
+    },
+    "avgFinancialErrorEuro": 0,
+    "financialImprovementVsV26Euro": 169.08,
+    "globalV26Euro": 220.27,
+    "globalEstimateAfterFixEuro": 51.19,
+    "aviludoAprilStatus": "CLOSED"
+  }
+}

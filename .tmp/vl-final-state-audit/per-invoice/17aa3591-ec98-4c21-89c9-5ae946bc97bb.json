@@ -1,0 +1,132 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio",
+  "deployVersion": 31,
+  "operationalStatus": "STALE",
+  "issues": [
+    "item_count_mismatch: DB 0 vs v31 8",
+    "missing_db_rows: 8 extract-only row(s)"
+  ],
+  "checks": {
+    "invoiceItemsCount": {
+      "db": 0,
+      "v31Extract": 8,
+      "expected": 8,
+      "match": false,
+      "dbMatchesExtract": false
+    },
+    "ingredientMatching": {
+      "matchedLines": 0,
+      "unmatchedLines": 8,
+      "totalLines": 8
+    },
+    "historicalPricing": {
+      "historyRows": 0,
+      "staleHistoryRows": 0,
+      "ghostHistoryRows": 0,
+      "staleDetails": []
+    },
+    "dashboardTotals": {
+      "dbLineSum": 0,
+      "extractLineSum": 281.79,
+      "headerTotal": null,
+      "extractHeaderTotal": 327.46,
+      "dbLineSumMatchesExtract": false,
+      "headerMatchesDbLines": null
+    },
+    "opportunities": {
+      "stalePriceSignals": 0,
+      "note": "Opportunity/margin alerts derive from ingredient_price_history — stale rows propagate wrong inflation signals"
+    },
+    "supplierIntelligence": {
+      "supplierName": "Emporio Italia, Lda.",
+      "lineCount": 8,
+      "matchedPct": 0
+    },
+    "staleRows": {
+      "count": 8,
+      "dbOnly": [],
+      "extractOnly": [
+        "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castiglioni 1/8 - 1,5kg",
+        "Assaporami Prosciutto Cotto Scelto HC 4-4,25Kg",
+        "Rovagnati - Mortadella IGP “Massima” con Pistacchio 1/2 – 3,5Kg",
+        "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "Rigamonti - Bresaola Punta d’Anca Oro 1/2 - 1,5Kg",
+        "Baladin - Ginger Beer 0.20cl",
+        "Rovagnati - Salame Ventricina 2,5 Kg"
+      ],
+      "fieldDrift": []
+    },
+    "duplicatePurchases": {
+      "count": 0,
+      "duplicates": []
+    },
+    "ghostPurchases": {
+      "count": 0,
+      "details": []
+    }
+  },
+  "extraction": {
+    "status": 200,
+    "itemCountRaw": 8,
+    "itemCountNormalized": 8,
+    "supplier": "Emporio Italia, Lda.",
+    "total": 327.46
+  },
+  "db": {
+    "itemCount": 0,
+    "oldestItemCreatedAt": null,
+    "newestItemCreatedAt": null
+  },
+  "matching": [
+    {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castiglioni 1/8 - 1,5kg",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Assaporami Prosciutto Cotto Scelto HC 4-4,25Kg",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Rovagnati - Mortadella IGP “Massima” con Pistacchio 1/2 – 3,5Kg",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Rigamonti - Bresaola Punta d’Anca Oro 1/2 - 1,5Kg",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Baladin - Ginger Beer 0.20cl",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    },
+    {
+      "name": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "matched": false,
+      "ingredientId": null,
+      "method": "unmatched"
+    }
+  ]
+}

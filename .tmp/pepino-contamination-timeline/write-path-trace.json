@@ -1,0 +1,97 @@
+{
+  "generated_at": "2026-06-14T08:52:00.000Z",
+  "bidfood_pepino_write_chain": {
+    "trigger": "Invoice OCR extraction completes for Bidfood da472b7f",
+    "synchronous": true,
+    "human_gate": false,
+    "call_stack": [
+      {
+        "order": 1,
+        "file": "src/routes/invoices.tsx",
+        "function": "extract/persist handler (post-OCR)",
+        "line_approx": 1338,
+        "action": "supabase.from('invoice_items').insert(insertRows)"
+      },
+      {
+        "order": 2,
+        "file": "src/routes/invoices.tsx",
+        "function": "same handler",
+        "line_approx": 1358,
+        "action": "syncOperationalIngredientCostsFromInvoiceLines(supabase, catalog, aliases, items, { priceHistory })"
+      },
+      {
+        "order": 3,
+        "file": "src/lib/ingredient-operational-intelligence.ts",
+        "function": "syncOperationalIngredientCostsFromInvoiceLines",
+        "line_approx": 923,
+        "action": "for each item: resolveInvoiceTableRowIngredientMatch → skip only if unmatched bucket"
+      },
+      {
+        "order": 4,
+        "file": "src/lib/ingredient-operational-intelligence.ts",
+        "function": "syncOperationalIngredientCostsFromInvoiceLines",
+        "line_approx": 933,
+        "action": "if bucket !== 'unmatched' → persistOperationalIngredientCostFromInvoiceLine",
+        "pepino_bucket": "matched (displayState confirmed → bucket matched)"
+      },
+      {
+        "order": 5,
+        "file": "src/lib/ingredient-auto-persist.ts",
+        "function": "persistOperationalIngredientCostFromInvoiceLine",
+        "line_approx": 124,
+        "action": "ingredients.update({ current_price, purchase_quantity })"
+      },
+      {
+        "order": 6,
+        "file": "src/lib/ingredient-auto-persist.ts",
+        "function": "persistOperationalIngredientCostFromInvoiceLine",
+        "line_approx": 140,
+        "action": "appendIngredientPriceHistoryFromInvoiceLine(...)"
+      },
+      {
+        "order": 7,
+        "file": "src/lib/ingredient-price-history.ts",
+        "function": "appendIngredientPriceHistoryFromInvoiceLine",
+        "line_approx": 458,
+        "action": "INSERT ingredient_price_history (invoice_id, ingredient_id, new_price=0.00177)",
+        "first_irreversible_write": true
+      }
+    ]
+  },
+  "alternative_paths_not_taken": [
+    {
+      "path": "confirmIngredientMatch",
+      "trigger": "User clicks Confirm match",
+      "used_for_pepino": false,
+      "reason": "displayState was already confirmed (exact) — Confirm button not shown"
+    },
+    {
+      "path": "selectIngredientForItem / persistIngredientCorrectionForItem",
+      "trigger": "User picks ingredient from picker",
+      "used_for_pepino": false,
+      "reason": "No evidence of manual pick; no alias row for bare 'Pepino'"
+    },
+    {
+      "path": "saveCanonicalIngredientFromInvoiceRow",
+      "trigger": "Create new ingredient",
+      "used_for_pepino": false
+    }
+  ],
+  "matcher_write_vs_cost_write": {
+    "alias_written_on_extract": false,
+    "match_persisted_on_invoice_items": false,
+    "cost_written_on_extract": true,
+    "separation": "Virtual match resolution triggers cost sync without alias or user confirm when displayState is confirmed or suggested"
+  },
+  "reextract_behavior": {
+    "invoice_items": "DELETE all rows for invoice_id then INSERT — new created_at wall-clock",
+    "price_history": "UPSERT refresh if (invoice_id, ingredient_id) exists — preserves invoice-date anchored created_at",
+    "code": "appendIngredientPriceHistoryFromInvoiceLine refreshExisting branch",
+    "pepino_latest_item_created_at": "2026-06-13T21:50:38.703943+00:00"
+  },
+  "timestamp_fields": {
+    "invoice_upload": "invoices.created_at = 2026-06-09T22:36:41.424691+00:00",
+    "history_stored_created_at": "2026-05-25T12:00:00+00:00 (invoice_date anchor via resolveIngredientPriceHistoryCreatedAt)",
+    "history_anchor_code": "src/lib/ingredient-price-history.ts resolveIngredientPriceHistoryCreatedAt"
+  }
+}

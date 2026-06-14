@@ -1,0 +1,42 @@
+{
+  "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+  "ingredientName": "Chocolate culinária",
+  "invoiceLabel": "Aviludo May",
+  "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+  "lineName": "Chocolate Culinaria Pantagruel 10x200 g",
+  "trustVerdict": "stale",
+  "classification": [
+    "stale_db_row"
+  ],
+  "invoiceSource": {
+    "quantity": 2,
+    "unit": "cx",
+    "unit_price": 29.99,
+    "total": 59.98
+  },
+  "normalized": {
+    "packPrice": 29.99,
+    "purchaseQuantity": 10,
+    "operationalUnitCost": 2.9989999999999997,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 29.19,
+    "purchase_quantity": 10,
+    "operationalUnitCost": 2.919
+  },
+  "priceHistory": [
+    {
+      "id": "bf250ee4-388a-480f-96d7-e8c0e8e8dfb2",
+      "previous_price": 2.919,
+      "new_price": 2.9989999999999997,
+      "delta": 0.07999999999999963,
+      "delta_percent": 2.7406646111681954,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
+  "opportunityRisk": [],
+  "notes": []
+}

@@ -1,0 +1,173 @@
+{
+  "generated_at": "2026-06-13T19:00:00.000Z",
+  "mode": "READ-ONLY",
+  "auditScope": "VL invoices + codebase + historical-pricing-integrity-audit",
+  "currentArchitectureSummary": {
+    "primaryKey": "ingredients.id (uuid) — single canonical row per user catalog entry",
+    "persistedIdentityFields": [
+      "name",
+      "normalized_name",
+      "ingredient_kind",
+      "unit / purchase_unit / base_unit",
+      "purchase_quantity",
+      "current_price"
+    ],
+    "aliasPersistence": "ingredient_aliases (alias_name, normalized_alias, supplier_name, confidence, confirmed_by_user)",
+    "priceHistoryKey": "ingredient_price_history.ingredient_id — no pack/SKU dimension",
+    "recipeReference": "recipe_ingredients.ingredient_id XOR sub_recipe_id",
+    "inMemoryOnlyIdentity": [
+      "ingredient-identity.ts family/form tokens",
+      "ingredient-operational-families.ts",
+      "ingredient-parent-form.ts (cheddar-only hierarchy)",
+      "ingredient-canonical-synthesis.ts synthetic cluster entries"
+    ],
+    "matchingPipeline": [
+      "user override (in-memory)",
+      "operational alias memory",
+      "ingredient_aliases DB map",
+      "exact normalized name memory",
+      "family-aware deterministic scoring",
+      "semantic similarity fallback"
+    ],
+    "autoPersistGuards": [
+      "duplicate_normalized_name",
+      "duplicate_operational_identity",
+      "operational_family_conflict",
+      "same_operational_family"
+    ],
+    "missingSchemaConcepts": [
+      "pack_variant_id / sku_id",
+      "equivalence_group_id",
+      "purchase_format_contract on history rows",
+      "cross-format chain blocker"
+    ]
+  },
+  "provenIdentityWeaknesses": [
+    {
+      "id": "W1_pack_format_collapse",
+      "severity": "critical",
+      "title": "Single ingredient_id collapses incompatible pack formats",
+      "evidence": {
+        "case": "Mozzarella fior di latte",
+        "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+        "bocconcino": {
+          "line": "MOZZARELLA FIOR DI LATTE 'IL BOCCONCINO' 125GR*8",
+          "packPrice": 9.5,
+          "purchaseQuantity": 10,
+          "operationalUnitCost": 0.95,
+          "interpretation": "€/piece (125g×8 tray, qty 10)"
+        },
+        "aviludoApril": {
+          "line": "Mozzarella Flor di Latte 2Kg",
+          "operationalUnitCost": 13.69,
+          "interpretation": "€/2kg block"
+        },
+        "priceHistoryDelta": "+1341% (0.95 → 13.69)",
+        "source": ".tmp/historical-pricing-integrity-audit/findings.json"
+      },
+      "rootCause": "Token match on 'mozzarella fior di latte' without persisted pack-format contract; ingredients.current_price last-write-wins across formats"
+    },
+    {
+      "id": "W2_cross_product_form_match",
+      "severity": "critical",
+      "title": "Fresh vs preserved forms share one ingredient_id",
+      "evidence": {
+        "case": "Pepino conserva vs Pepino fresco",
+        "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "catalogName": "Pepino conserva",
+        "bidfoodLine": "Pepino (3.36 kg @ €1.77/kg)",
+        "operationalNew": 0.00177,
+        "priorHistoryOperational": 3.748333333333333,
+        "priceHistoryDelta": "-99.95%",
+        "source": ".tmp/historical-pricing-integrity-audit/per-ingredient/635a1189-36ea-4ff2-9012-8172ab1ab81d.json"
+      },
+      "rootCause": "Name token 'pepino' matches conserva catalog row; no form/preservation dimension in schema or history chain guard"
+    },
+    {
+      "id": "W3_history_chains_without_equivalence",
+      "severity": "high",
+      "title": "price_history previous_price chains across any prior invoice for same ingredient_id",
+      "evidence": {
+        "code": "fetchPriorLinkedHistoryNewPrice → storedPrev = priorLinkedNewPrice (operational €/base-unit only)",
+        "file": "src/lib/ingredient-price-history.ts",
+        "vlImpact": "Mozzarella and Pepino false movement signals propagate to opportunities"
+      },
+      "rootCause": "No check that prior and new purchase_quantity / pack semantics are equivalent before computing delta"
+    },
+    {
+      "id": "W4_ephemeral_canonicalization",
+      "severity": "high",
+      "title": "Rich identity signals not persisted — recomputed per match",
+      "evidence": {
+        "familyTokens": "ingredient-identity.ts FAMILY_TOKEN_TO_ID (mozzarella→cheese)",
+        "operationalFamilies": "in-memory OPERATIONAL_FAMILY_REGISTRY only",
+        "parentForm": "PARENT_FORM_HIERARCHY_FAMILIES = cheddar only — mozzarella/cheese block vs piece not covered",
+        "syntheticClusters": "ingredient-canonical-synthesis.ts — never persisted"
+      },
+      "rootCause": "Match-time scoring cannot enforce downstream pricing equivalence after match is confirmed"
+    },
+    {
+      "id": "W5_alias_without_pack_contract",
+      "severity": "medium",
+      "title": "Aliases map invoice wording → ingredient_id without pack-format metadata",
+      "evidence": {
+        "schema": "ingredient_aliases: ingredient_id + normalized_alias + supplier_name + confidence",
+        "file": "supabase/migrations/20260519130000_ingredient_aliases.sql",
+        "vlUnmatched": "46/51 VL lines unmatched — limited alias coverage"
+      },
+      "rootCause": "Alias confirms identity of catalog row, not which purchase format that supplier line represents"
+    },
+    {
+      "id": "W6_volume_parse_not_identity_but_blocks_trust",
+      "severity": "medium",
+      "title": "Ginger Beer — packaging token parse failure (orthogonal but compounds identity gap)",
+      "evidence": {
+        "line": "Baladin - Ginger Beer 0.20cl",
+        "parsedMl": 2,
+        "costPerLiter": 575,
+        "unmatched": true,
+        "source": ".tmp/ginger-beer-audit/math-audit.json"
+      },
+      "rootCause": "0.20cl parsed as 0.2 CL not 20cl; line also unmatched — no SKU identity to attach correct volume"
+    }
+  ],
+  "impactOnPricingOpportunities": {
+    "severity": "high",
+    "summary": "Pricing math is sound; identity collapse poisons inputs",
+    "provenFailures": [
+      { "ingredient": "Mozzarella fior di latte", "issue": "non_equivalent_unit_comparison", "deltaPercent": 1341.05 },
+      { "ingredient": "Pepino conserva", "issue": "cross_product_chain", "deltaPercent": -99.95 },
+      { "ingredient": "Ginger Beer", "issue": "volume_parse_inflation", "costPerLiter": 575 }
+    ],
+    "mechanism": "ingredient_price_history stores operational €/base-unit per ingredient_id; opportunities use priceHistoryDeltaPct without format equivalence gate",
+    "trustedHistoryRows": "6/20",
+    "ghostHistoryRows": "14/20 (stale metadata + prior extraction lines)"
+  },
+  "impactOnSupplierIntelligence": {
+    "severity": "high",
+    "summary": "Supplier metrics aggregate by ingredient_id — pack-mixed histories produce false spikes and switch recommendations",
+    "mechanism": "buildSupplierIntelligence filters priceHistory by ingredient_id; compares latestUnit vs avg3mo and min90d without pack normalization guard",
+    "file": "src/lib/operational-intelligence-view.ts",
+    "vlExample": "Mozzarella: Bocconcino €0.95/piece history vs Aviludo €13.69/block appears as massive inflation and false 'better supplier' signal"
+  },
+  "impactOnPrepSubRecipes": {
+    "severity": "medium",
+    "summary": "Recipes bind to ingredient_id; current_price is single-valued — last matched invoice overwrites pack economics for all recipes",
+    "mechanism": "recipe_ingredients.ingredient_id → ingredients.current_price / purchase_quantity; effectiveUnitCost uses catalog row only",
+    "subRecipes": "sub_recipe_id references recipes(id) — prep identity is separate from ingredient pack identity (good) but leaf ingredients still suffer W1/W2",
+    "risk": "Recipe costing for mozzarella-heavy dishes drifts when unrelated pack format invoice syncs same ingredient_id"
+  },
+  "impactOnPurchaseHistory": {
+    "severity": "high",
+    "summary": "Purchase history is invoice-linked but keyed only by ingredient_id; no per-SKU ledger",
+    "mechanism": "appendIngredientPriceHistoryFromInvoiceLine on match persist; one row per (invoice_id, ingredient_id)",
+    "ghostRows": "14 rows flagged ghost in VL — prior line wording no longer on invoice but history persists on same ID"
+  },
+  "sufficiencyVerdict": {
+    "historicalPricing": "INSUFFICIENT — proven cross-format chains",
+    "supplierIntelligence": "INSUFFICIENT — same ID mixes incompatible economics",
+    "opportunities": "INSUFFICIENT — false ±100% movements",
+    "purchaseHistory": "PARTIAL — auditable per invoice but not per SKU",
+    "prepSubRecipes": "PARTIAL — sub-recipe graph OK; leaf ingredient economics ambiguous"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio Italia",
+  "product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5kg",
+  "productCode": "ROVA023",
+  "generatedAt": "2026-06-13T01:30:00.000Z",
+  "question": "Why does Mortadella still have ~€0.78–€3.50 residual after v28?",
+  "verdict": {
+    "classification": "A",
+    "label": "discount_extraction",
+    "secondary": "total_column_qty_times_unit",
+    "summary": "Pass C fails to populate discount_pct (10,00) and gross_unit_price (11,10 €), then emits line_total_net ≈ qty×misread unit (27.57) instead of copying Preço Total 31,07 €. Prosciutto/Ventricina closed because v24/v25 added explicit Desc.(%) examples; Mortadella shares the plain-decimal pattern but has no worked example. v28 VALOR block targets weight/case rows, not discount lines."
+  },
+  "confidencePercent": 88,
+  "expectedRecoveryEuro": 3.5,
+  "expectedRecoveryNote": "Up to €3.50 on v28 lab run; €0.78 on v27 tail; stability avg ~€4.09 — all recoverable when line_total_net=31.07"
+}

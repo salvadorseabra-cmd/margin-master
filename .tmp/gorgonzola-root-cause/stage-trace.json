@@ -1,0 +1,145 @@
+{
+  "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "label": "Emporio Italia",
+  "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelregio 1/8 ~1,5kg",
+  "productAliases": [
+    "Castelgrottto",
+    "Castelfrigo",
+    "Castelfiorito",
+    "Castelli",
+    "Casaleggio"
+  ],
+  "deployVersionAudited": 27,
+  "generatedAt": "2026-06-13T00:45:00.000Z",
+  "visibleInvoice": {
+    "source": ".tmp/emporio-italia-investigation/invoice-full.png",
+    "productCode": "GD87813",
+    "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelregio* 1/8\" ~1,5kg (Produto de Stock)",
+    "qtdColumn": "1,35",
+    "unitColumn": "kg (implied weight row)",
+    "precoUnitGross": "12,90 €",
+    "discountPct": "22,85",
+    "lineTotal": "13,44 €",
+    "arithmetic": "1.35 × 12.90 × (1 − 0.2285) ≈ 13.44",
+    "notes": [
+      "Fractional kg qty — not integer case count",
+      "Desc.(%) 22,85 has no % symbol (Emporio dense-table format)",
+      "Description contains 1/8 and ~1,5kg — must not override Qtd 1,35"
+    ]
+  },
+  "groundTruth": {
+    "source": ".tmp/field-accuracy-audit/ground-truth.json",
+    "qty": 1.35,
+    "unit": "kg",
+    "unit_price": 9.92,
+    "total": 13.44,
+    "interpretation": "Net unit after 22.85% discount; GT matches visible Preço Total"
+  },
+  "stages": [
+    {
+      "stage": 1,
+      "name": "visible_invoice",
+      "result": {
+        "qtdPrinted": "1,35",
+        "unitPriceGrossPrinted": "12,90 €",
+        "discountPctPrinted": "22,85",
+        "lineTotalPrinted": "13,44 €"
+      },
+      "divergedFromGT": false,
+      "status": "PASS"
+    },
+    {
+      "stage": 2,
+      "name": "geometry_crop",
+      "result": {
+        "bounds": { "top": 456, "bottom": 851, "headerTop": 466, "headerBottom": 502 },
+        "gorgonzolaRowVisible": true,
+        "discountHeaderInCrop": false,
+        "discountValuesInCrop": true,
+        "source": ".tmp/geometry-audit/17aa3591-ec98-4c21-89c9-5ae946bc97bb-geometry.json"
+      },
+      "divergedFromGT": false,
+      "status": "PARTIAL",
+      "note": "Pass C crop omits Desc.(%) header label; values readable in row pixels (same as emporio-discount-column-audit)"
+    },
+    {
+      "stage": 3,
+      "name": "passC_gpt_extraction",
+      "result": {
+        "outcomeGood_totalFromValor": {
+          "qtyRange": [1.26, 2.6],
+          "unit_priceRange": [9.45, 16.55],
+          "total": 13.44,
+          "occurrences": [
+            "passc-refinement reextract (qty 1.35, total 13.44, €0)",
+            "final-validation-lab-rerun-v26 (qty 1.26, total 13.44, €0)",
+            "persistence-audit pass-c-raw (qty 1.35, total 13.44)",
+            "v27-stability runs 1–4 (qty 2–2.6, total 13.44, €0)"
+          ]
+        },
+        "outcomeBad_qtyTimesUnitTotal": {
+          "qty": 2,
+          "unit_price": 13.5,
+          "total": 27,
+          "occurrences": [
+            "final-residual-error-audit v27 single run (€13.56 error)"
+          ],
+          "mechanism": "GPT doubled qty (2 vs 1,35), misread unit, emitted total ≈ qty×unit instead of copying VALOR 13,44"
+        },
+        "outcomeBad_tailFailure": {
+          "qty": 2,
+          "unit_price": 16.55,
+          "total": 33.14,
+          "occurrences": ["v27-stability run 5 (€19.70 error)"]
+        }
+      },
+      "divergedFromGT": "FIRST DIVERGENCE — qty/total wrong on bad runs; total correct on majority of runs",
+      "status": "FAIL_ON_BAD_RUNS",
+      "firstFailingStage": true
+    },
+    {
+      "stage": 4,
+      "name": "binder_monetary",
+      "result": {
+        "inputFromPassC": "quantity, gross_unit_price, discount_pct (usually null), line_total_net",
+        "whenTotalPresent": "API total = Pass C line_total_net unchanged",
+        "whenTotalNull": "total = qty × gross_unit_price (would amplify Pass C errors)",
+        "gorgonzolaObserved": "Bad runs had non-null wrong total from Pass C — binder forwarded €27 / €33.14 as-is"
+      },
+      "divergedFromGT": false,
+      "status": "PASS_THROUGH",
+      "note": "Binder did not create €13.56; it propagated Pass C line_total_net"
+    },
+    {
+      "stage": 5,
+      "name": "api_response",
+      "result": {
+        "v27BadRun": { "qty": 2, "unit_price": 13.5, "total": 27, "financialErrorEuro": 13.56 },
+        "v26Baseline": { "qty": 1.26, "unit_price": 10.5, "total": 13.44, "financialErrorEuro": 0 },
+        "refinementBaseline": { "qty": 1.35, "unit_price": 9.82, "total": 13.44, "financialErrorEuro": 0 },
+        "v27Stability5Run": {
+          "perfectTotalRuns": "4/5",
+          "avgFinancialErrorEuro": 3.94,
+          "source": ".tmp/gorgonzola-root-cause/v27-stability.json"
+        }
+      },
+      "divergedFromGT": "Only when Pass C outcomeBad",
+      "status": "VARIABLE"
+    }
+  ],
+  "fieldChangeSummary": {
+    "primaryFinancialDriver": "total (13.44 → 27.00 on bad v27 audit run)",
+    "secondaryFields": ["quantity (1.35 → 2)", "unit_price (9.92 net / 12.90 gross → 13.50)"],
+    "stableWhenCorrect": "line_total_net copied from VALOR 13,44 even when qty wrong (4/5 v27 stability runs)"
+  },
+  "sources": [
+    ".tmp/emporio-italia-investigation/invoice-full.png",
+    ".tmp/field-accuracy-audit/ground-truth.json",
+    ".tmp/passc-refinement-validation/reextract/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+    ".tmp/final-validation-lab-rerun-v26/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+    ".tmp/final-residual-error-audit/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+    ".tmp/emporio-discount-column-audit/discount-accuracy.json",
+    ".tmp/gorgonzola-root-cause/v27-stability.json",
+    ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json"
+  ]
+}

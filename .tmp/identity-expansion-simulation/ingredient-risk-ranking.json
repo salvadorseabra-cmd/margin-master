@@ -1,0 +1,114 @@
+[
+  {
+    "rank": 1,
+    "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+    "ingredientName": "Mozzarella fior di latte",
+    "existingPurchaseCount": 2,
+    "latentLinesPredicted": 1,
+    "latentContaminationLines": 1,
+    "riskLevel": "HIGH",
+    "riskScore": 119,
+    "signals": [
+      "A"
+    ],
+    "topLatentProducts": [
+      "MOZZA Fior di Latte Expet Julienne 3kg Simonetta"
+    ]
+  },
+  {
+    "rank": 2,
+    "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+    "ingredientName": "Pepino conserva",
+    "existingPurchaseCount": 3,
+    "latentLinesPredicted": 0,
+    "latentContaminationLines": 0,
+    "riskLevel": "HIGH",
+    "riskScore": 46,
+    "signals": [],
+    "topLatentProducts": []
+  },
+  {
+    "rank": 3,
+    "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+    "ingredientName": "Nata culinária",
+    "existingPurchaseCount": 3,
+    "latentLinesPredicted": 0,
+    "latentContaminationLines": 0,
+    "riskLevel": "LOW",
+    "riskScore": 6,
+    "signals": [],
+    "topLatentProducts": []
+  },
+  {
+    "rank": 4,
+    "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+    "ingredientName": "Gema líquida",
+    "existingPurchaseCount": 2,
+    "latentLinesPredicted": 0,
+    "latentContaminationLines": 0,
+    "riskLevel": "LOW",
+    "riskScore": 4,
+    "signals": [],
+    "topLatentProducts": []
+  },
+  {
+    "rank": 5,
+    "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+    "ingredientName": "Atum em óleo",
+    "existingPurchaseCount": 2,
+    "latentLinesPredicted": 0,
+    "latentContaminationLines": 0,
+    "riskLevel": "LOW",
+    "riskScore": 4,
+    "signals": [],
+    "topLatentProducts": []
+  },
+  {
+    "rank": 6,
+    "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+    "ingredientName": "Arroz agulha",
+    "existingPurchaseCount": 2,
+    "latentLinesPredicted": 0,
+    "latentContaminationLines": 0,
+    "riskLevel": "LOW",
+    "riskScore": 4,
+    "signals": [],
+    "topLatentProducts": []
+  },
+  {
+    "rank": 7,
+    "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+    "ingredientName": "Açúcar branco",
+    "existingPurchaseCount": 2,
+    "latentLinesPredicted": 0,
+    "latentContaminationLines": 0,
+    "riskLevel": "LOW",
+    "riskScore": 4,
+    "signals": [],
+    "topLatentProducts": []
+  },
+  {
+    "rank": 8,
+    "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+    "ingredientName": "Chocolate culinária",
+    "existingPurchaseCount": 1,
+    "latentLinesPredicted": 0,
+    "latentContaminationLines": 0,
+    "riskLevel": "LOW",
+    "riskScore": 2,
+    "signals": [],
+    "topLatentProducts": []
+  },
+  {
+    "rank": 9,
+    "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+    "ingredientName": "Anchoas",
+    "existingPurchaseCount": 1,
+    "latentLinesPredicted": 0,
+    "latentContaminationLines": 0,
+    "riskLevel": "LOW",
+    "riskScore": 2,
+    "signals": [],
+    "topLatentProducts": []
+  }
+]

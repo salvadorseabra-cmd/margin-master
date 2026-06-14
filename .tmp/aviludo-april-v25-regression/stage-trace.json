@@ -1,0 +1,109 @@
+{
+  "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+  "label": "Aviludo April",
+  "generatedAt": "2026-06-12T23:30:00.000Z",
+  "deployVersion": 25,
+  "fixturePath": ".tmp/footer-validation-4dc40c3/april-historico-png-fixture.b64.txt",
+  "fixtureFormat": "full_data_url (starts with data:image/png;base64,)",
+  "comparisons": {
+    "historicalSuccess": {
+      "source": ".tmp/passc-refinement-validation/reextract/c2f52357-0f80-491a-ba14-c97ff4837472.json",
+      "timestamp": "2026-06-11T00:48:05.506Z",
+      "deployApprox": "~04c0d88",
+      "imageInput": "PNG fixture (april-historico-png-fixture)",
+      "itemCount": 9,
+      "supplier": "AVILUDO",
+      "invoice_date": "2026-04-17",
+      "total": 687.07
+    },
+    "v25FailedAudit": {
+      "source": ".tmp/final-validation-lab-rerun/extracts/c2f52357-0f80-491a-ba14-c97ff4837472.json",
+      "timestamp": "2026-06-12T22:44:02.688Z",
+      "deployVersion": 25,
+      "imageInput": "PNG fixture via run-audit.mts (DOUBLE PREFIX BUG)",
+      "urlPrefixObserved": "data:image/png;base64,data:image/png;base64,iVBO",
+      "itemCount": 0,
+      "supplier": null,
+      "invoice_date": null,
+      "total": null
+    },
+    "v25CorrectedProbe": {
+      "source": ".tmp/aviludo-april-v25-regression/prefix-comparison.json",
+      "timestamp": "2026-06-12T23:25:00.000Z",
+      "deployVersion": 25,
+      "imageInput": "PNG fixture with prefix-normalized URL",
+      "runs": [
+        { "run": 1, "itemCount": 9, "supplier": "AVILUDO", "invoice_date": "2026-04-17", "total": 687.07 },
+        { "run": 2, "itemCount": 9, "supplier": "AVILUDO", "invoice_date": "2026-04-17", "total": 680.77 },
+        { "run": 3, "itemCount": 9, "supplier": "AVILUDO", "invoice_date": "2026-04-17", "total": 687.07 }
+      ]
+    }
+  },
+  "stages": [
+    {
+      "stage": 1,
+      "name": "image_input",
+      "historical": { "format": "PNG data URL", "decodable": true },
+      "v25FailedAudit": {
+        "format": "double-prefixed corrupt URL",
+        "decodable": false,
+        "diverged": true,
+        "note": "FIRST DIVERGENCE — file already has data: prefix; run-audit.mts prepends again"
+      },
+      "v25Corrected": { "format": "single valid PNG data URL", "decodable": true }
+    },
+    {
+      "stage": 2,
+      "name": "geometry",
+      "historical": { "bounds": { "top": 184, "bottom": 439, "headerTop": 194 }, "detected": true },
+      "v25FailedAudit": { "reached": false, "reason": "image decode failed upstream" },
+      "v25Corrected": { "bounds": { "top": 184, "bottom": 439, "headerTop": 194 }, "detected": true, "TABLE_TOP_MARGIN": 36 }
+    },
+    {
+      "stage": 3,
+      "name": "crop_generation",
+      "historical": { "fallbackUsed": false, "cropHeight": 255 },
+      "v25FailedAudit": { "reached": false, "reason": "no valid image bytes" },
+      "v25Corrected": { "fallbackUsed": false, "cropHeight": 255 }
+    },
+    {
+      "stage": 4,
+      "name": "passA_date",
+      "historical": { "invoice_date": "2026-04-17" },
+      "v25FailedAudit": { "invoice_date": null },
+      "v25Corrected": { "invoice_date": "2026-04-17" }
+    },
+    {
+      "stage": 5,
+      "name": "passB_supplier",
+      "historical": { "supplier": "AVILUDO" },
+      "v25FailedAudit": { "supplier": null },
+      "v25Corrected": { "supplier": "AVILUDO" }
+    },
+    {
+      "stage": 6,
+      "name": "passC_table",
+      "historical": { "itemCount": 9, "gptError": false, "emptyItemsArray": false },
+      "v25FailedAudit": { "itemCount": 0, "gptError": false, "emptyItemsArray": true, "note": "symptom not cause — upstream decode failure" },
+      "v25Corrected": { "itemCount": 9, "gptError": false, "itemsMatchHistorical": true }
+    },
+    {
+      "stage": 7,
+      "name": "final_items",
+      "historical": { "count": 9, "names": ["Filete de Anchovas", "Ovo Líquido Past.Gema Dovo 1kg", "Pepinos Extra II", "Atum Óleo Bolsa", "Arroz Agulha", "Chocolate Pantagruel", "Açúcar Branco", "Nata Reny Picot", "Mozzarella Fior di Latte"] },
+      "v25FailedAudit": { "count": 0 },
+      "v25Corrected": { "count": 9, "names": ["Filete de Anchovas", "Ovo Líquido Past.Gema Dovo 1kg", "Pepinos Extra II", "Atum Óleo Bolsa", "Arroz Agulha", "Chocolate Pantagruel", "Açúcar Branco", "Nata Reny Picot", "Mozzarella Fior di Latte"] }
+    }
+  ],
+  "firstDivergence": {
+    "stage": "image_input",
+    "stageNumber": 1,
+    "description": "final-validation-lab-rerun builds corrupt double-prefixed data URL from b64 fixture"
+  },
+  "gptBehaviorOnCorruptImage": {
+    "httpStatus": 200,
+    "errorField": null,
+    "responseShape": "all metadata null, items=[]",
+    "interpretation": "Silent full-pipeline failure — not schema rejection or GPT refusal"
+  }
+}

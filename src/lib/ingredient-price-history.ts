@@ -5,6 +5,13 @@ import {
   resolvedOperationalUnitCostEur,
 } from "@/lib/ingredient-unit-cost";
 import {
+  derivePurchaseContractSnapshot,
+  guardOperationalPreviousPrice,
+  selectChainCompatiblePriorOperationalPrice,
+  shouldBlockHistoryInsert,
+  type PriorChainCandidateRow,
+} from "@/lib/ingredient-price-chain-guard";
+import {
   compareInvoiceChronologyAsc,
   resolveInvoiceChronology,
 } from "@/lib/invoice-chronology";
@@ -183,6 +190,13 @@ export function linkedIngredientPriceHistoryRows<T extends PriceHistoryInvoiceLi
   return rows.filter(isLinkedPriceHistoryRow);
 }
 
+export {
+  filterHistoryRowsByContractAnchor,
+  filterTrustedPriceHistoryRows,
+  isTrustedPriceMovementRow,
+  trustedPriceHistoryDeltaPercent,
+} from "@/lib/ingredient-price-chain-guard";
+
 /**
  * Log a Supabase error with a stable, secret-free prefix. Treats the table as
  * optional: callers should fall back to empty results instead of throwing.
@@ -225,11 +239,37 @@ export async function fetchHistoryRowForInvoiceIngredient(
   }
 }
 
+function sortPriorChainRowsNewestFirst<
+  T extends {
+    invoice_id: string | null;
+    created_at: string | null;
+    id: string;
+    invoices?: { invoice_date: string | null; created_at: string | null } | null;
+  },
+>(rows: T[]): T[] {
+  return [...rows].sort((a, b) => {
+    const dateCmp = compareInvoiceChronologyAsc(
+      resolveInvoiceChronology(a.invoices ?? null).displayDateIso,
+      resolveInvoiceChronology(b.invoices ?? null).displayDateIso,
+    );
+    if (dateCmp !== 0) return -dateCmp;
+    const createdCmp = String(b.created_at ?? "").localeCompare(String(a.created_at ?? ""));
+    if (createdCmp !== 0) return createdCmp;
+    return String(b.id ?? "").localeCompare(String(a.id ?? ""));
+  });
+}
+
 /** Latest linked history `new_price` before a re-extract refresh (excludes the invoice being refreshed). */
 export async function fetchPriorLinkedHistoryNewPrice(
   client: AppSupabaseClient,
   ingredientId: string,
   excludeInvoiceId: string,
+  candidate?: {
+    ingredientName: string;
+    ingredientUnit?: string | null;
+    newPurchaseQuantity?: number | null;
+    storedNew: number;
+  },
 ): Promise<number | null> {
   const id = ingredientId.trim();
   const exclude = excludeInvoiceId.trim();
@@ -237,7 +277,9 @@ export async function fetchPriorLinkedHistoryNewPrice(
   try {
     const { data, error } = await client
       .from("ingredient_price_history")
-      .select("new_price, invoice_id, created_at, id, invoices(invoice_date, created_at)")
+      .select(
+        "new_price, ingredient_name, ingredient_unit, invoice_id, created_at, id, invoices(invoice_date, created_at)",
+      )
       .eq("ingredient_id", id)
       .not("invoice_id", "is", null)
       .neq("invoice_id", exclude);
@@ -245,24 +287,54 @@ export async function fetchPriorLinkedHistoryNewPrice(
       logSupabaseError("fetchPriorLinkedHistoryNewPrice", error);
       return null;
     }
-    const rows = [...(data ?? [])].sort((a, b) => {
-      const dateCmp = compareInvoiceChronologyAsc(
-        resolveInvoiceChronology(a.invoices).displayDateIso,
-        resolveInvoiceChronology(b.invoices).displayDateIso,
-      );
-      if (dateCmp !== 0) return -dateCmp;
-      const createdCmp = String(b.created_at ?? "").localeCompare(String(a.created_at ?? ""));
-      if (createdCmp !== 0) return createdCmp;
-      return String(b.id ?? "").localeCompare(String(a.id ?? ""));
+    const rows = sortPriorChainRowsNewestFirst(data ?? []);
+    if (!candidate) {
+      const n = rows[0]?.new_price == null ? null : Number(rows[0].new_price);
+      return n != null && Number.isFinite(n) ? n : null;
+    }
+
+    const nextSnap = derivePurchaseContractSnapshot({
+      name: candidate.ingredientName,
+      operationalUnitPrice: candidate.storedNew,
+      purchaseQuantity: candidate.newPurchaseQuantity ?? null,
+      ingredientUnit: candidate.ingredientUnit ?? null,
     });
-    const n = rows[0]?.new_price == null ? null : Number(rows[0].new_price);
-    return n != null && Number.isFinite(n) ? n : null;
+    return selectChainCompatiblePriorOperationalPrice(
+      rows as PriorChainCandidateRow[],
+      nextSnap,
+    );
   } catch (err) {
     console.error(
       `${LOG_PREFIX} fetchPriorLinkedHistoryNewPrice threw: ${err instanceof Error ? err.message : String(err)}`,
     );
     return null;
   }
+}
+
+function applyChainGuardToStoredPrices(
+  params: AppendIngredientPriceHistoryParams,
+  storedPrev: number | null,
+  storedNew: number,
+): number | null {
+  const nextSnap = derivePurchaseContractSnapshot({
+    name: params.ingredientName,
+    operationalUnitPrice: storedNew,
+    purchaseQuantity: params.newPurchaseQuantity ?? null,
+    ingredientUnit: params.ingredientUnit ?? null,
+  });
+
+  if (shouldBlockHistoryInsert(nextSnap)) return null;
+
+  if (storedPrev == null || !Number.isFinite(storedPrev)) return null;
+
+  const priorSnap = derivePurchaseContractSnapshot({
+    name: params.ingredientName,
+    operationalUnitPrice: storedPrev,
+    purchaseQuantity: params.previousPurchaseQuantity ?? null,
+    ingredientUnit: params.ingredientUnit ?? null,
+  });
+
+  return guardOperationalPreviousPrice(priorSnap, nextSnap) == null ? null : storedPrev;
 }
 
 function storedPriceHistoryFieldsFromParams(
@@ -299,7 +371,10 @@ function storedPriceHistoryFieldsFromParams(
     );
   }
 
-  return { storedPrev, storedNew, prevPack };
+  const guardedPrev = opts?.refreshExisting
+    ? storedPrev
+    : applyChainGuardToStoredPrices(params, storedPrev, storedNew);
+  return { storedPrev: guardedPrev, storedNew, prevPack };
 }
 
 function priceHistoryRowValuesMatch(
@@ -398,8 +473,30 @@ export async function appendIngredientPriceHistoryFromInvoiceLine(
   const existingRow = await fetchHistoryRowForInvoiceIngredient(client, invoiceId, ingredientId);
   const refreshExisting = existingRow != null;
 
+  const newPrice = Number(params.newPrice);
+  const storedNewPreview =
+    operationalUnitPriceForPriceHistory(newPrice, params.newPurchaseQuantity) ?? newPrice;
+  if (!Number.isFinite(storedNewPreview)) {
+    return { inserted: false, skippedReason: "invalid_new_price", error: null };
+  }
+
+  const nextInsertSnap = derivePurchaseContractSnapshot({
+    name: params.ingredientName,
+    operationalUnitPrice: storedNewPreview,
+    purchaseQuantity: params.newPurchaseQuantity ?? null,
+    ingredientUnit: params.ingredientUnit ?? null,
+  });
+  if (shouldBlockHistoryInsert(nextInsertSnap)) {
+    return { inserted: false, skippedReason: "invalid_new_price", error: null };
+  }
+
   const priorLinkedNewPrice = refreshExisting
-    ? await fetchPriorLinkedHistoryNewPrice(client, ingredientId, invoiceId)
+    ? await fetchPriorLinkedHistoryNewPrice(client, ingredientId, invoiceId, {
+        ingredientName: params.ingredientName,
+        ingredientUnit: params.ingredientUnit ?? null,
+        newPurchaseQuantity: params.newPurchaseQuantity ?? null,
+        storedNew: storedNewPreview,
+      })
     : null;
 
   const computed = storedPriceHistoryFieldsFromParams(params, {
@@ -411,7 +508,6 @@ export async function appendIngredientPriceHistoryFromInvoiceLine(
   }
 
   const { storedPrev, storedNew, prevPack } = computed;
-  const newPrice = Number(params.newPrice);
 
   if (
     !refreshExisting &&
