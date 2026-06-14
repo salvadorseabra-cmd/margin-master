@@ -16,6 +16,7 @@ import {
   type CatalogReviewCurrentMatchRow,
   type CatalogReviewInvoiceItemScanRow,
 } from "@/lib/catalog-review-current-matches";
+import type { PersistedMatchForCutover } from "@/lib/invoice-item-match-read-cutover";
 import {
   formatCurrentMatchCountSubline,
   sortCatalogReviewAlphabetical,
@@ -85,6 +86,9 @@ function CatalogReviewPage() {
   >([]);
   const [confirmedAliases, setConfirmedAliases] = useState<IngredientAliasMap>({});
   const [invoiceScanRows, setInvoiceScanRows] = useState<CatalogReviewInvoiceItemScanRow[]>([]);
+  const [scanPersistedMatchByItemId, setScanPersistedMatchByItemId] = useState<
+    Map<string, PersistedMatchForCutover>
+  >(() => new Map());
   const [scanTruncated, setScanTruncated] = useState(false);
   const [currentMatchCountById, setCurrentMatchCountById] = useState<Record<string, number>>({});
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -127,11 +131,17 @@ function CatalogReviewPage() {
     setCatalogRows(catalog);
     setConfirmedAliases(aliasMap);
     setInvoiceScanRows(scan.rows);
+    setScanPersistedMatchByItemId(scan.persistedMatchByItemId);
     setScanTruncated(scan.truncated);
 
     const canonical = filterCanonicalCatalogIngredients(catalog);
     setCurrentMatchCountById(
-      buildCatalogReviewCurrentMatchCountsFromScan(canonical, aliasMap, scan.rows),
+      buildCatalogReviewCurrentMatchCountsFromScan(
+        canonical,
+        aliasMap,
+        scan.rows,
+        scan.persistedMatchByItemId,
+      ),
     );
 
     const ingredientIds = canonical
@@ -252,7 +262,10 @@ function CatalogReviewPage() {
       canonical,
       confirmedAliasesRef.current,
       invoiceScanRows,
-      { truncated: scanTruncated },
+      {
+        truncated: scanTruncated,
+        persistedMatchByItemId: scanPersistedMatchByItemId,
+      },
     );
 
     setCurrentMatches(rows);
@@ -267,6 +280,7 @@ function CatalogReviewPage() {
     catalogRows,
     invoiceScanRows,
     scanTruncated,
+    scanPersistedMatchByItemId,
     confirmedAliases,
   ]);
 

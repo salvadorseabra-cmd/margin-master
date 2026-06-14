@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-06-14",
+  "virtual_counts": {
+    "confirmed": 7,
+    "suggested": 4,
+    "unmatched": 40
+  },
+  "expected_persisted_counts": {
+    "confirmed": 6,
+    "suggested": 5,
+    "unmatched": 40
+  },
+  "drift_lines": [
+    {
+      "invoice_item_id_latest": "514feb41-6cd4-44f1-abc8-344f0c0dfc23",
+      "invoice_item_id_prior": "8e9e727a-1d02-41f7-88e7-8eeea59c8b57",
+      "product": "Pepino",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "virtual": {
+        "displayState": "confirmed",
+        "kind": "exact",
+        "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d"
+      },
+      "expected_persisted": {
+        "status": "suggested",
+        "kind": "exact",
+        "ingredient_id": "635a1189-36ea-4ff2-9012-8172ab1ab81d"
+      },
+      "drift_type": "confirmed_to_suggested"
+    }
+  ],
+  "aligned_suggested": 4,
+  "aligned_confirmed_alias": 6,
+  "aligned_unmatched": 40
+}

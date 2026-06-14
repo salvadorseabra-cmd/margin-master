@@ -60,6 +60,28 @@ export async function getInvoiceItemMatchesByInvoiceId(
   return { data: (data ?? []) as InvoiceItemMatchRow[], error: null };
 }
 
+export async function getInvoiceItemMatchesForItemIds(
+  supabase: AppSupabaseClient,
+  invoiceItemIds: readonly string[],
+): Promise<{ data: InvoiceItemMatchRow[]; error: PostgrestError | null }> {
+  const ids = [...new Set(invoiceItemIds.map((id) => id.trim()).filter(Boolean))];
+  if (ids.length === 0) {
+    return { data: [], error: null };
+  }
+
+  const { data, error } = await supabase
+    .from("invoice_item_matches")
+    .select(MATCH_SELECT)
+    .in("invoice_item_id", ids);
+
+  if (error) {
+    logSupabaseError("getForItemIds", error);
+    return { data: [], error };
+  }
+
+  return { data: (data ?? []) as InvoiceItemMatchRow[], error: null };
+}
+
 export async function upsertInvoiceItemMatch(
   supabase: AppSupabaseClient,
   row: InvoiceItemMatchInsert,

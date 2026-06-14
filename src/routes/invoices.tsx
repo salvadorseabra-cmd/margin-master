@@ -67,6 +67,15 @@ import {
   invoiceRowMatchSummaryBucket,
   resolveInvoiceTableRowIngredientMatch,
 } from "@/lib/invoice-ingredient-row-display";
+import {
+  buildCutoverContextForInvoiceItem,
+  buildPersistedMatchMapFromRows,
+} from "@/lib/invoice-item-match-read-cutover";
+import {
+  getInvoiceItemMatchesByInvoiceId,
+  getInvoiceItemMatchesForItemIds,
+} from "@/lib/invoice-item-match-repository";
+import { isMatchLifecycleReadCutoverEnabled } from "@/lib/match-lifecycle-flags";
 import { traceInvoiceIngredientMatchPipeline } from "@/lib/invoice-ingredient-match-trace";
 import {
   getAliasTraceCompareBucket,
@@ -164,6 +173,11 @@ import {
   syncOperationalIngredientCostsFromInvoiceLines,
 } from "@/lib/ingredient-operational-intelligence";
 import { shadowSeedInvoiceItemMatchesAfterExtract } from "@/lib/invoice-item-match-shadow-seed";
+import {
+  confirmMatch,
+  correctMatch,
+  reassignMatch,
+} from "@/lib/match-lifecycle-service";
 import { dispatchOperationalIngredientCostChanged } from "@/lib/resolve-operational-ingredient-cost";
 import {
   fileNameFromInvoicePath,
@@ -173,6 +187,70 @@ import {
   normalizeSupplierDisplayName,
 } from "@/lib/supplier-identity";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
+
+type IngredientSelectLifecycleOptions = {
+  previousIngredientId?: string | null;
+  wasConfirmed?: boolean;
+};
+
+async function dualWriteMatchLifecycleAfterIngredientPersist(params: {
+  item: { id: string };
+  ingredientId: string;
+  invoiceId: string;
+  userId: string;
+  matchKind?: string | null;
+  lifecycle?: IngredientSelectLifecycleOptions;
+}): Promise<void> {
+  const { item, ingredientId, invoiceId, userId, matchKind, lifecycle } = params;
+  try {
+    if (
+      lifecycle?.previousIngredientId &&
+      lifecycle.previousIngredientId !== ingredientId
+    ) {
+      const result = lifecycle.wasConfirmed
+        ? await reassignMatch(supabase, {
+            invoiceItemId: item.id,
+            userId,
+            invoiceId,
+            newIngredientId: ingredientId,
+            previousIngredientId: lifecycle.previousIngredientId,
+          })
+        : await correctMatch(supabase, {
+            invoiceItemId: item.id,
+            userId,
+            invoiceId,
+            newIngredientId: ingredientId,
+            previousIngredientId: lifecycle.previousIngredientId,
+            keepConfirmed: false,
+          });
+      if (result.error) {
+        console.error(
+          "[invoices] match lifecycle correct dual-write failed:",
+          item.id,
+          result.error.message,
+        );
+      }
+      return;
+    }
+
+    const result = await confirmMatch(supabase, {
+      invoiceItemId: item.id,
+      userId,
+      invoiceId,
+      ingredientId,
+      matchKind: matchKind ?? "manual",
+    });
+    if (result.error) {
+      console.error(
+        "[invoices] match lifecycle confirm dual-write failed:",
+        item.id,
+        result.error.message,
+      );
+    }
+  } catch (err) {
+    console.error("[invoices] match lifecycle dual-write unexpected error:", item.id, err);
+  }
+}
 
 export const Route = createFileRoute("/invoices")({
   head: () => ({
@@ -797,6 +875,10 @@ function InvoicesPage() {
   const [unresolvedIngredientCountByInvoice, setUnresolvedIngredientCountByInvoice] = useState<
     Record<string, number>
   >({});
+  const [persistedMatchByItemId, setPersistedMatchByItemId] = useState<
+    Map<string, import("@/lib/invoice-item-match-read-cutover").PersistedMatchForCutover>
+  >(() => new Map());
+  const persistedMatchByItemIdRef = useRef(persistedMatchByItemId);
 
   useEffect(() => {
     settlementByInvoiceRef.current = settlementByInvoice;
@@ -807,19 +889,47 @@ function InvoicesPage() {
     [rows],
   );
 
+  useEffect(() => {
+    persistedMatchByItemIdRef.current = persistedMatchByItemId;
+  }, [persistedMatchByItemId]);
+
+  const buildPersistedMatchMapsByInvoice = useCallback(
+    (
+      itemsMap: Record<string, ItemRow[]>,
+      matchMap: ReadonlyMap<
+        string,
+        import("@/lib/invoice-item-match-read-cutover").PersistedMatchForCutover
+      >,
+    ) => {
+      return Object.fromEntries(
+        Object.keys(itemsMap).map((invoiceId) => [invoiceId, matchMap]),
+      );
+    },
+    [],
+  );
+
   const refreshUnresolvedIngredientCounts = useCallback(
     (itemsMap: Record<string, ItemRow[]>) => {
       if (ingredientCatalog.length === 0) return;
+      const matchMap = persistedMatchByItemIdRef.current;
       setUnresolvedIngredientCountByInvoice(
         countUnresolvedInvoiceIngredientsByInvoice(
           itemsMap,
           ingredientCatalog,
           confirmedIngredientAliases,
           supplierNameByInvoiceId,
+          isMatchLifecycleReadCutoverEnabled()
+            ? buildPersistedMatchMapsByInvoice(itemsMap, matchMap)
+            : {},
         ),
       );
     },
-    [ingredientCatalog, confirmedIngredientAliases, supplierNameByInvoiceId],
+    [
+      ingredientCatalog,
+      confirmedIngredientAliases,
+      supplierNameByInvoiceId,
+      buildPersistedMatchMapsByInvoice,
+    ],
   );
 
   useEffect(() => {
@@ -965,6 +1075,18 @@ function InvoicesPage() {
 
       if (loadSeq !== invoiceLoadSeqRef.current) return;
 
+      let nextPersistedMatchByItemId = persistedMatchByItemIdRef.current;
+      if (isMatchLifecycleReadCutoverEnabled()) {
+        const allItemIds = Object.values(itemsByInvoiceId)
+          .flat()
+          .map((item) => item.id);
+        const { data: matchRows } = await getInvoiceItemMatchesForItemIds(supabase, allItemIds);
+        if (loadSeq !== invoiceLoadSeqRef.current) return;
+        nextPersistedMatchByItemId = buildPersistedMatchMapFromRows(matchRows ?? []);
+        setPersistedMatchByItemId(nextPersistedMatchByItemId);
+        persistedMatchByItemIdRef.current = nextPersistedMatchByItemId;
+      }
+
       const identityState = invoiceIdentitiesRef.current;
       if (catalog.length > 0) {
         setUnresolvedIngredientCountByInvoice(
@@ -980,6 +1102,9 @@ function InvoicesPage() {
                 ) || null,
               ]),
             ),
+            isMatchLifecycleReadCutoverEnabled()
+              ? buildPersistedMatchMapsByInvoice(itemsByInvoiceId, nextPersistedMatchByItemId)
+              : {},
           ),
         );
       }
@@ -1658,7 +1783,22 @@ function InvoicesPage() {
     allInvoiceItemsRef.current = { ...allInvoiceItemsRef.current, [invoiceId]: items };
     setItemsByInvoice((s) => ({ ...s, [invoiceId]: items }));
     setPriceComparisonsByInvoice((s) => ({ ...s, [invoiceId]: priceComparisons }));
+
+    if (isMatchLifecycleReadCutoverEnabled()) {
+      const { data: matchRows } = await getInvoiceItemMatchesByInvoiceId(supabase, invoiceId);
+      const invoiceMatchMap = buildPersistedMatchMapFromRows(matchRows ?? []);
+      setPersistedMatchByItemId((current) => {
+        const next = new Map(current);
+        for (const [itemId, row] of invoiceMatchMap) {
+          next.set(itemId, row);
+        }
+        persistedMatchByItemIdRef.current = next;
+        return next;
+      });
+    }
+
     const supplierName = rows.find((row) => row.id === invoiceId)?.supplier_name ?? null;
+    const matchMap = persistedMatchByItemIdRef.current;
     if (ingredientCatalog.length > 0) {
       setUnresolvedIngredientCountByInvoice((current) => ({
         ...current,
@@ -1667,6 +1807,7 @@ function InvoicesPage() {
           ingredientCatalog,
           confirmedAliases: confirmedIngredientAliases,
           supplierName,
+          persistedMatchByItemId: isMatchLifecycleReadCutoverEnabled() ? matchMap : undefined,
         }).unmatchedCount,
       }));
     }
@@ -1927,6 +2068,15 @@ function InvoicesPage() {
       supplierName,
     );
     if (aliasResult.ok) {
+      if (user) {
+        void dualWriteMatchLifecycleAfterIngredientPersist({
+          item,
+          ingredientId: match.ingredient.id,
+          invoiceId,
+          userId: user.id,
+          matchKind: match.kind,
+        });
+      }
       dispatchOperationalIngredientCostChanged({
         trigger: "invoice_match_confirm",
         ingredientId: match.ingredient.id,
@@ -1945,6 +2095,7 @@ function InvoicesPage() {
     ingredientId: string,
     invoiceId: string,
     supplierName?: string | null,
+    lifecycle?: IngredientSelectLifecycleOptions,
   ): Promise<{ ok: boolean; error?: string }> => {
     const ingredient = ingredientCatalog.find((row) => row.id === ingredientId);
     if (!ingredient) return { ok: false, error: "Ingredient not found" };
@@ -1968,6 +2119,15 @@ function InvoicesPage() {
       supplierName,
     );
     if (result.ok) {
+      if (user) {
+        void dualWriteMatchLifecycleAfterIngredientPersist({
+          item,
+          ingredientId,
+          invoiceId,
+          userId: user.id,
+          lifecycle,
+        });
+      }
       dispatchOperationalIngredientCostChanged({
         trigger: "invoice_manual_match",
         ingredientId,
@@ -2042,6 +2202,14 @@ function InvoicesPage() {
         setCanonicalCreateError(result.error);
         return;
       }
+
+      void dualWriteMatchLifecycleAfterIngredientPersist({
+        item,
+        ingredientId: result.ingredientId,
+        invoiceId: canonicalInvoiceId,
+        userId: user.id,
+        matchKind: "manual",
+      });
 
       setIngredientCatalog((current) =>
         current.some((row) => row.id === result.catalogRow.id)
@@ -2122,6 +2290,16 @@ function InvoicesPage() {
 
     for (const outcome of result.outcomes) {
       if (outcome.result.ok) {
+        const bulkRow = rows.find((row) => row.context.item.id === outcome.itemId);
+        if (bulkRow) {
+          void dualWriteMatchLifecycleAfterIngredientPersist({
+            item: bulkRow.context.item,
+            ingredientId: outcome.result.ingredientId,
+            invoiceId,
+            userId: user.id,
+            matchKind: "manual",
+          });
+        }
         dispatchOperationalIngredientCostChanged({
           trigger: "invoice_canonical_save",
           ingredientId: outcome.result.ingredientId,
@@ -2535,6 +2713,11 @@ function InvoicesPage() {
                               allInvoiceSupplierNames={rows.map((row) => row.supplier_name)}
                               confirmedIngredientAliases={confirmedIngredientAliases}
                               supplierName={r.supplier_name}
+                              persistedMatchByItemId={
+                                isMatchLifecycleReadCutoverEnabled()
+                                  ? persistedMatchByItemId
+                                  : undefined
+                              }
                               userId={user?.id}
                               loading={itemsByInvoice[r.id] === undefined}
                               extracting={!!extracting[r.id]}
@@ -2545,8 +2728,14 @@ function InvoicesPage() {
                               onConfirmIngredientMatch={(item, match) =>
                                 confirmIngredientMatch(item, match, r.id, r.supplier_name)
                               }
-                              onSelectIngredientForItem={(item, ingredientId) =>
-                                selectIngredientForItem(item, ingredientId, r.id, r.supplier_name)
+                              onSelectIngredientForItem={(item, ingredientId, lifecycle) =>
+                                selectIngredientForItem(
+                                  item,
+                                  ingredientId,
+                                  r.id,
+                                  r.supplier_name,
+                                  lifecycle,
+                                )
                               }
                               onBulkCreateIngredients={(submissions, candidates) =>
                                 saveBulkCanonicalIngredientsFromInvoice(
@@ -2855,6 +3044,7 @@ function ItemsTable({
   allInvoiceSupplierNames,
   confirmedIngredientAliases,
   supplierName,
+  persistedMatchByItemId,
   userId,
   creatingIngredientByItem,
   ingredientCreationErrors,
@@ -2876,6 +3066,10 @@ function ItemsTable({
   allInvoiceSupplierNames: string[];
   confirmedIngredientAliases: IngredientAliasMap;
   supplierName?: string | null;
+  persistedMatchByItemId?: ReadonlyMap<
+    string,
+    import("@/lib/invoice-item-match-read-cutover").PersistedMatchForCutover
+  >;
   userId?: string;
   creatingIngredientByItem: IngredientCreationState;
   ingredientCreationErrors: IngredientCreationErrors;
@@ -2889,6 +3083,7 @@ function ItemsTable({
   onSelectIngredientForItem: (
     item: ItemRow,
     ingredientId: string,
+    lifecycle?: IngredientSelectLifecycleOptions,
   ) => Promise<{ ok: boolean; error?: string }>;
   onBulkCreateIngredients: (
     submissions: BulkCanonicalIngredientCreateSubmitRow[],
@@ -2911,7 +3106,9 @@ function ItemsTable({
   const [bulkCreateSheetOpen, setBulkCreateSheetOpen] = useState(false);
   const [bulkCreateSaving, setBulkCreateSaving] = useState(false);
   const [bulkCreateError, setBulkCreateError] = useState<string | null>(null);
-  const correctionSnapshotRef = useRef<Map<string, string | null>>(new Map());
+  const correctionSnapshotRef = useRef<
+    Map<string, { previousIngredientId: string | null; wasConfirmed: boolean }>
+  >(new Map());
 
   const ingredientPickerOptions = useMemo(() => {
     const built = buildIngredientPickerOptionsForInvoice(
@@ -2948,13 +3145,17 @@ function ItemsTable({
     options: {
       ingredientMatch?: IngredientCanonicalMatch | null;
       possibleIngredientMatch?: IngredientCanonicalMatch | null;
+      wasConfirmed?: boolean;
     },
   ) => {
     const previousIngredientId =
       options.ingredientMatch?.ingredient.id ??
       options.possibleIngredientMatch?.ingredient.id ??
       null;
-    correctionSnapshotRef.current.set(item.id, previousIngredientId);
+    correctionSnapshotRef.current.set(item.id, {
+      previousIngredientId,
+      wasConfirmed: options.wasConfirmed === true,
+    });
     setEditingMatchRowId(item.id);
   };
 
@@ -2968,7 +3169,9 @@ function ItemsTable({
     ingredientId: string,
     rawName: string,
   ) => {
-    const previousIngredientId = correctionSnapshotRef.current.get(item.id) ?? null;
+    const snapshot = correctionSnapshotRef.current.get(item.id);
+    const previousIngredientId = snapshot?.previousIngredientId ?? null;
+    const wasConfirmed = snapshot?.wasConfirmed ?? false;
     correctionSnapshotRef.current.delete(item.id);
     setEditingMatchRowId(null);
 
@@ -2992,7 +3195,10 @@ function ItemsTable({
       next.delete(item.id);
       return next;
     });
-    const result = await onSelectIngredientForItem(item, ingredientId);
+    const result = await onSelectIngredientForItem(item, ingredientId, {
+      previousIngredientId,
+      wasConfirmed,
+    });
     setSavingCorrectionLineId(null);
     if (result.ok) {
       toast("Ingredient mapping saved");
@@ -3021,6 +3227,7 @@ function ItemsTable({
         confirmedIngredientAliases,
         supplierName,
         { stage: "summary:after-canonical", rowId: rowItem.id, rawName },
+        buildCutoverContextForInvoiceItem(rowItem.id, persistedMatchByItemId),
       );
       const bucket = invoiceRowMatchSummaryBucket(state.displayState);
       if (bucket === "matched") {
@@ -3233,6 +3440,7 @@ function ItemsTable({
                     confirmedIngredientAliases,
                     supplierName,
                     { stage: "render:after-canonical", rowId: renderItem.id, rawName },
+                    buildCutoverContextForInvoiceItem(renderItem.id, persistedMatchByItemId),
                   );
                 traceInvoiceIngredientMatchPipeline({
                   stage: "render:final-jsx",
@@ -3402,6 +3610,7 @@ function ItemsTable({
                                 openIngredientCorrection(renderItem, {
                                   ingredientMatch,
                                   possibleIngredientMatch,
+                                  wasConfirmed: ingredientMatchState.displayState === "confirmed",
                                 });
                                 return;
                               }

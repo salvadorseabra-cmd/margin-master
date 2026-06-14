@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-06-14",
+  "vl_project_ref": "bjhnlrgodcqoyzddbpbd",
+  "actual": {
+    "invoice_items_count": 51,
+    "match_records_count": 0,
+    "table_exists": false,
+    "missing_records": 51,
+    "orphan_records": 0,
+    "duplicate_records": 0,
+    "coverage_percent": 0,
+    "flags_shadow_seed": false,
+    "flags_dual_write": false
+  },
+  "expected_post_backfill": {
+    "invoice_items_count": 51,
+    "match_records_count": 51,
+    "missing_records": 0,
+    "orphan_records": 0,
+    "duplicate_records": 0,
+    "coverage_percent": 100,
+    "by_status": {
+      "unmatched": 40,
+      "suggested": 5,
+      "confirmed": 6
+    }
+  }
+}

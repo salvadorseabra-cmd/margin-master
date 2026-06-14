@@ -70,6 +70,8 @@ export function buildMatchRecordForInvoiceItem(
     [...matchCatalog],
     params.confirmedAliases,
     params.supplierName ?? null,
+    undefined,
+    { useReadCutover: false },
   );
 
   return mapMatcherOutputToInitialMatchRecord({

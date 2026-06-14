@@ -27,6 +27,10 @@ import {
   invoiceRowMatchSummaryBucket,
   resolveInvoiceTableRowIngredientMatch,
 } from "@/lib/invoice-ingredient-row-display";
+import {
+  buildCutoverContextForInvoiceItem,
+  type PersistedMatchForCutover,
+} from "@/lib/invoice-item-match-read-cutover";
 import { readLocalInvoiceIngredientAliases } from "@/lib/operational-review-queue";
 import {
   defaultIsGenericUnit,
@@ -614,7 +618,11 @@ export function buildMatchedInvoiceProductsFromScan(
   catalog: readonly IngredientCanonicalInput[],
   confirmedAliases: IngredientAliasMap,
   scanRows: readonly MatchedInvoiceItemScanRow[],
-  options?: { truncated?: boolean; scanLimit?: number },
+  options?: {
+    truncated?: boolean;
+    scanLimit?: number;
+    persistedMatchByItemId?: ReadonlyMap<string, PersistedMatchForCutover>;
+  },
 ): IngredientMatchedInvoiceProductsResult {
   const trimmedId = ingredientId?.trim();
   const empty: IngredientMatchedInvoiceProductsResult = {
@@ -661,6 +669,8 @@ export function buildMatchedInvoiceProductsFromScan(
       matchCatalog,
       confirmedAliases,
       supplierName,
+      undefined,
+      buildCutoverContextForInvoiceItem(normalized.id, options?.persistedMatchByItemId),
     );
     const matchedIngredientId = match?.ingredient.id?.trim();
     if (!match || !matchedIngredientId || matchedIngredientId !== trimmedId) continue;
@@ -734,6 +744,7 @@ export function buildLatestPurchaseGlanceByIngredientIdFromScan(
   catalog: readonly IngredientCanonicalInput[],
   confirmedAliases: IngredientAliasMap,
   scanRows: readonly MatchedInvoiceItemScanRow[],
+  persistedMatchByItemId?: ReadonlyMap<string, PersistedMatchForCutover>,
 ): Record<string, IngredientLatestPurchaseGlance> {
   const catalogIds = new Set(
     catalog.map((row) => row.id?.trim()).filter((id): id is string => Boolean(id)),
@@ -772,6 +783,8 @@ export function buildLatestPurchaseGlanceByIngredientIdFromScan(
       matchCatalog,
       confirmedAliases,
       supplierName,
+      undefined,
+      buildCutoverContextForInvoiceItem(normalized.id, persistedMatchByItemId),
     );
     const matchedIngredientId = match?.ingredient.id?.trim();
     if (!match || !matchedIngredientId || !catalogIds.has(matchedIngredientId)) continue;
@@ -811,6 +824,7 @@ export function buildLatestOperationalIngredientCostByIngredientIdFromScan(
   catalog: readonly IngredientCanonicalInput[],
   confirmedAliases: IngredientAliasMap,
   scanRows: readonly MatchedInvoiceItemScanRow[],
+  persistedMatchByItemId?: ReadonlyMap<string, PersistedMatchForCutover>,
 ): Map<string, OperationalInvoiceCostEntry> {
   const catalogIds = new Set(
     catalog.map((row) => row.id?.trim()).filter((id): id is string => Boolean(id)),
@@ -849,6 +863,8 @@ export function buildLatestOperationalIngredientCostByIngredientIdFromScan(
       matchCatalog,
       confirmedAliases,
       supplierName,
+      undefined,
+      buildCutoverContextForInvoiceItem(normalized.id, persistedMatchByItemId),
     );
     const matchedIngredientId = match?.ingredient.id?.trim();
     if (!match || !matchedIngredientId || !catalogIds.has(matchedIngredientId)) continue;

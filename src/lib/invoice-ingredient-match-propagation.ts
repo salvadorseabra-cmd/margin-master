@@ -17,6 +17,8 @@ import {
   normalizeInvoiceItemFields,
   type InvoiceItemRow,
 } from "@/lib/invoice-item-fields";
+import type { InvoiceTableRowMatchCutoverContext } from "@/lib/invoice-item-match-read-cutover";
+import { resolveReadCutoverMatch } from "@/lib/invoice-item-match-read-cutover";
 
 /**
  * Mirrors `getItemIngredientMatch` in invoices.tsx (canonical lookup only).
@@ -93,6 +95,7 @@ export function resolveInvoiceTableRowFromItem(
   confirmedAliases: IngredientAliasMap = {},
   supplierName?: string | null,
   traceStage = "resolve-from-item",
+  cutover?: InvoiceTableRowMatchCutoverContext,
 ) {
   const rawName = item.name ?? "";
   const rowItem = normalizeInvoiceItemFields(item);
@@ -104,7 +107,7 @@ export function resolveInvoiceTableRowFromItem(
     nameChanged: rawName !== rowItem.name,
     ingredientCatalogLength: ingredientCatalog.length,
   });
-  return resolveInvoiceRowIngredientMatch(
+  const virtual = resolveInvoiceRowIngredientMatch(
     rowItem.name,
     ingredientCatalog,
     confirmedAliases,
@@ -115,6 +118,19 @@ export function resolveInvoiceTableRowFromItem(
       rawName,
     },
   );
+  const cutoverResult = resolveReadCutoverMatch({
+    itemName: rowItem.name,
+    ingredientCatalog,
+    virtualMatch: virtual.match,
+    virtualState: virtual.state,
+    cutover: cutover
+      ? {
+          ...cutover,
+          invoiceItemId: cutover.invoiceItemId ?? rowItem.id,
+        }
+      : { invoiceItemId: rowItem.id, persistedMatch: undefined },
+  });
+  return { match: cutoverResult.match, state: cutoverResult.state };
 }
 
 /** Pre-fix invoices.tsx treated only semantic matches as possible suggestions. */

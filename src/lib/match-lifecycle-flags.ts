@@ -32,3 +32,49 @@ export function isMatchLifecycleShadowSeedEnabled(
   const raw = env.VITE_MATCH_LIFECYCLE_SHADOW_SEED;
   return raw === "true" || raw === "1" || raw === "on";
 }
+
+/**
+ * Phase 3 dual-write: persist lifecycle transitions to invoice_item_matches after
+ * existing alias/cost flows succeed. Default OFF — enable with
+ * VITE_MATCH_LIFECYCLE_DUAL_WRITE=true|1|on
+ */
+export function isMatchLifecycleDualWriteEnabled(
+  env: Record<string, string | undefined> = import.meta.env,
+): boolean {
+  const raw = env.VITE_MATCH_LIFECYCLE_DUAL_WRITE;
+  return raw === "true" || raw === "1" || raw === "on";
+}
+
+/**
+ * Phase 4A dual-read validation: log virtual vs persisted drift in dev without read cutover.
+ * Default OFF — enable with VITE_MATCH_LIFECYCLE_DUAL_READ_LOG=true|1|on
+ */
+export function isMatchLifecycleDualReadLogEnabled(
+  env: Record<string, string | undefined> = import.meta.env,
+): boolean {
+  const raw = env.VITE_MATCH_LIFECYCLE_DUAL_READ_LOG;
+  return raw === "true" || raw === "1" || raw === "on";
+}
+
+function readLifecycleFlag(
+  name: string,
+  env: Record<string, string | undefined>,
+): string | undefined {
+  const fromEnv = env[name];
+  if (fromEnv !== undefined) return fromEnv;
+  if (typeof process !== "undefined") {
+    return process.env[name];
+  }
+  return undefined;
+}
+
+/**
+ * Phase 4B read cutover: prefer invoice_item_matches over virtual matcher on read paths.
+ * Default OFF — enable with VITE_MATCH_LIFECYCLE_READ_CUTOVER=true|1|on
+ */
+export function isMatchLifecycleReadCutoverEnabled(
+  env: Record<string, string | undefined> = import.meta.env,
+): boolean {
+  const raw = readLifecycleFlag("VITE_MATCH_LIFECYCLE_READ_CUTOVER", env);
+  return raw === "true" || raw === "1" || raw === "on";
+}

@@ -9,6 +9,12 @@ import {
   invoiceRowMatchSummaryBucket,
   resolveInvoiceTableRowIngredientMatch,
 } from "@/lib/invoice-ingredient-row-display";
+import {
+  buildCutoverContextForInvoiceItem,
+  type PersistedMatchForCutover,
+} from "@/lib/invoice-item-match-read-cutover";
+
+export { buildCutoverContextForInvoiceItem };
 
 export type InvoiceUnresolvedIngredientCountInput = Pick<
   InvoiceItemRow,
@@ -20,6 +26,7 @@ export type CountUnresolvedInvoiceIngredientsParams = {
   ingredientCatalog: readonly IngredientCanonicalInput[];
   confirmedAliases?: IngredientAliasMap;
   supplierName?: string | null;
+  persistedMatchByItemId?: ReadonlyMap<string, PersistedMatchForCutover>;
 };
 
 export type UnresolvedInvoiceIngredientCountResult = {
@@ -85,6 +92,8 @@ export function countUnresolvedInvoiceIngredients(
       matchCatalog,
       params.confirmedAliases ?? {},
       params.supplierName,
+      undefined,
+      buildCutoverContextForInvoiceItem(item.id, params.persistedMatchByItemId),
     );
     const bucket = invoiceRowMatchSummaryBucket(state.displayState);
     if (bucket === "matched") matchedCount += 1;
@@ -107,6 +116,9 @@ export function countUnresolvedInvoiceIngredientsByInvoice(
   ingredientCatalog: readonly IngredientCanonicalInput[],
   confirmedAliases: IngredientAliasMap = {},
   supplierNameByInvoice: Readonly<Record<string, string | null | undefined>> = {},
+  persistedMatchByInvoiceId: Readonly<
+    Record<string, ReadonlyMap<string, PersistedMatchForCutover>>
+  > = {},
 ): Record<string, number> {
   const counts: Record<string, number> = {};
   for (const [invoiceId, items] of Object.entries(itemsByInvoice)) {
@@ -115,6 +127,7 @@ export function countUnresolvedInvoiceIngredientsByInvoice(
       ingredientCatalog,
       confirmedAliases,
       supplierName: supplierNameByInvoice[invoiceId] ?? null,
+      persistedMatchByItemId: persistedMatchByInvoiceId[invoiceId],
     }).unmatchedCount;
   }
   return counts;

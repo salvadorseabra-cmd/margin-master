@@ -15,6 +15,13 @@ import {
   invoiceRowMatchSummaryBucket,
   resolveInvoiceTableRowIngredientMatch,
 } from "@/lib/invoice-ingredient-row-display";
+import {
+  buildCutoverContextForInvoiceItem,
+  buildPersistedMatchMapFromRows,
+  type PersistedMatchForCutover,
+} from "@/lib/invoice-item-match-read-cutover";
+import { getInvoiceItemMatchesForItemIds } from "@/lib/invoice-item-match-repository";
+import { isMatchLifecycleReadCutoverEnabled } from "@/lib/match-lifecycle-flags";
 import { normalizeInvoiceItemFields } from "@/lib/invoice-item-fields";
 import { isEligibleInvoiceIngredientRow } from "@/lib/invoice-unresolved-ingredient-count";
 import type { AppSupabaseClient } from "@/lib/ingredient-alias-memory";
@@ -72,6 +79,7 @@ export function buildCatalogReviewCurrentMatchCountsFromScan(
   catalog: readonly IngredientCanonicalInput[],
   confirmedAliases: IngredientAliasMap,
   scanRows: readonly CatalogReviewInvoiceItemScanRow[],
+  persistedMatchByItemId?: ReadonlyMap<string, PersistedMatchForCutover>,
 ): Record<string, number> {
   const catalogIds = new Set(
     catalog.map((row) => row.id?.trim()).filter((id): id is string => Boolean(id)),
@@ -110,6 +118,8 @@ export function buildCatalogReviewCurrentMatchCountsFromScan(
       matchCatalog,
       confirmedAliases,
       supplierName,
+      undefined,
+      buildCutoverContextForInvoiceItem(normalized.id, persistedMatchByItemId),
     );
     const matchedIngredientId = match?.ingredient.id?.trim();
     if (!match || !matchedIngredientId || !catalogIds.has(matchedIngredientId)) continue;
@@ -126,12 +136,29 @@ export function buildCatalogReviewCurrentMatchCountsFromScan(
 
 export async function loadCatalogReviewInvoiceItemScan(
   client: AppSupabaseClient,
-): Promise<{ rows: CatalogReviewInvoiceItemScanRow[]; truncated: boolean; scanLimit: number }> {
+): Promise<{
+  rows: CatalogReviewInvoiceItemScanRow[];
+  truncated: boolean;
+  scanLimit: number;
+  persistedMatchByItemId: Map<string, PersistedMatchForCutover>;
+}> {
   const { rows, truncated } = await loadInvoiceItemsForMatchedProductScan(client);
+  const scanRows = rows as CatalogReviewInvoiceItemScanRow[];
+
+  let persistedMatchByItemId = new Map<string, PersistedMatchForCutover>();
+  if (isMatchLifecycleReadCutoverEnabled() && scanRows.length > 0) {
+    const { data: matchRows } = await getInvoiceItemMatchesForItemIds(
+      client,
+      scanRows.map((row) => row.id),
+    );
+    persistedMatchByItemId = buildPersistedMatchMapFromRows(matchRows ?? []);
+  }
+
   return {
-    rows: rows as CatalogReviewInvoiceItemScanRow[],
+    rows: scanRows,
     truncated,
     scanLimit: MATCHED_INVOICE_PRODUCTS_SCAN_LIMIT,
+    persistedMatchByItemId,
   };
 }
 
@@ -140,7 +167,11 @@ export function loadCatalogReviewCurrentMatchesForIngredient(
   catalog: readonly IngredientCanonicalInput[],
   confirmedAliases: IngredientAliasMap,
   scanRows: readonly CatalogReviewInvoiceItemScanRow[],
-  options?: { truncated?: boolean; scanLimit?: number },
+  options?: {
+    truncated?: boolean;
+    scanLimit?: number;
+    persistedMatchByItemId?: ReadonlyMap<string, PersistedMatchForCutover>;
+  },
 ): CatalogReviewCurrentMatchesLoadResult {
   const trimmedId = ingredientId.trim();
   const entry = catalog.find((row) => row.id?.trim() === trimmedId);

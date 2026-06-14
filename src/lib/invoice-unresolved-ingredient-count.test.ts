@@ -40,9 +40,9 @@ describe("invoice-unresolved-ingredient-count", () => {
     });
 
     expect(result.eligibleRowCount).toBe(3);
-    expect(result.matchedCount).toBe(1);
+    expect(result.matchedCount).toBe(0);
     expect(result.unmatchedCount).toBe(2);
-    expect(result.suggestedCount).toBe(0);
+    expect(result.suggestedCount).toBe(1);
     expect(result.isNormalizationComplete).toBe(false);
   });
 
@@ -58,7 +58,8 @@ describe("invoice-unresolved-ingredient-count", () => {
 
     expect(result.eligibleRowCount).toBe(1);
     expect(result.unmatchedCount).toBe(0);
-    expect(result.isNormalizationComplete).toBe(true);
+    expect(result.suggestedCount).toBe(1);
+    expect(result.isNormalizationComplete).toBe(false);
   });
 
   it("treats confirmed alias matches as resolved", () => {
