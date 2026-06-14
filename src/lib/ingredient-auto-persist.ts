@@ -62,13 +62,14 @@ export type AutoPersistInvoiceItem = {
   quantity: number | null;
   unit: string | null;
   unit_price: number | null;
+  total?: number | null;
 };
 
 export type { OperationalIngredientCostFields };
 
 /** Maps a matched invoice line to catalog `current_price` / `purchase_quantity` fields. */
 export function operationalCostFieldsFromInvoiceLine(
-  item: Pick<AutoPersistInvoiceItem, "name" | "quantity" | "unit" | "unit_price">,
+  item: Pick<AutoPersistInvoiceItem, "name" | "quantity" | "unit" | "unit_price" | "total">,
   _options: {
     isGenericUnit?: (unit: string | null | undefined) => boolean;
   } = {},
@@ -78,6 +79,7 @@ export function operationalCostFieldsFromInvoiceLine(
     quantity: item.quantity,
     unit: item.unit,
     unit_price: item.unit_price,
+    line_total: item.total ?? undefined,
   });
   if (!recipeFields) return null;
   return {

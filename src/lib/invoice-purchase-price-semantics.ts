@@ -173,6 +173,26 @@ function formatPurchaseCount(value: number): string {
   return Number.isInteger(value) ? String(value) : value.toFixed(2);
 }
 
+const PER_ITEM_TOTAL_TOLERANCE_ABS = 0.02;
+const PER_ITEM_TOTAL_TOLERANCE_REL = 0.005;
+
+/** True when invoice line total matches qty × unit_price — unit_price is per priced unit, not line aggregate. */
+function isUnitPricePerPricedUnit(
+  rowQty: number,
+  unitPrice: number | null | undefined,
+  lineTotal: number | null | undefined,
+): boolean {
+  if (rowQty <= 1) return false;
+  const up = unitPrice == null ? null : Number(unitPrice);
+  const total = lineTotal == null ? null : Number(lineTotal);
+  if (up == null || !Number.isFinite(up) || total == null || !Number.isFinite(total)) return false;
+
+  const expected = rowQty * up;
+  const diff = Math.abs(total - expected);
+  if (diff <= PER_ITEM_TOTAL_TOLERANCE_ABS) return true;
+  return diff / Math.max(Math.abs(total), Math.abs(expected), 1e-9) <= PER_ITEM_TOTAL_TOLERANCE_REL;
+}
+
 function detectPurchasePriceKind(
   structured: StructuredPurchaseFormat,
   rowUnit: string | null | undefined,
@@ -451,6 +471,9 @@ export function resolveCountablePurchaseQuantityForCost(
     rowUnit === "pc" ||
     rowUnit === "pcs"
   ) {
+    if (isUnitPricePerPricedUnit(rowQty, metadata.unit_price, metadata.line_total)) {
+      return 1;
+    }
     return rowQty;
   }
 

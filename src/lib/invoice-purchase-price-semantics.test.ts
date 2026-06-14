@@ -142,6 +142,54 @@ describe("recipeOperationalCostFieldsFromInvoiceLine", () => {
     });
     expect(ingredientLineCostEur(1, fields!, { recipeUnit: "un" })).toBeCloseTo(1.15, 2);
   });
+
+  it("maps multi-un Atum 2 bags @ €6.29 to €6.29 not €3.145 (double-divide fix)", () => {
+    const fields = recipeOperationalCostFieldsFromInvoiceLine({
+      name: "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+      quantity: 2,
+      unit: "un",
+      unit_price: 6.29,
+      line_total: 12.58,
+    });
+    expect(fields?.purchase_quantity).toBe(1);
+    expect(effectiveIngredientUnitCostEur(fields!)).toBeCloseTo(6.29, 2);
+  });
+
+  it("maps multi-un Anchoas 2 tins @ €9.49 to per-tin operational", () => {
+    const fields = recipeOperationalCostFieldsFromInvoiceLine({
+      name: "Anchovas 495g",
+      quantity: 2,
+      unit: "un",
+      unit_price: 9.49,
+      line_total: 18.98,
+    });
+    expect(fields?.purchase_quantity).toBe(1);
+    expect(effectiveIngredientUnitCostEur(fields!)).toBeCloseTo(9.49, 2);
+  });
+
+  it("maps multi-un Gema 6 packs @ €10.19 to per-pack operational", () => {
+    const fields = recipeOperationalCostFieldsFromInvoiceLine({
+      name: "Ovo Gema 1kg",
+      quantity: 6,
+      unit: "un",
+      unit_price: 10.19,
+      line_total: 61.14,
+    });
+    expect(fields?.purchase_quantity).toBe(1);
+    expect(effectiveIngredientUnitCostEur(fields!)).toBeCloseTo(10.19, 2);
+  });
+
+  it("preserves rowQty when line total is aggregate unit_price (no per-item signal)", () => {
+    const fields = recipeOperationalCostFieldsFromInvoiceLine({
+      name: "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+      quantity: 2,
+      unit: "un",
+      unit_price: 12.58,
+      line_total: 12.58,
+    });
+    expect(fields?.purchase_quantity).toBe(2);
+    expect(effectiveIngredientUnitCostEur(fields!)).toBeCloseTo(6.29, 2);
+  });
 });
 
 describe("formatInvoicePurchasePriceLabel", () => {
