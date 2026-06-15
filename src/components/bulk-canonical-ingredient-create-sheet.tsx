@@ -51,6 +51,19 @@ function initialRowState(
   };
 }
 
+/** Preserve user edits when parent refreshes candidates while the sheet stays open. */
+export function mergeBulkCanonicalIngredientRows(
+  current: BulkCanonicalIngredientCreateRowState[],
+  candidates: BulkCanonicalCreateCandidate[],
+): BulkCanonicalIngredientCreateRowState[] {
+  const currentByItemId = new Map(current.map((row) => [row.itemId, row]));
+  return candidates.map((candidate) => {
+    const existing = currentByItemId.get(candidate.item.id);
+    if (existing) return existing;
+    return initialRowState(candidate);
+  });
+}
+
 export function BulkCanonicalIngredientCreateSheet({
   open,
   onOpenChange,
@@ -62,8 +75,11 @@ export function BulkCanonicalIngredientCreateSheet({
   const [rows, setRows] = useState<BulkCanonicalIngredientCreateRowState[]>([]);
 
   useEffect(() => {
-    if (!open) return;
-    setRows(candidates.map(initialRowState));
+    if (!open) {
+      setRows([]);
+      return;
+    }
+    setRows((current) => mergeBulkCanonicalIngredientRows(current, candidates));
   }, [open, candidates]);
 
   const selectedCount = useMemo(() => rows.filter((row) => row.selected).length, [rows]);
