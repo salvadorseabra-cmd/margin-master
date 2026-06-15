@@ -148,6 +148,7 @@ serve(async (req) => {
       tableFromPass = await extractTableItemsFromImage(
         imageDataUrl,
         OPENAI_API_KEY,
+        footerFromPass.total,
       );
       console.log("[invoice-ocr] stage=2d table-pass", {
         itemCount: tableFromPass.items.length,

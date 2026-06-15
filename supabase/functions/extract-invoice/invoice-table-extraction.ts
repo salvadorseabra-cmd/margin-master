@@ -305,29 +305,78 @@ export type TableExtractionResult = {
 export async function extractTableItemsFromImage(
   imageDataUrl: string,
   apiKey: string,
+  knownTotal: number | null = null,
 ): Promise<TableExtractionResult> {
+  const firstPass = await runTableExtractionPass(imageDataUrl, apiKey);
+  const usedCrop = firstPass.tableCrop.bounds != null &&
+    !firstPass.tableCrop.fallbackUsed &&
+    firstPass.croppedDataUrl !== imageDataUrl;
+
+  if (
+    firstPass.items.length === 0 &&
+    knownTotal != null &&
+    knownTotal > 0 &&
+    usedCrop
+  ) {
+    console.log("[invoice-ocr] table-pass-empty-retry", {
+      knownTotal,
+      retryStrategy: "full-image",
+      cropBounds: firstPass.tableCrop.bounds,
+    });
+    const retryPass = await runTableExtractionPass(imageDataUrl, apiKey, {
+      skipCrop: true,
+    });
+    if (retryPass.items.length > 0) {
+      return {
+        items: retryPass.items,
+        tableCrop: {
+          bounds: firstPass.tableCrop.bounds,
+          fallbackUsed: true,
+        },
+      };
+    }
+  }
+
+  return {
+    items: firstPass.items,
+    tableCrop: firstPass.tableCrop,
+  };
+}
+
+async function runTableExtractionPass(
+  imageDataUrl: string,
+  apiKey: string,
+  options: { skipCrop?: boolean } = {},
+): Promise<TableExtractionResult & { croppedDataUrl: string }> {
   let croppedDataUrl = imageDataUrl;
   let bounds = null;
   let fallbackUsed = true;
-  try {
-    const cropResult = await cropTableRegionForLineItems(imageDataUrl);
-    croppedDataUrl = cropResult.croppedDataUrl;
-    bounds = cropResult.bounds;
-    fallbackUsed = cropResult.fallbackUsed;
-    const cropHeight = bounds ? bounds.bottom - bounds.top : null;
-    console.log("[invoice-ocr] table-crop-result", {
-      cropSucceeded: !fallbackUsed,
-      fallbackUsed,
-      bounds,
-      cropHeight,
-      sentSameAsInput: croppedDataUrl === imageDataUrl,
-    });
-  } catch (cropError) {
-    console.error("[invoice-ocr] table-crop-failed", {
-      cropSucceeded: false,
-      fallbackUsed: true,
-      error:
-        cropError instanceof Error ? cropError.message : String(cropError),
+
+  if (!options.skipCrop) {
+    try {
+      const cropResult = await cropTableRegionForLineItems(imageDataUrl);
+      croppedDataUrl = cropResult.croppedDataUrl;
+      bounds = cropResult.bounds;
+      fallbackUsed = cropResult.fallbackUsed;
+      const cropHeight = bounds ? bounds.bottom - bounds.top : null;
+      console.log("[invoice-ocr] table-crop-result", {
+        cropSucceeded: !fallbackUsed,
+        fallbackUsed,
+        bounds,
+        cropHeight,
+        sentSameAsInput: croppedDataUrl === imageDataUrl,
+      });
+    } catch (cropError) {
+      console.error("[invoice-ocr] table-crop-failed", {
+        cropSucceeded: false,
+        fallbackUsed: true,
+        error:
+          cropError instanceof Error ? cropError.message : String(cropError),
+      });
+    }
+  } else {
+    console.log("[invoice-ocr] table-crop-skipped", {
+      reason: "full-image-retry",
     });
   }
 
@@ -358,8 +407,9 @@ export async function extractTableItemsFromImage(
     items,
     tableCrop: {
       bounds,
-      fallbackUsed,
+      fallbackUsed: options.skipCrop ? true : fallbackUsed,
     },
+    croppedDataUrl,
   };
 }
 

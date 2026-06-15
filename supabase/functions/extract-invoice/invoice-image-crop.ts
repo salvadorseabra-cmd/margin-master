@@ -18,6 +18,7 @@ import {
   TABLE_TOP_MARGIN,
   TOTALS_SCAN_END_FRACTION,
   FOOTER_GREY_HEADER_MAX_FRACTION,
+  TABLE_HEADER_BAND_SCAN_END_FRACTION,
   WHITE_HEADER_EXPANDED_MIN_RULE_FRACTION,
   WHITE_HEADER_MIN_RULE_FRACTION,
 } from "./invoice-crop-geometry.ts";
@@ -168,6 +169,42 @@ function detectWhiteHeaderTop(
   return null;
 }
 
+/**
+ * White headers without a strong horizontal rule (Lenha-style): scan column-header
+ * text bands in the upper table zone when rule anchoring finds nothing.
+ */
+function detectWhiteHeaderTopByBandScan(
+  image: Image,
+  scanStart: number,
+  scanEnd: number,
+): number | null {
+  let bestY: number | null = null;
+  let bestRuleScore = -1;
+
+  for (let y = scanStart; y < scanEnd - HEADER_BAND_ROWS; y++) {
+    if (!isWhiteHeaderBand(image, y)) continue;
+
+    let ruleScore = 0;
+    for (const offset of HEADER_RULE_OFFSETS) {
+      const ruleY = y - offset;
+      if (ruleY >= scanStart) {
+        ruleScore = Math.max(ruleScore, rowEdgeScore(image, ruleY));
+      }
+    }
+
+    if (
+      bestY == null ||
+      ruleScore > bestRuleScore ||
+      (ruleScore === bestRuleScore && y < bestY)
+    ) {
+      bestY = y;
+      bestRuleScore = ruleScore;
+    }
+  }
+
+  return bestY;
+}
+
 /** Detect header band and totals-section start for tabular invoice crops. */
 export function detectTableBounds(image: Image): TableBounds {
   const height = image.height;
@@ -196,6 +233,24 @@ export function detectTableBounds(image: Image): TableBounds {
       );
       if (fallbackWhiteTop != null) headerTop = fallbackWhiteTop;
     }
+  }
+
+  const footerMaxY = Math.floor(height * FOOTER_GREY_HEADER_MAX_FRACTION);
+  if (headerTop >= footerMaxY) {
+    const bandScanStart = Math.max(
+      scanStart,
+      Math.floor(height * WHITE_HEADER_EXPANDED_MIN_RULE_FRACTION),
+    );
+    const bandScanEnd = Math.min(
+      footerMaxY,
+      Math.floor(height * TABLE_HEADER_BAND_SCAN_END_FRACTION),
+    );
+    const bandScanTop = detectWhiteHeaderTopByBandScan(
+      image,
+      bandScanStart,
+      bandScanEnd,
+    );
+    if (bandScanTop != null) headerTop = bandScanTop;
   }
 
   if (!Number.isFinite(bestBandAverage)) {

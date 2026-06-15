@@ -128,6 +128,20 @@ Deno.test("footer crop: Emporio Italia includes grey totals box (Subtotal/Total)
   assertGreater(image.height - cropStartY, bounds.bottom - cropStartY);
 });
 
+Deno.test("detectTableBounds: Lenha includes product row, not IVA band y=621", async () => {
+  const image = await loadImage(".tmp/lenha-extraction-fix/invoice-full.png");
+  const bounds = detectTableBounds(image);
+
+  const productRowY = 430;
+  const ivaBandY = 621;
+
+  // Before fix: headerTop=621, cropTop=585 — product row excluded
+  assertLess(bounds.headerTop, ivaBandY);
+  assertLess(bounds.top, productRowY);
+  assertGreater(bounds.bottom, productRowY);
+  assertEquals(bounds.detected, true);
+});
+
 Deno.test("footer crop: Bidfood keeps table-anchored start with TOTAL 292.70", async () => {
   const image = await loadImage(".tmp/bidfood-ovo.png");
   const bounds = detectTableBounds(image);

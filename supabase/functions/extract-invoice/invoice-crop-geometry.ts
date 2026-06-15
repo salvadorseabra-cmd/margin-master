@@ -86,6 +86,8 @@ export const HEADER_RULE_MIN_EDGE = 28;
 
 /** Grey-band winners above this fraction are footer summary stripes, not column headers. */
 export const FOOTER_GREY_HEADER_MAX_FRACTION = 0.50;
+/** Upper bound for band-scan header recovery below the footer grey summary zone. */
+export const TABLE_HEADER_BAND_SCAN_END_FRACTION = 0.42;
 export const HEADER_RULE_OFFSETS = [12, 16, 20, 24] as const;
 
 /** Totals-band edge scan reaches the lower page even when the header sits higher. */
