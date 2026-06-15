@@ -15,6 +15,22 @@ import {
   looksLikeSupplierAbbreviatedCatalogName,
   shouldBlockCanonicalNameOnCreate,
 } from "@/lib/canonical-ingredient-operational-name";
+
+const CATALOG_READY_MAX_TOKENS = 2;
+const CATALOG_READY_PACK_TOKEN_RE = /\d/;
+
+/** Fuel surcharges and other non-food invoice lines excluded from canonical create. */
+const NON_FOOD_INVOICE_LINE_RE = /\brecarg[ao]\b.*\bcombustib/i;
+
+export function isNonFoodInvoiceLine(raw: string | null | undefined): boolean {
+  const trimmed = raw?.trim() ?? "";
+  if (!trimmed) return false;
+  const normalized = trimmed
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase();
+  return NON_FOOD_INVOICE_LINE_RE.test(normalized);
+}
 import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 import {
   getAliasTraceCompareBucket,
@@ -80,11 +96,33 @@ function confirmedNameMatchesInvoiceAlias(
   return a.length > 0 && a === b;
 }
 
+/** Simple produce/herb invoice names that need only display casing — Phase 1 pass-through. */
+export function isCatalogReadyInvoiceName(invoiceAlias: string): boolean {
+  const trimmed = invoiceAlias.trim();
+  if (!trimmed) return false;
+  if (isNonFoodInvoiceLine(trimmed)) return false;
+  if (looksLikeInvoiceShorthandName(trimmed)) return false;
+  if (looksLikeSupplierAbbreviatedCatalogName(trimmed)) return false;
+  if (shouldBlockCanonicalNameOnCreate(trimmed)) return false;
+
+  const displayName = formatCanonicalIngredientDisplayName(trimmed);
+  if (!displayName || !confirmedNameMatchesInvoiceAlias(displayName, trimmed)) return false;
+
+  const tokens = trimmed.split(/\s+/).filter(Boolean);
+  if (tokens.length > CATALOG_READY_MAX_TOKENS) return false;
+  if (CATALOG_READY_PACK_TOKEN_RE.test(trimmed)) return false;
+
+  return true;
+}
+
 export function validateCanonicalIngredientName(
   rawName: string | null | undefined,
   options?: { invoiceAlias?: string | null },
 ): CanonicalIngredientNameValidation {
   const name = rawName?.trim() ?? "";
+  if (isNonFoodInvoiceLine(name)) {
+    return { ok: false, message: "This invoice line is not a food ingredient." };
+  }
   if (!name) {
     traceIngredientAliasesValidationRejection("validateCanonicalIngredientName", "empty_name", {
       rawName,
@@ -93,15 +131,17 @@ export function validateCanonicalIngredientName(
   }
   const invoiceAlias = options?.invoiceAlias?.trim() ?? "";
   if (invoiceAlias && confirmedNameMatchesInvoiceAlias(name, invoiceAlias)) {
-    traceIngredientAliasesValidationRejection(
-      "validateCanonicalIngredientName",
-      "matches_invoice_alias",
-      { rawName: name, invoiceAlias },
-    );
-    return {
-      ok: false,
-      message: "Enter a catalog name, not invoice shorthand",
-    };
+    if (!isCatalogReadyInvoiceName(invoiceAlias)) {
+      traceIngredientAliasesValidationRejection(
+        "validateCanonicalIngredientName",
+        "matches_invoice_alias",
+        { rawName: name, invoiceAlias },
+      );
+      return {
+        ok: false,
+        message: "Enter a catalog name, not invoice shorthand",
+      };
+    }
   }
   const normalized = normalizeIngredientName(name);
   if (!normalized || normalized === "unknown") {
@@ -132,8 +172,10 @@ export function validateCanonicalIngredientName(
 export type CanonicalIngredientCreateFormDefaults = {
   itemId: string;
   invoiceAlias: string;
-  /** Cleanup preview only — never auto-filled into the confirmed name field. */
+  /** Cleanup preview — pre-filled when catalogReady. */
   suggestedCanonicalName: string | null;
+  /** Invoice name is already a good catalog label (simple produce/herb). */
+  catalogReady: boolean;
   unit: string;
   purchase_quantity: string;
   purchase_unit: string;
@@ -152,6 +194,24 @@ export function buildCanonicalIngredientCreateDefaults(
 ): CanonicalIngredientCreateFormDefaults {
   const isGenericUnit = options?.isGenericUnit ?? defaultIsGenericUnit;
   const invoiceAlias = item.name.trim();
+  if (isNonFoodInvoiceLine(invoiceAlias)) {
+    return {
+      itemId: item.id,
+      invoiceAlias,
+      suggestedCanonicalName: null,
+      catalogReady: false,
+      unit: item.unit?.trim() ?? "kg",
+      purchase_quantity: "1",
+      purchase_unit: "",
+      base_unit: item.unit?.trim() ?? "kg",
+      current_price:
+        item.unit_price != null && Number.isFinite(Number(item.unit_price))
+          ? String(Number(item.unit_price))
+          : "",
+      invoiceQuantityLabel: null,
+      supplierName: options?.supplierName?.trim() || null,
+    };
+  }
   const payload = buildIngredientInsertPayload(item, "placeholder-user", { isGenericUnit });
   const qty = item.quantity;
   const unit = item.unit?.trim();
@@ -171,9 +231,11 @@ export function buildCanonicalIngredientCreateDefaults(
   let suggestedCanonicalName = useOperationalSuggestion
     ? operationalName
     : formatCanonicalIngredientDisplayName(invoiceAlias) || null;
+  const catalogReady = isCatalogReadyInvoiceName(invoiceAlias);
   if (
     suggestedCanonicalName &&
-    confirmedNameMatchesInvoiceAlias(suggestedCanonicalName, invoiceAlias)
+    confirmedNameMatchesInvoiceAlias(suggestedCanonicalName, invoiceAlias) &&
+    !catalogReady
   ) {
     suggestedCanonicalName = null;
   }
@@ -200,6 +262,7 @@ export function buildCanonicalIngredientCreateDefaults(
     itemId: item.id,
     invoiceAlias,
     suggestedCanonicalName,
+    catalogReady,
     unit: payload?.unit ?? unit ?? "kg",
     purchase_quantity: payload?.purchase_quantity != null ? String(payload.purchase_quantity) : "1",
     purchase_unit: payload?.purchase_unit ?? "",

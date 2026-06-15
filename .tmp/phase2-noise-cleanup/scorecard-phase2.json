@@ -1,0 +1,278 @@
+{
+  "generated_at": "2026-06-15T12:27:28.219Z",
+  "total": 33,
+  "counts": {
+    "EXCELLENT": 6,
+    "ACCEPTABLE": 19,
+    "WEAK": 4,
+    "EMPTY": 4
+  },
+  "usable": 25,
+  "usablePct": "75.8%",
+  "rows": [
+    {
+      "invoice": "Manteiga Coimbra s/Sal Emb 1 Kg",
+      "baseline": "WEAK",
+      "phase1Class": "WEAK",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Manteiga s/sal",
+      "catalogReady": false
+    },
+    {
+      "invoice": "Abóbora Butternut",
+      "baseline": "EMPTY",
+      "phase1Class": "EMPTY",
+      "phase2Class": "EXCELLENT",
+      "suggested": "Abóbora butternut",
+      "catalogReady": true
+    },
+    {
+      "invoice": "Alho Francês",
+      "baseline": "EMPTY",
+      "phase1Class": "EMPTY",
+      "phase2Class": "EXCELLENT",
+      "suggested": "Alho francês",
+      "catalogReady": true
+    },
+    {
+      "invoice": "Courgettes",
+      "baseline": "EMPTY",
+      "phase1Class": "EMPTY",
+      "phase2Class": "EXCELLENT",
+      "suggested": "Courgettes",
+      "catalogReady": true
+    },
+    {
+      "invoice": "Pêra Abacate Hasse",
+      "baseline": "EMPTY",
+      "phase1Class": "EMPTY",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Pêra abacate",
+      "catalogReady": false
+    },
+    {
+      "invoice": "Hortelã",
+      "baseline": "EMPTY",
+      "phase1Class": "EMPTY",
+      "phase2Class": "EXCELLENT",
+      "suggested": "Hortelã",
+      "catalogReady": true
+    },
+    {
+      "invoice": "Manjericão",
+      "baseline": "EMPTY",
+      "phase1Class": "EMPTY",
+      "phase2Class": "EXCELLENT",
+      "suggested": "Manjericão",
+      "catalogReady": true
+    },
+    {
+      "invoice": "Salada Ibérica FSTK EMB. 250g",
+      "baseline": "EMPTY",
+      "phase1Class": "EMPTY",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Salada ibérica",
+      "catalogReady": false
+    },
+    {
+      "invoice": "Tomilho",
+      "baseline": "EMPTY",
+      "phase1Class": "EMPTY",
+      "phase2Class": "EXCELLENT",
+      "suggested": "Tomilho",
+      "catalogReady": true
+    },
+    {
+      "invoice": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "baseline": "WEAK",
+      "phase1Class": "WEAK",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Ovo classe M",
+      "catalogReady": false
+    },
+    {
+      "invoice": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "baseline": "ACCEPTABLE",
+      "phase1Class": "ACCEPTABLE",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Rovagnati - salame ventricina",
+      "catalogReady": false
+    },
+    {
+      "invoice": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "baseline": "EMPTY",
+      "phase1Class": "EMPTY",
+      "phase2Class": "EMPTY",
+      "suggested": null,
+      "catalogReady": false
+    },
+    {
+      "invoice": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello 1/8 - 1,85kg",
+      "baseline": "WEAK",
+      "phase1Class": "WEAK",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Arrigoni formaggi - gorgonzola DOP dolce linea castello 1/8 -",
+      "catalogReady": false
+    },
+    {
+      "invoice": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+      "baseline": "WEAK",
+      "phase1Class": "WEAK",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Rovagnati - assaporami prosciutto cotto scelto HC 4,3-",
+      "catalogReady": false
+    },
+    {
+      "invoice": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5Kg",
+      "baseline": "WEAK",
+      "phase1Class": "WEAK",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Rovagnati - mortadella IGP 'massima' con pistacchio 1/2 -",
+      "catalogReady": false
+    },
+    {
+      "invoice": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "baseline": "EMPTY",
+      "phase1Class": "EMPTY",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Sanpellegrino - acqua in vitro 75cl 15ud",
+      "catalogReady": false
+    },
+    {
+      "invoice": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg",
+      "baseline": "WEAK",
+      "phase1Class": "WEAK",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Rigamonti - bresaola punta d'anca oro 1/2 -",
+      "catalogReady": false
+    },
+    {
+      "invoice": "Baladin - Ginger Beer 0.20cl",
+      "baseline": "EMPTY",
+      "phase1Class": "EMPTY",
+      "phase2Class": "EMPTY",
+      "suggested": null,
+      "catalogReady": false
+    },
+    {
+      "invoice": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "baseline": "ACCEPTABLE",
+      "phase1Class": "ACCEPTABLE",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Guanciale di suino stagionato +/- *7 sorrentino",
+      "catalogReady": false
+    },
+    {
+      "invoice": "Rulo Di Capra 1kg*2 Simonetta",
+      "baseline": "ACCEPTABLE",
+      "phase1Class": "ACCEPTABLE",
+      "phase2Class": "WEAK",
+      "suggested": "Rulo di capra *2 simonetta",
+      "catalogReady": false
+    },
+    {
+      "invoice": "Recargo por combustibili",
+      "baseline": "EMPTY",
+      "phase1Class": "EMPTY",
+      "phase2Class": "EMPTY",
+      "suggested": null,
+      "catalogReady": false
+    },
+    {
+      "invoice": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "baseline": "WEAK",
+      "phase1Class": "WEAK",
+      "phase2Class": "WEAK",
+      "suggested": "Farina do pasta fresca e gnocchi caputo",
+      "catalogReady": false
+    },
+    {
+      "invoice": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "baseline": "WEAK",
+      "phase1Class": "WEAK",
+      "phase2Class": "WEAK",
+      "suggested": "Mozza fior di latte expet julienne simonetta",
+      "catalogReady": false
+    },
+    {
+      "invoice": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "baseline": "WEAK",
+      "phase1Class": "WEAK",
+      "phase2Class": "WEAK",
+      "suggested": "Aceto balsamico di modena IGP pet *2 toschi",
+      "catalogReady": false
+    },
+    {
+      "invoice": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "baseline": "EMPTY",
+      "phase1Class": "EMPTY",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Birra peroni nastro azzurro PNA 33cl 24 nastro azzurro",
+      "catalogReady": false
+    },
+    {
+      "invoice": "Farine Speciale pizza 25kg Amoruso",
+      "baseline": "ACCEPTABLE",
+      "phase1Class": "ACCEPTABLE",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Farine speciale pizza amoruso",
+      "catalogReady": false
+    },
+    {
+      "invoice": "ROLO DE CABRA E VACA 1KG",
+      "baseline": "ACCEPTABLE",
+      "phase1Class": "ACCEPTABLE",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Rolo DE cabra e vaca",
+      "catalogReady": false
+    },
+    {
+      "invoice": "RICOTTA TREVIGIANA 1,5KG",
+      "baseline": "EXCELLENT",
+      "phase1Class": "EXCELLENT",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Ricotta trevigiana",
+      "catalogReady": false
+    },
+    {
+      "invoice": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "baseline": "EMPTY",
+      "phase1Class": "EMPTY",
+      "phase2Class": "EMPTY",
+      "suggested": null,
+      "catalogReady": false
+    },
+    {
+      "invoice": "POMODORI PELATI (CX 2,5KG*6)",
+      "baseline": "EXCELLENT",
+      "phase1Class": "EXCELLENT",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Pomodori pelati ( , *6)",
+      "catalogReady": false
+    },
+    {
+      "invoice": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "baseline": "ACCEPTABLE",
+      "phase1Class": "ACCEPTABLE",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Mezzi paccheri mancini (cx *6)",
+      "catalogReady": false
+    },
+    {
+      "invoice": "STRACCIATELLA 250 GR",
+      "baseline": "ACCEPTABLE",
+      "phase1Class": "ACCEPTABLE",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Stracciatella 250gr",
+      "catalogReady": false
+    },
+    {
+      "invoice": "Filete de Anchovas Alconfirsta L1 495 g",
+      "baseline": "WEAK",
+      "phase1Class": "WEAK",
+      "phase2Class": "ACCEPTABLE",
+      "suggested": "Filete de anchovas alconfirsta l1 495g",
+      "catalogReady": false
+    }
+  ]
+}

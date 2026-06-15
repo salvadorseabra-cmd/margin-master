@@ -4,6 +4,7 @@ import { buildInvoiceMatchCatalog } from "@/lib/ingredient-canonical-synthesis";
 import {
   buildCanonicalIngredientCreateDefaults,
   buildExplicitCanonicalInsertPayload,
+  isNonFoodInvoiceLine,
   traceCanonicalConfirmedName,
   traceCanonicalCreate,
   traceCanonicalCreateFailure,
@@ -87,6 +88,7 @@ export type ExecuteBulkCanonicalIngredientCreateResult = {
 };
 
 function isEligibleForExplicitCanonicalCreate(name: string): boolean {
+  if (isNonFoodInvoiceLine(name)) return false;
   const normalized = name.trim().toLowerCase();
   return normalized.length > 0 && normalized !== "unknown";
 }

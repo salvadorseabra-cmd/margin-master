@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import {
   Sheet,
@@ -147,7 +148,14 @@ export function BulkCanonicalIngredientCreateSheet({
                         </p>
                       </div>
                       <div>
-                        <Label htmlFor={`${checkboxId}-name`}>Suggested canonical name</Label>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Label htmlFor={`${checkboxId}-name`}>Suggested canonical name</Label>
+                          {candidate.defaults.catalogReady && (
+                            <Badge variant="secondary" className="text-xs">
+                              Catalog Ready
+                            </Badge>
+                          )}
+                        </div>
                         <input
                           id={`${checkboxId}-name`}
                           value={row.canonicalName}

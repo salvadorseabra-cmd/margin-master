@@ -70,6 +70,7 @@ export const OPERATIONAL_ALIASES: Record<string, string> = {
   kraft: "kraft",
   maio: "maionese",
   mol: "molho",
+  mozza: "mozzarella",
   novilho: "novilho",
   on: "onion",
   oni: "onion",

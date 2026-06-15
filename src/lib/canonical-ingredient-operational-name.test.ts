@@ -63,6 +63,12 @@ describe("generateOperationalIngredientName", () => {
   it("formats ANG PTY 180 as Angus patty 180g", () => {
     expect(generateOperationalIngredientName("ANG PTY 180")).toBe("Angus patty 180g");
   });
+
+  it("expands MOZZA to mozzarella while preserving fior di latte", () => {
+    expect(generateOperationalIngredientName("MOZZA Fior di Latte Expet Julienne 3kg Simonetta")).toBe(
+      "Mozzarella fior di latte julienne",
+    );
+  });
 });
 
 describe("normalizeCanonicalRootIngredientName", () => {

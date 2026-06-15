@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
 import type { CanonicalIngredientCreateFormDefaults } from "@/lib/canonical-ingredient-create";
 import {
@@ -76,7 +77,10 @@ export function CanonicalIngredientCreateDialog({
     }
     setLocalError(null);
     setForm({
-      confirmedCanonicalName: "",
+      confirmedCanonicalName:
+        defaults.catalogReady && defaults.suggestedCanonicalName
+          ? defaults.suggestedCanonicalName
+          : "",
       unit: defaults.unit,
       purchase_quantity: defaults.purchase_quantity,
       purchase_unit: defaults.purchase_unit,
@@ -163,23 +167,34 @@ export function CanonicalIngredientCreateDialog({
 
             {suggestion && (
               <div className="rounded-md border border-dashed border-border bg-muted/20 px-3 py-2 text-sm">
-                <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Suggested canonical name
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Suggested canonical name
+                  </div>
+                  {defaults.catalogReady && (
+                    <Badge variant="secondary" className="text-xs">
+                      Catalog Ready
+                    </Badge>
+                  )}
                 </div>
                 <p className="mt-0.5 font-medium">{suggestion}</p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Preview from cleanup — not saved until you apply and confirm below.
+                  {defaults.catalogReady
+                    ? "Invoice name is already a good catalog name — confirm below or edit."
+                    : "Preview from cleanup — not saved until you apply and confirm below."}
                 </p>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  className="mt-2"
-                  disabled={saving}
-                  onClick={handleApplySuggestion}
-                >
-                  Apply suggestion
-                </Button>
+                {!defaults.catalogReady && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="mt-2"
+                    disabled={saving}
+                    onClick={handleApplySuggestion}
+                  >
+                    Apply suggestion
+                  </Button>
+                )}
               </div>
             )}
 

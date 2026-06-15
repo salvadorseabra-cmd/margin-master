@@ -3,21 +3,21 @@
   "ingredientName": "Mozzarella fior di latte",
   "invoiceLabel": "Bocconcino",
   "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-  "lineName": "MOZZARELLA FIOR DI LATTE 'IL BOCCONCINO' 125GR*8",
+  "lineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
   "trustVerdict": "stale",
   "classification": [
-    "stale_db_row"
+    "no_price_history"
   ],
   "invoiceSource": {
     "quantity": 10,
     "unit": "un",
-    "unit_price": 9.5,
+    "unit_price": 8.12,
     "total": 81.23
   },
   "normalized": {
-    "packPrice": 9.5,
+    "packPrice": 8.12,
     "purchaseQuantity": 10,
-    "operationalUnitCost": 0.95,
+    "operationalUnitCost": 0.8119999999999999,
     "usableCostPerLiter": null
   },
   "ingredientCatalog": {
@@ -25,18 +25,9 @@
     "purchase_quantity": 1,
     "operationalUnitCost": 13.69
   },
-  "priceHistory": [
-    {
-      "id": "18bdb0c5-0370-4bc7-878d-85957b8ba946",
-      "previous_price": null,
-      "new_price": 0.95,
-      "delta": null,
-      "delta_percent": null,
-      "deltaMathValid": true,
-      "directionValid": true,
-      "matchesComputedOperational": true
-    }
-  ],
+  "priceHistory": [],
   "opportunityRisk": [],
-  "notes": []
+  "notes": [
+    "Matched ingredient but no price_history row for this invoice"
+  ]
 }

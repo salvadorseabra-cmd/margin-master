@@ -1,14 +1,14 @@
 {
   "trusted": [
     {
-      "ingredient": "Pepino conserva",
-      "invoice": "Bidfood",
-      "line": "Pepino"
-    },
-    {
       "ingredient": "Mozzarella fior di latte",
       "invoice": "Aviludo April",
       "line": "Mozzarella Flor di Latte 2Kg"
+    },
+    {
+      "ingredient": "Chocolate culinária",
+      "invoice": "Aviludo May",
+      "line": "Chocolate Culinaria Pantagruel 10x200 g"
     }
   ],
   "notTrusted": [
@@ -27,21 +27,34 @@
   ],
   "stale": [
     {
-      "ingredient": "Chocolate culinária",
-      "invoice": "Aviludo May",
+      "ingredient": "Pepino conserva",
+      "invoice": "Bidfood",
       "reasons": [
-        "stale_db_row"
+        "pack_qty_mismatch",
+        "no_price_history"
       ]
     },
     {
       "ingredient": "Mozzarella fior di latte",
       "invoice": "Bocconcino",
       "reasons": [
-        "stale_db_row"
+        "no_price_history"
       ]
     }
   ],
   "unmatched": [
+    {
+      "line": "Manjericão",
+      "invoice": "Bidfood"
+    },
+    {
+      "line": "Alho Francês",
+      "invoice": "Bidfood"
+    },
+    {
+      "line": "Abóbora Butternut",
+      "invoice": "Bidfood"
+    },
     {
       "line": "Manteiga Coimbra s/Sal EMB 1 Kg",
       "invoice": "Bidfood"
@@ -59,10 +72,6 @@
       "invoice": "Bidfood"
     },
     {
-      "line": "Manjericão",
-      "invoice": "Bidfood"
-    },
-    {
       "line": "Hortelã",
       "invoice": "Bidfood"
     },
@@ -75,31 +84,7 @@
       "invoice": "Bidfood"
     },
     {
-      "line": "Alho Francês",
-      "invoice": "Bidfood"
-    },
-    {
-      "line": "Abóbora Butternut",
-      "invoice": "Bidfood"
-    },
-    {
       "line": "Nata Reny Picot 22% 6x1L",
-      "invoice": "Aviludo April"
-    },
-    {
-      "line": "Açúcar Branco Metro Chef 10x1Kg",
-      "invoice": "Aviludo April"
-    },
-    {
-      "line": "Chocolate Pantagruel 10x200g",
-      "invoice": "Aviludo April"
-    },
-    {
-      "line": "Arroz Agulha Metro Chef 12x1kg",
-      "invoice": "Aviludo April"
-    },
-    {
-      "line": "Atum Óleo Bolsa Nau Catineta 1 Kg",
       "invoice": "Aviludo April"
     },
     {
@@ -107,15 +92,43 @@
       "invoice": "Aviludo April"
     },
     {
-      "line": "Ovo Liquido Past.Gema Dovo 1kg",
+      "line": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
       "invoice": "Aviludo April"
     },
     {
-      "line": "Filete de Anchovas Alconfrisa Lt 495 g",
+      "line": "Arroz Agulha Metro Chef 12x1kg",
       "invoice": "Aviludo April"
     },
     {
-      "line": "Atum Óleo Bolsa Nau Ciatrieta 1 Kg",
+      "line": "Chocolate Pantagruel 10x200g",
+      "invoice": "Aviludo April"
+    },
+    {
+      "line": "Açúcar Branco Metro Chef 10x1Kg",
+      "invoice": "Aviludo April"
+    },
+    {
+      "line": "Ovo Líquido Past.Gema Dovo 1kg",
+      "invoice": "Aviludo April"
+    },
+    {
+      "line": "Filete de Anchovas Alconfrista Lt 495 g",
+      "invoice": "Aviludo April"
+    },
+    {
+      "line": "Filete de Anchoas Alconfirosa LI 495 g",
+      "invoice": "Aviludo May"
+    },
+    {
+      "line": "Açucar Branco METRO Chef 10x1 Kg",
+      "invoice": "Aviludo May"
+    },
+    {
+      "line": "Arroz Agulha Metro Chef 12x1 kg",
+      "invoice": "Aviludo May"
+    },
+    {
+      "line": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
       "invoice": "Aviludo May"
     },
     {
@@ -127,27 +140,19 @@
       "invoice": "Aviludo May"
     },
     {
-      "line": "Filete de Anchovas Alcoifinosa Lt 495 g",
+      "line": "Nata Culinaria 22% Reny Picot 6x1 Lt",
       "invoice": "Aviludo May"
     },
     {
-      "line": "Nata Culinaria 22% Remy Picot 6x1 Lt",
-      "invoice": "Aviludo May"
-    },
-    {
-      "line": "Acucar Branco METRO Chef 10x1 Kg",
-      "invoice": "Aviludo May"
-    },
-    {
-      "line": "Arroz Agulha Metro Chef 12x1 kg",
-      "invoice": "Aviludo May"
+      "line": "STRACCIATELLA 250 GR",
+      "invoice": "Bocconcino"
     },
     {
       "line": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
       "invoice": "Bocconcino"
     },
     {
-      "line": "POMODORO PELATI (CX 2.5KG*6)",
+      "line": "POMODORI PELATI (CX 2,5KG*6)",
       "invoice": "Bocconcino"
     },
     {
@@ -163,59 +168,51 @@
       "invoice": "Bocconcino"
     },
     {
-      "line": "STRACCIATELLA 250 GR",
-      "invoice": "Bocconcino"
-    },
-    {
-      "line": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello 1/8*1.5kg Produto de Stock",
+      "line": "Rovagnati - Salame Ventricina 2,5 Kg",
       "invoice": "Emporio (live)"
     },
     {
-      "line": "Axso Parma! - AxsoParma! Prosciutto Cotto Scelto HC - 4,25Kg Produto de Stock",
+      "line": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg",
       "invoice": "Emporio (live)"
     },
     {
-      "line": "Rovagnati - Mortadella IGP 'Massima' con pistacchi 1/2 - 3,5Kg Produto de Stock",
+      "line": "SanPellegrino - Acqua in vitro 75cl x 15ud",
       "invoice": "Emporio (live)"
     },
     {
-      "line": "SanPellegrino - Água in vitro 75cl x 15ud Produto de Stock",
+      "line": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5Kg",
       "invoice": "Emporio (live)"
     },
     {
-      "line": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg Produto de Stock",
+      "line": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
       "invoice": "Emporio (live)"
     },
     {
-      "line": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+      "line": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello 1/8 - 1,85kg",
       "invoice": "Emporio (live)"
     },
     {
-      "line": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+      "line": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
       "invoice": "Emporio (live)"
     },
     {
-      "line": "Guanciale di Suino stagionato +/- 1,5kg*7 Sorrentino",
+      "line": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
       "invoice": "Mammafiore"
     },
     {
-      "line": "Farina Speciale pizza 25kg Amoruso",
+      "line": "Farine Speciale pizza 25kg Amoruso",
       "invoice": "Mammafiore"
     },
     {
-      "line": "Birra Peroni Nastro Azzurro PNAA 33cl*24 Nastro Azzurro",
+      "line": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
       "invoice": "Mammafiore"
     },
     {
-      "line": "Aceto balsamico di moden IGP pet 5l*2 Toschi",
+      "line": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
       "invoice": "Mammafiore"
     },
     {
-      "line": "MOZZA Fioc di Latte Expet Julienne 3kg Simonetta",
-      "invoice": "Mammafiore"
-    },
-    {
-      "line": "Farina 00 pasta fresca e gnocchi25kg Caputo",
+      "line": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
       "invoice": "Mammafiore"
     },
     {
@@ -223,7 +220,11 @@
       "invoice": "Mammafiore"
     },
     {
-      "line": "Recargo por combustilvel",
+      "line": "Recargo por combustibili",
+      "invoice": "Mammafiore"
+    },
+    {
+      "line": "Farina do pasta fresca e gnocchi25kg Caputo",
       "invoice": "Mammafiore"
     }
   ]

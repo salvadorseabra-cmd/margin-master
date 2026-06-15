@@ -1,6 +1,7 @@
 import {
   buildCatalogIngredientIdentity,
   formatCanonicalIngredientDisplayName,
+  stripCatalogSupplierPackPhrases,
   type CatalogIngredientIdentity,
 } from "@/lib/canonical-ingredient-display-name";
 import { looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
@@ -113,7 +114,9 @@ export function generateOperationalIngredientName(
   raw: string | null | undefined,
   options?: ExpandSupplierTokensOptions,
 ): string {
-  const expanded = expandSupplierAbbreviations(raw, options);
+  const trimmed = raw?.trim() ?? "";
+  const preprocessed = stripCatalogSupplierPackPhrases(trimmed) || trimmed;
+  const expanded = expandSupplierAbbreviations(preprocessed, options);
   if (!expanded) return "";
   return formatCanonicalIngredientDisplayName(expanded);
 }

@@ -1,0 +1,1514 @@
+
+> test
+> vitest run src/lib/canonical-ingredient-display-name.test.ts src/lib/canonical-ingredient-create.test.ts src/lib/canonical-ingredient-operational-name.test.ts
+
+
+ RUN  v3.2.4 /Users/salvadorseabra1/margin-master
+
+ ✓ src/lib/canonical-ingredient-display-name.test.ts (20 tests) 12ms
+2:33:57 PM [vite] (ssr) warning: Duplicate key "bbq" in object literal
+112 |    mol: "sauces",
+113 |    molho: "sauces",
+114 |    bbq: "sauces",
+    |    ^
+115 |    top: "sauces",
+116 |    disp: "sauces",
+
+  Plugin: vite:esbuild
+  File: /Users/salvadorseabra1/margin-master/src/lib/ingredient-token-families.ts
+ ✓ src/lib/canonical-ingredient-operational-name.test.ts (18 tests) 13ms
+stdout | src/lib/canonical-ingredient-create.test.ts > validateCanonicalIngredientName > blocks invoice shorthand
+[ingredient_aliases_trace] {
+  stage: 'shorthand-rejected',
+  compareBucket: 'ANGUS_PTY',
+  function: 'validateCanonicalIngredientName',
+  branch: 'shorthand_name',
+  rawName: 'ANGUS PTY'
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > validateCanonicalIngredientName > allows human catalog names distinct from invoice alias
+[ingredient_aliases_trace] {
+  stage: 'validateCanonicalIngredientName:ok',
+  compareBucket: null,
+  rawName: 'Angus Burger Patty 180g',
+  normalized: 'angus burger patty 180g'
+}
+[ingredient_aliases_trace] {
+  stage: 'validateCanonicalIngredientName:ok',
+  compareBucket: null,
+  rawName: 'Hambúrguer Angus 180g',
+  normalized: 'hamburguer angus 180g'
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildCanonicalIngredientCreateDefaults > leaves confirmed name empty and separates suggestion for invoice shorthand
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'ANGUS PTY',
+  normalized: 'angus pty',
+  finalCanonicalName: 'ANGUS PTY',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'ANGUS PTY',
+  normalized: 'angus pty',
+  finalCanonicalName: 'ANGUS PTY',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'ANGUS PTY', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Angus patty' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'ANGUS PTY',
+  normalized: 'angus patty',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'ANGUS PTY',
+  normalized: 'angus patty',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildCanonicalIngredientCreateDefaults > suggests canonical preview without auto-filling confirmed name
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'QUEIJO MOZARELLA FATIADO 1KG',
+  normalized: 'queijo mozarella fatiado 1kg',
+  finalCanonicalName: 'QUEIJO MOZARELLA FATIADO 1KG',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'QUEIJO MOZARELLA FATIADO 1KG',
+  normalized: 'queijo mozarella fatiado 1kg',
+  finalCanonicalName: 'QUEIJO MOZARELLA FATIADO 1KG',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'QUEIJO MOZARELLA FATIADO 1KG', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Queijo mozarella fatiado' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'QUEIJO MOZARELLA FATIADO 1KG',
+  normalized: 'queijo mozarella fatiado',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'QUEIJO MOZARELLA FATIADO 1KG',
+  normalized: 'queijo mozarella fatiado',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildCanonicalIngredientCreateDefaults > does not suggest when cleanup preview equals invoice alias and line is not catalog-ready
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Óleo girassol fula 1L',
+  normalized: 'oleo girassol fula 1l',
+  finalCanonicalName: 'Óleo girassol fula 1L',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Óleo girassol fula 1L',
+  normalized: 'oleo girassol fula 1l',
+  finalCanonicalName: 'Óleo girassol fula 1L',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'Óleo girassol fula 1L', itemId: 'item-1' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Óleo girassol fula 1L',
+  normalized: null,
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Óleo girassol fula 1L',
+  normalized: null,
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildCanonicalIngredientCreateDefaults > suggests and marks catalog-ready for Tomilho
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Tomilho',
+  normalized: 'tomilho',
+  finalCanonicalName: 'Tomilho',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Tomilho',
+  normalized: 'tomilho',
+  finalCanonicalName: 'Tomilho',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'Tomilho', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Tomilho' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Tomilho',
+  normalized: 'tomilho',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Tomilho',
+  normalized: 'tomilho',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildCanonicalIngredientCreateDefaults > suggests and marks catalog-ready for Manjericão
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Manjericão',
+  normalized: 'manjericao',
+  finalCanonicalName: 'Manjericão',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Manjericão',
+  normalized: 'manjericao',
+  finalCanonicalName: 'Manjericão',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'Manjericão', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Manjericão' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Manjericão',
+  normalized: 'manjericao',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Manjericão',
+  normalized: 'manjericao',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildCanonicalIngredientCreateDefaults > suggests and marks catalog-ready for Hortelã
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Hortelã',
+  normalized: 'hortela',
+  finalCanonicalName: 'Hortelã',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Hortelã',
+  normalized: 'hortela',
+  finalCanonicalName: 'Hortelã',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'Hortelã', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Hortelã' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Hortelã',
+  normalized: 'hortela',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Hortelã',
+  normalized: 'hortela',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildCanonicalIngredientCreateDefaults > suggests and marks catalog-ready for Alho Francês
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Alho Francês',
+  normalized: 'alho frances',
+  finalCanonicalName: 'Alho Francês',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Alho Francês',
+  normalized: 'alho frances',
+  finalCanonicalName: 'Alho Francês',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'Alho Francês', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Alho francês' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Alho Francês',
+  normalized: 'alho frances',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Alho Francês',
+  normalized: 'alho frances',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildCanonicalIngredientCreateDefaults > suggests and marks catalog-ready for Courgettes
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Courgettes',
+  normalized: 'courgettes',
+  finalCanonicalName: 'Courgettes',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Courgettes',
+  normalized: 'courgettes',
+  finalCanonicalName: 'Courgettes',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'Courgettes', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Courgettes' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Courgettes',
+  normalized: 'courgettes',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Courgettes',
+  normalized: 'courgettes',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildCanonicalIngredientCreateDefaults > suggests and marks catalog-ready for Abóbora Butternut
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Abóbora Butternut',
+  normalized: 'abobora butternut',
+  finalCanonicalName: 'Abóbora Butternut',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Abóbora Butternut',
+  normalized: 'abobora butternut',
+  finalCanonicalName: 'Abóbora Butternut',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'Abóbora Butternut', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Abóbora butternut' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Abóbora Butternut',
+  normalized: 'abobora butternut',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Abóbora Butternut',
+  normalized: 'abobora butternut',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildCanonicalIngredientCreateDefaults > does not mark noisy three-token lines as catalog-ready before cleanup
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Pêra Abacate Hasse',
+  normalized: 'pera abacate hasse',
+  finalCanonicalName: 'Pêra Abacate Hasse',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Pêra Abacate Hasse',
+  normalized: 'pera abacate hasse',
+  finalCanonicalName: 'Pêra Abacate Hasse',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'Pêra Abacate Hasse', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Pêra abacate' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Pêra Abacate Hasse',
+  normalized: 'pera abacate',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Pêra Abacate Hasse',
+  normalized: 'pera abacate',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildCanonicalIngredientCreateDefaults > suggests cleaned name for Pêra Abacate Hasse after brand strip
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Pêra Abacate Hasse',
+  normalized: 'pera abacate hasse',
+  finalCanonicalName: 'Pêra Abacate Hasse',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Pêra Abacate Hasse',
+  normalized: 'pera abacate hasse',
+  finalCanonicalName: 'Pêra Abacate Hasse',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'Pêra Abacate Hasse', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Pêra abacate' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Pêra Abacate Hasse',
+  normalized: 'pera abacate',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Pêra Abacate Hasse',
+  normalized: 'pera abacate',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildCanonicalIngredientCreateDefaults > strips phase 2 noise from weak canonical examples
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Manteiga Coimbra s/Sal EMB 1 Kg',
+  normalized: 'manteiga coimbra s/sal emb 1 kg',
+  finalCanonicalName: 'Manteiga Coimbra s/Sal EMB 1 Kg',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Manteiga Coimbra s/Sal EMB 1 Kg',
+  normalized: 'manteiga coimbra s/sal emb 1 kg',
+  finalCanonicalName: 'Manteiga Coimbra s/Sal EMB 1 Kg',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'Manteiga Coimbra s/Sal EMB 1 Kg', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Manteiga s/sal' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Manteiga Coimbra s/Sal EMB 1 Kg',
+  normalized: 'manteiga s/sal',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Manteiga Coimbra s/Sal EMB 1 Kg',
+  normalized: 'manteiga s/sal',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)',
+  normalized: 'ovo moreno classe m cx.15 duzias cartao',
+  finalCanonicalName: 'Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)',
+  normalized: 'ovo moreno classe m cx.15 duzias cartao',
+  finalCanonicalName: 'Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] {
+  rawInvoiceText: 'Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)',
+  itemId: 'item-1'
+}
+[canonical_suggestion] { suggestedName: 'Ovo classe M' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)',
+  normalized: 'ovo classe m',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)',
+  normalized: 'ovo classe m',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Salada Ibérica FSTK EMB. 250g',
+  normalized: 'salada iberica fstk emb. 250g',
+  finalCanonicalName: 'Salada Ibérica FSTK EMB. 250g',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Salada Ibérica FSTK EMB. 250g',
+  normalized: 'salada iberica fstk emb. 250g',
+  finalCanonicalName: 'Salada Ibérica FSTK EMB. 250g',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'Salada Ibérica FSTK EMB. 250g', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Salada ibérica' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Salada Ibérica FSTK EMB. 250g',
+  normalized: 'salada iberica',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Salada Ibérica FSTK EMB. 250g',
+  normalized: 'salada iberica',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Arroz Agulha Metro Chef 12x1kg',
+  normalized: 'arroz agulha metro chef 12x1kg',
+  finalCanonicalName: 'Arroz Agulha Metro Chef 12x1kg',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Arroz Agulha Metro Chef 12x1kg',
+  normalized: 'arroz agulha metro chef 12x1kg',
+  finalCanonicalName: 'Arroz Agulha Metro Chef 12x1kg',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'Arroz Agulha Metro Chef 12x1kg', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Arroz agulha' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Arroz Agulha Metro Chef 12x1kg',
+  normalized: 'arroz agulha',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Arroz Agulha Metro Chef 12x1kg',
+  normalized: 'arroz agulha',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildCanonicalIngredientCreateDefaults > suggests Batata shoestring for BAT shoestr invoice shorthand
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'BAT shoestr',
+  normalized: 'bat shoestr',
+  finalCanonicalName: 'BAT shoestr',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'BAT shoestr',
+  normalized: 'bat shoestr',
+  finalCanonicalName: 'BAT shoestr',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'BAT shoestr', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Batata shoestring' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'BAT shoestr',
+  normalized: 'batata shoestring',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'BAT shoestr',
+  normalized: 'batata shoestring',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildCanonicalIngredientCreateDefaults > suggests final cleanup edge cases
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'MOZZA Fior di Latte Expet Julienne 3kg Simonetta',
+  normalized: 'mozza fior di latte expet julienne 3kg simonetta',
+  finalCanonicalName: 'MOZZA Fior di Latte Expet Julienne 3kg Simonetta',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'MOZZA Fior di Latte Expet Julienne 3kg Simonetta',
+  normalized: 'mozza fior di latte expet julienne 3kg simonetta',
+  finalCanonicalName: 'MOZZA Fior di Latte Expet Julienne 3kg Simonetta',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] {
+  rawInvoiceText: 'MOZZA Fior di Latte Expet Julienne 3kg Simonetta',
+  itemId: 'item-1'
+}
+[canonical_suggestion] { suggestedName: 'Mozzarella fior di latte julienne' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'MOZZA Fior di Latte Expet Julienne 3kg Simonetta',
+  normalized: 'mozzarella fior di latte julienne',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'MOZZA Fior di Latte Expet Julienne 3kg Simonetta',
+  normalized: 'mozzarella fior di latte julienne',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  normalized: 'de cecco paccheri lisci nr. 125 500g',
+  finalCanonicalName: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  normalized: 'de cecco paccheri lisci nr. 125 500g',
+  finalCanonicalName: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] {
+  rawInvoiceText: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  itemId: 'item-1'
+}
+[canonical_suggestion] { suggestedName: 'Paccheri lisci' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  normalized: 'paccheri lisci',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  normalized: 'paccheri lisci',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'ACQUA S.PELLEGRINO (CX 75CL*15)',
+  normalized: 'acqua s.pellegrino cx 75cl*15',
+  finalCanonicalName: 'ACQUA S.PELLEGRINO (CX 75CL*15)',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'ACQUA S.PELLEGRINO (CX 75CL*15)',
+  normalized: 'acqua s.pellegrino cx 75cl*15',
+  finalCanonicalName: 'ACQUA S.PELLEGRINO (CX 75CL*15)',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_modal_open] { rawInvoiceText: 'ACQUA S.PELLEGRINO (CX 75CL*15)', itemId: 'item-1' }
+[canonical_suggestion] { suggestedName: 'Água san pellegrino 75cl' }
+[canonical_name_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'ACQUA S.PELLEGRINO (CX 75CL*15)',
+  normalized: 'agua san pellegrino 75cl',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+[canonical_create_source] dialog-defaults {
+  stage: 'dialog-defaults',
+  flowFunction: 'buildCanonicalIngredientCreateDefaults',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'ACQUA S.PELLEGRINO (CX 75CL*15)',
+  normalized: 'agua san pellegrino 75cl',
+  finalCanonicalName: null,
+  nameSource: 'suggestion_preview',
+  insertAttempted: false
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildExplicitCanonicalInsertPayload > uses user canonical name, not invoice alias
+[ingredient_aliases_trace] {
+  stage: 'validateCanonicalIngredientName:ok',
+  compareBucket: null,
+  rawName: 'Angus Burger Patty 180g',
+  normalized: 'angus burger patty 180g'
+}
+[canonical_confirmed_name] { confirmedName: 'Angus Burger Patty 180g' }
+[canonical_create_attempt] enter {
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'ANGUS PTY',
+  normalized: 'angus burger patty 180g',
+  finalCanonicalName: 'Angus Burger Patty 180g',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'ANGUS PTY',
+  normalized: 'angus pty',
+  finalCanonicalName: 'ANGUS PTY',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'ANGUS PTY',
+  normalized: 'angus pty',
+  finalCanonicalName: 'ANGUS PTY',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_name_source] catalog-identity-resolved {
+  stage: 'catalog-identity-resolved',
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'ANGUS PTY',
+  normalized: 'angus burger patty 180g',
+  finalCanonicalName: 'Angus burger patty 180g',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical_create_source] catalog-identity-resolved {
+  stage: 'catalog-identity-resolved',
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'ANGUS PTY',
+  normalized: 'angus burger patty 180g',
+  finalCanonicalName: 'Angus burger patty 180g',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical-create] identity-resolved {
+  canonicalInput: 'Angus Burger Patty 180g',
+  name: 'Angus burger patty 180g',
+  normalizedName: 'angus burger patty 180g',
+  invoiceAlias: 'ANGUS PTY'
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildExplicitCanonicalInsertPayload > normalizes shouty uppercase names on save
+[canonical_confirmed_name] { confirmedName: 'OLEO GIRASSOL 10L' }
+[canonical_create_attempt] enter {
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'OLEO GIRASSOL VAQUEIRO 10L',
+  normalized: 'oleo girassol 10l',
+  finalCanonicalName: 'OLEO GIRASSOL 10L',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'OLEO GIRASSOL VAQUEIRO 10L',
+  normalized: 'oleo girassol vaqueiro 10l',
+  finalCanonicalName: 'OLEO GIRASSOL VAQUEIRO 10L',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'OLEO GIRASSOL VAQUEIRO 10L',
+  normalized: 'oleo girassol vaqueiro 10l',
+  finalCanonicalName: 'OLEO GIRASSOL VAQUEIRO 10L',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_name_source] catalog-identity-resolved {
+  stage: 'catalog-identity-resolved',
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'OLEO GIRASSOL VAQUEIRO 10L',
+  normalized: 'oleo girassol',
+  finalCanonicalName: 'Oleo girassol',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical_create_source] catalog-identity-resolved {
+  stage: 'catalog-identity-resolved',
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'OLEO GIRASSOL VAQUEIRO 10L',
+  normalized: 'oleo girassol',
+  finalCanonicalName: 'Oleo girassol',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical-create] identity-resolved {
+  canonicalInput: 'OLEO GIRASSOL 10L',
+  name: 'Oleo girassol',
+  normalizedName: 'oleo girassol',
+  invoiceAlias: 'OLEO GIRASSOL VAQUEIRO 10L'
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildExplicitCanonicalInsertPayload > creates payload for catalog-ready names that match invoice alias
+[canonical_confirmed_name] { confirmedName: 'Tomilho' }
+[canonical_create_attempt] enter {
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Tomilho',
+  normalized: 'tomilho',
+  finalCanonicalName: 'Tomilho',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Tomilho',
+  normalized: 'tomilho',
+  finalCanonicalName: 'Tomilho',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Tomilho',
+  normalized: 'tomilho',
+  finalCanonicalName: 'Tomilho',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_name_source] catalog-identity-resolved {
+  stage: 'catalog-identity-resolved',
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Tomilho',
+  normalized: 'tomilho',
+  finalCanonicalName: 'Tomilho',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical_create_source] catalog-identity-resolved {
+  stage: 'catalog-identity-resolved',
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Tomilho',
+  normalized: 'tomilho',
+  finalCanonicalName: 'Tomilho',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical-create] identity-resolved {
+  canonicalInput: 'Tomilho',
+  name: 'Tomilho',
+  normalizedName: 'tomilho',
+  invoiceAlias: 'Tomilho'
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildExplicitCanonicalInsertPayload > returns null for shorthand canonical names
+[ingredient_aliases_trace] {
+  stage: 'validation-rejected',
+  compareBucket: 'ANGUS_PTY',
+  function: 'validateCanonicalIngredientName',
+  branch: 'matches_invoice_alias',
+  rawName: 'ANGUS PTY',
+  invoiceAlias: 'ANGUS PTY'
+}
+[ingredient_aliases_trace] {
+  stage: 'buildExplicitCanonicalInsertPayload:early-return',
+  compareBucket: 'ANGUS_PTY',
+  branch: 'validateCanonicalIngredientName_failed',
+  canonicalName: 'ANGUS PTY',
+  invoiceAlias: 'ANGUS PTY'
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildExplicitCanonicalInsertPayload > preserves batata+palha in normalized_name for "Batata palha"
+[canonical_confirmed_name] { confirmedName: 'Batata palha' }
+[canonical_create_attempt] enter {
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Batata Palha Auchan 2kg',
+  normalized: 'batata palha',
+  finalCanonicalName: 'Batata palha',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Batata Palha Auchan 2kg',
+  normalized: 'batata palha auchan 2kg',
+  finalCanonicalName: 'Batata Palha Auchan 2kg',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Batata Palha Auchan 2kg',
+  normalized: 'batata palha auchan 2kg',
+  finalCanonicalName: 'Batata Palha Auchan 2kg',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_name_source] catalog-identity-resolved {
+  stage: 'catalog-identity-resolved',
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Batata Palha Auchan 2kg',
+  normalized: 'batata palha',
+  finalCanonicalName: 'Batata palha',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical_create_source] catalog-identity-resolved {
+  stage: 'catalog-identity-resolved',
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Batata Palha Auchan 2kg',
+  normalized: 'batata palha',
+  finalCanonicalName: 'Batata palha',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical-create] identity-resolved {
+  canonicalInput: 'Batata palha',
+  name: 'Batata palha',
+  normalizedName: 'batata palha',
+  invoiceAlias: 'Batata Palha Auchan 2kg'
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > buildExplicitCanonicalInsertPayload > builds canonical payload for CHK BREADED invoice line
+[canonical_confirmed_name] { confirmedName: 'Chicken Breaded / Frango Panado' }
+[canonical_create_attempt] enter {
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'CHK BREADED',
+  normalized: 'chicken breaded / frango panado',
+  finalCanonicalName: 'Chicken Breaded / Frango Panado',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'CHK BREADED',
+  normalized: 'chk breaded',
+  finalCanonicalName: 'CHK BREADED',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'CHK BREADED',
+  normalized: 'chk breaded',
+  finalCanonicalName: 'CHK BREADED',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_name_source] catalog-identity-resolved {
+  stage: 'catalog-identity-resolved',
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'CHK BREADED',
+  normalized: 'chicken breaded / frango panado',
+  finalCanonicalName: 'Chicken breaded / frango panado',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical_create_source] catalog-identity-resolved {
+  stage: 'catalog-identity-resolved',
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'CHK BREADED',
+  normalized: 'chicken breaded / frango panado',
+  finalCanonicalName: 'Chicken breaded / frango panado',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical-create] identity-resolved {
+  canonicalInput: 'Chicken Breaded / Frango Panado',
+  name: 'Chicken breaded / frango panado',
+  normalizedName: 'chicken breaded / frango panado',
+  invoiceAlias: 'CHK BREADED'
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > Batata Palha Auchan canonical create alias regression > persists invoice alias and rematch keys after create from shorthand line
+[canonical_confirmed_name] { confirmedName: 'Batata palha' }
+[canonical_create_attempt] enter {
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Batata Palha Auchan 2kg',
+  normalized: 'batata palha',
+  finalCanonicalName: 'Batata palha',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical_name_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Batata Palha Auchan 2kg',
+  normalized: 'batata palha auchan 2kg',
+  finalCanonicalName: 'Batata Palha Auchan 2kg',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_create_source] invoice-line-as-name {
+  stage: 'invoice-line-as-name',
+  flowFunction: 'buildIngredientInsertPayload',
+  flowOrigin: 'auto_persist',
+  rawInvoiceText: 'Batata Palha Auchan 2kg',
+  normalized: 'batata palha auchan 2kg',
+  finalCanonicalName: 'Batata Palha Auchan 2kg',
+  nameSource: 'invoice_line',
+  insertAttempted: false
+}
+[canonical_name_source] catalog-identity-resolved {
+  stage: 'catalog-identity-resolved',
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Batata Palha Auchan 2kg',
+  normalized: 'batata palha',
+  finalCanonicalName: 'Batata palha',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical_create_source] catalog-identity-resolved {
+  stage: 'catalog-identity-resolved',
+  flowFunction: 'buildExplicitCanonicalInsertPayload',
+  flowOrigin: 'explicit_user',
+  rawInvoiceText: 'Batata Palha Auchan 2kg',
+  normalized: 'batata palha',
+  finalCanonicalName: 'Batata palha',
+  nameSource: 'user_canonical',
+  insertAttempted: false
+}
+[canonical-create] identity-resolved {
+  canonicalInput: 'Batata palha',
+  name: 'Batata palha',
+  normalizedName: 'batata palha',
+  invoiceAlias: 'Batata Palha Auchan 2kg'
+}
+[manual_match_attempt] {
+  itemName: 'Batata Palha Auchan 2kg',
+  ingredientId: 'bat-palha-uuid',
+  ingredientName: 'Batata palha',
+  supplierName: 'Auchan',
+  invoiceAliasMemoryKey: 'batata palha',
+  priorMapKeyCount: 0
+}
+[alias_only] persist-manual-correction {
+  itemName: 'Batata Palha Auchan 2kg',
+  ingredientId: 'bat-palha-uuid',
+  ingredientName: 'Batata palha',
+  supplierName: 'Auchan',
+  note: 'ingredient_aliases only — no ingredients.insert'
+}
+[canonical-create] alias-persist-start {
+  itemName: 'Batata Palha Auchan 2kg',
+  ingredientId: 'bat-palha-uuid',
+  ingredientName: 'Batata palha',
+  supplierName: 'Auchan'
+}
+[unmatch_persist_state] {
+  phase: 'before_manual_rematch_persist',
+  itemName: 'Batata Palha Auchan 2kg',
+  ingredientId: 'bat-palha-uuid',
+  supplierName: 'Auchan',
+  clearedRejectedPairs: 0,
+  rejectedPairCountBefore: 0,
+  rejectedPairCountAfter: 0
+}
+[canonical-create] alias-upsert-attempt {
+  aliasName: 'Batata Palha Auchan 2kg',
+  normalizedAlias: 'batata palha',
+  aliasLookupKey: 'Auchan::batata palha',
+  ingredientId: 'bat-palha-uuid'
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > Batata Palha Auchan canonical create alias regression > persists invoice alias and rematch keys after create from shorthand line
+[ingredient_aliases] saved alias (inserted) {
+  ingredientId: 'bat-palha-uuid',
+  aliasName: 'Batata Palha Auchan 2kg',
+  normalizedAlias: 'batata palha',
+  supplierName: 'Auchan'
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > Batata Palha Auchan canonical create alias regression > persists invoice alias and rematch keys after create from shorthand line
+[canonical-create] alias-upsert-ok {
+  aliasName: 'Batata Palha Auchan 2kg',
+  normalizedAlias: 'batata palha',
+  ingredientId: 'bat-palha-uuid'
+}
+[manual_match_persist_result] {
+  ok: true,
+  itemName: 'Batata Palha Auchan 2kg',
+  ingredientId: 'bat-palha-uuid',
+  aliasLookupKey: 'Auchan::batata palha',
+  operationalAliasKey: 'batata palha',
+  normalizedAlias: 'batata palha',
+  keysWritten: [ 'Auchan::batata palha', 'batata palha' ],
+  dbUpsertAttempted: true,
+  dbError: null
+}
+[unmatch_persist_state] {
+  phase: 'after_manual_rematch_persist',
+  itemName: 'Batata Palha Auchan 2kg',
+  ingredientId: 'bat-palha-uuid',
+  supplierName: 'Auchan',
+  clearedRejectedPairs: 0,
+  persistOk: true,
+  rejectedPairCount: 0
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > CHK BREADED canonical create alias regression > persists invoice alias and rematch keys after manual link
+[ingredient_aliases_trace] {
+  stage: 'applyManualIngredientCorrection:enter',
+  compareBucket: 'CHK_BREADED',
+  function: 'applyManualIngredientCorrection',
+  itemName: 'CHK BREADED',
+  ingredientId: 'chk-uuid',
+  supplierName: null
+}
+[ingredient_aliases_trace] {
+  stage: 'buildManualIngredientCorrectionKeys:ok',
+  compareBucket: 'CHK_BREADED',
+  itemName: 'CHK BREADED',
+  normalizedAlias: 'chicken breaded',
+  aliasLookupKey: 'chicken breaded',
+  operationalAliasKey: 'chicken breaded',
+  expandedName: 'chicken breaded',
+  supplierName: null
+}
+[ingredient_aliases_trace] {
+  stage: 'applyManualIngredientCorrection:ok',
+  compareBucket: 'CHK_BREADED',
+  itemName: 'CHK BREADED',
+  aliasLookupKey: 'chicken breaded',
+  ingredientId: 'chk-uuid'
+}
+[manual_match_attempt] {
+  itemName: 'CHK BREADED',
+  ingredientId: 'chk-uuid',
+  ingredientName: 'Chicken Breaded / Frango Panado',
+  supplierName: null,
+  invoiceAliasMemoryKey: 'chk breaded',
+  priorMapKeyCount: 0
+}
+[alias_only] persist-manual-correction {
+  itemName: 'CHK BREADED',
+  ingredientId: 'chk-uuid',
+  ingredientName: 'Chicken Breaded / Frango Panado',
+  supplierName: null,
+  note: 'ingredient_aliases only — no ingredients.insert'
+}
+[canonical-create] alias-persist-start {
+  itemName: 'CHK BREADED',
+  ingredientId: 'chk-uuid',
+  ingredientName: 'Chicken Breaded / Frango Panado',
+  supplierName: null
+}
+[unmatch_persist_state] {
+  phase: 'before_manual_rematch_persist',
+  itemName: 'CHK BREADED',
+  ingredientId: 'chk-uuid',
+  supplierName: null,
+  clearedRejectedPairs: 0,
+  rejectedPairCountBefore: 0,
+  rejectedPairCountAfter: 0
+}
+[ingredient_aliases_trace] {
+  stage: 'applyManualIngredientCorrection:enter',
+  compareBucket: 'CHK_BREADED',
+  function: 'applyManualIngredientCorrection',
+  itemName: 'CHK BREADED',
+  ingredientId: 'chk-uuid',
+  supplierName: null
+}
+[ingredient_aliases_trace] {
+  stage: 'buildManualIngredientCorrectionKeys:ok',
+  compareBucket: 'CHK_BREADED',
+  itemName: 'CHK BREADED',
+  normalizedAlias: 'chicken breaded',
+  aliasLookupKey: 'chicken breaded',
+  operationalAliasKey: 'chicken breaded',
+  expandedName: 'chicken breaded',
+  supplierName: null
+}
+[ingredient_aliases_trace] {
+  stage: 'applyManualIngredientCorrection:ok',
+  compareBucket: 'CHK_BREADED',
+  itemName: 'CHK BREADED',
+  aliasLookupKey: 'chicken breaded',
+  ingredientId: 'chk-uuid'
+}
+[canonical-create] alias-upsert-attempt {
+  aliasName: 'CHK BREADED',
+  normalizedAlias: 'chicken breaded',
+  aliasLookupKey: 'chicken breaded',
+  ingredientId: 'chk-uuid'
+}
+[ingredient_aliases_trace] {
+  stage: 'persistManualIngredientCorrection:upsert-call',
+  compareBucket: 'CHK_BREADED',
+  function: 'persistManualIngredientCorrection',
+  itemName: 'CHK BREADED',
+  aliasName: 'CHK BREADED',
+  normalizedAlias: 'chicken breaded',
+  ingredientId: 'chk-uuid',
+  supplierName: null
+}
+[ingredient_aliases_trace] {
+  stage: 'upsertConfirmedAlias:enter',
+  compareBucket: 'CHK_BREADED',
+  function: 'upsertConfirmedAlias',
+  aliasName: 'CHK BREADED',
+  ingredientId: 'chk-uuid',
+  normalizedAliasOverride: 'chicken breaded',
+  supplierName: null,
+  manualConfirmation: true
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > CHK BREADED canonical create alias regression > persists invoice alias and rematch keys after manual link
+[ingredient_aliases_trace] {
+  stage: 'upsertConfirmedAlias:select-after',
+  compareBucket: 'CHK_BREADED',
+  aliasName: 'CHK BREADED',
+  ingredientId: 'chk-uuid',
+  normalizedAlias: 'chicken breaded',
+  supplierName: null,
+  existingId: null,
+  selectStatus: null,
+  selectError: null
+}
+[ingredient_aliases_trace] {
+  stage: 'insert-before',
+  compareBucket: 'CHK_BREADED',
+  function: 'upsertConfirmedAlias',
+  phase: 'insert',
+  aliasName: 'CHK BREADED',
+  payload: {
+    ingredient_id: 'chk-uuid',
+    alias_name: 'CHK BREADED',
+    normalized_alias: 'chicken breaded',
+    supplier_name: null,
+    confidence: 10,
+    confirmed_by_user: true
+  }
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > CHK BREADED canonical create alias regression > persists invoice alias and rematch keys after manual link
+[ingredient_aliases_trace] {
+  stage: 'insert-after',
+  compareBucket: 'CHK_BREADED',
+  function: 'upsertConfirmedAlias',
+  phase: 'insert',
+  aliasName: 'CHK BREADED',
+  data: undefined,
+  status: undefined,
+  statusText: undefined,
+  error: null
+}
+[ingredient_aliases] saved alias (inserted) {
+  ingredientId: 'chk-uuid',
+  aliasName: 'CHK BREADED',
+  normalizedAlias: 'chicken breaded',
+  supplierName: null
+}
+[ingredient_aliases_trace] {
+  stage: 'upsertConfirmedAlias:exit',
+  compareBucket: 'CHK_BREADED',
+  aliasName: 'CHK BREADED',
+  insertAttempted: true,
+  ok: true
+}
+
+stdout | src/lib/canonical-ingredient-create.test.ts > CHK BREADED canonical create alias regression > persists invoice alias and rematch keys after manual link
+[canonical-create] alias-upsert-ok {
+  aliasName: 'CHK BREADED',
+  normalizedAlias: 'chicken breaded',
+  ingredientId: 'chk-uuid'
+}
+[manual_match_persist_result] {
+  ok: true,
+  itemName: 'CHK BREADED',
+  ingredientId: 'chk-uuid',
+  aliasLookupKey: 'chicken breaded',
+  operationalAliasKey: 'chicken breaded',
+  normalizedAlias: 'chicken breaded',
+  keysWritten: [ 'chicken breaded' ],
+  dbUpsertAttempted: true,
+  dbError: null
+}
+[unmatch_persist_state] {
+  phase: 'after_manual_rematch_persist',
+  itemName: 'CHK BREADED',
+  ingredientId: 'chk-uuid',
+  supplierName: null,
+  clearedRejectedPairs: 0,
+  persistOk: true,
+  rejectedPairCount: 0
+}
+
+ ✓ src/lib/canonical-ingredient-create.test.ts (40 tests) 64ms
+
+ Test Files  3 passed (3)
+      Tests  78 passed (78)
+   Start at  14:33:57
+   Duration  1.05s (transform 701ms, setup 0ms, collect 1.14s, tests 89ms, environment 0ms, prepare 333ms)
+

@@ -28,6 +28,7 @@ const CATALOG_NOISE_PHRASES = [
   "oliveira da serra",
   "continente",
   "auchan",
+  "metro chef",
 ] as const;
 
 /** Product identity tokens that must never be dropped during catalog cleanup. */
@@ -53,6 +54,43 @@ const CATALOG_NOISE_TOKENS = new Set([
   "caixas",
   "pack",
   "packs",
+  "coimbra",
+  "moreno",
+  "hasse",
+  "emb",
+  "fstk",
+  "cartao",
+  "cartão",
+  "duzias",
+  "dúzias",
+  "simonetta",
+  "caputo",
+  "toschi",
+  "pet",
+  "expet",
+  "nr",
+]);
+
+/** Invoice `Brand - Product` prefixes stripped for commodity lines (not Rovagnati-style identity). */
+const INVOICE_BRAND_PREFIX_STRIP_RE = [
+  /^de\s+cecco\s*-\s*/i,
+  /^baladin\s*-\s*/i,
+] as const;
+
+/** Product heads where attached gram weights are pack noise, not SKU identity. */
+const CATALOG_GRAM_PACK_NOISE_HEADS = new Set([
+  "salada",
+  "tomilho",
+  "hortela",
+  "manjericao",
+  "courgette",
+  "curgete",
+  "pepino",
+  "alho",
+  "rucula",
+  "epinafre",
+  "pera",
+  "abobora",
 ]);
 
 const DIMENSION_TOKEN_RE = /^(\d+(?:[.,]\d+)?)x(\d+(?:[.,]\d+)?)$/i;
@@ -69,11 +107,35 @@ const COUNT_PACK_RE =
 
 /** Parentheses that only carry pack / case counts (not product identity). */
 const PACKAGING_ONLY_PAREN_RE =
-  /\(\s*(?:pack\s*\d+|\d+\s*un|\d+un|cx\s*\d+|caixa\s*\d+|c\/\s*\d+)\s*\)/gi;
+  /\(\s*(?:pack\s*\d+|\d+\s*un|\d+un|cx\s*\.?\s*\d+|cx\s*[^)]*|caixa\s*\.?\s*\d+|c\/\s*\d+|cart[aã]o)\s*\)/gi;
+
+const EMPTY_PAREN_RE = /\(\s*,?\s*\)/g;
 
 const PACK_COUNT_PHRASE_RE = /\bpack\s*\d+\b/gi;
 const C_PER_COUNT_RE = /\bc\/\s*\d+\b/gi;
-const CX_COUNT_PHRASE_RE = /\b(?:cx|caixa|caixas)\s*\d+\b/gi;
+const CX_COUNT_PHRASE_RE = /\b(?:cx|caixa|caixas)\.?\s*\d+\b/gi;
+
+const MULTIPACK_KG_RE =
+  /\b\d+(?:[.,]\d+)?\s*[xX]\s*\d+(?:[.,]\d+)?\s*(?:kg|kgs)\b|\b\d+[xX]\d+(?:kg|kgs)\b/gi;
+
+const MULTIPACK_STAR_RE =
+  /\b\d+(?:[.,]\d+)?(?:kg|kgs|l|lt|lts|ltr|ltrs)\s*\*\s*\d+\b/gi;
+
+/** OCR fused tokens like gnocchi25kg → gnocchi 25kg (weight stripped later). */
+const FUSED_WORD_WEIGHT_RE =
+  /\b([a-zA-ZÀ-ÿ]{2,})(\d+(?:[.,]\d+)?(?:kg|kgs|g|gr|grs|l|lt|lts))\b/gi;
+
+/** Case-count suffix on beverage serving sizes, e.g. 33cl*24. */
+const SERVING_STAR_COUNT_RE = /\b(\d+(?:[.,]\d+)?cl)\s*\*\s*\d+\b/gi;
+
+/** Case-count parens with beverage serving size, e.g. (CX 75CL*15). */
+const CX_SERVING_PACK_PAREN_RE = /\(\s*cx\s+(\d+(?:[.,]\d+)?)\s*cl[^)]*\)/gi;
+
+/** Trailing dash-pack weights on invoice lines, e.g. `- 500g`. */
+const DASH_PACK_WEIGHT_RE = /\s*-\s*\d+(?:[.,]\d+)?\s*(?:g|gr|grs|kg|kgs)\b/gi;
+
+/** Pasta SKU fragments like `Nr. 125`. */
+const PASTA_SKU_NR_RE = /\bnr\.?\s*\d+\b/gi;
 
 const OPERATIONAL_GRAM_RE = /\b(\d{2,3})\s*(?:g|gr|grs)\b|\b(\d{2,3})(?:g|gr|grs)\b/gi;
 
@@ -98,10 +160,14 @@ function parseCompactNumericPrefix(compact: string): number | null {
 /** Beverage / single-serve format kept on catalog identity (25cl, 33cl, 1.5L). */
 function isServingFormatToken(token: string): boolean {
   const compact = token.toLowerCase().replace(/\s+/g, "");
-  if (/^\d+(?:[.,]\d+)?cl$/.test(compact)) return true;
+  const clMatch = compact.match(/^(\d+(?:[.,]\d+)?)cl$/);
+  if (clMatch) {
+    const cl = Number.parseFloat(clMatch[1]!.replace(",", "."));
+    return Number.isFinite(cl) && cl >= 10;
+  }
   const liter = compact.match(/^(\d+(?:[.,]\d+)?)(?:l|lt|lts|ltr|ltrs)$/);
   if (!liter) return false;
-  const liters = parseCompactNumericPrefix(liter[1]);
+  const liters = parseCompactNumericPrefix(liter[1]!);
   return liters != null && liters > 0 && liters < 2;
 }
 
@@ -125,10 +191,40 @@ function removeBulkAttachedLiters(value: string): string {
 
 function removePackagingPhrases(value: string): string {
   return value
+    .replace(DASH_PACK_WEIGHT_RE, " ")
+    .replace(PASTA_SKU_NR_RE, " ")
     .replace(PACKAGING_ONLY_PAREN_RE, " ")
+    .replace(EMPTY_PAREN_RE, " ")
     .replace(PACK_COUNT_PHRASE_RE, " ")
     .replace(C_PER_COUNT_RE, " ")
     .replace(CX_COUNT_PHRASE_RE, " ");
+}
+
+function stripInvoiceBrandPrefix(value: string): string {
+  let out = value;
+  for (const pattern of INVOICE_BRAND_PREFIX_STRIP_RE) {
+    out = out.replace(pattern, "");
+  }
+  return out;
+}
+
+function splitFusedWordWeights(value: string): string {
+  return value.replace(FUSED_WORD_WEIGHT_RE, "$1 $2");
+}
+
+/** Normalize San Pellegrino beverage shorthand; extract single-serve cl from cx pack parens. */
+function normalizeBeverageBrandShorthand(value: string): string {
+  let text = value.replace(CX_SERVING_PACK_PAREN_RE, " $1cl ");
+  text = text.replace(SERVING_STAR_COUNT_RE, "$1");
+  const hasPellegrino = /\bpellegrino\b/i.test(text);
+  if (!hasPellegrino) return text;
+
+  text = text.replace(/\bs\.?\s*pellegrino\b/gi, "san pellegrino");
+  text = text.replace(/\bsanpellegrino\b/gi, "san pellegrino");
+  if (/\bacqua\b/i.test(text)) {
+    text = text.replace(/\bacqua\b/gi, "água");
+  }
+  return text;
 }
 
 function normalizeCatalogSizeToken(token: string): string {
@@ -147,6 +243,11 @@ function isOperationalGramToken(token: string): boolean {
 function isDimensionToken(token: string): boolean {
   const compact = token.replace(/\s+/g, "");
   return DIMENSION_TOKEN_RE.test(compact);
+}
+
+function isCatalogGramPackNoiseContext(input: string): boolean {
+  const tokens = stripAccentsLower(input).split(/\s+/).filter(Boolean);
+  return tokens.some((token) => CATALOG_GRAM_PACK_NOISE_HEADS.has(token));
 }
 
 function removeCatalogNoisePhrases(value: string): string {
@@ -180,6 +281,7 @@ function preserveOperationalTokens(input: string): { text: string; preserved: Pr
   text = text.replace(OPERATIONAL_GRAM_RE, (match) => {
     const compact = match.replace(/\s+/g, "").replace(/,/g, ".");
     if (!isOperationalGramToken(compact)) return match;
+    if (isCatalogGramPackNoiseContext(input)) return " ";
     return stash(compact);
   });
 
@@ -199,21 +301,45 @@ function shouldDropCatalogToken(token: string, contextTokens: string[]): boolean
   if (isOperationalGramToken(token)) return false;
   if (isDimensionToken(token)) return false;
 
-  const lower = stripAccentsLower(token);
+  const lower = stripAccentsLower(token).replace(/[.,;:]+$/g, "");
   if (CATALOG_PRODUCT_IDENTITY_TOKENS.has(lower)) return false;
   if (lower === "palha" && contextTokens.some((t) => stripAccentsLower(t) === "batata")) {
     return false;
   }
   if (CATALOG_NOISE_TOKENS.has(lower)) return true;
 
+  if (lower === "x") return true;
+  if (lower === "-" || lower === "–") return true;
+  if (/^nr\.?$/.test(lower)) return true;
+
   const compact = lower.replace(/\s+/g, "");
+  if (/^\*\d+$/.test(compact)) return true;
   if (isServingFormatToken(token)) return false;
-  if (/^\d+(?:[.,]\d+)?(?:kg|kgs|l|lt|lts|ltr|ltrs|ml)$/.test(compact)) return true;
+  if (/^\d+(?:[.,]\d+)?(?:kg|kgs|l|lt|lts|ltr|ltrs|ml|cl)$/.test(compact)) return true;
   if (/^\d+(?:un|und|unid)$/.test(compact)) return true;
   if (/^\d+f$/i.test(compact)) return true;
   if (/^\d+$/.test(compact)) return true;
 
   return false;
+}
+
+/**
+ * Strip supplier/pack phrases before operational abbreviation expansion.
+ * Prevents alias expansion from corrupting tokens like "Chef" in "Metro Chef".
+ */
+export function stripCatalogSupplierPackPhrases(raw: string | null | undefined): string {
+  const trimmed = raw?.trim() ?? "";
+  if (!trimmed) return "";
+  let text = trimmed;
+  text = normalizeBeverageBrandShorthand(text);
+  text = stripInvoiceBrandPrefix(text);
+  text = splitFusedWordWeights(text);
+  text = removePackagingPhrases(text);
+  text = removeCatalogNoisePhrases(text);
+  text = text.replace(MULTIPACK_KG_RE, " ");
+  text = text.replace(MULTIPACK_STAR_RE, " ");
+  text = text.replace(BULK_ATTACHED_KG_RE, " ");
+  return text.replace(/\s+/g, " ").trim();
 }
 
 /**
@@ -227,10 +353,17 @@ export function cleanCanonicalIngredientNameForCatalog(
   const trimmed = raw?.trim() ?? "";
   if (!trimmed) return "";
 
-  const { text: withPlaceholders, preserved } = preserveOperationalTokens(trimmed);
-  let text = withPlaceholders;
+  let text = trimmed;
+  text = normalizeBeverageBrandShorthand(text);
+  text = stripInvoiceBrandPrefix(text);
+  text = splitFusedWordWeights(text);
   text = removePackagingPhrases(text);
+
+  const { text: withPlaceholders, preserved } = preserveOperationalTokens(text);
+  text = withPlaceholders;
   text = removeCatalogNoisePhrases(text);
+  text = text.replace(MULTIPACK_KG_RE, " ");
+  text = text.replace(MULTIPACK_STAR_RE, " ");
   text = text.replace(BULK_ATTACHED_KG_RE, " ");
   text = removeBulkAttachedLiters(text);
   text = text.replace(COUNT_PACK_RE, " ");

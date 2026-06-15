@@ -1,0 +1,604 @@
+{
+  "generated_at": "2026-06-15T00:34:21.656Z",
+  "unmatched": {
+    "counts": {
+      "EXCELLENT": 2,
+      "ACCEPTABLE": 7,
+      "WEAK": 10,
+      "EMPTY": 14
+    },
+    "total": 33,
+    "usable": 9,
+    "rows": [
+      {
+        "invoice": "Manteiga Coimbra s/Sal Emb 1 Kg",
+        "suggested": "Manteiga coimbra s/sal emb",
+        "class": "WEAK",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Abóbora Butternut",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Alho Francês",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Courgettes",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Pêra Abacate Hasse",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Hortelã",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Manjericão",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Salada Ibérica FSTK EMB. 250g",
+        "suggested": "Salada ibérica fstk emb 250g",
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Tomilho",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+        "suggested": "Ovo moreno classe M dúzias cartão",
+        "class": "WEAK",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Rovagnati - Salame Ventricina 2,5 Kg",
+        "suggested": "Rovagnati - salame ventricina",
+        "class": "ACCEPTABLE",
+        "invoiceLabel": "Emporio (live)"
+      },
+      {
+        "invoice": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Emporio (live)"
+      },
+      {
+        "invoice": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello 1/8 - 1,85kg",
+        "suggested": "Arrigoni formaggi - gorgonzola DOP dolce linea castello 1/8 -",
+        "class": "WEAK",
+        "invoiceLabel": "Emporio (live)"
+      },
+      {
+        "invoice": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+        "suggested": "Rovagnati - assaporami prosciutto cotto scelto HC 4,3-",
+        "class": "WEAK",
+        "invoiceLabel": "Emporio (live)"
+      },
+      {
+        "invoice": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5Kg",
+        "suggested": "Rovagnati - mortadella IGP 'massima' con pistacchio 1/2 -",
+        "class": "WEAK",
+        "invoiceLabel": "Emporio (live)"
+      },
+      {
+        "invoice": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Emporio (live)"
+      },
+      {
+        "invoice": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg",
+        "suggested": "Rigamonti - bresaola punta d'anca oro 1/2 -",
+        "class": "WEAK",
+        "invoiceLabel": "Emporio (live)"
+      },
+      {
+        "invoice": "Baladin - Ginger Beer 0.20cl",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Emporio (live)"
+      },
+      {
+        "invoice": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "suggested": "Guanciale di suino stagionato +/- *7 sorrentino",
+        "class": "ACCEPTABLE",
+        "invoiceLabel": "Mammafiore"
+      },
+      {
+        "invoice": "Rulo Di Capra 1kg*2 Simonetta",
+        "suggested": "Rulo di capra *2 simonetta",
+        "class": "ACCEPTABLE",
+        "invoiceLabel": "Mammafiore"
+      },
+      {
+        "invoice": "Recargo por combustibili",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Mammafiore"
+      },
+      {
+        "invoice": "Farina do pasta fresca e gnocchi25kg Caputo",
+        "suggested": "Farina do pasta fresca e gnocchi caputo",
+        "class": "WEAK",
+        "invoiceLabel": "Mammafiore"
+      },
+      {
+        "invoice": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+        "suggested": "Mozza fior di latte expet julienne simonetta",
+        "class": "WEAK",
+        "invoiceLabel": "Mammafiore"
+      },
+      {
+        "invoice": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "suggested": "Aceto balsamico di modena IGP pet *2 toschi",
+        "class": "WEAK",
+        "invoiceLabel": "Mammafiore"
+      },
+      {
+        "invoice": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "suggested": "Birra peroni nastro azzurro PNA 33cl 24 nastro azzurro",
+        "class": "EMPTY",
+        "invoiceLabel": "Mammafiore"
+      },
+      {
+        "invoice": "Farine Speciale pizza 25kg Amoruso",
+        "suggested": "Farine speciale pizza amoruso",
+        "class": "ACCEPTABLE",
+        "invoiceLabel": "Mammafiore"
+      },
+      {
+        "invoice": "ROLO DE CABRA E VACA 1KG",
+        "suggested": "Rolo DE cabra e vaca",
+        "class": "ACCEPTABLE",
+        "invoiceLabel": "Bocconcino"
+      },
+      {
+        "invoice": "RICOTTA TREVIGIANA 1,5KG",
+        "suggested": "Ricotta trevigiana",
+        "class": "EXCELLENT",
+        "invoiceLabel": "Bocconcino"
+      },
+      {
+        "invoice": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bocconcino"
+      },
+      {
+        "invoice": "POMODORI PELATI (CX 2,5KG*6)",
+        "suggested": "Pomodori pelati ( , *6)",
+        "class": "EXCELLENT",
+        "invoiceLabel": "Bocconcino"
+      },
+      {
+        "invoice": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "suggested": "Mezzi paccheri mancini (cx *6)",
+        "class": "ACCEPTABLE",
+        "invoiceLabel": "Bocconcino"
+      },
+      {
+        "invoice": "STRACCIATELLA 250 GR",
+        "suggested": "Stracciatella 250gr",
+        "class": "ACCEPTABLE",
+        "invoiceLabel": "Bocconcino"
+      },
+      {
+        "invoice": "Filete de Anchovas Alconfirsta L1 495 g",
+        "suggested": "Filete de anchovas alconfirsta l1 495g",
+        "class": "WEAK",
+        "invoiceLabel": "Aviludo April"
+      }
+    ]
+  },
+  "bidfood": {
+    "counts": {
+      "EXCELLENT": 0,
+      "ACCEPTABLE": 0,
+      "WEAK": 2,
+      "EMPTY": 8
+    },
+    "total": 10,
+    "usable": 0,
+    "rows": [
+      {
+        "invoice": "Manteiga Coimbra s/Sal Emb 1 Kg",
+        "suggested": "Manteiga coimbra s/sal emb",
+        "class": "WEAK",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Abóbora Butternut",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Alho Francês",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Courgettes",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Pêra Abacate Hasse",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Hortelã",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Manjericão",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Salada Ibérica FSTK EMB. 250g",
+        "suggested": "Salada ibérica fstk emb 250g",
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Tomilho",
+        "suggested": null,
+        "class": "EMPTY",
+        "invoiceLabel": "Bidfood"
+      },
+      {
+        "invoice": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+        "suggested": "Ovo moreno classe M dúzias cartão",
+        "class": "WEAK",
+        "invoiceLabel": "Bidfood"
+      }
+    ]
+  },
+  "allExtracts": {
+    "counts": {
+      "EXCELLENT": 4,
+      "ACCEPTABLE": 16,
+      "WEAK": 11,
+      "EMPTY": 20
+    },
+    "total": 51,
+    "usable": 20,
+    "rows": [
+      {
+        "invoice": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelli oro 1/8 - 1,5kg",
+        "suggested": "Arrigoni formaggi - gorgonzola DOP dolce linea castelli oro 1/8 -",
+        "class": "WEAK"
+      },
+      {
+        "invoice": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+        "suggested": "Assaporami prosciutto cotto scelto HC 4,3-",
+        "class": "WEAK"
+      },
+      {
+        "invoice": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+        "suggested": "Rovagnati - mortadella IGP 'massima' con pistacchio 1/2 -",
+        "class": "WEAK"
+      },
+      {
+        "invoice": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+        "suggested": "Rigamonti - bresaola punta d'anca oro 1/2 -",
+        "class": "WEAK"
+      },
+      {
+        "invoice": "Baladin - Ginger Beer 0.20cl",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Rovagnati - Salame Ventricina 2,5 Kg",
+        "suggested": "Rovagnati - salame ventricina",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "suggested": "Guanciale di suino stagionato +/- *7 sorrentino",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "Farine Speciale pizza 25kg Amoruso",
+        "suggested": "Farine speciale pizza amoruso",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "suggested": "Birra peroni nastro azzurro PNA 33cl 24 nastro azzurro",
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "suggested": "Aceto balsamico di modena IGP pet *2 toschi",
+        "class": "WEAK"
+      },
+      {
+        "invoice": "MOZZA Fior di Latte Expert Julienne 3kg Simonetta",
+        "suggested": "Mozza fior di latte expert julienne simonetta",
+        "class": "WEAK"
+      },
+      {
+        "invoice": "Rulo Di Capra 1kg*2 Simonetta",
+        "suggested": "Rulo di capra *2 simonetta",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "Recargo por combustível",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Farina do pasta fresca e gnocchi25kg Caputo",
+        "suggested": "Farina do pasta fresca e gnocchi caputo",
+        "class": "WEAK"
+      },
+      {
+        "invoice": "Filete de Anchoas Alcoinfoosa LI 495 g",
+        "suggested": "Filete de anchoas alcoinfoosa LI 495g",
+        "class": "WEAK"
+      },
+      {
+        "invoice": "Ovo Líquido Past.Gema Dovo 1 Kg",
+        "suggested": "Ovo líquido past.gema dovo",
+        "class": "EXCELLENT"
+      },
+      {
+        "invoice": "Pepinos Extra Uli Frasco 6x720 g",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Atum Oleo Bolsa Nau Cafrinea 1 Kg",
+        "suggested": "Atum oleo bolsa nau cafrinea",
+        "class": "EXCELLENT"
+      },
+      {
+        "invoice": "Arroz Agulha Metro Chef 12x1 kg",
+        "suggested": "Arroz agulha metro cheddar 12x1 kg",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "Chocolate Culinaria Pantagruel 10x200 g",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Açucar Branco METRO Chef 10x1 Kg",
+        "suggested": "Açucar branco metro cheddar 10x1 kg",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "Nata Culinaria 22% Reny Picot 6x1 L",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Filete de Anchovas Alconfrisa Lt 495 g",
+        "suggested": "Filete de anchovas alconfrisa lt 495g",
+        "class": "WEAK"
+      },
+      {
+        "invoice": "Ovo Líquido Past.Gema Dovo 1kg",
+        "suggested": "Ovo líquido past.gema dovo",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "Pepinos Extra II Frasco 6x720g",
+        "suggested": "Pepinos extra II frasco x 720g",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "suggested": "Atum óleo bolsa nau catrineta",
+        "class": "EXCELLENT"
+      },
+      {
+        "invoice": "Arroz Agulha Metro Chef 12x1kg",
+        "suggested": "Arroz agulha metro cheddar 12g x",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "Chocolate Pantagruel 10x200g",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Açúcar Branco Metro Chef 10x1Kg",
+        "suggested": "Açúcar branco metro cheddar 10g x",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "Nata Reny Picot 22% 6x1L",
+        "suggested": "Nata reny picot 22 x 1L",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "Mozzarella Fior di Latte 2Kg",
+        "suggested": "Mozzarella fior di latte",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "Manteiga Coimbra s/Sal Emb 1 Kg",
+        "suggested": "Manteiga coimbra s/sal emb",
+        "class": "WEAK"
+      },
+      {
+        "invoice": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+        "suggested": "Ovo moreno classe M dúzias cartão",
+        "class": "WEAK"
+      },
+      {
+        "invoice": "Tomilho",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Salada Ibérica FSTK EMB. 250g",
+        "suggested": "Salada ibérica fstk emb 250g",
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Manjericão",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Hortelã",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Pepino",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Pêra Abacate Hasse",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Courgettes",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Alho Francês",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "Abóbora Butternut",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "STRACCIATELLA 250 GR",
+        "suggested": "Stracciatella 250gr",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "MEZZI PACCHERI MANICNI (CX 1KG*6)",
+        "suggested": "Mezzi paccheri manicni (cx *6)",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "POMODORI PELATI (2 X 2,5KG*6)",
+        "suggested": "Pomodori pelati (2x2, *6)",
+        "class": "ACCEPTABLE"
+      },
+      {
+        "invoice": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "suggested": null,
+        "class": "EMPTY"
+      },
+      {
+        "invoice": "RICOTTA TREVIGIANA 1,5KG",
+        "suggested": "Ricotta trevigiana",
+        "class": "EXCELLENT"
+      },
+      {
+        "invoice": "ROLO DE CABRA E VACA 1KG",
+        "suggested": "Rolo DE cabra e vaca",
+        "class": "ACCEPTABLE"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "invoice": "Tomilho",
+      "suggested": null,
+      "class": "EMPTY"
+    },
+    {
+      "invoice": "Manjericão",
+      "suggested": null,
+      "class": "EMPTY"
+    },
+    {
+      "invoice": "Hortelã",
+      "suggested": null,
+      "class": "EMPTY"
+    },
+    {
+      "invoice": "Alho Francês",
+      "suggested": null,
+      "class": "EMPTY"
+    },
+    {
+      "invoice": "Abóbora Butternut",
+      "suggested": null,
+      "class": "EMPTY"
+    },
+    {
+      "invoice": "Courgettes",
+      "suggested": null,
+      "class": "EMPTY"
+    },
+    {
+      "invoice": "Pêra Abacate Hasse",
+      "suggested": null,
+      "class": "EMPTY"
+    },
+    {
+      "invoice": "Manteiga Coimbra s/Sal EMB 1 Kg",
+      "suggested": "Manteiga coimbra s/sal EMB",
+      "class": "WEAK"
+    },
+    {
+      "invoice": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "suggested": "Ovo moreno classe M dúzias cartão",
+      "class": "WEAK"
+    },
+    {
+      "invoice": "Salada Ibérica FSTK EMB. 250g",
+      "suggested": "Salada ibérica fstk emb 250g",
+      "class": "EMPTY"
+    }
+  ]
+}

@@ -4,8 +4,11 @@
   "invoiceLabel": "Bidfood",
   "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
   "lineName": "Pepino",
-  "trustVerdict": "trusted",
-  "classification": [],
+  "trustVerdict": "stale",
+  "classification": [
+    "pack_qty_mismatch",
+    "no_price_history"
+  ],
   "invoiceSource": {
     "quantity": 3.36,
     "unit": "kg",
@@ -19,24 +22,14 @@
     "usableCostPerLiter": null
   },
   "ingredientCatalog": {
-    "current_price": 1.77,
-    "purchase_quantity": 1000,
-    "operationalUnitCost": 0.00177
+    "current_price": 22.49,
+    "purchase_quantity": 6,
+    "operationalUnitCost": 3.748333333333333
   },
-  "priceHistory": [
-    {
-      "id": "a689bd91-5b83-41d9-b060-b5a63ccfb3b4",
-      "previous_price": 3.748333333333333,
-      "new_price": 0.00177,
-      "delta": -3.746563333333333,
-      "delta_percent": -99.95277901289462,
-      "deltaMathValid": true,
-      "directionValid": true,
-      "matchesComputedOperational": true
-    }
-  ],
-  "opportunityRisk": [
-    "Large movement -99.9528% — verify equivalent units"
-  ],
-  "notes": []
+  "priceHistory": [],
+  "opportunityRisk": [],
+  "notes": [
+    "purchase_quantity drift: line 1000 vs catalog 6",
+    "Matched ingredient but no price_history row for this invoice"
+  ]
 }

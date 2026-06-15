@@ -1,6 +1,6 @@
 # Historical Pricing Integrity Audit
 
-**Generated:** 2026-06-13  
+**Generated:** 2026-06-15  
 **Mode:** READ-ONLY — DB + code replay
 
 ---
@@ -24,10 +24,10 @@
 | Not trusted | 1 |
 | Stale | 2 |
 | Unmatched (no ingredient) | 46 |
-| Price history rows | 20 |
-| History trusted | 4 |
-| History stale | 2 |
-| History ghost | 14 |
+| Price history rows | 16 |
+| History trusted | 2 |
+| History stale | 5 |
+| History ghost | 9 |
 | History not trusted | 0 |
 
 ---
@@ -37,18 +37,18 @@
 | Class | Count |
 |-------|-------|
 | Math/logic bugs | 1 |
-| Stale DB data | 2 |
+| Stale DB data | 0 |
 | Extraction residue | 0 |
 | GT catalog issues | 0 |
 | Gross vs net display | 0 |
-| No price_history | 0 |
+| No price_history | 2 |
 
 ---
 
 ## Fully Trusted (2)
 
-- **Pepino conserva** (Bidfood) — Pepino
 - **Mozzarella fior di latte** (Aviludo April) — Mozzarella Flor di Latte 2Kg
+- **Chocolate culinária** (Aviludo May) — Chocolate Culinaria Pantagruel 10x200 g
 
 ---
 
@@ -60,8 +60,8 @@
 
 ## Stale (2)
 
-- **Chocolate culinária** (Aviludo May): stale_db_row
-- **Mozzarella fior di latte** (Bocconcino): stale_db_row
+- **Pepino conserva** (Bidfood): pack_qty_mismatch, no_price_history
+- **Mozzarella fior di latte** (Bocconcino): no_price_history
 
 ---
 

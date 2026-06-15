@@ -142,3 +142,58 @@ describe("formatCanonicalIngredientDisplayName", () => {
     expect(formatCanonicalIngredientDisplayName(null)).toBe("");
   });
 });
+
+describe("phase 2 noise cleanup", () => {
+  it("strips supplier, pack, and channel noise from audit examples", () => {
+    expect(formatCanonicalIngredientDisplayName("Manteiga Coimbra s/Sal EMB 1 Kg")).toBe(
+      "Manteiga s/sal",
+    );
+    expect(
+      formatCanonicalIngredientDisplayName("Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)"),
+    ).toBe("Ovo classe M");
+    expect(formatCanonicalIngredientDisplayName("Salada Ibérica FSTK EMB. 250g")).toBe(
+      "Salada ibérica",
+    );
+    expect(formatCanonicalIngredientDisplayName("Pêra Abacate Hasse")).toBe("Pêra abacate");
+    expect(formatCanonicalIngredientDisplayName("Arroz Agulha Metro Chef 12x1kg")).toBe(
+      "Arroz agulha",
+    );
+  });
+
+  it("preserves known good canonical identities", () => {
+    expect(formatCanonicalIngredientDisplayName("Mozzarella Fior di Latte 2Kg")).toBe(
+      "Mozzarella fior di latte",
+    );
+    expect(formatCanonicalIngredientDisplayName("Batata palha")).toBe("Batata palha");
+    expect(formatCanonicalIngredientDisplayName("Salada Ibérica FSTK EMB. 250g")).toBe(
+      "Salada ibérica",
+    );
+  });
+});
+
+describe("final cleanup edge cases", () => {
+  it("strips distributor suffix noise (simonetta, caputo, toschi)", () => {
+    expect(formatCanonicalIngredientDisplayName("Rulo Di Capra 1kg*2 Simonetta")).toBe(
+      "Rulo di capra",
+    );
+    expect(formatCanonicalIngredientDisplayName("Farina do pasta fresca e gnocchi25kg Caputo")).toBe(
+      "Farina do pasta fresca e gnocchi",
+    );
+    expect(formatCanonicalIngredientDisplayName("Aceto balsamico di modena IGP pet 5l*2 Toschi")).toBe(
+      "Aceto balsamico di modena IGP",
+    );
+  });
+
+  it("strips invoice brand prefixes for De Cecco and Baladin commodity lines", () => {
+    expect(formatCanonicalIngredientDisplayName("De Cecco - Paccheri Lisci Nr. 125 - 500g")).toBe(
+      "Paccheri lisci",
+    );
+    expect(formatCanonicalIngredientDisplayName("Baladin - Ginger Beer 0.20cl")).toBe("Ginger beer");
+  });
+
+  it("normalizes San Pellegrino beverage shorthand while keeping brand", () => {
+    expect(formatCanonicalIngredientDisplayName("ACQUA S.PELLEGRINO (CX 75CL*15)")).toBe(
+      "Água san pellegrino 75cl",
+    );
+  });
+});

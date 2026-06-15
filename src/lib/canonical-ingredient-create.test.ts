@@ -8,6 +8,8 @@ import type { AppSupabaseClient } from "./ingredient-alias-memory";
 import {
   buildCanonicalIngredientCreateDefaults,
   buildExplicitCanonicalInsertPayload,
+  isCatalogReadyInvoiceName,
+  isNonFoodInvoiceLine,
   traceCanonicalConfirmedName,
   traceCanonicalModalOpen,
   traceCanonicalSuggestion,
@@ -38,7 +40,16 @@ describe("validateCanonicalIngredientName", () => {
     expect(validateCanonicalIngredientName("BAC FUM FAT").ok).toBe(false);
   });
 
-  it("blocks confirmed name that equals invoice alias (case-insensitive)", () => {
+  it("allows catalog-ready invoice names that match alias after display casing", () => {
+    expect(validateCanonicalIngredientName("Tomilho", { invoiceAlias: "Tomilho" })).toEqual({
+      ok: true,
+    });
+    expect(validateCanonicalIngredientName("Alho francês", { invoiceAlias: "Alho Francês" })).toEqual({
+      ok: true,
+    });
+  });
+
+  it("blocks confirmed name that equals invoice alias when not catalog-ready", () => {
     expect(
       validateCanonicalIngredientName("Óleo girassol fula 1L", {
         invoiceAlias: "Óleo girassol fula 1L",
@@ -68,6 +79,26 @@ describe("validateCanonicalIngredientName", () => {
   });
 });
 
+describe("isCatalogReadyInvoiceName", () => {
+  it.each([
+    "Tomilho",
+    "Manjericão",
+    "Hortelã",
+    "Alho Francês",
+    "Courgettes",
+    "Abóbora Butternut",
+  ])("detects catalog-ready produce/herb %s", (name) => {
+    expect(isCatalogReadyInvoiceName(name)).toBe(true);
+  });
+
+  it("rejects shorthand, noisy, and multi-word brand lines", () => {
+    expect(isCatalogReadyInvoiceName("ANGUS PTY")).toBe(false);
+    expect(isCatalogReadyInvoiceName("Óleo girassol fula 1L")).toBe(false);
+    expect(isCatalogReadyInvoiceName("Pêra Abacate Hasse")).toBe(false);
+    expect(isCatalogReadyInvoiceName("Salada Ibérica FSTK EMB. 250g")).toBe(false);
+  });
+});
+
 describe("buildCanonicalIngredientCreateDefaults", () => {
   it("leaves confirmed name empty and separates suggestion for invoice shorthand", () => {
     const defaults = buildCanonicalIngredientCreateDefaults(item("ANGUS PTY"), {
@@ -88,10 +119,54 @@ describe("buildCanonicalIngredientCreateDefaults", () => {
     expect(defaults.invoiceQuantityLabel).toContain("10");
   });
 
-  it("does not suggest when cleanup preview equals invoice alias", () => {
+  it("does not suggest when cleanup preview equals invoice alias and line is not catalog-ready", () => {
     const defaults = buildCanonicalIngredientCreateDefaults(item("Óleo girassol fula 1L"));
     expect(defaults.invoiceAlias).toBe("Óleo girassol fula 1L");
     expect(defaults.suggestedCanonicalName).toBeNull();
+    expect(defaults.catalogReady).toBe(false);
+  });
+
+  it.each([
+    ["Tomilho", "Tomilho"],
+    ["Manjericão", "Manjericão"],
+    ["Hortelã", "Hortelã"],
+    ["Alho Francês", "Alho francês"],
+    ["Courgettes", "Courgettes"],
+    ["Abóbora Butternut", "Abóbora butternut"],
+  ])("suggests and marks catalog-ready for %s", (invoiceName, expectedSuggestion) => {
+    const defaults = buildCanonicalIngredientCreateDefaults(item(invoiceName));
+    expect(defaults.suggestedCanonicalName).toBe(expectedSuggestion);
+    expect(defaults.catalogReady).toBe(true);
+  });
+
+  it("does not mark noisy three-token lines as catalog-ready before cleanup", () => {
+    const defaults = buildCanonicalIngredientCreateDefaults(item("Pêra Abacate Hasse"));
+    expect(defaults.catalogReady).toBe(false);
+  });
+
+  it("suggests cleaned name for Pêra Abacate Hasse after brand strip", () => {
+    const defaults = buildCanonicalIngredientCreateDefaults(item("Pêra Abacate Hasse"));
+    expect(defaults.suggestedCanonicalName).toBe("Pêra abacate");
+  });
+
+  it("strips phase 2 noise from weak canonical examples", () => {
+    expect(
+      buildCanonicalIngredientCreateDefaults(item("Manteiga Coimbra s/Sal EMB 1 Kg"))
+        .suggestedCanonicalName,
+    ).toBe("Manteiga s/sal");
+    expect(
+      buildCanonicalIngredientCreateDefaults(
+        item("Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)"),
+      ).suggestedCanonicalName,
+    ).toBe("Ovo classe M");
+    expect(
+      buildCanonicalIngredientCreateDefaults(item("Salada Ibérica FSTK EMB. 250g"))
+        .suggestedCanonicalName,
+    ).toBe("Salada ibérica");
+    expect(
+      buildCanonicalIngredientCreateDefaults(item("Arroz Agulha Metro Chef 12x1kg"))
+        .suggestedCanonicalName,
+    ).toBe("Arroz agulha");
   });
 
   it("suggests Batata shoestring for BAT shoestr invoice shorthand", () => {
@@ -137,6 +212,28 @@ describe("buildCanonicalIngredientCreateDefaults", () => {
     );
     info.mockRestore();
   });
+
+  it("suggests final cleanup edge cases", () => {
+    expect(
+      buildCanonicalIngredientCreateDefaults(item("MOZZA Fior di Latte Expet Julienne 3kg Simonetta"))
+        .suggestedCanonicalName,
+    ).toBe("Mozzarella fior di latte julienne");
+    expect(
+      buildCanonicalIngredientCreateDefaults(item("De Cecco - Paccheri Lisci Nr. 125 - 500g"))
+        .suggestedCanonicalName,
+    ).toBe("Paccheri lisci");
+    expect(
+      buildCanonicalIngredientCreateDefaults(item("ACQUA S.PELLEGRINO (CX 75CL*15)"))
+        .suggestedCanonicalName,
+    ).toBe("Água san pellegrino 75cl");
+  });
+
+  it("excludes non-food recargo lines from canonical create", () => {
+    expect(isNonFoodInvoiceLine("Recargo por combustibili")).toBe(true);
+    const defaults = buildCanonicalIngredientCreateDefaults(item("Recargo por combustibili"));
+    expect(defaults.suggestedCanonicalName).toBeNull();
+    expect(validateCanonicalIngredientName("Recargo por combustibili").ok).toBe(false);
+  });
 });
 
 describe("buildExplicitCanonicalInsertPayload", () => {
@@ -162,13 +259,24 @@ describe("buildExplicitCanonicalInsertPayload", () => {
     expect(payload?.normalized_name).toBe("oleo girassol");
   });
 
-  it("returns null when confirmed name equals invoice alias", () => {
+  it("returns null when confirmed name equals invoice alias for non-catalog-ready lines", () => {
     const payload = buildExplicitCanonicalInsertPayload({
       canonicalName: "Óleo girassol fula 1L",
       item: item("Óleo girassol fula 1L"),
       userId: "user-1",
     });
     expect(payload).toBeNull();
+  });
+
+  it("creates payload for catalog-ready names that match invoice alias", () => {
+    const payload = buildExplicitCanonicalInsertPayload({
+      canonicalName: "Tomilho",
+      item: item("Tomilho"),
+      userId: "user-1",
+    });
+    expect(payload).not.toBeNull();
+    expect(payload?.name).toBe("Tomilho");
+    expect(payload?.normalized_name).toBe("tomilho");
   });
 
   it("returns null for shorthand canonical names", () => {
