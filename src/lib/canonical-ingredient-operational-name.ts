@@ -189,9 +189,13 @@ function hasResolvableSupplierAliasToken(raw: string): boolean {
 export function looksLikeSupplierAbbreviatedCatalogName(raw: string | null | undefined): boolean {
   const trimmed = raw?.trim() ?? "";
   if (!trimmed) return false;
-  if (looksLikeInvoiceShorthandName(trimmed) || looksLikeInvoiceShorthandName(trimmed.toUpperCase())) {
-    return true;
-  }
+
+  const letters = trimmed.replace(/[^A-Za-zÀ-ÿ]/g, "");
+  const upperRatio =
+    letters.length > 0 ? (trimmed.match(/[A-Z]/g) ?? []).length / letters.length : 0;
+
+  if (looksLikeInvoiceShorthandName(trimmed)) return true;
+  if (upperRatio >= 0.82 && looksLikeInvoiceShorthandName(trimmed.toUpperCase())) return true;
   if (!hasResolvableSupplierAliasToken(trimmed)) return false;
 
   const expanded = expandSupplierAbbreviations(trimmed);

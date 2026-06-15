@@ -77,6 +77,24 @@ describe("validateCanonicalIngredientName", () => {
       }),
     ).toEqual({ ok: true });
   });
+
+  it("allows Phase 2 cleaned suggestions on validate + insert", () => {
+    expect(
+      validateCanonicalIngredientName("Pêra abacate", {
+        invoiceAlias: "Pêra Abacate Hasse",
+      }),
+    ).toEqual({ ok: true });
+    expect(
+      validateCanonicalIngredientName("Ovo classe M", {
+        invoiceAlias: "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      }),
+    ).toEqual({ ok: true });
+    expect(
+      validateCanonicalIngredientName("Salada ibérica", {
+        invoiceAlias: "Salada Ibérica FSTK EMB. 250g",
+      }),
+    ).toEqual({ ok: true });
+  });
 });
 
 describe("isCatalogReadyInvoiceName", () => {
@@ -286,6 +304,32 @@ describe("buildExplicitCanonicalInsertPayload", () => {
       userId: "user-1",
     });
     expect(payload).toBeNull();
+  });
+
+  it("creates payload for Phase 2 cleaned suggestions", () => {
+    const peraPayload = buildExplicitCanonicalInsertPayload({
+      canonicalName: "Pêra abacate",
+      item: item("Pêra Abacate Hasse"),
+      userId: "user-1",
+    });
+    expect(peraPayload).not.toBeNull();
+    expect(peraPayload?.name).toBe("Pêra abacate");
+
+    const ovoPayload = buildExplicitCanonicalInsertPayload({
+      canonicalName: "Ovo classe M",
+      item: item("Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)"),
+      userId: "user-1",
+    });
+    expect(ovoPayload).not.toBeNull();
+    expect(ovoPayload?.name).toBe("Ovo classe M");
+
+    const saladaPayload = buildExplicitCanonicalInsertPayload({
+      canonicalName: "Salada ibérica",
+      item: item("Salada Ibérica FSTK EMB. 250g"),
+      userId: "user-1",
+    });
+    expect(saladaPayload).not.toBeNull();
+    expect(saladaPayload?.name).toBe("Salada ibérica");
   });
 
   it('preserves batata+palha in normalized_name for "Batata palha"', () => {

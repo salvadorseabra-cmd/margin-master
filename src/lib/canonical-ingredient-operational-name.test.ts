@@ -113,4 +113,15 @@ describe("shouldBlockCanonicalNameOnCreate", () => {
   it("allows operational names on create", () => {
     expect(shouldBlockCanonicalNameOnCreate("Batata shoestring")).toBe(false);
   });
+
+  it("does not block title-cased cleaned catalog names", () => {
+    expect(shouldBlockCanonicalNameOnCreate("Pêra abacate")).toBe(false);
+    expect(shouldBlockCanonicalNameOnCreate("Ovo classe M")).toBe(false);
+    expect(shouldBlockCanonicalNameOnCreate("Salada ibérica")).toBe(false);
+  });
+
+  it("still blocks true invoice shorthand", () => {
+    expect(shouldBlockCanonicalNameOnCreate("ANGUS PTY")).toBe(true);
+    expect(shouldBlockCanonicalNameOnCreate("BAT shoestr")).toBe(true);
+  });
 });
