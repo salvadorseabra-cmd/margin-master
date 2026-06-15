@@ -11,7 +11,7 @@
 | Check | Expected | Actual | Pass |
 |---|---|---|---|
 | Delete row exists | `14330aad-cce1-4569-aa2f-4976dd1ac336` | Present on Nata | ✅ |
-| Keep row exists | `2767b722-cce1-4569-aa2f-4976dd1ac336` | Present (April confirmed) | ✅ |
+| Keep row exists | `2767b722-0985-45a8-9c80-9e9dae611142` | Present (April confirmed) | ✅ |
 | Ingredient | Nata culinária | `3d1af48c-be3c-494a-9e0f-be267fc9388b` | ✅ |
 | Match status (May) | suggested/semantic | suggested on item `1826cbe9` | ✅ |
 | `suggested_match_history_count` (VL) | 1 | 1 | ✅ |
@@ -35,7 +35,7 @@
 
 | ID | Invoice | Date | Match basis | New op | Action |
 |---|---|---|---|---|---|
-| `2767b722-cce1-4569-aa2f-4976dd1ac336` | `c2f52357` April | 2026-04-17 | **confirmed** | 3.048 | **KEEP** |
+| `2767b722-0985-45a8-9c80-9e9dae611142` | `c2f52357` April | 2026-04-17 | **confirmed** | 3.048 | **KEEP** |
 | `14330aad-cce1-4569-aa2f-4976dd1ac336` | `3b4cb21f` May | 2026-05-19 | **suggested/semantic** | 3.148 | **DELETE** |
 
 ---

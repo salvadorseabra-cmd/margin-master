@@ -1,0 +1,3689 @@
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 495,
+  afterQty: 495,
+  unit: 'g',
+  unitMeasurement: 'g',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 495,
+  totalUsableAmount: 495,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Filete de Anchovas Alconfrista Lt 495 g',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '495 g', value: 495, unit: 'g', index: 34 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    perItemBase: 495,
+    usableUnit: 'g',
+    totalUsableAmount: 495,
+    expression: '1 × 1 × 495 g'
+  },
+  totalUsableAmount: 495
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Filete de Anchovas Alconfrista Lt 495 g',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 495,
+  unit: 'g',
+  totalUsableAmount: 495,
+  usableUnit: 'g',
+  matchedText: '495 g'
+}
+[purchase_structure_parse] {
+  text: '2 un',
+  tierAttempted: 'none',
+  numericTokens: [],
+  parsed: null,
+  multiplierChain: null,
+  totalUsableAmount: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: '2 un',
+  tierAttempted: 'none',
+  beforeQty: null,
+  afterQty: null,
+  unit: null,
+  totalUsableAmount: null,
+  usableUnit: null,
+  matchedText: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  beforeQty: null,
+  afterQty: null,
+  text: '2 un',
+  tierAttempted: 'none'
+}
+[stock_normalize] input {
+  name: 'Filete de Anchovas Alconfrista Lt 495 g',
+  rowQuantity: 2,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 495,
+    packageUnit: 'g',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 2,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 495,
+  afterQty: 495,
+  unit: 'g',
+  unitMeasurement: 'g',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 495,
+  totalUsableAmount: 495,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Filete de Anchovas Alconfrista Lt 495 g',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '495 g', value: 495, unit: 'g', index: 34 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    perItemBase: 495,
+    usableUnit: 'g',
+    totalUsableAmount: 495,
+    expression: '1 × 1 × 495 g'
+  },
+  totalUsableAmount: 495
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Filete de Anchovas Alconfrista Lt 495 g',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 495,
+  unit: 'g',
+  totalUsableAmount: 495,
+  usableUnit: 'g',
+  matchedText: '495 g'
+}
+[stock_gram_ml_trace] {
+  step: 'computeUsableFromPurchaseStructure',
+  beforeQty: 495,
+  afterQty: 990,
+  unit: 'g',
+  rowQuantity: 2,
+  rowUnit: 'un',
+  unitSize: 495,
+  purchaseContainerCount: 2,
+  usableSource: 'structure_recomputed',
+  weak_scalar_activated: false,
+  weakRow: false,
+  rowConflatedInner: false,
+  fallbackReason: 'generic row unit × per-item (2 × 495 g)',
+  rawTotal: 990
+}
+[stock_usable_source] {
+  name: 'Filete de Anchovas Alconfrista Lt 495 g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  },
+  numericTokens: [ { raw: '495 g', value: 495, unit: 'g', index: 34 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    perItemBase: 495,
+    usableUnit: 'g',
+    totalUsableAmount: 495,
+    expression: '1 × 1 × 495 g'
+  },
+  computedTotal: 990,
+  structureTotal: 495,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (2 × 495 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 2,
+  rowUnit: 'un'
+}
+[stock_gram_ml_trace] {
+  step: 'normalizePurchasedToUsableStock',
+  name: 'Filete de Anchovas Alconfrista Lt 495 g',
+  beforeQty: 2,
+  afterQty: 990,
+  unit: 'g',
+  rowUnit: 'un',
+  source: 'purchase_structure',
+  unitSize: 495,
+  structureTotal: 495
+}
+[stock_normalize] result {
+  explicitPhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 495,
+    packageUnit: 'g',
+    confidence: 0.95
+  },
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: undefined,
+    innerUnitType: undefined,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    matchedText: '495 g',
+    tier: 'bare_measure'
+  },
+  purchaseContainerCount: 2,
+  packQuantity: 495,
+  packUnit: 'g',
+  usableQuantity: 990,
+  usableUnit: 'g',
+  unitFamily: 'mass',
+  source: 'purchase_structure',
+  pipelineId: 'unified',
+  reason: 'purchase structure (bare_measure)',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  }
+}
+[stock_normalize] resolve_line {
+  name: 'Filete de Anchovas Alconfrista Lt 495 g',
+  rowQuantity: 2,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 495,
+    packageUnit: 'g',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 2,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  },
+  explicitKind: 'weight_or_volume',
+  stockSource: 'purchase_structure',
+  pipelineId: 'unified',
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.stock',
+  name: 'Filete de Anchovas Alconfrista Lt 495 g',
+  beforeQty: 2,
+  afterQty: 990,
+  unit: 'g',
+  rowUnit: 'un',
+  stockSource: 'purchase_structure',
+  unitSize: 495,
+  structureTotal: 495
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.structured',
+  name: 'Filete de Anchovas Alconfrista Lt 495 g',
+  beforeQty: 990,
+  afterQty: 990,
+  unit: 'g',
+  packageQuantity: 495,
+  kind: 'weight_or_volume'
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 495,
+  afterQty: 495,
+  unit: 'g',
+  unitMeasurement: 'g',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 495,
+  totalUsableAmount: 495,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Filete de Anchovas Alconfrista Lt 495 g',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '495 g', value: 495, unit: 'g', index: 34 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    perItemBase: 495,
+    usableUnit: 'g',
+    totalUsableAmount: 495,
+    expression: '1 × 1 × 495 g'
+  },
+  totalUsableAmount: 495
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Filete de Anchovas Alconfrista Lt 495 g',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 495,
+  unit: 'g',
+  totalUsableAmount: 495,
+  usableUnit: 'g',
+  matchedText: '495 g'
+}
+[purchase_structure_parse] {
+  text: '1 un',
+  tierAttempted: 'none',
+  numericTokens: [],
+  parsed: null,
+  multiplierChain: null,
+  totalUsableAmount: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: '1 un',
+  tierAttempted: 'none',
+  beforeQty: null,
+  afterQty: null,
+  unit: null,
+  totalUsableAmount: null,
+  usableUnit: null,
+  matchedText: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  beforeQty: null,
+  afterQty: null,
+  text: '1 un',
+  tierAttempted: 'none'
+}
+[stock_normalize] input {
+  name: 'Filete de Anchovas Alconfrista Lt 495 g',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 495,
+    packageUnit: 'g',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 495,
+  afterQty: 495,
+  unit: 'g',
+  unitMeasurement: 'g',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 495,
+  totalUsableAmount: 495,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Filete de Anchovas Alconfrista Lt 495 g',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '495 g', value: 495, unit: 'g', index: 34 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    perItemBase: 495,
+    usableUnit: 'g',
+    totalUsableAmount: 495,
+    expression: '1 × 1 × 495 g'
+  },
+  totalUsableAmount: 495
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Filete de Anchovas Alconfrista Lt 495 g',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 495,
+  unit: 'g',
+  totalUsableAmount: 495,
+  usableUnit: 'g',
+  matchedText: '495 g'
+}
+[stock_gram_ml_trace] {
+  step: 'computeUsableFromPurchaseStructure',
+  beforeQty: 495,
+  afterQty: 495,
+  unit: 'g',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  unitSize: 495,
+  purchaseContainerCount: 1,
+  usableSource: 'structure_recomputed',
+  weak_scalar_activated: false,
+  weakRow: false,
+  rowConflatedInner: false,
+  fallbackReason: 'generic row unit × per-item (1 × 495 g)',
+  rawTotal: 495
+}
+[stock_usable_source] {
+  name: 'Filete de Anchovas Alconfrista Lt 495 g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  },
+  numericTokens: [ { raw: '495 g', value: 495, unit: 'g', index: 34 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    perItemBase: 495,
+    usableUnit: 'g',
+    totalUsableAmount: 495,
+    expression: '1 × 1 × 495 g'
+  },
+  computedTotal: 495,
+  structureTotal: 495,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (1 × 495 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 1,
+  rowUnit: 'un'
+}
+[stock_gram_ml_trace] {
+  step: 'normalizePurchasedToUsableStock',
+  name: 'Filete de Anchovas Alconfrista Lt 495 g',
+  beforeQty: 1,
+  afterQty: 495,
+  unit: 'g',
+  rowUnit: 'un',
+  source: 'purchase_structure',
+  unitSize: 495,
+  structureTotal: 495
+}
+[stock_normalize] result {
+  explicitPhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 495,
+    packageUnit: 'g',
+    confidence: 0.95
+  },
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: undefined,
+    innerUnitType: undefined,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    matchedText: '495 g',
+    tier: 'bare_measure'
+  },
+  purchaseContainerCount: 1,
+  packQuantity: 495,
+  packUnit: 'g',
+  usableQuantity: 495,
+  usableUnit: 'g',
+  unitFamily: 'mass',
+  source: 'purchase_structure',
+  pipelineId: 'unified',
+  reason: 'purchase structure (bare_measure)',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  }
+}
+[stock_normalize] resolve_line {
+  name: 'Filete de Anchovas Alconfrista Lt 495 g',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 495,
+    packageUnit: 'g',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  },
+  explicitKind: 'weight_or_volume',
+  stockSource: 'purchase_structure',
+  pipelineId: 'unified',
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.stock',
+  name: 'Filete de Anchovas Alconfrista Lt 495 g',
+  beforeQty: 1,
+  afterQty: 495,
+  unit: 'g',
+  rowUnit: 'un',
+  stockSource: 'purchase_structure',
+  unitSize: 495,
+  structureTotal: 495
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.structured',
+  name: 'Filete de Anchovas Alconfrista Lt 495 g',
+  beforeQty: 495,
+  afterQty: 495,
+  unit: 'g',
+  packageQuantity: 495,
+  kind: 'weight_or_volume'
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  unitMeasurement: 'kg',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 1000,
+  totalUsableAmount: 1000,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Ovo Líquido Past.Gema Dovo 1kg',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '1kg', value: 1, unit: 'kg', index: 27 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  totalUsableAmount: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Ovo Líquido Past.Gema Dovo 1kg',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 1,
+  unit: 'kg',
+  totalUsableAmount: 1000,
+  usableUnit: 'g',
+  matchedText: '1kg'
+}
+[purchase_structure_parse] {
+  text: '6 un',
+  tierAttempted: 'none',
+  numericTokens: [],
+  parsed: null,
+  multiplierChain: null,
+  totalUsableAmount: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: '6 un',
+  tierAttempted: 'none',
+  beforeQty: null,
+  afterQty: null,
+  unit: null,
+  totalUsableAmount: null,
+  usableUnit: null,
+  matchedText: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  beforeQty: null,
+  afterQty: null,
+  text: '6 un',
+  tierAttempted: 'none'
+}
+[stock_normalize] input {
+  name: 'Ovo Líquido Past.Gema Dovo 1kg',
+  rowQuantity: 6,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 6,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  unitMeasurement: 'kg',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 1000,
+  totalUsableAmount: 1000,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Ovo Líquido Past.Gema Dovo 1kg',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '1kg', value: 1, unit: 'kg', index: 27 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  totalUsableAmount: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Ovo Líquido Past.Gema Dovo 1kg',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 1,
+  unit: 'kg',
+  totalUsableAmount: 1000,
+  usableUnit: 'g',
+  matchedText: '1kg'
+}
+[stock_gram_ml_trace] {
+  step: 'computeUsableFromPurchaseStructure',
+  beforeQty: 1000,
+  afterQty: 6000,
+  unit: 'g',
+  rowQuantity: 6,
+  rowUnit: 'un',
+  unitSize: 1,
+  purchaseContainerCount: 6,
+  usableSource: 'structure_recomputed',
+  weak_scalar_activated: false,
+  weakRow: false,
+  rowConflatedInner: false,
+  fallbackReason: 'generic row unit × per-item (6 × 1 kg)',
+  rawTotal: 6000
+}
+[stock_usable_source] {
+  name: 'Ovo Líquido Past.Gema Dovo 1kg',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  numericTokens: [ { raw: '1kg', value: 1, unit: 'kg', index: 27 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  computedTotal: 6000,
+  structureTotal: 1000,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (6 × 1 kg)',
+  weak_scalar_activated: false,
+  rowQuantity: 6,
+  rowUnit: 'un'
+}
+[stock_gram_ml_trace] {
+  step: 'normalizePurchasedToUsableStock',
+  name: 'Ovo Líquido Past.Gema Dovo 1kg',
+  beforeQty: 6,
+  afterQty: 6000,
+  unit: 'g',
+  rowUnit: 'un',
+  source: 'purchase_structure',
+  unitSize: 1,
+  structureTotal: 1000
+}
+[stock_normalize] result {
+  explicitPhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.95
+  },
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: undefined,
+    innerUnitType: undefined,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    matchedText: '1kg',
+    tier: 'bare_measure'
+  },
+  purchaseContainerCount: 6,
+  packQuantity: 1,
+  packUnit: 'kg',
+  usableQuantity: 6000,
+  usableUnit: 'g',
+  unitFamily: 'mass',
+  source: 'purchase_structure',
+  pipelineId: 'unified',
+  reason: 'purchase structure (bare_measure)',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  }
+}
+[stock_normalize] resolve_line {
+  name: 'Ovo Líquido Past.Gema Dovo 1kg',
+  rowQuantity: 6,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 6,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  },
+  explicitKind: 'weight_or_volume',
+  stockSource: 'purchase_structure',
+  pipelineId: 'unified',
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.stock',
+  name: 'Ovo Líquido Past.Gema Dovo 1kg',
+  beforeQty: 6,
+  afterQty: 6000,
+  unit: 'g',
+  rowUnit: 'un',
+  stockSource: 'purchase_structure',
+  unitSize: 1,
+  structureTotal: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.structured',
+  name: 'Ovo Líquido Past.Gema Dovo 1kg',
+  beforeQty: 6000,
+  afterQty: 6000,
+  unit: 'g',
+  packageQuantity: 1,
+  kind: 'weight_or_volume'
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  unitMeasurement: 'kg',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 1000,
+  totalUsableAmount: 1000,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Ovo Líquido Past.Gema Dovo 1kg',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '1kg', value: 1, unit: 'kg', index: 27 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  totalUsableAmount: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Ovo Líquido Past.Gema Dovo 1kg',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 1,
+  unit: 'kg',
+  totalUsableAmount: 1000,
+  usableUnit: 'g',
+  matchedText: '1kg'
+}
+[purchase_structure_parse] {
+  text: '1 un',
+  tierAttempted: 'none',
+  numericTokens: [],
+  parsed: null,
+  multiplierChain: null,
+  totalUsableAmount: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: '1 un',
+  tierAttempted: 'none',
+  beforeQty: null,
+  afterQty: null,
+  unit: null,
+  totalUsableAmount: null,
+  usableUnit: null,
+  matchedText: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  beforeQty: null,
+  afterQty: null,
+  text: '1 un',
+  tierAttempted: 'none'
+}
+[stock_normalize] input {
+  name: 'Ovo Líquido Past.Gema Dovo 1kg',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  unitMeasurement: 'kg',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 1000,
+  totalUsableAmount: 1000,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Ovo Líquido Past.Gema Dovo 1kg',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '1kg', value: 1, unit: 'kg', index: 27 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  totalUsableAmount: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Ovo Líquido Past.Gema Dovo 1kg',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 1,
+  unit: 'kg',
+  totalUsableAmount: 1000,
+  usableUnit: 'g',
+  matchedText: '1kg'
+}
+[stock_gram_ml_trace] {
+  step: 'computeUsableFromPurchaseStructure',
+  beforeQty: 1000,
+  afterQty: 1000,
+  unit: 'g',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  unitSize: 1,
+  purchaseContainerCount: 1,
+  usableSource: 'structure_recomputed',
+  weak_scalar_activated: false,
+  weakRow: false,
+  rowConflatedInner: false,
+  fallbackReason: 'generic row unit × per-item (1 × 1 kg)',
+  rawTotal: 1000
+}
+[stock_usable_source] {
+  name: 'Ovo Líquido Past.Gema Dovo 1kg',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  numericTokens: [ { raw: '1kg', value: 1, unit: 'kg', index: 27 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  computedTotal: 1000,
+  structureTotal: 1000,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (1 × 1 kg)',
+  weak_scalar_activated: false,
+  rowQuantity: 1,
+  rowUnit: 'un'
+}
+[stock_gram_ml_trace] {
+  step: 'normalizePurchasedToUsableStock',
+  name: 'Ovo Líquido Past.Gema Dovo 1kg',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  rowUnit: 'un',
+  source: 'purchase_structure',
+  unitSize: 1,
+  structureTotal: 1000
+}
+[stock_normalize] result {
+  explicitPhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.95
+  },
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: undefined,
+    innerUnitType: undefined,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    matchedText: '1kg',
+    tier: 'bare_measure'
+  },
+  purchaseContainerCount: 1,
+  packQuantity: 1,
+  packUnit: 'kg',
+  usableQuantity: 1000,
+  usableUnit: 'g',
+  unitFamily: 'mass',
+  source: 'purchase_structure',
+  pipelineId: 'unified',
+  reason: 'purchase structure (bare_measure)',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  }
+}
+[stock_normalize] resolve_line {
+  name: 'Ovo Líquido Past.Gema Dovo 1kg',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  },
+  explicitKind: 'weight_or_volume',
+  stockSource: 'purchase_structure',
+  pipelineId: 'unified',
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.stock',
+  name: 'Ovo Líquido Past.Gema Dovo 1kg',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  rowUnit: 'un',
+  stockSource: 'purchase_structure',
+  unitSize: 1,
+  structureTotal: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.structured',
+  name: 'Ovo Líquido Past.Gema Dovo 1kg',
+  beforeQty: 1000,
+  afterQty: 1000,
+  unit: 'g',
+  packageQuantity: 1,
+  kind: 'weight_or_volume'
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  unitMeasurement: 'kg',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 1000,
+  totalUsableAmount: 1000,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '1 Kg', value: 1, unit: 'Kg', index: 30 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  totalUsableAmount: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 1,
+  unit: 'kg',
+  totalUsableAmount: 1000,
+  usableUnit: 'g',
+  matchedText: '1 Kg'
+}
+[purchase_structure_parse] {
+  text: '2 un',
+  tierAttempted: 'none',
+  numericTokens: [],
+  parsed: null,
+  multiplierChain: null,
+  totalUsableAmount: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: '2 un',
+  tierAttempted: 'none',
+  beforeQty: null,
+  afterQty: null,
+  unit: null,
+  totalUsableAmount: null,
+  usableUnit: null,
+  matchedText: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  beforeQty: null,
+  afterQty: null,
+  text: '2 un',
+  tierAttempted: 'none'
+}
+[stock_normalize] input {
+  name: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  rowQuantity: 2,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 2,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  unitMeasurement: 'kg',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 1000,
+  totalUsableAmount: 1000,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '1 Kg', value: 1, unit: 'Kg', index: 30 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  totalUsableAmount: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 1,
+  unit: 'kg',
+  totalUsableAmount: 1000,
+  usableUnit: 'g',
+  matchedText: '1 Kg'
+}
+[stock_gram_ml_trace] {
+  step: 'computeUsableFromPurchaseStructure',
+  beforeQty: 1000,
+  afterQty: 2000,
+  unit: 'g',
+  rowQuantity: 2,
+  rowUnit: 'un',
+  unitSize: 1,
+  purchaseContainerCount: 2,
+  usableSource: 'structure_recomputed',
+  weak_scalar_activated: false,
+  weakRow: false,
+  rowConflatedInner: false,
+  fallbackReason: 'generic row unit × per-item (2 × 1 kg)',
+  rawTotal: 2000
+}
+[stock_usable_source] {
+  name: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  numericTokens: [ { raw: '1 Kg', value: 1, unit: 'Kg', index: 30 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  computedTotal: 2000,
+  structureTotal: 1000,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (2 × 1 kg)',
+  weak_scalar_activated: false,
+  rowQuantity: 2,
+  rowUnit: 'un'
+}
+[stock_gram_ml_trace] {
+  step: 'normalizePurchasedToUsableStock',
+  name: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  beforeQty: 2,
+  afterQty: 2000,
+  unit: 'g',
+  rowUnit: 'un',
+  source: 'purchase_structure',
+  unitSize: 1,
+  structureTotal: 1000
+}
+[stock_normalize] result {
+  explicitPhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.95
+  },
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: undefined,
+    innerUnitType: undefined,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    matchedText: '1 Kg',
+    tier: 'bare_measure'
+  },
+  purchaseContainerCount: 2,
+  packQuantity: 1,
+  packUnit: 'kg',
+  usableQuantity: 2000,
+  usableUnit: 'g',
+  unitFamily: 'mass',
+  source: 'purchase_structure',
+  pipelineId: 'unified',
+  reason: 'purchase structure (bare_measure)',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  }
+}
+[stock_normalize] resolve_line {
+  name: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  rowQuantity: 2,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 2,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  },
+  explicitKind: 'weight_or_volume',
+  stockSource: 'purchase_structure',
+  pipelineId: 'unified',
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.stock',
+  name: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  beforeQty: 2,
+  afterQty: 2000,
+  unit: 'g',
+  rowUnit: 'un',
+  stockSource: 'purchase_structure',
+  unitSize: 1,
+  structureTotal: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.structured',
+  name: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  beforeQty: 2000,
+  afterQty: 2000,
+  unit: 'g',
+  packageQuantity: 1,
+  kind: 'weight_or_volume'
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  unitMeasurement: 'kg',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 1000,
+  totalUsableAmount: 1000,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '1 Kg', value: 1, unit: 'Kg', index: 30 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  totalUsableAmount: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 1,
+  unit: 'kg',
+  totalUsableAmount: 1000,
+  usableUnit: 'g',
+  matchedText: '1 Kg'
+}
+[purchase_structure_parse] {
+  text: '1 un',
+  tierAttempted: 'none',
+  numericTokens: [],
+  parsed: null,
+  multiplierChain: null,
+  totalUsableAmount: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: '1 un',
+  tierAttempted: 'none',
+  beforeQty: null,
+  afterQty: null,
+  unit: null,
+  totalUsableAmount: null,
+  usableUnit: null,
+  matchedText: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  beforeQty: null,
+  afterQty: null,
+  text: '1 un',
+  tierAttempted: 'none'
+}
+[stock_normalize] input {
+  name: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  unitMeasurement: 'kg',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 1000,
+  totalUsableAmount: 1000,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '1 Kg', value: 1, unit: 'Kg', index: 30 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  totalUsableAmount: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 1,
+  unit: 'kg',
+  totalUsableAmount: 1000,
+  usableUnit: 'g',
+  matchedText: '1 Kg'
+}
+[stock_gram_ml_trace] {
+  step: 'computeUsableFromPurchaseStructure',
+  beforeQty: 1000,
+  afterQty: 1000,
+  unit: 'g',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  unitSize: 1,
+  purchaseContainerCount: 1,
+  usableSource: 'structure_recomputed',
+  weak_scalar_activated: false,
+  weakRow: false,
+  rowConflatedInner: false,
+  fallbackReason: 'generic row unit × per-item (1 × 1 kg)',
+  rawTotal: 1000
+}
+[stock_usable_source] {
+  name: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  numericTokens: [ { raw: '1 Kg', value: 1, unit: 'Kg', index: 30 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  computedTotal: 1000,
+  structureTotal: 1000,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (1 × 1 kg)',
+  weak_scalar_activated: false,
+  rowQuantity: 1,
+  rowUnit: 'un'
+}
+[stock_gram_ml_trace] {
+  step: 'normalizePurchasedToUsableStock',
+  name: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  rowUnit: 'un',
+  source: 'purchase_structure',
+  unitSize: 1,
+  structureTotal: 1000
+}
+[stock_normalize] result {
+  explicitPhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.95
+  },
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: undefined,
+    innerUnitType: undefined,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    matchedText: '1 Kg',
+    tier: 'bare_measure'
+  },
+  purchaseContainerCount: 1,
+  packQuantity: 1,
+  packUnit: 'kg',
+  usableQuantity: 1000,
+  usableUnit: 'g',
+  unitFamily: 'mass',
+  source: 'purchase_structure',
+  pipelineId: 'unified',
+  reason: 'purchase structure (bare_measure)',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  }
+}
+[stock_normalize] resolve_line {
+  name: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  },
+  explicitKind: 'weight_or_volume',
+  stockSource: 'purchase_structure',
+  pipelineId: 'unified',
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.stock',
+  name: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  rowUnit: 'un',
+  stockSource: 'purchase_structure',
+  unitSize: 1,
+  structureTotal: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.structured',
+  name: 'Atum Óleo Bolsa Nau Catrineta 1 Kg',
+  beforeQty: 1000,
+  afterQty: 1000,
+  unit: 'g',
+  packageQuantity: 1,
+  kind: 'weight_or_volume'
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 495,
+  afterQty: 495,
+  unit: 'g',
+  unitMeasurement: 'g',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 495,
+  totalUsableAmount: 495,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Filete de Anchoas Alconfirosa LI 495 g',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '495 g', value: 495, unit: 'g', index: 33 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    perItemBase: 495,
+    usableUnit: 'g',
+    totalUsableAmount: 495,
+    expression: '1 × 1 × 495 g'
+  },
+  totalUsableAmount: 495
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Filete de Anchoas Alconfirosa LI 495 g',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 495,
+  unit: 'g',
+  totalUsableAmount: 495,
+  usableUnit: 'g',
+  matchedText: '495 g'
+}
+[purchase_structure_parse] {
+  text: '2 un',
+  tierAttempted: 'none',
+  numericTokens: [],
+  parsed: null,
+  multiplierChain: null,
+  totalUsableAmount: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: '2 un',
+  tierAttempted: 'none',
+  beforeQty: null,
+  afterQty: null,
+  unit: null,
+  totalUsableAmount: null,
+  usableUnit: null,
+  matchedText: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  beforeQty: null,
+  afterQty: null,
+  text: '2 un',
+  tierAttempted: 'none'
+}
+[stock_normalize] input {
+  name: 'Filete de Anchoas Alconfirosa LI 495 g',
+  rowQuantity: 2,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 495,
+    packageUnit: 'g',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 2,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 495,
+  afterQty: 495,
+  unit: 'g',
+  unitMeasurement: 'g',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 495,
+  totalUsableAmount: 495,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Filete de Anchoas Alconfirosa LI 495 g',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '495 g', value: 495, unit: 'g', index: 33 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    perItemBase: 495,
+    usableUnit: 'g',
+    totalUsableAmount: 495,
+    expression: '1 × 1 × 495 g'
+  },
+  totalUsableAmount: 495
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Filete de Anchoas Alconfirosa LI 495 g',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 495,
+  unit: 'g',
+  totalUsableAmount: 495,
+  usableUnit: 'g',
+  matchedText: '495 g'
+}
+[stock_gram_ml_trace] {
+  step: 'computeUsableFromPurchaseStructure',
+  beforeQty: 495,
+  afterQty: 990,
+  unit: 'g',
+  rowQuantity: 2,
+  rowUnit: 'un',
+  unitSize: 495,
+  purchaseContainerCount: 2,
+  usableSource: 'structure_recomputed',
+  weak_scalar_activated: false,
+  weakRow: false,
+  rowConflatedInner: false,
+  fallbackReason: 'generic row unit × per-item (2 × 495 g)',
+  rawTotal: 990
+}
+[stock_usable_source] {
+  name: 'Filete de Anchoas Alconfirosa LI 495 g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  },
+  numericTokens: [ { raw: '495 g', value: 495, unit: 'g', index: 33 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    perItemBase: 495,
+    usableUnit: 'g',
+    totalUsableAmount: 495,
+    expression: '1 × 1 × 495 g'
+  },
+  computedTotal: 990,
+  structureTotal: 495,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (2 × 495 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 2,
+  rowUnit: 'un'
+}
+[stock_gram_ml_trace] {
+  step: 'normalizePurchasedToUsableStock',
+  name: 'Filete de Anchoas Alconfirosa LI 495 g',
+  beforeQty: 2,
+  afterQty: 990,
+  unit: 'g',
+  rowUnit: 'un',
+  source: 'purchase_structure',
+  unitSize: 495,
+  structureTotal: 495
+}
+[stock_normalize] result {
+  explicitPhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 495,
+    packageUnit: 'g',
+    confidence: 0.95
+  },
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: undefined,
+    innerUnitType: undefined,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    matchedText: '495 g',
+    tier: 'bare_measure'
+  },
+  purchaseContainerCount: 2,
+  packQuantity: 495,
+  packUnit: 'g',
+  usableQuantity: 990,
+  usableUnit: 'g',
+  unitFamily: 'mass',
+  source: 'purchase_structure',
+  pipelineId: 'unified',
+  reason: 'purchase structure (bare_measure)',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  }
+}
+[stock_normalize] resolve_line {
+  name: 'Filete de Anchoas Alconfirosa LI 495 g',
+  rowQuantity: 2,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 495,
+    packageUnit: 'g',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 2,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  },
+  explicitKind: 'weight_or_volume',
+  stockSource: 'purchase_structure',
+  pipelineId: 'unified',
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.stock',
+  name: 'Filete de Anchoas Alconfirosa LI 495 g',
+  beforeQty: 2,
+  afterQty: 990,
+  unit: 'g',
+  rowUnit: 'un',
+  stockSource: 'purchase_structure',
+  unitSize: 495,
+  structureTotal: 495
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.structured',
+  name: 'Filete de Anchoas Alconfirosa LI 495 g',
+  beforeQty: 990,
+  afterQty: 990,
+  unit: 'g',
+  packageQuantity: 495,
+  kind: 'weight_or_volume'
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 495,
+  afterQty: 495,
+  unit: 'g',
+  unitMeasurement: 'g',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 495,
+  totalUsableAmount: 495,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Filete de Anchoas Alconfirosa LI 495 g',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '495 g', value: 495, unit: 'g', index: 33 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    perItemBase: 495,
+    usableUnit: 'g',
+    totalUsableAmount: 495,
+    expression: '1 × 1 × 495 g'
+  },
+  totalUsableAmount: 495
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Filete de Anchoas Alconfirosa LI 495 g',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 495,
+  unit: 'g',
+  totalUsableAmount: 495,
+  usableUnit: 'g',
+  matchedText: '495 g'
+}
+[purchase_structure_parse] {
+  text: '1 un',
+  tierAttempted: 'none',
+  numericTokens: [],
+  parsed: null,
+  multiplierChain: null,
+  totalUsableAmount: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: '1 un',
+  tierAttempted: 'none',
+  beforeQty: null,
+  afterQty: null,
+  unit: null,
+  totalUsableAmount: null,
+  usableUnit: null,
+  matchedText: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  beforeQty: null,
+  afterQty: null,
+  text: '1 un',
+  tierAttempted: 'none'
+}
+[stock_normalize] input {
+  name: 'Filete de Anchoas Alconfirosa LI 495 g',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 495,
+    packageUnit: 'g',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 495,
+  afterQty: 495,
+  unit: 'g',
+  unitMeasurement: 'g',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 495,
+  totalUsableAmount: 495,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Filete de Anchoas Alconfirosa LI 495 g',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '495 g', value: 495, unit: 'g', index: 33 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    perItemBase: 495,
+    usableUnit: 'g',
+    totalUsableAmount: 495,
+    expression: '1 × 1 × 495 g'
+  },
+  totalUsableAmount: 495
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Filete de Anchoas Alconfirosa LI 495 g',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 495,
+  unit: 'g',
+  totalUsableAmount: 495,
+  usableUnit: 'g',
+  matchedText: '495 g'
+}
+[stock_gram_ml_trace] {
+  step: 'computeUsableFromPurchaseStructure',
+  beforeQty: 495,
+  afterQty: 495,
+  unit: 'g',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  unitSize: 495,
+  purchaseContainerCount: 1,
+  usableSource: 'structure_recomputed',
+  weak_scalar_activated: false,
+  weakRow: false,
+  rowConflatedInner: false,
+  fallbackReason: 'generic row unit × per-item (1 × 495 g)',
+  rawTotal: 495
+}
+[stock_usable_source] {
+  name: 'Filete de Anchoas Alconfirosa LI 495 g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  },
+  numericTokens: [ { raw: '495 g', value: 495, unit: 'g', index: 33 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    perItemBase: 495,
+    usableUnit: 'g',
+    totalUsableAmount: 495,
+    expression: '1 × 1 × 495 g'
+  },
+  computedTotal: 495,
+  structureTotal: 495,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (1 × 495 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 1,
+  rowUnit: 'un'
+}
+[stock_gram_ml_trace] {
+  step: 'normalizePurchasedToUsableStock',
+  name: 'Filete de Anchoas Alconfirosa LI 495 g',
+  beforeQty: 1,
+  afterQty: 495,
+  unit: 'g',
+  rowUnit: 'un',
+  source: 'purchase_structure',
+  unitSize: 495,
+  structureTotal: 495
+}
+[stock_normalize] result {
+  explicitPhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 495,
+    packageUnit: 'g',
+    confidence: 0.95
+  },
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: undefined,
+    innerUnitType: undefined,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    matchedText: '495 g',
+    tier: 'bare_measure'
+  },
+  purchaseContainerCount: 1,
+  packQuantity: 495,
+  packUnit: 'g',
+  usableQuantity: 495,
+  usableUnit: 'g',
+  unitFamily: 'mass',
+  source: 'purchase_structure',
+  pipelineId: 'unified',
+  reason: 'purchase structure (bare_measure)',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  }
+}
+[stock_normalize] resolve_line {
+  name: 'Filete de Anchoas Alconfirosa LI 495 g',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 495,
+    packageUnit: 'g',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  },
+  explicitKind: 'weight_or_volume',
+  stockSource: 'purchase_structure',
+  pipelineId: 'unified',
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 495,
+    unitMeasurement: 'g',
+    totalUsableAmount: 495,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '495 g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 495,
+      unitMeasurement: 'g',
+      perItemBase: 495,
+      usableUnit: 'g',
+      totalUsableAmount: 495,
+      expression: '1 × 1 × 495 g'
+    }
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.stock',
+  name: 'Filete de Anchoas Alconfirosa LI 495 g',
+  beforeQty: 1,
+  afterQty: 495,
+  unit: 'g',
+  rowUnit: 'un',
+  stockSource: 'purchase_structure',
+  unitSize: 495,
+  structureTotal: 495
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.structured',
+  name: 'Filete de Anchoas Alconfirosa LI 495 g',
+  beforeQty: 495,
+  afterQty: 495,
+  unit: 'g',
+  packageQuantity: 495,
+  kind: 'weight_or_volume'
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  unitMeasurement: 'kg',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 1000,
+  totalUsableAmount: 1000,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '1 Kg', value: 1, unit: 'Kg', index: 27 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  totalUsableAmount: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 1,
+  unit: 'kg',
+  totalUsableAmount: 1000,
+  usableUnit: 'g',
+  matchedText: '1 Kg'
+}
+[purchase_structure_parse] {
+  text: '6 un',
+  tierAttempted: 'none',
+  numericTokens: [],
+  parsed: null,
+  multiplierChain: null,
+  totalUsableAmount: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: '6 un',
+  tierAttempted: 'none',
+  beforeQty: null,
+  afterQty: null,
+  unit: null,
+  totalUsableAmount: null,
+  usableUnit: null,
+  matchedText: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  beforeQty: null,
+  afterQty: null,
+  text: '6 un',
+  tierAttempted: 'none'
+}
+[stock_normalize] input {
+  name: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  rowQuantity: 6,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 6,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  unitMeasurement: 'kg',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 1000,
+  totalUsableAmount: 1000,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '1 Kg', value: 1, unit: 'Kg', index: 27 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  totalUsableAmount: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 1,
+  unit: 'kg',
+  totalUsableAmount: 1000,
+  usableUnit: 'g',
+  matchedText: '1 Kg'
+}
+[stock_gram_ml_trace] {
+  step: 'computeUsableFromPurchaseStructure',
+  beforeQty: 1000,
+  afterQty: 6000,
+  unit: 'g',
+  rowQuantity: 6,
+  rowUnit: 'un',
+  unitSize: 1,
+  purchaseContainerCount: 6,
+  usableSource: 'structure_recomputed',
+  weak_scalar_activated: false,
+  weakRow: false,
+  rowConflatedInner: false,
+  fallbackReason: 'generic row unit × per-item (6 × 1 kg)',
+  rawTotal: 6000
+}
+[stock_usable_source] {
+  name: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  numericTokens: [ { raw: '1 Kg', value: 1, unit: 'Kg', index: 27 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  computedTotal: 6000,
+  structureTotal: 1000,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (6 × 1 kg)',
+  weak_scalar_activated: false,
+  rowQuantity: 6,
+  rowUnit: 'un'
+}
+[stock_gram_ml_trace] {
+  step: 'normalizePurchasedToUsableStock',
+  name: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  beforeQty: 6,
+  afterQty: 6000,
+  unit: 'g',
+  rowUnit: 'un',
+  source: 'purchase_structure',
+  unitSize: 1,
+  structureTotal: 1000
+}
+[stock_normalize] result {
+  explicitPhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.95
+  },
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: undefined,
+    innerUnitType: undefined,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    matchedText: '1 Kg',
+    tier: 'bare_measure'
+  },
+  purchaseContainerCount: 6,
+  packQuantity: 1,
+  packUnit: 'kg',
+  usableQuantity: 6000,
+  usableUnit: 'g',
+  unitFamily: 'mass',
+  source: 'purchase_structure',
+  pipelineId: 'unified',
+  reason: 'purchase structure (bare_measure)',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  }
+}
+[stock_normalize] resolve_line {
+  name: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  rowQuantity: 6,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 6,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  },
+  explicitKind: 'weight_or_volume',
+  stockSource: 'purchase_structure',
+  pipelineId: 'unified',
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.stock',
+  name: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  beforeQty: 6,
+  afterQty: 6000,
+  unit: 'g',
+  rowUnit: 'un',
+  stockSource: 'purchase_structure',
+  unitSize: 1,
+  structureTotal: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.structured',
+  name: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  beforeQty: 6000,
+  afterQty: 6000,
+  unit: 'g',
+  packageQuantity: 1,
+  kind: 'weight_or_volume'
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  unitMeasurement: 'kg',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 1000,
+  totalUsableAmount: 1000,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '1 Kg', value: 1, unit: 'Kg', index: 27 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  totalUsableAmount: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 1,
+  unit: 'kg',
+  totalUsableAmount: 1000,
+  usableUnit: 'g',
+  matchedText: '1 Kg'
+}
+[purchase_structure_parse] {
+  text: '1 un',
+  tierAttempted: 'none',
+  numericTokens: [],
+  parsed: null,
+  multiplierChain: null,
+  totalUsableAmount: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: '1 un',
+  tierAttempted: 'none',
+  beforeQty: null,
+  afterQty: null,
+  unit: null,
+  totalUsableAmount: null,
+  usableUnit: null,
+  matchedText: null
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  beforeQty: null,
+  afterQty: null,
+  text: '1 un',
+  tierAttempted: 'none'
+}
+[stock_normalize] input {
+  name: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'buildStructure.measureToBase',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  unitMeasurement: 'kg',
+  purchaseQuantity: 1,
+  innerUnitCount: 1,
+  rawTotal: 1000,
+  totalUsableAmount: 1000,
+  tier: 'bare_measure'
+}
+[purchase_structure_parse] {
+  text: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  tierAttempted: 'bare_measure',
+  numericTokens: [ { raw: '1 Kg', value: 1, unit: 'Kg', index: 27 } ],
+  parsed: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  totalUsableAmount: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'parsePurchaseStructureFromText',
+  text: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  tierAttempted: 'bare_measure',
+  beforeQty: null,
+  afterQty: 1,
+  unit: 'kg',
+  totalUsableAmount: 1000,
+  usableUnit: 'g',
+  matchedText: '1 Kg'
+}
+[stock_gram_ml_trace] {
+  step: 'computeUsableFromPurchaseStructure',
+  beforeQty: 1000,
+  afterQty: 1000,
+  unit: 'g',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  unitSize: 1,
+  purchaseContainerCount: 1,
+  usableSource: 'structure_recomputed',
+  weak_scalar_activated: false,
+  weakRow: false,
+  rowConflatedInner: false,
+  fallbackReason: 'generic row unit × per-item (1 × 1 kg)',
+  rawTotal: 1000
+}
+[stock_usable_source] {
+  name: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  },
+  numericTokens: [ { raw: '1 Kg', value: 1, unit: 'Kg', index: 27 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    perItemBase: 1000,
+    usableUnit: 'g',
+    totalUsableAmount: 1000,
+    expression: '1 × 1 × 1 kg'
+  },
+  computedTotal: 1000,
+  structureTotal: 1000,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (1 × 1 kg)',
+  weak_scalar_activated: false,
+  rowQuantity: 1,
+  rowUnit: 'un'
+}
+[stock_gram_ml_trace] {
+  step: 'normalizePurchasedToUsableStock',
+  name: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  rowUnit: 'un',
+  source: 'purchase_structure',
+  unitSize: 1,
+  structureTotal: 1000
+}
+[stock_normalize] result {
+  explicitPhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.95
+  },
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: undefined,
+    innerUnitType: undefined,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    matchedText: '1 Kg',
+    tier: 'bare_measure'
+  },
+  purchaseContainerCount: 1,
+  packQuantity: 1,
+  packUnit: 'kg',
+  usableQuantity: 1000,
+  usableUnit: 'g',
+  unitFamily: 'mass',
+  source: 'purchase_structure',
+  pipelineId: 'unified',
+  reason: 'purchase structure (bare_measure)',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  }
+}
+[stock_normalize] resolve_line {
+  name: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  rowQuantity: 1,
+  rowUnit: 'un',
+  namePhrase: {
+    kind: 'weight_or_volume',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'kg',
+    confidence: 0.98
+  },
+  rowPhrase: {
+    kind: 'unit_count',
+    containerCount: 1,
+    packageQuantity: 1,
+    packageUnit: 'un',
+    confidence: 0.94
+  },
+  explicitKind: 'weight_or_volume',
+  stockSource: 'purchase_structure',
+  pipelineId: 'unified',
+  purchaseStructure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1000,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1 Kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1,
+      unitMeasurement: 'kg',
+      perItemBase: 1000,
+      usableUnit: 'g',
+      totalUsableAmount: 1000,
+      expression: '1 × 1 × 1 kg'
+    }
+  }
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.stock',
+  name: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  beforeQty: 1,
+  afterQty: 1000,
+  unit: 'g',
+  rowUnit: 'un',
+  stockSource: 'purchase_structure',
+  unitSize: 1,
+  structureTotal: 1000
+}
+[stock_gram_ml_trace] {
+  step: 'resolveInvoiceLinePurchaseFormat.structured',
+  name: 'Ovo Líquido Past.Gema Dovo 1 Kg',
+  beforeQty: 1000,
+  afterQty: 1000,
+  unit: 'g',
+  packageQuantity: 1,
+  kind: 'weight_or_volume'
+}
+{
+  "queried_at": "2026-06-14T23:22:31.812Z",
+  "project": "bjhnlrgodcqoyzddbpbd",
+  "fix_1_created_at": {
+    "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+    "expected_repair_ids": [
+      "edc6c627-d934-40de-8eb8-cc0a25d36755",
+      "14330aad-cce1-4569-aa2f-4976dd1ac336",
+      "908de185-e61a-4f41-af4c-3b70f69bd08f",
+      "1d9d5133-724b-461c-b141-605392f2b64d",
+      "781ab1ac-39d2-4462-9106-635e5603c466",
+      "e143080d-511b-4c37-9018-11949343aedc",
+      "bf250ee4-388a-480f-96d7-e8c0e8e8dfb2"
+    ],
+    "found_corrupted": [],
+    "total_on_invoice": 8,
+    "global_corrupted_count": 0,
+    "all_expected_present": false
+  },
+  "fix_2_mozzarella": {
+    "ingredient_id": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+    "keep_id": "3c508a43-68bd-4b69-9205-61ddbbfb26a7",
+    "delete_ids": [
+      "9ee1b793-974d-4a6b-b656-c7b5e8febfaa",
+      "18bdb0c5-0370-4bc7-878d-85957b8ba946"
+    ],
+    "rows": [
+      {
+        "id": "3c508a43-68bd-4b69-9205-61ddbbfb26a7",
+        "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "new_price": 13.69,
+        "created_at": "2026-04-17T12:00:00+00:00",
+        "invoices": {
+          "invoice_date": "2026-04-17"
+        }
+      }
+    ],
+    "matches": [
+      {
+        "invoice_item_id": "ec1932a2-497e-4dbe-b016-84fd11604b2f",
+        "status": "suggested",
+        "match_kind": "semantic",
+        "invoice_items": {
+          "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+          "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968"
+        }
+      },
+      {
+        "invoice_item_id": "2ef47b45-922f-420c-b9fc-a6f70a4e6e4d",
+        "status": "confirmed",
+        "match_kind": "confirmed-override",
+        "invoice_items": {
+          "name": "Mozzarella Flor di Latte 2Kg",
+          "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472"
+        }
+      }
+    ],
+    "keep_present": true,
+    "delete_present": false,
+    "row_count": 1
+  },
+  "fix_3_multi_un": {
+    "atum_april_history_id": "61c51696-acd8-4a58-878f-a588c1878af0",
+    "atum_april_in_audit": true,
+    "confirmed_multi_un_count": 5,
+    "lines": [
+      {
+        "ingredient_id": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+        "ingredient_name": "Anchoas",
+        "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "item_id": "a30ae064-ced0-440b-85bd-3c8068defb70",
+        "line": "Filete de Anchovas Alconfrista Lt 495 g",
+        "qty": 2,
+        "unit": "un",
+        "unit_price": 9.49,
+        "purchase_qty": 2,
+        "operational": 4.745,
+        "suspect_double_divide": true,
+        "history_id": "952119dc-8645-4a5f-a3ff-191ae1a57ea8",
+        "history_new_price": 4.745
+      },
+      {
+        "ingredient_id": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+        "ingredient_name": "Gema líquida",
+        "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "item_id": "d26f0c74-9ef8-43b4-ac19-f67d237e7c9b",
+        "line": "Ovo Líquido Past.Gema Dovo 1kg",
+        "qty": 6,
+        "unit": "un",
+        "unit_price": 10.19,
+        "purchase_qty": 6,
+        "operational": 1.6983333333333333,
+        "suspect_double_divide": true,
+        "history_id": "e967f673-1dc5-4390-90e6-464b66ec2a4b",
+        "history_new_price": 1.6983333333333333
+      },
+      {
+        "ingredient_id": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+        "ingredient_name": "Atum em óleo",
+        "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "item_id": "ff2ad683-3e89-4601-91b6-d467493fb116",
+        "line": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "qty": 2,
+        "unit": "un",
+        "unit_price": 6.29,
+        "purchase_qty": 2,
+        "operational": 3.145,
+        "suspect_double_divide": true,
+        "history_id": "61c51696-acd8-4a58-878f-a588c1878af0",
+        "history_new_price": 3.145
+      },
+      {
+        "ingredient_id": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+        "ingredient_name": "Anchoas",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "item_id": "38129b5d-8272-42fb-abc7-f0a509fdd565",
+        "line": "Filete de Anchoas Alconfirosa LI 495 g",
+        "qty": 2,
+        "unit": "un",
+        "unit_price": 9.99,
+        "purchase_qty": 2,
+        "operational": 4.995,
+        "suspect_double_divide": true,
+        "history_id": "908de185-e61a-4f41-af4c-3b70f69bd08f",
+        "history_new_price": 4.995
+      },
+      {
+        "ingredient_id": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+        "ingredient_name": "Gema líquida",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "item_id": "30ccb08d-2f53-4dae-8f2a-b02047b835e1",
+        "line": "Ovo Líquido Past.Gema Dovo 1 Kg",
+        "qty": 6,
+        "unit": "un",
+        "unit_price": 10.49,
+        "purchase_qty": 6,
+        "operational": 1.7483333333333333,
+        "suspect_double_divide": true,
+        "history_id": "e143080d-511b-4c37-9018-11949343aedc",
+        "history_new_price": 1.7483333333333333
+      }
+    ]
+  },
+  "other": {
+    "duplicate_groups_count": 0,
+    "duplicate_groups": [],
+    "suggested_match_history_count": 1,
+    "suggested_match_history": [
+      {
+        "id": "14330aad-cce1-4569-aa2f-4976dd1ac336",
+        "ingredient_id": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+        "ingredient_name": "Nata culinária",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "new_price": 3.1483333333333334,
+        "created_at": "2026-05-19T12:00:00+00:00"
+      }
+    ]
+  }
+}

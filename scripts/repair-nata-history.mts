@@ -21,7 +21,7 @@ loadEnvFiles();
 
 const VL_PROJECT_REF = "bjhnlrgodcqoyzddbpbd";
 const NATA_ID = "3d1af48c-be3c-494a-9e0f-be267fc9388b";
-const NATA_KEEP = "2767b722-cce1-4569-aa2f-4976dd1ac336";
+const NATA_KEEP = "2767b722-0985-45a8-9c80-9e9dae611142";
 const NATA_DELETE = "14330aad-cce1-4569-aa2f-4976dd1ac336";
 
 const executeMode = process.argv.includes("--execute");

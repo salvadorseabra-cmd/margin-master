@@ -1,0 +1,100 @@
+    "row_count": 1
+  },
+  "fix_3_multi_un": {
+    "atum_april_history_id": "61c51696-acd8-4a58-878f-a588c1878af0",
+    "atum_april_in_audit": true,
+    "confirmed_multi_un_count": 5,
+    "lines": [
+      {
+        "ingredient_id": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+        "ingredient_name": "Anchoas",
+        "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "item_id": "a30ae064-ced0-440b-85bd-3c8068defb70",
+        "line": "Filete de Anchovas Alconfrista Lt 495 g",
+        "qty": 2,
+        "unit": "un",
+        "unit_price": 9.49,
+        "purchase_qty": 1,
+        "operational": 9.49,
+        "suspect_double_divide": false,
+        "history_id": "952119dc-8645-4a5f-a3ff-191ae1a57ea8",
+        "history_new_price": 9.49
+      },
+      {
+        "ingredient_id": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+        "ingredient_name": "Gema líquida",
+        "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "item_id": "d26f0c74-9ef8-43b4-ac19-f67d237e7c9b",
+        "line": "Ovo Líquido Past.Gema Dovo 1kg",
+        "qty": 6,
+        "unit": "un",
+        "unit_price": 10.19,
+        "purchase_qty": 1,
+        "operational": 10.19,
+        "suspect_double_divide": false,
+        "history_id": "e967f673-1dc5-4390-90e6-464b66ec2a4b",
+        "history_new_price": 10.19
+      },
+      {
+        "ingredient_id": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+        "ingredient_name": "Atum em óleo",
+        "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "item_id": "ff2ad683-3e89-4601-91b6-d467493fb116",
+        "line": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "qty": 2,
+        "unit": "un",
+        "unit_price": 6.29,
+        "purchase_qty": 1,
+        "operational": 6.29,
+        "suspect_double_divide": false,
+        "history_id": "61c51696-acd8-4a58-878f-a588c1878af0",
+        "history_new_price": 6.29
+      },
+      {
+        "ingredient_id": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+        "ingredient_name": "Anchoas",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "item_id": "38129b5d-8272-42fb-abc7-f0a509fdd565",
+        "line": "Filete de Anchoas Alconfirosa LI 495 g",
+        "qty": 2,
+        "unit": "un",
+        "unit_price": 9.99,
+        "purchase_qty": 1,
+        "operational": 9.99,
+        "suspect_double_divide": false,
+        "history_id": "908de185-e61a-4f41-af4c-3b70f69bd08f",
+        "history_new_price": 9.99
+      },
+      {
+        "ingredient_id": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+        "ingredient_name": "Gema líquida",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "item_id": "30ccb08d-2f53-4dae-8f2a-b02047b835e1",
+        "line": "Ovo Líquido Past.Gema Dovo 1 Kg",
+        "qty": 6,
+        "unit": "un",
+        "unit_price": 10.49,
+        "purchase_qty": 1,
+        "operational": 10.49,
+        "suspect_double_divide": false,
+        "history_id": "e143080d-511b-4c37-9018-11949343aedc",
+        "history_new_price": 10.49
+      }
+    ]
+  },
+  "other": {
+    "duplicate_groups_count": 0,
+    "duplicate_groups": [],
+    "suggested_match_history_count": 1,
+    "suggested_match_history": [
+      {
+        "id": "14330aad-cce1-4569-aa2f-4976dd1ac336",
+        "ingredient_id": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+        "ingredient_name": "Nata culinária",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "new_price": 3.1483333333333334,
+        "created_at": "2026-05-19T12:00:00+00:00"
+      }
+    ]
+  }
+}

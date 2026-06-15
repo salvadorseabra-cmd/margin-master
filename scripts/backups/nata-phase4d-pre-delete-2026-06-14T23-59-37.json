@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-06-14T23-59-37",
+  "ingredient_id": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+  "delete_id": "14330aad-cce1-4569-aa2f-4976dd1ac336",
+  "keep_id": "2767b722-0985-45a8-9c80-9e9dae611142",
+  "row": {
+    "id": "14330aad-cce1-4569-aa2f-4976dd1ac336",
+    "ingredient_id": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+    "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+    "ingredient_name": "Nata culinária",
+    "supplier_name": "Aviludo",
+    "ingredient_unit": "un",
+    "previous_price": 3.0483333333333333,
+    "new_price": 3.1483333333333334,
+    "delta": 0.10000000000000009,
+    "delta_percent": 3.2804811372334637,
+    "created_at": "2026-05-19T12:00:00+00:00"
+  }
+}
