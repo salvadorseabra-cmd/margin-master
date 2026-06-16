@@ -427,7 +427,22 @@ describe("appendIngredientPriceHistoryFromInvoiceLine", () => {
   });
 
   it("refreshes existing invoice_id + ingredient_id on re-extract", async () => {
+    const line = {
+      name: "Ovo Gema 1kg",
+      quantity: 6,
+      unit: "un",
+      unit_price: 10.49,
+      total: 62.94,
+    };
+    const fields = operationalCostFieldsFromInvoiceLine(line);
+    expect(fields?.purchase_quantity).toBe(1);
     const { client, historyInserts, historyUpdates, historyRows } = createPersistenceMockClient({
+      ingredient: {
+        name: "Gema líquida",
+        unit: "kg",
+        current_price: 10.49,
+        purchase_quantity: fields!.purchase_quantity,
+      },
       existingHistoryRows: [
         {
           id: "hist-april",
@@ -453,22 +468,19 @@ describe("appendIngredientPriceHistoryFromInvoiceLine", () => {
         },
       ],
     });
-    const result = await appendIngredientPriceHistoryFromInvoiceLine(client as never, {
-      ingredientId: "ing-gema",
-      invoiceId: "inv-may",
-      ingredientName: "Gema líquida",
-      ingredientUnit: "kg",
-      previousPrice: 0.9,
-      newPrice: 10.49,
-      previousPurchaseQuantity: 6,
-      newPurchaseQuantity: 6,
-    });
-    expect(result.inserted).toBe(false);
+    const result = await persistOperationalIngredientCostFromInvoiceLine(
+      client as never,
+      "ing-gema",
+      line,
+      { priceHistory: { invoiceId: "inv-may", supplierName: "Aviludo" } },
+    );
     expect(result.updated).toBe(true);
+    expect(result.historyInserted).toBe(true);
     expect(historyInserts).toHaveLength(0);
     const mayUpdate = historyUpdates.find((entry) => entry.id === "e143080d");
     expect(mayUpdate).toBeDefined();
-    expect(mayUpdate?.payload.new_price).toBeCloseTo(10.49 / 6, 6);
+    expect(mayUpdate?.payload.new_price).toBeCloseTo(10.49, 4);
+    expect(mayUpdate?.payload.new_price).not.toBeCloseTo(10.49 / 6, 4);
     expect(mayUpdate?.payload.previous_price).toBeCloseTo(1.698, 4);
     const mayRow = historyRows.find((row) => row.id === "e143080d");
     expect(mayRow?.created_at).toBe("2026-05-19T12:00:00.000Z");
@@ -622,6 +634,60 @@ describe("persistOperationalIngredientCostFromInvoiceLine", () => {
     });
     expect(historyInserts[0].previous_price).toBeCloseTo(0.008, 4);
     expect(historyInserts[0].new_price).toBeCloseTo(0.0095, 4);
+  });
+
+  it("stores per-pack operational price for multi-un Atum line with line total", async () => {
+    const line = {
+      name: "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+      quantity: 2,
+      unit: "un",
+      unit_price: 6.29,
+      total: 12.58,
+    };
+    const fields = operationalCostFieldsFromInvoiceLine(line);
+    expect(fields?.purchase_quantity).toBe(1);
+    const { client, historyInserts } = createPersistenceMockClient({
+      ingredient: {
+        name: "Atum em óleo",
+        unit: "kg",
+        current_price: 6.55,
+        purchase_quantity: 2,
+      },
+    });
+
+    await persistOperationalIngredientCostFromInvoiceLine(client as never, "ing-atum", line, {
+      priceHistory: { invoiceId: "inv-atum", supplierName: "Aviludo" },
+    });
+
+    expect(historyInserts[0].new_price).toBeCloseTo(6.29, 2);
+    expect(historyInserts[0].new_price).not.toBeCloseTo(6.29 / 2, 4);
+  });
+
+  it("stores per-pack operational price for multi-un Gema line with line total", async () => {
+    const line = {
+      name: "Ovo Gema 1kg",
+      quantity: 6,
+      unit: "un",
+      unit_price: 10.19,
+      total: 61.14,
+    };
+    const fields = operationalCostFieldsFromInvoiceLine(line);
+    expect(fields?.purchase_quantity).toBe(1);
+    const { client, historyInserts } = createPersistenceMockClient({
+      ingredient: {
+        name: "Gema líquida",
+        unit: "kg",
+        current_price: 8.43,
+        purchase_quantity: 1,
+      },
+    });
+
+    await persistOperationalIngredientCostFromInvoiceLine(client as never, "ing-gema", line, {
+      priceHistory: { invoiceId: "inv-gema", supplierName: "Aviludo" },
+    });
+
+    expect(historyInserts[0].new_price).toBeCloseTo(10.19, 2);
+    expect(historyInserts[0].new_price).not.toBeCloseTo(10.19 / 6, 4);
   });
 
   it("uses history fallback operational price without double normalization", async () => {

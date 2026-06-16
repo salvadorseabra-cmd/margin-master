@@ -30,6 +30,7 @@ type BackfillInvoiceItemRow = {
   quantity: number | null;
   unit: string | null;
   unit_price: number | null;
+  total: number | null;
   invoices: {
     invoice_date: string | null;
     created_at: string | null;
@@ -82,7 +83,7 @@ export async function backfillIngredientPriceHistoryFromInvoices(
       client
         .from("invoice_items")
         .select(
-          "id,invoice_id,name,quantity,unit,unit_price,invoices!inner(invoice_date,created_at,supplier_name)",
+          "id,invoice_id,name,quantity,unit,unit_price,total,invoices!inner(invoice_date,created_at,supplier_name)",
         ),
     ]);
 
@@ -111,6 +112,7 @@ export async function backfillIngredientPriceHistoryFromInvoices(
         quantity: row.quantity,
         unit: row.unit,
         unit_price: row.unit_price,
+        total: row.total,
       });
       if (!isEligibleInvoiceIngredientRow(normalized)) return null;
       const chrono = resolveInvoiceChronology(row.invoices);

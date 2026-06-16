@@ -1492,6 +1492,7 @@ function InvoicesPage() {
           quantity: it.quantity ?? null,
           unit: it.unit ?? null,
           unit_price: it.unit_price ?? null,
+          total: it.total ?? null,
           supplierName: supplierForSync,
         })),
         {
@@ -1952,6 +1953,7 @@ function InvoicesPage() {
           quantity: item.quantity,
           unit: item.unit,
           unit_price: item.unit_price,
+          total: item.total ?? null,
         },
         {
           isGenericUnit,

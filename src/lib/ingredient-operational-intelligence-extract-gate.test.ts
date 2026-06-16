@@ -60,6 +60,7 @@ describe("syncOperationalIngredientCostsFromInvoiceLines extract gate", () => {
           quantity: 2,
           unit: "un",
           unit_price: 3.5,
+          total: 7,
           supplierName: "Aviludo",
         },
       ],
@@ -78,7 +79,10 @@ describe("syncOperationalIngredientCostsFromInvoiceLines extract gate", () => {
     expect(persistSpy).toHaveBeenCalledWith(
       expect.anything(),
       "ing-pepino-conserva",
-      expect.objectContaining({ name: "PEPINO CONSERVA 720G" }),
+      expect.objectContaining({
+        name: "PEPINO CONSERVA 720G",
+        total: 7,
+      }),
       expect.anything(),
     );
   });

@@ -101,7 +101,7 @@ export type { InvoiceIngredientPriceHistoryContext };
 export async function persistOperationalIngredientCostFromInvoiceLine(
   client: AppSupabaseClient,
   ingredientId: string,
-  item: Pick<AutoPersistInvoiceItem, "name" | "quantity" | "unit" | "unit_price">,
+  item: Pick<AutoPersistInvoiceItem, "name" | "quantity" | "unit" | "unit_price" | "total">,
   options: {
     isGenericUnit?: (unit: string | null | undefined) => boolean;
     /** When set, appends `ingredient_price_history` after a successful ingredients update. */

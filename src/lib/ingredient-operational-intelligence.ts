@@ -880,6 +880,7 @@ export function buildLatestOperationalIngredientCostByIngredientIdFromScan(
       quantity: normalized.quantity,
       unit: normalized.unit,
       unit_price: normalized.unit_price,
+      total: normalized.total ?? null,
     });
     if (!fields) continue;
 
@@ -918,6 +919,7 @@ export type InvoiceLineOperationalCostSyncInput = {
   quantity: number | null;
   unit: string | null;
   unit_price: number | null;
+  total?: number | null;
   supplierName?: string | null;
 };
 
@@ -1001,6 +1003,7 @@ export async function syncOperationalIngredientCostsFromInvoiceLines(
         quantity: item.quantity,
         unit: item.unit,
         unit_price: item.unit_price,
+        total: item.total ?? null,
       },
       { isGenericUnit, priceHistory: options.priceHistory },
     );
