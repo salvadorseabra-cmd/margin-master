@@ -26,6 +26,7 @@ import {
   type RecipeRecord,
 } from "@/lib/margin-alert-data";
 import type { MarginVisitDelta } from "@/lib/margin-alert-visit";
+import { normalizeSupplierDisplayName, normalizeSupplierKey } from "@/lib/supplier-identity";
 
 export type CostCategoryGroup =
   | "meat"
@@ -935,9 +936,9 @@ export function buildSupplierWatchlist(
   for (const invoice of data.invoices) {
     const name = invoice.supplier_name?.trim();
     if (!name) continue;
-    const key = name.toLowerCase();
+    const key = normalizeSupplierKey(name);
     const current: SupplierEntry = supplierMap.get(key) ?? {
-      displayName: name,
+      displayName: normalizeSupplierDisplayName(name),
       lastDate: "",
       increases: 0,
       decreases: 0,
@@ -947,6 +948,10 @@ export function buildSupplierWatchlist(
     const date = invoice.created_at ?? "";
     if (!current.lastDate || date.localeCompare(current.lastDate) > 0) {
       current.lastDate = date;
+    }
+    const normalizedDisplay = normalizeSupplierDisplayName(name);
+    if (/[a-z]/.test(normalizedDisplay) && !/[a-z]/.test(current.displayName)) {
+      current.displayName = normalizedDisplay;
     }
     supplierMap.set(key, current);
   }
@@ -958,18 +963,22 @@ export function buildSupplierWatchlist(
   for (const row of linkedIngredientPriceHistoryRows(data.priceHistory)) {
     const supplier = row.supplier_name?.trim();
     if (!supplier) continue;
-    const key = supplier.toLowerCase();
+    const key = normalizeSupplierKey(supplier);
     const prior = row.id ? (priorById.get(row.id) ?? null) : null;
     const pct = trustedPriceHistoryDeltaPercent(row, prior) ?? 0;
     if (pct === 0 && !isTrustedPriceMovementRow(row, prior)) continue;
     const entry: SupplierEntry = supplierMap.get(key) ?? {
-      displayName: supplier,
+      displayName: normalizeSupplierDisplayName(supplier),
       lastDate: row.created_at,
       increases: 0,
       decreases: 0,
       maxPct: 0,
       notes: [],
     };
+    const normalizedDisplay = normalizeSupplierDisplayName(supplier);
+    if (/[a-z]/.test(normalizedDisplay) && !/[a-z]/.test(entry.displayName)) {
+      entry.displayName = normalizedDisplay;
+    }
     if (pct > 2) entry.increases += 1;
     if (pct < -2) entry.decreases += 1;
     if (Math.abs(pct) > Math.abs(entry.maxPct)) entry.maxPct = pct;
@@ -987,7 +996,7 @@ export function buildSupplierWatchlist(
   for (const alert of supplierTrendAlerts) {
     const supplier = alert.meta.find((m) => m.label === "Supplier")?.value;
     if (!supplier) continue;
-    const key = supplier.toLowerCase();
+    const key = normalizeSupplierKey(supplier);
     const entry = supplierMap.get(key);
     if (entry) entry.notes.push(alert.title);
   }

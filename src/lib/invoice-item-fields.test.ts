@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  cleanInvoiceItemDisplayName,
   normalizeInvoiceItemFields,
   normalizeInvoiceUnitToken,
   shouldRejectInvoiceIngredientRow,
@@ -53,6 +54,38 @@ describe("normalizeInvoiceUnitToken", () => {
   it("returns null for empty input", () => {
     expect(normalizeInvoiceUnitToken(null)).toBeNull();
     expect(normalizeInvoiceUnitToken("")).toBeNull();
+  });
+});
+
+describe("cleanInvoiceItemDisplayName", () => {
+  it("strips trailing Produto de Stock suffix", () => {
+    expect(
+      cleanInvoiceItemDisplayName({
+        name: "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+        quantity: 1,
+        unit: "un",
+      }),
+    ).toBe("De Cecco - Paccheri Lisci Nr. 125 - 500g");
+  });
+
+  it("strips slash-separated Produto de Stock suffix", () => {
+    expect(
+      cleanInvoiceItemDisplayName({
+        name: "Rigamonti / Produto de Stock",
+        quantity: 1,
+        unit: "un",
+      }),
+    ).toBe("Rigamonti");
+  });
+
+  it("strips dash-separated Produto de Stock suffix", () => {
+    expect(
+      cleanInvoiceItemDisplayName({
+        name: "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - Produto de Stock",
+        quantity: 1,
+        unit: "un",
+      }),
+    ).toBe("Rigamonti - Bresaola Punta d'Anca Oro 1/2");
   });
 });
 

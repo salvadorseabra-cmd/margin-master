@@ -85,9 +85,21 @@ describe("fuzzyLookupIngredientIdFromAliasMap", () => {
       fuzzyLookupIngredientIdFromAliasMap(
         aliases,
         "filete de anchovas alconfirosa 495",
-        "AVIJUDO",
+        "BIDFOOD",
       ),
     ).toBeNull();
+  });
+
+  it("recovers OCR typo supplier Avijudo against Aviludo alias cluster", () => {
+    const aliases = {
+      [supplierKey("filete de anchovas alconfrisa 495", "AVILUDO")]: ANCHOAS_ID,
+    };
+    const hit = fuzzyLookupIngredientIdFromAliasMap(
+      aliases,
+      "filete de anchovas alconfirosa 495",
+      "AVIJUDO",
+    );
+    expect(hit?.ingredientId).toBe(ANCHOAS_ID);
   });
 
   it("does not recover pepino from pepino conserva aliases", () => {

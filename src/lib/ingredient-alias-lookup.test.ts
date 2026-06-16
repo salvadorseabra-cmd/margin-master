@@ -50,7 +50,7 @@ describe("ingredient alias lookup", () => {
       "chk-1",
       "Metro",
     );
-    expect(next["Metro::chicken breaded"]).toBe("chk-1");
+    expect(next["metro::chicken breaded"]).toBe("chk-1");
     expect(next["chicken breaded"]).toBe("chk-1");
     expect(
       lookupIngredientIdFromAliasMap(next, "chicken breaded", "Metro", "CHK BREADED"),

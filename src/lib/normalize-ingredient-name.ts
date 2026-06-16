@@ -21,6 +21,7 @@ const COMMERCIAL_PHRASES = [
   "premium",
   "auchan",
   "rama",
+  "produto de stock",
 ] as const;
 
 /** Standalone marketing / pack / brand tokens (not product identity). */

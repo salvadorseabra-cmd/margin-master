@@ -29,6 +29,8 @@ const CATALOG_NOISE_PHRASES = [
   "continente",
   "auchan",
   "metro chef",
+  "produto de stock",
+  "linea castello",
 ] as const;
 
 /** Product identity tokens that must never be dropped during catalog cleanup. */
@@ -69,10 +71,22 @@ const CATALOG_NOISE_TOKENS = new Set([
   "pet",
   "expet",
   "nr",
+  "sorrentino",
+  "amoruso",
+  "alconfirsta",
+  "assaporami",
+  "formaggi",
+  "hc",
+  "pna",
+  "l1",
 ]);
 
-/** Invoice `Brand - Product` prefixes stripped for commodity lines (not Rovagnati-style identity). */
+/** Invoice `Brand - Product` prefixes stripped for commodity charcuterie/cheese/pasta lines. */
 const INVOICE_BRAND_PREFIX_STRIP_RE = [
+  /^arrigoni\s+formaggi\s*-\s*/i,
+  /^rovagnati\s*-\s*/i,
+  /^rigamonti\s*-\s*/i,
+  /^arrigoni\s*-\s*/i,
   /^de\s+cecco\s*-\s*/i,
   /^baladin\s*-\s*/i,
 ] as const;
@@ -103,7 +117,12 @@ const BULK_ATTACHED_LITER_RE =
   /\b(\d+(?:[.,]\d+)?)\s*(?:l|lt|lts|ltr|ltrs)\b|\b(\d+(?:[.,]\d+)?)(?:l|lt|lts|ltr|ltrs)\b/gi;
 
 const COUNT_PACK_RE =
-  /\b\d+\s*(?:un|und|unds|unid|unids|unit|units|pc|pcs)\b|\b\d+un\b/gi;
+  /\b\d+\s*(?:un|und|unds|unid|unids|unit|units|pc|pcs|ud|uds)\b|\b\d+(?:un|ud|uds)\b/gi;
+
+/** Wheel fractions and hyphenated purchase weight ranges (procurement metadata). */
+const WHEEL_FRACTION_RE = /\b1\/[248]\b/gi;
+const PURCHASE_WEIGHT_RANGE_RE =
+  /\b\d+(?:[.,]\d+)?\s*-\s*\d+(?:[.,]\d+)?\s*(?:kg|kgs|g|gr|grs)?\b/gi;
 
 /** Parentheses that only carry pack / case counts (not product identity). */
 const PACKAGING_ONLY_PAREN_RE =
@@ -191,6 +210,8 @@ function removeBulkAttachedLiters(value: string): string {
 
 function removePackagingPhrases(value: string): string {
   return value
+    .replace(WHEEL_FRACTION_RE, " ")
+    .replace(PURCHASE_WEIGHT_RANGE_RE, " ")
     .replace(DASH_PACK_WEIGHT_RE, " ")
     .replace(PASTA_SKU_NR_RE, " ")
     .replace(PACKAGING_ONLY_PAREN_RE, " ")
@@ -214,7 +235,8 @@ function splitFusedWordWeights(value: string): string {
 
 /** Normalize San Pellegrino beverage shorthand; extract single-serve cl from cx pack parens. */
 function normalizeBeverageBrandShorthand(value: string): string {
-  let text = value.replace(CX_SERVING_PACK_PAREN_RE, " $1cl ");
+  let text = value.replace(/^san\s*pellegrino\s*-\s*/i, "san pellegrino ");
+  text = text.replace(CX_SERVING_PACK_PAREN_RE, " $1cl ");
   text = text.replace(SERVING_STAR_COUNT_RE, "$1");
   const hasPellegrino = /\bpellegrino\b/i.test(text);
   if (!hasPellegrino) return text;
@@ -310,7 +332,10 @@ function shouldDropCatalogToken(token: string, contextTokens: string[]): boolean
 
   if (lower === "x") return true;
   if (lower === "-" || lower === "–") return true;
+  if (lower === "+/-" || lower === "+/") return true;
   if (/^nr\.?$/.test(lower)) return true;
+  if (/^1\/[248]$/.test(lower)) return true;
+  if (/^1\/$/.test(lower)) return true;
 
   const compact = lower.replace(/\s+/g, "");
   if (/^\*\d+$/.test(compact)) return true;
@@ -319,8 +344,23 @@ function shouldDropCatalogToken(token: string, contextTokens: string[]): boolean
   if (/^\d+(?:un|und|unid)$/.test(compact)) return true;
   if (/^\d+f$/i.test(compact)) return true;
   if (/^\d+$/.test(compact)) return true;
+  if (/^\d+(?:[.,]\d+)?$/.test(compact)) return true;
 
   return false;
+}
+
+function collapseDuplicateTokens(tokens: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const token of tokens) {
+    const key = stripAccentsLower(token)
+      .replace(/[.,;:]+$/g, "")
+      .replace(/^['"]+|['"]+$/g, "");
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(token);
+  }
+  return out;
 }
 
 /**
@@ -369,9 +409,11 @@ export function cleanCanonicalIngredientNameForCatalog(
   text = text.replace(COUNT_PACK_RE, " ");
 
   const rawTokens = text.split(/\s+/).filter(Boolean);
-  const tokens = rawTokens
-    .filter((token) => !shouldDropCatalogToken(token, rawTokens))
-    .map(normalizeCatalogSizeToken);
+  const tokens = collapseDuplicateTokens(
+    rawTokens
+      .filter((token) => !shouldDropCatalogToken(token, rawTokens))
+      .map(normalizeCatalogSizeToken),
+  );
   let cleaned = restorePreservedTokens(tokens.join(" "), preserved);
   cleaned = cleaned.replace(/\s+/g, " ").trim();
   return cleaned || trimmed;

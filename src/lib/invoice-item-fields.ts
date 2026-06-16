@@ -21,6 +21,8 @@ const INVOICE_ROW_TAIL_RE = new RegExp(
   "iu",
 );
 const INVOICE_PRODUCT_CODE_RE = /^(?:[A-Z]{1,4}\d{3,8}|\d{2,8})\s+/iu;
+/** Emporio Italia Designação boilerplate suffix (space, slash, or dash separated). */
+const INVOICE_PRODUTO_DE_STOCK_SUFFIX_RE = /[/\s-]*Produto de Stock\s*$/iu;
 
 const parseInvoiceNumberToken = (raw: string): number | null => {
   let value = raw
@@ -104,6 +106,7 @@ export const cleanInvoiceItemDisplayName = (
     .replace(/\s+\d{1,2}(?:[,.]\d+)?\s*%\s*$/u, "")
     .replace(/\s+(?:€|EUR)\s*\d+(?:[,.]\d{1,4})?\s*$/iu, "")
     .replace(/\s+\d+[,.]\d{1,4}\s*(?:€|EUR)\s*$/iu, "")
+    .replace(INVOICE_PRODUTO_DE_STOCK_SUFFIX_RE, "")
     .replace(/\s+/g, " ")
     .trim();
 };

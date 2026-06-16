@@ -1,5 +1,5 @@
 import type { IngredientAliasMap } from "@/lib/ingredient-canonical";
-import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
+import { normalizeSupplierKey } from "@/lib/supplier-identity";
 
 /** Product prefixes stripped before brand fingerprint extraction (longest match first). */
 export const BRAND_PRODUCT_PREFIXES = [
@@ -81,7 +81,7 @@ export function extractBrandFingerprint(normalizedKey: string): string {
 
 function normalizeSupplierScope(raw: string | null | undefined): string | null {
   if (!raw?.trim()) return null;
-  const normalized = normalizeSupplierDisplayName(raw);
+  const normalized = normalizeSupplierKey(raw);
   return normalized || null;
 }
 
@@ -123,7 +123,7 @@ export function fuzzyLookupIngredientIdFromAliasMap(
     if (!mapKey.includes("::")) continue;
     const [mapSupplier, storedAlias] = mapKey.split("::");
     if (!mapSupplier || !storedAlias) continue;
-    if (mapSupplier.toUpperCase() !== supplier.toUpperCase()) continue;
+    if (mapSupplier !== supplier) continue;
 
     const storedPrefix = extractProductPrefix(storedAlias);
     if (!productPrefixesCompatible(queryPrefix, storedPrefix)) continue;

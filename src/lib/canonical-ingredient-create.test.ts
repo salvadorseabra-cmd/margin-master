@@ -246,6 +246,31 @@ describe("buildCanonicalIngredientCreateDefaults", () => {
     ).toBe("Água san pellegrino 75cl");
   });
 
+  it("strips Produto de Stock from canonical suggestions", () => {
+    const contaminated =
+      "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock";
+    const defaults = buildCanonicalIngredientCreateDefaults(item(contaminated));
+    expect(defaults.suggestedCanonicalName?.toLowerCase()).not.toContain("produto de stock");
+    expect(defaults.suggestedCanonicalName).toBe("San pellegrino água in vitro 75cl");
+  });
+
+  it("suggests phase 4 cleaned charcuterie and beverage lines", () => {
+    expect(
+      buildCanonicalIngredientCreateDefaults(item("Rovagnati - Salame Ventricina 2,5 Kg"))
+        .suggestedCanonicalName,
+    ).toBe("Salame ventricina");
+    expect(
+      buildCanonicalIngredientCreateDefaults(
+        item("Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro"),
+      ).suggestedCanonicalName,
+    ).toBe("Birra peroni nastro azzurro 33cl");
+    expect(
+      buildCanonicalIngredientCreateDefaults(
+        item("Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg"),
+      ).suggestedCanonicalName,
+    ).toBe("Bresaola punta d'anca oro");
+  });
+
   it("excludes non-food recargo lines from canonical create", () => {
     expect(isNonFoodInvoiceLine("Recargo por combustibili")).toBe(true);
     const defaults = buildCanonicalIngredientCreateDefaults(item("Recargo por combustibili"));

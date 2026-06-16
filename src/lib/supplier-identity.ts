@@ -1,6 +1,11 @@
 const LEGAL_SUFFIX_RE =
   /\b(?:lda\.?|l\.?d\.?a\.?|sa|s\.?a\.?|unipessoal|sociedade\s+unipessoal|limitada)\b\.?/gi;
 
+/** Proven VL typo corrections — identity key only, not display name. */
+const SUPPLIER_KEY_TYPO_MAP: Readonly<Record<string, string>> = {
+  avijudo: "aviludo",
+};
+
 const UPLOAD_FILENAME_HINT_RE =
   /\b(?:screenshot|screen shot|captura|whatsapp|img|image|scan|document|invoice|fatura)\b/i;
 
@@ -34,9 +39,22 @@ function stripLegalSuffixes(value: string) {
 
 function titleCaseWord(word: string) {
   if (!word) return word;
-  if (/^[A-Z0-9&]{2,}$/.test(word)) return word;
   if (/[A-Z][a-z]+[A-Z]/.test(word)) return word;
+  if (/[a-z]/.test(word) && /[A-Z]/.test(word.slice(1))) return word;
   return word.charAt(0).toLocaleUpperCase() + word.slice(1).toLocaleLowerCase();
+}
+
+function prepareSupplierNameValue(raw: string) {
+  let value = stripFileExtension(raw);
+  value = collapseSpaces(value.replace(/[_]+/g, " "));
+  value = trimCompanyDescriptor(value);
+  value = stripLegalSuffixes(value);
+  value = value.replace(/\s+([,.;:])/g, "$1").replace(/[.,;:\s]+$/g, "");
+  return collapseSpaces(value);
+}
+
+function applySupplierKeyTypoMap(key: string): string {
+  return SUPPLIER_KEY_TYPO_MAP[key] ?? key;
 }
 
 function tidyCapitalization(value: string) {
@@ -54,15 +72,16 @@ export function fileNameFromInvoicePath(path: string | null | undefined): string
   return stripFileExtension(last.replace(/^\d+-/, "").replace(/_/g, " ")).trim() || null;
 }
 
+/** Deterministic supplier identity key for lookups and aggregation (lowercase, no legal suffixes). */
+export function normalizeSupplierKey(raw: string | null | undefined): string {
+  if (!raw) return "";
+  const key = prepareSupplierNameValue(raw).toLocaleLowerCase();
+  return applySupplierKeyTypoMap(key);
+}
+
 export function normalizeSupplierDisplayName(raw: string | null | undefined): string {
   if (!raw) return "";
-  let value = stripFileExtension(raw);
-  value = collapseSpaces(value.replace(/[_]+/g, " "));
-  value = trimCompanyDescriptor(value);
-  value = stripLegalSuffixes(value);
-  value = value.replace(/\s+([,.;:])/g, "$1").replace(/[.,;:\s]+$/g, "");
-  value = collapseSpaces(value);
-  return tidyCapitalization(value);
+  return tidyCapitalization(prepareSupplierNameValue(raw));
 }
 
 export function looksLikeUploadedFileName(

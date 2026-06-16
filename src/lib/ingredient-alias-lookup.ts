@@ -3,13 +3,13 @@ import { fuzzyLookupIngredientIdFromAliasMap } from "@/lib/ingredient-alias-fuzz
 import { buildOverrideKeysFromInvoiceLine } from "@/lib/ingredient-match-override";
 import { traceManualIngredientMatch } from "@/lib/manual-ingredient-match-trace";
 import { normalizeInvoiceAliasMemoryKey } from "@/lib/normalize-ingredient-name";
-import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
+import { normalizeSupplierKey } from "@/lib/supplier-identity";
 
 const LOG_PREFIX = "[ingredient_aliases]";
 
 function normalizeSupplierScope(raw: string | null | undefined): string | null {
   if (!raw?.trim()) return null;
-  const normalized = normalizeSupplierDisplayName(raw);
+  const normalized = normalizeSupplierKey(raw);
   return normalized || null;
 }
 

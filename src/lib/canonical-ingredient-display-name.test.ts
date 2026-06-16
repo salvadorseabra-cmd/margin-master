@@ -197,3 +197,81 @@ describe("final cleanup edge cases", () => {
     );
   });
 });
+
+describe("phase 4 semantic canonicalization", () => {
+  it("strips Emporio charcuterie brand prefixes", () => {
+    expect(formatCanonicalIngredientDisplayName("Rovagnati - Salame Ventricina 2,5 Kg")).toBe(
+      "Salame ventricina",
+    );
+    expect(formatCanonicalIngredientDisplayName("Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg")).toBe(
+      "Bresaola punta d'anca oro",
+    );
+    expect(
+      formatCanonicalIngredientDisplayName(
+        "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello 1/8 - 1,85kg",
+      ),
+    ).toBe("Gorgonzola DOP dolce");
+  });
+
+  it("strips procurement metadata and commercial codes", () => {
+    expect(
+      formatCanonicalIngredientDisplayName(
+        "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+      ),
+    ).toBe("Prosciutto cotto scelto");
+    expect(
+      formatCanonicalIngredientDisplayName(
+        "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5Kg",
+      ),
+    ).toBe("Mortadella IGP 'massima' con pistacchio");
+    expect(
+      formatCanonicalIngredientDisplayName("Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro"),
+    ).toBe("Birra peroni nastro azzurro 33cl");
+    expect(formatCanonicalIngredientDisplayName("SanPellegrino - Acqua in vitro 75cl x 15ud")).toBe(
+      "San pellegrino água in vitro 75cl",
+    );
+  });
+
+  it("strips distributor suffix noise", () => {
+    expect(formatCanonicalIngredientDisplayName("Farine Speciale pizza 25kg Amoruso")).toBe(
+      "Farine speciale pizza",
+    );
+    expect(
+      formatCanonicalIngredientDisplayName("Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino"),
+    ).toBe("Guanciale di suino stagionato");
+    expect(formatCanonicalIngredientDisplayName("Filete de Anchovas Alconfirsta L1 495 g")).toBe(
+      "Filete de anchovas 495g",
+    );
+  });
+
+  it("preserves phase 4 regression anchors", () => {
+    expect(
+      formatCanonicalIngredientDisplayName("MOZZA Fior di Latte Expet Julienne 3kg Simonetta"),
+    ).toBe("Mozza fior di latte julienne");
+    expect(formatCanonicalIngredientDisplayName("De Cecco - Paccheri Lisci Nr. 125 - 500g")).toBe(
+      "Paccheri lisci",
+    );
+    expect(formatCanonicalIngredientDisplayName("Baladin - Ginger Beer 0.20cl")).toBe("Ginger beer");
+    expect(formatCanonicalIngredientDisplayName("ACQUA S.PELLEGRINO (CX 75CL*15)")).toBe(
+      "Água san pellegrino 75cl",
+    );
+    expect(formatCanonicalIngredientDisplayName("Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)")).toBe(
+      "Ovo classe M",
+    );
+    expect(formatCanonicalIngredientDisplayName("Salada Ibérica FSTK EMB. 250g")).toBe(
+      "Salada ibérica",
+    );
+    expect(formatCanonicalIngredientDisplayName("Tomilho")).toBe("Tomilho");
+    expect(formatCanonicalIngredientDisplayName("Manjericão")).toBe("Manjericão");
+    expect(formatCanonicalIngredientDisplayName("Hortelã")).toBe("Hortelã");
+    expect(formatCanonicalIngredientDisplayName("RICOTTA TREVIGIANA 1,5KG")).toBe("Ricotta trevigiana");
+    expect(formatCanonicalIngredientDisplayName("Rulo Di Capra 1kg*2 Simonetta")).toBe("Rulo di capra");
+    expect(
+      formatCanonicalIngredientDisplayName("Aceto balsamico di modena IGP pet 5l*2 Toschi"),
+    ).toBe("Aceto balsamico di modena IGP");
+    expect(formatCanonicalIngredientDisplayName("MEZZI PACCHERI MANCINI (CX 1KG*6)")).toBe(
+      "Mezzi paccheri mancini",
+    );
+    expect(formatCanonicalIngredientDisplayName("STRACCIATELLA 250 GR")).toBe("Stracciatella 250gr");
+  });
+});
