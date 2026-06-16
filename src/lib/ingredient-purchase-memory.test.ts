@@ -107,20 +107,21 @@ describe("ingredient-purchase-memory", () => {
     expect(recent[0]?.dateLabel).not.toMatch(/18/);
   });
 
-  it("buildRecentPurchases formats supplier, date, and unit price", () => {
+  it("buildRecentPurchases formats supplier, date, and invoice line total", () => {
     const recent = buildRecentPurchases("ing-bacon", "Bacon", [
       potatoProduct({
         itemName: "BAC STRK 1KG",
         supplierName: "metro",
         invoiceDate: "2026-02-15",
         unitPrice: 9.99,
+        lineTotal: 19.98,
       }),
     ]);
 
     expect(recent).toHaveLength(1);
     expect(recent[0]?.supplierLabel).toBe("Metro");
     expect(recent[0]?.dateLabel).toMatch(/2026/);
-    expect(recent[0]?.priceLabel).toBe("€9.99");
+    expect(recent[0]?.priceLabel).toBe("€19.98");
   });
 
   it("purchaseMemorySummary describes counts", () => {

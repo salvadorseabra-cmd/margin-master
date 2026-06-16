@@ -44,6 +44,7 @@ import {
 } from "@/lib/ingredient-operational-notes";
 import {
   buildDuplicateReviewDetail,
+  buildIngredientOperationalCostPresentation,
   buildIngredientPurchaseInsights,
   buildUnusedEntryReviewDetail,
   formatPurchaseHistoryCatalogLine,
@@ -523,6 +524,11 @@ function IngredientDetailContent({
     [sortedPurchases],
   );
 
+  const operationalCostPresentation = useMemo(
+    () => buildIngredientOperationalCostPresentation(ingredient),
+    [ingredient],
+  );
+
   const operationalSummary = useMemo(() => {
     if (inListReview) {
       return {
@@ -717,7 +723,7 @@ function IngredientDetailContent({
                       <th className="px-3 py-2 font-medium whitespace-nowrap">Date</th>
                       <th className="px-3 py-2 font-medium">Supplier</th>
                       <th className="px-3 py-2 font-medium text-right whitespace-nowrap">
-                        Price / unit
+                        Purchase price
                       </th>
                     </tr>
                   </thead>
@@ -770,6 +776,31 @@ function IngredientDetailContent({
                 )}
               </div>
             ) : null}
+          </section>
+
+          <section className="overflow-hidden rounded-lg border border-border/30 bg-muted/[0.02]">
+            <h3 className={`border-b border-border/20 px-3 py-2 ${sectionTitleClass}`}>
+              Operational Cost
+            </h3>
+            {operationalCostPresentation ? (
+              <dl className="divide-y divide-border/20">
+                {operationalCostPresentation.lines.map((line) => (
+                  <div
+                    key={line.label}
+                    className="flex items-baseline justify-between gap-3 px-3 py-2.5"
+                  >
+                    <dt className="text-xs text-muted-foreground">{line.label}</dt>
+                    <dd className="text-right text-sm font-medium tabular-nums text-foreground/90">
+                      {line.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            ) : (
+              <p className="px-3 py-4 text-xs text-muted-foreground">
+                No operational cost on file
+              </p>
+            )}
           </section>
 
           <section className="rounded-lg border border-border/30 bg-muted/[0.02] px-3 py-2">

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildDuplicateReviewDetail,
   buildIngredientDetailInsights,
+  buildIngredientOperationalCostPresentation,
   buildOperationalInsights,
   buildPricingFreshnessReviewDetail,
   buildUnusedEntryReviewDetail,
@@ -64,29 +65,33 @@ function ingredient(
 
 const invoiceLine = (
   overrides: Partial<IngredientMatchedInvoiceProduct> = {},
-): IngredientMatchedInvoiceProduct => ({
-  matchedIngredientId: "ing-1",
-  itemId: "line-1",
-  itemName: "LINE",
-  supplierName: "Continente",
-  invoiceDate: "2026-05-18",
-  chronologySourceType: "invoice_issue_date",
-  invoiceId: "inv-1",
-  invoiceCreatedAt: null,
-  invoiceIssueDateRaw: "2026-05-18",
-  itemCreatedAt: null,
-  unitPrice: 1.39,
-  lineTotal: 1.39,
-  matchBucket: "matched",
-  matchDisplayState: "matched",
-  matchKind: "exact",
-  confidenceLabel: "100%",
-  matchSourceHeadline: "",
-  matchSourceDetail: "",
-  purchaseStructureSummary: null,
-  normalizedUsableQuantityLabel: null,
-  ...overrides,
-});
+): IngredientMatchedInvoiceProduct => {
+  const unitPrice = overrides.unitPrice ?? 1.39;
+  const lineTotal = overrides.lineTotal ?? unitPrice;
+  return {
+    matchedIngredientId: "ing-1",
+    itemId: "line-1",
+    itemName: "LINE",
+    supplierName: "Continente",
+    invoiceDate: "2026-05-18",
+    chronologySourceType: "invoice_issue_date",
+    invoiceId: "inv-1",
+    invoiceCreatedAt: null,
+    invoiceIssueDateRaw: "2026-05-18",
+    itemCreatedAt: null,
+    matchBucket: "matched",
+    matchDisplayState: "matched",
+    matchKind: "exact",
+    confidenceLabel: "100%",
+    matchSourceHeadline: "",
+    matchSourceDetail: "",
+    purchaseStructureSummary: null,
+    normalizedUsableQuantityLabel: null,
+    ...overrides,
+    unitPrice,
+    lineTotal,
+  };
+};
 
 describe("ingredient-detail-panel", () => {
   it("alface: hides purchases, recipes, and price history when empty", () => {
@@ -139,6 +144,7 @@ describe("ingredient-detail-panel", () => {
         supplierName: "Metro",
         invoiceDate: "2026-05-18",
         unitPrice: 9.99,
+        lineTotal: 9.99,
       }),
       invoiceLine({
         matchedIngredientId: "ing-bacon",
@@ -147,6 +153,7 @@ describe("ingredient-detail-panel", () => {
         supplierName: "Auchan",
         invoiceDate: "2026-04-10",
         unitPrice: 8.5,
+        lineTotal: 8.5,
       }),
     ]);
     const insights = buildOperationalInsights({
@@ -301,6 +308,7 @@ describe("ingredient-detail-panel", () => {
         itemName: "REGRESSION OIL 1L",
         supplierName: "A",
         unitPrice: 2,
+        lineTotal: 10,
       }),
       invoiceLine({
         matchedIngredientId: "ing-dots",
@@ -308,6 +316,7 @@ describe("ingredient-detail-panel", () => {
         itemName: "REGRESSION OIL 1L",
         supplierName: "C",
         unitPrice: 3.5,
+        lineTotal: 15,
       }),
       invoiceLine({
         matchedIngredientId: "ing-dots",
@@ -315,6 +324,7 @@ describe("ingredient-detail-panel", () => {
         itemName: "REGRESSION OIL 1L",
         supplierName: "B",
         unitPrice: 5,
+        lineTotal: 20,
       }),
     ]);
 
@@ -651,10 +661,11 @@ describe("ingredient-detail-panel", () => {
   });
 
   it("buildMatchCatalogIntelligenceLines omits pricing copy in browse mode", () => {
+    const recentPurchase = new Date(Date.now() - 4 * 86_400_000).toISOString().slice(0, 10);
     const snapshot = derivePricingFreshnessSnapshot({
       currentPrice: 10,
       priceRefreshAt: null,
-      lastPurchaseAt: "2026-05-01",
+      lastPurchaseAt: recentPurchase,
     });
     expect(snapshot.catalogConfirmationPending).toBe(true);
     expect(
@@ -692,5 +703,19 @@ describe("ingredient-detail-panel", () => {
     expect(notes).not.toContain("Price volatility detected");
     expect(notes).not.toContain("Latest invoice not confirmed");
     expect(notes).not.toContain("Ingredient unused in recipes");
+  });
+
+  it("buildIngredientOperationalCostPresentation shows normalized pack and unit costs", () => {
+    const peroni = ingredient({
+      name: "Peroni Nastro Azzurro 24 x 33cl",
+      current_price: 25.69,
+      purchase_quantity: 7920,
+      purchase_unit: "pack",
+      base_unit: "ml",
+      unit: "ml",
+    });
+    const presentation = buildIngredientOperationalCostPresentation(peroni);
+    expect(presentation?.lines.some((line) => line.label === "Cost per litre")).toBe(true);
+    expect(presentation?.lines.some((line) => line.label.startsWith("Cost per"))).toBe(true);
   });
 });

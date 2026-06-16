@@ -48,11 +48,11 @@ function formatPurchaseDate(value: string | null | undefined): string {
 }
 
 function formatPurchasePrice(product: IngredientMatchedInvoiceProduct): string {
-  if (product.unitPrice != null && Number.isFinite(product.unitPrice)) {
-    return formatCurrency(product.unitPrice);
-  }
   if (product.lineTotal != null && Number.isFinite(product.lineTotal)) {
     return formatCurrency(product.lineTotal);
+  }
+  if (product.unitPrice != null && Number.isFinite(product.unitPrice)) {
+    return formatCurrency(product.unitPrice);
   }
   return "—";
 }

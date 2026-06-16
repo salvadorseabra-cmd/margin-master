@@ -734,6 +734,8 @@ export function buildMatchedInvoiceProductsFromScan(
 export type IngredientLatestPurchaseGlance = {
   lastPurchaseAt: string | null;
   supplierLabel: string | null;
+  /** Invoice line total paid on the latest matched purchase. */
+  lastPaidTotal: number | null;
 };
 
 /**
@@ -796,11 +798,16 @@ export function buildLatestPurchaseGlanceByIngredientIdFromScan(
     const invoiceDate = resolveMatchedRowChronology(source.invoices).displayDateIso;
     if (!invoiceDate) continue;
 
+    const lineTotal =
+      normalized.total != null && Number.isFinite(Number(normalized.total))
+        ? Number(normalized.total)
+        : null;
     const previous = latest[matchedIngredientId]?.lastPurchaseAt ?? null;
     if (!previous || compareInvoiceChronologyDesc(previous, invoiceDate) > 0) {
       latest[matchedIngredientId] = {
         lastPurchaseAt: invoiceDate,
         supplierLabel: supplierName,
+        lastPaidTotal: lineTotal,
       };
     }
   }

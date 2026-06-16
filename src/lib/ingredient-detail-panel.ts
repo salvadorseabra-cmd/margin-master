@@ -1,5 +1,5 @@
 import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
-import { formatCurrency, formatPercent } from "@/lib/display-format";
+import { formatCurrency, formatPercent, formatQuantityWithUnit } from "@/lib/display-format";
 import { formatDisplayUnitCost } from "@/lib/display-unit-cost";
 import { formatPackagedLiquidContextFromCostFields } from "@/lib/packaged-liquid-context";
 import type { IngredientMergeCluster } from "@/lib/ingredient-merge-hooks";
@@ -11,9 +11,13 @@ import {
 import {
   effectiveIngredientUnitCostEur,
   inferIngredientCostBaseUnit,
+  isOperationalPricingResolved,
+  purchaseQuantityDenom,
   type IngredientCostFields,
 } from "@/lib/ingredient-unit-cost";
+import { formatPurchaseStructureSummary } from "@/lib/ingredient-operational-intelligence";
 import type { RecentPurchaseRow } from "@/lib/ingredient-purchase-memory";
+import { parsePurchaseStructureFromText } from "@/lib/stock-normalization";
 import {
   daysSinceRecency,
   derivePricingFreshnessSnapshot,
@@ -37,7 +41,7 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type IngredientRow = Pick<
   Tables<"ingredients">,
-  "current_price" | "purchase_quantity" | "base_unit" | "unit" | "purchase_unit"
+  "name" | "current_price" | "purchase_quantity" | "base_unit" | "unit" | "purchase_unit"
 >;
 
 export type IngredientPriceActivity = Pick<
@@ -243,6 +247,158 @@ export function deriveIngredientCompactTrendState(input: {
 export function formatIngredientPackPrice(ingredient: IngredientRow): string {
   const pack = Number(ingredient.current_price);
   return formatCurrency(Number.isFinite(pack) ? pack : 0);
+}
+
+/** Latest invoice line total for list/detail purchase columns. */
+export function formatLastPaidTotalGlance(lastPaidTotal: number | null | undefined): string {
+  if (lastPaidTotal == null || !Number.isFinite(lastPaidTotal)) return "—";
+  return formatCurrency(lastPaidTotal);
+}
+
+export type IngredientOperationalCostLine = {
+  label: string;
+  value: string;
+};
+
+export type IngredientOperationalCostPresentation = {
+  lines: IngredientOperationalCostLine[];
+};
+
+function formatIngredientPackMeasureLabel(
+  size: number,
+  unit: string,
+): string {
+  if (unit === "ml" && size >= 10 && size < 1000 && size % 10 === 0) {
+    return `${size / 10}cl`;
+  }
+  return formatQuantityWithUnit(size, unit as "g" | "ml" | "un");
+}
+
+function inferCountableUnitNoun(
+  ingredient: IngredientRow,
+  count: number,
+): string {
+  const purchaseUnit = ingredient.purchase_unit?.trim().toLowerCase() ?? "";
+  const name = ingredient.name?.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase() ?? "";
+
+  if (/\b(garrafa|garrafas|bottle|bottles)\b/.test(name) || purchaseUnit.includes("garrafa") || purchaseUnit.includes("bottle")) {
+    return count === 1 ? "bottle" : "bottles";
+  }
+  if (/\b(lata|latas|can|cans)\b/.test(name) || purchaseUnit.includes("lata") || purchaseUnit.includes("can")) {
+    return count === 1 ? "can" : "cans";
+  }
+  if (purchaseUnit === "un" || purchaseUnit === "unit" || purchaseUnit === "units") {
+    return count === 1 ? "unit" : "units";
+  }
+  if (purchaseUnit) return purchaseUnit;
+  return count === 1 ? "unit" : "units";
+}
+
+function formatIngredientOperationalPackDetail(ingredient: IngredientRow): string | null {
+  const structure = parsePurchaseStructureFromText(ingredient.name?.trim() ?? "");
+  if (structure?.innerUnitCount != null && structure.innerUnitCount > 1 && structure.unitSize != null) {
+    const sizeLabel = formatIngredientPackMeasureLabel(
+      structure.unitSize,
+      structure.unitMeasurement,
+    );
+    return `Pack ${structure.innerUnitCount} x ${sizeLabel}`;
+  }
+
+  const summary = formatPurchaseStructureSummary(structure);
+  if (summary) return summary;
+
+  const purchaseUnit = ingredient.purchase_unit?.trim();
+  const purchaseQty = purchaseQuantityDenom(ingredient.purchase_quantity);
+  if (purchaseUnit && purchaseQty > 1) {
+    return `Pack ${purchaseQty} ${purchaseUnit}`;
+  }
+  if (purchaseQty > 1) {
+    return `Pack ${purchaseQty}`;
+  }
+  return null;
+}
+
+/** Normalized operational costs from catalog costing fields (presentation only). */
+export function buildIngredientOperationalCostPresentation(
+  ingredient: IngredientRow,
+): IngredientOperationalCostPresentation | null {
+  if (!isOperationalPricingResolved(ingredient)) return null;
+
+  const lines: IngredientOperationalCostLine[] = [];
+  const packDetail = formatIngredientOperationalPackDetail(ingredient);
+  if (packDetail) {
+    lines.push({ label: "Pack", value: packDetail });
+  }
+
+  const purchaseQty = purchaseQuantityDenom(ingredient.purchase_quantity);
+  const purchaseUnit = ingredient.purchase_unit?.trim();
+  if (purchaseUnit) {
+    lines.push({
+      label: "Quantity purchased",
+      value: `${purchaseQty} ${purchaseUnit}`,
+    });
+  } else if (purchaseQty > 1) {
+    lines.push({
+      label: "Quantity purchased",
+      value: String(purchaseQty),
+    });
+  }
+
+  const structure = parsePurchaseStructureFromText(ingredient.name?.trim() ?? "");
+  if (structure?.totalUsableAmount != null && structure.usableUnit) {
+    lines.push({
+      label: "Usable quantity",
+      value: formatQuantityWithUnit(structure.totalUsableAmount, structure.usableUnit),
+    });
+  } else {
+    const baseUnit = inferIngredientCostBaseUnit(ingredient);
+    if ((baseUnit === "g" || baseUnit === "ml") && purchaseQty > 0) {
+      lines.push({
+        label: "Usable quantity",
+        value: formatQuantityWithUnit(purchaseQty, baseUnit),
+      });
+    }
+  }
+
+  const baseUnit = inferIngredientCostBaseUnit(ingredient);
+  const unitCost = effectiveIngredientUnitCostEur(ingredient);
+  const packPrice = Number(ingredient.current_price);
+
+  const pieceCount =
+    structure?.innerUnitCount != null && structure.innerUnitCount > 1
+      ? structure.innerUnitCount
+      : baseUnit === "un"
+        ? purchaseQty
+        : null;
+
+  if (pieceCount != null && pieceCount > 1 && Number.isFinite(packPrice) && packPrice > 0) {
+    const noun = inferCountableUnitNoun(ingredient, pieceCount).replace(/s$/, "");
+    lines.push({
+      label: `Cost per ${noun}`,
+      value: formatCurrency(packPrice / pieceCount),
+    });
+  } else if (baseUnit === "un") {
+    lines.push({
+      label: "Cost per unit",
+      value: formatDisplayUnitCost(unitCost, "un").formattedLabel,
+    });
+  }
+
+  if (baseUnit === "g") {
+    lines.push({
+      label: "Cost per kg",
+      value: formatDisplayUnitCost(unitCost, "g").formattedLabel,
+    });
+  }
+
+  if (baseUnit === "ml") {
+    lines.push({
+      label: "Cost per litre",
+      value: formatDisplayUnitCost(unitCost, "ml").formattedLabel,
+    });
+  }
+
+  return lines.length > 0 ? { lines } : null;
 }
 
 /** Compact unit cost for KPI tile. */

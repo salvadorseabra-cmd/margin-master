@@ -83,6 +83,7 @@ describe("ingredient-operational-intelligence", () => {
     const glanceById = buildLatestPurchaseGlanceByIngredientIdFromScan(palhaCatalog, {}, scanRows);
     expect(glanceById["bat-palha"]?.supplierLabel).toBe("Metro");
     expect(glanceById["bat-palha"]?.lastPurchaseAt).toBe("2026-02-10");
+    expect(glanceById["bat-palha"]?.lastPaidTotal).toBe(20);
     expect(latestById["bat-palha"]).toBe("2026-02-10");
     expect(result.products.map((row) => row.itemName)).toEqual([
       "BATATA PALHA EXTRA FINA FS 2KG",

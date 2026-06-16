@@ -15,7 +15,6 @@ import { normalizeIngredientName } from "@/lib/normalizeIngredient";
 import { guardIngredientCreation } from "@/lib/ingredient-operational-identity";
 import { INGREDIENT_KIND_CANONICAL } from "@/lib/ingredient-kind";
 import { INGREDIENT_CREATE_LOG_PREFIX } from "@/lib/ingredient-auto-persist";
-import { formatCurrency } from "@/lib/display-format";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 import { CanonicalIngredientRenameDialog } from "@/components/canonical-ingredient-rename-dialog";
 import { IngredientDetailOperationalLayout } from "@/components/ingredient-detail-operational-layout";
@@ -66,6 +65,7 @@ import {
   formatOperationalListRowDominantReason,
   pricingSnapshotForListRow,
 } from "@/lib/ingredient-list-glance-signals";
+import { formatLastPaidTotalGlance } from "@/lib/ingredient-detail-panel";
 import { loadMatchingIngredientCatalog } from "@/lib/ingredient-catalog-load";
 import { loadConfirmedIngredientAliasMap } from "@/lib/ingredient-alias-memory";
 import { loadLatestPurchaseGlanceByIngredientId } from "@/lib/ingredient-pricing-freshness";
@@ -787,7 +787,7 @@ function IngredientsIndexPage() {
         </td>
         <td className="px-3 py-2 text-right align-middle tabular-nums whitespace-nowrap">
           <span className="text-xs font-medium text-foreground/90">
-            {formatCurrency(Number(ing.current_price))}
+            {formatLastPaidTotalGlance(purchaseGlance?.lastPaidTotal)}
           </span>
         </td>
         <td className="py-2 pl-1 pr-3 text-right align-middle whitespace-nowrap">
@@ -1036,7 +1036,7 @@ function IngredientsIndexPage() {
                     <th className="px-3 py-2 font-medium">Ingredient</th>
                     <th className="px-3 py-2 font-medium whitespace-nowrap">Last purchase</th>
                     <th className="px-3 py-2 font-medium text-right whitespace-nowrap">
-                      Pack price
+                      Last paid
                     </th>
                     <th className="w-14 py-2 pr-3 font-medium text-right" aria-label="Actions" />
                   </tr>
