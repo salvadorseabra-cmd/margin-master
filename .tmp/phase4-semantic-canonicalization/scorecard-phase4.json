@@ -1,0 +1,462 @@
+{
+  "generated_at": "2026-06-16T16:54:23.263Z",
+  "total": 32,
+  "before": {
+    "GOOD": 20,
+    "BRAND_LEAK": 7,
+    "COMMERCIAL_DESCRIPTOR_LEAK": 3,
+    "PACKAGE_METADATA_LEAK": 2,
+    "goodPct": "62.5%"
+  },
+  "after": {
+    "GOOD": 30,
+    "BRAND_LEAK": 0,
+    "COMMERCIAL_DESCRIPTOR_LEAK": 1,
+    "PACKAGE_METADATA_LEAK": 1,
+    "goodPct": "93.8%"
+  },
+  "transitions": [
+    {
+      "supplier": "Emporio",
+      "invoice": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "before": "BRAND_LEAK",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Salame ventricina",
+      "transition": "BRAND_LEAK → GOOD"
+    },
+    {
+      "supplier": "Emporio",
+      "invoice": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello 1/8 - 1,85kg",
+      "before": "COMMERCIAL_DESCRIPTOR_LEAK",
+      "beforeSecondary": "BRAND_LEAK",
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Gorgonzola DOP dolce",
+      "transition": "COMMERCIAL_DESCRIPTOR_LEAK → GOOD"
+    },
+    {
+      "supplier": "Emporio",
+      "invoice": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+      "before": "COMMERCIAL_DESCRIPTOR_LEAK",
+      "beforeSecondary": "BRAND_LEAK",
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Prosciutto cotto scelto",
+      "transition": "COMMERCIAL_DESCRIPTOR_LEAK → GOOD"
+    },
+    {
+      "supplier": "Emporio",
+      "invoice": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5Kg",
+      "before": "BRAND_LEAK",
+      "beforeSecondary": "PACKAGE_METADATA_LEAK",
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Mortadella IGP 'massima' con pistacchio",
+      "transition": "BRAND_LEAK → GOOD"
+    },
+    {
+      "supplier": "Emporio",
+      "invoice": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "before": "PACKAGE_METADATA_LEAK",
+      "beforeSecondary": "COMMERCIAL_DESCRIPTOR_LEAK",
+      "after": "COMMERCIAL_DESCRIPTOR_LEAK",
+      "afterSecondary": null,
+      "suggested": "San pellegrino água in vitro 75cl",
+      "transition": "PACKAGE_METADATA_LEAK → COMMERCIAL_DESCRIPTOR_LEAK"
+    },
+    {
+      "supplier": "Emporio",
+      "invoice": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg",
+      "before": "BRAND_LEAK",
+      "beforeSecondary": "PACKAGE_METADATA_LEAK",
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Bresaola punta d'anca oro",
+      "transition": "BRAND_LEAK → GOOD"
+    },
+    {
+      "supplier": "Mammafiore",
+      "invoice": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "before": "BRAND_LEAK",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Guanciale di suino stagionato",
+      "transition": "BRAND_LEAK → GOOD"
+    },
+    {
+      "supplier": "Mammafiore",
+      "invoice": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "before": "COMMERCIAL_DESCRIPTOR_LEAK",
+      "beforeSecondary": "BRAND_LEAK",
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Birra peroni nastro azzurro 33cl",
+      "transition": "COMMERCIAL_DESCRIPTOR_LEAK → GOOD"
+    },
+    {
+      "supplier": "Mammafiore",
+      "invoice": "Farine Speciale pizza 25kg Amoruso",
+      "before": "BRAND_LEAK",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Farine speciale pizza",
+      "transition": "BRAND_LEAK → GOOD"
+    },
+    {
+      "supplier": "Bocconcino",
+      "invoice": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "before": "BRAND_LEAK",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Mezzi paccheri mancini",
+      "transition": "BRAND_LEAK → GOOD"
+    },
+    {
+      "supplier": "Bocconcino",
+      "invoice": "STRACCIATELLA 250 GR",
+      "before": "PACKAGE_METADATA_LEAK",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Stracciatella 250gr",
+      "transition": "PACKAGE_METADATA_LEAK → GOOD"
+    },
+    {
+      "supplier": "Aviludo",
+      "invoice": "Filete de Anchovas Alconfirsta L1 495 g",
+      "before": "BRAND_LEAK",
+      "beforeSecondary": "COMMERCIAL_DESCRIPTOR_LEAK",
+      "after": "PACKAGE_METADATA_LEAK",
+      "afterSecondary": null,
+      "suggested": "Filete de anchovas 495g",
+      "transition": "BRAND_LEAK → PACKAGE_METADATA_LEAK"
+    }
+  ],
+  "rows": [
+    {
+      "supplier": "Bidfood",
+      "invoice": "Manteiga Coimbra s/Sal Emb 1 Kg",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Manteiga s/sal",
+      "transition": null
+    },
+    {
+      "supplier": "Bidfood",
+      "invoice": "Abóbora Butternut",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Abóbora butternut",
+      "transition": null
+    },
+    {
+      "supplier": "Bidfood",
+      "invoice": "Alho Francês",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Alho francês",
+      "transition": null
+    },
+    {
+      "supplier": "Bidfood",
+      "invoice": "Courgettes",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Courgettes",
+      "transition": null
+    },
+    {
+      "supplier": "Bidfood",
+      "invoice": "Pêra Abacate Hasse",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Pêra abacate",
+      "transition": null
+    },
+    {
+      "supplier": "Bidfood",
+      "invoice": "Hortelã",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Hortelã",
+      "transition": null
+    },
+    {
+      "supplier": "Bidfood",
+      "invoice": "Manjericão",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Manjericão",
+      "transition": null
+    },
+    {
+      "supplier": "Bidfood",
+      "invoice": "Salada Ibérica FSTK EMB. 250g",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Salada ibérica",
+      "transition": null
+    },
+    {
+      "supplier": "Bidfood",
+      "invoice": "Tomilho",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Tomilho",
+      "transition": null
+    },
+    {
+      "supplier": "Bidfood",
+      "invoice": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Ovo classe M",
+      "transition": null
+    },
+    {
+      "supplier": "Emporio",
+      "invoice": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "before": "BRAND_LEAK",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Salame ventricina",
+      "transition": "BRAND_LEAK → GOOD"
+    },
+    {
+      "supplier": "Emporio",
+      "invoice": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Paccheri lisci",
+      "transition": null
+    },
+    {
+      "supplier": "Emporio",
+      "invoice": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello 1/8 - 1,85kg",
+      "before": "COMMERCIAL_DESCRIPTOR_LEAK",
+      "beforeSecondary": "BRAND_LEAK",
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Gorgonzola DOP dolce",
+      "transition": "COMMERCIAL_DESCRIPTOR_LEAK → GOOD"
+    },
+    {
+      "supplier": "Emporio",
+      "invoice": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+      "before": "COMMERCIAL_DESCRIPTOR_LEAK",
+      "beforeSecondary": "BRAND_LEAK",
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Prosciutto cotto scelto",
+      "transition": "COMMERCIAL_DESCRIPTOR_LEAK → GOOD"
+    },
+    {
+      "supplier": "Emporio",
+      "invoice": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5Kg",
+      "before": "BRAND_LEAK",
+      "beforeSecondary": "PACKAGE_METADATA_LEAK",
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Mortadella IGP 'massima' con pistacchio",
+      "transition": "BRAND_LEAK → GOOD"
+    },
+    {
+      "supplier": "Emporio",
+      "invoice": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "before": "PACKAGE_METADATA_LEAK",
+      "beforeSecondary": "COMMERCIAL_DESCRIPTOR_LEAK",
+      "after": "COMMERCIAL_DESCRIPTOR_LEAK",
+      "afterSecondary": null,
+      "suggested": "San pellegrino água in vitro 75cl",
+      "transition": "PACKAGE_METADATA_LEAK → COMMERCIAL_DESCRIPTOR_LEAK"
+    },
+    {
+      "supplier": "Emporio",
+      "invoice": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg",
+      "before": "BRAND_LEAK",
+      "beforeSecondary": "PACKAGE_METADATA_LEAK",
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Bresaola punta d'anca oro",
+      "transition": "BRAND_LEAK → GOOD"
+    },
+    {
+      "supplier": "Emporio",
+      "invoice": "Baladin - Ginger Beer 0.20cl",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Ginger beer",
+      "transition": null
+    },
+    {
+      "supplier": "Mammafiore",
+      "invoice": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "before": "BRAND_LEAK",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Guanciale di suino stagionato",
+      "transition": "BRAND_LEAK → GOOD"
+    },
+    {
+      "supplier": "Mammafiore",
+      "invoice": "Rulo Di Capra 1kg*2 Simonetta",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Rulo di capra",
+      "transition": null
+    },
+    {
+      "supplier": "Mammafiore",
+      "invoice": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Farina do pasta fresca e gnocchi",
+      "transition": null
+    },
+    {
+      "supplier": "Mammafiore",
+      "invoice": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Mozzarella fior di latte julienne",
+      "transition": null
+    },
+    {
+      "supplier": "Mammafiore",
+      "invoice": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Aceto balsamico di modena IGP",
+      "transition": null
+    },
+    {
+      "supplier": "Mammafiore",
+      "invoice": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "before": "COMMERCIAL_DESCRIPTOR_LEAK",
+      "beforeSecondary": "BRAND_LEAK",
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Birra peroni nastro azzurro 33cl",
+      "transition": "COMMERCIAL_DESCRIPTOR_LEAK → GOOD"
+    },
+    {
+      "supplier": "Mammafiore",
+      "invoice": "Farine Speciale pizza 25kg Amoruso",
+      "before": "BRAND_LEAK",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Farine speciale pizza",
+      "transition": "BRAND_LEAK → GOOD"
+    },
+    {
+      "supplier": "Bocconcino",
+      "invoice": "ROLO DE CABRA E VACA 1KG",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Rolo DE cabra e vaca",
+      "transition": null
+    },
+    {
+      "supplier": "Bocconcino",
+      "invoice": "RICOTTA TREVIGIANA 1,5KG",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Ricotta trevigiana",
+      "transition": null
+    },
+    {
+      "supplier": "Bocconcino",
+      "invoice": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Água san pellegrino 75cl",
+      "transition": null
+    },
+    {
+      "supplier": "Bocconcino",
+      "invoice": "POMODORI PELATI (CX 2,5KG*6)",
+      "before": "GOOD",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Pomodori pelati",
+      "transition": null
+    },
+    {
+      "supplier": "Bocconcino",
+      "invoice": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "before": "BRAND_LEAK",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Mezzi paccheri mancini",
+      "transition": "BRAND_LEAK → GOOD"
+    },
+    {
+      "supplier": "Bocconcino",
+      "invoice": "STRACCIATELLA 250 GR",
+      "before": "PACKAGE_METADATA_LEAK",
+      "beforeSecondary": null,
+      "after": "GOOD",
+      "afterSecondary": null,
+      "suggested": "Stracciatella 250gr",
+      "transition": "PACKAGE_METADATA_LEAK → GOOD"
+    },
+    {
+      "supplier": "Aviludo",
+      "invoice": "Filete de Anchovas Alconfirsta L1 495 g",
+      "before": "BRAND_LEAK",
+      "beforeSecondary": "COMMERCIAL_DESCRIPTOR_LEAK",
+      "after": "PACKAGE_METADATA_LEAK",
+      "afterSecondary": null,
+      "suggested": "Filete de anchovas 495g",
+      "transition": "BRAND_LEAK → PACKAGE_METADATA_LEAK"
+    }
+  ]
+}

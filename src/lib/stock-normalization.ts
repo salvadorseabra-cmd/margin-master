@@ -12,7 +12,7 @@ import { extractLineWeightGrams } from "@/lib/ingredient-weight-match";
 
 export type UnitFamily = "mass" | "volume" | "count";
 
-export type PackMeasureUnit = "g" | "ml" | "kg" | "L" | "un";
+export type PackMeasureUnit = "g" | "ml" | "kg" | "L" | "cl" | "un";
 
 export type PackPhraseKind =
   | "container_with_size"
@@ -47,6 +47,7 @@ export type PurchaseStructure = {
     | "units_size"
     | "container_size"
     | "count_size"
+    | "size_count"
     | "bare_measure";
 };
 
@@ -157,13 +158,15 @@ const GENERIC_UNIT_TOKEN = String.raw`un|uni|und|unds|unid|unids|unit|units|unid
 const INNER_UNIT_TOKEN = String.raw`un|uni|und|unds|unid|unids|unit|units|can|cans|lata|latas|garrafa|garrafas|bottle|bottles`;
 
 /** Only generic count tokens — excludes bottle/garrafa so `1 bottle x 450 ml` stays container×size. */
-const GENERIC_INNER_UNIT_TOKEN = String.raw`un|uni|und|unds|unid|unids|unit|units|pc|pcs`;
+const GENERIC_INNER_UNIT_TOKEN = String.raw`un|uni|und|unds|ud|uds|unid|unids|unit|units|pc|pcs`;
 
 const GENERIC_PURCHASE_UNITS = new Set([
   "un",
   "uni",
   "und",
   "unds",
+  "ud",
+  "uds",
   "unid",
   "unids",
   "unit",
@@ -230,6 +233,12 @@ const CONTAINER_LEADING_SIZE_RE = new RegExp(
 
 const COUNT_SIZE_RE = new RegExp(
   String.raw`\b(?<purchase>\d+(?:[.,]\d+)?)\s*${MULTIPLIER_SEP}\s*(?<size>\d+(?:[.,]\d+)?)\s*(?<unit>${MEASURE_UNIT_TOKEN})\b`,
+  "iu",
+);
+
+/** `75cl x 15ud` / `33cl x 24 un` (size before count — common on beverage invoices). */
+const SIZE_COUNT_RE = new RegExp(
+  String.raw`\b(?<size>\d+(?:[.,]\d+)?)\s*(?<unit>${MEASURE_UNIT_TOKEN})\s*${MULTIPLIER_SEP}\s*(?<inner>\d+(?:[.,]\d+)?)\s*(?<innerUnit>${GENERIC_INNER_UNIT_TOKEN})?\b`,
   "iu",
 );
 
@@ -358,6 +367,13 @@ function scoreCountSizeMatch(match: RegExpMatchArray): number {
   return purchaseQuantity * measureToBase(unitSize, unitMeasurement).amount;
 }
 
+function scoreSizeCountMatch(match: RegExpMatchArray): number {
+  const innerUnitCount = parseQuantityToken(match.groups?.inner ?? "");
+  const { unitSize, unitMeasurement } = parseSizeAndUnit(match.groups?.size, match.groups?.unit);
+  if (innerUnitCount == null || unitSize == null || !unitMeasurement) return -1;
+  return innerUnitCount * measureToBase(unitSize, unitMeasurement).amount;
+}
+
 function hasMultiplierStructureInText(text: string): boolean {
   return MULTIPLIER_IN_TEXT_RE.test(text);
 }
@@ -429,7 +445,7 @@ function buildInnerUnitsStructure(params: {
   unitSize: number;
   unitMeasurement: PackMeasureUnit;
   matchedText: string;
-  tier: "caixa_units_size" | "caixa_compact_size" | "units_size";
+  tier: "caixa_units_size" | "caixa_compact_size" | "units_size" | "size_count";
   purchaseFormat?: string;
 }): PurchaseStructure {
   return buildStructure({
@@ -506,7 +522,7 @@ export function normalizeMeasureUnit(raw: string): PackMeasureUnit | null {
   if (unit === "kg" || unit === "kgs") return "kg";
   if (unit === "g" || unit === "gr" || unit === "grs" || unit === "mg") return "g";
   if (unit === "ml") return "ml";
-  if (unit === "cl") return "ml";
+  if (unit === "cl") return "cl";
   if (unit === "l" || unit === "lt" || unit === "lts" || unit === "ltr" || unit === "ltrs") return "L";
   if (
     [
@@ -546,12 +562,8 @@ function parseSizeAndUnit(
   sizeRaw: string | undefined,
   unitRaw: string | undefined,
 ): { unitSize: number | null; unitMeasurement: PackMeasureUnit | null } {
-  let unitSize = parseQuantityToken(sizeRaw ?? "");
-  let unitMeasurement = normalizeMeasureUnit(unitRaw ?? "");
-  if (unitRaw?.toLowerCase() === "cl" && unitSize != null) {
-    unitSize = unitSize * 10;
-    unitMeasurement = "ml";
-  }
+  const unitSize = parseQuantityToken(sizeRaw ?? "");
+  const unitMeasurement = normalizeMeasureUnit(unitRaw ?? "");
   if (unitSize == null || !unitMeasurement || unitMeasurement === "un") {
     return { unitSize: null, unitMeasurement: null };
   }
@@ -702,6 +714,27 @@ export function parsePurchaseStructureFromText(text: string): PurchaseStructure 
       purchaseFormat: "unit",
     });
     logPurchaseStructureParse(trimmed, structure, "units_size");
+    return structure;
+  }
+
+  const sizeCount = findBestRegexMatch(trimmed, SIZE_COUNT_RE, scoreSizeCountMatch);
+  if (sizeCount?.groups) {
+    const innerUnitCount = parseQuantityToken(sizeCount.groups.inner ?? "");
+    const { unitSize, unitMeasurement } = parseSizeAndUnit(sizeCount.groups.size, sizeCount.groups.unit);
+    if (innerUnitCount == null || unitSize == null || !unitMeasurement) {
+      logPurchaseStructureParse(trimmed, null, "size_count");
+      return null;
+    }
+    const structure = buildInnerUnitsStructure({
+      innerUnitCount,
+      innerUnitType: normalizeInnerUnitType(sizeCount.groups.innerUnit),
+      unitSize,
+      unitMeasurement,
+      matchedText: sizeCount[0] ?? trimmed,
+      tier: "size_count",
+      purchaseFormat: "unit",
+    });
+    logPurchaseStructureParse(trimmed, structure, "size_count");
     return structure;
   }
 
@@ -961,6 +994,7 @@ export function measureToBase(
   if (unit === "g") return { amount: quantity, base: "g", family: "mass" };
   if (unit === "L") return { amount: quantity * 1000, base: "ml", family: "volume" };
   if (unit === "ml") return { amount: quantity, base: "ml", family: "volume" };
+  if (unit === "cl") return { amount: quantity * 10, base: "ml", family: "volume" };
   return { amount: quantity, base: "un", family: "count" };
 }
 

@@ -160,8 +160,9 @@ describe("ingredient-purchase-memory", () => {
 
     expect(latest?.priceLabel).toBe("€38.56");
     expect(bestValue?.priceLabel).toBe("€25.74");
-    expect(latest?.comparablePrice).toBeCloseTo(19.28, 2);
-    expect(bestValue?.comparablePrice).toBeCloseTo(25.74, 2);
+    // 15×75cl/case → 11.25 L; comparablePrice is €/L via computeEffectiveUsableCost
+    expect(latest?.comparablePrice).toBeCloseTo(19.28 / 11.25, 2);
+    expect(bestValue?.comparablePrice).toBeCloseTo(25.74 / 11.25, 2);
 
     const insights = buildIngredientPurchaseInsights(purchases);
     expect(insights.best?.priceLabel).toBe("€38.56");

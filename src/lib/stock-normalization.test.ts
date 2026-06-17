@@ -21,6 +21,7 @@ import {
   resolveSemanticUsableQuantity,
   summarizePurchaseStructure,
   type NormalizedPackPhrase,
+  type PurchaseStructure,
 } from "./stock-normalization";
 
 const phrase = (
@@ -255,6 +256,122 @@ describe("parsePurchaseStructureFromText", () => {
       expect(derived.weak_scalar_activated).toBe(true);
     },
   );
+});
+
+describe("parsePurchaseStructureFromText — beverage cl pack patterns", () => {
+  function expectClPackStructure(
+    input: string,
+    expected: {
+      pack_count: number;
+      inner_quantity: number;
+      inner_unit: "cl";
+      usable_quantity: number;
+      tier?: PurchaseStructure["tier"];
+    },
+  ) {
+    const structure = parsePurchaseStructureFromText(input);
+    expect(structure).not.toBeNull();
+    const phrase = purchaseStructureToPackPhrase(structure!);
+    expect(phrase.containerCount).toBe(expected.pack_count);
+    expect(phrase.packageQuantity).toBe(expected.inner_quantity);
+    expect(structure!.unitMeasurement).toBe(expected.inner_unit);
+    expect(structure!.totalUsableAmount).toBe(expected.usable_quantity);
+    expect(structure!.usableUnit).toBe("ml");
+    if (expected.tier) {
+      expect(structure?.tier).toBe(expected.tier);
+    }
+  }
+
+  it.each([
+    {
+      input: "24x33cl",
+      pack_count: 24,
+      inner_quantity: 33,
+      inner_unit: "cl" as const,
+      usable_quantity: 7920,
+      tier: "count_size" as const,
+    },
+    {
+      input: "24 x 33cl",
+      pack_count: 24,
+      inner_quantity: 33,
+      inner_unit: "cl" as const,
+      usable_quantity: 7920,
+      tier: "count_size" as const,
+    },
+    {
+      input: "33cl x24",
+      pack_count: 24,
+      inner_quantity: 33,
+      inner_unit: "cl" as const,
+      usable_quantity: 7920,
+      tier: "size_count" as const,
+    },
+    {
+      input: "33cl x 24 un",
+      pack_count: 24,
+      inner_quantity: 33,
+      inner_unit: "cl" as const,
+      usable_quantity: 7920,
+      tier: "size_count" as const,
+    },
+    {
+      input: "15x75cl",
+      pack_count: 15,
+      inner_quantity: 75,
+      inner_unit: "cl" as const,
+      usable_quantity: 11250,
+      tier: "count_size" as const,
+    },
+    {
+      input: "75cl x15",
+      pack_count: 15,
+      inner_quantity: 75,
+      inner_unit: "cl" as const,
+      usable_quantity: 11250,
+      tier: "size_count" as const,
+    },
+    {
+      input: "75cl x 15ud",
+      pack_count: 15,
+      inner_quantity: 75,
+      inner_unit: "cl" as const,
+      usable_quantity: 11250,
+      tier: "size_count" as const,
+    },
+    {
+      input: "24x20cl",
+      pack_count: 24,
+      inner_quantity: 20,
+      inner_unit: "cl" as const,
+      usable_quantity: 4800,
+      tier: "count_size" as const,
+    },
+    {
+      input: "20cl x24",
+      pack_count: 24,
+      inner_quantity: 20,
+      inner_unit: "cl" as const,
+      usable_quantity: 4800,
+      tier: "size_count" as const,
+    },
+  ])("parses $input", (caseRow) => {
+    expectClPackStructure(caseRow.input, caseRow);
+  });
+
+  it.each([
+    { input: "6x1L", pack_count: 6, inner_quantity: 1, inner_unit: "L" as const, usable_quantity: 6000 },
+    { input: "12x1kg", pack_count: 12, inner_quantity: 1, inner_unit: "kg" as const, usable_quantity: 12000 },
+    { input: "10x200g", pack_count: 10, inner_quantity: 200, inner_unit: "g" as const, usable_quantity: 2000 },
+  ])("regression: $input", ({ input, pack_count, inner_quantity, inner_unit, usable_quantity }) => {
+    const structure = parsePurchaseStructureFromText(input);
+    expect(structure).not.toBeNull();
+    const phrase = purchaseStructureToPackPhrase(structure!);
+    expect(phrase.containerCount).toBe(pack_count);
+    expect(phrase.packageQuantity).toBe(inner_quantity);
+    expect(structure!.unitMeasurement).toBe(inner_unit);
+    expect(structure!.totalUsableAmount).toBe(usable_quantity);
+  });
 });
 
 describe("isWeakInvoiceRowContentMeasure", () => {
