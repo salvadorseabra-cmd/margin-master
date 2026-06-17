@@ -24,6 +24,7 @@ import {
   hasRichPackageSemantics,
   preserveCountableExtractedUnit,
   resolveInvoiceLinePurchaseFormat,
+  resolveInvoiceLinePurchaseUnit,
   structuredPurchaseToIngredientFields,
   type StructuredPurchaseFormat,
 } from "@/lib/invoice-purchase-format";
@@ -70,14 +71,20 @@ export type { OperationalIngredientCostFields };
 /** Maps a matched invoice line to catalog `current_price` / `purchase_quantity` fields. */
 export function operationalCostFieldsFromInvoiceLine(
   item: Pick<AutoPersistInvoiceItem, "name" | "quantity" | "unit" | "unit_price" | "total">,
-  _options: {
+  options: {
     isGenericUnit?: (unit: string | null | undefined) => boolean;
   } = {},
 ): OperationalIngredientCostFields | null {
+  const isGenericUnit = options.isGenericUnit ?? defaultIsGenericUnit;
+  const resolvedUnit =
+    resolveInvoiceLinePurchaseUnit(
+      { name: item.name, quantity: item.quantity, unit: item.unit },
+      isGenericUnit,
+    ).unit ?? (item.unit?.trim() || null);
   const recipeFields = recipeOperationalCostFieldsFromInvoiceLine({
     name: item.name,
     quantity: item.quantity,
-    unit: item.unit,
+    unit: resolvedUnit,
     unit_price: item.unit_price,
     line_total: item.total ?? undefined,
   });
@@ -97,6 +104,69 @@ export function operationalCostFieldsFromInvoiceLine(
 
 export type { InvoiceIngredientPriceHistoryContext };
 
+type IngredientCatalogPersistFields = {
+  purchase_quantity: number;
+  purchase_unit: string;
+  base_unit: string;
+  unit: string;
+  preferCatalogPackFields: boolean;
+};
+
+/** Catalog pack count (un) vs operational usable totals (ml/g) for multipack beverages. */
+function shouldPreferCatalogPackFieldsForPersist(
+  operational: OperationalIngredientCostFields,
+  catalog: Pick<IngredientCatalogPersistFields, "purchase_quantity" | "purchase_unit">,
+): boolean {
+  return (
+    catalog.purchase_unit === "un" &&
+    operational.cost_base_unit !== "un" &&
+    operational.purchase_quantity !== catalog.purchase_quantity
+  );
+}
+
+function catalogPersistFieldsFromInvoiceLine(
+  item: Pick<AutoPersistInvoiceItem, "name" | "quantity" | "unit" | "unit_price" | "total">,
+  operational: OperationalIngredientCostFields,
+  options: {
+    isGenericUnit?: (unit: string | null | undefined) => boolean;
+  } = {},
+): IngredientCatalogPersistFields {
+  const isGenericUnit = options.isGenericUnit ?? defaultIsGenericUnit;
+  const extractedUnit = item.unit?.trim() || null;
+  const structured = resolveInvoiceLinePurchaseFormat({
+    name: item.name,
+    quantity: item.quantity,
+    unit: item.unit,
+  });
+  const catalogFields = structuredPurchaseToIngredientFields(
+    structured,
+    extractedUnit,
+    isGenericUnit,
+  );
+  const preferCatalogPackFields = shouldPreferCatalogPackFieldsForPersist(
+    operational,
+    catalogFields,
+  );
+
+  if (!preferCatalogPackFields) {
+    return {
+      purchase_quantity: operational.purchase_quantity,
+      purchase_unit: operational.cost_base_unit,
+      base_unit: operational.cost_base_unit,
+      unit: operational.cost_base_unit,
+      preferCatalogPackFields: false,
+    };
+  }
+
+  return {
+    purchase_quantity: catalogFields.purchase_quantity,
+    purchase_unit: catalogFields.purchase_unit,
+    base_unit: catalogFields.base_unit,
+    unit: catalogFields.base_unit,
+    preferCatalogPackFields: true,
+  };
+}
+
 /** Persists latest invoice operational pack price onto the canonical ingredient row. */
 export async function persistOperationalIngredientCostFromInvoiceLine(
   client: AppSupabaseClient,
@@ -112,6 +182,7 @@ export async function persistOperationalIngredientCostFromInvoiceLine(
   if (!id) return { updated: false, error: null };
   const fields = operationalCostFieldsFromInvoiceLine(item, options);
   if (!fields || fields.current_price == null) return { updated: false, error: null };
+  const catalogPersist = catalogPersistFieldsFromInvoiceLine(item, fields, options);
 
   const historyCtx = options.priceHistory;
   let snapshot = null;
@@ -127,7 +198,14 @@ export async function persistOperationalIngredientCostFromInvoiceLine(
     .from("ingredients")
     .update({
       current_price: fields.current_price,
-      purchase_quantity: fields.purchase_quantity,
+      purchase_quantity: catalogPersist.purchase_quantity,
+      ...(catalogPersist.preferCatalogPackFields
+        ? {
+            purchase_unit: catalogPersist.purchase_unit,
+            base_unit: catalogPersist.base_unit,
+            unit: catalogPersist.unit,
+          }
+        : {}),
     })
     .eq("id", id);
   if (error) return { updated: false, error };
@@ -405,28 +483,24 @@ export function buildIngredientInsertPayload(
     isGenericUnit,
   );
   const operational = operationalCostFieldsFromInvoiceLine(item, { isGenericUnit });
-  const preservedUnit = preserveCountableExtractedUnit(extractedUnit, structured, isGenericUnit);
-  const stockUnit =
-    preservedUnit ??
-    (structured.inferred.base_unit && isGenericUnit(extractedUnit)
-      ? structured.inferred.base_unit
-      : (extractedUnit ??
-        structured.inferred.base_unit ??
-        structured.inferred.conversion_hint?.purchase_unit ??
-        purchaseFields.base_unit));
+  const catalogPersist = operational
+    ? catalogPersistFieldsFromInvoiceLine(item, operational, { isGenericUnit })
+    : null;
   const detectedPrice = Number(item.unit_price);
   const currentPrice = Number.isFinite(detectedPrice) && detectedPrice >= 0 ? detectedPrice : 0;
-  const costBase = operational?.cost_base_unit ?? purchaseFields.base_unit;
 
   return {
     user_id: userId,
     name,
     normalized_name: normalizedName,
-    unit: operational?.cost_base_unit ?? stockUnit,
+    unit: catalogPersist?.unit ?? operational?.cost_base_unit ?? purchaseFields.base_unit,
     current_price: currentPrice,
-    purchase_quantity: operational?.purchase_quantity ?? purchaseFields.purchase_quantity,
-    purchase_unit: costBase,
-    base_unit: costBase,
+    purchase_quantity:
+      catalogPersist?.purchase_quantity ??
+      operational?.purchase_quantity ??
+      purchaseFields.purchase_quantity,
+    purchase_unit: catalogPersist?.purchase_unit ?? purchaseFields.purchase_unit,
+    base_unit: catalogPersist?.base_unit ?? purchaseFields.base_unit,
     ingredient_kind: INGREDIENT_KIND_CANONICAL,
   };
 }

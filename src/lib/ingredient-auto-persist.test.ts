@@ -9,7 +9,9 @@ import {
   catalogHasOperationalFamilyConflict,
   catalogHasSameOperationalFamilyDuplicate,
   evaluateAutoPersistEligibility,
+  operationalCostFieldsFromInvoiceLine,
   persistIngredientFromInvoiceItem,
+  persistOperationalIngredientCostFromInvoiceLine,
 } from "./ingredient-auto-persist";
 import { recordInvoiceLineAliasMemory } from "./ingredient-match-alias-memory";
 
@@ -270,5 +272,212 @@ describe("persistIngredientFromInvoiceItem", () => {
     expect(result.blocked).toBe(true);
     expect(result.blockReason).toBe("invoice_shorthand_not_canonical");
     expect(insert).not.toHaveBeenCalled();
+  });
+});
+
+function createPersistUpdateMockClient(ingredient: {
+  name: string;
+  unit: string | null;
+  current_price: number | null;
+  purchase_quantity: number | null;
+  purchase_unit?: string | null;
+  base_unit?: string | null;
+}) {
+  const updates: Record<string, unknown>[] = [];
+  const client = {
+    from: (table: string) => {
+      if (table === "ingredients") {
+        return {
+          select: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({ data: ingredient, error: null }),
+            }),
+          }),
+          update: (payload: Record<string, unknown>) => ({
+            eq: async () => {
+              updates.push(payload);
+              Object.assign(ingredient, payload);
+              return { error: null };
+            },
+          }),
+        };
+      }
+      return {};
+    },
+  };
+  return { client, updates, ingredient };
+}
+
+describe("persistOperationalIngredientCostFromInvoiceLine — catalog pack fields", () => {
+  it.each([
+    {
+      product: "San Pellegrino",
+      line: {
+        name: "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        quantity: 1,
+        unit: "un" as const,
+        unit_price: 19.32,
+      },
+      expected: { purchase_quantity: 15, purchase_unit: "un", base_unit: "un", unit: "un" },
+    },
+    {
+      product: "Peroni",
+      line: {
+        name: "Peroni 24x33cl",
+        quantity: 1,
+        unit: null,
+        unit_price: 24.5,
+      },
+      expected: { purchase_quantity: 24, purchase_unit: "un", base_unit: "un", unit: "un" },
+    },
+    {
+      product: "Nata",
+      line: {
+        name: "Nata 6x1L",
+        quantity: 1,
+        unit: "un" as const,
+        unit_price: 3.05,
+      },
+      expected: { purchase_quantity: 6, purchase_unit: "un", base_unit: "un", unit: "un" },
+    },
+  ])("persists catalog pack count for $product multipacks", async ({ line, expected }) => {
+    const operational = operationalCostFieldsFromInvoiceLine(line);
+    expect(operational?.cost_base_unit).not.toBe("un");
+    expect(operational?.purchase_quantity).not.toBe(expected.purchase_quantity);
+
+    const { client, updates, ingredient } = createPersistUpdateMockClient({
+      name: line.name,
+      unit: "ml",
+      current_price: 10,
+      purchase_quantity: expected.purchase_quantity,
+      purchase_unit: "un",
+      base_unit: "un",
+    });
+
+    const result = await persistOperationalIngredientCostFromInvoiceLine(
+      client as never,
+      "ing-multipack",
+      line,
+    );
+
+    expect(result.updated).toBe(true);
+    expect(updates[0]).toMatchObject({
+      current_price: line.unit_price,
+      ...expected,
+    });
+    expect(ingredient.purchase_quantity).toBe(expected.purchase_quantity);
+    expect(ingredient.purchase_unit).toBe("un");
+  });
+
+  it.each([
+    {
+      product: "Anchoas",
+      line: {
+        name: "Filete de Anchovas Alconfrisa Lt 495 g",
+        quantity: 2,
+        unit: "un" as const,
+        unit_price: 6.29,
+        total: 12.58,
+      },
+      expected: { purchase_quantity: 1, cost_base_unit: "un" as const },
+    },
+    {
+      product: "Gema",
+      line: {
+        name: "Ovo Líquido Past.Gema Dovo 1kg",
+        quantity: 6,
+        unit: "un" as const,
+        unit_price: 10.19,
+        total: 61.14,
+      },
+      expected: { purchase_quantity: 1, cost_base_unit: "un" as const },
+    },
+  ])("operational cost for countable $product", ({ line, expected }) => {
+    const fields = operationalCostFieldsFromInvoiceLine(line);
+    expect(fields).toMatchObject({
+      current_price: line.unit_price,
+      ...expected,
+    });
+  });
+
+  it.each([
+    {
+      product: "Prosciutto",
+      line: {
+        name: "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+ 4,25Kg",
+        quantity: 4.3,
+        unit: null,
+        unit_price: 8.5,
+      },
+    },
+    {
+      product: "Bresaola",
+      line: {
+        name: "Rigamonti - Bresaola Punta d'Anca Oro 1/2 ~1,5Kg",
+        quantity: 1.83,
+        unit: null,
+        unit_price: 22.5,
+      },
+    },
+    {
+      product: "Mortadella",
+      line: {
+        name: "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 ~3,5Kg",
+        quantity: 3.11,
+        unit: null,
+        unit_price: 12.0,
+      },
+    },
+  ])("weight-priced $product uses kg costing contract", ({ line }) => {
+    const fields = operationalCostFieldsFromInvoiceLine(line);
+    expect(fields).toMatchObject({
+      current_price: line.unit_price,
+      purchase_quantity: 1000,
+      cost_base_unit: "g",
+    });
+  });
+
+  it.each([
+    {
+      product: "Pepino",
+      line: { name: "Pepino", quantity: 3.36, unit: "kg" as const, unit_price: 1.77 },
+    },
+    {
+      product: "Courgettes",
+      line: { name: "Courgettes", quantity: 3.3, unit: "kg" as const, unit_price: 2.5 },
+    },
+  ])("$product explicit kg OCR keeps kg costing contract", ({ line }) => {
+    const fields = operationalCostFieldsFromInvoiceLine(line);
+    expect(fields).toMatchObject({
+      current_price: line.unit_price,
+      purchase_quantity: 1000,
+      cost_base_unit: "g",
+    });
+  });
+
+  it("does not overwrite unit fields for non-multipack weight rows", async () => {
+    const line = {
+      name: "QUEIJO MOZARELLA FATIADO 1KG",
+      quantity: 1,
+      unit: "kg" as const,
+      unit_price: 9.5,
+    };
+    const { client, updates, ingredient } = createPersistUpdateMockClient({
+      name: "Mozzarella 1kg",
+      unit: "kg",
+      current_price: 8,
+      purchase_quantity: 1000,
+      purchase_unit: "g",
+      base_unit: "g",
+    });
+
+    await persistOperationalIngredientCostFromInvoiceLine(client as never, "ing-moz", line);
+
+    expect(updates[0]).toEqual({
+      current_price: 9.5,
+      purchase_quantity: 1000,
+    });
+    expect(updates[0]).not.toHaveProperty("purchase_unit");
+    expect(ingredient.unit).toBe("kg");
   });
 });

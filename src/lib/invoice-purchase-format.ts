@@ -9,6 +9,7 @@
 import { formatQuantityWithUnit } from "@/lib/display-format";
 import {
   inferPurchaseUnitsFromLineItemName,
+  normalizeForUnitMatch,
   type PackageType,
   type UnitInferenceResult,
 } from "@/lib/ingredient-unit-inference";
@@ -1360,6 +1361,141 @@ export type IngredientPurchaseFields = {
   base_unit: string;
 };
 
+export type InvoiceLinePurchaseUnitSource =
+  | "preserved_countable"
+  | "ocr_explicit"
+  | "ocr_normalized"
+  | "structured_container"
+  | "multi_unit_pack"
+  | "unit_count"
+  | "name_weight_denomination"
+  | "conversion_hint"
+  | "fallback_null";
+
+export type InvoiceLinePurchaseUnitResolution = {
+  unit: string | null;
+  source: InvoiceLinePurchaseUnitSource;
+};
+
+const PURCHASE_DENOMINATION_ALLOWLIST = new Set(["kg", "l", "un", "cx", "em", "mo"]);
+
+function normalizeOcrToPurchaseDenomination(rawUnit: string): string | null {
+  const u = rawUnit.trim().toLowerCase();
+  if (u === "kg" || u === "kgs") return "kg";
+  if (u === "l" || u === "lt" || u === "ltr" || u === "lts" || u === "ltrs") return "L";
+  if (u === "un" || u === "unit" || u === "units" || u === "und" || u === "unds" || u === "unid" || u === "unids") {
+    return "un";
+  }
+  if (u === "cx" || u === "caixa" || u === "caixas" || u === "case" || u === "cases" || u === "box" || u === "boxes") {
+    return "cx";
+  }
+  if (u === "em" || u === "emb" || u === "embalagem" || u === "embalagens") return "em";
+  if (u === "mo") return "mo";
+  return null;
+}
+
+function isOperationalMicroUnit(rawUnit: string | null | undefined): boolean {
+  const u = rawUnit?.trim().toLowerCase();
+  return u === "g" || u === "gr" || u === "grs" || u === "ml";
+}
+
+function embeddedPurchaseDenominationFromName(name: string): "kg" | "L" | null {
+  const normalized = normalizeForUnitMatch(name);
+  if (/(\d+(?:[.,]\d+)?)\s*(KG|KGS)\b/.test(normalized)) return "kg";
+  if (/(\d+(?:[.,]\d+)?)\s*(L|LT|LTS|LTR|LTRS)\b/.test(normalized)) return "L";
+  return null;
+}
+
+function isInvoiceCounterWeightPricedRow(item: InvoiceLinePurchaseInput): boolean {
+  const qty = item.quantity;
+  return qty != null && Number.isFinite(qty) && qty > 0 && !Number.isInteger(qty);
+}
+
+function normalizeOperationalOcrToPurchaseDenomination(
+  item: InvoiceLinePurchaseInput,
+  extractedUnit: string,
+  structured: StructuredPurchaseFormat,
+): "kg" | "L" | null {
+  if (!isOperationalMicroUnit(extractedUnit)) return null;
+  if (structured.kind === "unit_count" || structured.kind === "multi_unit_pack") return null;
+  const embedded = embeddedPurchaseDenominationFromName(item.name);
+  if (!embedded) return null;
+  if (isInvoiceCounterWeightPricedRow(item)) return embedded;
+  return null;
+}
+
+function isAllowlistedPurchaseDenomination(unit: string): boolean {
+  return PURCHASE_DENOMINATION_ALLOWLIST.has(unit.toLowerCase()) || unit === "L";
+}
+
+/**
+ * Resolves invoice purchase denomination only: kg, L, un, cx, em, mo — never operational g/ml.
+ */
+export function resolveInvoiceLinePurchaseUnit(
+  item: InvoiceLinePurchaseInput,
+  isGenericUnit: (unit: string | null | undefined) => boolean,
+): InvoiceLinePurchaseUnitResolution {
+  const extractedUnit = item.unit?.trim() || null;
+  const structured = resolveInvoiceLinePurchaseFormat(item);
+  const familyOpts = {
+    usableQuantityUnit: structured.usableQuantityUnit,
+    purchaseFormatKind: structured.kind,
+  };
+
+  const preservedUnit = preserveCountableExtractedUnit(extractedUnit, structured, isGenericUnit);
+  if (preservedUnit) {
+    const normalized = normalizeOcrToPurchaseDenomination(preservedUnit) ?? preservedUnit;
+    return { unit: normalized, source: "preserved_countable" };
+  }
+
+  if (extractedUnit && !isGenericUnit(extractedUnit)) {
+    const allowlisted = normalizeOcrToPurchaseDenomination(extractedUnit);
+    if (allowlisted) {
+      return { unit: allowlisted, source: "ocr_explicit" };
+    }
+    const normalizedOp = normalizeOperationalOcrToPurchaseDenomination(item, extractedUnit, structured);
+    if (normalizedOp) {
+      return { unit: normalizedOp, source: "ocr_normalized" };
+    }
+  }
+
+  if (structured.kind === "multi_unit_pack" && isGenericUnit(extractedUnit)) {
+    const containerUnit = structured.purchaseContainerUnit?.trim().toLowerCase() ?? null;
+    if (containerUnit && inferUnitFamily(containerUnit, familyOpts) === "countable") {
+      const normalized =
+        normalizeOcrToPurchaseDenomination(containerUnit) ??
+        (containerUnit === "unit" || containerUnit === "units" ? "un" : containerUnit);
+      if (isAllowlistedPurchaseDenomination(normalized)) {
+        return { unit: normalized, source: "structured_container" };
+      }
+    }
+    return { unit: "un", source: "multi_unit_pack" };
+  }
+
+  if (structured.kind === "unit_count" && isGenericUnit(extractedUnit)) {
+    return { unit: "un", source: "unit_count" };
+  }
+
+  if (
+    (isGenericUnit(extractedUnit) || isOperationalMicroUnit(extractedUnit)) &&
+    structured.kind !== "unit_count" &&
+    structured.kind !== "multi_unit_pack"
+  ) {
+    const embedded = embeddedPurchaseDenominationFromName(item.name);
+    if (embedded) {
+      return { unit: embedded, source: "name_weight_denomination" };
+    }
+  }
+
+  const hint = structured.inferred.conversion_hint?.purchase_unit;
+  if (hint && isGenericUnit(extractedUnit)) {
+    const normalized = normalizeOcrToPurchaseDenomination(hint) ?? hint;
+    return { unit: normalized, source: "conversion_hint" };
+  }
+
+  return { unit: null, source: "fallback_null" };
+}
+
 /**
  * When OCR supplies a generic countable unit (e.g. `un`) on a unit-count or multi-pack row,
  * keep that unit instead of replacing it with embedded per-item weight from the name.
@@ -1369,26 +1505,14 @@ export function resolveInvoicePersistedItemUnit(
   item: InvoiceLinePurchaseInput,
   isGenericUnit: (unit: string | null | undefined) => boolean,
 ): string | null {
+  const resolved = resolveInvoiceLinePurchaseUnit(item, isGenericUnit).unit;
+  if (resolved) return resolved;
+
   const extractedUnit = item.unit?.trim() || null;
-  const structured = resolveInvoiceLinePurchaseFormat(item);
-  const preservedUnit = preserveCountableExtractedUnit(extractedUnit, structured, isGenericUnit);
-  if (preservedUnit) return preservedUnit;
-
-  if (structured.kind === "multi_unit_pack" && isGenericUnit(extractedUnit)) {
-    const familyOpts = {
-      usableQuantityUnit: structured.usableQuantityUnit,
-      purchaseFormatKind: structured.kind,
-    };
-    const containerUnit = structured.purchaseContainerUnit?.trim().toLowerCase() ?? null;
-    if (containerUnit && inferUnitFamily(containerUnit, familyOpts) === "countable") {
-      return containerUnit === "unit" || containerUnit === "units" ? "un" : containerUnit;
-    }
-    return "un";
+  if (extractedUnit && !isOperationalMicroUnit(extractedUnit)) {
+    return normalizeOcrToPurchaseDenomination(extractedUnit) ?? extractedUnit;
   }
-
-  const inferred = structured.inferred;
-  if (inferred.base_unit && isGenericUnit(extractedUnit)) return inferred.base_unit;
-  return extractedUnit ?? inferred.base_unit ?? inferred.conversion_hint?.purchase_unit ?? null;
+  return null;
 }
 
 export function preserveCountableExtractedUnit(

@@ -683,3 +683,131 @@ describe("resolveInvoicePersistedItemUnit — beverage multipacks", () => {
     expect(resolveInvoicePersistedItemUnit({ name, unit }, isGeneric)).toBe(expected);
   });
 });
+
+describe("resolveInvoicePersistedItemUnit — purchase denomination (never g/ml)", () => {
+  const isGeneric = (unit: string | null | undefined) =>
+    !unit?.trim() || ["un", "unit", "units", "und", "unds", "unid", "unids"].includes(unit.trim().toLowerCase());
+
+  const assertPurchaseDenomination = (unit: string | null) => {
+    expect(unit).not.toBe("g");
+    expect(unit).not.toBe("ml");
+  };
+
+  describe("weight-priced (null unit + KG in name)", () => {
+    it.each([
+      {
+        product: "Prosciutto",
+        line: {
+          name: "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+ 4,25Kg",
+          quantity: 4.3,
+          unit: null as string | null,
+        },
+        expectedUnit: "kg",
+      },
+      {
+        product: "Bresaola",
+        line: {
+          name: "Rigamonti - Bresaola Punta d'Anca Oro 1/2 ~1,5Kg",
+          quantity: 1.83,
+          unit: null as string | null,
+        },
+        expectedUnit: "kg",
+      },
+      {
+        product: "Bresaola (OCR g)",
+        line: {
+          name: "Rigamonti - Bresaola Punta d'Anca Oro 1/2 ~1,5Kg",
+          quantity: 1.83,
+          unit: "g" as string | null,
+        },
+        expectedUnit: "kg",
+      },
+      {
+        product: "Mortadella",
+        line: {
+          name: "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 ~3,5Kg",
+          quantity: 3.11,
+          unit: null as string | null,
+        },
+        expectedUnit: "kg",
+      },
+    ])("resolves $product → $expectedUnit", ({ line, expectedUnit }) => {
+      const unit = resolveInvoicePersistedItemUnit(line, isGeneric);
+      assertPurchaseDenomination(unit);
+      expect(unit).toBe(expectedUnit);
+    });
+  });
+
+  describe("multipack beverages", () => {
+    it.each([
+      {
+        product: "San Pellegrino",
+        line: {
+          name: "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          quantity: 2,
+          unit: "un" as string | null,
+        },
+        expectedUnit: "un",
+      },
+      {
+        product: "Peroni",
+        line: {
+          name: "Peroni 24x33cl",
+          quantity: 24,
+          unit: "un" as string | null,
+        },
+        expectedUnit: "un",
+      },
+    ])("resolves $product → $expectedUnit", ({ line, expectedUnit }) => {
+      const unit = resolveInvoicePersistedItemUnit(line, isGeneric);
+      assertPurchaseDenomination(unit);
+      expect(unit).toBe(expectedUnit);
+    });
+  });
+
+  describe("countable with embedded weight", () => {
+    it.each([
+      {
+        product: "Anchoas",
+        line: {
+          name: "Filete de Anchovas Alconfrisa Lt 495 g",
+          quantity: 2,
+          unit: "un" as string | null,
+        },
+        expectedUnit: "un",
+      },
+      {
+        product: "Gema",
+        line: {
+          name: "Ovo Líquido Past.Gema Dovo 1kg",
+          quantity: 6,
+          unit: "un" as string | null,
+        },
+        expectedUnit: "un",
+      },
+    ])("resolves $product → $expectedUnit", ({ line, expectedUnit }) => {
+      const unit = resolveInvoicePersistedItemUnit(line, isGeneric);
+      assertPurchaseDenomination(unit);
+      expect(unit).toBe(expectedUnit);
+    });
+  });
+
+  describe("explicit kg OCR controls", () => {
+    it.each([
+      {
+        product: "Pepino",
+        line: { name: "Pepino", quantity: 3.36, unit: "kg" as string | null },
+        expectedUnit: "kg",
+      },
+      {
+        product: "Courgettes",
+        line: { name: "Courgettes", quantity: 3.3, unit: "kg" as string | null },
+        expectedUnit: "kg",
+      },
+    ])("keeps $product at $expectedUnit", ({ line, expectedUnit }) => {
+      const unit = resolveInvoicePersistedItemUnit(line, isGeneric);
+      assertPurchaseDenomination(unit);
+      expect(unit).toBe(expectedUnit);
+    });
+  });
+});

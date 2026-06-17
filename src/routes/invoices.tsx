@@ -1481,14 +1481,17 @@ function InvoicesPage() {
         supabase,
         ingredientCatalog,
         confirmedIngredientAliasesRef.current,
-        normalizedItems.map((it: ItemRow) => ({
-          name: String(it.name ?? ""),
-          quantity: it.quantity ?? null,
-          unit: it.unit ?? null,
-          unit_price: it.unit_price ?? null,
-          total: it.total ?? null,
-          supplierName: supplierForSync,
-        })),
+        normalizedItems.map((it: ItemRow) => {
+          const name = String(it.name ?? "");
+          return {
+            name,
+            quantity: it.quantity ?? null,
+            unit: resolveInvoiceItemUnit({ name, unit: it.unit }),
+            unit_price: it.unit_price ?? null,
+            total: it.total ?? null,
+            supplierName: supplierForSync,
+          };
+        }),
         {
           isGenericUnit,
           priceHistory: {
