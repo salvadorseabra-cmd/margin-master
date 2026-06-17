@@ -455,6 +455,74 @@ describe("persistOperationalIngredientCostFromInvoiceLine — catalog pack field
     });
   });
 
+  it.each([
+    {
+      product: "Atum",
+      line: {
+        name: "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+        quantity: 1,
+        unit: "un" as const,
+        unit_price: 13.1,
+        total: 13.1,
+      },
+    },
+    {
+      product: "Gema",
+      line: {
+        name: "Ovo Líquido Past.Gema Dovo 1 Kg",
+        quantity: 6,
+        unit: "un" as const,
+        unit_price: 10.49,
+        total: 62.94,
+      },
+    },
+    {
+      product: "Anchoas",
+      line: {
+        name: "Filete de Anchoas Alconfirosa LI 495 g",
+        quantity: 2,
+        unit: "un" as const,
+        unit_price: 9.99,
+        total: 19.98,
+      },
+    },
+  ])(
+    "persists unit fields for countable Class B $product (cost_base_unit=un)",
+    async ({ line }) => {
+      const operational = operationalCostFieldsFromInvoiceLine(line);
+      expect(operational).toMatchObject({
+        current_price: line.unit_price,
+        purchase_quantity: 1,
+        cost_base_unit: "un",
+      });
+
+      const { client, updates, ingredient } = createPersistUpdateMockClient({
+        name: line.name,
+        unit: null,
+        current_price: 5,
+        purchase_quantity: 1,
+      });
+
+      const result = await persistOperationalIngredientCostFromInvoiceLine(
+        client as never,
+        "ing-class-b",
+        line,
+      );
+
+      expect(result.updated).toBe(true);
+      expect(updates[0]).toMatchObject({
+        current_price: line.unit_price,
+        purchase_quantity: 1,
+        purchase_unit: "un",
+        base_unit: "un",
+        unit: "un",
+      });
+      expect(ingredient.unit).toBe("un");
+      expect(ingredient.purchase_unit).toBe("un");
+      expect(ingredient.base_unit).toBe("un");
+    },
+  );
+
   it("does not overwrite unit fields for non-multipack weight rows", async () => {
     const line = {
       name: "QUEIJO MOZARELLA FATIADO 1KG",

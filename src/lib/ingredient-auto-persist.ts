@@ -194,12 +194,15 @@ export async function persistOperationalIngredientCostFromInvoiceLine(
     }
   }
 
+  const includeCatalogUnitFields =
+    catalogPersist.preferCatalogPackFields || fields.cost_base_unit === "un";
+
   const { error } = await client
     .from("ingredients")
     .update({
       current_price: fields.current_price,
       purchase_quantity: catalogPersist.purchase_quantity,
-      ...(catalogPersist.preferCatalogPackFields
+      ...(includeCatalogUnitFields
         ? {
             purchase_unit: catalogPersist.purchase_unit,
             base_unit: catalogPersist.base_unit,
