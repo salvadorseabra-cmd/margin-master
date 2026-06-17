@@ -39,6 +39,7 @@ import {
   hasRichPackageSemantics,
   isCollapsedMeaninglessPurchaseLabel,
   preserveCountableExtractedUnit,
+  resolveInvoicePersistedItemUnit,
   resolveInvoiceLinePurchaseFormat,
   resolveInvoiceLineStockPresentation,
   resolveInvoicePurchaseDisplayLabel,
@@ -651,15 +652,8 @@ const formatPackSize = (inferred: UnitInferenceResult) => {
   return formatOperationalQuantityWithUnit(inferred.pack_size, inferred.pack_size_unit);
 };
 
-const resolveInvoiceItemUnit = (item: Pick<ItemRow, "name" | "unit">) => {
-  const extractedUnit = item.unit?.trim() || null;
-  const structured = resolveItemPurchaseFormat(item);
-  const preservedUnit = preserveCountableExtractedUnit(extractedUnit, structured, isGenericUnit);
-  if (preservedUnit) return preservedUnit;
-  const inferred = structured.inferred;
-  if (inferred.base_unit && isGenericUnit(extractedUnit)) return inferred.base_unit;
-  return extractedUnit ?? inferred.base_unit ?? inferred.conversion_hint?.purchase_unit;
-};
+const resolveInvoiceItemUnit = (item: Pick<ItemRow, "name" | "unit">) =>
+  resolveInvoicePersistedItemUnit(item, isGenericUnit);
 
 const pickUnitTracePayload = (item: {
   name?: unknown;

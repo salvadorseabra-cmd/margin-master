@@ -1364,6 +1364,33 @@ export type IngredientPurchaseFields = {
  * When OCR supplies a generic countable unit (e.g. `un`) on a unit-count or multi-pack row,
  * keep that unit instead of replacing it with embedded per-item weight from the name.
  */
+/** Resolves the unit persisted on `invoice_items` from OCR row + structured purchase format. */
+export function resolveInvoicePersistedItemUnit(
+  item: InvoiceLinePurchaseInput,
+  isGenericUnit: (unit: string | null | undefined) => boolean,
+): string | null {
+  const extractedUnit = item.unit?.trim() || null;
+  const structured = resolveInvoiceLinePurchaseFormat(item);
+  const preservedUnit = preserveCountableExtractedUnit(extractedUnit, structured, isGenericUnit);
+  if (preservedUnit) return preservedUnit;
+
+  if (structured.kind === "multi_unit_pack" && isGenericUnit(extractedUnit)) {
+    const familyOpts = {
+      usableQuantityUnit: structured.usableQuantityUnit,
+      purchaseFormatKind: structured.kind,
+    };
+    const containerUnit = structured.purchaseContainerUnit?.trim().toLowerCase() ?? null;
+    if (containerUnit && inferUnitFamily(containerUnit, familyOpts) === "countable") {
+      return containerUnit === "unit" || containerUnit === "units" ? "un" : containerUnit;
+    }
+    return "un";
+  }
+
+  const inferred = structured.inferred;
+  if (inferred.base_unit && isGenericUnit(extractedUnit)) return inferred.base_unit;
+  return extractedUnit ?? inferred.base_unit ?? inferred.conversion_hint?.purchase_unit ?? null;
+}
+
 export function preserveCountableExtractedUnit(
   extractedUnit: string | null,
   structured: StructuredPurchaseFormat,

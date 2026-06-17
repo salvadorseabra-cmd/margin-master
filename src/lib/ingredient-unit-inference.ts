@@ -250,6 +250,46 @@ export function detectPackQuantity(name: string): PackDetection | null {
       packageType: null,
       source: "explicit_unit_count",
     },
+    {
+      re: /\b(\d+)\s*UDS?\b/g,
+      group: 1,
+      confidence: 0.9,
+      label: "N UD",
+      packageType: null,
+      source: "explicit_unit_count",
+    },
+    {
+      re: /\b(\d+)UDS?\b/g,
+      group: 1,
+      confidence: 0.9,
+      label: "NUD",
+      packageType: null,
+      source: "explicit_unit_count",
+    },
+    {
+      re: /\b(\d+)\s*(?:UNIT|UNITS|UNI|UND|UNID|UNIDS)\b/g,
+      group: 1,
+      confidence: 0.88,
+      label: "N UNIT",
+      packageType: null,
+      source: "explicit_unit_count",
+    },
+    {
+      re: /\b(\d+)\s*[xX×*]\s*(\d+(?:[.,]\d+)?)\s*(?:CL|ML|G|GR|GRS|KG|KGS|L|LT|LTS|LTR|LTRS)\b/g,
+      group: 1,
+      confidence: 0.94,
+      label: "NxSIZE",
+      packageType: null,
+      source: "multiplier",
+    },
+    {
+      re: /\b(\d+(?:[.,]\d+)?)\s*(?:CL|ML|G|GR|GRS|KG|KGS|L|LT|LTS|LTR|LTRS)\s*[xX×*]\s*(\d+)\s*(?:UDS?|UNI?|UND?|UNIDS?|UNITS?|UN)?\b/g,
+      group: 2,
+      confidence: 0.93,
+      label: "SIZE x N",
+      packageType: null,
+      source: "multiplier",
+    },
   ];
   let best: PackDetection | null = null;
   for (const { re, group, confidence, label, packageType, source } of candidates) {

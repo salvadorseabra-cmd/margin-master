@@ -14,6 +14,7 @@ import {
   resolveInvoiceLineStockPresentation,
   resolveInvoicePurchaseDisplayLabel,
   preserveCountableExtractedUnit,
+  resolveInvoicePersistedItemUnit,
   resolveStructuredPurchaseForDisplay,
   structuredPurchaseToIngredientFields,
   USABLE_STOCK_MIN_CONFIDENCE,
@@ -663,5 +664,22 @@ describe("structuredPurchaseToIngredientFields", () => {
     expect(fields.base_unit).toBe("g");
     expect(fields.purchase_unit).toBe("g");
     expect(fields.purchase_quantity).toBe(2000);
+  });
+});
+
+describe("resolveInvoicePersistedItemUnit — beverage multipacks", () => {
+  const isGeneric = (unit: string | null | undefined) =>
+    !unit?.trim() || ["un", "unit", "units", "und", "unds", "unid", "unids"].includes(unit.trim().toLowerCase());
+
+  it.each([
+    { name: "SanPellegrino - Acqua in vitro 75cl x 15ud", unit: null, expected: "un" },
+    { name: "SanPellegrino - Acqua in vitro 75cl x 15ud", unit: "cx", expected: "cx" },
+    { name: "24x33cl", unit: null, expected: "un" },
+    { name: "Peroni 24x33cl", unit: null, expected: "un" },
+    { name: "Baladin - Ginger Beer 24x20cl", unit: null, expected: "un" },
+    { name: "33cl x24", unit: null, expected: "un" },
+    { name: "75cl x15", unit: null, expected: "un" },
+  ])("resolves $name @ unit=$unit → $expected", ({ name, unit, expected }) => {
+    expect(resolveInvoicePersistedItemUnit({ name, unit }, isGeneric)).toBe(expected);
   });
 });
