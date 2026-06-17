@@ -87,6 +87,8 @@ const invoiceLine = (
     matchSourceDetail: "",
     purchaseStructureSummary: null,
     normalizedUsableQuantityLabel: null,
+    quantity: overrides.quantity ?? null,
+    unit: overrides.unit ?? null,
     ...overrides,
     unitPrice,
     lineTotal,

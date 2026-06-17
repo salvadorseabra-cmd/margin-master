@@ -80,6 +80,8 @@ export type IngredientMatchedInvoiceProduct = {
   itemCreatedAt: string | null;
   unitPrice: number | null;
   lineTotal: number | null;
+  quantity: number | null;
+  unit: string | null;
   matchBucket: "matched" | "suggested";
   matchDisplayState: InvoiceIngredientDisplayState;
   matchKind: IngredientCanonicalMatchKind;
@@ -709,6 +711,8 @@ export function buildMatchedInvoiceProductsFromScan(
       itemCreatedAt: source.created_at?.trim() || null,
       unitPrice: normalized.unit_price,
       lineTotal: normalized.total,
+      quantity: normalized.quantity,
+      unit: normalized.unit,
       matchBucket: bucket,
       matchDisplayState: state.displayState,
       matchKind: match.kind,

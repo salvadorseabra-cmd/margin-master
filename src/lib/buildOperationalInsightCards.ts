@@ -5,7 +5,7 @@ import {
   purchasePriceExtentsDiffer,
   sortRecentPurchasesByDate,
 } from "@/lib/ingredient-detail-panel";
-import type { RecentPurchaseRow } from "@/lib/ingredient-purchase-memory";
+import { purchaseComparablePrice, type RecentPurchaseRow } from "@/lib/ingredient-purchase-memory";
 import {
   pickTopInsights,
   type InsightPriorityTier,
@@ -56,12 +56,8 @@ function costChangeSinceInvoice(
   return `${name} cost decreased ${rounded}% since last invoice`;
 }
 
-function parsePriceLabel(label: string): number | null {
-  const match = label.replace(/\s/g, "").match(/[\d,.]+/);
-  if (!match) return null;
-  const normalized = match[0].replace(",", ".");
-  const value = Number(normalized);
-  return Number.isFinite(value) ? value : null;
+function formatDeltaPercent(current: number, baseline: number): number {
+  return Math.round(((current - baseline) / baseline) * 100);
 }
 
 function normalizeProductHint(hint: string | null | undefined): string | null {
@@ -70,13 +66,9 @@ function normalizeProductHint(hint: string | null | undefined): string | null {
   return trimmed.toLowerCase().replace(/\s+/g, " ");
 }
 
-function formatDeltaPercent(current: number, baseline: number): number {
-  return Math.round(((current - baseline) / baseline) * 100);
-}
-
 function purchasePrices(purchases: readonly RecentPurchaseRow[]): number[] {
   return purchases
-    .map((row) => parsePriceLabel(row.priceLabel))
+    .map((row) => purchaseComparablePrice(row))
     .filter((price): price is number => price != null);
 }
 
@@ -84,7 +76,7 @@ function latestPurchasePrice(purchases: readonly RecentPurchaseRow[]): number | 
   const sorted = sortRecentPurchasesByDate(purchases);
   const latest = sorted[0];
   if (!latest) return null;
-  return parsePriceLabel(latest.priceLabel);
+  return purchaseComparablePrice(latest);
 }
 
 function lowestPurchasePrice(purchases: readonly RecentPurchaseRow[]): number | null {
@@ -122,7 +114,7 @@ function hasSupplierPriceVariation(purchases: readonly RecentPurchaseRow[]): boo
   for (const row of purchases) {
     const supplier = row.supplierLabel.trim();
     if (!supplier) continue;
-    const price = parsePriceLabel(row.priceLabel);
+    const price = purchaseComparablePrice(row);
     if (price == null) continue;
     const bucket = bySupplier.get(supplier) ?? [];
     bucket.push(price);
@@ -157,7 +149,7 @@ function buildPurchaseInsightCandidates(
   const lowest = lowestPurchasePrice(purchases);
   const latestSupplier = latest.supplierLabel.trim();
   const cheapestSupplier = cheapestSupplierLabel(purchases);
-  const priorPrice = previous ? parsePriceLabel(previous.priceLabel) : null;
+  const priorPrice = previous ? purchaseComparablePrice(previous) : null;
   const priorSupplier = previous?.supplierLabel.trim() || null;
 
   if (current != null && priorPrice != null && priorPrice > 0 && current > priorPrice * 1.03) {
@@ -221,7 +213,7 @@ function buildPurchaseInsightCandidates(
     current > lowest + 0.001 &&
     !noLongerCheapest
   ) {
-    const bestRow = sorted.find((row) => parsePriceLabel(row.priceLabel) === lowest);
+    const bestRow = sorted.find((row) => purchaseComparablePrice(row) === lowest);
     const bestSupplier = bestRow?.supplierLabel.trim();
     candidates.push({
       id: "insight:lower-historical-price",

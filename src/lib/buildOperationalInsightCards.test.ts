@@ -8,10 +8,16 @@ import type { RecentPurchaseRow } from "@/lib/ingredient-purchase-memory";
 function purchase(
   partial: Partial<RecentPurchaseRow> & Pick<RecentPurchaseRow, "itemId" | "priceLabel">,
 ): RecentPurchaseRow {
+  const match = partial.priceLabel.replace(/\s/g, "").match(/[\d,.]+/);
+  const parsedComparable =
+    match != null ? Number(match[0].replace(",", ".")) : null;
   return {
     supplierLabel: "Supplier A",
     dateLabel: "01/05/2026",
     productHint: null,
+    comparablePrice:
+      partial.comparablePrice ??
+      (parsedComparable != null && Number.isFinite(parsedComparable) ? parsedComparable : null),
     ...partial,
   };
 }

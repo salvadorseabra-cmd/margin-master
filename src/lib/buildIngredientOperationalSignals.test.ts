@@ -9,16 +9,18 @@ import {
   pickTopInsights,
   pickVisibleOperationalSignals,
 } from "@/lib/buildIngredientOperationalSignals";
+import type { RecentPurchaseRow } from "@/lib/ingredient-purchase-memory";
 
 function purchaseRow(
   price: number,
   supplier: string,
   date = "2026-05-01",
-): { itemId: string; supplierLabel: string; priceLabel: string; dateLabel: string } {
+): RecentPurchaseRow {
   return {
     itemId: `line-${price}-${supplier}`,
     supplierLabel: supplier,
     priceLabel: `€${price.toFixed(2)} / kg`,
+    comparablePrice: price,
     dateLabel: date,
   };
 }

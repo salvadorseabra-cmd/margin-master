@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { buildIngredientPurchaseInsights } from "@/lib/ingredient-detail-panel";
 import {
   buildRecentPurchases,
   buildRecognizedSupplierProducts,
@@ -42,6 +43,8 @@ const potatoProduct = (
   itemCreatedAt: null,
   unitPrice: 12.5,
   lineTotal: 25,
+  quantity: null,
+  unit: null,
   matchBucket: "matched",
   matchDisplayState: "matched",
   matchKind: "exact",
@@ -122,6 +125,47 @@ describe("ingredient-purchase-memory", () => {
     expect(recent[0]?.supplierLabel).toBe("Metro");
     expect(recent[0]?.dateLabel).toMatch(/2026/);
     expect(recent[0]?.priceLabel).toBe("€19.98");
+    expect(recent[0]?.comparablePrice).toBe(9.99);
+  });
+
+  it("San Pellegrino: Best Buy ranks by per-case economics not invoice total", () => {
+    const productName = "SanPellegrino - Acqua in vitro 75cl x 15ud";
+    const purchases = buildRecentPurchases("ing-sp", "San Pellegrino", [
+      potatoProduct({
+        matchedIngredientId: "ing-sp",
+        itemId: "line-a",
+        itemName: productName,
+        supplierName: "Emporio Italia",
+        invoiceDate: "2026-05-01",
+        quantity: 1,
+        unit: "cx",
+        unitPrice: 25.74,
+        lineTotal: 25.74,
+      }),
+      potatoProduct({
+        matchedIngredientId: "ing-sp",
+        itemId: "line-b",
+        itemName: productName,
+        supplierName: "Emporio Italia",
+        invoiceDate: "2026-06-10",
+        quantity: 2,
+        unit: "cx",
+        unitPrice: 19.28,
+        lineTotal: 38.56,
+      }),
+    ]);
+
+    const latest = purchases.find((row) => row.itemId === "line-b");
+    const bestValue = purchases.find((row) => row.itemId === "line-a");
+
+    expect(latest?.priceLabel).toBe("€38.56");
+    expect(bestValue?.priceLabel).toBe("€25.74");
+    expect(latest?.comparablePrice).toBeCloseTo(19.28, 2);
+    expect(bestValue?.comparablePrice).toBeCloseTo(25.74, 2);
+
+    const insights = buildIngredientPurchaseInsights(purchases);
+    expect(insights.best?.priceLabel).toBe("€38.56");
+    expect(insights.worst?.priceLabel).toBe("€25.74");
   });
 
   it("purchaseMemorySummary describes counts", () => {

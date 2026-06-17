@@ -16,7 +16,7 @@ import {
   type IngredientCostFields,
 } from "@/lib/ingredient-unit-cost";
 import { formatPurchaseStructureSummary } from "@/lib/ingredient-operational-intelligence";
-import type { RecentPurchaseRow } from "@/lib/ingredient-purchase-memory";
+import { purchaseComparablePrice, type RecentPurchaseRow } from "@/lib/ingredient-purchase-memory";
 import { parsePurchaseStructureFromText } from "@/lib/stock-normalization";
 import {
   daysSinceRecency,
@@ -212,8 +212,8 @@ export function deriveIngredientCompactTrendState(input: {
   if (volatile) return "volatile";
 
   const sorted = sortRecentPurchasesByDate(purchases);
-  const current = parsePriceLabel(sorted[0]?.priceLabel ?? "");
-  const prior = sorted.length >= 2 ? parsePriceLabel(sorted[1]!.priceLabel) : null;
+  const current = sorted[0] ? purchaseComparablePrice(sorted[0]) : null;
+  const prior = sorted.length >= 2 ? purchaseComparablePrice(sorted[1]!) : null;
   if (current != null && prior != null && current > prior * 1.03) {
     return "recently-increased";
   }
@@ -679,7 +679,7 @@ export function findCheapestPurchaseItemId(purchases: readonly RecentPurchaseRow
   let bestId: string | null = null;
   let bestPrice: number | null = null;
   for (const row of purchases) {
-    const price = parsePriceLabel(row.priceLabel);
+    const price = purchaseComparablePrice(row);
     if (price == null) continue;
     if (bestPrice == null || price < bestPrice) {
       bestPrice = price;
@@ -695,7 +695,7 @@ export function findMostExpensivePurchaseItemId(
   let worstId: string | null = null;
   let worstPrice: number | null = null;
   for (const row of purchases) {
-    const price = parsePriceLabel(row.priceLabel);
+    const price = purchaseComparablePrice(row);
     if (price == null) continue;
     if (worstPrice == null || price > worstPrice) {
       worstPrice = price;
@@ -815,7 +815,7 @@ function daysSincePurchaseDate(value: string): number | null {
 
 function purchasePrices(purchases: readonly RecentPurchaseRow[]): number[] {
   return purchases
-    .map((row) => parsePriceLabel(row.priceLabel))
+    .map((row) => purchaseComparablePrice(row))
     .filter((price): price is number => price != null);
 }
 
@@ -829,7 +829,7 @@ function latestPurchasePrice(purchases: readonly RecentPurchaseRow[]): number | 
   const sorted = sortRecentPurchasesByDate(purchases);
   const latest = sorted[0];
   if (!latest) return null;
-  return parsePriceLabel(latest.priceLabel);
+  return purchaseComparablePrice(latest);
 }
 
 function lowestPurchasePrice(purchases: readonly RecentPurchaseRow[]): number | null {
@@ -1013,8 +1013,8 @@ export function derivePurchaseTimelineLabels(
   }
 
   if (index === 0 && sorted.length >= 2) {
-    const current = parsePriceLabel(purchase.priceLabel);
-    const prior = parsePriceLabel(sorted[1]!.priceLabel);
+    const current = purchaseComparablePrice(purchase);
+    const prior = purchaseComparablePrice(sorted[1]!);
     if (current != null && prior != null && current > prior * 1.03) {
       labels.push("vs-previous-purchase");
     }
@@ -1048,8 +1048,8 @@ export function purchaseTimelineLabelText(
     case "vs-previous-purchase": {
       if (!purchase || !purchases || purchases.length < 2) return "Higher than previous purchase";
       const sorted = sortRecentPurchasesByDate(purchases);
-      const current = parsePriceLabel(purchase.priceLabel);
-      const prior = parsePriceLabel(sorted[1]!.priceLabel);
+      const current = purchaseComparablePrice(purchase);
+      const prior = purchaseComparablePrice(sorted[1]!);
       if (current == null || prior == null || prior <= 0) return "Higher than previous purchase";
       const pct = Math.round(((current - prior) / prior) * 100);
       return `↑ ${pct}% vs previous purchase`;
@@ -1123,7 +1123,7 @@ export function buildIngredientPurchaseInsights(
   let worstPrice: number | null = null;
 
   for (const row of purchases) {
-    const price = parsePriceLabel(row.priceLabel);
+    const price = purchaseComparablePrice(row);
     if (price == null) continue;
     const snapshot: IngredientPurchaseInsightRow = {
       supplierLabel: row.supplierLabel,
@@ -1199,7 +1199,7 @@ function purchasePriceExtents(purchases: readonly RecentPurchaseRow[]): {
   max: number | null;
 } {
   const prices = purchases
-    .map((row) => parsePriceLabel(row.priceLabel))
+    .map((row) => purchaseComparablePrice(row))
     .filter((price): price is number => price != null);
   if (prices.length === 0) return { min: null, max: null };
   return { min: Math.min(...prices), max: Math.max(...prices) };
@@ -1207,7 +1207,7 @@ function purchasePriceExtents(purchases: readonly RecentPurchaseRow[]): {
 
 function hasMeaningfulPurchaseVolatility(purchases: readonly RecentPurchaseRow[]): boolean {
   const prices = purchases
-    .map((row) => parsePriceLabel(row.priceLabel))
+    .map((row) => purchaseComparablePrice(row))
     .filter((price): price is number => price != null);
   if (prices.length < 2) return false;
   const min = Math.min(...prices);
@@ -1226,7 +1226,7 @@ function uniqueSupplierLabels(purchases: readonly RecentPurchaseRow[]): string[]
 
 function isStableAcrossPurchases(purchases: readonly RecentPurchaseRow[]): boolean {
   const prices = purchases
-    .map((row) => parsePriceLabel(row.priceLabel))
+    .map((row) => purchaseComparablePrice(row))
     .filter((price): price is number => price != null);
   if (prices.length < 2) return false;
   const min = Math.min(...prices);
@@ -1240,7 +1240,7 @@ function hasSupplierPriceVariation(purchases: readonly RecentPurchaseRow[]): boo
   for (const row of purchases) {
     const supplier = row.supplierLabel.trim();
     if (!supplier) continue;
-    const price = parsePriceLabel(row.priceLabel);
+    const price = purchaseComparablePrice(row);
     if (price == null) continue;
     const bucket = bySupplier.get(supplier) ?? [];
     bucket.push(price);
@@ -1260,7 +1260,7 @@ function cheapestSupplierLabel(purchases: readonly RecentPurchaseRow[]): string 
   let bestLabel: string | null = null;
   let bestPrice: number | null = null;
   for (const row of purchases) {
-    const price = parsePriceLabel(row.priceLabel);
+    const price = purchaseComparablePrice(row);
     if (price == null || !row.supplierLabel.trim()) continue;
     if (bestPrice == null || price < bestPrice) {
       bestPrice = price;
@@ -1280,14 +1280,6 @@ function bestSupplierChangedRecently(purchases: readonly RecentPurchaseRow[]): b
     return false;
   }
   return latest.supplierLabel.trim() === overallCheapest;
-}
-
-function parsePriceLabel(label: string): number | null {
-  const match = label.replace(/\s/g, "").match(/[\d,.]+/);
-  if (!match) return null;
-  const normalized = match[0].replace(",", ".");
-  const value = Number(normalized);
-  return Number.isFinite(value) ? value : null;
 }
 
 export type IngredientReviewDetailSection = {

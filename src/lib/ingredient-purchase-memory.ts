@@ -1,5 +1,10 @@
 import { formatCurrency } from "@/lib/display-format";
 import { logChronologyAudit } from "@/lib/invoice-chronology";
+import { resolveInvoiceLinePurchaseFormat } from "@/lib/invoice-purchase-format";
+import {
+  computeEffectiveUsableCost,
+  type InvoicePurchasePriceMetadata,
+} from "@/lib/invoice-purchase-price-semantics";
 import {
   filterMatchedInvoiceProductsForIngredient,
   type IngredientMatchedInvoiceProduct,
@@ -18,9 +23,63 @@ export type RecentPurchaseRow = {
   /** ISO issue date for operational recency (preferred over localized dateLabel). */
   dateIso?: string | null;
   priceLabel: string;
+  /** Normalized comparable unit economics for intelligence (not invoice total). */
+  comparablePrice: number | null;
   /** Short invoice line wording for timeline display (no ids or match metadata). */
   productHint?: string | null;
 };
+
+/** Comparable unit economics for ranking and trends — not invoice line totals. */
+export function purchaseComparablePrice(row: RecentPurchaseRow): number | null {
+  const price = row.comparablePrice;
+  return price != null && Number.isFinite(price) ? price : null;
+}
+
+function invoiceMetadataFromProduct(
+  product: IngredientMatchedInvoiceProduct,
+): InvoicePurchasePriceMetadata {
+  return {
+    name: product.itemName,
+    quantity: product.quantity,
+    unit: product.unit,
+    unit_price: product.unitPrice,
+    total: product.lineTotal,
+  };
+}
+
+function resolveComparablePurchasePrice(
+  product: IngredientMatchedInvoiceProduct,
+): number | null {
+  const metadata = invoiceMetadataFromProduct(product);
+  const unitPrice =
+    product.unitPrice != null && Number.isFinite(product.unitPrice)
+      ? product.unitPrice
+      : null;
+
+  if (unitPrice != null) {
+    const structured = resolveInvoiceLinePurchaseFormat(metadata);
+    const effective = computeEffectiveUsableCost(
+      unitPrice,
+      metadata,
+      structured,
+      product.itemName,
+    );
+    if (effective != null && Number.isFinite(effective.cost) && effective.cost > 0) {
+      return effective.cost;
+    }
+    return unitPrice;
+  }
+
+  const qty =
+    product.quantity != null && Number.isFinite(product.quantity) && product.quantity > 0
+      ? product.quantity
+      : null;
+  if (product.lineTotal != null && Number.isFinite(product.lineTotal)) {
+    return qty != null ? product.lineTotal / qty : product.lineTotal;
+  }
+
+  return null;
+}
 
 function normalizeProductNameKey(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/g, " ");
@@ -122,6 +181,7 @@ export function buildRecentPurchases(
         dateLabel: formatPurchaseDate(product.invoiceDate),
         dateIso: product.invoiceIssueDateRaw ?? product.invoiceDate ?? null,
         priceLabel: formatPurchasePrice(product),
+        comparablePrice: resolveComparablePurchasePrice(product),
         productHint: product.itemName?.trim() || null,
       };
       logChronologyAudit({

@@ -1,7 +1,7 @@
 import { formatPercent } from "@/lib/display-format";
 import type { IngredientPriceActivity } from "@/lib/ingredient-detail-panel";
 import { sortRecentPurchasesByDate } from "@/lib/ingredient-detail-panel";
-import type { RecentPurchaseRow } from "@/lib/ingredient-purchase-memory";
+import { purchaseComparablePrice, type RecentPurchaseRow } from "@/lib/ingredient-purchase-memory";
 import type { PriceHistoryRecord } from "@/lib/margin-alert-data";
 
 export type OperationalSignalCategory =
@@ -225,11 +225,10 @@ function daysSince(value: string): number {
   return Math.max(0, Math.floor((Date.now() - timestamp) / 86_400_000));
 }
 
-function parsePriceLabel(label: string): number | null {
-  const match = label.replace(/\s/g, "").match(/[\d,.]+/);
-  if (!match) return null;
-  const value = Number(match[0].replace(",", "."));
-  return Number.isFinite(value) ? value : null;
+function purchasePrices(purchases: readonly RecentPurchaseRow[]): number[] {
+  return purchases
+    .map((row) => purchaseComparablePrice(row))
+    .filter((price): price is number => price != null);
 }
 
 function historyPercent(row: PriceHistoryRecord): number | null {
@@ -280,12 +279,6 @@ function costChangeLabel(
   return `${name} cost decreased ${rounded}% ${sincePhrase}`;
 }
 
-function purchasePrices(purchases: readonly RecentPurchaseRow[]): number[] {
-  return purchases
-    .map((row) => parsePriceLabel(row.priceLabel))
-    .filter((price): price is number => price != null);
-}
-
 function uniqueSupplierLabels(purchases: readonly RecentPurchaseRow[]): string[] {
   const seen = new Set<string>();
   const labels: string[] = [];
@@ -312,7 +305,7 @@ function hasSupplierPriceVariation(purchases: readonly RecentPurchaseRow[]): boo
   for (const row of purchases) {
     const supplier = row.supplierLabel.trim();
     if (!supplier) continue;
-    const price = parsePriceLabel(row.priceLabel);
+    const price = purchaseComparablePrice(row);
     if (price == null) continue;
     const bucket = bySupplier.get(supplier) ?? [];
     bucket.push(price);
@@ -399,8 +392,8 @@ export function buildIngredientOperationalSignals(
       });
     }
   } else if (sortedPurchases.length >= 2) {
-    const latest = parsePriceLabel(sortedPurchases[0]!.priceLabel);
-    const prior = parsePriceLabel(sortedPurchases[1]!.priceLabel);
+    const latest = purchaseComparablePrice(sortedPurchases[0]!);
+    const prior = purchaseComparablePrice(sortedPurchases[1]!);
     if (latest != null && prior != null && prior > 0) {
       const pct = ((latest - prior) / prior) * 100;
       if (Math.abs(pct) >= 3) {
@@ -433,7 +426,7 @@ export function buildIngredientOperationalSignals(
       .filter((price): price is number => price != null);
     const latestPrice =
       numberOrNull(latestHistory?.new_price) ??
-      parsePriceLabel(sortedPurchases[0]?.priceLabel ?? "");
+      (sortedPurchases[0] ? purchaseComparablePrice(sortedPurchases[0]) : null);
     if (prices.length >= 2 && latestPrice != null && latestPrice >= Math.max(...prices) - 0.001) {
       pushSignal(signals, {
         id: "highest-in-window",
