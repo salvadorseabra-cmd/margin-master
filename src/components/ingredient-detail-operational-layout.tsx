@@ -21,7 +21,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { formatCanonicalIngredientDisplayName } from "@/lib/canonical-ingredient-display-name";
 import type { ActionableCanonicalNamingQueueEntry } from "@/lib/canonical-ingredient-naming-queue";
 import {
   buildIngredientOperationalSignals,
@@ -44,7 +43,8 @@ import {
 } from "@/lib/ingredient-operational-notes";
 import {
   buildDuplicateReviewDetail,
-  buildIngredientOperationalCostPresentation,
+  buildIngredientDetailHeaderPresentation,
+  buildLastPurchaseCostPresentation,
   buildIngredientPurchaseInsights,
   buildUnusedEntryReviewDetail,
   formatPurchaseHistoryCatalogLine,
@@ -52,6 +52,7 @@ import {
   formatPurchaseHistoryEntryPrice,
   formatPurchaseHistorySupplierLine,
   formatPurchaseTimelineMonthDay,
+  INGREDIENT_PURCHASE_HISTORY_TOTAL_COLUMN_LABEL,
   purchaseExtentPriceTextClassName,
   purchaseHistoryPriceTextClassName,
   sortRecentPurchasesByDate,
@@ -64,7 +65,6 @@ import {
   type OperationalInsightCard,
   type OperationalInsightCardKind,
 } from "@/lib/buildOperationalInsightCards";
-import { ingredientDisplayBaseUnit } from "@/lib/ingredient-unit-cost";
 import {
   detectOrphanCanonicalIngredients,
   emptyOrphanReport,
@@ -377,15 +377,8 @@ function IngredientDetailContent({
   onArchive,
   onDelete,
 }: IngredientDetailPanelProps & { ingredient: Row }) {
-  const displayName = formatCanonicalIngredientDisplayName(ingredient.name);
-  const stockUnit = ingredientDisplayBaseUnit(ingredient);
-  const purchaseUnit = ingredient.purchase_unit?.trim();
-  const headerSubtitle =
-    purchaseUnit && purchaseUnit.toLowerCase() !== stockUnit.toLowerCase()
-      ? purchaseUnit
-      : stockUnit
-        ? `${stockUnit} unit`
-        : null;
+  const headerPresentation = buildIngredientDetailHeaderPresentation(ingredient);
+  const displayName = headerPresentation.title;
   const recipeCount = recipeLinkActivity?.count ?? 0;
   const inListReview = listReviewMode != null && !namingReviewActive;
 
@@ -525,8 +518,8 @@ function IngredientDetailContent({
   );
 
   const operationalCostPresentation = useMemo(
-    () => buildIngredientOperationalCostPresentation(ingredient),
-    [ingredient],
+    () => buildLastPurchaseCostPresentation(sortedPurchases[0]),
+    [sortedPurchases],
   );
 
   const operationalSummary = useMemo(() => {
@@ -642,11 +635,8 @@ function IngredientDetailContent({
       <header className="flex items-start justify-between gap-3 border-b border-border/25 px-4 py-3">
         <div className="min-w-0 flex-1 space-y-0.5">
           <h2 className="truncate text-xl font-semibold leading-tight tracking-tight text-foreground">
-            {displayName}
+            {headerPresentation.title}
           </h2>
-          {headerSubtitle ? (
-            <p className="truncate text-xs text-muted-foreground">{headerSubtitle}</p>
-          ) : null}
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -723,7 +713,7 @@ function IngredientDetailContent({
                       <th className="px-3 py-2 font-medium whitespace-nowrap">Date</th>
                       <th className="px-3 py-2 font-medium">Supplier</th>
                       <th className="px-3 py-2 font-medium text-right whitespace-nowrap">
-                        Purchase price
+                        {INGREDIENT_PURCHASE_HISTORY_TOTAL_COLUMN_LABEL}
                       </th>
                     </tr>
                   </thead>

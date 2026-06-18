@@ -1,8 +1,9 @@
-import { formatCurrency } from "@/lib/display-format";
+import { formatCurrency, formatUnitCostCurrency } from "@/lib/display-format";
 import { logChronologyAudit } from "@/lib/invoice-chronology";
 import { resolveInvoiceLinePurchaseFormat } from "@/lib/invoice-purchase-format";
 import {
   computeEffectiveUsableCost,
+  formatRowPurchaseQuantityLabel,
   type InvoicePurchasePriceMetadata,
 } from "@/lib/invoice-purchase-price-semantics";
 import {
@@ -25,6 +26,10 @@ export type RecentPurchaseRow = {
   priceLabel: string;
   /** Normalized comparable unit economics for intelligence (not invoice total). */
   comparablePrice: number | null;
+  /** Invoice line quantity for operational cost display (e.g. "3.3 kg"). */
+  purchaseQuantityLabel?: string | null;
+  /** Comparable unit economics label for operational cost display (e.g. "€1.95/kg"). */
+  unitCostLabel?: string | null;
   /** Short invoice line wording for timeline display (no ids or match metadata). */
   productHint?: string | null;
 };
@@ -79,6 +84,37 @@ function resolveComparablePurchasePrice(
   }
 
   return null;
+}
+
+function resolvePurchaseUnitCostLabel(
+  product: IngredientMatchedInvoiceProduct,
+): string | null {
+  const metadata = invoiceMetadataFromProduct(product);
+  const unitPrice =
+    product.unitPrice != null && Number.isFinite(product.unitPrice)
+      ? product.unitPrice
+      : null;
+
+  if (unitPrice != null) {
+    const structured = resolveInvoiceLinePurchaseFormat(metadata);
+    const effective = computeEffectiveUsableCost(
+      unitPrice,
+      metadata,
+      structured,
+      product.itemName,
+    );
+    if (effective != null && Number.isFinite(effective.cost) && effective.cost > 0) {
+      return `${formatUnitCostCurrency(effective.cost)} / ${effective.unit}`;
+    }
+    const unit = product.unit?.trim();
+    if (unit) {
+      return `${formatUnitCostCurrency(unitPrice)} / ${unit}`;
+    }
+    return formatUnitCostCurrency(unitPrice);
+  }
+
+  const comparable = resolveComparablePurchasePrice(product);
+  return comparable != null ? formatUnitCostCurrency(comparable) : null;
 }
 
 function normalizeProductNameKey(value: string): string {
@@ -174,6 +210,7 @@ export function buildRecentPurchases(
   return filterMatchedInvoiceProductsForIngredient(matchedProducts, trimmedId)
     .filter((product) => isIngredientScopedMatchedProduct(product, trimmedId))
     .map((product) => {
+      const metadata = invoiceMetadataFromProduct(product);
       const row: RecentPurchaseRow = {
         itemId: product.itemId,
         supplierLabel:
@@ -182,6 +219,8 @@ export function buildRecentPurchases(
         dateIso: product.invoiceIssueDateRaw ?? product.invoiceDate ?? null,
         priceLabel: formatPurchasePrice(product),
         comparablePrice: resolveComparablePurchasePrice(product),
+        purchaseQuantityLabel: formatRowPurchaseQuantityLabel(metadata),
+        unitCostLabel: resolvePurchaseUnitCostLabel(product),
         productHint: product.itemName?.trim() || null,
       };
       logChronologyAudit({

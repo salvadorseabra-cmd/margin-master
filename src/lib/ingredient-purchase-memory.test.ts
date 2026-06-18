@@ -174,6 +174,47 @@ describe("ingredient-purchase-memory", () => {
     expect(purchaseMemorySummary(0, 0)).toBe("No purchase history yet");
   });
 
+  it("Courgettes: last purchase quantity and unit cost from invoice line", () => {
+    const recent = buildRecentPurchases("ing-courgettes", "Courgettes", [
+      potatoProduct({
+        matchedIngredientId: "ing-courgettes",
+        itemId: "line-courgettes",
+        itemName: "Courgettes",
+        supplierName: "Bidfood Portugal",
+        invoiceDate: "2026-05-25",
+        quantity: 3.3,
+        unit: "kg",
+        unitPrice: 1.95,
+        lineTotal: 5.15,
+      }),
+    ]);
+
+    expect(recent[0]?.purchaseQuantityLabel).toBe("3.30 kg");
+    expect(recent[0]?.unitCostLabel).toBe("€1.95 / kg");
+    expect(recent[0]?.priceLabel).toBe("€5.15");
+    expect(recent[0]?.supplierLabel).toBe("Bidfood Portugal");
+  });
+
+  it("Alho Francês: last purchase quantity from invoice line", () => {
+    const recent = buildRecentPurchases("ing-alho", "Alho Francês", [
+      potatoProduct({
+        matchedIngredientId: "ing-alho",
+        itemId: "line-alho",
+        itemName: "Alho Francês",
+        supplierName: "Bidfood Portugal",
+        invoiceDate: "2026-05-25",
+        quantity: 5.42,
+        unit: "kg",
+        unitPrice: 1.77,
+        lineTotal: 7.67,
+      }),
+    ]);
+
+    expect(recent[0]?.purchaseQuantityLabel).toBe("5.42 kg");
+    expect(recent[0]?.unitCostLabel).toBe("€1.77 / kg");
+    expect(recent[0]?.priceLabel).toBe("€7.67");
+  });
+
   it("Alface iceberg memory excludes oleo girassol invoice lines", () => {
     const recognized = buildRecognizedSupplierProducts(
       "ing-alface",

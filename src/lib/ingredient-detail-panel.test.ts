@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   buildDuplicateReviewDetail,
+  buildIngredientDetailHeaderPresentation,
   buildIngredientDetailInsights,
-  buildIngredientOperationalCostPresentation,
+  buildLastPurchaseCostPresentation,
   buildOperationalInsights,
   buildPricingFreshnessReviewDetail,
   buildUnusedEntryReviewDetail,
@@ -21,12 +22,14 @@ import {
   formatPurchaseExtentLine,
   formatPurchaseHistoryCatalogLine,
   formatPurchaseHistoryDatePriceLine,
+  formatPurchaseHistoryEntryPrice,
   formatPurchaseHistoryRowLine,
   formatPurchaseHistorySupplierLine,
   purchaseHistoryPriceTextClassName,
   purchaseHistoryRowTextClassName,
   formatIngredientUnitCostKpi,
   formatLastPurchaseDateKpi,
+  INGREDIENT_PURCHASE_HISTORY_TOTAL_COLUMN_LABEL,
   formatPurchaseInsightLine,
   formatRecentPurchaseLine,
   formatRecipesLinkedKpi,
@@ -707,17 +710,93 @@ describe("ingredient-detail-panel", () => {
     expect(notes).not.toContain("Ingredient unused in recipes");
   });
 
-  it("buildIngredientOperationalCostPresentation shows normalized pack and unit costs", () => {
-    const peroni = ingredient({
-      name: "Peroni Nastro Azzurro 24 x 33cl",
-      current_price: 25.69,
-      purchase_quantity: 7920,
-      purchase_unit: "pack",
-      base_unit: "ml",
-      unit: "ml",
+  it("buildLastPurchaseCostPresentation shows last purchase economics, not catalog pack fields", () => {
+    const courgettes = ingredient({
+      id: "ing-courgettes",
+      name: "Courgettes",
+      current_price: 1.95,
+      purchase_quantity: 1000,
+      purchase_unit: "g",
+      base_unit: "g",
+      unit: "g",
     });
-    const presentation = buildIngredientOperationalCostPresentation(peroni);
-    expect(presentation?.lines.some((line) => line.label === "Cost per litre")).toBe(true);
-    expect(presentation?.lines.some((line) => line.label.startsWith("Cost per"))).toBe(true);
+    const purchases = buildRecentPurchases("ing-courgettes", "Courgettes", [
+      invoiceLine({
+        matchedIngredientId: "ing-courgettes",
+        itemId: "line-courgettes",
+        itemName: "Courgettes",
+        supplierName: "Bidfood Portugal",
+        invoiceDate: "2026-05-25",
+        quantity: 3.3,
+        unit: "kg",
+        unitPrice: 1.95,
+        lineTotal: 5.15,
+      }),
+    ]);
+    const presentation = buildLastPurchaseCostPresentation(purchases[0]);
+
+    expect(formatIngredientUnitCostKpi(courgettes)).toMatch(/€1\.95\/kg/);
+    expect(presentation?.lines).toEqual(
+      expect.arrayContaining([
+        { label: "Last Purchase", value: "3.30 kg" },
+        { label: "Unit Cost", value: "€1.95 / kg" },
+        { label: "Total Paid", value: "€5.15" },
+        { label: "Supplier", value: "Bidfood Portugal" },
+        { label: "Purchase Date", value: expect.stringMatching(/25.*2026/i) },
+      ]),
+    );
+    expect(presentation?.lines.some((line) => line.label === "Pack")).toBe(false);
+    expect(presentation?.lines.some((line) => line.label === "Quantity purchased")).toBe(false);
+    expect(presentation?.lines.some((line) => line.label === "Usable quantity")).toBe(false);
+    expect(presentation?.lines.some((line) => line.value.includes("1000"))).toBe(false);
+  });
+
+  it("buildLastPurchaseCostPresentation returns null without purchase memory", () => {
+    expect(buildLastPurchaseCostPresentation(null)).toBeNull();
+    expect(buildLastPurchaseCostPresentation(undefined)).toBeNull();
+  });
+
+  it("buildIngredientDetailHeaderPresentation shows ingredient name only", () => {
+    const courgettes = ingredient({
+      name: "Courgettes",
+      purchase_quantity: 1000,
+      purchase_unit: "g",
+      base_unit: "g",
+      unit: "g",
+    });
+    const alho = ingredient({
+      name: "Alho francês",
+      purchase_quantity: 1000,
+      purchase_unit: "g",
+      base_unit: "g",
+      unit: "g",
+    });
+
+    expect(buildIngredientDetailHeaderPresentation(courgettes)).toEqual({ title: "Courgettes" });
+    expect(buildIngredientDetailHeaderPresentation(alho)).toEqual({ title: "Alho francês" });
+    expect(JSON.stringify(buildIngredientDetailHeaderPresentation(courgettes))).not.toMatch(
+      /g unit/i,
+    );
+  });
+
+  it("purchase history column label is Total paid and values stay invoice line totals", () => {
+    expect(INGREDIENT_PURCHASE_HISTORY_TOTAL_COLUMN_LABEL).toBe("Total paid");
+
+    const purchases = buildRecentPurchases("ing-1", "Courgettes", [
+      invoiceLine({
+        matchedIngredientId: "ing-1",
+        itemId: "line-1",
+        itemName: "Courgettes",
+        supplierName: "Bidfood Portugal",
+        invoiceDate: "2026-05-25",
+        quantity: 3.3,
+        unit: "kg",
+        unitPrice: 1.95,
+        lineTotal: 7.67,
+      }),
+    ]);
+
+    expect(formatPurchaseHistoryEntryPrice(purchases[0]!)).toBe("€7.67");
+    expect(formatIngredientUnitCostKpi(ingredient({ name: "Courgettes" }))).not.toBe("€7.67");
   });
 });
