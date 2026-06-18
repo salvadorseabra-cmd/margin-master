@@ -1,0 +1,40 @@
+{
+  "ingredientId": "06cc0c4d-9933-4ae2-8abe-64d196575f9f",
+  "ingredientName": "Rovagnati salame ventricina",
+  "invoiceLabel": "Emporio (live)",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "lineName": "Rovagnati - Salame Ventricina 2,5 Kg",
+  "trustVerdict": "trusted",
+  "classification": [],
+  "invoiceSource": {
+    "quantity": 2.6,
+    "unit": "kg",
+    "unit_price": 15.19,
+    "total": 39.49
+  },
+  "normalized": {
+    "packPrice": 15.19,
+    "purchaseQuantity": 1000,
+    "operationalUnitCost": 0.015189999999999999,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 15.19,
+    "purchase_quantity": 1000,
+    "operationalUnitCost": 0.015189999999999999
+  },
+  "priceHistory": [
+    {
+      "id": "4ebd7557-a985-4328-bd18-466467296058",
+      "previous_price": null,
+      "new_price": 0.015189999999999999,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
+  "opportunityRisk": [],
+  "notes": []
+}

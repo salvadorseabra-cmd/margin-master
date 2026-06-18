@@ -36,6 +36,7 @@ import {
   fetchLatestHistoryNewPrice,
   resolvePreviousOperationalPriceForHistory,
   resolvePreviousPackPriceForHistory,
+  syncIngredientCurrentPrice,
   type InvoiceIngredientPriceHistoryContext,
 } from "@/lib/ingredient-price-history";
 import { findInvoiceItemIngredientMatch } from "@/lib/invoice-ingredient-match-propagation";
@@ -197,10 +198,41 @@ export async function persistOperationalIngredientCostFromInvoiceLine(
   const includeCatalogUnitFields =
     catalogPersist.preferCatalogPackFields || fields.cost_base_unit === "un";
 
+  const historyCtxPresent = Boolean(historyCtx?.invoiceId?.trim() && snapshot);
+  let historyInserted = false;
+  if (historyCtxPresent) {
+    const previousPrice = resolvePreviousPackPriceForHistory(snapshot!);
+    const previousOperationalPrice = resolvePreviousOperationalPriceForHistory(
+      snapshot!,
+      latestHistoryNewPrice,
+    );
+    const historyResult = await appendIngredientPriceHistoryFromInvoiceLine(client, {
+      ingredientId: id,
+      invoiceId: historyCtx!.invoiceId.trim(),
+      ingredientName: snapshot!.name.trim() || item.name.trim(),
+      ingredientUnit: snapshot!.unit,
+      supplierName: historyCtx!.supplierName,
+      previousPrice,
+      previousOperationalPrice,
+      newPrice: fields.current_price,
+      previousPurchaseQuantity: snapshot!.purchase_quantity,
+      newPurchaseQuantity: fields.purchase_quantity,
+      invoiceDate: historyCtx!.invoiceDate,
+      invoiceCreatedAt: historyCtx!.invoiceCreatedAt,
+    });
+    historyInserted = historyResult.inserted || Boolean(historyResult.updated);
+    if (historyResult.error) {
+      console.error(
+        `${LOG_PREFIX} ingredient_price_history append failed:`,
+        historyResult.error.message,
+      );
+    }
+  }
+
   const { error } = await client
     .from("ingredients")
     .update({
-      current_price: fields.current_price,
+      ...(historyCtxPresent ? {} : { current_price: fields.current_price }),
       purchase_quantity: catalogPersist.purchase_quantity,
       ...(includeCatalogUnitFields
         ? {
@@ -213,32 +245,12 @@ export async function persistOperationalIngredientCostFromInvoiceLine(
     .eq("id", id);
   if (error) return { updated: false, error };
 
-  let historyInserted = false;
-  if (historyCtx?.invoiceId?.trim() && snapshot) {
-    const previousPrice = resolvePreviousPackPriceForHistory(snapshot);
-    const previousOperationalPrice = resolvePreviousOperationalPriceForHistory(
-      snapshot,
-      latestHistoryNewPrice,
-    );
-    const historyResult = await appendIngredientPriceHistoryFromInvoiceLine(client, {
-      ingredientId: id,
-      invoiceId: historyCtx.invoiceId.trim(),
-      ingredientName: snapshot.name.trim() || item.name.trim(),
-      ingredientUnit: snapshot.unit,
-      supplierName: historyCtx.supplierName,
-      previousPrice,
-      previousOperationalPrice,
-      newPrice: fields.current_price,
-      previousPurchaseQuantity: snapshot.purchase_quantity,
-      newPurchaseQuantity: fields.purchase_quantity,
-      invoiceDate: historyCtx.invoiceDate,
-      invoiceCreatedAt: historyCtx.invoiceCreatedAt,
-    });
-    historyInserted = historyResult.inserted || Boolean(historyResult.updated);
-    if (historyResult.error) {
+  if (historyCtxPresent) {
+    const syncResult = await syncIngredientCurrentPrice(client, id);
+    if (syncResult.error) {
       console.error(
-        `${LOG_PREFIX} ingredient_price_history append failed:`,
-        historyResult.error.message,
+        `${LOG_PREFIX} syncIngredientCurrentPrice failed:`,
+        syncResult.error.message,
       );
     }
   }

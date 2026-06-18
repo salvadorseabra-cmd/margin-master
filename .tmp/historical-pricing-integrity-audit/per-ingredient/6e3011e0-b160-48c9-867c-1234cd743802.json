@@ -1,0 +1,40 @@
+{
+  "ingredientId": "6e3011e0-b160-48c9-867c-1234cd743802",
+  "ingredientName": "Hortelã",
+  "invoiceLabel": "Bidfood",
+  "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+  "lineName": "Hortelã",
+  "trustVerdict": "trusted",
+  "classification": [],
+  "invoiceSource": {
+    "quantity": 0.5,
+    "unit": "kg",
+    "unit_price": 6.74,
+    "total": 2.7
+  },
+  "normalized": {
+    "packPrice": 6.74,
+    "purchaseQuantity": 1000,
+    "operationalUnitCost": 0.00674,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 6.74,
+    "purchase_quantity": 1000,
+    "operationalUnitCost": 0.00674
+  },
+  "priceHistory": [
+    {
+      "id": "0040cde3-5bc4-44d6-a8c4-a29316f6e510",
+      "previous_price": null,
+      "new_price": 0.00674,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
+  "opportunityRisk": [],
+  "notes": []
+}

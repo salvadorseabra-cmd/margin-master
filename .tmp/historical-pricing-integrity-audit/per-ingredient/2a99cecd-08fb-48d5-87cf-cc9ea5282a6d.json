@@ -6,7 +6,7 @@
   "lineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
   "trustVerdict": "stale",
   "classification": [
-    "no_price_history"
+    "stale_price_history"
   ],
   "invoiceSource": {
     "quantity": 10,
@@ -25,9 +25,20 @@
     "purchase_quantity": 1,
     "operationalUnitCost": 13.69
   },
-  "priceHistory": [],
+  "priceHistory": [
+    {
+      "id": "f0f76e84-f4c5-4dc1-9fb6-ba026d2384d0",
+      "previous_price": 13.69,
+      "new_price": 8.12,
+      "delta": -5.57,
+      "delta_percent": -40.686632578524474,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": false
+    }
+  ],
   "opportunityRisk": [],
   "notes": [
-    "Matched ingredient but no price_history row for this invoice"
+    "History new_price 8.12 vs computed operational 0.8119999999999999"
   ]
 }

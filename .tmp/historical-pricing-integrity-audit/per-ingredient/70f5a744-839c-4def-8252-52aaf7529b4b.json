@@ -1,0 +1,44 @@
+{
+  "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b",
+  "ingredientName": "Birra peroni nastro azzurro 33cl",
+  "invoiceLabel": "Mammafiore",
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "lineName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+  "trustVerdict": "stale",
+  "classification": [
+    "stale_price_history"
+  ],
+  "invoiceSource": {
+    "quantity": 24,
+    "unit": "un",
+    "unit_price": 1.07,
+    "total": 25.69
+  },
+  "normalized": {
+    "packPrice": 1.07,
+    "purchaseQuantity": 24,
+    "operationalUnitCost": 0.044583333333333336,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 1.07,
+    "purchase_quantity": 24,
+    "operationalUnitCost": 0.044583333333333336
+  },
+  "priceHistory": [
+    {
+      "id": "7d6b70fa-543f-41c2-89e5-2b691afcdff4",
+      "previous_price": null,
+      "new_price": 0.0001351010101010101,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": false
+    }
+  ],
+  "opportunityRisk": [],
+  "notes": [
+    "History new_price 0.0001351010101010101 vs computed operational 0.044583333333333336"
+  ]
+}

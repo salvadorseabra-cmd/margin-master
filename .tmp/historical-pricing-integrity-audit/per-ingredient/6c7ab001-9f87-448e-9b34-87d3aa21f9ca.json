@@ -1,35 +1,33 @@
 {
-  "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
-  "ingredientName": "Pepino conserva",
+  "ingredientId": "6c7ab001-9f87-448e-9b34-87d3aa21f9ca",
+  "ingredientName": "Courgettes",
   "invoiceLabel": "Bidfood",
   "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
-  "lineName": "Pepino",
+  "lineName": "Courgettes",
   "trustVerdict": "stale",
   "classification": [
-    "pack_qty_mismatch",
     "no_price_history"
   ],
   "invoiceSource": {
-    "quantity": 3.36,
+    "quantity": 3.3,
     "unit": "kg",
-    "unit_price": 1.77,
-    "total": 4.76
+    "unit_price": 1.95,
+    "total": 5.15
   },
   "normalized": {
-    "packPrice": 1.77,
+    "packPrice": 1.95,
     "purchaseQuantity": 1000,
-    "operationalUnitCost": 0.00177,
+    "operationalUnitCost": 0.00195,
     "usableCostPerLiter": null
   },
   "ingredientCatalog": {
-    "current_price": 21.99,
-    "purchase_quantity": 6,
-    "operationalUnitCost": 3.6649999999999996
+    "current_price": 1.95,
+    "purchase_quantity": 1000,
+    "operationalUnitCost": 0.00195
   },
   "priceHistory": [],
   "opportunityRisk": [],
   "notes": [
-    "purchase_quantity drift: line 1000 vs catalog 6",
     "Matched ingredient but no price_history row for this invoice"
   ]
 }

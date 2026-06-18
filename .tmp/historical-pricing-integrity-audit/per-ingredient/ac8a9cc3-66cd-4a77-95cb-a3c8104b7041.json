@@ -1,0 +1,44 @@
+{
+  "ingredientId": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041",
+  "ingredientName": "Tomilho",
+  "invoiceLabel": "Bidfood",
+  "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+  "lineName": "Tomilho",
+  "trustVerdict": "trusted",
+  "classification": [
+    "gross_vs_net_display"
+  ],
+  "invoiceSource": {
+    "quantity": 1,
+    "unit": "mo",
+    "unit_price": 2.57,
+    "total": 2.06
+  },
+  "normalized": {
+    "packPrice": 2.57,
+    "purchaseQuantity": 1,
+    "operationalUnitCost": 2.57,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 2.57,
+    "purchase_quantity": 1,
+    "operationalUnitCost": 2.57
+  },
+  "priceHistory": [
+    {
+      "id": "25c318d5-64d8-4317-8d1e-57dff5aaa1e5",
+      "previous_price": 2.06,
+      "new_price": 2.57,
+      "delta": 0.5099999999999998,
+      "delta_percent": 24.757281553398048,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
+  "opportunityRisk": [],
+  "notes": [
+    "unit_price (2.57) > total (2.06) — binder-derived net unit"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "ingredientId": "b091e1d0-e7e2-49a8-a9a7-f61c8a4d4263",
+  "ingredientName": "Rolo de cabra e vaca",
+  "invoiceLabel": "Bocconcino",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "lineName": "ROLO DE CABRA E VACA 1KG",
+  "trustVerdict": "stale",
+  "classification": [
+    "extraction_residue_or_stale"
+  ],
+  "invoiceSource": {
+    "quantity": 1,
+    "unit": "un",
+    "unit_price": 12.87,
+    "total": 12.87
+  },
+  "normalized": {
+    "packPrice": 12.87,
+    "purchaseQuantity": 1,
+    "operationalUnitCost": 12.87,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 12.87,
+    "purchase_quantity": 1,
+    "operationalUnitCost": 12.87
+  },
+  "priceHistory": [
+    {
+      "id": "b28ab86d-c95c-4346-accd-2f3d770f0aef",
+      "previous_price": null,
+      "new_price": 12.87,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
+  "opportunityRisk": [],
+  "notes": []
+}

@@ -23,8 +23,11 @@ describe("subtractivePricingCleanupForUnmatch", () => {
       linkedRowCount: 1,
       errors: [],
     });
-    vi.spyOn(priceHistory, "revertIngredientCurrentPriceFromHistory").mockResolvedValue({
+    vi.spyOn(priceHistory, "syncIngredientCurrentPrice").mockResolvedValue({
       updated: true,
+      currentPrice: null,
+      latestOperationalPrice: null,
+      sourceHistoryRowId: null,
       error: null,
     });
   });
@@ -51,7 +54,7 @@ describe("subtractivePricingCleanupForUnmatch", () => {
       client,
       "ing-pepino",
     );
-    expect(priceHistory.revertIngredientCurrentPriceFromHistory).toHaveBeenCalledWith(
+    expect(priceHistory.syncIngredientCurrentPrice).toHaveBeenCalledWith(
       client,
       "ing-pepino",
     );

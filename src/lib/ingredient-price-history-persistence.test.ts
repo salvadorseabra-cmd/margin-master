@@ -21,7 +21,7 @@ import {
 type HistoryInsert = Record<string, unknown>;
 type HistoryRow = HistoryInsert & { id: string };
 
-function createPersistenceMockClient(options: {
+export function createPersistenceMockClient(options: {
   ingredient?: {
     name: string;
     unit: string | null;
@@ -231,6 +231,7 @@ function createPersistenceMockClient(options: {
             }
             if (
               cols === "new_price, invoice_id" ||
+              cols === "id,new_price,invoice_id,created_at,invoices(invoice_date, created_at)" ||
               cols === "new_price, invoice_id, created_at, id, invoices(invoice_date, created_at)" ||
               cols ===
                 "new_price, ingredient_name, ingredient_unit, invoice_id, created_at, id, invoices(invoice_date, created_at)"
@@ -705,7 +706,18 @@ describe("persistOperationalIngredientCostFromInvoiceLine", () => {
         current_price: null,
         purchase_quantity: fields!.purchase_quantity,
       },
-      latestHistoryNewPrice: 0.2,
+      existingHistoryRows: [
+        {
+          id: "hist-prior",
+          ingredient_id: "ing-1",
+          invoice_id: "inv-prior",
+          ingredient_name: "Brioche Burger Bun 80g",
+          ingredient_unit: "un",
+          previous_price: null,
+          new_price: 0.2,
+          created_at: "2026-01-01T12:00:00.000Z",
+        },
+      ],
     });
 
     await persistOperationalIngredientCostFromInvoiceLine(client as never, "ing-1", line, {

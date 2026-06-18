@@ -1,0 +1,44 @@
+{
+  "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+  "ingredientName": "Prosciutto cotto scelto",
+  "invoiceLabel": "Emporio (live)",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "lineName": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+  "trustVerdict": "stale",
+  "classification": [
+    "pack_qty_mismatch"
+  ],
+  "invoiceSource": {
+    "quantity": 4.3,
+    "unit": "kg",
+    "unit_price": 8.5,
+    "total": 36.54
+  },
+  "normalized": {
+    "packPrice": 8.5,
+    "purchaseQuantity": 1000,
+    "operationalUnitCost": 0.0085,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 8.5,
+    "purchase_quantity": 1,
+    "operationalUnitCost": 8.5
+  },
+  "priceHistory": [
+    {
+      "id": "b0e17b8b-22d5-4b02-8477-dca1b913f986",
+      "previous_price": null,
+      "new_price": 8.5,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": false
+    }
+  ],
+  "opportunityRisk": [],
+  "notes": [
+    "purchase_quantity drift: line 1000 vs catalog 1"
+  ]
+}

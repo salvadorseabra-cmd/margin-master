@@ -1,0 +1,33 @@
+{
+  "ingredientId": "52f7bf70-eeca-4039-987d-241b35248119",
+  "ingredientName": "Pomodori pelati",
+  "invoiceLabel": "Bocconcino",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "lineName": "POMODORI PELATI (CX 2,5KG*6)",
+  "trustVerdict": "stale",
+  "classification": [
+    "no_price_history"
+  ],
+  "invoiceSource": {
+    "quantity": 1,
+    "unit": "un",
+    "unit_price": 22.05,
+    "total": 22.05
+  },
+  "normalized": {
+    "packPrice": 22.05,
+    "purchaseQuantity": 1,
+    "operationalUnitCost": 22.05,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 22.05,
+    "purchase_quantity": 1,
+    "operationalUnitCost": 22.05
+  },
+  "priceHistory": [],
+  "opportunityRisk": [],
+  "notes": [
+    "Matched ingredient but no price_history row for this invoice"
+  ]
+}

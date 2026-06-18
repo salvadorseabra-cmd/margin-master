@@ -1,0 +1,40 @@
+{
+  "ingredientId": "6ec0bc6b-409a-4db2-b21f-fb01394f0014",
+  "ingredientName": "Ricotta trevigiana",
+  "invoiceLabel": "Bocconcino",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "lineName": "RICOTTA TREVIGIANA 1,5KG",
+  "trustVerdict": "trusted",
+  "classification": [],
+  "invoiceSource": {
+    "quantity": 2,
+    "unit": "un",
+    "unit_price": 7.97,
+    "total": 7.97
+  },
+  "normalized": {
+    "packPrice": 7.97,
+    "purchaseQuantity": 2,
+    "operationalUnitCost": 3.985,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 7.97,
+    "purchase_quantity": 2,
+    "operationalUnitCost": 3.985
+  },
+  "priceHistory": [
+    {
+      "id": "3219f379-1e51-4e6c-b1ee-a5cd1af1a989",
+      "previous_price": null,
+      "new_price": 3.985,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
+  "opportunityRisk": [],
+  "notes": []
+}

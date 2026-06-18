@@ -1,6 +1,16 @@
 {
   "trusted": [
     {
+      "ingredient": "Tomilho",
+      "invoice": "Bidfood",
+      "line": "Tomilho"
+    },
+    {
+      "ingredient": "Hortelã",
+      "invoice": "Bidfood",
+      "line": "Hortelã"
+    },
+    {
       "ingredient": "Mozzarella fior di latte",
       "invoice": "Aviludo April",
       "line": "Mozzarella Flor di Latte 2Kg"
@@ -9,23 +19,91 @@
       "ingredient": "Chocolate culinária",
       "invoice": "Aviludo May",
       "line": "Chocolate Culinaria Pantagruel 10x200 g"
+    },
+    {
+      "ingredient": "Mezzi paccheri mancini",
+      "invoice": "Bocconcino",
+      "line": "MEZZI PACCHERI MANCINI (CX 1KG*6)"
+    },
+    {
+      "ingredient": "Ricotta trevigiana",
+      "invoice": "Bocconcino",
+      "line": "RICOTTA TREVIGIANA 1,5KG"
+    },
+    {
+      "ingredient": "Rovagnati salame ventricina",
+      "invoice": "Emporio (live)",
+      "line": "Rovagnati - Salame Ventricina 2,5 Kg"
+    },
+    {
+      "ingredient": "Rigamonti bresaola punta d'anca oro",
+      "invoice": "Emporio (live)",
+      "line": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg"
+    },
+    {
+      "ingredient": "Mortadella IGP massima con pistacchio",
+      "invoice": "Emporio (live)",
+      "line": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5kg"
     }
   ],
   "notTrusted": [
     {
-      "ingredient": "—",
+      "ingredient": "Ginger beer",
       "invoice": "Emporio (live)",
       "line": "Baladin - Ginger Beer 0.20cl",
       "reasons": [
         "math_logic_volume_parse",
-        "unmatched_no_ingredient"
+        "no_price_history"
       ],
       "notes": [
-        "No catalog ingredient match — no price_history sync"
+        "Volume parse bug: €5425/L (expected ~€2-5/L)",
+        "Matched ingredient but no price_history row for this invoice"
       ]
     }
   ],
   "stale": [
+    {
+      "ingredient": "Manjericão",
+      "invoice": "Bidfood",
+      "reasons": [
+        "no_price_history"
+      ]
+    },
+    {
+      "ingredient": "Manteiga s/sal",
+      "invoice": "Bidfood",
+      "reasons": [
+        "no_price_history"
+      ]
+    },
+    {
+      "ingredient": "Abóbora butternut",
+      "invoice": "Bidfood",
+      "reasons": [
+        "no_price_history"
+      ]
+    },
+    {
+      "ingredient": "Alho francês",
+      "invoice": "Bidfood",
+      "reasons": [
+        "no_price_history"
+      ]
+    },
+    {
+      "ingredient": "Courgettes",
+      "invoice": "Bidfood",
+      "reasons": [
+        "no_price_history"
+      ]
+    },
+    {
+      "ingredient": "Pêra abacate",
+      "invoice": "Bidfood",
+      "reasons": [
+        "no_price_history"
+      ]
+    },
     {
       "ingredient": "Pepino conserva",
       "invoice": "Bidfood",
@@ -35,8 +113,66 @@
       ]
     },
     {
+      "ingredient": "Stracciatella",
+      "invoice": "Bocconcino",
+      "reasons": [
+        "pack_qty_mismatch",
+        "stale_price_history"
+      ]
+    },
+    {
+      "ingredient": "Pomodori pelati",
+      "invoice": "Bocconcino",
+      "reasons": [
+        "no_price_history"
+      ]
+    },
+    {
+      "ingredient": "Rolo de cabra e vaca",
+      "invoice": "Bocconcino",
+      "reasons": [
+        "extraction_residue_or_stale"
+      ]
+    },
+    {
       "ingredient": "Mozzarella fior di latte",
       "invoice": "Bocconcino",
+      "reasons": [
+        "stale_price_history"
+      ]
+    },
+    {
+      "ingredient": "Prosciutto cotto scelto",
+      "invoice": "Emporio (live)",
+      "reasons": [
+        "pack_qty_mismatch"
+      ]
+    },
+    {
+      "ingredient": "Farina do pasta fresca e gnocchi",
+      "invoice": "Mammafiore",
+      "reasons": [
+        "extraction_residue_or_stale",
+        "no_price_history"
+      ]
+    },
+    {
+      "ingredient": "Birra peroni nastro azzurro 33cl",
+      "invoice": "Mammafiore",
+      "reasons": [
+        "stale_price_history"
+      ]
+    },
+    {
+      "ingredient": "Aceto balsamico di modena IGP",
+      "invoice": "Mammafiore",
+      "reasons": [
+        "pack_qty_mismatch"
+      ]
+    },
+    {
+      "ingredient": "Rulo di capra",
+      "invoice": "Mammafiore",
       "reasons": [
         "no_price_history"
       ]
@@ -44,19 +180,7 @@
   ],
   "unmatched": [
     {
-      "line": "Manjericão",
-      "invoice": "Bidfood"
-    },
-    {
-      "line": "Alho Francês",
-      "invoice": "Bidfood"
-    },
-    {
-      "line": "Abóbora Butternut",
-      "invoice": "Bidfood"
-    },
-    {
-      "line": "Manteiga Coimbra s/Sal EMB 1 Kg",
+      "line": "Salada Ibérica FSTK EMB. 250g",
       "invoice": "Bidfood"
     },
     {
@@ -64,27 +188,7 @@
       "invoice": "Bidfood"
     },
     {
-      "line": "Tomilho",
-      "invoice": "Bidfood"
-    },
-    {
-      "line": "Salada Ibérica FSTK EMB. 250g",
-      "invoice": "Bidfood"
-    },
-    {
-      "line": "Hortelã",
-      "invoice": "Bidfood"
-    },
-    {
-      "line": "Pêra Abacate Hasse",
-      "invoice": "Bidfood"
-    },
-    {
-      "line": "Courgettes",
-      "invoice": "Bidfood"
-    },
-    {
-      "line": "Nata Reny Picot 22% 6x1L",
+      "line": "Ovo Líquido Past.Gema Dovo 1kg",
       "invoice": "Aviludo April"
     },
     {
@@ -92,15 +196,11 @@
       "invoice": "Aviludo April"
     },
     {
-      "line": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+      "line": "Filete de Anchovas Alconfrista Lt 495 g",
       "invoice": "Aviludo April"
     },
     {
-      "line": "Arroz Agulha Metro Chef 12x1kg",
-      "invoice": "Aviludo April"
-    },
-    {
-      "line": "Chocolate Pantagruel 10x200g",
+      "line": "Nata Reny Picot 22% 6x1L",
       "invoice": "Aviludo April"
     },
     {
@@ -108,15 +208,23 @@
       "invoice": "Aviludo April"
     },
     {
-      "line": "Ovo Líquido Past.Gema Dovo 1kg",
+      "line": "Chocolate Pantagruel 10x200g",
       "invoice": "Aviludo April"
     },
     {
-      "line": "Filete de Anchovas Alconfrista Lt 495 g",
+      "line": "Arroz Agulha Metro Chef 12x1kg",
+      "invoice": "Aviludo April"
+    },
+    {
+      "line": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
       "invoice": "Aviludo April"
     },
     {
       "line": "Filete de Anchoas Alconfirosa LI 495 g",
+      "invoice": "Aviludo May"
+    },
+    {
+      "line": "Nata Culinaria 22% Reny Picot 6x1 Lt",
       "invoice": "Aviludo May"
     },
     {
@@ -140,55 +248,15 @@
       "invoice": "Aviludo May"
     },
     {
-      "line": "Nata Culinaria 22% Reny Picot 6x1 Lt",
-      "invoice": "Aviludo May"
-    },
-    {
-      "line": "STRACCIATELLA 250 GR",
-      "invoice": "Bocconcino"
-    },
-    {
-      "line": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
-      "invoice": "Bocconcino"
-    },
-    {
-      "line": "POMODORI PELATI (CX 2,5KG*6)",
-      "invoice": "Bocconcino"
-    },
-    {
       "line": "ACQUA S.PELLEGRINO (CX 75CL*15)",
       "invoice": "Bocconcino"
     },
     {
-      "line": "RICOTTA TREVIGIANA 1,5KG",
-      "invoice": "Bocconcino"
-    },
-    {
-      "line": "ROLO DE CABRA E VACA 1KG",
-      "invoice": "Bocconcino"
-    },
-    {
-      "line": "Rovagnati - Salame Ventricina 2,5 Kg",
-      "invoice": "Emporio (live)"
-    },
-    {
-      "line": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg",
+      "line": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
       "invoice": "Emporio (live)"
     },
     {
       "line": "SanPellegrino - Acqua in vitro 75cl x 15ud",
-      "invoice": "Emporio (live)"
-    },
-    {
-      "line": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5Kg",
-      "invoice": "Emporio (live)"
-    },
-    {
-      "line": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
-      "invoice": "Emporio (live)"
-    },
-    {
-      "line": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello 1/8 - 1,85kg",
       "invoice": "Emporio (live)"
     },
     {
@@ -200,15 +268,7 @@
       "invoice": "Mammafiore"
     },
     {
-      "line": "Farine Speciale pizza 25kg Amoruso",
-      "invoice": "Mammafiore"
-    },
-    {
-      "line": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
-      "invoice": "Mammafiore"
-    },
-    {
-      "line": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "line": "Farina Speciale pizza 25kg Amoruso",
       "invoice": "Mammafiore"
     },
     {
@@ -216,15 +276,7 @@
       "invoice": "Mammafiore"
     },
     {
-      "line": "Rulo Di Capra 1kg*2 Simonetta",
-      "invoice": "Mammafiore"
-    },
-    {
-      "line": "Recargo por combustibili",
-      "invoice": "Mammafiore"
-    },
-    {
-      "line": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "line": "Recargo por combustivel",
       "invoice": "Mammafiore"
     }
   ]

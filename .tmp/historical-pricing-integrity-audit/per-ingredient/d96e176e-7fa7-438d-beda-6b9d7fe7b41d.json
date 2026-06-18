@@ -1,0 +1,46 @@
+{
+  "ingredientId": "d96e176e-7fa7-438d-beda-6b9d7fe7b41d",
+  "ingredientName": "Stracciatella",
+  "invoiceLabel": "Bocconcino",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "lineName": "STRACCIATELLA 250 GR",
+  "trustVerdict": "stale",
+  "classification": [
+    "pack_qty_mismatch",
+    "stale_price_history"
+  ],
+  "invoiceSource": {
+    "quantity": 24,
+    "unit": "un",
+    "unit_price": 3.11,
+    "total": 74.54
+  },
+  "normalized": {
+    "packPrice": 3.11,
+    "purchaseQuantity": 24,
+    "operationalUnitCost": 0.12958333333333333,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 3.11,
+    "purchase_quantity": 1,
+    "operationalUnitCost": 3.11
+  },
+  "priceHistory": [
+    {
+      "id": "194bb341-bd65-432e-90f0-6f62f42da8de",
+      "previous_price": null,
+      "new_price": 3.11,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": false
+    }
+  ],
+  "opportunityRisk": [],
+  "notes": [
+    "purchase_quantity drift: line 24 vs catalog 1",
+    "History new_price 3.11 vs computed operational 0.12958333333333333"
+  ]
+}

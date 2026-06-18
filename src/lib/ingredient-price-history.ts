@@ -174,6 +174,118 @@ export type IngredientPriceHistoryRow = Pick<
   | "created_at"
 >;
 
+type LinkedHistoryChronologyRow = IngredientPriceHistoryRow & {
+  invoices?: { invoice_date: string | null; created_at: string | null } | null;
+};
+
+/** Oldest → newest linked rows by invoice issue date (matches reconcile chain ordering). */
+export function sortLinkedHistoryByInvoiceChronology<T extends LinkedHistoryChronologyRow>(
+  rows: readonly T[],
+): T[] {
+  return [...rows].sort((a, b) => {
+    const dateCmp = compareInvoiceChronologyAsc(
+      resolveInvoiceChronology(a.invoices ?? null).displayDateIso,
+      resolveInvoiceChronology(b.invoices ?? null).displayDateIso,
+    );
+    if (dateCmp !== 0) return dateCmp;
+    const createdCmp = String(a.created_at ?? "").localeCompare(String(b.created_at ?? ""));
+    if (createdCmp !== 0) return createdCmp;
+    return String(a.id ?? "").localeCompare(String(b.id ?? ""));
+  });
+}
+
+const LINKED_HISTORY_CHRONOLOGY_SELECT =
+  "id,new_price,invoice_id,created_at,invoices(invoice_date, created_at)" as const;
+
+function latestLinkedOperationalPriceFromRows(
+  rows: readonly LinkedHistoryChronologyRow[],
+): { operationalPrice: number | null; sourceHistoryRowId: string | null } {
+  const linked = sortLinkedHistoryByInvoiceChronology(rows.filter(isLinkedPriceHistoryRow));
+  for (let i = linked.length - 1; i >= 0; i -= 1) {
+    const row = linked[i];
+    const n = row.new_price == null ? null : Number(row.new_price);
+    if (n != null && Number.isFinite(n)) {
+      return { operationalPrice: n, sourceHistoryRowId: row.id };
+    }
+  }
+  return { operationalPrice: null, sourceHistoryRowId: null };
+}
+
+export type SyncIngredientCurrentPriceResult = {
+  updated: boolean;
+  currentPrice: number | null;
+  latestOperationalPrice: number | null;
+  sourceHistoryRowId: string | null;
+  error: PostgrestError | null;
+};
+
+/** Projects `ingredients.current_price` from chronology-correct linked price history. */
+export async function syncIngredientCurrentPrice(
+  client: AppSupabaseClient,
+  ingredientId: string,
+): Promise<SyncIngredientCurrentPriceResult> {
+  const id = ingredientId.trim();
+  const empty: SyncIngredientCurrentPriceResult = {
+    updated: false,
+    currentPrice: null,
+    latestOperationalPrice: null,
+    sourceHistoryRowId: null,
+    error: null,
+  };
+  if (!id) return empty;
+
+  const snapshot = await fetchIngredientPriceSnapshot(client, id);
+  if (!snapshot) return empty;
+
+  try {
+    const { data, error } = await client
+      .from("ingredient_price_history")
+      .select(LINKED_HISTORY_CHRONOLOGY_SELECT)
+      .eq("ingredient_id", id)
+      .not("invoice_id", "is", null);
+    if (error) {
+      logSupabaseError("syncIngredientCurrentPrice fetch", error);
+      return { ...empty, error };
+    }
+
+    const { operationalPrice, sourceHistoryRowId } = latestLinkedOperationalPriceFromRows(
+      (data ?? []) as LinkedHistoryChronologyRow[],
+    );
+    let currentPrice: number | null = null;
+    if (operationalPrice != null && Number.isFinite(operationalPrice)) {
+      currentPrice = operationalPrice * purchaseQuantityDenom(snapshot.purchase_quantity);
+    }
+
+    const { error: updateError } = await client
+      .from("ingredients")
+      .update({ current_price: currentPrice })
+      .eq("id", id);
+    if (updateError) {
+      logSupabaseError("syncIngredientCurrentPrice update", updateError);
+      return {
+        updated: false,
+        currentPrice,
+        latestOperationalPrice: operationalPrice,
+        sourceHistoryRowId,
+        error: updateError,
+      };
+    }
+
+    return {
+      updated: true,
+      currentPrice,
+      latestOperationalPrice: operationalPrice,
+      sourceHistoryRowId,
+      error: null,
+    };
+  } catch (err) {
+    console.error(
+      `${LOG_PREFIX} syncIngredientCurrentPrice threw: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return empty;
+  }
+}
+
 /** Minimal shape for invoice-link checks on price history rows. */
 export type PriceHistoryInvoiceLink = Pick<IngredientPriceHistoryRow, "invoice_id">;
 
@@ -349,8 +461,8 @@ function storedPriceHistoryFieldsFromParams(
   if (!Number.isFinite(newPrice)) return null;
 
   const prevPack = params.previousPrice == null ? null : Number(params.previousPrice);
-  const storedNew =
-    operationalUnitPriceForPriceHistory(newPrice, params.newPurchaseQuantity) ?? newPrice;
+  const storedNew = operationalUnitPriceForPriceHistory(newPrice, params.newPurchaseQuantity);
+  if (storedNew == null) return null;
 
   let storedPrev: number | null;
   if (opts?.refreshExisting) {
@@ -427,21 +539,21 @@ export async function fetchLatestHistoryNewPrice(
   client: AppSupabaseClient,
   ingredientId: string,
 ): Promise<number | null> {
+  const id = ingredientId.trim();
+  if (!id) return null;
   try {
     const { data, error } = await client
       .from("ingredient_price_history")
-      .select("new_price, invoice_id")
-      .eq("ingredient_id", ingredientId)
-      .not("invoice_id", "is", null)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .select(LINKED_HISTORY_CHRONOLOGY_SELECT)
+      .eq("ingredient_id", id)
+      .not("invoice_id", "is", null);
     if (error) {
       logSupabaseError("fetchLatestHistoryNewPrice", error);
       return null;
     }
-    const n = data?.new_price == null ? null : Number(data.new_price);
-    return n != null && Number.isFinite(n) ? n : null;
+    return latestLinkedOperationalPriceFromRows(
+      (data ?? []) as LinkedHistoryChronologyRow[],
+    ).operationalPrice;
   } catch (err) {
     console.error(
       `${LOG_PREFIX} fetchLatestHistoryNewPrice threw: ${err instanceof Error ? err.message : String(err)}`,
@@ -461,7 +573,11 @@ export async function appendIngredientPriceHistoryFromInvoiceLine(
 ): Promise<{
   inserted: boolean;
   updated?: boolean;
-  skippedReason?: "missing_ids" | "invalid_new_price" | "unchanged_price";
+  skippedReason?:
+    | "missing_ids"
+    | "invalid_new_price"
+    | "normalization_failed"
+    | "unchanged_price";
   error: PostgrestError | null;
 }> {
   const ingredientId = params.ingredientId.trim();
@@ -474,10 +590,12 @@ export async function appendIngredientPriceHistoryFromInvoiceLine(
   const refreshExisting = existingRow != null;
 
   const newPrice = Number(params.newPrice);
-  const storedNewPreview =
-    operationalUnitPriceForPriceHistory(newPrice, params.newPurchaseQuantity) ?? newPrice;
-  if (!Number.isFinite(storedNewPreview)) {
-    return { inserted: false, skippedReason: "invalid_new_price", error: null };
+  const storedNewPreview = operationalUnitPriceForPriceHistory(
+    newPrice,
+    params.newPurchaseQuantity,
+  );
+  if (storedNewPreview == null || !Number.isFinite(storedNewPreview)) {
+    return { inserted: false, skippedReason: "normalization_failed", error: null };
   }
 
   const nextInsertSnap = derivePurchaseContractSnapshot({
@@ -612,38 +730,13 @@ export async function deleteIngredientPriceHistoryForInvoiceIngredient(
   }
 }
 
-/** Reverts `ingredients.current_price` from latest linked history after subtractive cleanup. */
+/** @deprecated Prefer {@link syncIngredientCurrentPrice}. */
 export async function revertIngredientCurrentPriceFromHistory(
   client: AppSupabaseClient,
   ingredientId: string,
 ): Promise<{ updated: boolean; error: PostgrestError | null }> {
-  const id = ingredientId.trim();
-  if (!id) return { updated: false, error: null };
-
-  const snapshot = await fetchIngredientPriceSnapshot(client, id);
-  if (!snapshot) return { updated: false, error: null };
-
-  const latestOperational = await fetchLatestHistoryNewPrice(client, id);
-  let current_price: number | null = null;
-  if (latestOperational != null && Number.isFinite(latestOperational)) {
-    current_price = latestOperational * purchaseQuantityDenom(snapshot.purchase_quantity);
-  }
-
-  try {
-    const { error } = await client.from("ingredients").update({ current_price }).eq("id", id);
-    if (error) {
-      logSupabaseError("revertIngredientCurrentPriceFromHistory", error);
-      return { updated: false, error };
-    }
-    return { updated: true, error: null };
-  } catch (err) {
-    console.error(
-      `${LOG_PREFIX} revertIngredientCurrentPriceFromHistory threw: ${
-        err instanceof Error ? err.message : String(err)
-      }`,
-    );
-    return { updated: false, error: null };
-  }
+  const result = await syncIngredientCurrentPrice(client, ingredientId);
+  return { updated: result.updated, error: result.error };
 }
 
 /**

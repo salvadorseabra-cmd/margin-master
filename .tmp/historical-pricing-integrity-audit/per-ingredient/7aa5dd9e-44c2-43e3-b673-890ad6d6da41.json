@@ -1,0 +1,35 @@
+{
+  "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+  "ingredientName": "Ginger beer",
+  "invoiceLabel": "Emporio (live)",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "lineName": "Baladin - Ginger Beer 0.20cl",
+  "trustVerdict": "not_trusted",
+  "classification": [
+    "math_logic_volume_parse",
+    "no_price_history"
+  ],
+  "invoiceSource": {
+    "quantity": 2,
+    "unit": null,
+    "unit_price": 10.85,
+    "total": 19.38
+  },
+  "normalized": {
+    "packPrice": 10.85,
+    "purchaseQuantity": 2,
+    "operationalUnitCost": 5.425,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 10.85,
+    "purchase_quantity": 2,
+    "operationalUnitCost": 5.425
+  },
+  "priceHistory": [],
+  "opportunityRisk": [],
+  "notes": [
+    "Volume parse bug: €5425/L (expected ~€2-5/L)",
+    "Matched ingredient but no price_history row for this invoice"
+  ]
+}

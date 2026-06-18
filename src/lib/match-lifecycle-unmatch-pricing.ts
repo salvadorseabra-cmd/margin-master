@@ -3,7 +3,7 @@ import { clearIngredientMatchedInvoiceProductsCache } from "@/lib/ingredient-ope
 import {
   deleteIngredientPriceHistoryForInvoiceIngredient,
   fetchHistoryRowForInvoiceIngredient,
-  revertIngredientCurrentPriceFromHistory,
+  syncIngredientCurrentPrice,
   type AppSupabaseClient,
 } from "@/lib/ingredient-price-history";
 import { reconcileIngredientPriceHistoryChain } from "@/lib/ingredient-price-history-reconcile";
@@ -32,7 +32,7 @@ export type SubtractiveUnmatchPricingResult = SubtractivePricingCleanupResult;
 
 /**
  * Shared subtractive cleanup: delete `(invoice_id, ingredient_id)` history, rechain,
- * and revert `ingredients.current_price` from surviving history.
+ * and sync `ingredients.current_price` from surviving history.
  */
 export async function subtractivePricingCleanupForPreviousIngredient(
   client: AppSupabaseClient,
@@ -65,21 +65,21 @@ export async function subtractivePricingCleanupForPreviousIngredient(
     console.error(`${LOG_PREFIX} reconcile errors for ${ingredientId}:`, reconcileResult.errors);
   }
 
-  const revertResult = await revertIngredientCurrentPriceFromHistory(client, ingredientId);
-  if (revertResult.error) {
+  const syncResult = await syncIngredientCurrentPrice(client, ingredientId);
+  if (syncResult.error) {
     return {
       cleaned: deleteResult.deleted,
       historyDeleted: deleteResult.deleted,
-      error: revertResult.error,
+      error: syncResult.error,
     };
   }
 
-  if (deleteResult.deleted || revertResult.updated) {
+  if (deleteResult.deleted || syncResult.updated) {
     clearIngredientMatchedInvoiceProductsCache(ingredientId);
   }
 
   return {
-    cleaned: deleteResult.deleted || revertResult.updated,
+    cleaned: deleteResult.deleted || syncResult.updated,
     historyDeleted: deleteResult.deleted,
     error: null,
   };

@@ -1,6 +1,7 @@
 import {
   computePriceHistoryDelta,
   isLinkedPriceHistoryRow,
+  sortLinkedHistoryByInvoiceChronology,
   type AppSupabaseClient,
   type IngredientPriceHistoryRow,
 } from "@/lib/ingredient-price-history";
@@ -8,10 +9,6 @@ import {
   deriveSnapshotFromHistoryRow,
   purchaseContractsChainCompatible,
 } from "@/lib/ingredient-price-chain-guard";
-import {
-  compareInvoiceChronologyAsc,
-  resolveInvoiceChronology,
-} from "@/lib/invoice-chronology";
 
 const LOG_PREFIX = "[ingredient_price_history_reconcile]";
 
@@ -65,23 +62,6 @@ function chainFieldsMatch(
 type LinkedHistoryFetchRow = IngredientPriceHistoryRow & {
   invoices: { invoice_date: string | null; created_at: string | null } | null;
 };
-
-function sortLinkedHistoryByInvoiceChronology(
-  rows: LinkedHistoryFetchRow[],
-): IngredientPriceHistoryRow[] {
-  return [...rows]
-    .sort((a, b) => {
-      const dateCmp = compareInvoiceChronologyAsc(
-        resolveInvoiceChronology(a.invoices).displayDateIso,
-        resolveInvoiceChronology(b.invoices).displayDateIso,
-      );
-      if (dateCmp !== 0) return dateCmp;
-      const createdCmp = (a.created_at ?? "").localeCompare(b.created_at ?? "");
-      if (createdCmp !== 0) return createdCmp;
-      return a.id.localeCompare(b.id);
-    })
-    .map(({ invoices: _invoices, ...row }) => row);
-}
 
 /** Ingredient ids with history rows tied to an invoice (call before deleting the invoice). */
 export async function collectIngredientIdsForInvoiceHistory(
@@ -161,7 +141,7 @@ export async function reconcileIngredientPriceHistoryChain(
 
     const linked = sortLinkedHistoryByInvoiceChronology(
       (data ?? []).filter(isLinkedPriceHistoryRow) as LinkedHistoryFetchRow[],
-    );
+    ).map(({ invoices: _invoices, ...row }) => row);
     result.linkedRowCount = linked.length;
 
     let prevRow: IngredientPriceHistoryRow | null = null;

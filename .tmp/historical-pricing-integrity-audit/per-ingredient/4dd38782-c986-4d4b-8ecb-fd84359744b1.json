@@ -1,0 +1,33 @@
+{
+  "ingredientId": "4dd38782-c986-4d4b-8ecb-fd84359744b1",
+  "ingredientName": "Rulo di capra",
+  "invoiceLabel": "Mammafiore",
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "lineName": "Rulo Di Capra 1kg*2 Simonetta",
+  "trustVerdict": "stale",
+  "classification": [
+    "no_price_history"
+  ],
+  "invoiceSource": {
+    "quantity": 1,
+    "unit": "un",
+    "unit_price": 10.86,
+    "total": 10.86
+  },
+  "normalized": {
+    "packPrice": 10.86,
+    "purchaseQuantity": 1,
+    "operationalUnitCost": 10.86,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 10.86,
+    "purchase_quantity": 1,
+    "operationalUnitCost": 10.86
+  },
+  "priceHistory": [],
+  "opportunityRisk": [],
+  "notes": [
+    "Matched ingredient but no price_history row for this invoice"
+  ]
+}

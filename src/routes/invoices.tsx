@@ -167,6 +167,7 @@ import {
   collectIngredientIdsForInvoiceHistory,
   reconcileAfterInvoiceDelete,
 } from "@/lib/ingredient-price-history-reconcile";
+import { syncIngredientCurrentPrice } from "@/lib/ingredient-price-history";
 import { traceCanonicalCreateAttempt } from "@/lib/ingredient-catalog-diagnostics";
 import { traceFoodCostRecalculationSource } from "@/lib/recipe-canonical-graph-trace";
 import {
@@ -2474,6 +2475,15 @@ function InvoicesPage() {
       const reconcileErrors = reconcileResult.ingredients.flatMap((entry) => entry.errors);
       if (reconcileErrors.length > 0) {
         console.error("[invoices] price history reconcile had errors:", reconcileErrors);
+      }
+      for (const ingredientId of affectedIngredientIds) {
+        const syncResult = await syncIngredientCurrentPrice(supabase, ingredientId);
+        if (syncResult.error) {
+          console.error(
+            "[invoices] syncIngredientCurrentPrice failed:",
+            syncResult.error.message,
+          );
+        }
       }
     }
     load();

@@ -1,0 +1,40 @@
+{
+  "ingredientId": "9c853a47-82fe-4d6d-88bc-f0aa007e0a59",
+  "ingredientName": "Mortadella IGP massima con pistacchio",
+  "invoiceLabel": "Emporio (live)",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "lineName": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5kg",
+  "trustVerdict": "trusted",
+  "classification": [],
+  "invoiceSource": {
+    "quantity": 3.11,
+    "unit": "kg",
+    "unit_price": 9.99,
+    "total": 31.07
+  },
+  "normalized": {
+    "packPrice": 9.99,
+    "purchaseQuantity": 1000,
+    "operationalUnitCost": 0.00999,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 9.99,
+    "purchase_quantity": 1000,
+    "operationalUnitCost": 0.00999
+  },
+  "priceHistory": [
+    {
+      "id": "2440697f-8dbd-403f-8cfe-c43ca03642f9",
+      "previous_price": null,
+      "new_price": 0.00999,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
+  "opportunityRisk": [],
+  "notes": []
+}

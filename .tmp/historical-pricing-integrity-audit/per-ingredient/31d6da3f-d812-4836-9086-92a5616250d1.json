@@ -1,0 +1,40 @@
+{
+  "ingredientId": "31d6da3f-d812-4836-9086-92a5616250d1",
+  "ingredientName": "Rigamonti bresaola punta d'anca oro",
+  "invoiceLabel": "Emporio (live)",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "lineName": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+  "trustVerdict": "trusted",
+  "classification": [],
+  "invoiceSource": {
+    "quantity": 1.83,
+    "unit": "kg",
+    "unit_price": 27.04,
+    "total": 49.48
+  },
+  "normalized": {
+    "packPrice": 27.04,
+    "purchaseQuantity": 1000,
+    "operationalUnitCost": 0.027039999999999998,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 27.04,
+    "purchase_quantity": 1000,
+    "operationalUnitCost": 0.027039999999999998
+  },
+  "priceHistory": [
+    {
+      "id": "5181c592-39fa-448c-b2e2-3cfae5456bea",
+      "previous_price": null,
+      "new_price": 0.027039999999999998,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
+  "opportunityRisk": [],
+  "notes": []
+}

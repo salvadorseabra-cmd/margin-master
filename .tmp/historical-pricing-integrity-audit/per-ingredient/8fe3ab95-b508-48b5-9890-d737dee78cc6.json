@@ -1,0 +1,33 @@
+{
+  "ingredientId": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+  "ingredientName": "Manjericão",
+  "invoiceLabel": "Bidfood",
+  "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+  "lineName": "Manjericão",
+  "trustVerdict": "stale",
+  "classification": [
+    "no_price_history"
+  ],
+  "invoiceSource": {
+    "quantity": 5,
+    "unit": "mo",
+    "unit_price": 2.57,
+    "total": 10.28
+  },
+  "normalized": {
+    "packPrice": 2.57,
+    "purchaseQuantity": 100,
+    "operationalUnitCost": 0.025699999999999997,
+    "usableCostPerLiter": null
+  },
+  "ingredientCatalog": {
+    "current_price": 2.57,
+    "purchase_quantity": 100,
+    "operationalUnitCost": 0.025699999999999997
+  },
+  "priceHistory": [],
+  "opportunityRisk": [],
+  "notes": [
+    "Matched ingredient but no price_history row for this invoice"
+  ]
+}

@@ -19,9 +19,9 @@
     "usableCostPerLiter": null
   },
   "ingredientCatalog": {
-    "current_price": 29.99,
+    "current_price": 29.19,
     "purchase_quantity": 10,
-    "operationalUnitCost": 2.9989999999999997
+    "operationalUnitCost": 2.919
   },
   "priceHistory": [
     {
