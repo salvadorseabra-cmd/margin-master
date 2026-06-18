@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-18T23:24:24.182Z",
+  "generated_at": "2026-06-18T23:46:34.154Z",
   "finalQuestion": "Can Marginly safely use historical pricing and opportunity calculations in production today?",
   "answer": "YES WITH CAVEATS",
   "historicalPricingStatus": "PARTIAL",
