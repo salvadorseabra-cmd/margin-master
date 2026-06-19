@@ -23,13 +23,27 @@ type HistoryRow = HistoryInsert & { id: string };
 
 export function createPersistenceMockClient(options: {
   ingredient?: {
+    id?: string;
     name: string;
+    normalized_name?: string;
     unit: string | null;
     current_price: number | null;
     purchase_quantity: number | null;
+    purchase_unit?: string | null;
+    base_unit?: string | null;
   };
   existingHistoryRows?: HistoryRow[];
   latestHistoryNewPrice?: number | null;
+  invoiceItems?: Array<{
+    id: string;
+    invoice_id: string;
+    name: string;
+    quantity: number | null;
+    unit: string | null;
+    unit_price: number | null;
+    total?: number | null;
+    invoices?: { invoice_date: string | null; created_at: string | null; supplier_name?: string | null };
+  }>;
 }) {
   const historyInserts: HistoryInsert[] = [];
   const historyUpdates: Array<{ id: string; payload: HistoryInsert }> = [];
@@ -37,11 +51,18 @@ export function createPersistenceMockClient(options: {
     id: String(row.id ?? `hist-${index}`),
     ...row,
   }));
-  const ingredient = options.ingredient ?? {
-    name: "Tomato passata",
-    unit: "kg",
-    current_price: 10,
-    purchase_quantity: 1,
+  const invoiceItems = (options.invoiceItems ?? []).map((row) => ({ ...row }));
+  const ingredient = {
+    id: options.ingredient?.id ?? "ing-1",
+    normalized_name: options.ingredient?.normalized_name ?? options.ingredient?.name?.toLowerCase() ?? "ingredient",
+    purchase_unit: options.ingredient?.purchase_unit ?? null,
+    base_unit: options.ingredient?.base_unit ?? null,
+    ...(options.ingredient ?? {
+      name: "Tomato passata",
+      unit: "kg",
+      current_price: 10,
+      purchase_quantity: 1,
+    }),
   };
 
   function historyByInvoiceIngredient(invoiceId: string, ingredientId: string) {
@@ -77,8 +98,46 @@ export function createPersistenceMockClient(options: {
               if (payload.purchase_quantity != null) {
                 ingredient.purchase_quantity = payload.purchase_quantity as number;
               }
+              if (payload.purchase_unit != null) {
+                ingredient.purchase_unit = payload.purchase_unit as string;
+              }
+              if (payload.base_unit != null) {
+                ingredient.base_unit = payload.base_unit as string;
+              }
+              if (payload.unit != null) {
+                ingredient.unit = payload.unit as string;
+              }
               return { error: null };
             },
+          }),
+        };
+      }
+      if (table === "invoice_items") {
+        return {
+          select: () => ({
+            in: (_col: string, invoiceIds: string[]) =>
+              Promise.resolve({
+                data: invoiceItems
+                  .filter((row) => invoiceIds.includes(row.invoice_id))
+                  .map((row) => ({
+                    ...row,
+                    invoices: row.invoices ?? {
+                      invoice_date: null,
+                      created_at: null,
+                      supplier_name: null,
+                    },
+                  })),
+                error: null,
+              }),
+          }),
+        };
+      }
+      if (table === "ingredient_aliases") {
+        return {
+          select: () => ({
+            eq: () => ({
+              eq: () => Promise.resolve({ data: [], error: null }),
+            }),
           }),
         };
       }
@@ -202,6 +261,9 @@ export function createPersistenceMockClient(options: {
 
         return {
           select: (cols: string) => {
+            if (cols === "id") {
+              return buildHistoryQuery("select");
+            }
             if (cols === "id,created_at,previous_price,new_price") {
               return {
                 eq: (col: string, val: string) => ({
@@ -232,7 +294,9 @@ export function createPersistenceMockClient(options: {
             if (
               cols === "new_price, invoice_id" ||
               cols === "id,new_price,invoice_id,created_at,invoices(invoice_date, created_at)" ||
+              cols === "id,new_price,invoice_id,created_at,invoices(invoice_date,created_at)" ||
               cols === "new_price, invoice_id, created_at, id, invoices(invoice_date, created_at)" ||
+              cols === "invoice_id,created_at,invoices(invoice_date,created_at)" ||
               cols ===
                 "new_price, ingredient_name, ingredient_unit, invoice_id, created_at, id, invoices(invoice_date, created_at)"
             ) {
@@ -487,8 +551,21 @@ describe("appendIngredientPriceHistoryFromInvoiceLine", () => {
     expect(mayRow?.created_at).toBe("2026-05-19T12:00:00.000Z");
   });
 
-  it("skips unchanged effective unit price", async () => {
-    const { client, historyInserts } = createPersistenceMockClient({});
+  it("skips unchanged effective unit price when linked history exists", async () => {
+    const { client, historyInserts } = createPersistenceMockClient({
+      existingHistoryRows: [
+        {
+          id: "hist-prior",
+          ingredient_id: "ing-1",
+          invoice_id: "inv-prior",
+          ingredient_name: "Tomato",
+          ingredient_unit: "kg",
+          previous_price: null,
+          new_price: 5,
+          created_at: "2026-01-01T12:00:00.000Z",
+        },
+      ],
+    });
     expect(
       invoiceLinePricesUnchanged(10, 2, 20, 4),
     ).toBe(true);
@@ -605,11 +682,24 @@ describe("persistOperationalIngredientCostFromInvoiceLine", () => {
     const fields = operationalCostFieldsFromInvoiceLine(line);
     const { client, historyInserts, ingredient } = createPersistenceMockClient({
       ingredient: {
-        name: "Mozzarella 1kg",
+        id: "ing-1",
+        name: "QUEIJO MOZARELLA FATIADO 1KG",
         unit: "kg",
         current_price: 8,
         purchase_quantity: fields!.purchase_quantity,
       },
+      invoiceItems: [
+        {
+          id: "item-moz",
+          invoice_id: "inv-a",
+          name: "QUEIJO MOZARELLA FATIADO 1KG",
+          quantity: 1,
+          unit: "kg",
+          unit_price: 9.5,
+          total: 9.5,
+          invoices: { invoice_date: "2026-02-01", created_at: "2026-02-01T12:00:00.000Z" },
+        },
+      ],
     });
 
     const result = await persistOperationalIngredientCostFromInvoiceLine(
@@ -729,7 +819,7 @@ describe("persistOperationalIngredientCostFromInvoiceLine", () => {
     expect(historyInserts[0].previous_price).not.toBeCloseTo(0.2 / 24, 6);
   });
 
-  it("does not append history when price unchanged", async () => {
+  it("does not append history when price unchanged and linked history exists", async () => {
     const line = { name: "SAL 1KG", quantity: 1, unit: "kg", unit_price: 2 };
     const fields = operationalCostFieldsFromInvoiceLine(line);
     expect(fields?.current_price).not.toBeNull();
@@ -740,6 +830,18 @@ describe("persistOperationalIngredientCostFromInvoiceLine", () => {
         current_price: fields!.current_price,
         purchase_quantity: fields!.purchase_quantity,
       },
+      existingHistoryRows: [
+        {
+          id: "hist-salt",
+          ingredient_id: "ing-1",
+          invoice_id: "inv-prior",
+          ingredient_name: "Salt",
+          ingredient_unit: "kg",
+          previous_price: null,
+          new_price: 0.002,
+          created_at: "2026-01-01T12:00:00.000Z",
+        },
+      ],
     });
 
     const result = await persistOperationalIngredientCostFromInvoiceLine(
@@ -751,6 +853,133 @@ describe("persistOperationalIngredientCostFromInvoiceLine", () => {
 
     expect(result.historyInserted).toBe(false);
     expect(historyInserts).toHaveLength(0);
+  });
+});
+
+describe("first linked history bootstrap", () => {
+  it("Case A: inserts history when no linked history and previous equals new", async () => {
+    const { client, historyInserts } = createPersistenceMockClient({
+      ingredient: {
+        name: "Salt",
+        unit: "kg",
+        current_price: 2,
+        purchase_quantity: 1000,
+      },
+    });
+
+    const result = await appendIngredientPriceHistoryFromInvoiceLine(client as never, {
+      ingredientId: "ing-1",
+      invoiceId: "inv-bootstrap",
+      ingredientName: "Salt",
+      previousPrice: 2,
+      newPrice: 2,
+      previousPurchaseQuantity: 1000,
+      newPurchaseQuantity: 1000,
+    });
+
+    expect(result.inserted).toBe(true);
+    expect(historyInserts).toHaveLength(1);
+  });
+
+  it("Case B: skips unchanged price when linked history already exists", async () => {
+    const { client, historyInserts } = createPersistenceMockClient({
+      ingredient: {
+        name: "Salt",
+        unit: "kg",
+        current_price: 2,
+        purchase_quantity: 1000,
+      },
+      existingHistoryRows: [
+        {
+          id: "hist-salt",
+          ingredient_id: "ing-1",
+          invoice_id: "inv-prior",
+          ingredient_name: "Salt",
+          ingredient_unit: "kg",
+          previous_price: null,
+          new_price: 0.002,
+          created_at: "2026-01-01T12:00:00.000Z",
+        },
+      ],
+    });
+
+    const result = await appendIngredientPriceHistoryFromInvoiceLine(client as never, {
+      ingredientId: "ing-1",
+      invoiceId: "inv-repeat",
+      ingredientName: "Salt",
+      previousPrice: 2,
+      newPrice: 2,
+      previousPurchaseQuantity: 1000,
+      newPurchaseQuantity: 1000,
+    });
+
+    expect(result.skippedReason).toBe("unchanged_price");
+    expect(historyInserts).toHaveLength(0);
+  });
+
+  it("Case C: Courgettes bootstrap inserts first row with null previous_price", async () => {
+    const line = {
+      name: "Courgettes",
+      quantity: 3.3,
+      unit: "kg" as const,
+      unit_price: 1.95,
+      total: 5.15,
+    };
+    const fields = operationalCostFieldsFromInvoiceLine(line);
+    expect(fields?.current_price).toBe(1.95);
+    const { client, historyInserts } = createPersistenceMockClient({
+      ingredient: {
+        id: "ing-courgettes",
+        name: "Courgettes",
+        unit: "kg",
+        current_price: fields!.current_price,
+        purchase_quantity: fields!.purchase_quantity,
+      },
+    });
+
+    const result = await persistOperationalIngredientCostFromInvoiceLine(
+      client as never,
+      "ing-courgettes",
+      line,
+      { priceHistory: { invoiceId: "inv-courgettes", supplierName: "Bidfood Portugal" } },
+    );
+
+    expect(result.historyInserted).toBe(true);
+    expect(historyInserts).toHaveLength(1);
+    expect(historyInserts[0].previous_price).toBeNull();
+    expect(Number(historyInserts[0].new_price)).toBeCloseTo(0.00195, 6);
+  });
+
+  it("Case D: Alho Francês bootstrap inserts first linked history row", async () => {
+    const line = {
+      name: "Alho Francês",
+      quantity: 5.42,
+      unit: "kg" as const,
+      unit_price: 1.77,
+      total: 7.67,
+    };
+    const fields = operationalCostFieldsFromInvoiceLine(line);
+    expect(fields?.current_price).toBe(1.77);
+    const { client, historyInserts } = createPersistenceMockClient({
+      ingredient: {
+        id: "ing-alho",
+        name: "Alho Francês",
+        unit: "kg",
+        current_price: fields!.current_price,
+        purchase_quantity: fields!.purchase_quantity,
+      },
+    });
+
+    const result = await persistOperationalIngredientCostFromInvoiceLine(
+      client as never,
+      "ing-alho",
+      line,
+      { priceHistory: { invoiceId: "inv-alho", supplierName: "Bidfood Portugal" } },
+    );
+
+    expect(result.historyInserted).toBe(true);
+    expect(historyInserts).toHaveLength(1);
+    expect(Number(historyInserts[0].new_price)).toBeCloseTo(0.00177, 6);
   });
 });
 

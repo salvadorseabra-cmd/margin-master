@@ -1,6 +1,6 @@
 # Historical Pricing Integrity Audit
 
-**Generated:** 2026-06-18  
+**Generated:** 2026-06-19  
 **Mode:** READ-ONLY — DB + code replay
 
 ---
@@ -20,12 +20,12 @@
 | Metric | Count |
 |--------|-------|
 | Line audits | 51 |
-| Trusted | 9 |
+| Trusted | 17 |
 | Not trusted | 1 |
-| Stale | 16 |
+| Stale | 8 |
 | Unmatched (no ingredient) | 25 |
-| Price history rows | 36 |
-| History trusted | 14 |
+| Price history rows | 49 |
+| History trusted | 27 |
 | History stale | 13 |
 | History ghost | 9 |
 | History not trusted | 0 |
@@ -41,21 +41,29 @@
 | Extraction residue | 2 |
 | GT catalog issues | 0 |
 | Gross vs net display | 1 |
-| No price_history | 11 |
+| No price_history | 2 |
 
 ---
 
-## Fully Trusted (9)
+## Fully Trusted (17)
 
+- **Manjericão** (Bidfood) — Manjericão
 - **Tomilho** (Bidfood) — Tomilho
+- **Manteiga s/sal** (Bidfood) — Manteiga Coimbra s/Sal Emb 1 Kg
+- **Abóbora butternut** (Bidfood) — Abóbora Butternut
+- **Alho francês** (Bidfood) — Alho Francês
+- **Courgettes** (Bidfood) — Courgettes
+- **Pêra abacate** (Bidfood) — Pêra Abacate Hasse
 - **Hortelã** (Bidfood) — Hortelã
 - **Mozzarella fior di latte** (Aviludo April) — Mozzarella Flor di Latte 2Kg
 - **Chocolate culinária** (Aviludo May) — Chocolate Culinaria Pantagruel 10x200 g
 - **Mezzi paccheri mancini** (Bocconcino) — MEZZI PACCHERI MANCINI (CX 1KG*6)
+- **Pomodori pelati** (Bocconcino) — POMODORI PELATI (CX 2,5KG*6)
 - **Ricotta trevigiana** (Bocconcino) — RICOTTA TREVIGIANA 1,5KG
 - **Rovagnati salame ventricina** (Emporio (live)) — Rovagnati - Salame Ventricina 2,5 Kg
 - **Rigamonti bresaola punta d'anca oro** (Emporio (live)) — Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg
 - **Mortadella IGP massima con pistacchio** (Emporio (live)) — Rovagnati - Mortadella IGP "Massima" con Pistacchio 1/2 - 3,5kg
+- **Rulo di capra** (Mammafiore) — Rulo Di Capra 1kg*2 Simonetta
 
 ---
 
@@ -65,24 +73,16 @@
 
 ---
 
-## Stale (16)
+## Stale (8)
 
-- **Manjericão** (Bidfood): no_price_history
-- **Manteiga s/sal** (Bidfood): no_price_history
-- **Abóbora butternut** (Bidfood): no_price_history
-- **Alho francês** (Bidfood): no_price_history
-- **Courgettes** (Bidfood): no_price_history
-- **Pêra abacate** (Bidfood): no_price_history
 - **Pepino conserva** (Bidfood): pack_qty_mismatch, no_price_history
 - **Stracciatella** (Bocconcino): pack_qty_mismatch, stale_price_history
-- **Pomodori pelati** (Bocconcino): no_price_history
 - **Rolo de cabra e vaca** (Bocconcino): extraction_residue_or_stale
 - **Mozzarella fior di latte** (Bocconcino): stale_price_history
 - **Prosciutto cotto scelto** (Emporio (live)): pack_qty_mismatch
-- **Farina do pasta fresca e gnocchi** (Mammafiore): extraction_residue_or_stale, no_price_history
+- **Farina do pasta fresca e gnocchi** (Mammafiore): extraction_residue_or_stale
 - **Birra peroni nastro azzurro 33cl** (Mammafiore): stale_price_history
 - **Aceto balsamico di modena IGP** (Mammafiore): pack_qty_mismatch
-- ... and 1 more
 
 ---
 

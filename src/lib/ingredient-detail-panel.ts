@@ -272,37 +272,66 @@ export type IngredientOperationalCostLine = {
   value: string;
 };
 
-export type IngredientOperationalCostPresentation = {
+/** Structured last-purchase economics for ingredient detail (display only). */
+export type IngredientLastPurchaseCostFields = {
+  lastPurchase: string | null;
+  procurementCost: string | null;
+  operationalCost: string | null;
+  totalPaid: string | null;
+  supplier: string | null;
+  purchaseDate: string | null;
+};
+
+export type IngredientOperationalCostPresentation = IngredientLastPurchaseCostFields & {
   lines: IngredientOperationalCostLine[];
 };
 
-/** Last confirmed purchase economics for the operational cost card (display only). */
+function pushPresentationLine(
+  lines: IngredientOperationalCostLine[],
+  label: string,
+  value: string | null | undefined,
+): void {
+  const trimmed = value?.trim();
+  if (trimmed) lines.push({ label, value: trimmed });
+}
+
+/** Last confirmed purchase economics for the purchase cost card (display only). */
 export function buildLastPurchaseCostPresentation(
   purchase: RecentPurchaseRow | null | undefined,
 ): IngredientOperationalCostPresentation | null {
   if (!purchase) return null;
 
+  const lastPurchase = purchase.purchaseQuantityLabel?.trim() || null;
+  const procurementCost = purchase.procurementCostLabel?.trim() || null;
+  const operationalCost =
+    purchase.operationalCostLabel?.trim() || purchase.unitCostLabel?.trim() || null;
+  const totalPaid =
+    purchase.priceLabel?.trim() && purchase.priceLabel.trim() !== "—"
+      ? purchase.priceLabel.trim()
+      : null;
+  const supplier = purchase.supplierLabel?.trim() || null;
+  const purchaseDateValue = formatLastPurchaseDateKpi([purchase]);
+  const purchaseDate = purchaseDateValue !== "—" ? purchaseDateValue : null;
+
   const lines: IngredientOperationalCostLine[] = [];
+  pushPresentationLine(lines, "Last Purchase", lastPurchase);
+  pushPresentationLine(lines, "Procurement Cost", procurementCost);
+  pushPresentationLine(lines, "Operational Cost", operationalCost);
+  pushPresentationLine(lines, "Total Paid", totalPaid);
+  pushPresentationLine(lines, "Supplier", supplier);
+  pushPresentationLine(lines, "Purchase Date", purchaseDate);
 
-  if (purchase.purchaseQuantityLabel?.trim()) {
-    lines.push({ label: "Last Purchase", value: purchase.purchaseQuantityLabel.trim() });
-  }
-  if (purchase.unitCostLabel?.trim()) {
-    lines.push({ label: "Unit Cost", value: purchase.unitCostLabel.trim() });
-  }
-  if (purchase.priceLabel?.trim() && purchase.priceLabel.trim() !== "—") {
-    lines.push({ label: "Total Paid", value: purchase.priceLabel.trim() });
-  }
-  if (purchase.supplierLabel?.trim()) {
-    lines.push({ label: "Supplier", value: purchase.supplierLabel.trim() });
-  }
+  if (lines.length === 0) return null;
 
-  const purchaseDate = formatLastPurchaseDateKpi([purchase]);
-  if (purchaseDate !== "—") {
-    lines.push({ label: "Purchase Date", value: purchaseDate });
-  }
-
-  return lines.length > 0 ? { lines } : null;
+  return {
+    lastPurchase,
+    procurementCost,
+    operationalCost,
+    totalPaid,
+    supplier,
+    purchaseDate,
+    lines,
+  };
 }
 
 /** @deprecated Prefer {@link buildLastPurchaseCostPresentation} with sorted purchase memory. */

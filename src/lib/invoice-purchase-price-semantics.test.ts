@@ -337,7 +337,7 @@ describe("resolveInvoiceLinePricingPresentation", () => {
           "normalizedLine": "7.2 kg usable",
           "purchasePriceLine": "€46.00 / case · €92.00 total",
           "purchaseQuantityLine": "2 cases · 40 × 180 g",
-          "usableCostLine": "€6.3889 / kg usable",
+          "usableCostLine": "€6.39 / kg usable",
         },
         "purchasedPackDetail": "40 × 180 g",
         "rowQuantity": "2 cases",
@@ -613,6 +613,61 @@ describe("groupInvoiceLineBadges", () => {
         badges: ["In 3 recipes"],
       },
     ]);
+  });
+});
+
+describe("computeEffectiveUsableCost operational unit semantics", () => {
+  it("Case A Peroni: 24×33cl €1.07/bottle → €3.2437/L not €0.1351/L", () => {
+    const meta = {
+      name: "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      quantity: 24,
+      unit: "un",
+      unit_price: 1.07,
+      line_total: 25.69,
+    };
+    const structured = resolveInvoiceLinePurchaseFormat(meta);
+    const perUnit = resolveUsablePerPricedUnit(meta, structured);
+    expect(perUnit).toEqual({ amount: 7920, unit: "ml" });
+
+    const effective = computeEffectiveUsableCost(1.07, meta, structured, meta.name);
+    expect(effective?.unit).toBe("L");
+    expect(effective?.cost).toBeCloseTo(3.24, 2);
+    expect(effective?.cost).not.toBeCloseTo(0.1351, 3);
+  });
+
+  it("Case B San Pellegrino: 2 cases 15×75cl €19.28/case → €1.7138/L unchanged", () => {
+    const meta = {
+      name: "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      quantity: 2,
+      unit: "cx",
+      unit_price: 19.28,
+      line_total: 38.56,
+    };
+    const structured = resolveInvoiceLinePurchaseFormat(meta);
+    const effective = computeEffectiveUsableCost(19.28, meta, structured, meta.name);
+    expect(effective?.unit).toBe("L");
+    expect(effective?.cost).toBeCloseTo(1.7138, 3);
+  });
+
+  it("Case C Aceto: 1×(2×5L) €15.55 → €1.555/L unchanged", () => {
+    const meta = {
+      name: "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      quantity: 1,
+      unit: "un",
+      unit_price: 15.55,
+      line_total: 15.55,
+    };
+    const structured = resolveInvoiceLinePurchaseFormat(meta);
+    const effective = computeEffectiveUsableCost(15.55, meta, structured, meta.name);
+    expect(effective?.unit).toBe("L");
+    expect(effective?.cost).toBeCloseTo(1.555, 3);
+  });
+
+  it("Case D generic kg ingredient: multi-kg row stays €/kg", () => {
+    const meta = { name: "PEPINO", quantity: 3.36, unit: "kg" as const, unit_price: 1.42 };
+    const structured = resolveInvoiceLinePurchaseFormat(meta);
+    const effective = computeEffectiveUsableCost(1.42, meta, structured, meta.name);
+    expect(effective).toEqual({ cost: 1.42, unit: "kg" });
   });
 });
 

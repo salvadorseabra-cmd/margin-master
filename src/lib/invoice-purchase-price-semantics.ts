@@ -337,6 +337,50 @@ function isRowQuantityPackContentMeasure(
   return false;
 }
 
+function isIndividualCountableRowUnit(rowUnit: string | null | undefined): boolean {
+  const normalized = normalizeToken(rowUnit);
+  if (!normalized || PACK_CONTAINER_UNITS.has(normalized)) return false;
+  return (
+    normalized === "un" ||
+    normalized === "uni" ||
+    normalized === "unid" ||
+    normalized === "unit" ||
+    normalized === "units" ||
+    normalized === "pc" ||
+    normalized === "pcs"
+  );
+}
+
+/**
+ * Pack volume embedded in the product name (e.g. 33cl*24) survives qty=1 re-parse as case total.
+ * When unit_price is per individual unit (un), scale to one priced unit for operational cost only.
+ */
+function resolveOperationalUsablePerPricedUnit(
+  metadata: InvoicePurchasePriceMetadata,
+  structured: StructuredPurchaseFormat,
+  usable: { amount: number; unit: "g" | "ml" | "un" },
+): { amount: number; unit: "g" | "ml" | "un" } {
+  const totalUsable = structured.normalizedUsableQuantity;
+  if (totalUsable == null || usable.amount !== totalUsable) return usable;
+
+  const rowQuantity = metadata.quantity == null ? null : Number(metadata.quantity);
+  if (!Number.isFinite(rowQuantity) || rowQuantity == null || rowQuantity <= 1) return usable;
+  if (!isIndividualCountableRowUnit(metadata.unit)) return usable;
+
+  const singleUnitStructured = resolveInvoiceLinePurchaseFormat({
+    name: metadata.name,
+    quantity: 1,
+    unit: metadata.unit,
+    matchedIngredientName: metadata.matchedIngredientName ?? null,
+  });
+  const singleUnitUsable = singleUnitStructured.normalizedUsableQuantity;
+  if (singleUnitUsable == null || Math.abs(singleUnitUsable - totalUsable) >= 0.01) {
+    return usable;
+  }
+
+  return { amount: totalUsable / rowQuantity, unit: usable.unit };
+}
+
 export function resolveUsablePerPricedUnit(
   metadata: InvoicePurchasePriceMetadata,
   structured: StructuredPurchaseFormat,
@@ -387,20 +431,22 @@ export function computeEffectiveUsableCost(
   const usable = resolveUsablePerPricedUnit(metadata, structured);
   if (!usable || usable.amount <= 0) return null;
 
-  if (usable.unit === "g") {
-    const kgPerPurchase = usable.amount / 1000;
+  const operationalUsable = resolveOperationalUsablePerPricedUnit(metadata, structured, usable);
+
+  if (operationalUsable.unit === "g") {
+    const kgPerPurchase = operationalUsable.amount / 1000;
     if (kgPerPurchase <= 0) return null;
     return { cost: unitPrice / kgPerPurchase, unit: "kg" };
   }
 
-  if (usable.unit === "ml") {
-    const litersPerPurchase = usable.amount / 1000;
+  if (operationalUsable.unit === "ml") {
+    const litersPerPurchase = operationalUsable.amount / 1000;
     if (litersPerPurchase <= 0) return null;
     return { cost: unitPrice / litersPerPurchase, unit: "L" };
   }
 
   return {
-    cost: unitPrice / usable.amount,
+    cost: unitPrice / operationalUsable.amount,
     unit: inferCountableCostUnit(name),
   };
 }

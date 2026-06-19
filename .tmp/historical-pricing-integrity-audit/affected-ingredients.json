@@ -1,9 +1,39 @@
 {
   "trusted": [
     {
+      "ingredient": "Manjericão",
+      "invoice": "Bidfood",
+      "line": "Manjericão"
+    },
+    {
       "ingredient": "Tomilho",
       "invoice": "Bidfood",
       "line": "Tomilho"
+    },
+    {
+      "ingredient": "Manteiga s/sal",
+      "invoice": "Bidfood",
+      "line": "Manteiga Coimbra s/Sal Emb 1 Kg"
+    },
+    {
+      "ingredient": "Abóbora butternut",
+      "invoice": "Bidfood",
+      "line": "Abóbora Butternut"
+    },
+    {
+      "ingredient": "Alho francês",
+      "invoice": "Bidfood",
+      "line": "Alho Francês"
+    },
+    {
+      "ingredient": "Courgettes",
+      "invoice": "Bidfood",
+      "line": "Courgettes"
+    },
+    {
+      "ingredient": "Pêra abacate",
+      "invoice": "Bidfood",
+      "line": "Pêra Abacate Hasse"
     },
     {
       "ingredient": "Hortelã",
@@ -26,6 +56,11 @@
       "line": "MEZZI PACCHERI MANCINI (CX 1KG*6)"
     },
     {
+      "ingredient": "Pomodori pelati",
+      "invoice": "Bocconcino",
+      "line": "POMODORI PELATI (CX 2,5KG*6)"
+    },
+    {
       "ingredient": "Ricotta trevigiana",
       "invoice": "Bocconcino",
       "line": "RICOTTA TREVIGIANA 1,5KG"
@@ -44,6 +79,11 @@
       "ingredient": "Mortadella IGP massima con pistacchio",
       "invoice": "Emporio (live)",
       "line": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5kg"
+    },
+    {
+      "ingredient": "Rulo di capra",
+      "invoice": "Mammafiore",
+      "line": "Rulo Di Capra 1kg*2 Simonetta"
     }
   ],
   "notTrusted": [
@@ -63,48 +103,6 @@
   ],
   "stale": [
     {
-      "ingredient": "Manjericão",
-      "invoice": "Bidfood",
-      "reasons": [
-        "no_price_history"
-      ]
-    },
-    {
-      "ingredient": "Manteiga s/sal",
-      "invoice": "Bidfood",
-      "reasons": [
-        "no_price_history"
-      ]
-    },
-    {
-      "ingredient": "Abóbora butternut",
-      "invoice": "Bidfood",
-      "reasons": [
-        "no_price_history"
-      ]
-    },
-    {
-      "ingredient": "Alho francês",
-      "invoice": "Bidfood",
-      "reasons": [
-        "no_price_history"
-      ]
-    },
-    {
-      "ingredient": "Courgettes",
-      "invoice": "Bidfood",
-      "reasons": [
-        "no_price_history"
-      ]
-    },
-    {
-      "ingredient": "Pêra abacate",
-      "invoice": "Bidfood",
-      "reasons": [
-        "no_price_history"
-      ]
-    },
-    {
       "ingredient": "Pepino conserva",
       "invoice": "Bidfood",
       "reasons": [
@@ -118,13 +116,6 @@
       "reasons": [
         "pack_qty_mismatch",
         "stale_price_history"
-      ]
-    },
-    {
-      "ingredient": "Pomodori pelati",
-      "invoice": "Bocconcino",
-      "reasons": [
-        "no_price_history"
       ]
     },
     {
@@ -152,8 +143,7 @@
       "ingredient": "Farina do pasta fresca e gnocchi",
       "invoice": "Mammafiore",
       "reasons": [
-        "extraction_residue_or_stale",
-        "no_price_history"
+        "extraction_residue_or_stale"
       ]
     },
     {
@@ -168,13 +158,6 @@
       "invoice": "Mammafiore",
       "reasons": [
         "pack_qty_mismatch"
-      ]
-    },
-    {
-      "ingredient": "Rulo di capra",
-      "invoice": "Mammafiore",
-      "reasons": [
-        "no_price_history"
       ]
     }
   ],

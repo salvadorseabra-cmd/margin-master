@@ -1,0 +1,44 @@
+{
+  "mode": "dry-run",
+  "generated_at": "2026-06-19T21:41:25.516Z",
+  "project_ref": "bjhnlrgodcqoyzddbpbd",
+  "before": {
+    "matched_with_zero_history_count": 1,
+    "ingredients": [
+      {
+        "ingredient_id": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+        "name": "Ginger beer",
+        "history_rows": 0
+      }
+    ]
+  },
+  "planned_inserts": [],
+  "blocked": [
+    {
+      "ingredient_id": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+      "ingredient_name": "Ginger beer",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoice_item_id": "4843605f-3a77-47c8-bd98-fce79ba3a4b7",
+      "line_name": "Baladin - Ginger Beer 0.20cl",
+      "invoice_date": "2026-05-19",
+      "new_price_pack": 10.85,
+      "new_price_operational": 5.425,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "blocked": true,
+      "block_reason": "shouldBlockHistoryInsert"
+    }
+  ],
+  "skipped": [],
+  "created": [],
+  "errors": [],
+  "after": {
+    "matched_with_zero_history_count": 1,
+    "ingredients": [
+      {
+        "ingredient_id": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+        "name": "Ginger beer"
+      }
+    ]
+  }
+}

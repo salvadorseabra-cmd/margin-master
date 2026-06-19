@@ -4,10 +4,8 @@
   "invoiceLabel": "Bidfood",
   "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
   "lineName": "Courgettes",
-  "trustVerdict": "stale",
-  "classification": [
-    "no_price_history"
-  ],
+  "trustVerdict": "trusted",
+  "classification": [],
   "invoiceSource": {
     "quantity": 3.3,
     "unit": "kg",
@@ -25,9 +23,18 @@
     "purchase_quantity": 1000,
     "operationalUnitCost": 0.00195
   },
-  "priceHistory": [],
+  "priceHistory": [
+    {
+      "id": "3d1220e6-024b-46db-9d4a-088fbc83f166",
+      "previous_price": null,
+      "new_price": 0.00195,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
   "opportunityRisk": [],
-  "notes": [
-    "Matched ingredient but no price_history row for this invoice"
-  ]
+  "notes": []
 }

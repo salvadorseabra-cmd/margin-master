@@ -4,10 +4,8 @@
   "invoiceLabel": "Bidfood",
   "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
   "lineName": "Abóbora Butternut",
-  "trustVerdict": "stale",
-  "classification": [
-    "no_price_history"
-  ],
+  "trustVerdict": "trusted",
+  "classification": [],
   "invoiceSource": {
     "quantity": 5.42,
     "unit": "kg",
@@ -25,9 +23,18 @@
     "purchase_quantity": 1000,
     "operationalUnitCost": 0.00124
   },
-  "priceHistory": [],
+  "priceHistory": [
+    {
+      "id": "010a73aa-9cce-4709-8078-c9c7a52ef780",
+      "previous_price": null,
+      "new_price": 0.00124,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
   "opportunityRisk": [],
-  "notes": [
-    "Matched ingredient but no price_history row for this invoice"
-  ]
+  "notes": []
 }

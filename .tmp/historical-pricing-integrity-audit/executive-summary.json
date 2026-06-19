@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-06-18T23:46:34.154Z",
+  "generated_at": "2026-06-19T21:41:01.351Z",
   "finalQuestion": "Can Marginly safely use historical pricing and opportunity calculations in production today?",
   "answer": "YES WITH CAVEATS",
   "historicalPricingStatus": "PARTIAL",
   "confidencePercent": 82,
   "headline": "Core €/base-unit pipeline trusted; isolated stale rows and unmatched lines remain.",
-  "trustedCount": 9,
+  "trustedCount": 17,
   "notTrustedCount": 1,
-  "staleCount": 16,
+  "staleCount": 8,
   "keyRisks": [
     "1 math/logic trust failures (volume parse, delta)",
     "9 ghost price_history rows (old invoice lines)",
     "13 stale operational mismatches in price_history",
-    "29 stale DB rows from Jun 11 era",
+    "21 stale DB rows from Jun 11 era",
     "25 unmatched lines — no price_history sync path"
   ],
   "recommendations": [

@@ -219,71 +219,20 @@ export type SyncIngredientCurrentPriceResult = {
   error: PostgrestError | null;
 };
 
-/** Projects `ingredients.current_price` from chronology-correct linked price history. */
+/** @deprecated Use {@link syncIngredientProcurementPrice} from `@/lib/ingredient-procurement-price-sync`. */
 export async function syncIngredientCurrentPrice(
   client: AppSupabaseClient,
   ingredientId: string,
 ): Promise<SyncIngredientCurrentPriceResult> {
-  const id = ingredientId.trim();
-  const empty: SyncIngredientCurrentPriceResult = {
-    updated: false,
-    currentPrice: null,
+  const { syncIngredientProcurementPrice } = await import("@/lib/ingredient-procurement-price-sync");
+  const result = await syncIngredientProcurementPrice(client, ingredientId);
+  return {
+    updated: result.updated,
+    currentPrice: result.currentPrice,
     latestOperationalPrice: null,
     sourceHistoryRowId: null,
-    error: null,
+    error: result.error,
   };
-  if (!id) return empty;
-
-  const snapshot = await fetchIngredientPriceSnapshot(client, id);
-  if (!snapshot) return empty;
-
-  try {
-    const { data, error } = await client
-      .from("ingredient_price_history")
-      .select(LINKED_HISTORY_CHRONOLOGY_SELECT)
-      .eq("ingredient_id", id)
-      .not("invoice_id", "is", null);
-    if (error) {
-      logSupabaseError("syncIngredientCurrentPrice fetch", error);
-      return { ...empty, error };
-    }
-
-    const { operationalPrice, sourceHistoryRowId } = latestLinkedOperationalPriceFromRows(
-      (data ?? []) as LinkedHistoryChronologyRow[],
-    );
-    let currentPrice: number | null = null;
-    if (operationalPrice != null && Number.isFinite(operationalPrice)) {
-      currentPrice = operationalPrice * purchaseQuantityDenom(snapshot.purchase_quantity);
-    }
-
-    const { error: updateError } = await client
-      .from("ingredients")
-      .update({ current_price: currentPrice })
-      .eq("id", id);
-    if (updateError) {
-      logSupabaseError("syncIngredientCurrentPrice update", updateError);
-      return {
-        updated: false,
-        currentPrice,
-        latestOperationalPrice: operationalPrice,
-        sourceHistoryRowId,
-        error: updateError,
-      };
-    }
-
-    return {
-      updated: true,
-      currentPrice,
-      latestOperationalPrice: operationalPrice,
-      sourceHistoryRowId,
-      error: null,
-    };
-  } catch (err) {
-    console.error(
-      `${LOG_PREFIX} syncIngredientCurrentPrice threw: ${err instanceof Error ? err.message : String(err)}`,
-    );
-    return empty;
-  }
 }
 
 /** Minimal shape for invoice-link checks on price history rows. */
@@ -562,6 +511,33 @@ export async function fetchLatestHistoryNewPrice(
   }
 }
 
+/** True when the ingredient already has at least one invoice-linked history row. */
+async function ingredientHasLinkedPriceHistory(
+  client: AppSupabaseClient,
+  ingredientId: string,
+): Promise<boolean> {
+  const id = ingredientId.trim();
+  if (!id) return false;
+  try {
+    const { data, error } = await client
+      .from("ingredient_price_history")
+      .select("id")
+      .eq("ingredient_id", id)
+      .not("invoice_id", "is", null)
+      .limit(1);
+    if (error) {
+      logSupabaseError("ingredientHasLinkedPriceHistory", error);
+      return false;
+    }
+    return (data?.length ?? 0) > 0;
+  } catch (err) {
+    console.error(
+      `${LOG_PREFIX} ingredientHasLinkedPriceHistory threw: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return false;
+  }
+}
+
 /**
  * Inserts or refreshes one `ingredient_price_history` row for an invoice line price change.
  * When `(invoice_id, ingredient_id)` already exists (re-extract), recomputes stored prices
@@ -625,9 +601,13 @@ export async function appendIngredientPriceHistoryFromInvoiceLine(
     return { inserted: false, skippedReason: "invalid_new_price", error: null };
   }
 
-  const { storedPrev, storedNew, prevPack } = computed;
+  let { storedPrev, storedNew, prevPack } = computed;
 
-  if (
+  const hasLinkedHistory = refreshExisting
+    ? true
+    : await ingredientHasLinkedPriceHistory(client, ingredientId);
+
+  const unchangedPrice =
     !refreshExisting &&
     (invoiceLinePricesUnchanged(
       prevPack,
@@ -635,9 +615,13 @@ export async function appendIngredientPriceHistoryFromInvoiceLine(
       newPrice,
       params.newPurchaseQuantity ?? null,
     ) ||
-      (storedPrev != null && Math.abs(storedPrev - storedNew) <= INGREDIENT_PRICE_EQ_EPS))
-  ) {
-    return { inserted: false, skippedReason: "unchanged_price", error: null };
+      (storedPrev != null && Math.abs(storedPrev - storedNew) <= INGREDIENT_PRICE_EQ_EPS));
+
+  if (unchangedPrice) {
+    if (hasLinkedHistory) {
+      return { inserted: false, skippedReason: "unchanged_price", error: null };
+    }
+    storedPrev = null;
   }
 
   if (refreshExisting && priceHistoryRowValuesMatch(existingRow, storedPrev, storedNew)) {
@@ -730,12 +714,13 @@ export async function deleteIngredientPriceHistoryForInvoiceIngredient(
   }
 }
 
-/** @deprecated Prefer {@link syncIngredientCurrentPrice}. */
+/** @deprecated Prefer {@link syncIngredientProcurementPrice}. */
 export async function revertIngredientCurrentPriceFromHistory(
   client: AppSupabaseClient,
   ingredientId: string,
 ): Promise<{ updated: boolean; error: PostgrestError | null }> {
-  const result = await syncIngredientCurrentPrice(client, ingredientId);
+  const { syncIngredientProcurementPrice } = await import("@/lib/ingredient-procurement-price-sync");
+  const result = await syncIngredientProcurementPrice(client, ingredientId);
   return { updated: result.updated, error: result.error };
 }
 

@@ -40,6 +40,10 @@ export function formatCurrency(value: number) {
 
 export function formatUnitCostCurrency(value: number) {
   const safeValue = finiteNumber(value);
+  if (Math.abs(safeValue) >= 1) {
+    return `€${formatNumber(safeValue, 2, 2)}`;
+  }
+
   const roundedToTwo = roundTo(safeValue, 2);
   if (Math.abs(safeValue - roundedToTwo) < 0.000_5) {
     return `€${formatNumber(safeValue, 2, 2)}`;

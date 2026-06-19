@@ -770,7 +770,7 @@ function IngredientDetailContent({
 
           <section className="overflow-hidden rounded-lg border border-border/30 bg-muted/[0.02]">
             <h3 className={`border-b border-border/20 px-3 py-2 ${sectionTitleClass}`}>
-              Operational Cost
+              Purchase economics
             </h3>
             {operationalCostPresentation ? (
               <dl className="divide-y divide-border/20">
@@ -788,7 +788,7 @@ function IngredientDetailContent({
               </dl>
             ) : (
               <p className="px-3 py-4 text-xs text-muted-foreground">
-                No operational cost on file
+                No purchase economics on file
               </p>
             )}
           </section>

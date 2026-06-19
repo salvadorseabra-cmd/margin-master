@@ -739,12 +739,20 @@ describe("ingredient-detail-panel", () => {
     expect(presentation?.lines).toEqual(
       expect.arrayContaining([
         { label: "Last Purchase", value: "3.30 kg" },
-        { label: "Unit Cost", value: "€1.95 / kg" },
+        { label: "Procurement Cost", value: "€1.95 / kg" },
+        { label: "Operational Cost", value: "€1.95 / kg" },
         { label: "Total Paid", value: "€5.15" },
         { label: "Supplier", value: "Bidfood Portugal" },
         { label: "Purchase Date", value: expect.stringMatching(/25.*2026/i) },
       ]),
     );
+    expect(presentation).toMatchObject({
+      lastPurchase: "3.30 kg",
+      procurementCost: "€1.95 / kg",
+      operationalCost: "€1.95 / kg",
+      totalPaid: "€5.15",
+      supplier: "Bidfood Portugal",
+    });
     expect(presentation?.lines.some((line) => line.label === "Pack")).toBe(false);
     expect(presentation?.lines.some((line) => line.label === "Quantity purchased")).toBe(false);
     expect(presentation?.lines.some((line) => line.label === "Usable quantity")).toBe(false);
@@ -754,6 +762,125 @@ describe("ingredient-detail-panel", () => {
   it("buildLastPurchaseCostPresentation returns null without purchase memory", () => {
     expect(buildLastPurchaseCostPresentation(null)).toBeNull();
     expect(buildLastPurchaseCostPresentation(undefined)).toBeNull();
+  });
+
+  it("buildLastPurchaseCostPresentation separates procurement and operational costs", () => {
+    const cases = [
+      {
+        id: "ing-peroni",
+        line: invoiceLine({
+          matchedIngredientId: "ing-peroni",
+          itemId: "line-peroni",
+          itemName: "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          supplierName: "Mammafiore",
+          invoiceDate: "2026-05-19",
+          quantity: 24,
+          unit: "un",
+          unitPrice: 1.07,
+          lineTotal: 25.69,
+        }),
+        expect: {
+          lastPurchase: "24 un",
+          procurementCost: "€1.07 / unit",
+          operationalCost: /^€3\.24 \/ L$/,
+          procurementDiffersFromOperational: true,
+        },
+      },
+      {
+        id: "ing-sp",
+        line: invoiceLine({
+          matchedIngredientId: "ing-sp",
+          itemId: "line-sp",
+          itemName: "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          supplierName: "Emporio Italia",
+          invoiceDate: "2026-06-10",
+          quantity: 2,
+          unit: "cx",
+          unitPrice: 19.28,
+          lineTotal: 38.56,
+        }),
+        expect: {
+          lastPurchase: "2 cases",
+          procurementCost: "€19.28 / case",
+          operationalCost: /^€1\.71 \/ L$/,
+          procurementDiffersFromOperational: true,
+        },
+      },
+      {
+        id: "ing-anchoas",
+        line: invoiceLine({
+          matchedIngredientId: "ing-anchoas",
+          itemId: "line-anchoas",
+          itemName: "Filete de Anchoas Alconfirosa LI 495 g",
+          supplierName: "Continente",
+          invoiceDate: "2026-05-18",
+          quantity: 2,
+          unit: "lata",
+          unitPrice: 9.99,
+          lineTotal: 19.98,
+        }),
+        expect: {
+          lastPurchase: "2 cans",
+          procurementCost: "€9.99 / g",
+          operationalCost: /^€20\.18 \/ kg$/,
+          procurementDiffersFromOperational: true,
+        },
+      },
+      {
+        id: "ing-aceto",
+        line: invoiceLine({
+          matchedIngredientId: "ing-aceto",
+          itemId: "line-aceto",
+          itemName: "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+          supplierName: "Mammafiore",
+          invoiceDate: "2026-05-19",
+          quantity: 1,
+          unit: "un",
+          unitPrice: 18.929,
+          lineTotal: 16.09,
+        }),
+        expect: {
+          lastPurchase: "1 un",
+          procurementCost: "€18.93 / unit",
+          operationalCost: /^€1\.89 \/ L$/,
+          procurementDiffersFromOperational: true,
+        },
+      },
+      {
+        id: "ing-mozz",
+        line: invoiceLine({
+          matchedIngredientId: "ing-mozz",
+          itemId: "line-mozz",
+          itemName: "MOZZARELLA JULIENNE 2KG",
+          supplierName: "Bidfood Portugal",
+          invoiceDate: "2026-05-25",
+          quantity: 1,
+          unit: "un",
+          unitPrice: 13.5,
+          lineTotal: 13.5,
+        }),
+        expect: {
+          lastPurchase: "1 un",
+          procurementCost: "€13.50 / kg",
+          operationalCost: /^€6\.75 \/ kg$/,
+          procurementDiffersFromOperational: true,
+        },
+      },
+    ] as const;
+
+    for (const testCase of cases) {
+      const purchases = buildRecentPurchases(testCase.id, "Ingredient", [testCase.line]);
+      const presentation = buildLastPurchaseCostPresentation(purchases[0]);
+
+      expect(presentation?.lastPurchase, testCase.id).toBe(testCase.expect.lastPurchase);
+      expect(presentation?.procurementCost, testCase.id).toBe(testCase.expect.procurementCost);
+      expect(presentation?.operationalCost, testCase.id).toMatch(testCase.expect.operationalCost);
+      if (testCase.expect.procurementDiffersFromOperational) {
+        expect(presentation?.procurementCost, testCase.id).not.toBe(
+          presentation?.operationalCost,
+        );
+      }
+    }
   });
 
   it("buildIngredientDetailHeaderPresentation shows ingredient name only", () => {

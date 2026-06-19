@@ -6,8 +6,7 @@
   "lineName": "Farina do pasta fresca e gnocchi25kg Caputo",
   "trustVerdict": "stale",
   "classification": [
-    "extraction_residue_or_stale",
-    "no_price_history"
+    "extraction_residue_or_stale"
   ],
   "invoiceSource": {
     "quantity": 1,
@@ -26,9 +25,18 @@
     "purchase_quantity": 1,
     "operationalUnitCost": 30.11
   },
-  "priceHistory": [],
+  "priceHistory": [
+    {
+      "id": "04dd2f90-7770-47cf-9ce7-f01da203d78a",
+      "previous_price": null,
+      "new_price": 30.11,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
   "opportunityRisk": [],
-  "notes": [
-    "Matched ingredient but no price_history row for this invoice"
-  ]
+  "notes": []
 }

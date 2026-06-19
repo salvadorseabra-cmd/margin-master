@@ -4,10 +4,8 @@
   "invoiceLabel": "Bidfood",
   "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
   "lineName": "Manteiga Coimbra s/Sal Emb 1 Kg",
-  "trustVerdict": "stale",
-  "classification": [
-    "no_price_history"
-  ],
+  "trustVerdict": "trusted",
+  "classification": [],
   "invoiceSource": {
     "quantity": 8,
     "unit": "kg",
@@ -25,9 +23,18 @@
     "purchase_quantity": 1000,
     "operationalUnitCost": 0.0089
   },
-  "priceHistory": [],
+  "priceHistory": [
+    {
+      "id": "54995295-99b0-4879-aa09-c34125905df9",
+      "previous_price": null,
+      "new_price": 0.0089,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
   "opportunityRisk": [],
-  "notes": [
-    "Matched ingredient but no price_history row for this invoice"
-  ]
+  "notes": []
 }

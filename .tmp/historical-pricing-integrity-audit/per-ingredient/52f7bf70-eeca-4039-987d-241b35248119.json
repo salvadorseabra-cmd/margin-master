@@ -4,10 +4,8 @@
   "invoiceLabel": "Bocconcino",
   "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
   "lineName": "POMODORI PELATI (CX 2,5KG*6)",
-  "trustVerdict": "stale",
-  "classification": [
-    "no_price_history"
-  ],
+  "trustVerdict": "trusted",
+  "classification": [],
   "invoiceSource": {
     "quantity": 1,
     "unit": "un",
@@ -25,9 +23,18 @@
     "purchase_quantity": 1,
     "operationalUnitCost": 22.05
   },
-  "priceHistory": [],
+  "priceHistory": [
+    {
+      "id": "ca320e47-4677-49e7-8b39-eb73f02bb314",
+      "previous_price": null,
+      "new_price": 22.05,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
   "opportunityRisk": [],
-  "notes": [
-    "Matched ingredient but no price_history row for this invoice"
-  ]
+  "notes": []
 }

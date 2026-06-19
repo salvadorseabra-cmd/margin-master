@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import * as priceHistory from "@/lib/ingredient-price-history";
 import * as reconcile from "@/lib/ingredient-price-history-reconcile";
 import * as matchLifecycleFlags from "@/lib/match-lifecycle-flags";
+import * as procurementSync from "@/lib/ingredient-procurement-price-sync";
 import {
   subtractivePricingCleanupForPreviousIngredient,
   subtractivePricingCleanupForUnmatch,
@@ -23,11 +24,13 @@ describe("subtractivePricingCleanupForUnmatch", () => {
       linkedRowCount: 1,
       errors: [],
     });
-    vi.spyOn(priceHistory, "syncIngredientCurrentPrice").mockResolvedValue({
+    vi.spyOn(procurementSync, "syncIngredientProcurementPrice").mockResolvedValue({
       updated: true,
       currentPrice: null,
-      latestOperationalPrice: null,
-      sourceHistoryRowId: null,
+      purchaseQuantity: null,
+      purchaseUnit: null,
+      sourceInvoiceId: null,
+      sourceInvoiceItemId: null,
       error: null,
     });
   });
@@ -54,9 +57,10 @@ describe("subtractivePricingCleanupForUnmatch", () => {
       client,
       "ing-pepino",
     );
-    expect(priceHistory.syncIngredientCurrentPrice).toHaveBeenCalledWith(
+    expect(procurementSync.syncIngredientProcurementPrice).toHaveBeenCalledWith(
       client,
       "ing-pepino",
+      { excludeInvoiceId: "inv-1" },
     );
   });
 

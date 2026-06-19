@@ -3,9 +3,9 @@ import { clearIngredientMatchedInvoiceProductsCache } from "@/lib/ingredient-ope
 import {
   deleteIngredientPriceHistoryForInvoiceIngredient,
   fetchHistoryRowForInvoiceIngredient,
-  syncIngredientCurrentPrice,
   type AppSupabaseClient,
 } from "@/lib/ingredient-price-history";
+import { syncIngredientProcurementPrice } from "@/lib/ingredient-procurement-price-sync";
 import { reconcileIngredientPriceHistoryChain } from "@/lib/ingredient-price-history-reconcile";
 import { isMatchLifecycleSubtractivePricingEnabled } from "@/lib/match-lifecycle-flags";
 
@@ -32,7 +32,7 @@ export type SubtractiveUnmatchPricingResult = SubtractivePricingCleanupResult;
 
 /**
  * Shared subtractive cleanup: delete `(invoice_id, ingredient_id)` history, rechain,
- * and sync `ingredients.current_price` from surviving history.
+ * and sync `ingredients.current_price` from the latest surviving procurement invoice.
  */
 export async function subtractivePricingCleanupForPreviousIngredient(
   client: AppSupabaseClient,
@@ -65,7 +65,9 @@ export async function subtractivePricingCleanupForPreviousIngredient(
     console.error(`${LOG_PREFIX} reconcile errors for ${ingredientId}:`, reconcileResult.errors);
   }
 
-  const syncResult = await syncIngredientCurrentPrice(client, ingredientId);
+  const syncResult = await syncIngredientProcurementPrice(client, ingredientId, {
+    excludeInvoiceId: invoiceId,
+  });
   if (syncResult.error) {
     return {
       cleaned: deleteResult.deleted,

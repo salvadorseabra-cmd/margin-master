@@ -4,10 +4,8 @@
   "invoiceLabel": "Bidfood",
   "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
   "lineName": "Manjericão",
-  "trustVerdict": "stale",
-  "classification": [
-    "no_price_history"
-  ],
+  "trustVerdict": "trusted",
+  "classification": [],
   "invoiceSource": {
     "quantity": 5,
     "unit": "mo",
@@ -25,9 +23,18 @@
     "purchase_quantity": 100,
     "operationalUnitCost": 0.025699999999999997
   },
-  "priceHistory": [],
+  "priceHistory": [
+    {
+      "id": "cab6571b-919b-4572-860e-7fb3a59fd8e8",
+      "previous_price": null,
+      "new_price": 0.025699999999999997,
+      "delta": null,
+      "delta_percent": null,
+      "deltaMathValid": true,
+      "directionValid": true,
+      "matchesComputedOperational": true
+    }
+  ],
   "opportunityRisk": [],
-  "notes": [
-    "Matched ingredient but no price_history row for this invoice"
-  ]
+  "notes": []
 }

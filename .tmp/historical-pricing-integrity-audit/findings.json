@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-18T23:46:34.134Z",
+  "generated_at": "2026-06-19T21:41:01.346Z",
   "vlInvoices": [
     {
       "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
@@ -29,12 +29,12 @@
   "deletedEmporioVlId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
   "summary": {
     "totalLineAudits": 51,
-    "trusted": 9,
+    "trusted": 17,
     "notTrusted": 1,
-    "stale": 16,
+    "stale": 8,
     "unmatched": 25,
-    "priceHistoryRows": 36,
-    "priceHistoryTrusted": 14,
+    "priceHistoryRows": 49,
+    "priceHistoryTrusted": 27,
     "priceHistoryStale": 13,
     "priceHistoryGhost": 9,
     "priceHistoryNotTrusted": 0,
@@ -52,14 +52,44 @@
     "extraction_residue": 2,
     "gt_catalog": 0,
     "gross_vs_net": 1,
-    "no_history": 11,
+    "no_history": 2,
     "unit_scaling": 0
   },
   "fullyTrustedIngredients": [
     {
+      "ingredient": "Manjericão",
+      "invoice": "Bidfood",
+      "line": "Manjericão"
+    },
+    {
       "ingredient": "Tomilho",
       "invoice": "Bidfood",
       "line": "Tomilho"
+    },
+    {
+      "ingredient": "Manteiga s/sal",
+      "invoice": "Bidfood",
+      "line": "Manteiga Coimbra s/Sal Emb 1 Kg"
+    },
+    {
+      "ingredient": "Abóbora butternut",
+      "invoice": "Bidfood",
+      "line": "Abóbora Butternut"
+    },
+    {
+      "ingredient": "Alho francês",
+      "invoice": "Bidfood",
+      "line": "Alho Francês"
+    },
+    {
+      "ingredient": "Courgettes",
+      "invoice": "Bidfood",
+      "line": "Courgettes"
+    },
+    {
+      "ingredient": "Pêra abacate",
+      "invoice": "Bidfood",
+      "line": "Pêra Abacate Hasse"
     },
     {
       "ingredient": "Hortelã",
@@ -82,6 +112,11 @@
       "line": "MEZZI PACCHERI MANCINI (CX 1KG*6)"
     },
     {
+      "ingredient": "Pomodori pelati",
+      "invoice": "Bocconcino",
+      "line": "POMODORI PELATI (CX 2,5KG*6)"
+    },
+    {
       "ingredient": "Ricotta trevigiana",
       "invoice": "Bocconcino",
       "line": "RICOTTA TREVIGIANA 1,5KG"
@@ -100,6 +135,11 @@
       "ingredient": "Mortadella IGP massima con pistacchio",
       "invoice": "Emporio (live)",
       "line": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5kg"
+    },
+    {
+      "ingredient": "Rulo di capra",
+      "invoice": "Mammafiore",
+      "line": "Rulo Di Capra 1kg*2 Simonetta"
     }
   ],
   "notTrustedIngredients": [
@@ -119,48 +159,6 @@
   ],
   "staleIngredients": [
     {
-      "ingredient": "Manjericão",
-      "invoice": "Bidfood",
-      "reasons": [
-        "no_price_history"
-      ]
-    },
-    {
-      "ingredient": "Manteiga s/sal",
-      "invoice": "Bidfood",
-      "reasons": [
-        "no_price_history"
-      ]
-    },
-    {
-      "ingredient": "Abóbora butternut",
-      "invoice": "Bidfood",
-      "reasons": [
-        "no_price_history"
-      ]
-    },
-    {
-      "ingredient": "Alho francês",
-      "invoice": "Bidfood",
-      "reasons": [
-        "no_price_history"
-      ]
-    },
-    {
-      "ingredient": "Courgettes",
-      "invoice": "Bidfood",
-      "reasons": [
-        "no_price_history"
-      ]
-    },
-    {
-      "ingredient": "Pêra abacate",
-      "invoice": "Bidfood",
-      "reasons": [
-        "no_price_history"
-      ]
-    },
-    {
       "ingredient": "Pepino conserva",
       "invoice": "Bidfood",
       "reasons": [
@@ -174,13 +172,6 @@
       "reasons": [
         "pack_qty_mismatch",
         "stale_price_history"
-      ]
-    },
-    {
-      "ingredient": "Pomodori pelati",
-      "invoice": "Bocconcino",
-      "reasons": [
-        "no_price_history"
       ]
     },
     {
@@ -208,8 +199,7 @@
       "ingredient": "Farina do pasta fresca e gnocchi",
       "invoice": "Mammafiore",
       "reasons": [
-        "extraction_residue_or_stale",
-        "no_price_history"
+        "extraction_residue_or_stale"
       ]
     },
     {
@@ -224,13 +214,6 @@
       "invoice": "Mammafiore",
       "reasons": [
         "pack_qty_mismatch"
-      ]
-    },
-    {
-      "ingredient": "Rulo di capra",
-      "invoice": "Mammafiore",
-      "reasons": [
-        "no_price_history"
       ]
     }
   ],
@@ -252,6 +235,33 @@
     }
   ],
   "priceHistoryRowAudits": [
+    {
+      "historyId": "e967f673-1dc5-4390-90e6-464b66ec2a4b",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+      "ingredientName": "Gema líquida",
+      "historyIngredientName": "Gema líquida",
+      "matchedLineName": "Ovo Líquido Past.Gema Dovo 1kg",
+      "trustVerdict": "stale",
+      "classification": [
+        "stale_operational_mismatch",
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": null,
+        "new_price": 10.19,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 1.6983333333333333,
+        "deltaMathValid": true
+      },
+      "notes": [
+        "Stored 10.19 vs recomputed 1.6983 from line"
+      ]
+    },
     {
       "historyId": "d72bf77a-eb4c-4ade-a26f-e01c0b7e6a5b",
       "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
@@ -277,25 +287,23 @@
       "notes": []
     },
     {
-      "historyId": "73df8387-6906-4341-8e33-0864f70f502a",
+      "historyId": "3c508a43-68bd-4b69-9205-61ddbbfb26a7",
       "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
       "invoiceLabel": "Aviludo April",
-      "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
-      "ingredientName": "Açúcar branco",
-      "historyIngredientName": "Açúcar branco",
-      "matchedLineName": "Açúcar Branco Metro Chef 10x1Kg",
-      "trustVerdict": "ghost",
-      "classification": [
-        "vl_final_state_ghost"
-      ],
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "ingredientName": "Mozzarella fior di latte",
+      "historyIngredientName": "Mozzarella fior di latte",
+      "matchedLineName": "Mozzarella Flor di Latte 2Kg",
+      "trustVerdict": "trusted",
+      "classification": [],
       "stored": {
         "previous_price": null,
-        "new_price": 0.9289999999999999,
+        "new_price": 13.69,
         "delta": null,
         "delta_percent": null
       },
       "computed": {
-        "expectedOperationalNew": 0.9289999999999999,
+        "expectedOperationalNew": 13.69,
         "deltaMathValid": true
       },
       "notes": []
@@ -351,30 +359,6 @@
       ]
     },
     {
-      "historyId": "2767b722-0985-45a8-9c80-9e9dae611142",
-      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
-      "invoiceLabel": "Aviludo April",
-      "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
-      "ingredientName": "Nata culinária",
-      "historyIngredientName": "Nata culinária",
-      "matchedLineName": "Nata Reny Picot 22% 6x1L",
-      "trustVerdict": "ghost",
-      "classification": [
-        "vl_final_state_ghost"
-      ],
-      "stored": {
-        "previous_price": null,
-        "new_price": 3.0483333333333333,
-        "delta": null,
-        "delta_percent": null
-      },
-      "computed": {
-        "expectedOperationalNew": 3.0483333333333333,
-        "deltaMathValid": true
-      },
-      "notes": []
-    },
-    {
       "historyId": "bc6b61db-7e1f-477e-9b9f-a8103bfd3db2",
       "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
       "invoiceLabel": "Aviludo April",
@@ -394,6 +378,30 @@
       },
       "computed": {
         "expectedOperationalNew": 1.1208333333333333,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "2767b722-0985-45a8-9c80-9e9dae611142",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoiceLabel": "Aviludo April",
+      "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+      "ingredientName": "Nata culinária",
+      "historyIngredientName": "Nata culinária",
+      "matchedLineName": "Nata Reny Picot 22% 6x1L",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": null,
+        "new_price": 3.0483333333333333,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 3.0483333333333333,
         "deltaMathValid": true
       },
       "notes": []
@@ -426,50 +434,139 @@
       ]
     },
     {
-      "historyId": "e967f673-1dc5-4390-90e6-464b66ec2a4b",
+      "historyId": "73df8387-6906-4341-8e33-0864f70f502a",
       "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
       "invoiceLabel": "Aviludo April",
-      "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
-      "ingredientName": "Gema líquida",
-      "historyIngredientName": "Gema líquida",
-      "matchedLineName": "Ovo Líquido Past.Gema Dovo 1kg",
-      "trustVerdict": "stale",
+      "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+      "ingredientName": "Açúcar branco",
+      "historyIngredientName": "Açúcar branco",
+      "matchedLineName": "Açúcar Branco Metro Chef 10x1Kg",
+      "trustVerdict": "ghost",
       "classification": [
-        "stale_operational_mismatch",
         "vl_final_state_ghost"
       ],
       "stored": {
         "previous_price": null,
-        "new_price": 10.19,
+        "new_price": 0.9289999999999999,
         "delta": null,
         "delta_percent": null
       },
       "computed": {
-        "expectedOperationalNew": 1.6983333333333333,
+        "expectedOperationalNew": 0.9289999999999999,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "4bd5e0f1-8579-4726-9b1b-9c4a53e188a7",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+      "ingredientName": "Água san pellegrino",
+      "historyIngredientName": "Água san pellegrino",
+      "matchedLineName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "trustVerdict": "stale",
+      "classification": [
+        "stale_operational_mismatch"
+      ],
+      "stored": {
+        "previous_price": null,
+        "new_price": 0.001864,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 10.485,
         "deltaMathValid": true
       },
       "notes": [
-        "Stored 10.19 vs recomputed 1.6983 from line"
+        "Stored 0.001864 vs recomputed 10.485 from line"
       ]
     },
     {
-      "historyId": "3c508a43-68bd-4b69-9205-61ddbbfb26a7",
-      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
-      "invoiceLabel": "Aviludo April",
-      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
-      "ingredientName": "Mozzarella fior di latte",
-      "historyIngredientName": "Mozzarella fior di latte",
-      "matchedLineName": "Mozzarella Flor di Latte 2Kg",
+      "historyId": "b28ab86d-c95c-4346-accd-2f3d770f0aef",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "ingredientId": "b091e1d0-e7e2-49a8-a9a7-f61c8a4d4263",
+      "ingredientName": "Rolo de cabra e vaca",
+      "historyIngredientName": "Rolo de cabra e vaca",
+      "matchedLineName": "ROLO DE CABRA E VACA 1KG",
       "trustVerdict": "trusted",
       "classification": [],
       "stored": {
         "previous_price": null,
-        "new_price": 13.69,
+        "new_price": 12.87,
         "delta": null,
         "delta_percent": null
       },
       "computed": {
-        "expectedOperationalNew": 13.69,
+        "expectedOperationalNew": 12.87,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "ca320e47-4677-49e7-8b39-eb73f02bb314",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "ingredientId": "52f7bf70-eeca-4039-987d-241b35248119",
+      "ingredientName": "Pomodori pelati",
+      "historyIngredientName": "Pomodori pelati",
+      "matchedLineName": "POMODORI PELATI (CX 2,5KG*6)",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 22.05,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 22.05,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "27ebdf67-4ae7-4b2e-b55b-b818dda5f5aa",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "ingredientId": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+      "ingredientName": "Mezzi paccheri mancini",
+      "historyIngredientName": "Mezzi paccheri mancini",
+      "matchedLineName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 13.655,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 13.655,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "3219f379-1e51-4e6c-b1ee-a5cd1af1a989",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceLabel": "Bocconcino",
+      "ingredientId": "6ec0bc6b-409a-4db2-b21f-fb01394f0014",
+      "ingredientName": "Ricotta trevigiana",
+      "historyIngredientName": "Ricotta trevigiana",
+      "matchedLineName": "RICOTTA TREVIGIANA 1,5KG",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 3.985,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 3.985,
         "deltaMathValid": true
       },
       "notes": []
@@ -501,54 +598,6 @@
       ]
     },
     {
-      "historyId": "4bd5e0f1-8579-4726-9b1b-9c4a53e188a7",
-      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-      "invoiceLabel": "Bocconcino",
-      "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
-      "ingredientName": "Água san pellegrino",
-      "historyIngredientName": "Água san pellegrino",
-      "matchedLineName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
-      "trustVerdict": "stale",
-      "classification": [
-        "stale_operational_mismatch"
-      ],
-      "stored": {
-        "previous_price": null,
-        "new_price": 0.02796,
-        "delta": null,
-        "delta_percent": null
-      },
-      "computed": {
-        "expectedOperationalNew": 10.485,
-        "deltaMathValid": true
-      },
-      "notes": [
-        "Stored 0.02796 vs recomputed 10.485 from line"
-      ]
-    },
-    {
-      "historyId": "27ebdf67-4ae7-4b2e-b55b-b818dda5f5aa",
-      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-      "invoiceLabel": "Bocconcino",
-      "ingredientId": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
-      "ingredientName": "Mezzi paccheri mancini",
-      "historyIngredientName": "Mezzi paccheri mancini",
-      "matchedLineName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
-      "trustVerdict": "trusted",
-      "classification": [],
-      "stored": {
-        "previous_price": null,
-        "new_price": 13.655,
-        "delta": null,
-        "delta_percent": null
-      },
-      "computed": {
-        "expectedOperationalNew": 13.655,
-        "deltaMathValid": true
-      },
-      "notes": []
-    },
-    {
       "historyId": "194bb341-bd65-432e-90f0-6f62f42da8de",
       "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
       "invoiceLabel": "Bocconcino",
@@ -575,45 +624,437 @@
       ]
     },
     {
-      "historyId": "3219f379-1e51-4e6c-b1ee-a5cd1af1a989",
-      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-      "invoiceLabel": "Bocconcino",
-      "ingredientId": "6ec0bc6b-409a-4db2-b21f-fb01394f0014",
-      "ingredientName": "Ricotta trevigiana",
-      "historyIngredientName": "Ricotta trevigiana",
-      "matchedLineName": "RICOTTA TREVIGIANA 1,5KG",
+      "historyId": "04dd2f90-7770-47cf-9ce7-f01da203d78a",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "ingredientId": "7c850fb7-71e5-4649-8ecc-d1641d5b9e95",
+      "ingredientName": "Farina do pasta fresca e gnocchi",
+      "historyIngredientName": "Farina do pasta fresca e gnocchi",
+      "matchedLineName": "Farina do pasta fresca e gnocchi25kg Caputo",
       "trustVerdict": "trusted",
       "classification": [],
       "stored": {
         "previous_price": null,
-        "new_price": 3.985,
+        "new_price": 30.11,
         "delta": null,
         "delta_percent": null
       },
       "computed": {
-        "expectedOperationalNew": 3.985,
+        "expectedOperationalNew": 30.11,
         "deltaMathValid": true
       },
       "notes": []
     },
     {
-      "historyId": "b28ab86d-c95c-4346-accd-2f3d770f0aef",
-      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-      "invoiceLabel": "Bocconcino",
-      "ingredientId": "b091e1d0-e7e2-49a8-a9a7-f61c8a4d4263",
-      "ingredientName": "Rolo de cabra e vaca",
-      "historyIngredientName": "Rolo de cabra e vaca",
-      "matchedLineName": "ROLO DE CABRA E VACA 1KG",
+      "historyId": "edc6c627-d934-40de-8eb8-cc0a25d36755",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+      "ingredientName": "Arroz agulha",
+      "historyIngredientName": "Arroz agulha",
+      "matchedLineName": "Arroz Agulha Metro Chef 12x1 kg",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": 1.1208333333333333,
+        "new_price": 1.1624999999999999,
+        "delta": 0.04166666666666652,
+        "delta_percent": 3.717472118959095
+      },
+      "computed": {
+        "expectedOperationalNew": 1.1624999999999999,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "5bd9a4e1-713f-4474-9985-f46bdb1b36b0",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "ingredientName": "Pepino conserva",
+      "historyIngredientName": "Pepino conserva",
+      "matchedLineName": "Pepinos Extra Uli Frasco 6x720 g",
       "trustVerdict": "trusted",
       "classification": [],
       "stored": {
+        "previous_price": 3.6649999999999996,
+        "new_price": 3.748333333333333,
+        "delta": 0.08333333333333348,
+        "delta_percent": 2.273760800363806
+      },
+      "computed": {
+        "expectedOperationalNew": 3.748333333333333,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "da9d4ea1-f7ee-427e-869b-623aacbd550d",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+      "ingredientName": "Nata culinária",
+      "historyIngredientName": "Nata culinária",
+      "matchedLineName": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": 3.0483333333333333,
+        "new_price": 3.1483333333333334,
+        "delta": 0.10000000000000009,
+        "delta_percent": 3.2804811372334637
+      },
+      "computed": {
+        "expectedOperationalNew": 3.1483333333333334,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "4a00605a-a9e7-4b93-969b-92e5aae8e714",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+      "ingredientName": "Água san pellegrino",
+      "historyIngredientName": "Água san pellegrino",
+      "matchedLineName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "trustVerdict": "stale",
+      "classification": [
+        "stale_operational_mismatch"
+      ],
+      "stored": {
+        "previous_price": 0.001864,
+        "new_price": 0.0017137777777777778,
+        "delta": -0.00015022222222222216,
+        "delta_percent": -8.059132093466854
+      },
+      "computed": {
+        "expectedOperationalNew": 9.64,
+        "deltaMathValid": true
+      },
+      "notes": [
+        "Stored 0.0017137777777777778 vs recomputed 9.64 from line"
+      ]
+    },
+    {
+      "historyId": "1d9d5133-724b-461c-b141-605392f2b64d",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+      "ingredientName": "Açúcar branco",
+      "historyIngredientName": "Açúcar branco",
+      "matchedLineName": "Açucar Branco METRO Chef 10x1 Kg",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": 0.9289999999999999,
+        "new_price": 0.999,
+        "delta": 0.07000000000000006,
+        "delta_percent": 7.534983853606035
+      },
+      "computed": {
+        "expectedOperationalNew": 0.999,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "bf250ee4-388a-480f-96d7-e8c0e8e8dfb2",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+      "ingredientName": "Chocolate culinária",
+      "historyIngredientName": "Chocolate culinária",
+      "matchedLineName": "Chocolate Culinaria Pantagruel 10x200 g",
+      "trustVerdict": "ghost",
+      "classification": [
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": 2.919,
+        "new_price": 2.9989999999999997,
+        "delta": 0.07999999999999963,
+        "delta_percent": 2.7406646111681954
+      },
+      "computed": {
+        "expectedOperationalNew": 2.9989999999999997,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "7d6b70fa-543f-41c2-89e5-2b691afcdff4",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b",
+      "ingredientName": "Birra peroni nastro azzurro 33cl",
+      "historyIngredientName": "Birra peroni nastro azzurro 33cl",
+      "matchedLineName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "trustVerdict": "stale",
+      "classification": [
+        "stale_operational_mismatch"
+      ],
+      "stored": {
         "previous_price": null,
-        "new_price": 12.87,
+        "new_price": 0.0001351010101010101,
         "delta": null,
         "delta_percent": null
       },
       "computed": {
-        "expectedOperationalNew": 12.87,
+        "expectedOperationalNew": 0.044583333333333336,
+        "deltaMathValid": true
+      },
+      "notes": [
+        "Stored 0.0001351010101010101 vs recomputed 0.0446 from line"
+      ]
+    },
+    {
+      "historyId": "e143080d-511b-4c37-9018-11949343aedc",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+      "ingredientName": "Gema líquida",
+      "historyIngredientName": "Gema líquida",
+      "matchedLineName": "Ovo Líquido Past.Gema Dovo 1 Kg",
+      "trustVerdict": "stale",
+      "classification": [
+        "stale_operational_mismatch",
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": 10.19,
+        "new_price": 10.49,
+        "delta": 0.3000000000000007,
+        "delta_percent": 2.944062806673216
+      },
+      "computed": {
+        "expectedOperationalNew": 1.7483333333333333,
+        "deltaMathValid": true
+      },
+      "notes": [
+        "Stored 10.49 vs recomputed 1.7483 from line"
+      ]
+    },
+    {
+      "historyId": "3e837eab-c658-4d88-9988-a700659a6196",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "ingredientId": "3976c267-f8aa-4173-abc7-55410811f399",
+      "ingredientName": "Farine speciale pizza",
+      "historyIngredientName": "Farine speciale pizza",
+      "matchedLineName": "Farina Speciale pizza 25kg Amoruso",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 26.52,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 26.52,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "31967d4f-b9f2-4682-b6ae-5508328af824",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6",
+      "ingredientName": "Guanciale stagionato",
+      "historyIngredientName": "Guanciale stagionato",
+      "matchedLineName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "trustVerdict": "stale",
+      "classification": [
+        "stale_operational_mismatch"
+      ],
+      "stored": {
+        "previous_price": null,
+        "new_price": 10.83,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 1.806204136090727,
+        "deltaMathValid": true
+      },
+      "notes": [
+        "Stored 10.83 vs recomputed 1.8062 from line"
+      ]
+    },
+    {
+      "historyId": "781ab1ac-39d2-4462-9106-635e5603c466",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+      "ingredientName": "Atum em óleo",
+      "historyIngredientName": "Atum em óleo",
+      "matchedLineName": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+      "trustVerdict": "stale",
+      "classification": [
+        "non_equivalent_unit_chain"
+      ],
+      "stored": {
+        "previous_price": 6.29,
+        "new_price": 13.1,
+        "delta": 6.81,
+        "delta_percent": 108.2670906200318
+      },
+      "computed": {
+        "expectedOperationalNew": 13.1,
+        "deltaMathValid": true
+      },
+      "notes": [
+        "Large cross-format delta 108.2671% — prior/new may be different pack bases"
+      ]
+    },
+    {
+      "historyId": "44fbb625-017d-40c6-bf0d-31a460b17bb4",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "ingredientId": "5e9e7f89-7141-44f7-b8d4-bc92bad9bc36",
+      "ingredientName": "Mozzarella julienne",
+      "historyIngredientName": "Mozzarella julienne",
+      "matchedLineName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "trustVerdict": "stale",
+      "classification": [
+        "stale_operational_mismatch"
+      ],
+      "stored": {
+        "previous_price": null,
+        "new_price": 20.03,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 2.003,
+        "deltaMathValid": true
+      },
+      "notes": [
+        "Stored 20.03 vs recomputed 2.003 from line"
+      ]
+    },
+    {
+      "historyId": "b0e17b8b-22d5-4b02-8477-dca1b913f986",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+      "ingredientName": "Prosciutto cotto scelto",
+      "historyIngredientName": "Prosciutto cotto scelto",
+      "matchedLineName": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+      "trustVerdict": "stale",
+      "classification": [
+        "stale_operational_mismatch"
+      ],
+      "stored": {
+        "previous_price": null,
+        "new_price": 8.5,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 0.0085,
+        "deltaMathValid": true
+      },
+      "notes": [
+        "Stored 8.5 vs recomputed 0.0085 from line"
+      ]
+    },
+    {
+      "historyId": "908de185-e61a-4f41-af4c-3b70f69bd08f",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoiceLabel": "Aviludo May",
+      "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+      "ingredientName": "Anchoas",
+      "historyIngredientName": "Anchoas",
+      "matchedLineName": "Filete de Anchoas Alconfirosa LI 495 g",
+      "trustVerdict": "stale",
+      "classification": [
+        "stale_operational_mismatch",
+        "vl_final_state_ghost"
+      ],
+      "stored": {
+        "previous_price": 9.49,
+        "new_price": 9.99,
+        "delta": 0.5,
+        "delta_percent": 5.268703898840886
+      },
+      "computed": {
+        "expectedOperationalNew": 4.995,
+        "deltaMathValid": true
+      },
+      "notes": [
+        "Stored 9.99 vs recomputed 4.995 from line"
+      ]
+    },
+    {
+      "historyId": "2b9887cd-29b7-4eab-b346-9d3662494db0",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "ingredientId": "4dd38782-c986-4d4b-8ecb-fd84359744b1",
+      "ingredientName": "Rulo di capra",
+      "historyIngredientName": "Rulo di capra",
+      "matchedLineName": "Rulo Di Capra 1kg*2 Simonetta",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 10.86,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 10.86,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "d35170c1-d94e-49d5-ac45-1871e00bd98b",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceLabel": "Emporio (live)",
+      "ingredientId": "d7fcbb41-4e19-47ee-bbea-058e7b44a040",
+      "ingredientName": "Paccheri lisci",
+      "historyIngredientName": "Paccheri lisci",
+      "matchedLineName": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 2.35,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 2.35,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "3bedfab2-8567-4059-a931-e8473cccabbc",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceLabel": "Mammafiore",
+      "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4",
+      "ingredientName": "Aceto balsamico di modena IGP",
+      "historyIngredientName": "Aceto balsamico di modena IGP",
+      "matchedLineName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 0.0015550000000000002,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 0.0015550000000000002,
         "deltaMathValid": true
       },
       "notes": []
@@ -707,371 +1148,199 @@
       "notes": []
     },
     {
-      "historyId": "781ab1ac-39d2-4462-9106-635e5603c466",
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "invoiceLabel": "Aviludo May",
-      "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
-      "ingredientName": "Atum em óleo",
-      "historyIngredientName": "Atum em óleo",
-      "matchedLineName": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
-      "trustVerdict": "stale",
-      "classification": [
-        "non_equivalent_unit_chain"
-      ],
-      "stored": {
-        "previous_price": 6.29,
-        "new_price": 13.1,
-        "delta": 6.81,
-        "delta_percent": 108.2670906200318
-      },
-      "computed": {
-        "expectedOperationalNew": 13.1,
-        "deltaMathValid": true
-      },
-      "notes": [
-        "Large cross-format delta 108.2671% — prior/new may be different pack bases"
-      ]
-    },
-    {
-      "historyId": "edc6c627-d934-40de-8eb8-cc0a25d36755",
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "invoiceLabel": "Aviludo May",
-      "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
-      "ingredientName": "Arroz agulha",
-      "historyIngredientName": "Arroz agulha",
-      "matchedLineName": "Arroz Agulha Metro Chef 12x1 kg",
-      "trustVerdict": "ghost",
-      "classification": [
-        "vl_final_state_ghost"
-      ],
-      "stored": {
-        "previous_price": 1.1208333333333333,
-        "new_price": 1.1624999999999999,
-        "delta": 0.04166666666666652,
-        "delta_percent": 3.717472118959095
-      },
-      "computed": {
-        "expectedOperationalNew": 1.1624999999999999,
-        "deltaMathValid": true
-      },
-      "notes": []
-    },
-    {
-      "historyId": "5bd9a4e1-713f-4474-9985-f46bdb1b36b0",
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "invoiceLabel": "Aviludo May",
-      "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
-      "ingredientName": "Pepino conserva",
-      "historyIngredientName": "Pepino conserva",
-      "matchedLineName": "Pepinos Extra Uli Frasco 6x720 g",
-      "trustVerdict": "trusted",
-      "classification": [],
-      "stored": {
-        "previous_price": 3.6649999999999996,
-        "new_price": 3.748333333333333,
-        "delta": 0.08333333333333348,
-        "delta_percent": 2.273760800363806
-      },
-      "computed": {
-        "expectedOperationalNew": 3.748333333333333,
-        "deltaMathValid": true
-      },
-      "notes": []
-    },
-    {
-      "historyId": "da9d4ea1-f7ee-427e-869b-623aacbd550d",
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "invoiceLabel": "Aviludo May",
-      "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
-      "ingredientName": "Nata culinária",
-      "historyIngredientName": "Nata culinária",
-      "matchedLineName": "Nata Culinaria 22% Reny Picot 6x1 Lt",
-      "trustVerdict": "trusted",
-      "classification": [],
-      "stored": {
-        "previous_price": 3.0483333333333333,
-        "new_price": 3.1483333333333334,
-        "delta": 0.10000000000000009,
-        "delta_percent": 3.2804811372334637
-      },
-      "computed": {
-        "expectedOperationalNew": 3.1483333333333334,
-        "deltaMathValid": true
-      },
-      "notes": []
-    },
-    {
-      "historyId": "1d9d5133-724b-461c-b141-605392f2b64d",
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "invoiceLabel": "Aviludo May",
-      "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
-      "ingredientName": "Açúcar branco",
-      "historyIngredientName": "Açúcar branco",
-      "matchedLineName": "Açucar Branco METRO Chef 10x1 Kg",
-      "trustVerdict": "ghost",
-      "classification": [
-        "vl_final_state_ghost"
-      ],
-      "stored": {
-        "previous_price": 0.9289999999999999,
-        "new_price": 0.999,
-        "delta": 0.07000000000000006,
-        "delta_percent": 7.534983853606035
-      },
-      "computed": {
-        "expectedOperationalNew": 0.999,
-        "deltaMathValid": true
-      },
-      "notes": []
-    },
-    {
-      "historyId": "bf250ee4-388a-480f-96d7-e8c0e8e8dfb2",
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "invoiceLabel": "Aviludo May",
-      "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
-      "ingredientName": "Chocolate culinária",
-      "historyIngredientName": "Chocolate culinária",
-      "matchedLineName": "Chocolate Culinaria Pantagruel 10x200 g",
-      "trustVerdict": "ghost",
-      "classification": [
-        "vl_final_state_ghost"
-      ],
-      "stored": {
-        "previous_price": 2.919,
-        "new_price": 2.9989999999999997,
-        "delta": 0.07999999999999963,
-        "delta_percent": 2.7406646111681954
-      },
-      "computed": {
-        "expectedOperationalNew": 2.9989999999999997,
-        "deltaMathValid": true
-      },
-      "notes": []
-    },
-    {
-      "historyId": "7d6b70fa-543f-41c2-89e5-2b691afcdff4",
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "invoiceLabel": "Mammafiore",
-      "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b",
-      "ingredientName": "Birra peroni nastro azzurro 33cl",
-      "historyIngredientName": "Birra peroni nastro azzurro 33cl",
-      "matchedLineName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
-      "trustVerdict": "stale",
-      "classification": [
-        "stale_operational_mismatch"
-      ],
-      "stored": {
-        "previous_price": null,
-        "new_price": 0.0001351010101010101,
-        "delta": null,
-        "delta_percent": null
-      },
-      "computed": {
-        "expectedOperationalNew": 0.044583333333333336,
-        "deltaMathValid": true
-      },
-      "notes": [
-        "Stored 0.0001351010101010101 vs recomputed 0.0446 from line"
-      ]
-    },
-    {
-      "historyId": "31967d4f-b9f2-4682-b6ae-5508328af824",
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "invoiceLabel": "Mammafiore",
-      "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6",
-      "ingredientName": "Guanciale stagionato",
-      "historyIngredientName": "Guanciale stagionato",
-      "matchedLineName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
-      "trustVerdict": "stale",
-      "classification": [
-        "stale_operational_mismatch"
-      ],
-      "stored": {
-        "previous_price": null,
-        "new_price": 10.83,
-        "delta": null,
-        "delta_percent": null
-      },
-      "computed": {
-        "expectedOperationalNew": 1.806204136090727,
-        "deltaMathValid": true
-      },
-      "notes": [
-        "Stored 10.83 vs recomputed 1.8062 from line"
-      ]
-    },
-    {
-      "historyId": "e143080d-511b-4c37-9018-11949343aedc",
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "invoiceLabel": "Aviludo May",
-      "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
-      "ingredientName": "Gema líquida",
-      "historyIngredientName": "Gema líquida",
-      "matchedLineName": "Ovo Líquido Past.Gema Dovo 1 Kg",
-      "trustVerdict": "stale",
-      "classification": [
-        "stale_operational_mismatch",
-        "vl_final_state_ghost"
-      ],
-      "stored": {
-        "previous_price": 10.19,
-        "new_price": 10.49,
-        "delta": 0.3000000000000007,
-        "delta_percent": 2.944062806673216
-      },
-      "computed": {
-        "expectedOperationalNew": 1.7483333333333333,
-        "deltaMathValid": true
-      },
-      "notes": [
-        "Stored 10.49 vs recomputed 1.7483 from line"
-      ]
-    },
-    {
-      "historyId": "44fbb625-017d-40c6-bf0d-31a460b17bb4",
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "invoiceLabel": "Mammafiore",
-      "ingredientId": "5e9e7f89-7141-44f7-b8d4-bc92bad9bc36",
-      "ingredientName": "Mozzarella julienne",
-      "historyIngredientName": "Mozzarella julienne",
-      "matchedLineName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
-      "trustVerdict": "stale",
-      "classification": [
-        "stale_operational_mismatch"
-      ],
-      "stored": {
-        "previous_price": null,
-        "new_price": 20.03,
-        "delta": null,
-        "delta_percent": null
-      },
-      "computed": {
-        "expectedOperationalNew": 2.003,
-        "deltaMathValid": true
-      },
-      "notes": [
-        "Stored 20.03 vs recomputed 2.003 from line"
-      ]
-    },
-    {
-      "historyId": "b0e17b8b-22d5-4b02-8477-dca1b913f986",
-      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
-      "invoiceLabel": "Emporio (live)",
-      "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
-      "ingredientName": "Prosciutto cotto scelto",
-      "historyIngredientName": "Prosciutto cotto scelto",
-      "matchedLineName": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
-      "trustVerdict": "stale",
-      "classification": [
-        "stale_operational_mismatch"
-      ],
-      "stored": {
-        "previous_price": null,
-        "new_price": 8.5,
-        "delta": null,
-        "delta_percent": null
-      },
-      "computed": {
-        "expectedOperationalNew": 0.0085,
-        "deltaMathValid": true
-      },
-      "notes": [
-        "Stored 8.5 vs recomputed 0.0085 from line"
-      ]
-    },
-    {
-      "historyId": "908de185-e61a-4f41-af4c-3b70f69bd08f",
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "invoiceLabel": "Aviludo May",
-      "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
-      "ingredientName": "Anchoas",
-      "historyIngredientName": "Anchoas",
-      "matchedLineName": "Filete de Anchoas Alconfirosa LI 495 g",
-      "trustVerdict": "stale",
-      "classification": [
-        "stale_operational_mismatch",
-        "vl_final_state_ghost"
-      ],
-      "stored": {
-        "previous_price": 9.49,
-        "new_price": 9.99,
-        "delta": 0.5,
-        "delta_percent": 5.268703898840886
-      },
-      "computed": {
-        "expectedOperationalNew": 4.995,
-        "deltaMathValid": true
-      },
-      "notes": [
-        "Stored 9.99 vs recomputed 4.995 from line"
-      ]
-    },
-    {
-      "historyId": "4a00605a-a9e7-4b93-969b-92e5aae8e714",
-      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
-      "invoiceLabel": "Emporio (live)",
-      "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
-      "ingredientName": "Água san pellegrino",
-      "historyIngredientName": "Água san pellegrino",
-      "matchedLineName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
-      "trustVerdict": "stale",
-      "classification": [
-        "stale_operational_mismatch"
-      ],
-      "stored": {
-        "previous_price": null,
-        "new_price": 0.0017137777777777778,
-        "delta": null,
-        "delta_percent": null
-      },
-      "computed": {
-        "expectedOperationalNew": 9.64,
-        "deltaMathValid": true
-      },
-      "notes": [
-        "Stored 0.0017137777777777778 vs recomputed 9.64 from line"
-      ]
-    },
-    {
-      "historyId": "d35170c1-d94e-49d5-ac45-1871e00bd98b",
-      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
-      "invoiceLabel": "Emporio (live)",
-      "ingredientId": "d7fcbb41-4e19-47ee-bbea-058e7b44a040",
-      "ingredientName": "Paccheri lisci",
-      "historyIngredientName": "Paccheri lisci",
-      "matchedLineName": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "historyId": "b97d3cc9-cb74-4514-8999-afdd58c5260f",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "ingredientId": "d8a90b20-f20c-464f-a153-d65e062d5ff9",
+      "ingredientName": "Pêra abacate",
+      "historyIngredientName": "Pêra abacate",
+      "matchedLineName": "Pêra Abacate Hasse",
       "trustVerdict": "trusted",
       "classification": [],
       "stored": {
         "previous_price": null,
-        "new_price": 2.35,
+        "new_price": 0.00532,
         "delta": null,
         "delta_percent": null
       },
       "computed": {
-        "expectedOperationalNew": 2.35,
+        "expectedOperationalNew": 0.00532,
         "deltaMathValid": true
       },
       "notes": []
     },
     {
-      "historyId": "3bedfab2-8567-4059-a931-e8473cccabbc",
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "invoiceLabel": "Mammafiore",
-      "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4",
-      "ingredientName": "Aceto balsamico di modena IGP",
-      "historyIngredientName": "Aceto balsamico di modena IGP",
-      "matchedLineName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "historyId": "010a73aa-9cce-4709-8078-c9c7a52ef780",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "ingredientId": "9338970d-b55b-4526-be36-ab8497cd9da8",
+      "ingredientName": "Abóbora butternut",
+      "historyIngredientName": "Abóbora butternut",
+      "matchedLineName": "Abóbora Butternut",
       "trustVerdict": "trusted",
       "classification": [],
       "stored": {
         "previous_price": null,
-        "new_price": 0.0015550000000000002,
+        "new_price": 0.00124,
         "delta": null,
         "delta_percent": null
       },
       "computed": {
-        "expectedOperationalNew": 0.0015550000000000002,
+        "expectedOperationalNew": 0.00124,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "66339369-9df8-4f43-bc17-189bd39ab38e",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "ingredientId": "47cd8362-79f4-4285-8491-f016229eaa21",
+      "ingredientName": "Salada ibérica",
+      "historyIngredientName": "Salada ibérica",
+      "matchedLineName": "Salada Ibérica FSTK EMB. 250g",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 0.00932,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 0.00932,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "0040cde3-5bc4-44d6-a8c4-a29316f6e510",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "ingredientId": "6e3011e0-b160-48c9-867c-1234cd743802",
+      "ingredientName": "Hortelã",
+      "historyIngredientName": "Hortelã",
+      "matchedLineName": "Hortelã",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 0.00674,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 0.00674,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "cab6571b-919b-4572-860e-7fb3a59fd8e8",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "ingredientId": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+      "ingredientName": "Manjericão",
+      "historyIngredientName": "Manjericão",
+      "matchedLineName": "Manjericão",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 0.025699999999999997,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 0.025699999999999997,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "0e70f19d-fdf2-4201-8a0c-0fa65712afd7",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "ingredientId": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+      "ingredientName": "Ovo classe M",
+      "historyIngredientName": "Ovo classe M",
+      "matchedLineName": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 38.44,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 38.44,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "3d1220e6-024b-46db-9d4a-088fbc83f166",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "ingredientId": "6c7ab001-9f87-448e-9b34-87d3aa21f9ca",
+      "ingredientName": "Courgettes",
+      "historyIngredientName": "Courgettes",
+      "matchedLineName": "Courgettes",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 0.00195,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 0.00195,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "54995295-99b0-4879-aa09-c34125905df9",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "ingredientId": "30fd4652-be74-47eb-afb1-60b2a15a14fc",
+      "ingredientName": "Manteiga s/sal",
+      "historyIngredientName": "Manteiga s/sal",
+      "matchedLineName": "Manteiga Coimbra s/Sal Emb 1 Kg",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 0.0089,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 0.0089,
+        "deltaMathValid": true
+      },
+      "notes": []
+    },
+    {
+      "historyId": "9b1eed03-a70c-44a6-8a83-68d7be851d46",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoiceLabel": "Bidfood",
+      "ingredientId": "963d3a72-6f74-427b-8658-8d98b6a8d8df",
+      "ingredientName": "Pepino fresco",
+      "historyIngredientName": "Pepino fresco",
+      "matchedLineName": "Pepino",
+      "trustVerdict": "trusted",
+      "classification": [],
+      "stored": {
+        "previous_price": null,
+        "new_price": 0.00177,
+        "delta": null,
+        "delta_percent": null
+      },
+      "computed": {
+        "expectedOperationalNew": 0.00177,
         "deltaMathValid": true
       },
       "notes": []
@@ -1099,23 +1368,23 @@
       "notes": []
     },
     {
-      "historyId": "0040cde3-5bc4-44d6-a8c4-a29316f6e510",
+      "historyId": "cd8d2350-7ccc-4ff8-8a83-625975ea45a0",
       "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
       "invoiceLabel": "Bidfood",
-      "ingredientId": "6e3011e0-b160-48c9-867c-1234cd743802",
-      "ingredientName": "Hortelã",
-      "historyIngredientName": "Hortelã",
-      "matchedLineName": "Hortelã",
+      "ingredientId": "446f3217-9a6f-428a-abc6-10927a958168",
+      "ingredientName": "Alho francês",
+      "historyIngredientName": "Alho francês",
+      "matchedLineName": "Alho Francês",
       "trustVerdict": "trusted",
       "classification": [],
       "stored": {
         "previous_price": null,
-        "new_price": 0.00674,
+        "new_price": 0.00177,
         "delta": null,
         "delta_percent": null
       },
       "computed": {
-        "expectedOperationalNew": 0.00674,
+        "expectedOperationalNew": 0.00177,
         "deltaMathValid": true
       },
       "notes": []

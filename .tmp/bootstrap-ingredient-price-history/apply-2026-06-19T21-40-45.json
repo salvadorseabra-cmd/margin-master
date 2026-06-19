@@ -1,0 +1,449 @@
+{
+  "mode": "apply",
+  "generated_at": "2026-06-19T21:40:50.720Z",
+  "project_ref": "bjhnlrgodcqoyzddbpbd",
+  "before": {
+    "matched_with_zero_history_count": 14,
+    "ingredients": [
+      {
+        "ingredient_id": "9338970d-b55b-4526-be36-ab8497cd9da8",
+        "name": "Abóbora butternut",
+        "history_rows": 0
+      },
+      {
+        "ingredient_id": "446f3217-9a6f-428a-abc6-10927a958168",
+        "name": "Alho francês",
+        "history_rows": 0
+      },
+      {
+        "ingredient_id": "6c7ab001-9f87-448e-9b34-87d3aa21f9ca",
+        "name": "Courgettes",
+        "history_rows": 0
+      },
+      {
+        "ingredient_id": "7c850fb7-71e5-4649-8ecc-d1641d5b9e95",
+        "name": "Farina do pasta fresca e gnocchi",
+        "history_rows": 0
+      },
+      {
+        "ingredient_id": "3976c267-f8aa-4173-abc7-55410811f399",
+        "name": "Farine speciale pizza",
+        "history_rows": 0
+      },
+      {
+        "ingredient_id": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+        "name": "Ginger beer",
+        "history_rows": 0
+      },
+      {
+        "ingredient_id": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+        "name": "Manjericão",
+        "history_rows": 0
+      },
+      {
+        "ingredient_id": "30fd4652-be74-47eb-afb1-60b2a15a14fc",
+        "name": "Manteiga s/sal",
+        "history_rows": 0
+      },
+      {
+        "ingredient_id": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+        "name": "Ovo classe M",
+        "history_rows": 0
+      },
+      {
+        "ingredient_id": "963d3a72-6f74-427b-8658-8d98b6a8d8df",
+        "name": "Pepino fresco",
+        "history_rows": 0
+      },
+      {
+        "ingredient_id": "d8a90b20-f20c-464f-a153-d65e062d5ff9",
+        "name": "Pêra abacate",
+        "history_rows": 0
+      },
+      {
+        "ingredient_id": "52f7bf70-eeca-4039-987d-241b35248119",
+        "name": "Pomodori pelati",
+        "history_rows": 0
+      },
+      {
+        "ingredient_id": "4dd38782-c986-4d4b-8ecb-fd84359744b1",
+        "name": "Rulo di capra",
+        "history_rows": 0
+      },
+      {
+        "ingredient_id": "47cd8362-79f4-4285-8491-f016229eaa21",
+        "name": "Salada ibérica",
+        "history_rows": 0
+      }
+    ]
+  },
+  "planned_inserts": [
+    {
+      "ingredient_id": "9338970d-b55b-4526-be36-ab8497cd9da8",
+      "ingredient_name": "Abóbora butternut",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "2ab220fa-f29a-48c6-8103-0d043a17f1be",
+      "line_name": "Abóbora Butternut",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 1.24,
+      "new_price_operational": 0.00124,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "010a73aa-9cce-4709-8078-c9c7a52ef780"
+    },
+    {
+      "ingredient_id": "446f3217-9a6f-428a-abc6-10927a958168",
+      "ingredient_name": "Alho francês",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "4ad54bd5-6902-4443-89f9-8b0c3ecbde75",
+      "line_name": "Alho Francês",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 1.77,
+      "new_price_operational": 0.00177,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "cd8d2350-7ccc-4ff8-8a83-625975ea45a0"
+    },
+    {
+      "ingredient_id": "6c7ab001-9f87-448e-9b34-87d3aa21f9ca",
+      "ingredient_name": "Courgettes",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "0d50905c-8f10-4a23-a7d2-14b0dd587e31",
+      "line_name": "Courgettes",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 1.95,
+      "new_price_operational": 0.00195,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "3d1220e6-024b-46db-9d4a-088fbc83f166"
+    },
+    {
+      "ingredient_id": "7c850fb7-71e5-4649-8ecc-d1641d5b9e95",
+      "ingredient_name": "Farina do pasta fresca e gnocchi",
+      "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice_item_id": "d69123d3-40af-4b9e-a566-bde7a8989e49",
+      "line_name": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "invoice_date": "2026-05-19",
+      "new_price_pack": 30.11,
+      "new_price_operational": 30.11,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "04dd2f90-7770-47cf-9ce7-f01da203d78a"
+    },
+    {
+      "ingredient_id": "3976c267-f8aa-4173-abc7-55410811f399",
+      "ingredient_name": "Farine speciale pizza",
+      "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice_item_id": "65ced122-bedd-4f87-bc23-3b85477ebe8b",
+      "line_name": "Farina Speciale pizza 25kg Amoruso",
+      "invoice_date": "2026-05-19",
+      "new_price_pack": 26.52,
+      "new_price_operational": 26.52,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "3e837eab-c658-4d88-9988-a700659a6196"
+    },
+    {
+      "ingredient_id": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+      "ingredient_name": "Manjericão",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "41bf997f-a7cf-412f-9585-82b12a487ece",
+      "line_name": "Manjericão",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 2.57,
+      "new_price_operational": 0.025699999999999997,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "cab6571b-919b-4572-860e-7fb3a59fd8e8"
+    },
+    {
+      "ingredient_id": "30fd4652-be74-47eb-afb1-60b2a15a14fc",
+      "ingredient_name": "Manteiga s/sal",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "606eff8c-dc75-4a56-b72a-90f0b555f86d",
+      "line_name": "Manteiga Coimbra s/Sal Emb 1 Kg",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 8.9,
+      "new_price_operational": 0.0089,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "54995295-99b0-4879-aa09-c34125905df9"
+    },
+    {
+      "ingredient_id": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+      "ingredient_name": "Ovo classe M",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "f3dc077e-4bd8-4244-84e0-d8db9b3020a3",
+      "line_name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 38.44,
+      "new_price_operational": 38.44,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "0e70f19d-fdf2-4201-8a0c-0fa65712afd7"
+    },
+    {
+      "ingredient_id": "963d3a72-6f74-427b-8658-8d98b6a8d8df",
+      "ingredient_name": "Pepino fresco",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "1ddcdc66-e97a-406b-ab7f-c7b8ade65635",
+      "line_name": "Pepino",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 1.77,
+      "new_price_operational": 0.00177,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "9b1eed03-a70c-44a6-8a83-68d7be851d46"
+    },
+    {
+      "ingredient_id": "d8a90b20-f20c-464f-a153-d65e062d5ff9",
+      "ingredient_name": "Pêra abacate",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "434e2500-cbee-430a-959a-58a483bf7972",
+      "line_name": "Pêra Abacate Hasse",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 5.32,
+      "new_price_operational": 0.00532,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "b97d3cc9-cb74-4514-8999-afdd58c5260f"
+    },
+    {
+      "ingredient_id": "52f7bf70-eeca-4039-987d-241b35248119",
+      "ingredient_name": "Pomodori pelati",
+      "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice_item_id": "fd24d2dc-238a-43f2-ac2a-755361a083f0",
+      "line_name": "POMODORI PELATI (CX 2,5KG*6)",
+      "invoice_date": "2026-05-08",
+      "new_price_pack": 22.05,
+      "new_price_operational": 22.05,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "ca320e47-4677-49e7-8b39-eb73f02bb314"
+    },
+    {
+      "ingredient_id": "4dd38782-c986-4d4b-8ecb-fd84359744b1",
+      "ingredient_name": "Rulo di capra",
+      "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice_item_id": "e418468e-cb13-44f3-93b2-1857ae6eaa4d",
+      "line_name": "Rulo Di Capra 1kg*2 Simonetta",
+      "invoice_date": "2026-05-19",
+      "new_price_pack": 10.86,
+      "new_price_operational": 10.86,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "2b9887cd-29b7-4eab-b346-9d3662494db0"
+    },
+    {
+      "ingredient_id": "47cd8362-79f4-4285-8491-f016229eaa21",
+      "ingredient_name": "Salada ibérica",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "709cda62-453a-4d5d-b51d-29788b0f1c12",
+      "line_name": "Salada Ibérica FSTK EMB. 250g",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 2.33,
+      "new_price_operational": 0.00932,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "66339369-9df8-4f43-bc17-189bd39ab38e"
+    }
+  ],
+  "blocked": [
+    {
+      "ingredient_id": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+      "ingredient_name": "Ginger beer",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoice_item_id": "4843605f-3a77-47c8-bd98-fce79ba3a4b7",
+      "line_name": "Baladin - Ginger Beer 0.20cl",
+      "invoice_date": "2026-05-19",
+      "new_price_pack": 10.85,
+      "new_price_operational": 5.425,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "blocked": true,
+      "block_reason": "shouldBlockHistoryInsert"
+    }
+  ],
+  "skipped": [],
+  "created": [
+    {
+      "ingredient_id": "9338970d-b55b-4526-be36-ab8497cd9da8",
+      "ingredient_name": "Abóbora butternut",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "2ab220fa-f29a-48c6-8103-0d043a17f1be",
+      "line_name": "Abóbora Butternut",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 1.24,
+      "new_price_operational": 0.00124,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "010a73aa-9cce-4709-8078-c9c7a52ef780"
+    },
+    {
+      "ingredient_id": "446f3217-9a6f-428a-abc6-10927a958168",
+      "ingredient_name": "Alho francês",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "4ad54bd5-6902-4443-89f9-8b0c3ecbde75",
+      "line_name": "Alho Francês",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 1.77,
+      "new_price_operational": 0.00177,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "cd8d2350-7ccc-4ff8-8a83-625975ea45a0"
+    },
+    {
+      "ingredient_id": "6c7ab001-9f87-448e-9b34-87d3aa21f9ca",
+      "ingredient_name": "Courgettes",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "0d50905c-8f10-4a23-a7d2-14b0dd587e31",
+      "line_name": "Courgettes",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 1.95,
+      "new_price_operational": 0.00195,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "3d1220e6-024b-46db-9d4a-088fbc83f166"
+    },
+    {
+      "ingredient_id": "7c850fb7-71e5-4649-8ecc-d1641d5b9e95",
+      "ingredient_name": "Farina do pasta fresca e gnocchi",
+      "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice_item_id": "d69123d3-40af-4b9e-a566-bde7a8989e49",
+      "line_name": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "invoice_date": "2026-05-19",
+      "new_price_pack": 30.11,
+      "new_price_operational": 30.11,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "04dd2f90-7770-47cf-9ce7-f01da203d78a"
+    },
+    {
+      "ingredient_id": "3976c267-f8aa-4173-abc7-55410811f399",
+      "ingredient_name": "Farine speciale pizza",
+      "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice_item_id": "65ced122-bedd-4f87-bc23-3b85477ebe8b",
+      "line_name": "Farina Speciale pizza 25kg Amoruso",
+      "invoice_date": "2026-05-19",
+      "new_price_pack": 26.52,
+      "new_price_operational": 26.52,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "3e837eab-c658-4d88-9988-a700659a6196"
+    },
+    {
+      "ingredient_id": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+      "ingredient_name": "Manjericão",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "41bf997f-a7cf-412f-9585-82b12a487ece",
+      "line_name": "Manjericão",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 2.57,
+      "new_price_operational": 0.025699999999999997,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "cab6571b-919b-4572-860e-7fb3a59fd8e8"
+    },
+    {
+      "ingredient_id": "30fd4652-be74-47eb-afb1-60b2a15a14fc",
+      "ingredient_name": "Manteiga s/sal",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "606eff8c-dc75-4a56-b72a-90f0b555f86d",
+      "line_name": "Manteiga Coimbra s/Sal Emb 1 Kg",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 8.9,
+      "new_price_operational": 0.0089,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "54995295-99b0-4879-aa09-c34125905df9"
+    },
+    {
+      "ingredient_id": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+      "ingredient_name": "Ovo classe M",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "f3dc077e-4bd8-4244-84e0-d8db9b3020a3",
+      "line_name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 38.44,
+      "new_price_operational": 38.44,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "0e70f19d-fdf2-4201-8a0c-0fa65712afd7"
+    },
+    {
+      "ingredient_id": "963d3a72-6f74-427b-8658-8d98b6a8d8df",
+      "ingredient_name": "Pepino fresco",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "1ddcdc66-e97a-406b-ab7f-c7b8ade65635",
+      "line_name": "Pepino",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 1.77,
+      "new_price_operational": 0.00177,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "9b1eed03-a70c-44a6-8a83-68d7be851d46"
+    },
+    {
+      "ingredient_id": "d8a90b20-f20c-464f-a153-d65e062d5ff9",
+      "ingredient_name": "Pêra abacate",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "434e2500-cbee-430a-959a-58a483bf7972",
+      "line_name": "Pêra Abacate Hasse",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 5.32,
+      "new_price_operational": 0.00532,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "b97d3cc9-cb74-4514-8999-afdd58c5260f"
+    },
+    {
+      "ingredient_id": "52f7bf70-eeca-4039-987d-241b35248119",
+      "ingredient_name": "Pomodori pelati",
+      "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice_item_id": "fd24d2dc-238a-43f2-ac2a-755361a083f0",
+      "line_name": "POMODORI PELATI (CX 2,5KG*6)",
+      "invoice_date": "2026-05-08",
+      "new_price_pack": 22.05,
+      "new_price_operational": 22.05,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "ca320e47-4677-49e7-8b39-eb73f02bb314"
+    },
+    {
+      "ingredient_id": "4dd38782-c986-4d4b-8ecb-fd84359744b1",
+      "ingredient_name": "Rulo di capra",
+      "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice_item_id": "e418468e-cb13-44f3-93b2-1857ae6eaa4d",
+      "line_name": "Rulo Di Capra 1kg*2 Simonetta",
+      "invoice_date": "2026-05-19",
+      "new_price_pack": 10.86,
+      "new_price_operational": 10.86,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "2b9887cd-29b7-4eab-b346-9d3662494db0"
+    },
+    {
+      "ingredient_id": "47cd8362-79f4-4285-8491-f016229eaa21",
+      "ingredient_name": "Salada ibérica",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice_item_id": "709cda62-453a-4d5d-b51d-29788b0f1c12",
+      "line_name": "Salada Ibérica FSTK EMB. 250g",
+      "invoice_date": "2026-05-25",
+      "new_price_pack": 2.33,
+      "new_price_operational": 0.00932,
+      "previous_price_pack": null,
+      "bootstrap": true,
+      "history_id": "66339369-9df8-4f43-bc17-189bd39ab38e"
+    }
+  ],
+  "errors": [],
+  "after": {
+    "matched_with_zero_history_count": 1,
+    "ingredients": [
+      {
+        "ingredient_id": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+        "name": "Ginger beer"
+      }
+    ]
+  }
+}

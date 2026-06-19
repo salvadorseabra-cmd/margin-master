@@ -36,9 +36,9 @@ import {
   fetchLatestHistoryNewPrice,
   resolvePreviousOperationalPriceForHistory,
   resolvePreviousPackPriceForHistory,
-  syncIngredientCurrentPrice,
   type InvoiceIngredientPriceHistoryContext,
 } from "@/lib/ingredient-price-history";
+import { syncIngredientProcurementPrice } from "@/lib/ingredient-procurement-price-sync";
 import { findInvoiceItemIngredientMatch } from "@/lib/invoice-ingredient-match-propagation";
 import { INGREDIENT_KIND_CANONICAL, looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
 import { shouldBlockCanonicalNameOnCreate } from "@/lib/canonical-ingredient-operational-name";
@@ -168,6 +168,35 @@ function catalogPersistFieldsFromInvoiceLine(
   };
 }
 
+/** Procurement pack contract for `ingredients.current_price` — invoice unit_price, not history. */
+export function procurementPackFieldsFromInvoiceLine(
+  item: Pick<AutoPersistInvoiceItem, "name" | "quantity" | "unit" | "unit_price" | "total">,
+  options: {
+    isGenericUnit?: (unit: string | null | undefined) => boolean;
+  } = {},
+): {
+  current_price: number;
+  purchase_quantity: number;
+  purchase_unit: string;
+  base_unit: string;
+  unit: string;
+  includeCatalogUnitFields: boolean;
+} | null {
+  const fields = operationalCostFieldsFromInvoiceLine(item, options);
+  if (!fields || fields.current_price == null) return null;
+  const catalogPersist = catalogPersistFieldsFromInvoiceLine(item, fields, options);
+  const includeCatalogUnitFields =
+    catalogPersist.preferCatalogPackFields || fields.cost_base_unit === "un";
+  return {
+    current_price: fields.current_price,
+    purchase_quantity: catalogPersist.purchase_quantity,
+    purchase_unit: catalogPersist.purchase_unit,
+    base_unit: catalogPersist.base_unit,
+    unit: catalogPersist.unit,
+    includeCatalogUnitFields,
+  };
+}
+
 /** Persists latest invoice operational pack price onto the canonical ingredient row. */
 export async function persistOperationalIngredientCostFromInvoiceLine(
   client: AppSupabaseClient,
@@ -246,10 +275,10 @@ export async function persistOperationalIngredientCostFromInvoiceLine(
   if (error) return { updated: false, error };
 
   if (historyCtxPresent) {
-    const syncResult = await syncIngredientCurrentPrice(client, id);
+    const syncResult = await syncIngredientProcurementPrice(client, id);
     if (syncResult.error) {
       console.error(
-        `${LOG_PREFIX} syncIngredientCurrentPrice failed:`,
+        `${LOG_PREFIX} syncIngredientProcurementPrice failed:`,
         syncResult.error.message,
       );
     }

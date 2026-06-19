@@ -128,6 +128,29 @@ describe("ingredient-purchase-memory", () => {
     expect(recent[0]?.comparablePrice).toBe(9.99);
   });
 
+  it("Peroni: operational unit cost is €/L per bottle not per full case", () => {
+    const productName = "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro";
+    const purchases = buildRecentPurchases("ing-peroni", "Peroni", [
+      potatoProduct({
+        matchedIngredientId: "ing-peroni",
+        itemId: "line-peroni",
+        itemName: productName,
+        supplierName: "Mammafiore",
+        invoiceDate: "2026-05-19",
+        quantity: 24,
+        unit: "un",
+        unitPrice: 1.07,
+        lineTotal: 25.69,
+      }),
+    ]);
+
+    expect(purchases[0]?.procurementCostLabel).toBe("€1.07 / unit");
+    expect(purchases[0]?.operationalCostLabel).toMatch(/^€3\.24 \/ L$/);
+    expect(purchases[0]?.unitCostLabel).toBe(purchases[0]?.operationalCostLabel);
+    expect(purchases[0]?.comparablePrice).toBeCloseTo(3.24, 2);
+    expect(purchases[0]?.comparablePrice).not.toBeCloseTo(0.1351, 3);
+  });
+
   it("San Pellegrino: Best Buy ranks by per-case economics not invoice total", () => {
     const productName = "SanPellegrino - Acqua in vitro 75cl x 15ud";
     const purchases = buildRecentPurchases("ing-sp", "San Pellegrino", [
@@ -190,6 +213,8 @@ describe("ingredient-purchase-memory", () => {
     ]);
 
     expect(recent[0]?.purchaseQuantityLabel).toBe("3.30 kg");
+    expect(recent[0]?.procurementCostLabel).toBe("€1.95 / kg");
+    expect(recent[0]?.operationalCostLabel).toBe("€1.95 / kg");
     expect(recent[0]?.unitCostLabel).toBe("€1.95 / kg");
     expect(recent[0]?.priceLabel).toBe("€5.15");
     expect(recent[0]?.supplierLabel).toBe("Bidfood Portugal");
