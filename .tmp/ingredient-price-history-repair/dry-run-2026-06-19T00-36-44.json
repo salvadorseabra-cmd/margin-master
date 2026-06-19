@@ -1,0 +1,193 @@
+{
+  "mode": "dry-run",
+  "generated_at": "2026-06-19T00:36:52.713Z",
+  "project_ref": "bjhnlrgodcqoyzddbpbd",
+  "repair_plans": [
+    {
+      "historyId": "4bd5e0f1-8579-4726-9b1b-9c4a53e188a7",
+      "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+      "ingredient": "Água san pellegrino",
+      "storedNewPrice": 0.02796,
+      "expectedNewPrice": 0.001864,
+      "patch": {
+        "new_price": 0.001864,
+        "previous_price": null,
+        "delta": null,
+        "delta_percent": null
+      }
+    }
+  ],
+  "validation": {
+    "before_mismatches": 1,
+    "after_mismatches": 1,
+    "before_details": [
+      {
+        "historyId": "4bd5e0f1-8579-4726-9b1b-9c4a53e188a7",
+        "ingredient": "Água san pellegrino",
+        "stored": 0.02796,
+        "expected": 0.001864
+      }
+    ],
+    "after_details": [
+      {
+        "historyId": "4bd5e0f1-8579-4726-9b1b-9c4a53e188a7",
+        "ingredient": "Água san pellegrino",
+        "stored": 0.02796,
+        "expected": 0.001864
+      }
+    ]
+  },
+  "rows_repaired": [],
+  "repair_errors": [],
+  "chain_reconciliation": {
+    "50783e60-702f-42b2-bccd-0b6a98d7635f": {
+      "orphansDeleted": 0,
+      "rowsUpdated": 0,
+      "linkedRowCount": 0,
+      "errors": [
+        "dry-run"
+      ]
+    }
+  },
+  "atum_chain": [
+    {
+      "id": "61c51696-acd8-4a58-878f-a588c1878af0",
+      "previous_price": null,
+      "new_price": 6.29,
+      "delta_percent": null,
+      "created_at": "2026-04-17T12:00:00+00:00"
+    },
+    {
+      "id": "781ab1ac-39d2-4462-9106-635e5603c466",
+      "previous_price": 6.29,
+      "new_price": 13.1,
+      "delta_percent": 108.2670906200318,
+      "created_at": "2026-05-19T12:00:00+00:00"
+    }
+  ],
+  "current_price_impact": [
+    {
+      "ingredientId": "5e9e7f89-7141-44f7-b8d4-bc92bad9bc36",
+      "name": "Mozzarella julienne",
+      "db_current_price": 20.03,
+      "db_purchase_quantity": 1,
+      "db_catalog_operational": 20.03,
+      "projected_from_repaired_latest_history": 20.03,
+      "delta_catalog_vs_projected": 0,
+      "excluded_from_repair": false
+    },
+    {
+      "ingredientId": "d96e176e-7fa7-438d-beda-6b9d7fe7b41d",
+      "name": "Stracciatella",
+      "db_current_price": 3.11,
+      "db_purchase_quantity": 1,
+      "db_catalog_operational": 3.11,
+      "projected_from_repaired_latest_history": 3.11,
+      "delta_catalog_vs_projected": 0,
+      "excluded_from_repair": false
+    },
+    {
+      "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b",
+      "name": "Birra peroni nastro azzurro 33cl",
+      "db_current_price": 1.07,
+      "db_purchase_quantity": 24,
+      "db_catalog_operational": 0.044583333333333336,
+      "projected_from_repaired_latest_history": 0.0001351010101010101,
+      "delta_catalog_vs_projected": -0.04444823232323233,
+      "excluded_from_repair": false
+    },
+    {
+      "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+      "name": "Anchoas",
+      "db_current_price": 9.49,
+      "db_purchase_quantity": 1,
+      "db_catalog_operational": 9.49,
+      "projected_from_repaired_latest_history": 9.99,
+      "delta_catalog_vs_projected": 0.5,
+      "excluded_from_repair": false
+    },
+    {
+      "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+      "name": "Água san pellegrino",
+      "db_current_price": 19.28,
+      "db_purchase_quantity": 15,
+      "db_catalog_operational": 1.2853333333333334,
+      "projected_from_repaired_latest_history": 0.0017137777777777778,
+      "delta_catalog_vs_projected": -1.2836195555555556,
+      "excluded_from_repair": false
+    },
+    {
+      "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+      "name": "Atum em óleo",
+      "db_current_price": 6.29,
+      "db_purchase_quantity": 1,
+      "db_catalog_operational": 6.29,
+      "projected_from_repaired_latest_history": 13.1,
+      "delta_catalog_vs_projected": 6.81,
+      "excluded_from_repair": false
+    },
+    {
+      "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6",
+      "name": "Guanciale stagionato",
+      "db_current_price": 10.83,
+      "db_purchase_quantity": 1,
+      "db_catalog_operational": 10.83,
+      "projected_from_repaired_latest_history": 10.83,
+      "delta_catalog_vs_projected": 0,
+      "excluded_from_repair": false
+    },
+    {
+      "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+      "name": "Gema líquida",
+      "db_current_price": 10.19,
+      "db_purchase_quantity": 1,
+      "db_catalog_operational": 10.19,
+      "projected_from_repaired_latest_history": 10.49,
+      "delta_catalog_vs_projected": 0.3000000000000007,
+      "excluded_from_repair": false
+    },
+    {
+      "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+      "name": "Prosciutto cotto scelto",
+      "db_current_price": 8.5,
+      "db_purchase_quantity": 1,
+      "db_catalog_operational": 8.5,
+      "projected_from_repaired_latest_history": 8.5,
+      "delta_catalog_vs_projected": 0,
+      "excluded_from_repair": false
+    },
+    {
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "name": "Mozzarella fior di latte",
+      "db_current_price": 13.69,
+      "db_purchase_quantity": 1,
+      "db_catalog_operational": 13.69,
+      "projected_from_repaired_latest_history": 8.12,
+      "delta_catalog_vs_projected": -5.57,
+      "excluded_from_repair": true
+    }
+  ],
+  "skipped": [
+    {
+      "historyId": "3c508a43-68bd-4b69-9205-61ddbbfb26a7",
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "ingredient": "Mozzarella fior di latte",
+      "reason": "excluded_ingredient",
+      "storedNewPrice": 13.69
+    },
+    {
+      "historyId": "f0f76e84-f4c5-4dc1-9fb6-ba026d2384d0",
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "ingredient": "Mozzarella fior di latte",
+      "reason": "excluded_ingredient",
+      "storedNewPrice": 8.12
+    },
+    {
+      "historyId": "b0e17b8b-22d5-4b02-8477-dca1b913f986",
+      "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+      "ingredient": "Prosciutto cotto scelto",
+      "reason": "ghost_no_invoice_line",
+      "storedNewPrice": 8.5
+    }
+  ]
+}
