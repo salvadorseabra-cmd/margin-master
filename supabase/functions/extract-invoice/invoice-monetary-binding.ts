@@ -106,6 +106,32 @@ function matchesPrice(a: number, b: number): boolean {
   return Math.abs(a - b) <= PRICE_TOLERANCE;
 }
 
+/** Gross unit_price with net line total: qty×unit_price exceeds total beyond tolerance. */
+function hasInconsistentGrossLineTotal(item: MonetaryLineItem): boolean {
+  const { quantity, unit_price, total } = item;
+  if (quantity == null || quantity <= 0 || unit_price == null || total == null) {
+    return false;
+  }
+  const lineFromUnit = unit_price * quantity;
+  if (Math.abs(lineFromUnit - total) <= PRICE_TOLERANCE) return false;
+  return total < lineFromUnit - PRICE_TOLERANCE;
+}
+
+function applyEffectivePaidPrice(item: MonetaryLineItem): MonetaryLineItem {
+  if (
+    item.gross_unit_price != null ||
+    item.discount_pct != null ||
+    item.line_total_net != null
+  ) {
+    return item;
+  }
+  if (!hasInconsistentGrossLineTotal(item)) return item;
+  return {
+    ...item,
+    unit_price: round2(item.total! / item.quantity!),
+  };
+}
+
 /** Rule E: unit_price matches adjacent row's price and row arithmetic is inconsistent. */
 function triggersRuleE(
   items: MonetaryLineItem[],
@@ -180,12 +206,13 @@ function bindRow(
     item = applyStructuredBinding(item);
   }
 
-  return item;
+  return applyEffectivePaidPrice(item);
 }
 
 /**
  * Deterministic monetary column binding after Pass C.
- * Implements Rule B (unit ≈ discount %) and Rule E (neighbour bleed) only.
+ * Rule B (unit ≈ discount %), Rule E (neighbour bleed), and effective paid price
+ * (total ÷ qty when gross unit_price × qty ≠ net total).
  */
 export function bindMonetaryColumns(items: MonetaryLineItem[]): MonetaryLineItem[] {
   const structured = items.map(applyStructuredBinding);

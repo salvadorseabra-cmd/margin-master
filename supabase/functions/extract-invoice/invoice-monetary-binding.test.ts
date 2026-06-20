@@ -127,3 +127,115 @@ Deno.test("Rule B: Prosciutto Desc.(%) 17 bleed", () => {
   assertEquals(items[0].unit_price, 8.5);
   assertEquals(items[0].total, 36.54);
 });
+
+Deno.test("Effective paid price: Paccheri gross unit with discounted total", () => {
+  const items = bindMonetaryColumns(parseMonetaryLineItems([{
+    name: "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+    quantity: 24,
+    unit: null,
+    gross_unit_price: null,
+    discount_pct: null,
+    line_total_net: null,
+    unit_price: 2.35,
+    total: 50.4,
+  }]));
+
+  assertEquals(items[0].unit_price, 2.1);
+  assertEquals(items[0].total, 50.4);
+});
+
+Deno.test("Effective paid price: Courgettes gross unit with discounted total", () => {
+  const items = bindMonetaryColumns(parseMonetaryLineItems([{
+    name: "Courgettes",
+    quantity: 3.3,
+    unit: "kg",
+    gross_unit_price: null,
+    discount_pct: null,
+    line_total_net: null,
+    unit_price: 1.95,
+    total: 5.15,
+  }]));
+
+  assertEquals(items[0].unit_price, 1.56);
+  assertEquals(items[0].total, 5.15);
+});
+
+Deno.test("Effective paid price: Alho Francês gross unit with discounted total", () => {
+  const items = bindMonetaryColumns(parseMonetaryLineItems([{
+    name: "Alho Francês",
+    quantity: 5.42,
+    unit: "kg",
+    gross_unit_price: null,
+    discount_pct: null,
+    line_total_net: null,
+    unit_price: 1.77,
+    total: 7.67,
+  }]));
+
+  assertEquals(items[0].unit_price, 1.42);
+  assertEquals(items[0].total, 7.67);
+});
+
+Deno.test("Effective paid price: Prosciutto consistent row unchanged", () => {
+  const items = bindMonetaryColumns(parseMonetaryLineItems([{
+    name: "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+    quantity: 4.3,
+    unit: "kg",
+    gross_unit_price: null,
+    discount_pct: null,
+    line_total_net: null,
+    unit_price: 8.5,
+    total: 36.54,
+  }]));
+
+  assertEquals(items[0].unit_price, 8.5);
+  assertEquals(items[0].total, 36.54);
+});
+
+Deno.test("Effective paid price: San Pellegrino consistent row unchanged", () => {
+  const items = bindMonetaryColumns(parseMonetaryLineItems([{
+    name: "SanPellegrino - Acqua in vitro 75cl x 15ud",
+    quantity: 2,
+    unit: null,
+    gross_unit_price: null,
+    discount_pct: null,
+    line_total_net: null,
+    unit_price: 19.28,
+    total: 38.56,
+  }]));
+
+  assertEquals(items[0].unit_price, 19.28);
+  assertEquals(items[0].total, 38.56);
+});
+
+Deno.test("Effective paid price regression: Mortadella consistent row unchanged", () => {
+  const items = bindMonetaryColumns(parseMonetaryLineItems([{
+    name: "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5kg",
+    quantity: 3.11,
+    unit: "kg",
+    gross_unit_price: null,
+    discount_pct: null,
+    line_total_net: null,
+    unit_price: 9.99,
+    total: 31.07,
+  }]));
+
+  assertEquals(items[0].unit_price, 9.99);
+  assertEquals(items[0].total, 31.07);
+});
+
+Deno.test("Effective paid price regression: Aceto total above unit unchanged", () => {
+  const items = bindMonetaryColumns(parseMonetaryLineItems([{
+    name: "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+    quantity: 1,
+    unit: null,
+    gross_unit_price: null,
+    discount_pct: null,
+    line_total_net: null,
+    unit_price: 15.55,
+    total: 16.09,
+  }]));
+
+  assertEquals(items[0].unit_price, 15.55);
+  assertEquals(items[0].total, 16.09);
+});
