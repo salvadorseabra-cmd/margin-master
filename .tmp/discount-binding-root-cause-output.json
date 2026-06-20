@@ -1,0 +1,1839 @@
+{
+  "generated_at": "2026-06-20T00:43:13.975Z",
+  "vl_project": "bjhnlrgodcqoyzddbpbd",
+  "paccheri_pipeline": {
+    "visible_invoice_ground_truth": {
+      "source": ".tmp/emporio-discount-column-audit + invoice-table-extraction prompt examples",
+      "note": "Emporio Desc.(%) column; Paccheri typically ~10% line discount on list price",
+      "expected_pattern": "gross_unit_price=2.35, discount_pct≈10.64, line_total_net=50.40"
+    },
+    "stage_1_ocr_vision": {
+      "note": "GPT-4.1 vision reads table crop; no separate OCR stage"
+    },
+    "stage_2_gpt_pass_c_structured": {
+      "fields_expected": [
+        "gross_unit_price",
+        "discount_pct",
+        "line_total_net"
+      ],
+      "fields_in_cached_extract": {
+        "source": ".tmp/emporio-italia-investigation/extract-invoice-response.json",
+        "paccheri": {
+          "quantity": 24,
+          "unit_price": 2.35,
+          "total": 50.2
+        },
+        "note": "API response is POST-binding — only unit_price/total; discount_pct stripped"
+      },
+      "inferred_pass_c": {
+        "gross_unit_price": 2.35,
+        "discount_pct": null,
+        "line_total_net": 50.4,
+        "failure": "discount_pct null → binding cannot derive net unit"
+      }
+    },
+    "stage_3_parseMonetaryLineItems": {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null,
+      "gross_unit_price": 2.35,
+      "discount_pct": null,
+      "line_total_net": 50.4,
+      "unit_price": null,
+      "total": null
+    },
+    "stage_4_bindMonetaryColumns": {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null,
+      "gross_unit_price": 2.35,
+      "discount_pct": null,
+      "line_total_net": 50.4,
+      "unit_price": 2.35,
+      "total": 50.4
+    },
+    "stage_5_monetaryToInvoiceLineItem": {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null,
+      "unit_price": 2.35,
+      "total": 50.4
+    },
+    "stage_6_reconcileLineItemAmounts": {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null,
+      "unit_price": 2.35,
+      "total": 50.4
+    },
+    "stage_7_runExtraction_persist": {
+      "source": "src/routes/invoices.tsx insertRows",
+      "persisted": {
+        "id": "867121e4-7284-4ed8-9610-46e78ba487aa",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "quantity": 24,
+        "unit": null,
+        "unit_price": 2.35,
+        "total": 50.4,
+        "created_at": "2026-06-17T21:28:13.21244+00:00"
+      },
+      "columns_written": [
+        "unit_price",
+        "total"
+      ],
+      "columns_dropped": [
+        "gross_unit_price",
+        "discount_pct",
+        "line_total_net"
+      ]
+    },
+    "stage_8_ingredient_auto_persist": {
+      "current_price_source": "invoice_items.unit_price (gross 2.35)",
+      "recipe_fields": {
+        "current_price": 2.35,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 500
+      },
+      "operational_fields": {
+        "current_price": 2.35,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 500
+      },
+      "uses_total_for_price": false
+    },
+    "stage_9_price_history": {
+      "history_rows": [
+        {
+          "ingredient_name": "Paccheri lisci",
+          "new_price": 2.35,
+          "previous_price": null,
+          "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "created_at": "2026-05-19T12:00:00+00:00"
+        }
+      ],
+      "history_new_price_reflects": "gross unit_price",
+      "operational_history_price": 2.35
+    },
+    "counterfactual_with_discount_extracted": {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null,
+      "unit_price": 2.1,
+      "total": 50.4
+    },
+    "information_disappears_at": "Pass C (discount_pct=null) → bindMonetaryColumns keeps gross as unit_price"
+  },
+  "bidfood_findings": [
+    {
+      "description": "Alho Francês",
+      "invoice_item_id": "4ad54bd5-6902-4443-89f9-8b0c3ecbde75",
+      "persisted": {
+        "id": "4ad54bd5-6902-4443-89f9-8b0c3ecbde75",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Alho Francês",
+        "quantity": 5.42,
+        "unit": "kg",
+        "unit_price": 1.77,
+        "total": 7.67,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "expected_effective_unit_price": 1.4151,
+      "upstream_extract_cached": {
+        "name": "Alho Francês",
+        "quantity": 5.42,
+        "unit": "kg",
+        "unit_price": 1.77,
+        "total": 7.67
+      },
+      "upstream_had_structured_discount": false,
+      "replay": {
+        "persisted": {
+          "unit_price": 1.77,
+          "total": 7.67,
+          "qty": 5.42
+        },
+        "effective_target": 1.4151,
+        "inferred_discount_pct": 20.0508,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 1.77,
+            "total": 7.67,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 1.42,
+            "total": 7.67,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 1.77,
+            "total": 7.67,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 1.77,
+            "total": 7.67,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 1.77,
+            "total": 7.67,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "classification": "A"
+    },
+    {
+      "description": "Manjericão",
+      "invoice_item_id": "41bf997f-a7cf-412f-9585-82b12a487ece",
+      "persisted": {
+        "id": "41bf997f-a7cf-412f-9585-82b12a487ece",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Manjericão",
+        "quantity": 5,
+        "unit": "mo",
+        "unit_price": 2.57,
+        "total": 10.28,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "expected_effective_unit_price": 2.056,
+      "upstream_extract_cached": {
+        "name": "Manjericão",
+        "quantity": 5,
+        "unit": "mo",
+        "unit_price": 2.57,
+        "total": 10.28
+      },
+      "upstream_had_structured_discount": false,
+      "replay": {
+        "persisted": {
+          "unit_price": 2.57,
+          "total": 10.28,
+          "qty": 5
+        },
+        "effective_target": 2.056,
+        "inferred_discount_pct": 20,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 2.57,
+            "total": 10.28,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 2.06,
+            "total": 10.28,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 2.57,
+            "total": 10.28,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 2.57,
+            "total": 10.28,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 2.57,
+            "total": 10.28,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "classification": "A"
+    },
+    {
+      "description": "Courgettes",
+      "invoice_item_id": "0d50905c-8f10-4a23-a7d2-14b0dd587e31",
+      "persisted": {
+        "id": "0d50905c-8f10-4a23-a7d2-14b0dd587e31",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Courgettes",
+        "quantity": 3.3,
+        "unit": "kg",
+        "unit_price": 1.95,
+        "total": 5.15,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "expected_effective_unit_price": 1.5606,
+      "upstream_extract_cached": {
+        "name": "Courgettes",
+        "quantity": 3.3,
+        "unit": "kg",
+        "unit_price": 1.95,
+        "total": 6.44
+      },
+      "upstream_had_structured_discount": false,
+      "replay": {
+        "persisted": {
+          "unit_price": 1.95,
+          "total": 5.15,
+          "qty": 3.3
+        },
+        "effective_target": 1.5606,
+        "inferred_discount_pct": 19.9692,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 1.95,
+            "total": 5.15,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 1.56,
+            "total": 5.15,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 1.95,
+            "total": 5.15,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 1.95,
+            "total": 5.15,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 1.95,
+            "total": 5.15,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "classification": "A"
+    }
+  ],
+  "binding_replay": [
+    {
+      "invoice_item_id": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "description": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "persisted": {
+  {
+  "generated_at": "2026-06-20T00:43:13.975Z",
+  "vl_project": "bjhnlrgodcqoyzddbpbd",
+  "paccheri_pipeline": {
+    "visible_invoice_ground_truth": {
+      "source": ".tmp/emporio-discount-column-audit + invoice-table-extraction prompt examples",
+      "note": "Emporio Desc.(%) column; Paccheri typically ~10% line discount on list price",
+      "expected_pattern": "gross_unit_price=2.35, discount_pct≈10.64, line_total_net=50.40"
+    },
+    "stage_1_ocr_vision": {
+      "note": "GPT-4.1 vision reads table crop; no separate OCR stage"
+    },
+    "stage_2_gpt_pass_c_structured": {
+      "fields_expected": [
+        "gross_unit_price",
+        "discount_pct",
+        "line_total_net"
+      ],
+      "fields_in_cached_extract": {
+        "source": ".tmp/emporio-italia-investigation/extract-invoice-response.json",
+        "paccheri": {
+          "quantity": 24,
+          "unit_price": 2.35,
+          "total": 50.2
+        },
+        "note": "API response is POST-binding — only unit_price/total; discount_pct stripped"
+      },
+      "inferred_pass_c": {
+        "gross_unit_price": 2.35,
+        "discount_pct": null,
+        "line_total_net": 50.4,
+        "failure": "discount_pct null → binding cannot derive net unit"
+      }
+    },
+    "stage_3_parseMonetaryLineItems": {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null,
+      "gross_unit_price": 2.35,
+      "discount_pct": null,
+      "line_total_net": 50.4,
+      "unit_price": null,
+      "total": null
+    },
+    "stage_4_bindMonetaryColumns": {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null,
+      "gross_unit_price": 2.35,
+      "discount_pct": null,
+      "line_total_net": 50.4,
+      "unit_price": 2.35,
+      "total": 50.4
+    },
+    "stage_5_monetaryToInvoiceLineItem": {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null,
+      "unit_price": 2.35,
+      "total": 50.4
+    },
+    "stage_6_reconcileLineItemAmounts": {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null,
+      "unit_price": 2.35,
+      "total": 50.4
+    },
+    "stage_7_runExtraction_persist": {
+      "source": "src/routes/invoices.tsx insertRows",
+      "persisted": {
+        "id": "867121e4-7284-4ed8-9610-46e78ba487aa",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "quantity": 24,
+        "unit": null,
+        "unit_price": 2.35,
+        "total": 50.4,
+        "created_at": "2026-06-17T21:28:13.21244+00:00"
+      },
+      "columns_written": [
+        "unit_price",
+        "total"
+      ],
+      "columns_dropped": [
+        "gross_unit_price",
+        "discount_pct",
+        "line_total_net"
+      ]
+    },
+    "stage_8_ingredient_auto_persist": {
+      "current_price_source": "invoice_items.unit_price (gross 2.35)",
+      "recipe_fields": {
+        "current_price": 2.35,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 500
+      },
+      "operational_fields": {
+        "current_price": 2.35,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 500
+      },
+      "uses_total_for_price": false
+    },
+    "stage_9_price_history": {
+      "history_rows": [
+        {
+          "ingredient_name": "Paccheri lisci",
+          "new_price": 2.35,
+          "previous_price": null,
+          "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "created_at": "2026-05-19T12:00:00+00:00"
+        }
+      ],
+      "history_new_price_reflects": "gross unit_price",
+      "operational_history_price": 2.35
+    },
+    "counterfactual_with_discount_extracted": {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null,
+      "unit_price": 2.1,
+      "total": 50.4
+    },
+    "information_disappears_at": "Pass C (discount_pct=null) → bindMonetaryColumns keeps gross as unit_price"
+  },
+  "bidfood_findings": [
+    {
+      "description": "Alho Francês",
+      "invoice_item_id": "4ad54bd5-6902-4443-89f9-8b0c3ecbde75",
+      "persisted": {
+        "id": "4ad54bd5-6902-4443-89f9-8b0c3ecbde75",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Alho Francês",
+        "quantity": 5.42,
+        "unit": "kg",
+        "unit_price": 1.77,
+        "total": 7.67,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "expected_effective_unit_price": 1.4151,
+      "upstream_extract_cached": {
+        "name": "Alho Francês",
+        "quantity": 5.42,
+        "unit": "kg",
+        "unit_price": 1.77,
+        "total": 7.67
+      },
+      "upstream_had_structured_discount": false,
+      "replay": {
+        "persisted": {
+          "unit_price": 1.77,
+          "total": 7.67,
+          "qty": 5.42
+        },
+        "effective_target": 1.4151,
+        "inferred_discount_pct": 20.0508,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 1.77,
+            "total": 7.67,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 1.42,
+            "total": 7.67,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 1.77,
+            "total": 7.67,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 1.77,
+            "total": 7.67,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 1.77,
+            "total": 7.67,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "classification": "A"
+    },
+    {
+      "description": "Manjericão",
+      "invoice_item_id": "41bf997f-a7cf-412f-9585-82b12a487ece",
+      "persisted": {
+        "id": "41bf997f-a7cf-412f-9585-82b12a487ece",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Manjericão",
+        "quantity": 5,
+        "unit": "mo",
+        "unit_price": 2.57,
+        "total": 10.28,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "expected_effective_unit_price": 2.056,
+      "upstream_extract_cached": {
+        "name": "Manjericão",
+        "quantity": 5,
+        "unit": "mo",
+        "unit_price": 2.57,
+        "total": 10.28
+      },
+      "upstream_had_structured_discount": false,
+      "replay": {
+        "persisted": {
+          "unit_price": 2.57,
+          "total": 10.28,
+          "qty": 5
+        },
+        "effective_target": 2.056,
+        "inferred_discount_pct": 20,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 2.57,
+            "total": 10.28,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 2.06,
+            "total": 10.28,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 2.57,
+            "total": 10.28,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 2.57,
+            "total": 10.28,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 2.57,
+            "total": 10.28,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "classification": "A"
+    },
+    {
+      "description": "Courgettes",
+      "invoice_item_id": "0d50905c-8f10-4a23-a7d2-14b0dd587e31",
+      "persisted": {
+        "id": "0d50905c-8f10-4a23-a7d2-14b0dd587e31",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Courgettes",
+        "quantity": 3.3,
+        "unit": "kg",
+        "unit_price": 1.95,
+        "total": 5.15,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "expected_effective_unit_price": 1.5606,
+      "upstream_extract_cached": {
+        "name": "Courgettes",
+        "quantity": 3.3,
+        "unit": "kg",
+        "unit_price": 1.95,
+        "total": 6.44
+      },
+      "upstream_had_structured_discount": false,
+      "replay": {
+        "persisted": {
+          "unit_price": 1.95,
+          "total": 5.15,
+          "qty": 3.3
+        },
+        "effective_target": 1.5606,
+        "inferred_discount_pct": 19.9692,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 1.95,
+            "total": 5.15,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 1.56,
+            "total": 5.15,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 1.95,
+            "total": 5.15,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 1.95,
+            "total": 5.15,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 1.95,
+            "total": 5.15,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "classification": "A"
+    }
+  ],
+  "binding_replay": [
+    {
+      "invoice_item_id": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "description": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "persisted": {
+        "id": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 27.31,
+        "total": 27.3,
+        "created_at": "2026-06-16T18:46:12.036503+00:00"
+      },
+      "effective_paid": 13.65,
+      "replay": {
+        "persisted": {
+          "unit_price": 27.31,
+          "total": 27.3,
+          "qty": 2
+        },
+        "effective_target": 13.65,
+        "inferred_discount_pct": 50.0183,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 27.31,
+            "total": 27.3,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 13.65,
+            "total": 27.3,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 27.31,
+            "total": 27.3,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 27.31,
+            "total": 27.3,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 27.31,
+            "total": 27.3,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    },
+    {
+      "invoice_item_id": "409850ab-646d-44fa-b20c-c8a4a8570064",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "description": "RICOTTA TREVIGIANA 1,5KG",
+      "persisted": {
+        "id": "409850ab-646d-44fa-b20c-c8a4a8570064",
+        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "name": "RICOTTA TREVIGIANA 1,5KG",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 7.97,
+        "total": 7.97,
+        "created_at": "2026-06-16T18:46:12.036503+00:00"
+      },
+      "effective_paid": 3.985,
+      "replay": {
+        "persisted": {
+          "unit_price": 7.97,
+          "total": 7.97,
+          "qty": 2
+        },
+        "effective_target": 3.985,
+        "inferred_discount_pct": 50,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 7.97,
+            "total": 7.97,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 3.99,
+            "total": 7.97,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 7.97,
+            "total": 7.97,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 7.97,
+            "total": 7.97,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 7.97,
+            "total": 7.97,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    },
+    {
+      "invoice_item_id": "33dc7070-a202-4397-bba0-e7865bfb6931",
+      "supplier": "Emporio Italia",
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "persisted": {
+        "id": "33dc7070-a202-4397-bba0-e7865bfb6931",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+        "quantity": 2,
+        "unit": "kg",
+        "unit_price": 10.22,
+        "total": 13.44,
+        "created_at": "2026-06-17T21:28:13.21244+00:00"
+      },
+      "effective_paid": 6.72,
+      "replay": {
+        "persisted": {
+          "unit_price": 10.22,
+          "total": 13.44,
+          "qty": 2
+        },
+        "effective_target": 6.72,
+        "inferred_discount_pct": 34.2466,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 10.22,
+            "total": 13.44,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 6.72,
+            "total": 13.44,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 10.22,
+            "total": 13.44,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 10.22,
+            "total": 13.44,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 10.22,
+            "total": 13.44,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    },
+    {
+      "invoice_item_id": "4ad54bd5-6902-4443-89f9-8b0c3ecbde75",
+      "supplier": "Bidfood Portugal",
+      "description": "Alho Francês",
+      "persisted": {
+        "id": "4ad54bd5-6902-4443-89f9-8b0c3ecbde75",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Alho Francês",
+        "quantity": 5.42,
+        "unit": "kg",
+        "unit_price": 1.77,
+        "total": 7.67,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "effective_paid": 1.4151,
+      "replay": {
+        "persisted": {
+          "unit_price": 1.77,
+          "total": 7.67,
+          "qty": 5.42
+        },
+        "effective_target": 1.4151,
+        "inferred_discount_pct": 20.0508,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 1.77,
+            "total": 7.67,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 1.42,
+            "total": 7.67,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 1.77,
+            "total": 7.67,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 1.77,
+            "total": 7.67,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 1.77,
+            "total": 7.67,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    },
+    {
+      "invoice_item_id": "41bf997f-a7cf-412f-9585-82b12a487ece",
+      "supplier": "Bidfood Portugal",
+      "description": "Manjericão",
+      "persisted": {
+        "id": "41bf997f-a7cf-412f-9585-82b12a487ece",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Manjericão",
+        "quantity": 5,
+        "unit": "mo",
+        "unit_price": 2.57,
+        "total": 10.28,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "effective_paid": 2.056,
+      "replay": {
+        "persisted": {
+          "unit_price": 2.57,
+          "total": 10.28,
+          "qty": 5
+        },
+        "effective_target": 2.056,
+        "inferred_discount_pct": 20,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 2.57,
+            "total": 10.28,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 2.06,
+            "total": 10.28,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 2.57,
+            "total": 10.28,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 2.57,
+            "total": 10.28,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 2.57,
+            "total": 10.28,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    },
+    {
+      "invoice_item_id": "434e2500-cbee-430a-959a-58a483bf7972",
+      "supplier": "Bidfood Portugal",
+      "description": "Pêra Abacate Hasse",
+      "persisted": {
+        "id": "434e2500-cbee-430a-959a-58a483bf7972",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Pêra Abacate Hasse",
+        "quantity": 3.28,
+        "unit": "kg",
+        "unit_price": 5.32,
+        "total": 13.96,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "effective_paid": 4.2561,
+      "replay": {
+        "persisted": {
+          "unit_price": 5.32,
+          "total": 13.96,
+          "qty": 3.28
+        },
+        "effective_target": 4.2561,
+        "inferred_discount_pct": 19.9981,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 5.32,
+            "total": 13.96,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 4.26,
+            "total": 13.96,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 5.32,
+            "total": 13.96,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 5.32,
+            "total": 13.96,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 5.32,
+            "total": 13.96,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    },
+    {
+      "invoice_item_id": "0d50905c-8f10-4a23-a7d2-14b0dd587e31",
+      "supplier": "Bidfood Portugal",
+      "description": "Courgettes",
+      "persisted": {
+        "id": "0d50905c-8f10-4a23-a7d2-14b0dd587e31",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Courgettes",
+        "quantity": 3.3,
+        "unit": "kg",
+        "unit_price": 1.95,
+        "total": 5.15,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "effective_paid": 1.5606,
+      "replay": {
+        "persisted": {
+          "unit_price": 1.95,
+          "total": 5.15,
+          "qty": 3.3
+        },
+        "effective_target": 1.5606,
+        "inferred_discount_pct": 19.9692,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 1.95,
+            "total": 5.15,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 1.56,
+            "total": 5.15,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 1.95,
+            "total": 5.15,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 1.95,
+            "total": 5.15,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 1.95,
+            "total": 5.15,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    },
+    {
+      "invoice_item_id": "1ddcdc66-e97a-406b-ab7f-c7b8ade65635",
+      "supplier": "Bidfood Portugal",
+      "description": "Pepino",
+      "persisted": {
+        "id": "1ddcdc66-e97a-406b-ab7f-c7b8ade65635",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Pepino",
+        "quantity": 3.36,
+        "unit": "kg",
+        "unit_price": 1.77,
+        "total": 4.76,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "effective_paid": 1.4167,
+      "replay": {
+        "persisted": {
+          "unit_price": 1.77,
+          "total": 4.76,
+          "qty": 3.36
+        },
+        "effective_target": 1.4167,
+        "inferred_discount_pct": 19.9605,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 1.77,
+            "total": 4.76,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 1.42,
+            "total": 4.76,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 1.77,
+            "total": 4.76,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 1.77,
+            "total": 4.76,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 1.77,
+            "total": 4.76,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    },
+    {
+      "invoice_item_id": "43c623cb-bcd4-4821-ad5e-a2dcc825487e",
+      "supplier": "Bidfood Portugal",
+      "description": "Hortelã",
+      "persisted": {
+        "id": "43c623cb-bcd4-4821-ad5e-a2dcc825487e",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Hortelã",
+        "quantity": 0.5,
+        "unit": "kg",
+        "unit_price": 6.74,
+        "total": 2.7,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "effective_paid": 5.4,
+      "replay": {
+        "persisted": {
+          "unit_price": 6.74,
+          "total": 2.7,
+          "qty": 0.5
+        },
+        "effective_target": 5.4,
+        "inferred_discount_pct": 19.8813,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 6.74,
+            "total": 2.7,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 5.4,
+            "total": 2.7,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 6.74,
+            "total": 2.7,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 6.74,
+            "total": 2.7,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 6.74,
+            "total": 2.7,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    },
+    {
+      "invoice_item_id": "d998575f-ad64-441e-b003-38785bcb4ca1",
+      "supplier": "Bidfood Portugal",
+      "description": "Tomilho",
+      "persisted": {
+        "id": "d998575f-ad64-441e-b003-38785bcb4ca1",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Tomilho",
+        "quantity": 1,
+        "unit": "mo",
+        "unit_price": 2.57,
+        "total": 2.06,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "effective_paid": 2.06,
+      "replay": {
+        "persisted": {
+          "unit_price": 2.57,
+          "total": 2.06,
+          "qty": 1
+        },
+        "effective_target": 2.06,
+        "inferred_discount_pct": 19.8444,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 2.57,
+            "total": 2.06,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 2.06,
+            "total": 2.06,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 2.57,
+            "total": 2.06,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 2.57,
+            "total": 2.06,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 2.57,
+            "total": 2.06,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    },
+    {
+      "invoice_item_id": "2ab220fa-f29a-48c6-8103-0d043a17f1be",
+      "supplier": "Bidfood Portugal",
+      "description": "Abóbora Butternut",
+      "persisted": {
+        "id": "2ab220fa-f29a-48c6-8103-0d043a17f1be",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Abóbora Butternut",
+        "quantity": 5.42,
+        "unit": "kg",
+        "unit_price": 1.24,
+        "total": 5.59,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "effective_paid": 1.0314,
+      "replay": {
+        "persisted": {
+          "unit_price": 1.24,
+          "total": 5.59,
+          "qty": 5.42
+        },
+        "effective_target": 1.0314,
+        "inferred_discount_pct": 16.8226,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 1.24,
+            "total": 5.59,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 1.03,
+            "total": 5.59,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 1.24,
+            "total": 5.59,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 1.24,
+            "total": 5.59,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 1.24,
+            "total": 5.59,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    },
+    {
+      "invoice_item_id": "4843605f-3a77-47c8-bd98-fce79ba3a4b7",
+      "supplier": "Emporio Italia",
+      "description": "Baladin - Ginger Beer 0.20cl",
+      "persisted": {
+        "id": "4843605f-3a77-47c8-bd98-fce79ba3a4b7",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 10.85,
+        "total": 19.38,
+        "created_at": "2026-06-17T21:28:13.21244+00:00"
+      },
+      "effective_paid": 9.69,
+      "replay": {
+        "persisted": {
+          "unit_price": 10.85,
+          "total": 19.38,
+          "qty": 2
+        },
+        "effective_target": 9.69,
+        "inferred_discount_pct": 10.6912,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 10.85,
+            "total": 19.38,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 9.69,
+            "total": 19.38,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 10.85,
+            "total": 19.38,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 10.85,
+            "total": 19.38,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 10.85,
+            "total": 19.38,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    },
+    {
+      "invoice_item_id": "867121e4-7284-4ed8-9610-46e78ba487aa",
+      "supplier": "Emporio Italia",
+      "description": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "persisted": {
+        "id": "867121e4-7284-4ed8-9610-46e78ba487aa",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "quantity": 24,
+        "unit": null,
+        "unit_price": 2.35,
+        "total": 50.4,
+        "created_at": "2026-06-17T21:28:13.21244+00:00"
+      },
+      "effective_paid": 2.1,
+      "replay": {
+        "persisted": {
+          "unit_price": 2.35,
+          "total": 50.4,
+          "qty": 24
+        },
+        "effective_target": 2.1,
+        "inferred_discount_pct": 10.6383,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 2.35,
+            "total": 50.4,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 2.1,
+            "total": 50.4,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 2.35,
+            "total": 50.4,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 2.35,
+            "total": 50.4,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 2.35,
+            "total": 50.4,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    },
+    {
+      "invoice_item_id": "709cda62-453a-4d5d-b51d-29788b0f1c12",
+      "supplier": "Bidfood Portugal",
+      "description": "Salada Ibérica FSTK EMB. 250g",
+      "persisted": {
+        "id": "709cda62-453a-4d5d-b51d-29788b0f1c12",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "name": "Salada Ibérica FSTK EMB. 250g",
+        "quantity": 4,
+        "unit": "em",
+        "unit_price": 2.33,
+        "total": 8.76,
+        "created_at": "2026-06-17T21:27:47.998817+00:00"
+      },
+      "effective_paid": 2.19,
+      "replay": {
+        "persisted": {
+          "unit_price": 2.33,
+          "total": 8.76,
+          "qty": 4
+        },
+        "effective_target": 2.19,
+        "inferred_discount_pct": 6.0086,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 2.33,
+            "total": 8.76,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 2.19,
+            "total": 8.76,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 2.33,
+            "total": 8.76,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 2.33,
+            "total": 8.76,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 2.33,
+            "total": 8.76,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    },
+    {
+      "invoice_item_id": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
+      "supplier": "Mammafiore Portugal",
+      "description": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "persisted": {
+        "id": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 15.55,
+        "total": 16.09,
+        "created_at": "2026-06-17T21:28:14.257398+00:00"
+      },
+      "effective_paid": 16.09,
+      "replay": {
+        "persisted": {
+          "unit_price": 15.55,
+          "total": 16.09,
+          "qty": 1
+        },
+        "effective_target": 16.09,
+        "inferred_discount_pct": -3.4727,
+        "fixes": [
+          {
+            "scenario": "legacy_only_no_structured",
+            "unit_price": 15.55,
+            "total": 16.09,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_discount_net",
+            "unit_price": 16.09,
+            "total": 16.09,
+            "matches_effective": true,
+            "matches_persisted": false
+          },
+          {
+            "scenario": "structured_gross_and_net_no_discount",
+            "unit_price": 15.55,
+            "total": 16.09,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_net_total_only",
+            "unit_price": 15.55,
+            "total": 16.09,
+            "matches_effective": false,
+            "matches_persisted": true
+          },
+          {
+            "scenario": "structured_gross_only",
+            "unit_price": 15.55,
+            "total": 16.09,
+            "matches_effective": false,
+            "matches_persisted": true
+          }
+        ],
+        "replay_would_fix": {
+          "with_discount_pct": true,
+          "with_net_rebind_only": false,
+          "binding_alone_fixes": true
+        }
+      },
+      "would_replay_fix": "YES",
+      "fix_mechanism": "needs discount_pct in Pass C",
+      "classification": "A",
+      "classification_label": "discount present but lost (binding/extraction gap)"
+    }
+  ],
+  "summary": {
+    "total_flagged": 15,
+    "would_fix_with_proper_binding": 15,
+    "needs_discount_extraction": 15,
+    "binding_cannot_fix_even_with_net": 0,
+    "by_classification": {
+      "A": 15,
+      "B": 0,
+      "C": 0,
+      "D": 0,
+      "E": 0
+    }
+  },
+  "extraction_audit": {
+    "bidfood": {
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "artifacts": [
+        ".tmp/vl-final-state-audit/extracts/da472b7f-0fd9-4a26-a37c-80ad335f7f7e.json",
+        ".tmp/passc-implementation/reextract/da472b7f-0fd9-4a26-a37c-80ad335f7f7e.json"
+      ],
+      "pass_c_structured_fields_in_api": false,
+      "sample_courgettes": {
+        "name": "Courgettes",
+        "quantity": 3.3,
+        "unit": "kg",
+        "unit_price": 1.95,
+        "total": 6.44
+      },
+      "note": "Cached extracts show unit_price=gross list, total=net line; no gross_unit_price/discount_pct in API"
+    },
+    "emporio": {
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "artifacts": [
+        ".tmp/emporio-italia-investigation/extract-invoice-response.json",
+        ".tmp/emporio-footer-audit/emporio/extract-invoice-response.json",
+        ".tmp/prosciutto-v23-audit/stage-trace.json",
+        ".tmp/emporio-discount-column-audit/discount-stage-trace.json"
+      ],
+      "pass_c_discount_pct_extracted": false,
+      "prosciutto_stage_trace": {
+        "stage": "pass_c_gpt_structured",
+        "status": "FAIL",
+        "inferredFromLiveRuns": {
+          "quantity": "CORRECT (~4.3)",
+          "gross_unit_price": "PARTIAL (10.22–10.76 vs visible 10.30 — minor OCR drift)",
+          "discount_pct": "FAIL (often null; visible 17.50%)",
+          "line_total_net": "INTERMITTENT (36.44 when read; null on worst runs)",
+          "unit_price_legacy": "blocked by v23 json_schema"
+        },
+        "firstDeviationStage": true,
+        "issueType": "GPT extraction — discount column not populated in structured schema"
+      }
+    }
+  },
+  "contract_break_point": "Pass C GPT returns discount_pct=null on discounted rows → bindMonetaryColumns preserves gross_unit_price as unit_price → monetaryToInvoiceLineItem strips structured fields → invoice_items stores gross in unit_price → downstream reads unit_price only"
+}

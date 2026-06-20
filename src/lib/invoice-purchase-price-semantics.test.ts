@@ -616,6 +616,151 @@ describe("groupInvoiceLineBadges", () => {
   });
 });
 
+describe("resolvePriceSuffix procurement container semantics", () => {
+  it.each([
+    {
+      id: "Anchoas",
+      meta: {
+        name: "Filete de Anchoas Alconfirosa LI 495 g",
+        quantity: 2,
+        unit: "lata",
+        unit_price: 9.99,
+        line_total: 19.98,
+      },
+      procurementSuffix: "can",
+      operationalUnit: "kg",
+      operationalCost: 20.18,
+    },
+    {
+      id: "Peroni",
+      meta: {
+        name: "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        quantity: 24,
+        unit: "un",
+        unit_price: 1.07,
+        line_total: 25.69,
+      },
+      procurementSuffix: "bottle",
+      operationalUnit: "L",
+      operationalCost: 3.24,
+    },
+    {
+      id: "San Pellegrino",
+      meta: {
+        name: "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        quantity: 2,
+        unit: "cx",
+        unit_price: 19.28,
+        line_total: 38.56,
+      },
+      procurementSuffix: "case",
+      operationalUnit: "L",
+      operationalCost: 1.71,
+    },
+    {
+      id: "Farina pasta fresca",
+      meta: {
+        name: "Farina 00 pasta fresca e gnocchi25kg Caputo",
+        quantity: 1,
+        unit: "un",
+        unit_price: 30.11,
+        line_total: 30.11,
+      },
+      procurementSuffix: "bag",
+      operationalUnit: "kg",
+      operationalCost: 1.2,
+    },
+    {
+      id: "Farine speciale pizza",
+      meta: {
+        name: "Farine Speciale pizza 25kg Amoruso",
+        quantity: 1,
+        unit: "un",
+        unit_price: 26.52,
+        line_total: 26.52,
+      },
+      procurementSuffix: "bag",
+      operationalUnit: "kg",
+      operationalCost: 1.06,
+    },
+    {
+      id: "Mozzarella Julienne",
+      meta: {
+        name: "MOZZA Fior di Latte Expert Julienne 3kg Simonetta",
+        quantity: 1,
+        unit: "un",
+        unit_price: 20.03,
+        line_total: 20.03,
+      },
+      procurementSuffix: "bag",
+      operationalUnit: "kg",
+      operationalCost: 6.68,
+    },
+  ] as const)(
+    "shows procurement /$procurementSuffix for $id (not content measure)",
+    ({ meta, procurementSuffix, operationalUnit, operationalCost }) => {
+      const structured = resolveInvoiceLinePurchaseFormat(meta);
+      const presentation = resolveInvoiceLinePricingPresentation(meta);
+      const effective = computeEffectiveUsableCost(meta.unit_price, meta, structured, meta.name);
+
+      expect(presentation.priceDisplay).toBe(
+        `€${meta.unit_price.toFixed(2)} / ${procurementSuffix}`,
+      );
+      expect(effective?.unit).toBe(operationalUnit);
+      expect(effective?.cost).toBeCloseTo(operationalCost, 2);
+    },
+  );
+
+  it.each([
+    {
+      id: "Pepino fresco",
+      meta: { name: "Pepino", quantity: 3.36, unit: "kg" as const, unit_price: 1.42 },
+      procurementSuffix: "kg",
+    },
+    {
+      id: "Courgettes",
+      meta: { name: "Courgettes", quantity: 3.3, unit: "kg" as const, unit_price: 1.95 },
+      procurementSuffix: "kg",
+    },
+    {
+      id: "Aceto",
+      meta: {
+        name: "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        quantity: 1,
+        unit: "un",
+        unit_price: 15.55,
+      },
+      procurementSuffix: "unit",
+    },
+    {
+      id: "Pomodori",
+      meta: {
+        name: "POMODORI PELATI (CX 2,5KG*6)",
+        quantity: 1,
+        unit: "un",
+        unit_price: 27.56,
+      },
+      procurementSuffix: "case",
+    },
+    {
+      id: "Ovo",
+      meta: {
+        name: "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+        quantity: 1,
+        unit: "cx",
+        unit_price: 38.44,
+        line_total: 38.44,
+      },
+      procurementSuffix: "case",
+    },
+  ] as const)("keeps procurement /$procurementSuffix for $id", ({ meta, procurementSuffix }) => {
+    const presentation = resolveInvoiceLinePricingPresentation(meta);
+    expect(presentation.priceDisplay).toBe(
+      `€${meta.unit_price.toFixed(2)} / ${procurementSuffix}`,
+    );
+  });
+});
+
 describe("computeEffectiveUsableCost operational unit semantics", () => {
   it("Case A Peroni: 24×33cl €1.07/bottle → €3.2437/L not €0.1351/L", () => {
     const meta = {

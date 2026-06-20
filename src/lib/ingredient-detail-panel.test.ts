@@ -781,7 +781,7 @@ describe("ingredient-detail-panel", () => {
         }),
         expect: {
           lastPurchase: "24 un",
-          procurementCost: "€1.07 / unit",
+          procurementCost: "€1.07 / bottle",
           operationalCost: /^€3\.24 \/ L$/,
           procurementDiffersFromOperational: true,
         },
@@ -821,7 +821,7 @@ describe("ingredient-detail-panel", () => {
         }),
         expect: {
           lastPurchase: "2 cans",
-          procurementCost: "€9.99 / g",
+          procurementCost: "€9.99 / can",
           operationalCost: /^€20\.18 \/ kg$/,
           procurementDiffersFromOperational: true,
         },
@@ -861,7 +861,7 @@ describe("ingredient-detail-panel", () => {
         }),
         expect: {
           lastPurchase: "1 un",
-          procurementCost: "€13.50 / kg",
+          procurementCost: "€13.50 / bag",
           operationalCost: /^€6\.75 \/ kg$/,
           procurementDiffersFromOperational: true,
         },

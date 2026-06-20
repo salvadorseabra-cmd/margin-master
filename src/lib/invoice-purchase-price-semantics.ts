@@ -156,6 +156,18 @@ const ROW_UNIT_PRICE_SUFFIX: Record<string, string> = {
   embalagem: "pack",
   em: "pack",
   mo: "bunch",
+  bottle: "bottle",
+  bottles: "bottle",
+  garrafa: "bottle",
+  garrafas: "bottle",
+  lata: "can",
+  latas: "can",
+  can: "can",
+  cans: "can",
+  saco: "bag",
+  sacos: "bag",
+  bag: "bag",
+  bags: "bag",
   un: "unit",
   kg: "kg",
   g: "g",
@@ -167,6 +179,65 @@ type PurchasePriceKind = "pack" | "purchase" | "price";
 
 function normalizeToken(value: string | null | undefined): string {
   return value?.trim().toLowerCase() ?? "";
+}
+
+function isIndividualCountableRowUnit(rowUnit: string | null | undefined): boolean {
+  const normalized = normalizeToken(rowUnit);
+  if (!normalized || PACK_CONTAINER_UNITS.has(normalized)) return false;
+  return (
+    normalized === "un" ||
+    normalized === "uni" ||
+    normalized === "unid" ||
+    normalized === "unit" ||
+    normalized === "units" ||
+    normalized === "pc" ||
+    normalized === "pcs"
+  );
+}
+
+/** True when invoice row unit is explicit bulk weight (Bidfood veg @ €/kg). */
+function isTrueBulkPurchaseRow(rowUnit: string | null | undefined): boolean {
+  const normalized = normalizeToken(rowUnit);
+  return normalized === "kg" || normalized === "kgs";
+}
+
+/**
+ * Display-only procurement container from product name when row metadata lacks pack unit.
+ * Procurement answers "what did I buy?" — not inner content measure.
+ */
+function inferProcurementContainerFromName(
+  name: string,
+  rowUnit: string | null | undefined,
+): string | null {
+  const normalized = name.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+
+  if (/\b(cx|caixa|case|cases)\b/i.test(name) || /\(\s*cx\b/i.test(name) || /\bx\s*\d+\s*ud\b/i.test(normalized)) {
+    return "case";
+  }
+
+  if (
+    /\b(lata|latas|lt)\b/i.test(normalized) ||
+    /\bli\b(?=\s*\d)/i.test(name) ||
+    /\blt\b(?=\s*\d)/i.test(name)
+  ) {
+    return "can";
+  }
+
+  if (/\b(bolsa|bolsas|saco|sacos)\b/i.test(normalized)) {
+    return "bag";
+  }
+
+  if (/\d+\s*cl\s*[*x×]/i.test(normalized)) {
+    return "bottle";
+  }
+
+  const embeddedKg = normalized.match(/(\d+(?:[.,]\d+)?)\s*kg\b/i);
+  if (embeddedKg && isIndividualCountableRowUnit(rowUnit)) {
+    const kg = Number(embeddedKg[1]!.replace(",", "."));
+    if (Number.isFinite(kg) && kg >= 2) return "bag";
+  }
+
+  return null;
 }
 
 function formatPurchaseCount(value: number): string {
@@ -230,6 +301,25 @@ export function formatInvoicePurchasePriceLabel(metadata: InvoicePurchasePriceMe
   return "Price";
 }
 
+/**
+ * Procurement price suffix for invoice display ("€X / can").
+ *
+ * Ordering (before 2026-06 fix — content measure ran before row/name containers):
+ * 1. case row with embedded piece weight only → row case suffix
+ * 2. structured.packageType
+ * 3. structured.purchaseContainerUnit → ROW_UNIT_PRICE_SUFFIX (incl. g/kg measure tokens)
+ * 4. row unit → ROW_UNIT_PRICE_SUFFIX
+ * 5. packageMeasurementUnit / usableQuantityUnit → kg, L, g, ml (content measure)
+ *
+ * Ordering (after fix — procurement container before content measure):
+ * 1. case row with embedded piece weight only
+ * 2. explicit packageType
+ * 3. explicit procurement container (PACK_CONTAINER_UNITS only — not g/kg/L)
+ * 4. row pack container (PACK_CONTAINER_UNITS, ROW_UNIT_CONTAINER_LABEL)
+ * 5. inferred container from name (lata/LI→can, bolsa→bag, 33cl×N→bottle, CX/xNud→case, ≥2kg+un→bag)
+ * 6. generic countable unit (un → unit)
+ * 7. content measure fallback ONLY for true bulk rows (unit: kg — Bidfood veg)
+ */
 function resolvePriceSuffix(
   structured: StructuredPurchaseFormat,
   rowUnit: string | null | undefined,
@@ -248,27 +338,46 @@ function resolvePriceSuffix(
   }
 
   const containerUnit = normalizeToken(structured.purchaseContainerUnit);
-  if (containerUnit && ROW_UNIT_PRICE_SUFFIX[containerUnit]) {
-    return ROW_UNIT_PRICE_SUFFIX[containerUnit];
-  }
   if (containerUnit && PACK_CONTAINER_UNITS.has(containerUnit)) {
+    if (ROW_UNIT_PRICE_SUFFIX[containerUnit]) {
+      return ROW_UNIT_PRICE_SUFFIX[containerUnit];
+    }
     return containerUnit === "cx" || containerUnit.startsWith("caixa") || containerUnit === "case"
       ? "case"
       : containerUnit;
   }
 
   const normalizedRowUnit = normalizeToken(rowUnit);
-  if (normalizedRowUnit && ROW_UNIT_PRICE_SUFFIX[normalizedRowUnit]) {
-    return ROW_UNIT_PRICE_SUFFIX[normalizedRowUnit];
+  if (normalizedRowUnit && PACK_CONTAINER_UNITS.has(normalizedRowUnit)) {
+    const containerLabel = ROW_UNIT_CONTAINER_LABEL[normalizedRowUnit];
+    if (containerLabel) return containerLabel.singular;
+    if (ROW_UNIT_PRICE_SUFFIX[normalizedRowUnit]) {
+      return ROW_UNIT_PRICE_SUFFIX[normalizedRowUnit];
+    }
   }
 
-  const measureUnit = structured.packageMeasurementUnit ?? structured.inferred.base_unit;
-  if (measureUnit === "kg" || measureUnit === "L") return measureUnit;
-  if (measureUnit === "g") return "kg";
-  if (measureUnit === "ml") return "L";
-  if (structured.usableQuantityUnit === "g") return "kg";
-  if (structured.usableQuantityUnit === "ml") return "L";
-  if (structured.usableQuantityUnit === "un") return "unit";
+  const inferredContainer = inferProcurementContainerFromName(name, rowUnit);
+  if (inferredContainer) return inferredContainer;
+
+  if (isIndividualCountableRowUnit(rowUnit)) {
+    return "unit";
+  }
+
+  if (normalizedRowUnit && ROW_UNIT_PRICE_SUFFIX[normalizedRowUnit]) {
+    const mapped = ROW_UNIT_PRICE_SUFFIX[normalizedRowUnit];
+    if (mapped !== "kg" && mapped !== "g" && mapped !== "L" && mapped !== "ml") {
+      return mapped;
+    }
+  }
+
+  if (isTrueBulkPurchaseRow(rowUnit)) {
+    const measureUnit = structured.packageMeasurementUnit ?? structured.inferred.base_unit;
+    if (measureUnit === "kg" || measureUnit === "L") return measureUnit;
+    if (measureUnit === "g") return "kg";
+    if (measureUnit === "ml") return "L";
+    if (structured.usableQuantityUnit === "g") return "kg";
+    if (structured.usableQuantityUnit === "ml") return "L";
+  }
 
   return null;
 }
@@ -335,20 +444,6 @@ function isRowQuantityPackContentMeasure(
   }
 
   return false;
-}
-
-function isIndividualCountableRowUnit(rowUnit: string | null | undefined): boolean {
-  const normalized = normalizeToken(rowUnit);
-  if (!normalized || PACK_CONTAINER_UNITS.has(normalized)) return false;
-  return (
-    normalized === "un" ||
-    normalized === "uni" ||
-    normalized === "unid" ||
-    normalized === "unit" ||
-    normalized === "units" ||
-    normalized === "pc" ||
-    normalized === "pcs"
-  );
 }
 
 /**

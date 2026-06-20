@@ -144,7 +144,7 @@ describe("ingredient-purchase-memory", () => {
       }),
     ]);
 
-    expect(purchases[0]?.procurementCostLabel).toBe("€1.07 / unit");
+    expect(purchases[0]?.procurementCostLabel).toBe("€1.07 / bottle");
     expect(purchases[0]?.operationalCostLabel).toMatch(/^€3\.24 \/ L$/);
     expect(purchases[0]?.unitCostLabel).toBe(purchases[0]?.operationalCostLabel);
     expect(purchases[0]?.comparablePrice).toBeCloseTo(3.24, 2);

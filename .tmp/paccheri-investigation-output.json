@@ -1,0 +1,1107 @@
+[stock_usable_source] {
+  name: 'Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1.5,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1,5kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1.5,
+      unitMeasurement: 'kg',
+      perItemBase: 1500,
+      usableUnit: 'g',
+      totalUsableAmount: 1500,
+      expression: '1 × 1 × 1.5 kg'
+    }
+  },
+  numericTokens: [ { raw: '1,5kg', value: 1.5, unit: 'kg', index: 65 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1.5,
+    unitMeasurement: 'kg',
+    perItemBase: 1500,
+    usableUnit: 'g',
+    totalUsableAmount: 1500,
+    expression: '1 × 1 × 1.5 kg'
+  },
+  computedTotal: 1500,
+  structureTotal: 1500,
+  usableSource: 'structure_total',
+  fallbackReason: null,
+  weak_scalar_activated: false,
+  rowQuantity: 2,
+  rowUnit: 'kg'
+}
+[stock_usable_source] {
+  name: 'Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1.5,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1,5kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1.5,
+      unitMeasurement: 'kg',
+      perItemBase: 1500,
+      usableUnit: 'g',
+      totalUsableAmount: 1500,
+      expression: '1 × 1 × 1.5 kg'
+    }
+  },
+  numericTokens: [ { raw: '1,5kg', value: 1.5, unit: 'kg', index: 65 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1.5,
+    unitMeasurement: 'kg',
+    perItemBase: 1500,
+    usableUnit: 'g',
+    totalUsableAmount: 1500,
+    expression: '1 × 1 × 1.5 kg'
+  },
+  computedTotal: 1500,
+  structureTotal: 1500,
+  usableSource: 'structure_total',
+  fallbackReason: null,
+  weak_scalar_activated: false,
+  rowQuantity: 2,
+  rowUnit: 'kg'
+}
+[stock_usable_source] {
+  name: 'Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1.5,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1,5kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1.5,
+      unitMeasurement: 'kg',
+      perItemBase: 1500,
+      usableUnit: 'g',
+      totalUsableAmount: 1500,
+      expression: '1 × 1 × 1.5 kg'
+    }
+  },
+  numericTokens: [ { raw: '1,5kg', value: 1.5, unit: 'kg', index: 65 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1.5,
+    unitMeasurement: 'kg',
+    perItemBase: 1500,
+    usableUnit: 'g',
+    totalUsableAmount: 1500,
+    expression: '1 × 1 × 1.5 kg'
+  },
+  computedTotal: 1500,
+  structureTotal: 1500,
+  usableSource: 'structure_total',
+  fallbackReason: null,
+  weak_scalar_activated: false,
+  rowQuantity: 2,
+  rowUnit: 'kg'
+}
+[stock_usable_source] {
+  name: 'Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 1.5,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 1500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '1,5kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 1.5,
+      unitMeasurement: 'kg',
+      perItemBase: 1500,
+      usableUnit: 'g',
+      totalUsableAmount: 1500,
+      expression: '1 × 1 × 1.5 kg'
+    }
+  },
+  numericTokens: [ { raw: '1,5kg', value: 1.5, unit: 'kg', index: 65 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 1.5,
+    unitMeasurement: 'kg',
+    perItemBase: 1500,
+    usableUnit: 'g',
+    totalUsableAmount: 1500,
+    expression: '1 × 1 × 1.5 kg'
+  },
+  computedTotal: 1500,
+  structureTotal: 1500,
+  usableSource: 'structure_total',
+  fallbackReason: null,
+  weak_scalar_activated: false,
+  rowQuantity: 2,
+  rowUnit: 'kg'
+}
+[stock_usable_source] {
+  name: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    totalUsableAmount: 500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '500g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 500,
+      unitMeasurement: 'g',
+      perItemBase: 500,
+      usableUnit: 'g',
+      totalUsableAmount: 500,
+      expression: '1 × 1 × 500 g'
+    }
+  },
+  numericTokens: [ { raw: '500g', value: 500, unit: 'g', index: 36 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    perItemBase: 500,
+    usableUnit: 'g',
+    totalUsableAmount: 500,
+    expression: '1 × 1 × 500 g'
+  },
+  computedTotal: 12000,
+  structureTotal: 500,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (24 × 500 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 24,
+  rowUnit: null
+}
+[stock_usable_source] {
+  name: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    totalUsableAmount: 500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '500g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 500,
+      unitMeasurement: 'g',
+      perItemBase: 500,
+      usableUnit: 'g',
+      totalUsableAmount: 500,
+      expression: '1 × 1 × 500 g'
+    }
+  },
+  numericTokens: [ { raw: '500g', value: 500, unit: 'g', index: 36 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    perItemBase: 500,
+    usableUnit: 'g',
+    totalUsableAmount: 500,
+    expression: '1 × 1 × 500 g'
+  },
+  computedTotal: 12000,
+  structureTotal: 500,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (24 × 500 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 24,
+  rowUnit: null
+}
+[stock_usable_source] {
+  name: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    totalUsableAmount: 500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '500g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 500,
+      unitMeasurement: 'g',
+      perItemBase: 500,
+      usableUnit: 'g',
+      totalUsableAmount: 500,
+      expression: '1 × 1 × 500 g'
+    }
+  },
+  numericTokens: [ { raw: '500g', value: 500, unit: 'g', index: 36 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    perItemBase: 500,
+    usableUnit: 'g',
+    totalUsableAmount: 500,
+    expression: '1 × 1 × 500 g'
+  },
+  computedTotal: 500,
+  structureTotal: 500,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (1 × 500 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 1,
+  rowUnit: null
+}
+[stock_usable_source] {
+  name: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    totalUsableAmount: 500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '500g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 500,
+      unitMeasurement: 'g',
+      perItemBase: 500,
+      usableUnit: 'g',
+      totalUsableAmount: 500,
+      expression: '1 × 1 × 500 g'
+    }
+  },
+  numericTokens: [ { raw: '500g', value: 500, unit: 'g', index: 36 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    perItemBase: 500,
+    usableUnit: 'g',
+    totalUsableAmount: 500,
+    expression: '1 × 1 × 500 g'
+  },
+  computedTotal: 500,
+  structureTotal: 500,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (1 × 500 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 1,
+  rowUnit: null
+}
+[stock_usable_source] {
+  name: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    totalUsableAmount: 500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '500g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 500,
+      unitMeasurement: 'g',
+      perItemBase: 500,
+      usableUnit: 'g',
+      totalUsableAmount: 500,
+      expression: '1 × 1 × 500 g'
+    }
+  },
+  numericTokens: [ { raw: '500g', value: 500, unit: 'g', index: 36 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    perItemBase: 500,
+    usableUnit: 'g',
+    totalUsableAmount: 500,
+    expression: '1 × 1 × 500 g'
+  },
+  computedTotal: 12000,
+  structureTotal: 500,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (24 × 500 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 24,
+  rowUnit: null
+}
+[stock_usable_source] {
+  name: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    totalUsableAmount: 500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '500g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 500,
+      unitMeasurement: 'g',
+      perItemBase: 500,
+      usableUnit: 'g',
+      totalUsableAmount: 500,
+      expression: '1 × 1 × 500 g'
+    }
+  },
+  numericTokens: [ { raw: '500g', value: 500, unit: 'g', index: 36 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    perItemBase: 500,
+    usableUnit: 'g',
+    totalUsableAmount: 500,
+    expression: '1 × 1 × 500 g'
+  },
+  computedTotal: 12000,
+  structureTotal: 500,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (24 × 500 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 24,
+  rowUnit: null
+}
+[stock_usable_source] {
+  name: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    totalUsableAmount: 500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '500g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 500,
+      unitMeasurement: 'g',
+      perItemBase: 500,
+      usableUnit: 'g',
+      totalUsableAmount: 500,
+      expression: '1 × 1 × 500 g'
+    }
+  },
+  numericTokens: [ { raw: '500g', value: 500, unit: 'g', index: 36 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    perItemBase: 500,
+    usableUnit: 'g',
+    totalUsableAmount: 500,
+    expression: '1 × 1 × 500 g'
+  },
+  computedTotal: 500,
+  structureTotal: 500,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (1 × 500 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 1,
+  rowUnit: null
+}
+[stock_usable_source] {
+  name: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    totalUsableAmount: 500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '500g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 500,
+      unitMeasurement: 'g',
+      perItemBase: 500,
+      usableUnit: 'g',
+      totalUsableAmount: 500,
+      expression: '1 × 1 × 500 g'
+    }
+  },
+  numericTokens: [ { raw: '500g', value: 500, unit: 'g', index: 36 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    perItemBase: 500,
+    usableUnit: 'g',
+    totalUsableAmount: 500,
+    expression: '1 × 1 × 500 g'
+  },
+  computedTotal: 500,
+  structureTotal: 500,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (1 × 500 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 1,
+  rowUnit: null
+}
+[stock_usable_source] {
+  name: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    totalUsableAmount: 500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '500g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 500,
+      unitMeasurement: 'g',
+      perItemBase: 500,
+      usableUnit: 'g',
+      totalUsableAmount: 500,
+      expression: '1 × 1 × 500 g'
+    }
+  },
+  numericTokens: [ { raw: '500g', value: 500, unit: 'g', index: 36 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    perItemBase: 500,
+    usableUnit: 'g',
+    totalUsableAmount: 500,
+    expression: '1 × 1 × 500 g'
+  },
+  computedTotal: 500,
+  structureTotal: 500,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (1 × 500 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 1,
+  rowUnit: null
+}
+[stock_usable_source] {
+  name: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    totalUsableAmount: 500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '500g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 500,
+      unitMeasurement: 'g',
+      perItemBase: 500,
+      usableUnit: 'g',
+      totalUsableAmount: 500,
+      expression: '1 × 1 × 500 g'
+    }
+  },
+  numericTokens: [ { raw: '500g', value: 500, unit: 'g', index: 36 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    perItemBase: 500,
+    usableUnit: 'g',
+    totalUsableAmount: 500,
+    expression: '1 × 1 × 500 g'
+  },
+  computedTotal: 12000,
+  structureTotal: 500,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (24 × 500 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 24,
+  rowUnit: null
+}
+[stock_usable_source] {
+  name: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    totalUsableAmount: 500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '500g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 500,
+      unitMeasurement: 'g',
+      perItemBase: 500,
+      usableUnit: 'g',
+      totalUsableAmount: 500,
+      expression: '1 × 1 × 500 g'
+    }
+  },
+  numericTokens: [ { raw: '500g', value: 500, unit: 'g', index: 36 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    perItemBase: 500,
+    usableUnit: 'g',
+    totalUsableAmount: 500,
+    expression: '1 × 1 × 500 g'
+  },
+  computedTotal: 12000,
+  structureTotal: 500,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (24 × 500 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 24,
+  rowUnit: null
+}
+[stock_usable_source] {
+  name: 'De Cecco - Paccheri Lisci Nr. 125 - 500g',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    totalUsableAmount: 500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '500g',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 500,
+      unitMeasurement: 'g',
+      perItemBase: 500,
+      usableUnit: 'g',
+      totalUsableAmount: 500,
+      expression: '1 × 1 × 500 g'
+    }
+  },
+  numericTokens: [ { raw: '500g', value: 500, unit: 'g', index: 36 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 500,
+    unitMeasurement: 'g',
+    perItemBase: 500,
+    usableUnit: 'g',
+    totalUsableAmount: 500,
+    expression: '1 × 1 × 500 g'
+  },
+  computedTotal: 500,
+  structureTotal: 500,
+  usableSource: 'structure_recomputed',
+  fallbackReason: 'generic row unit × per-item (1 × 500 g)',
+  weak_scalar_activated: false,
+  rowQuantity: 1,
+  rowUnit: null
+}
+[stock_usable_source] {
+  name: 'Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 4.5,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 4500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '4,5kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 4.5,
+      unitMeasurement: 'kg',
+      perItemBase: 4500,
+      usableUnit: 'g',
+      totalUsableAmount: 4500,
+      expression: '1 × 1 × 4.5 kg'
+    }
+  },
+  numericTokens: [ { raw: '4,5kg', value: 4.5, unit: 'kg', index: 54 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 4.5,
+    unitMeasurement: 'kg',
+    perItemBase: 4500,
+    usableUnit: 'g',
+    totalUsableAmount: 4500,
+    expression: '1 × 1 × 4.5 kg'
+  },
+  computedTotal: 4500,
+  structureTotal: 4500,
+  usableSource: 'structure_total',
+  fallbackReason: null,
+  weak_scalar_activated: false,
+  rowQuantity: 4.3,
+  rowUnit: 'kg'
+}
+[stock_usable_source] {
+  name: 'Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 4.5,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 4500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '4,5kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 4.5,
+      unitMeasurement: 'kg',
+      perItemBase: 4500,
+      usableUnit: 'g',
+      totalUsableAmount: 4500,
+      expression: '1 × 1 × 4.5 kg'
+    }
+  },
+  numericTokens: [ { raw: '4,5kg', value: 4.5, unit: 'kg', index: 54 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 4.5,
+    unitMeasurement: 'kg',
+    perItemBase: 4500,
+    usableUnit: 'g',
+    totalUsableAmount: 4500,
+    expression: '1 × 1 × 4.5 kg'
+  },
+  computedTotal: 4500,
+  structureTotal: 4500,
+  usableSource: 'structure_total',
+  fallbackReason: null,
+  weak_scalar_activated: false,
+  rowQuantity: 4.3,
+  rowUnit: 'kg'
+}
+[stock_usable_source] {
+  name: 'Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 4.5,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 4500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '4,5kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 4.5,
+      unitMeasurement: 'kg',
+      perItemBase: 4500,
+      usableUnit: 'g',
+      totalUsableAmount: 4500,
+      expression: '1 × 1 × 4.5 kg'
+    }
+  },
+  numericTokens: [ { raw: '4,5kg', value: 4.5, unit: 'kg', index: 54 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 4.5,
+    unitMeasurement: 'kg',
+    perItemBase: 4500,
+    usableUnit: 'g',
+    totalUsableAmount: 4500,
+    expression: '1 × 1 × 4.5 kg'
+  },
+  computedTotal: 4500,
+  structureTotal: 4500,
+  usableSource: 'structure_total',
+  fallbackReason: null,
+  weak_scalar_activated: false,
+  rowQuantity: 4.3,
+  rowUnit: 'kg'
+}
+[stock_usable_source] {
+  name: 'Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg',
+  structure: {
+    purchaseQuantity: 1,
+    purchaseFormat: 'unit',
+    innerUnitCount: null,
+    innerUnitType: null,
+    unitSize: 4.5,
+    unitMeasurement: 'kg',
+    totalUsableAmount: 4500,
+    usableUnit: 'g',
+    tier: 'bare_measure',
+    matchedText: '4,5kg',
+    multiplierChain: {
+      purchaseQuantity: 1,
+      innerUnitCount: 1,
+      unitSize: 4.5,
+      unitMeasurement: 'kg',
+      perItemBase: 4500,
+      usableUnit: 'g',
+      totalUsableAmount: 4500,
+      expression: '1 × 1 × 4.5 kg'
+    }
+  },
+  numericTokens: [ { raw: '4,5kg', value: 4.5, unit: 'kg', index: 54 } ],
+  multiplierChain: {
+    purchaseQuantity: 1,
+    innerUnitCount: 1,
+    unitSize: 4.5,
+    unitMeasurement: 'kg',
+    perItemBase: 4500,
+    usableUnit: 'g',
+    totalUsableAmount: 4500,
+    expression: '1 × 1 × 4.5 kg'
+  },
+  computedTotal: 4500,
+  structureTotal: 4500,
+  usableSource: 'structure_total',
+  fallbackReason: null,
+  weak_scalar_activated: false,
+  rowQuantity: 4.3,
+  rowUnit: 'kg'
+}
+{
+  "generated_at": "2026-06-20T00:18:33.315Z",
+  "vl_project": "bjhnlrgodcqoyzddbpbd",
+  "invoice": {
+    "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "supplier_name": "Emporio Italia",
+    "invoice_date": "2026-05-19",
+    "created_at": "2026-06-11T22:53:16.723511+00:00",
+    "total": 327.46,
+    "file_url": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781218392988-Screenshot_2026-06-07_at_21.05.07.png"
+  },
+  "schemaNote": {
+    "table": "invoice_items (not invoice_products)",
+    "persisted_columns": [
+      "name",
+      "quantity",
+      "unit",
+      "unit_price",
+      "total"
+    ],
+    "discount_columns_in_db": "none — discount_pct/gross_unit_price/line_total_net exist only in extract-invoice Pass C, bound into unit_price/total before persistence",
+    "extraction_binding": "bindMonetaryColumns: unit_price = gross*(1-discount/100) when structured cols present; total = line_total_net"
+  },
+  "target_line_count": 3,
+  "discounted_line_count_on_invoice": 3,
+  "discounted_candidates": [
+    {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 2,
+      "unit_price": 10.22,
+      "total": 13.44,
+      "qty_x_price": 20.44
+    },
+    {
+      "name": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 2,
+      "unit_price": 10.85,
+      "total": 19.38,
+      "qty_x_price": 21.7
+    },
+    {
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit_price": 2.35,
+      "total": 50.4,
+      "qty_x_price": 56.4
+    }
+  ],
+  "target_replay": [
+    {
+      "line": {
+        "id": "33dc7070-a202-4397-bba0-e7865bfb6931",
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+        "quantity": 2,
+        "unit": "kg",
+        "unit_price": 10.22,
+        "total": 13.44,
+        "created_at": "2026-06-17T21:28:13.21244+00:00",
+        "updated_at": "2026-06-17T21:28:13.21244+00:00"
+      },
+      "arithmetic": {
+        "gross_unit_price": 10.22,
+        "quantity": 2,
+        "line_total": 13.44,
+        "qty_x_gross": 20.44,
+        "effective_paid_per_unit": 6.72,
+        "implied_discount_pct": 34.2466,
+        "net_unit_if_11pct_off_gross": 9.0958,
+        "delta_total_vs_qty_x_gross": -7
+      },
+      "replay": {
+        "recipeOperationalCostFieldsFromInvoiceLine": {
+          "current_price": 10.22,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "operationalCostFieldsFromInvoiceLine": {
+          "current_price": 10.22,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "computeEffectiveUsableCost": {
+          "cost": 10.22,
+          "unit": "kg"
+        },
+        "resolvedOperationalUnitCostEur": 0.0102,
+        "operationalUnitPriceForPriceHistory": 0.0102,
+        "presentation_usable_cost_line": "€10.22 / kg usable",
+        "presentation_purchase_price_line": "€10.22 / kg · €13.44 total",
+        "structured": {
+          "kind": "weight_or_volume",
+          "packageQuantity": 1.5,
+          "packageMeasurementUnit": "kg",
+          "normalizedUsableQuantity": 1500,
+          "usableQuantityUnit": "g"
+        }
+      },
+      "source_field_used": {
+        "current_price": "invoice_items.unit_price (via recipeOperationalCostFieldsFromInvoiceLine)",
+        "purchase_quantity": "derived from name/unit/qty (resolveCountablePurchaseQuantityForCost etc.)",
+        "operational_cost": "current_price / purchase_quantity (resolvedOperationalUnitCostEur)",
+        "history_new_price": "same pack current_price from operationalCostFieldsFromInvoiceLine",
+        "total_not_used_for_current_price": true
+      }
+    },
+    {
+      "line": {
+        "id": "867121e4-7284-4ed8-9610-46e78ba487aa",
+        "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "quantity": 24,
+        "unit": null,
+        "unit_price": 2.35,
+        "total": 50.4,
+        "created_at": "2026-06-17T21:28:13.21244+00:00",
+        "updated_at": "2026-06-17T21:28:13.21244+00:00"
+      },
+      "arithmetic": {
+        "gross_unit_price": 2.35,
+        "quantity": 24,
+        "line_total": 50.4,
+        "qty_x_gross": 56.4,
+        "effective_paid_per_unit": 2.1,
+        "implied_discount_pct": 10.6383,
+        "net_unit_if_11pct_off_gross": 2.0915,
+        "delta_total_vs_qty_x_gross": -6
+      },
+      "replay": {
+        "recipeOperationalCostFieldsFromInvoiceLine": {
+          "current_price": 2.35,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 500
+        },
+        "operationalCostFieldsFromInvoiceLine": {
+          "current_price": 2.35,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 500
+        },
+        "computeEffectiveUsableCost": {
+          "cost": 4.7,
+          "unit": "kg"
+        },
+        "resolvedOperationalUnitCostEur": 2.35,
+        "operationalUnitPriceForPriceHistory": 2.35,
+        "presentation_usable_cost_line": "€4.70 / kg usable",
+        "presentation_purchase_price_line": "€2.35 · €50.40 total",
+        "structured": {
+          "kind": "weight_or_volume",
+          "packageQuantity": 500,
+          "packageMeasurementUnit": "g",
+          "normalizedUsableQuantity": 12000,
+          "usableQuantityUnit": "g"
+        }
+      },
+      "source_field_used": {
+        "current_price": "invoice_items.unit_price (via recipeOperationalCostFieldsFromInvoiceLine)",
+        "purchase_quantity": "derived from name/unit/qty (resolveCountablePurchaseQuantityForCost etc.)",
+        "operational_cost": "current_price / purchase_quantity (resolvedOperationalUnitCostEur)",
+        "history_new_price": "same pack current_price from operationalCostFieldsFromInvoiceLine",
+        "total_not_used_for_current_price": true
+      }
+    },
+    {
+      "line": {
+        "id": "bcc33682-97ce-49af-a137-97f4b5070b45",
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+        "quantity": 4.3,
+        "unit": "kg",
+        "unit_price": 8.5,
+        "total": 36.54,
+        "created_at": "2026-06-17T21:28:13.21244+00:00",
+        "updated_at": "2026-06-17T21:28:13.21244+00:00"
+      },
+      "arithmetic": {
+        "gross_unit_price": 8.5,
+        "quantity": 4.3,
+        "line_total": 36.54,
+        "qty_x_gross": 36.55,
+        "effective_paid_per_unit": 8.4977,
+        "implied_discount_pct": 0.0274,
+        "net_unit_if_11pct_off_gross": 7.565,
+        "delta_total_vs_qty_x_gross": -0.01
+      },
+      "replay": {
+        "recipeOperationalCostFieldsFromInvoiceLine": {
+          "current_price": 8.5,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "operationalCostFieldsFromInvoiceLine": {
+          "current_price": 8.5,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "computeEffectiveUsableCost": {
+          "cost": 8.5,
+          "unit": "kg"
+        },
+        "resolvedOperationalUnitCostEur": 0.0085,
+        "operationalUnitPriceForPriceHistory": 0.0085,
+        "presentation_usable_cost_line": "€8.50 / kg usable",
+        "presentation_purchase_price_line": "€8.50 / kg · €36.54 total",
+        "structured": {
+          "kind": "weight_or_volume",
+          "packageQuantity": 4.5,
+          "packageMeasurementUnit": "kg",
+          "normalizedUsableQuantity": 4500,
+          "usableQuantityUnit": "g"
+        }
+      },
+      "source_field_used": {
+        "current_price": "invoice_items.unit_price (via recipeOperationalCostFieldsFromInvoiceLine)",
+        "purchase_quantity": "derived from name/unit/qty (resolveCountablePurchaseQuantityForCost etc.)",
+        "operational_cost": "current_price / purchase_quantity (resolvedOperationalUnitCostEur)",
+        "history_new_price": "same pack current_price from operationalCostFieldsFromInvoiceLine",
+        "total_not_used_for_current_price": true
+      }
+    }
+  ],
+  "ingredient_audit": [
+    {
+      "line": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "match": null
+    },
+    {
+      "line": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "match": null
+    },
+    {
+      "line": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+      "match": null
+    }
+  ]
+}
+
+--- SUPPLEMENT ---
+ALL_LINES:
+{"name":"Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg","qty":2,"unit":"kg","unit_price":10.22,"total":13.44,"discounted":true}
+{"name":"Baladin - Ginger Beer 0.20cl","qty":2,"unit":null,"unit_price":10.85,"total":19.38,"discounted":true}
+{"name":"De Cecco - Paccheri Lisci Nr. 125 - 500g","qty":24,"unit":null,"unit_price":2.35,"total":50.4,"discounted":true}
+{"name":"Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg","qty":1.83,"unit":"kg","unit_price":27.04,"total":49.48,"discounted":false}
+{"name":"Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg","qty":4.3,"unit":"kg","unit_price":8.5,"total":36.54,"discounted":false}
+{"name":"Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5kg","qty":3.11,"unit":"kg","unit_price":9.99,"total":31.07,"discounted":false}
+{"name":"Rovagnati - Salame Ventricina 2,5 Kg","qty":2.6,"unit":"kg","unit_price":15.19,"total":39.49,"discounted":false}
+{"name":"SanPellegrino - Acqua in vitro 75cl x 15ud","qty":2,"unit":"un","unit_price":19.28,"total":38.56,"discounted":false}
+HISTORY_FOR_INVOICE [{"ingredient_name":"Água san pellegrino","new_price":0.0017137777777777778,"previous_price":0.001864,"invoice_id":"ab52796d-de1d-418d-86e7-230c8f056f09","created_at":"2026-05-19T12:00:00+00:00","supplier_name":"Emporio Italia"},{"ingredient_name":"Prosciutto cotto scelto","new_price":8.5,"previous_price":null,"invoice_id":"ab52796d-de1d-418d-86e7-230c8f056f09","created_at":"2026-05-19T12:00:00+00:00","supplier_name":"Emporio Italia"},{"ingredient_name":"Paccheri lisci","new_price":2.35,"previous_price":null,"invoice_id":"ab52796d-de1d-418d-86e7-230c8f056f09","created_at":"2026-05-19T12:00:00+00:00","supplier_name":"Emporio Italia"},{"ingredient_name":"Gorgonzola DOP dolce","new_price":0.01022,"previous_price":null,"invoice_id":"ab52796d-de1d-418d-86e7-230c8f056f09","created_at":"2026-05-19T12:00:00+00:00","supplier_name":"Emporio Italia"},{"ingredient_name":"Mortadella IGP massima con pistacchio","new_price":0.00999,"previous_price":null,"invoice_id":"ab52796d-de1d-418d-86e7-230c8f056f09","created_at":"2026-05-19T12:00:00+00:00","supplier_name":"Emporio Italia"},{"ingredient_name":"Rigamonti bresaola punta d'anca oro","new_price":0.027039999999999998,"previous_price":null,"invoice_id":"ab52796d-de1d-418d-86e7-230c8f056f09","created_at":"2026-05-19T12:00:00+00:00","supplier_name":"Emporio Italia"},{"ingredient_name":"Rovagnati salame ventricina","new_price":0.015189999999999999,"previous_price":null,"invoice_id":"ab52796d-de1d-418d-86e7-230c8f056f09","created_at":"2026-05-19T12:00:00+00:00","supplier_name":"Emporio Italia"}]
