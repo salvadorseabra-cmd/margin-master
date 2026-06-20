@@ -118,9 +118,8 @@ function hasInconsistentGrossLineTotal(item: MonetaryLineItem): boolean {
 }
 
 function applyEffectivePaidPrice(item: MonetaryLineItem): MonetaryLineItem {
-  // Structured gross/discount rows are handled by applyStructuredBinding / rebindFromStructured.
-  // line_total_net alone may still leave gross unit_price — derive paid unit from net total.
-  if (item.gross_unit_price != null || item.discount_pct != null) {
+  // Rows with an extracted discount % are net-derived in applyStructuredBinding.
+  if (item.discount_pct != null) {
     return item;
   }
   if (!hasInconsistentGrossLineTotal(item)) return item;

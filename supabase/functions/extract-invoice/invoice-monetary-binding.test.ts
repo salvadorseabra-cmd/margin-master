@@ -224,6 +224,22 @@ Deno.test("Effective paid price regression: Mortadella consistent row unchanged"
   assertEquals(items[0].total, 31.07);
 });
 
+Deno.test("Effective paid price: Paccheri gross_unit_price without discount_pct", () => {
+  const items = bindMonetaryColumns(parseMonetaryLineItems([{
+    name: "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+    quantity: 24,
+    unit: null,
+    gross_unit_price: 2.35,
+    discount_pct: null,
+    line_total_net: 50.4,
+    unit_price: 2.35,
+    total: 50.4,
+  }]));
+
+  assertEquals(items[0].unit_price, 2.1);
+  assertEquals(items[0].total, 50.4);
+});
+
 Deno.test("Effective paid price: Courgettes with line_total_net only", () => {
   const items = bindMonetaryColumns(parseMonetaryLineItems([{
     name: "Courgettes",
