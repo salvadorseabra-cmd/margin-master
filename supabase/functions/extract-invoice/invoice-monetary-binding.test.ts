@@ -224,6 +224,22 @@ Deno.test("Effective paid price regression: Mortadella consistent row unchanged"
   assertEquals(items[0].total, 31.07);
 });
 
+Deno.test("Effective paid price: Courgettes with line_total_net only", () => {
+  const items = bindMonetaryColumns(parseMonetaryLineItems([{
+    name: "Courgettes",
+    quantity: 3.3,
+    unit: "kg",
+    gross_unit_price: null,
+    discount_pct: null,
+    line_total_net: 5.15,
+    unit_price: 1.95,
+    total: 5.15,
+  }]));
+
+  assertEquals(items[0].unit_price, 1.56);
+  assertEquals(items[0].total, 5.15);
+});
+
 Deno.test("Effective paid price regression: Aceto total above unit unchanged", () => {
   const items = bindMonetaryColumns(parseMonetaryLineItems([{
     name: "Aceto balsamico di modena IGP pet 5l*2 Toschi",
