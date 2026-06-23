@@ -1406,6 +1406,39 @@ function embeddedPurchaseDenominationFromName(name: string): "kg" | "L" | null {
   return null;
 }
 
+const PACK_DENOMINATION_MARKER_RE = /\b(EMB|CX|CAIXA|PACK)\b/;
+
+function hasPackDenominationMarkersInName(name: string): boolean {
+  return PACK_DENOMINATION_MARKER_RE.test(normalizeForUnitMatch(name));
+}
+
+/** Retail per-item g/ml/cl in name — excludes kg/L purchase denomination. */
+function embeddedRetailMeasureInName(name: string): boolean {
+  const normalized = normalizeForUnitMatch(name);
+  if (/(\d+(?:[.,]\d+)?)\s*(KG|KGS)\b/.test(normalized)) return false;
+  if (/(\d+(?:[.,]\d+)?)\s*(L|LT|LTS|LTR|LTRS)\b/.test(normalized)) return false;
+  return /(\d+(?:[.,]\d+)?)\s*(G|GR|GRS|ML|CL)\b/.test(normalized);
+}
+
+function shouldInferUnForEmbeddedMeasureCountable(
+  item: InvoiceLinePurchaseInput,
+  resolution: InvoiceLinePurchaseUnitResolution,
+): boolean {
+  if (resolution.source !== "fallback_null") return false;
+  if (item.unit?.trim()) return false;
+
+  const structured = resolveInvoiceLinePurchaseFormat(item);
+  if (structured.kind !== "weight_or_volume") return false;
+
+  const qty = item.quantity;
+  if (qty == null || !Number.isFinite(qty) || !Number.isInteger(qty) || qty <= 1) return false;
+
+  if (!embeddedRetailMeasureInName(item.name)) return false;
+  if (hasPackDenominationMarkersInName(item.name)) return false;
+
+  return true;
+}
+
 function isInvoiceCounterWeightPricedRow(item: InvoiceLinePurchaseInput): boolean {
   const qty = item.quantity;
   return qty != null && Number.isFinite(qty) && qty > 0 && !Number.isInteger(qty);
@@ -1505,13 +1538,18 @@ export function resolveInvoicePersistedItemUnit(
   item: InvoiceLinePurchaseInput,
   isGenericUnit: (unit: string | null | undefined) => boolean,
 ): string | null {
-  const resolved = resolveInvoiceLinePurchaseUnit(item, isGenericUnit).unit;
-  if (resolved) return resolved;
+  const resolution = resolveInvoiceLinePurchaseUnit(item, isGenericUnit);
+  if (resolution.unit) return resolution.unit;
 
   const extractedUnit = item.unit?.trim() || null;
   if (extractedUnit && !isOperationalMicroUnit(extractedUnit)) {
     return normalizeOcrToPurchaseDenomination(extractedUnit) ?? extractedUnit;
   }
+
+  if (shouldInferUnForEmbeddedMeasureCountable(item, resolution)) {
+    return "un";
+  }
+
   return null;
 }
 

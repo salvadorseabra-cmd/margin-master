@@ -811,3 +811,103 @@ describe("resolveInvoicePersistedItemUnit — purchase denomination (never g/ml)
     });
   });
 });
+
+describe("resolveInvoicePersistedItemUnit — embedded retail measure countable (gated un)", () => {
+  const isGeneric = (unit: string | null | undefined) =>
+    !unit?.trim() || ["un", "unit", "units", "und", "unds", "unid", "unids"].includes(unit.trim().toLowerCase());
+
+  it.each([
+    {
+      product: "Paccheri 500g",
+      line: {
+        name: "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        quantity: 24,
+        unit: null as string | null,
+      },
+      expectedUnit: "un",
+    },
+    {
+      product: "Ginger Beer 0.20cl",
+      line: {
+        name: "Baladin - Ginger Beer 0.20cl",
+        quantity: 24,
+        unit: null as string | null,
+      },
+      expectedUnit: "un",
+    },
+  ])("infers un for $product when OCR unit is null", ({ line, expectedUnit }) => {
+    expect(resolveInvoicePersistedItemUnit(line, isGeneric)).toBe(expectedUnit);
+  });
+
+  it.each([
+    {
+      product: "Peroni",
+      line: { name: "Peroni 24x33cl", quantity: 24, unit: null as string | null },
+      expectedUnit: "un",
+    },
+    {
+      product: "Pellegrino",
+      line: {
+        name: "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        quantity: 2,
+        unit: null as string | null,
+      },
+      expectedUnit: "un",
+    },
+    {
+      product: "Açúcar",
+      line: { name: "Açúcar Branco 10x1kg", quantity: 1, unit: "cx" as string | null },
+      expectedUnit: "cx",
+    },
+    {
+      product: "Pomodori",
+      line: { name: "Pomodori Secchi 2,5kg x 6", quantity: 6, unit: null as string | null },
+      expectedUnit: "un",
+    },
+    {
+      product: "Mozzarella",
+      line: { name: "Mozzarella 125g x 8", quantity: 8, unit: null as string | null },
+      expectedUnit: "un",
+    },
+    {
+      product: "Guanciale",
+      line: {
+        name: "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        quantity: 5.996,
+        unit: null as string | null,
+      },
+      expectedUnit: "un",
+    },
+  ])("does not regress $product → $expectedUnit", ({ line, expectedUnit }) => {
+    expect(resolveInvoicePersistedItemUnit(line, isGeneric)).toBe(expectedUnit);
+  });
+
+  it.each([
+    {
+      product: "Gorgonzola bulk",
+      line: { name: "Gorgonzola 1,5kg", quantity: 2, unit: null as string | null },
+      expectedUnit: "kg",
+    },
+    {
+      product: "Manteiga EMB",
+      line: { name: "Manteiga Coimbra EMB 1 Kg", quantity: 8, unit: null as string | null },
+      expectedUnit: "kg",
+    },
+    {
+      product: "Salada EMB",
+      line: { name: "Salada Ibérica EMB. 250g", quantity: 4, unit: null as string | null },
+      expectedUnit: null,
+    },
+    {
+      product: "Prosciutto counter-weight",
+      line: {
+        name: "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+ 4,25Kg",
+        quantity: 4.3,
+        unit: null as string | null,
+      },
+      expectedUnit: "kg",
+    },
+  ])("does not infer un for $product", ({ line, expectedUnit }) => {
+    expect(resolveInvoicePersistedItemUnit(line, isGeneric)).toBe(expectedUnit);
+  });
+});
