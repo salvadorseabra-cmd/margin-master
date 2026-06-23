@@ -1,0 +1,54 @@
+{
+  "auditedAt": "2026-06-22T00:00:00.000Z",
+  "mode": "STRICT_READ_ONLY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "product": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "invoiceItemId": "095b2bb9-bd36-44c2-a1f9-7c50fa9c0cc6",
+  "supplier": "IL BOCCONCINO Distribuição Alimentar",
+  "invoiceDate": "2026-05-08",
+  "fundamentalAssumption": {
+    "statement": "invoice qty=10, current usable 1000g, expected 10000g — is 10kg actually correct?",
+    "answer": true,
+    "classification": "A",
+    "classificationLabel": "Proven"
+  },
+  "purchaseReality": {
+    "whatWasPurchased": "10 outer packs (10 CX / QUANT 10,000) of Mozzarella Fior di Latte Il Bocconcino; each pack contains 8 balls × 125 g = 1 kg",
+    "invoiceQty": 10,
+    "invoiceUnit": "un",
+    "grossUnitPriceEur": 9.5,
+    "netLineTotalEur": 81.23,
+    "netUnitPriceEur": 8.123,
+    "discountPct": 14.5,
+    "totalMassGrams": 10000,
+    "totalMassKg": 10,
+    "referenceSku": "QJ0107*8"
+  },
+  "operationalReality": {
+    "usableGramsEntered": 1000,
+    "usableKgEntered": 1,
+    "lastPurchaseDisplay": "10 un",
+    "operationalCostShown": "€81.20 / kg",
+    "operationalCostCorrect": "€8.12 / kg",
+    "is1000gWrong": true,
+    "is10000gProven": true
+  },
+  "confidence": {
+    "level": "high",
+    "score": 0.95,
+    "rationale": "Invoice OCR shows QUANT 10 / 10 CX with €81.23 net matching 10×€9.50 less 14.5% discount; 125GR*8 is standard 8×125 g per-pack notation; peer lines on same invoice scale qty×per-unit mass correctly"
+  },
+  "sources": [
+    ".tmp/bocconcino-investigation/REPORT.md",
+    ".tmp/field-accuracy-audit/ground-truth.json",
+    ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+    ".tmp/discount-line-audit/ground-truth-trace.json",
+    ".tmp/quantity-mismatch-validation/mismatches.json",
+    ".tmp/quantity-mismatch-ui-audit/replay.json",
+    ".tmp/quantity-mismatch-ui-audit/classifications.json",
+    ".tmp/gpt-pattern-audit/multiplier-errors.json",
+    ".tmp/stock-normalization-family-assessment/assessment.json",
+    "VL DB read-only: invoice_items f0aa5a08 (2026-06-22)"
+  ]
+}

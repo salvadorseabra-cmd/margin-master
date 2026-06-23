@@ -1,0 +1,471 @@
+{
+  "generated_at": "2026-06-22T00:00:00.000Z",
+  "mode": "STRICT_READ_ONLY_STRATEGY_COMPARISON",
+  "validation_lab": "bjhnlrgodcqoyzddbpbd",
+  "scope": {
+    "family": "Family A",
+    "products": [
+      "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "RICOTTA TREVIGIANA 1,5KG"
+    ],
+    "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+    "supplier": "IL BOCCONCINO",
+    "confirmed_failures": 2,
+    "pattern_expansion": 0
+  },
+  "approaches": {
+    "A": {
+      "label": "Binding correction (Option C)",
+      "investigation_mapping": "family-a-fix-design Option C",
+      "correction_locus": {
+        "file": "supabase/functions/extract-invoice/invoice-monetary-binding.ts",
+        "function": "bindMonetaryColumns",
+        "stage": "Post-GPT monetary binding (before applyEffectivePaidPrice)"
+      },
+      "mechanism": "Deterministic qty-inflation signature detection and quantity correction"
+    },
+    "B": {
+      "label": "Extraction source (Hybrid H / prompt/schema)",
+      "investigation_mapping": "family-a-fix-design Option A + Hybrid H table GPT pass",
+      "correction_locus": {
+        "file": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+        "function": "callOpenAiJson",
+        "stage": "Pass D table GPT (Hybrid H) — authoritative qty authoring"
+      },
+      "mechanism": "Prompt/schema refinement so GPT emits qty=1 for undiscounted Bocconcino blank-DESC rows"
+    }
+  },
+  "known_failure_state": {
+    "pdf_ocr_qty": 1,
+    "pass_c_baseline_qty": 1,
+    "hybrid_h_qty": 2,
+    "stability": "10/10 qty=2 across v25-v36",
+    "first_incorrect_stage": 4,
+    "first_incorrect_stage_name": "Hybrid H table GPT pass (callOpenAiJson)",
+    "downstream_qty_invariant": true,
+    "root_cause_confidence": 0.91,
+    "evidence": [
+      ".tmp/family-a-transition-trace/REPORT.md",
+      ".tmp/ricotta-root-cause-trace/",
+      ".tmp/mezzi-root-cause-trace/",
+      ".tmp/family-a-implementation-prep/readiness.json"
+    ]
+  },
+  "comparison_dimensions": {
+    "complexity": {
+      "winner": "A",
+      "A": {
+        "rating": "medium",
+        "score_1_to_5": 3,
+        "summary": "Deterministic binding rule; requires proxy mapping for 3 investigation-only combo gates; runtime proxy is a different rule from validated combo",
+        "evidence": [
+          ".tmp/family-a-implementability-audit/REPORT.md",
+          ".tmp/family-a-runtime-equivalence/REPORT.md",
+          ".tmp/family-a-implementation-prep/REPORT.md"
+        ]
+      },
+      "B": {
+        "rating": "high",
+        "score_1_to_5": 2,
+        "summary": "Prompt+schema interaction primary (45%); anti-inflation rules present yet insufficient; narrow Bocconcino scoping vs Mammafiore regression history",
+        "evidence": [
+          ".tmp/family-a-causal-attribution/REPORT.md",
+          ".tmp/family-a-hybrid-diff-attribution/REPORT.md",
+          ".tmp/family-a-strategy-validation/REPORT.md"
+        ]
+      }
+    },
+    "runtime_dependencies": {
+      "winner": "A",
+      "A": {
+        "rating": "partial_pipeline_at_bind",
+        "score_1_to_5": 3,
+        "green_signals": [
+          "hybrid_h_qty_eq_2",
+          "supplier_il_bocconcino",
+          "unit_price_approx_total_at_qty1"
+        ],
+        "yellow_signals": [
+          "binding_changed",
+          "diff_pct_ge_45",
+          "total_preserved",
+          "qty_inflation_signature"
+        ],
+        "red_signals": [
+          "ocr_qty_eq_1",
+          "hybrid_h_qty_2_stable",
+          "undiscounted_blank_desc"
+        ],
+        "implementability_totals": {
+          "GREEN": 3,
+          "YELLOW": 4,
+          "RED": 3
+        },
+        "supplier_threading_required": true,
+        "evidence": [
+          ".tmp/family-a-implementability-audit/signals.json",
+          ".tmp/family-a-runtime-equivalence/REPORT.md"
+        ]
+      },
+      "B": {
+        "rating": "live_gpt_required",
+        "score_1_to_5": 2,
+        "dependencies": [
+          "callOpenAiJson GPT vision",
+          "TABLE_EXTRACTION_SYSTEM_PROMPT",
+          "TABLE_EXTRACTION_RESPONSE_FORMAT strict json_schema",
+          "OpenAI non-determinism"
+        ],
+        "missing_artifacts": [
+          "bad_path_hybrid_h_gpt_raw_json"
+        ],
+        "evidence": [
+          ".tmp/family-a-transition-trace/REPORT.md",
+          ".tmp/family-a-v25-raw-capture/artifact-index.json",
+          ".tmp/family-a-strategy-validation/REPORT.md"
+        ]
+      }
+    },
+    "investigation_only_signals_required": {
+      "winner": "tie",
+      "A": {
+        "documented_combo_gates": 6,
+        "investigation_only_gates": 3,
+        "gates": [
+          {
+            "id": "ocr_qty_eq_1",
+            "source": "passc-refinement reextract + RowSpec meta",
+            "runtime_available": false,
+            "implementability": "RED"
+          },
+          {
+            "id": "hybrid_h_qty_2_stable",
+            "source": "10/10 final-stability-audit",
+            "runtime_available": false,
+            "implementability": "RED",
+            "omission_risk": "Rolo run 7 false positive"
+          },
+          {
+            "id": "undiscounted_blank_desc",
+            "source": "visible DESC audit + RowSpec meta",
+            "runtime_available": "partial",
+            "implementability": "RED",
+            "proposed_proxy": "discount_pct == null || 0 at bind input"
+          }
+        ],
+        "implementability_verdict": "B",
+        "implementability_verdict_label": "Partially depends on investigation-only signals",
+        "evidence": [
+          ".tmp/family-a-implementability-audit/REPORT.md",
+          ".tmp/family-a-implementability-audit/signals.json"
+        ]
+      },
+      "B": {
+        "blockers": [
+          {
+            "id": "bad_path_gpt_raw",
+            "status": "missing",
+            "impact": "Cannot confirm GPT emits qty=2 vs binding inflation"
+          },
+          {
+            "id": "post_prompt_10x_stability",
+            "status": "not_run",
+            "impact": "Cannot prove post-fix behavior"
+          },
+          {
+            "id": "prompt_only_sufficiency",
+            "status": "low_confidence",
+            "confidence": 0.4,
+            "impact": "Undiscounted blank-DESC rows not covered by POMODORI guardrail"
+          }
+        ],
+        "selectable_today": false,
+        "evidence": [
+          ".tmp/family-a-strategy-validation/REPORT.md",
+          ".tmp/family-a-fix-design/DESIGN.md",
+          ".tmp/family-a-v25-raw-capture/artifact-index.json"
+        ]
+      }
+    },
+    "blast_radius": {
+      "scoped_winner": "B",
+      "unscoped_risk_winner": "A_higher_if_global",
+      "confirmed_scope": {
+        "products": 2,
+        "invoices": 1,
+        "expansion_products": 0,
+        "sibling_lines_unchanged": 5,
+        "invoice_total_unchanged_eur": 290.64
+      },
+      "A": {
+        "pipeline_reach": "All invoices through monetary binding",
+        "scoped_bocconcino_supplier": {
+          "level": "LOW",
+          "controls_pass": [
+            "Pomodori",
+            "Rolo stable",
+            "Acqua",
+            "Gorgonzola",
+            "Mammafiore"
+          ]
+        },
+        "global_unscoped": {
+          "level": "HIGH",
+          "effective_paid_would_fix": "12/15 rows"
+        },
+        "runtime_proxy_fp": {
+          "product": "Rolo transient run 7",
+          "invoice": "f0aa5a08",
+          "same_invoice_as_failures": true,
+          "frequency": "1/10 GPT variance"
+        },
+        "threshold_fragility": {
+          "gorgonzola_diff_pct": 0.3425,
+          "family_a_diff_pct_approx": 0.5,
+          "risk_if_threshold_leq": 0.3
+        },
+        "evidence": [
+          ".tmp/family-a-fix-design/DESIGN.md",
+          ".tmp/family-a-option-c-replay/REPORT.md",
+          ".tmp/family-a-option-c-replay/combo-stress-result.json",
+          ".tmp/family-a-sanity-review/REPORT.md"
+        ]
+      },
+      "B": {
+        "pipeline_reach": "All invoices through Pass C table extraction",
+        "scoped_bocconcino_prompt": {
+          "level": "LOW"
+        },
+        "broad_pack_rules": {
+          "level": "MEDIUM",
+          "regression": "Mammafiore Aceto/Rulo qty 1→2 counterfactuals"
+        },
+        "schema_only_insufficient": true,
+        "evidence": [
+          ".tmp/family-a-fix-design/DESIGN.md",
+          ".tmp/family-a-strategy-validation/REPORT.md",
+          ".tmp/family-a-causal-attribution/REPORT.md"
+        ]
+      }
+    },
+    "validation_effort": {
+      "winner": "A",
+      "A": {
+        "offline_replay_documented_rule": {
+          "status": "complete",
+          "recall": 1.0,
+          "precision": 1.0,
+          "false_positives": 0,
+          "population_15_of_15": true
+        },
+        "offline_replay_runtime_proxy": {
+          "status": "complete",
+          "recall": 1.0,
+          "precision": 0.923,
+          "false_positives": 1,
+          "fp_product": "Rolo transient run 7"
+        },
+        "exact_rule_shippable": false,
+        "runtime_equivalence_verdict": "C",
+        "runtime_equivalence_label": "Runtime implementation not equivalent",
+        "adversarial_verdict": "NOT READY",
+        "pending_post_deploy": [
+          "10x Bocconcino stability",
+          "VL re-ingest end-to-end"
+        ],
+        "evidence": [
+          ".tmp/family-a-option-c-replay/REPORT.md",
+          ".tmp/family-a-runtime-equivalence/REPORT.md",
+          ".tmp/family-a-sanity-review/verdict.json",
+          ".tmp/family-a-impact-analysis/REPORT.md"
+        ]
+      },
+      "B": {
+        "offline_proof_possible": false,
+        "root_cause_localization": "complete",
+        "bad_path_capture": "missing",
+        "post_prompt_stability": "not_run",
+        "selectable_today": false,
+        "provability_without_new_gpt": 0.15,
+        "evidence": [
+          ".tmp/family-a-strategy-validation/REPORT.md",
+          ".tmp/family-a-transition-trace/REPORT.md",
+          ".tmp/family-a-v25-raw-capture/artifact-index.json"
+        ]
+      }
+    },
+    "long_term_maintainability": {
+      "winner": "B",
+      "A": {
+        "fixes_root_cause": false,
+        "symptom_patch": true,
+        "deterministic": true,
+        "dual_layer_risk": "GPT may still emit qty=2; binding corrects",
+        "rule_drift_risk": "Gate stack fragile; partial proxy implementation",
+        "evidence": [
+          ".tmp/family-a-fix-design/DESIGN.md",
+          ".tmp/family-a-sanity-review/REPORT.md",
+          ".tmp/family-a-runtime-equivalence/REPORT.md"
+        ]
+      },
+      "B": {
+        "fixes_root_cause": true,
+        "single_source_of_truth": "GPT quantity through persist",
+        "deterministic": false,
+        "causal_model": "Interaction primary 45% (prompt+schema)",
+        "anti_inflation_rules_insufficient": true,
+        "evidence": [
+          ".tmp/family-a-transition-trace/REPORT.md",
+          ".tmp/family-a-causal-attribution/REPORT.md",
+          ".tmp/family-a-hybrid-diff-attribution/REPORT.md"
+        ]
+      }
+    }
+  },
+  "dimension_scorecard": {
+    "scale": "1=worse/harder, 5=better/easier for delivery (except foundation_alignment where 5=stronger alignment)",
+    "rows": [
+      {
+        "dimension": "complexity",
+        "A": 3,
+        "B": 2,
+        "winner": "A"
+      },
+      {
+        "dimension": "runtime_self_sufficiency",
+        "A": 3,
+        "B": 2,
+        "winner": "A"
+      },
+      {
+        "dimension": "investigation_artifact_dependence",
+        "A": 2,
+        "B": 2,
+        "winner": "tie"
+      },
+      {
+        "dimension": "blast_radius_scoped",
+        "A": 3,
+        "B": 4,
+        "winner": "B"
+      },
+      {
+        "dimension": "offline_provability",
+        "A": 5,
+        "B": 1,
+        "winner": "A"
+      },
+      {
+        "dimension": "foundation_alignment",
+        "A": 2,
+        "B": 5,
+        "winner": "B"
+      },
+      {
+        "dimension": "delivery_readiness_investigations_only",
+        "A": 3,
+        "B": 1,
+        "winner": "A"
+      }
+    ]
+  },
+  "simulation_metrics": {
+    "documented_option_c_rule": {
+      "source": ".tmp/family-a-option-c-replay/replay-result.json",
+      "recall": 1.0,
+      "precision": 1.0,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "population": "15-row replay harness"
+    },
+    "conservative_runtime_proxy": {
+      "source": ".tmp/family-a-runtime-equivalence/equivalence.json",
+      "recall": 1.0,
+      "precision": 0.923,
+      "false_positives": 1,
+      "false_negatives": 0,
+      "fp_detail": {
+        "product": "Rolo (transient run 7)",
+        "invoice": "f0aa5a08",
+        "cause": "hybrid_h_qty_2_stable gate omitted in proxy"
+      }
+    }
+  },
+  "selectability": {
+    "A_binding": {
+      "selectable_today": false,
+      "reason": "Runtime proxy not equivalent to validated rule; sanity review NOT READY",
+      "offline_provability_architecture": "strong",
+      "evidence": [
+        ".tmp/family-a-strategy-validation/REPORT.md",
+        ".tmp/family-a-sanity-review/verdict.json",
+        ".tmp/family-a-runtime-equivalence/REPORT.md"
+      ]
+    },
+    "B_extraction": {
+      "selectable_today": false,
+      "reason": "Requires new GPT behavior; bad-path raw missing; post-prompt stability not run",
+      "root_cause_alignment": "strong",
+      "evidence": [
+        ".tmp/family-a-strategy-validation/REPORT.md",
+        ".tmp/family-a-fix-design/DESIGN.md"
+      ]
+    }
+  },
+  "final_recommendation": {
+    "principle": "Fix the data foundation first",
+    "aligned_approach": "B",
+    "aligned_approach_label": "Extraction source (Hybrid H / prompt/schema)",
+    "confidence": 0.88,
+    "rationale": [
+      "Quantity is authored at Hybrid H table GPT pass (callOpenAiJson); binding preserves quantity and never assigns it",
+      "First incorrect value qty 1→2 occurs between Pass C baseline and Hybrid H output, not at binding",
+      "Impact analysis counterfactual defines correction at Hybrid H source",
+      "Option C explicitly treats symptom not GPT cause per fix-design",
+      "Causal attribution: interaction at prompt+schema on undiscounted Bocconcino rows is the foundation defect"
+    ],
+    "investigation_caveat": "Approach B aligns with foundation principle but has weaker investigation closure than Approach A offline provability; neither approach is selectable without additional read-only gates",
+    "provability_note": "Approach A has 100% offline replay on documented binding rule but runtime-equivalence verdict C — shippable rule differs from validated rule",
+    "priority_audit_context": "implementation-priority-audit ranks Family A #1 on Approach A delivery readiness — reflects provability not foundation principle",
+    "evidence": [
+      ".tmp/family-a-transition-trace/REPORT.md",
+      ".tmp/family-a-fix-design/DESIGN.md",
+      ".tmp/family-a-impact-analysis/REPORT.md",
+      ".tmp/family-a-causal-attribution/REPORT.md",
+      ".tmp/family-a-runtime-equivalence/REPORT.md",
+      ".tmp/family-a-strategy-validation/REPORT.md",
+      ".tmp/implementation-priority-audit/REPORT.md"
+    ]
+  },
+  "pre_implementation_gates_read_only": {
+    "for_approach_A": [
+      "Offline replay exact runtime proxy rule (no stability, no passc OCR) on 15-row extract + effective-paid including Rolo run 7",
+      "Confirm supplier threading into bindMonetaryColumns",
+      "Read-only dry-run re-ingest impact for f0aa5a08 class C fields"
+    ],
+    "for_approach_B": [
+      "Capture Pass C raw structured JSON for Mezzi/Ricotta bad path",
+      "Post-prompt 10x Bocconcino stability on undiscounted blank-DESC rows",
+      "Prompt counterfactual audit on Mammafiore *2 controls"
+    ],
+    "source": ".tmp/family-a-sanity-review/REPORT.md"
+  },
+  "evidence_index": [
+    ".tmp/family-a-fix-design/DESIGN.md",
+    ".tmp/family-a-strategy-validation/REPORT.md",
+    ".tmp/family-a-implementation-prep/REPORT.md",
+    ".tmp/family-a-implementability-audit/REPORT.md",
+    ".tmp/family-a-implementability-audit/signals.json",
+    ".tmp/family-a-sanity-review/REPORT.md",
+    ".tmp/family-a-sanity-review/verdict.json",
+    ".tmp/family-a-runtime-equivalence/REPORT.md",
+    ".tmp/family-a-runtime-equivalence/equivalence.json",
+    ".tmp/family-a-transition-trace/REPORT.md",
+    ".tmp/family-a-hybrid-diff-attribution/REPORT.md",
+    ".tmp/family-a-causal-attribution/REPORT.md",
+    ".tmp/family-a-option-c-replay/REPORT.md",
+    ".tmp/family-a-impact-analysis/REPORT.md",
+    ".tmp/bug-pattern-expansion-audit/REPORT.md",
+    ".tmp/implementation-priority-audit/REPORT.md"
+  ]
+}

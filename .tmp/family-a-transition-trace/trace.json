@@ -1,0 +1,501 @@
+{
+  "generatedAt": "2026-06-22T00:00:00.000Z",
+  "mode": "STRICT_READ_ONLY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "scope": "Pass C baseline → Hybrid H boundary only (no procurement, costs, UI, persistence)",
+  "terminology": {
+    "passC": "Pre-Hybrid table GPT era: legacy JSON schema {name, quantity, unit, unit_price, total}. Baseline from passc-refinement-validation reextract (2026-06-11) and pass-c-raw GPT cache.",
+    "hybridH": "Current table pass in invoice-table-extraction.ts: structured GPT schema {gross_unit_price, discount_pct, line_total_net} + bindMonetaryColumns + reconcile. Deploy v25+ (final-validation-lab-rerun). NOT a second in-run pass — replaces Pass C table extraction.",
+    "boundaryNote": "Pass C → Hybrid H is a deployment/version transition, not two sequential stages in one extract-invoice invocation."
+  },
+  "pdfGroundTruth": {
+    "source": ".tmp/geometry-audit/images/f0aa5a08-86a3-4938-99f0-711e86073968.png",
+    "rows": {
+      "MEZZI PACCHERI MANCINI (CX 1KG*6)": { "quantity": 1, "unitPrice": 27.3, "total": 27.3, "desc": "QUANT=1,000 · blank DESC · P.VENDA=27,300 · VALOR=27,30" },
+      "RICOTTA TREVIGIANA 1,5KG": { "quantity": 1, "unitPrice": 7.967, "total": 7.97, "desc": "QUANT=1,000 · blank DESC · P.VENDA=7,967 · VALOR=7,97" },
+      "POMODORI PELATI (CX 2,5KG*6)": { "quantity": 1, "unitPrice": 27.56, "total": 22.05, "desc": "QUANT=1,000 · DESC=20% · discounted" },
+      "ROLO DE CABRA E VACA 1KG": { "quantity": 1, "unitPrice": 12.71, "total": 12.71, "desc": "QUANT=1,000 · blank DESC" },
+      "ACQUA S.PELLEGRINO (CX 75CL*15)": { "quantity": 2, "unitPrice": 23.19, "total": 41.27, "desc": "QUANT=2,000 · column-faithful multi-qty" }
+    }
+  },
+  "familyARows": {
+    "ricotta": {
+      "lineName": "RICOTTA TREVIGIANA 1,5KG",
+      "stages": [
+        {
+          "stage": "passC_gptRawCache",
+          "source": ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-gpt-raw-cache.json",
+          "object": {
+            "name": "RICOTTA TREVIGIANA 1,5KG",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 7.97,
+            "total": 7.97
+          }
+        },
+        {
+          "stage": "passC_baselineReextract",
+          "source": ".tmp/passc-refinement-validation/reextract/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+          "object": {
+            "name": "RICOTTA TREVIGIANA 1,5KG",
+            "quantity": 1,
+            "unit": "uni",
+            "unit_price": 7.97,
+            "total": 7.97
+          }
+        },
+        {
+          "stage": "passC_eraCroppedTableInvoke",
+          "source": ".tmp/bocconcino-investigation/extract-invoice-response.json",
+          "object": {
+            "name": "RICOTTA TREVIGIANA 1,5KG",
+            "quantity": 1,
+            "unit": "uni",
+            "unit_price": 7.967,
+            "total": 7.97
+          }
+        },
+        {
+          "stage": "hybridH_gptRawStructured",
+          "source": "MISSING — .tmp/family-a-v25-raw-capture/artifact-index.json: no archived gpt-raw-json for Hybrid H v25 bad path",
+          "inferredFromApiOutput": {
+            "note": "API returns post-bind legacy fields only; structured columns stripped at monetaryToInvoiceLineItem. Quantity must equal GPT raw quantity (downstream invariant proven).",
+            "quantity": 2,
+            "likelyStructured": {
+              "gross_unit_price": null,
+              "discount_pct": null,
+              "line_total_net": null,
+              "unit_price": 7.967,
+              "total": 7.97
+            }
+          }
+        },
+        {
+          "stage": "hybridH_postNormalize_parseMonetaryLineItems",
+          "source": "production replay 2026-06-22 (frozen v25 API row as GPT-equivalent input)",
+          "object": {
+            "name": "RICOTTA TREVIGIANA 1,5KG",
+            "quantity": 2,
+            "unit": "uni",
+            "gross_unit_price": null,
+            "discount_pct": null,
+            "line_total_net": null,
+            "unit_price": 7.967,
+            "total": 7.97
+          },
+          "qtyModified": false
+        },
+        {
+          "stage": "hybridH_postBind_bindMonetaryColumns",
+          "source": "production replay; corroborated .tmp/phase1-validation-forensics-result.json ricotta.db.replay.bound",
+          "object": {
+            "name": "RICOTTA TREVIGIANA 1,5KG",
+            "quantity": 2,
+            "unit": "uni",
+            "unit_price": 3.99,
+            "total": 7.97
+          },
+          "qtyModified": false,
+          "note": "applyEffectivePaidPrice: 7.97÷2=3.99 (total preserved, unit halved)"
+        },
+        {
+          "stage": "hybridH_postReconcile_reconcileLineItemAmounts",
+          "object": {
+            "name": "RICOTTA TREVIGIANA 1,5KG",
+            "quantity": 2,
+            "unit": "uni",
+            "unit_price": 3.99,
+            "total": 7.97
+          },
+          "qtyModified": false
+        },
+        {
+          "stage": "hybridH_postFinalize_finalizeExtractedLineItems",
+          "source": ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json (deployVersion 25)",
+          "object": {
+            "name": "RICOTTA TREVIGIANA 1,5KG",
+            "quantity": 2,
+            "unit": "uni",
+            "unit_price": 7.967,
+            "total": 7.97
+          },
+          "qtyModified": false,
+          "note": "API response exposes pre-bind unit_price (7.967) in v25 extract artifact; v36 edge-invoke shows post-bind 3.99"
+        }
+      ],
+      "firstQtyDeviation": {
+        "from": 1,
+        "to": 2,
+        "between": "passC_baselineReextract → hybridH_postFinalize (GPT table pass output)",
+        "confidence": "HIGH — downstream stages preserve quantity (replay verified)"
+      },
+      "stability": {
+        "source": ".tmp/final-stability-audit/extracts/f0aa5a08-86a3-4938-99f0-711e86073968-all-runs.json",
+        "qty2Runs": "10/10",
+        "unitPriceModal": 7.967,
+        "totalModal": 7.97
+      }
+    },
+    "mezzi": {
+      "lineName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "stages": [
+        {
+          "stage": "passC_gptRawCache",
+          "source": ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-gpt-raw-cache.json",
+          "object": {
+            "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 27.56,
+            "total": 27.3
+          }
+        },
+        {
+          "stage": "passC_baselineReextract",
+          "source": ".tmp/passc-refinement-validation/reextract/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+          "object": {
+            "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+            "quantity": 1,
+            "unit": "uni",
+            "unit_price": 27.56,
+            "total": 27.3
+          }
+        },
+        {
+          "stage": "passC_eraCroppedTableInvoke",
+          "source": ".tmp/bocconcino-investigation/extract-invoice-response.json (5-row cropped table era)",
+          "object": {
+            "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+            "quantity": 1,
+            "unit": "uni",
+            "unit_price": 27.3,
+            "total": 27.3
+          }
+        },
+        {
+          "stage": "hybridH_gptRawStructured",
+          "source": "MISSING — no bad-path structured GPT capture",
+          "inferredFromApiOutput": {
+            "quantity": 2,
+            "likelyStructured": {
+              "gross_unit_price": null,
+              "discount_pct": null,
+              "line_total_net": null,
+              "unit_price": 27.36,
+              "total": 27.3
+            }
+          }
+        },
+        {
+          "stage": "hybridH_postNormalize_parseMonetaryLineItems",
+          "object": {
+            "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+            "quantity": 2,
+            "unit": "uni",
+            "gross_unit_price": null,
+            "discount_pct": null,
+            "line_total_net": null,
+            "unit_price": 27.36,
+            "total": 27.3
+          },
+          "qtyModified": false
+        },
+        {
+          "stage": "hybridH_postBind_bindMonetaryColumns",
+          "object": {
+            "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+            "quantity": 2,
+            "unit": "uni",
+            "unit_price": 13.65,
+            "total": 27.3
+          },
+          "qtyModified": false,
+          "note": "applyEffectivePaidPrice: 27.30÷2=13.65"
+        },
+        {
+          "stage": "hybridH_postReconcile_reconcileLineItemAmounts",
+          "object": {
+            "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+            "quantity": 2,
+            "unit": "uni",
+            "unit_price": 13.65,
+            "total": 27.3
+          },
+          "qtyModified": false
+        },
+        {
+          "stage": "hybridH_postFinalize_finalizeExtractedLineItems",
+          "source": ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+          "object": {
+            "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+            "quantity": 2,
+            "unit": "uni",
+            "unit_price": 27.36,
+            "total": 27.3
+          },
+          "qtyModified": false
+        }
+      ],
+      "firstQtyDeviation": {
+        "from": 1,
+        "to": 2,
+        "between": "passC_baselineReextract → hybridH_postFinalize (GPT table pass output)",
+        "confidence": "HIGH"
+      },
+      "stability": {
+        "source": ".tmp/final-stability-audit/extracts/f0aa5a08-86a3-4938-99f0-711e86073968-all-runs.json",
+        "qty2Runs": "10/10",
+        "unitPriceModal": 27.36,
+        "totalModal": 27.3
+      }
+    }
+  },
+  "codePath": [
+    {
+      "function": "extractTableItemsFromImage",
+      "file": "invoice-table-extraction.ts:305-344",
+      "inputQty": "N/A (orchestrator)",
+      "outputQty": "unchanged",
+      "canModifyQty": false
+    },
+    {
+      "function": "runTableExtractionPass",
+      "file": "invoice-table-extraction.ts:346-414",
+      "inputQty": "N/A",
+      "outputQty": "from GPT",
+      "canModifyQty": false
+    },
+    {
+      "function": "cropTableRegionForLineItems",
+      "file": "invoice-image-crop.ts",
+      "inputQty": "N/A (image only)",
+      "outputQty": "N/A",
+      "canModifyQty": false,
+      "note": "Geometry change (5-row→7-row post 2edcd02) alters GPT input image; indirect qty effect via vision model only"
+    },
+    {
+      "function": "callOpenAiJson (table GPT)",
+      "file": "invoice-table-extraction.ts:383-399",
+      "inputQty": "none",
+      "outputQty": "GPT-emitted quantity",
+      "canModifyQty": true,
+      "note": "SOLE quantity author in Hybrid H pipeline"
+    },
+    {
+      "function": "parseMonetaryLineItems",
+      "file": "invoice-monetary-binding.ts:25-44",
+      "inputQty": "row.quantity",
+      "outputQty": "row.quantity (passthrough)",
+      "canModifyQty": false
+    },
+    {
+      "function": "bindMonetaryColumns → applyStructuredBinding",
+      "file": "invoice-monetary-binding.ts:57-86",
+      "inputQty": "item.quantity",
+      "outputQty": "item.quantity",
+      "canModifyQty": false
+    },
+    {
+      "function": "bindMonetaryColumns → bindRow → applyEffectivePaidPrice",
+      "file": "invoice-monetary-binding.ts:120-130,184-207",
+      "inputQty": "item.quantity",
+      "outputQty": "item.quantity",
+      "canModifyQty": false,
+      "note": "Modifies unit_price only (total÷qty)"
+    },
+    {
+      "function": "monetaryToInvoiceLineItem",
+      "file": "invoice-monetary-binding.ts:219-227",
+      "inputQty": "item.quantity",
+      "outputQty": "item.quantity",
+      "canModifyQty": false
+    },
+    {
+      "function": "reconcileLineItemAmounts",
+      "file": "invoice-line-reconcile.ts:68-85",
+      "inputQty": "item.quantity",
+      "outputQty": "item.quantity",
+      "canModifyQty": false,
+      "note": "Only derives missing unit_price or total; skips when both present"
+    },
+    {
+      "function": "finalizeExtractedLineItems → reconcileLineItemsToNetSubtotal",
+      "file": "invoice-line-reconcile.ts:27-60",
+      "inputQty": "item.quantity",
+      "outputQty": "item.quantity",
+      "canModifyQty": false,
+      "note": "Only adjusts unit_price/total on single-pack OCR-gap rows; requires quantity===1"
+    }
+  ],
+  "hybridHMechanics": {
+    "rerunsGpt": true,
+    "singleTablePassPerExtract": true,
+    "mergesMultiplePasses": false,
+    "choosesCandidates": false,
+    "scoresRows": false,
+    "synthesizesQty": false,
+    "postProcessingModifiesQty": false,
+    "description": "Hybrid H = one vision-GPT table pass (structured schema) + deterministic monetary binding. extract-invoice index.ts runs passes A–D (date, supplier, footer, table); only pass D (table) emits line quantities. No merge/score/synthesis layer exists in code.",
+    "passCvsHybridHDiffs": [
+      "GPT response schema: legacy unit_price/total vs structured gross_unit_price/discount_pct/line_total_net",
+      "Prompt: column-faithful TABLE_EXTRACTION_SYSTEM_PROMPT (~250 lines) vs shorter Pass C prompt",
+      "Post-GPT: bindMonetaryColumns added (Phase 3); Pass C used reconcileLineItemAmounts only",
+      "Crop geometry: full 7-row table post commit 2edcd02 vs pre-fix 5-row crop (.tmp/hallucination-audit/REPORT.md)"
+    ],
+    "artifactGaps": [
+      "No archived Hybrid H structured GPT raw JSON for Ricotta/Mezzi bad path",
+      "capture-hybrid-h.deno.ts exists but stage-trace.json / gpt-raw-json.json not present in .tmp/family-a-v25-raw-capture/"
+    ]
+  },
+  "familyADifferential": {
+    "source": ".tmp/family-a-scope-audit/audit-result.json",
+    "comparison": [
+      {
+        "product": "RICOTTA TREVIGIANA 1,5KG",
+        "passCQty": 1,
+        "hybridHQty": 2,
+        "familyA": true,
+        "clusters": ["decimal_weight_1,5KG", "weight_token", "blank_CX"],
+        "undiscountedBlankDesc": true,
+        "unitApproxTotalAtQty1": true
+      },
+      {
+        "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "passCQty": 1,
+        "hybridHQty": 2,
+        "familyA": true,
+        "clusters": ["CX+*N", "pack_multiplier", "blank_CX"],
+        "undiscountedBlankDesc": true,
+        "unitApproxTotalAtQty1": true
+      },
+      {
+        "product": "POMODORI PELATI (CX 2,5KG*6)",
+        "passCQty": 1,
+        "hybridHQty": 1,
+        "familyA": false,
+        "clusters": ["CX+*N", "pack_multiplier", "blank_CX"],
+        "differentiator": "Has line discount DESC 20%; prompt negative example L131-135; discounted total≠gross unit"
+      },
+      {
+        "product": "ROLO DE CABRA E VACA 1KG",
+        "passCQty": 1,
+        "hybridHQty": 1,
+        "familyA": false,
+        "clusters": ["weight_token", "blank_CX"],
+        "differentiator": "No pack multiplier (*N); weight token only; 9/10 stable qty=1 (run 7 transient qty=2)"
+      },
+      {
+        "product": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "passCQty": 2,
+        "hybridHQty": 2,
+        "familyA": false,
+        "clusters": [],
+        "differentiator": "PDF QUANT=2,000 — true multi-qty; not 1→2 inflation"
+      }
+    ],
+    "minimumSeparatingCombo": [
+      "ocr/passc qty=1",
+      "hybridH qty=2 (stable 10/10)",
+      "undiscounted blank DESC",
+      "unit_price ≈ total at qty=1",
+      "supplier IL BOCCONCINO"
+    ]
+  },
+  "rootCauseCandidates": [
+    {
+      "candidate": "GPT table pass emits qty=2 at vision extraction (pack-metadata conflation)",
+      "supported": [
+        "Pass C baseline qty=1 across gpt-raw-cache, reextract, bocconcino-investigation",
+        "Hybrid H API qty=2 stable 10/10",
+        "All post-GPT stages preserve quantity (production replay)",
+        "Total and unit_price match PDF at qty=1 semantics; only qty wrong",
+        "Family A clusters: pack_multiplier / decimal_weight_1,5KG"
+      ],
+      "contradicted": []
+    },
+    {
+      "candidate": "bindMonetaryColumns inflates quantity",
+      "supported": [],
+      "contradicted": [
+        "invoice-monetary-binding.ts never assigns quantity",
+        "Replay: postBind.quantity === postNormalize.quantity"
+      ]
+    },
+    {
+      "candidate": "reconcileLineItemAmounts / finalizeExtractedLineItems inflates quantity",
+      "supported": [],
+      "contradicted": [
+        "reconcileLineItemAmounts returns item unchanged when unit_price and total both present",
+        "reconcileLineItemsToNetSubtotal requires quantity===1 for corrections"
+      ]
+    },
+    {
+      "candidate": "Crop geometry change (5→7 rows) causes qty=2",
+      "supported": [
+        "Pre-fix crop returned 5/7 rows; post 2edcd02 returns 7/7",
+        "Pass C era 5-row invoke had qty=1 for Ricotta/Mezzi"
+      ],
+      "contradicted": [
+        "Pomodori/Rolo/Acqua also on full 7-row crop but qty correct",
+        "Geometry affects GPT input, not deterministic qty mutation"
+      ],
+      "status": "POSSIBLE indirect (vision input change), not deterministic post-process"
+    },
+    {
+      "candidate": "Structured schema (gross_unit_price/discount_pct/line_total_net) causes qty=2",
+      "supported": [
+        "Hybrid H introduces structured fields; Pass C used legacy only",
+        "Bad-path API returns null structured fields (legacy bleed)"
+      ],
+      "contradicted": [
+        "parseMonetaryLineItems passthrough qty regardless of schema",
+        "Pomodori uses same pipeline with qty=1"
+      ],
+      "status": "POSSIBLE via GPT behaviour change, not binder"
+    },
+    {
+      "candidate": "Hybrid H merges/scores multiple GPT candidates",
+      "supported": [],
+      "contradicted": [
+        "Single callOpenAiJson per table pass",
+        "No candidate selection code in extract-invoice/"
+      ]
+    }
+  ],
+  "eliminationTable": {
+    "OCR_deterministic_parsers": "ELIMINATED — parseContinente/parsePadaria/stages.ts not invoked (index.ts L69)",
+    "Pass_C_baseline_era_GPT": "ELIMINATED as mutation site — emits qty=1; is the 'before' state not the changer",
+    "monetary_binding_bindMonetaryColumns": "ELIMINATED — preserves quantity; modifies unit_price via total÷qty",
+    "reconcile_finalize": "ELIMINATED — quantity invariant proven",
+    "persistence": "ELIMINATED — out of scope; stores Hybrid H qty unchanged",
+    "procurement_operational_costing_ingredient_UI": "ELIMINATED — explicitly out of scope",
+    "Hybrid_H_GPT_table_pass": "PROVEN — first stage where qty=2 appears vs Pass C qty=1",
+    "Hybrid_H_crop_geometry": "POSSIBLE — indirect GPT input change between eras",
+    "Hybrid_H_prompt_schema_delta": "POSSIBLE — correlates with deployment transition; bad-path raw GPT unproven",
+    "Hybrid_H_selection_synthesis_postProcess": "ELIMINATED — no such stages in code"
+  },
+  "confidence": {
+    "qtyMutationAtGptTablePass": 0.91,
+    "downstreamQtyInvariant": 0.97,
+    "badPathGptRawQtyEquals2": 0.78,
+    "rootMechanismPackMetadataConflation": 0.72,
+    "overall": 0.88
+  },
+  "sources": [
+    ".tmp/passc-refinement-validation/reextract/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+    ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-gpt-raw-cache.json",
+    ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+    ".tmp/final-stability-audit/extracts/f0aa5a08-86a3-4938-99f0-711e86073968-all-runs.json",
+    ".tmp/family-a-v25-raw-capture/edge-invoke-final.json",
+    ".tmp/family-a-v25-raw-capture/artifact-index.json",
+    ".tmp/ricotta-root-cause-trace/",
+    ".tmp/mezzi-root-cause-trace/",
+    ".tmp/family-a-scope-audit/audit-result.json",
+    ".tmp/bocconcino-investigation/extract-invoice-response.json",
+    "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+    "supabase/functions/extract-invoice/invoice-monetary-binding.ts",
+    "supabase/functions/extract-invoice/invoice-line-reconcile.ts",
+    "supabase/functions/extract-invoice/index.ts"
+  ]
+}

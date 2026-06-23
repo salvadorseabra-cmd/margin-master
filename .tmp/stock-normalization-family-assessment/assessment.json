@@ -1,0 +1,177 @@
+{
+  "generatedAt": "2026-06-22T00:00:00.000Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "methodology": "Read-only end-to-end trace comparison; live replay of stock-normalization.ts against persisted VL artifacts",
+  "products": [
+    {
+      "key": "mozzarella",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceItemId": "095b2bb9-bd36-44c2-a1f9-7c50fa9c0cc6",
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "lineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "firstIncorrectStage": 8,
+      "firstIncorrectField": "usable_weight",
+      "pdfTruth": { "quantity": 10, "usableGrams": 10000, "operationalCostPerKg": 8.12 },
+      "incorrectValue": { "usableGrams": 1000, "operationalCostPerKg": 81.2 },
+      "parseTier": "size_count",
+      "matchedToken": "125GR*8",
+      "tokenRole": "inner pack structure (8 × 125 g = 1 kg per outer pack)",
+      "causal": {
+        "wrongMultiplier": false,
+        "wrongPackageStructure": "partial — inner *8 is correct per pack; outer pack count missing",
+        "doubleCounting": false,
+        "weightUnitConfusion": false,
+        "quantityIgnored": true,
+        "quantityAppliedTwice": false
+      },
+      "direction": "under_count",
+      "rootCauseSummary": "SIZE×COUNT structure treated as final single-pack total; invoice qty=10 (outer packs) not multiplied into usable"
+    },
+    {
+      "key": "guanciale",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+      "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6",
+      "lineName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "firstIncorrectStage": 8,
+      "firstIncorrectField": "usable_weight",
+      "pdfTruth": { "quantity": 5.996, "usableGrams": 5996, "operationalCostPerKg": 10.83 },
+      "incorrectValue": { "usableGrams": 10500, "operationalCostPerKg": 6.18 },
+      "parseTier": "size_count",
+      "matchedToken": "1,5kg*7",
+      "tokenRole": "supplier case notation (7 × ~1.5 kg per case), not units purchased on this line",
+      "causal": {
+        "wrongMultiplier": true,
+        "wrongPackageStructure": true,
+        "doubleCounting": false,
+        "weightUnitConfusion": true,
+        "quantityIgnored": true,
+        "quantityAppliedTwice": false
+      },
+      "direction": "over_count",
+      "rootCauseSummary": "Weight line (qty=5.996 kg, unit=UN) misread as count; *7 pack fiction (7×1.5 kg) used instead of row weight"
+    }
+  ],
+  "sharedCodePaths": {
+    "entryPoint": "resolveInvoiceLinePurchaseFormat (invoice-purchase-format.ts)",
+    "normalization": "normalizePurchasedToUsableStock (stock-normalization.ts)",
+    "structureParser": "parsePurchaseStructureFromText → SIZE_COUNT_RE",
+    "usableDerivation": "computeUsableFromPurchaseStructure",
+    "blockingPolicy": "structureTotalIsFinalForGenericRow",
+    "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+    "structuredKind": "multi_unit_pack",
+    "downstreamCost": "resolveCountablePurchaseQuantityForCost → purchaseQtyForCost=1"
+  },
+  "controlOnSameInvoice": {
+    "product": "Stracciatella 250 GR",
+    "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+    "parseTier": "bare_measure",
+    "rowQty": 24,
+    "usableGrams": 6000,
+    "note": "No SIZE×COUNT token; generic row qty scales per-item weight correctly"
+  },
+  "causalComparison": {
+    "wrongMultiplier": { "mozzarella": false, "guanciale": true },
+    "wrongPackageStructure": { "mozzarella": "partial", "guanciale": true },
+    "doubleCounting": { "mozzarella": false, "guanciale": false },
+    "weightUnitConfusion": { "mozzarella": false, "guanciale": true },
+    "quantityIgnored": { "mozzarella": true, "guanciale": true },
+    "quantityAppliedTwice": { "mozzarella": false, "guanciale": false }
+  },
+  "bugFamilyAssessment": {
+    "choice": "B",
+    "label": "Same subsystem, different root causes",
+    "rationale": "Both fail at stage 8 in stock-normalization via the same SIZE_COUNT_RE tier and structureTotalIsFinalForGenericRow policy, but Mozzarella under-counts (invoice outer-pack qty not applied) while Guanciale over-counts (weight line + supplier *7 fiction). Fixes would diverge."
+  },
+  "confidence": {
+    "level": "high",
+    "score": 0.92,
+    "evidence": [
+      "Stages 1–7 identical and correct in both traces (PDF → Hybrid H → bind → persist)",
+      "Live replay of stock-normalization.ts reproduces persisted usable values exactly (1000 g / 10500 g)",
+      "quantity-mismatch-ui-audit/replay.json matches phase1-validation-forensics structured block for Mozzarella",
+      "Stracciatella control on Mozzarella invoice proves pipeline can scale by row qty when bare_measure tier applies"
+    ]
+  },
+  "stockNormalizationPath": [
+    {
+      "function": "parsePurchaseStructureFromText",
+      "mozzarella": {
+        "input": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "output": { "tier": "size_count", "innerUnitCount": 8, "unitSize": 125, "unitMeasurement": "g", "totalUsableAmount": 1000, "matchedText": "125GR*8" }
+      },
+      "guanciale": {
+        "input": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "output": { "tier": "size_count", "innerUnitCount": 7, "unitSize": 1.5, "unitMeasurement": "kg", "totalUsableAmount": 10500, "matchedText": "1,5kg*7" }
+      }
+    },
+    {
+      "function": "purchaseStructureToPackPhrase",
+      "mozzarella": {
+        "input": "size_count structure (8×125 g)",
+        "output": { "kind": "multi_unit_pack", "containerCount": 8, "packageQuantity": 125, "packageUnit": "g" }
+      },
+      "guanciale": {
+        "input": "size_count structure (7×1.5 kg)",
+        "output": { "kind": "multi_unit_pack", "containerCount": 7, "packageQuantity": 1.5, "packageUnit": "kg" }
+      }
+    },
+    {
+      "function": "resolveStructurePurchaseQuantity",
+      "mozzarella": {
+        "input": { "structurePurchaseQty": 1, "rowQuantity": 10, "rowUnit": "un" },
+        "output": 1
+      },
+      "guanciale": {
+        "input": { "structurePurchaseQty": 1, "rowQuantity": 5.996, "rowUnit": "un" },
+        "output": 1
+      }
+    },
+    {
+      "function": "computeUsableFromPurchaseStructure",
+      "mozzarella": {
+        "input": { "structureTotal": 1000, "rowQuantity": 10, "rowUnit": "un" },
+        "output": { "usableQuantity": 1000, "usableSource": "structure_total", "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack" }
+      },
+      "guanciale": {
+        "input": { "structureTotal": 10500, "rowQuantity": 5.996, "rowUnit": "un" },
+        "output": { "usableQuantity": 10500, "usableSource": "structure_total", "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack" }
+      }
+    },
+    {
+      "function": "resolveInvoiceLinePurchaseFormat",
+      "mozzarella": {
+        "input": { "quantity": 10, "unit": "un" },
+        "output": { "kind": "multi_unit_pack", "purchaseContainerCount": 8, "normalizedUsableQuantity": 1000, "usableQuantityUnit": "g" }
+      },
+      "guanciale": {
+        "input": { "quantity": 5.996, "unit": "un" },
+        "output": { "kind": "multi_unit_pack", "purchaseContainerCount": 7, "normalizedUsableQuantity": 10500, "usableQuantityUnit": "g" }
+      }
+    },
+    {
+      "function": "resolveCountablePurchaseQuantityForCost",
+      "mozzarella": {
+        "input": { "invoiceQty": 10, "structuredUsable": 1000 },
+        "output": 1
+      },
+      "guanciale": {
+        "input": { "invoiceQty": 5.996, "structuredUsable": 10500 },
+        "output": 1
+      }
+    }
+  ],
+  "sources": [
+    ".tmp/remaining-bug-root-causes/root-causes.json",
+    ".tmp/remaining-bug-root-causes/REPORT.md",
+    ".tmp/quantity-mismatch-ui-audit/replay.json",
+    ".tmp/quantity-mismatch-ui-audit/classifications.json",
+    ".tmp/phase1-validation-forensics-result.json",
+    ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+    ".tmp/final-validation-lab-rerun/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d.json",
+    ".tmp/field-accuracy-audit/ground-truth.json",
+    ".tmp/mammafiore-line-audit/ground-truth.json",
+    "src/lib/stock-normalization.ts",
+    "src/lib/invoice-purchase-format.ts"
+  ]
+}

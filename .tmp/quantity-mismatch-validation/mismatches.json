@@ -1,0 +1,838 @@
+{
+  "generatedAt": "2026-06-21T01:43:31.626Z",
+  "vl": "bjhnlrgodcqoyzddbpbd",
+  "methodology": {
+    "binding": "bindMonetaryColumns (production path) before replay",
+    "purchaseQty": "resolveCountablePurchaseQuantityForCost",
+    "scope": "51 invoice lines, 50 confirmed matches",
+    "criteriaNotes": {
+      "invoice_vs_stored": "Only when row unit and stored cost_base_unit are both generic countable (un/pcs) — excludes cx→inner-un expansion",
+      "usable_implies_more": "purchaseContainerCount tracks invoice qty but resolveCountablePurchaseQuantityForCost is lower (Family A signature)"
+    }
+  },
+  "counts": {
+    "totalMismatchRows": 19,
+    "matchedIngredientRows": 19,
+    "uniqueIngredients": 16,
+    "familyARows": 2,
+    "nonFamilyARows": 17,
+    "byMismatchType": {
+      "invoice_vs_stored_purchase_quantity": 11,
+      "invoice_vs_catalog_purchase_quantity": 9,
+      "invoice_vs_last_purchase_display": 1,
+      "last_purchase_display_vs_catalog_purchase_quantity": 9,
+      "usable_implies_more_units_than_purchased": 19
+    }
+  },
+  "conclusion": {
+    "onlyRicottaMezziPreviouslyIdentified": false,
+    "familyAItemIds": [
+      "409850ab-646d-44fa-b20c-c8a4a8570064",
+      "bb4bbfac-a59b-4d0b-9844-ba773c1f261e"
+    ],
+    "familyAFound": [
+      "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "RICOTTA TREVIGIANA 1,5KG"
+    ],
+    "additionalBeyondFamilyA": [
+      {
+        "ingredient": "Anchoas",
+        "lineName": "Filete de Anchoas Alconfirosa LI 495 g",
+        "types": [
+          "invoice_vs_stored_purchase_quantity",
+          "invoice_vs_catalog_purchase_quantity",
+          "last_purchase_display_vs_catalog_purchase_quantity",
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Gema líquida",
+        "lineName": "Ovo Líquido Past.Gema Dovo 1 Kg",
+        "types": [
+          "invoice_vs_stored_purchase_quantity",
+          "invoice_vs_catalog_purchase_quantity",
+          "last_purchase_display_vs_catalog_purchase_quantity",
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Anchoas",
+        "lineName": "Filete de Anchovas Alconfrista Lt 495 g",
+        "types": [
+          "invoice_vs_stored_purchase_quantity",
+          "invoice_vs_catalog_purchase_quantity",
+          "last_purchase_display_vs_catalog_purchase_quantity",
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Gema líquida",
+        "lineName": "Ovo Líquido Past.Gema Dovo 1kg",
+        "types": [
+          "invoice_vs_stored_purchase_quantity",
+          "invoice_vs_catalog_purchase_quantity",
+          "last_purchase_display_vs_catalog_purchase_quantity",
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Atum em óleo",
+        "lineName": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "types": [
+          "invoice_vs_stored_purchase_quantity",
+          "invoice_vs_catalog_purchase_quantity",
+          "last_purchase_display_vs_catalog_purchase_quantity",
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Mozzarella fior di latte",
+        "lineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "types": [
+          "invoice_vs_stored_purchase_quantity",
+          "invoice_vs_catalog_purchase_quantity",
+          "last_purchase_display_vs_catalog_purchase_quantity",
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Stracciatella",
+        "lineName": "STRACCIATELLA 250 GR",
+        "types": [
+          "invoice_vs_stored_purchase_quantity",
+          "invoice_vs_catalog_purchase_quantity",
+          "last_purchase_display_vs_catalog_purchase_quantity",
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Pomodori pelati",
+        "lineName": "POMODORI PELATI (CX 2,5KG*6)",
+        "types": [
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Água san pellegrino",
+        "lineName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "types": [
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Paccheri lisci",
+        "lineName": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "types": [
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Água san pellegrino",
+        "lineName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "types": [
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Ginger beer",
+        "lineName": "Baladin - Ginger Beer 0.20cl",
+        "types": [
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Guanciale stagionato",
+        "lineName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "types": [
+          "invoice_vs_stored_purchase_quantity",
+          "invoice_vs_catalog_purchase_quantity",
+          "invoice_vs_last_purchase_display",
+          "last_purchase_display_vs_catalog_purchase_quantity",
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Peroni nastro azzurro 33cl",
+        "lineName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "types": [
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Aceto balsamico di modena IGP",
+        "lineName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "types": [
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Mozzarella julienne",
+        "lineName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+        "types": [
+          "invoice_vs_stored_purchase_quantity",
+          "invoice_vs_catalog_purchase_quantity",
+          "last_purchase_display_vs_catalog_purchase_quantity",
+          "usable_implies_more_units_than_purchased"
+        ]
+      },
+      {
+        "ingredient": "Rulo di capra",
+        "lineName": "Rulo Di Capra 1kg*2 Simonetta",
+        "types": [
+          "usable_implies_more_units_than_purchased"
+        ]
+      }
+    ]
+  },
+  "mismatches": [
+    {
+      "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+      "ingredient": "Anchoas",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "invoiceDate": "2026-05-19",
+      "invoiceItemId": "7e6f6f69-81ed-42be-a062-e28ffc015f0c",
+      "lineName": "Filete de Anchoas Alconfirosa LI 495 g",
+      "invoiceQuantity": 2,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 9.99,
+      "boundTotal": 19.98,
+      "storedPurchaseQuantity": 1,
+      "storedPurchaseUnit": "un",
+      "catalogPurchaseQuantity": 1,
+      "lastPurchaseQuantity": 2,
+      "lastPurchaseLabel": "2 un",
+      "usableQuantity": 990,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 2,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€20.18 / kg",
+      "procurementCost": "€9.99 / can",
+      "mismatchTypes": [
+        "invoice_vs_stored_purchase_quantity",
+        "invoice_vs_catalog_purchase_quantity",
+        "last_purchase_display_vs_catalog_purchase_quantity",
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "bound qty=2 un vs stored purchase_quantity=1 un",
+        "bound qty=2 vs ingredients.purchase_quantity=1",
+        "Last Purchase=2 vs catalog purchase_quantity=1",
+        "structure outer count=2 > resolveCountablePurchaseQuantityForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+      "ingredient": "Gema líquida",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "invoiceDate": "2026-05-19",
+      "invoiceItemId": "77d804e3-b2ff-4a06-b4df-a78d3ff405a5",
+      "lineName": "Ovo Líquido Past.Gema Dovo 1 Kg",
+      "invoiceQuantity": 6,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 10.49,
+      "boundTotal": 62.94,
+      "storedPurchaseQuantity": 1,
+      "storedPurchaseUnit": "un",
+      "catalogPurchaseQuantity": 1,
+      "lastPurchaseQuantity": 6,
+      "lastPurchaseLabel": "6 un",
+      "usableQuantity": 6000,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 6,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€10.49 / kg",
+      "procurementCost": "€10.49 / unit",
+      "mismatchTypes": [
+        "invoice_vs_stored_purchase_quantity",
+        "invoice_vs_catalog_purchase_quantity",
+        "last_purchase_display_vs_catalog_purchase_quantity",
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "bound qty=6 un vs stored purchase_quantity=1 un",
+        "bound qty=6 vs ingredients.purchase_quantity=1",
+        "Last Purchase=6 vs catalog purchase_quantity=1",
+        "structure outer count=6 > resolveCountablePurchaseQuantityForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+      "ingredient": "Anchoas",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "invoiceDate": "2026-04-17",
+      "invoiceItemId": "8476c916-26a1-4d2a-b6e7-f211560f6e95",
+      "lineName": "Filete de Anchovas Alconfrista Lt 495 g",
+      "invoiceQuantity": 2,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 9.49,
+      "boundTotal": 18.98,
+      "storedPurchaseQuantity": 1,
+      "storedPurchaseUnit": "un",
+      "catalogPurchaseQuantity": 1,
+      "lastPurchaseQuantity": 2,
+      "lastPurchaseLabel": "2 un",
+      "usableQuantity": 990,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 2,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€19.17 / kg",
+      "procurementCost": "€9.49 / can",
+      "mismatchTypes": [
+        "invoice_vs_stored_purchase_quantity",
+        "invoice_vs_catalog_purchase_quantity",
+        "last_purchase_display_vs_catalog_purchase_quantity",
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "bound qty=2 un vs stored purchase_quantity=1 un",
+        "bound qty=2 vs ingredients.purchase_quantity=1",
+        "Last Purchase=2 vs catalog purchase_quantity=1",
+        "structure outer count=2 > resolveCountablePurchaseQuantityForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+      "ingredient": "Gema líquida",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "invoiceDate": "2026-04-17",
+      "invoiceItemId": "c3533ceb-8784-49de-a0a9-ecf168d68c40",
+      "lineName": "Ovo Líquido Past.Gema Dovo 1kg",
+      "invoiceQuantity": 6,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 10.19,
+      "boundTotal": 61.14,
+      "storedPurchaseQuantity": 1,
+      "storedPurchaseUnit": "un",
+      "catalogPurchaseQuantity": 1,
+      "lastPurchaseQuantity": 6,
+      "lastPurchaseLabel": "6 un",
+      "usableQuantity": 6000,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 6,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€10.19 / kg",
+      "procurementCost": "€10.19 / unit",
+      "mismatchTypes": [
+        "invoice_vs_stored_purchase_quantity",
+        "invoice_vs_catalog_purchase_quantity",
+        "last_purchase_display_vs_catalog_purchase_quantity",
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "bound qty=6 un vs stored purchase_quantity=1 un",
+        "bound qty=6 vs ingredients.purchase_quantity=1",
+        "Last Purchase=6 vs catalog purchase_quantity=1",
+        "structure outer count=6 > resolveCountablePurchaseQuantityForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+      "ingredient": "Atum em óleo",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "invoiceDate": "2026-04-17",
+      "invoiceItemId": "9af131b9-159f-48d6-807b-47b6124a9045",
+      "lineName": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+      "invoiceQuantity": 2,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 6.29,
+      "boundTotal": 12.58,
+      "storedPurchaseQuantity": 1,
+      "storedPurchaseUnit": "un",
+      "catalogPurchaseQuantity": 1,
+      "lastPurchaseQuantity": 2,
+      "lastPurchaseLabel": "2 un",
+      "usableQuantity": 2000,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 2,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€6.29 / kg",
+      "procurementCost": "€6.29 / bag",
+      "mismatchTypes": [
+        "invoice_vs_stored_purchase_quantity",
+        "invoice_vs_catalog_purchase_quantity",
+        "last_purchase_display_vs_catalog_purchase_quantity",
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "bound qty=2 un vs stored purchase_quantity=1 un",
+        "bound qty=2 vs ingredients.purchase_quantity=1",
+        "Last Purchase=2 vs catalog purchase_quantity=1",
+        "structure outer count=2 > resolveCountablePurchaseQuantityForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "ingredient": "Mozzarella fior di latte",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceDate": "2026-05-08",
+      "invoiceItemId": "095b2bb9-bd36-44c2-a1f9-7c50fa9c0cc6",
+      "lineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "invoiceQuantity": 10,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 8.12,
+      "boundTotal": 81.23,
+      "storedPurchaseQuantity": 1,
+      "storedPurchaseUnit": "un",
+      "catalogPurchaseQuantity": 1,
+      "lastPurchaseQuantity": 10,
+      "lastPurchaseLabel": "10 un",
+      "usableQuantity": 1000,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 8,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€81.20 / kg",
+      "procurementCost": "€8.12 / unit",
+      "mismatchTypes": [
+        "invoice_vs_stored_purchase_quantity",
+        "invoice_vs_catalog_purchase_quantity",
+        "last_purchase_display_vs_catalog_purchase_quantity",
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "bound qty=10 un vs stored purchase_quantity=1 un",
+        "bound qty=10 vs ingredients.purchase_quantity=1",
+        "Last Purchase=10 vs catalog purchase_quantity=1",
+        "purchaseContainerCount=8 > purchaseQtyForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "d96e176e-7fa7-438d-beda-6b9d7fe7b41d",
+      "ingredient": "Stracciatella",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceDate": "2026-05-08",
+      "invoiceItemId": "da2ad0fc-eb56-4506-8ba4-ae22b3cb6a5a",
+      "lineName": "STRACCIATELLA 250 GR",
+      "invoiceQuantity": 24,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 3.11,
+      "boundTotal": 74.54,
+      "storedPurchaseQuantity": 1,
+      "storedPurchaseUnit": "un",
+      "catalogPurchaseQuantity": 1,
+      "lastPurchaseQuantity": 24,
+      "lastPurchaseLabel": "24 un",
+      "usableQuantity": 6000,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 24,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€12.44 / kg",
+      "procurementCost": "€3.11 / unit",
+      "mismatchTypes": [
+        "invoice_vs_stored_purchase_quantity",
+        "invoice_vs_catalog_purchase_quantity",
+        "last_purchase_display_vs_catalog_purchase_quantity",
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "bound qty=24 un vs stored purchase_quantity=1 un",
+        "bound qty=24 vs ingredients.purchase_quantity=1",
+        "Last Purchase=24 vs catalog purchase_quantity=1",
+        "structure outer count=24 > resolveCountablePurchaseQuantityForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+      "ingredient": "Mezzi paccheri mancini",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceDate": "2026-05-08",
+      "invoiceItemId": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+      "lineName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "invoiceQuantity": 2,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 13.65,
+      "boundTotal": 27.3,
+      "storedPurchaseQuantity": 1,
+      "storedPurchaseUnit": "un",
+      "catalogPurchaseQuantity": 2,
+      "lastPurchaseQuantity": 2,
+      "lastPurchaseLabel": "2 un",
+      "usableQuantity": 6000,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 6,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€4.55 / kg",
+      "procurementCost": "€13.65 / case",
+      "mismatchTypes": [
+        "invoice_vs_stored_purchase_quantity",
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": true,
+      "notes": [
+        "bound qty=2 un vs stored purchase_quantity=1 un",
+        "purchaseContainerCount=6 > purchaseQtyForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "52f7bf70-eeca-4039-987d-241b35248119",
+      "ingredient": "Pomodori pelati",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceDate": "2026-05-08",
+      "invoiceItemId": "fd24d2dc-238a-43f2-ac2a-755361a083f0",
+      "lineName": "POMODORI PELATI (CX 2,5KG*6)",
+      "invoiceQuantity": 1,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 22.05,
+      "boundTotal": 22.05,
+      "storedPurchaseQuantity": 1,
+      "storedPurchaseUnit": "un",
+      "catalogPurchaseQuantity": 1,
+      "lastPurchaseQuantity": 1,
+      "lastPurchaseLabel": "1 un",
+      "usableQuantity": 15000,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 6,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€1.47 / kg",
+      "procurementCost": "€22.05 / case",
+      "mismatchTypes": [
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "purchaseContainerCount=6 > purchaseQtyForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+      "ingredient": "Água san pellegrino",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceDate": "2026-05-08",
+      "invoiceItemId": "f25feb92-3477-41a4-9a81-c556a90a0814",
+      "lineName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "invoiceQuantity": 2,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 20.97,
+      "boundTotal": 42.07,
+      "storedPurchaseQuantity": 11250,
+      "storedPurchaseUnit": "ml",
+      "catalogPurchaseQuantity": 15,
+      "lastPurchaseQuantity": 2,
+      "lastPurchaseLabel": "2 un",
+      "usableQuantity": 11250,
+      "usableQuantityUnit": "ml",
+      "purchaseContainerCount": 15,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€3.73 / L",
+      "procurementCost": "€20.97 / case",
+      "mismatchTypes": [
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "purchaseContainerCount=15 > purchaseQtyForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "6ec0bc6b-409a-4db2-b21f-fb01394f0014",
+      "ingredient": "Ricotta trevigiana",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceDate": "2026-05-08",
+      "invoiceItemId": "409850ab-646d-44fa-b20c-c8a4a8570064",
+      "lineName": "RICOTTA TREVIGIANA 1,5KG",
+      "invoiceQuantity": 2,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 3.99,
+      "boundTotal": 7.97,
+      "storedPurchaseQuantity": 1,
+      "storedPurchaseUnit": "un",
+      "catalogPurchaseQuantity": 2,
+      "lastPurchaseQuantity": 2,
+      "lastPurchaseLabel": "2 un",
+      "usableQuantity": 3000,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 2,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€2.66 / kg",
+      "procurementCost": "€3.99 / unit",
+      "mismatchTypes": [
+        "invoice_vs_stored_purchase_quantity",
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": true,
+      "notes": [
+        "bound qty=2 un vs stored purchase_quantity=1 un",
+        "structure outer count=2 > resolveCountablePurchaseQuantityForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "d7fcbb41-4e19-47ee-bbea-058e7b44a040",
+      "ingredient": "Paccheri lisci",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "invoiceDate": "2026-05-19",
+      "invoiceItemId": "728517aa-8578-4f6f-a415-aae06f05f5c4",
+      "lineName": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "invoiceQuantity": 24,
+      "invoiceUnit": null,
+      "boundUnitPrice": 2.1,
+      "boundTotal": 50.4,
+      "storedPurchaseQuantity": 1,
+      "storedPurchaseUnit": "un",
+      "catalogPurchaseQuantity": 1,
+      "lastPurchaseQuantity": 24,
+      "lastPurchaseLabel": "24",
+      "usableQuantity": 12000,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 24,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€4.20 / kg",
+      "procurementCost": "€2.10",
+      "mismatchTypes": [
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "structure outer count=24 > resolveCountablePurchaseQuantityForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+      "ingredient": "Água san pellegrino",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "invoiceDate": "2026-05-19",
+      "invoiceItemId": "9cdd22ba-051b-4422-a122-3e6a39e9ef8c",
+      "lineName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "invoiceQuantity": 2,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 19.28,
+      "boundTotal": 38.56,
+      "storedPurchaseQuantity": 11250,
+      "storedPurchaseUnit": "ml",
+      "catalogPurchaseQuantity": 15,
+      "lastPurchaseQuantity": 2,
+      "lastPurchaseLabel": "2 un",
+      "usableQuantity": 11250,
+      "usableQuantityUnit": "ml",
+      "purchaseContainerCount": 15,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€3.43 / L",
+      "procurementCost": "€19.28 / case",
+      "mismatchTypes": [
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "purchaseContainerCount=15 > purchaseQtyForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+      "ingredient": "Ginger beer",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "invoiceDate": "2026-05-19",
+      "invoiceItemId": "634a418b-1509-42a9-bf01-563705967b6f",
+      "lineName": "Baladin - Ginger Beer 0.20cl",
+      "invoiceQuantity": 24,
+      "invoiceUnit": null,
+      "boundUnitPrice": 0.81,
+      "boundTotal": 19.38,
+      "storedPurchaseQuantity": 2,
+      "storedPurchaseUnit": "ml",
+      "catalogPurchaseQuantity": 2,
+      "lastPurchaseQuantity": 24,
+      "lastPurchaseLabel": "24",
+      "usableQuantity": 48,
+      "usableQuantityUnit": "ml",
+      "purchaseContainerCount": 24,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€405.00 / L",
+      "procurementCost": "€0.81",
+      "mismatchTypes": [
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "structure outer count=24 > resolveCountablePurchaseQuantityForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6",
+      "ingredient": "Guanciale stagionato",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "invoiceDate": "2026-05-19",
+      "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+      "lineName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "invoiceQuantity": 5.996,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 10.83,
+      "boundTotal": 64.93,
+      "storedPurchaseQuantity": 1,
+      "storedPurchaseUnit": "un",
+      "catalogPurchaseQuantity": 1,
+      "lastPurchaseQuantity": 6,
+      "lastPurchaseLabel": "6.00 un",
+      "usableQuantity": 10500,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 7,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€6.18 / kg",
+      "procurementCost": "€10.83 / unit",
+      "mismatchTypes": [
+        "invoice_vs_stored_purchase_quantity",
+        "invoice_vs_catalog_purchase_quantity",
+        "invoice_vs_last_purchase_display",
+        "last_purchase_display_vs_catalog_purchase_quantity",
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "bound qty=5.996 un vs stored purchase_quantity=1 un",
+        "bound qty=5.996 vs ingredients.purchase_quantity=1",
+        "bound qty=5.996 vs Last Purchase=\"6.00 un\" (parsed 6)",
+        "Last Purchase=6 vs catalog purchase_quantity=1",
+        "purchaseContainerCount=7 > purchaseQtyForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b",
+      "ingredient": "Peroni nastro azzurro 33cl",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "invoiceDate": "2026-05-19",
+      "invoiceItemId": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+      "lineName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "invoiceQuantity": 24,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 1.07,
+      "boundTotal": 25.69,
+      "storedPurchaseQuantity": 7920,
+      "storedPurchaseUnit": "ml",
+      "catalogPurchaseQuantity": 24,
+      "lastPurchaseQuantity": 24,
+      "lastPurchaseLabel": "24 un",
+      "usableQuantity": 7920,
+      "usableQuantityUnit": "ml",
+      "purchaseContainerCount": 24,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€3.24 / L",
+      "procurementCost": "€1.07 / bottle",
+      "mismatchTypes": [
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "structure outer count=24 > resolveCountablePurchaseQuantityForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4",
+      "ingredient": "Aceto balsamico di modena IGP",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "invoiceDate": "2026-05-19",
+      "invoiceItemId": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
+      "lineName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "invoiceQuantity": 1,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 15.55,
+      "boundTotal": 16.09,
+      "storedPurchaseQuantity": 10000,
+      "storedPurchaseUnit": "ml",
+      "catalogPurchaseQuantity": 2,
+      "lastPurchaseQuantity": 1,
+      "lastPurchaseLabel": "1 un",
+      "usableQuantity": 10000,
+      "usableQuantityUnit": "ml",
+      "purchaseContainerCount": 2,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€1.56 / L",
+      "procurementCost": "€15.55 / unit",
+      "mismatchTypes": [
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "purchaseContainerCount=2 > purchaseQtyForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "5e9e7f89-7141-44f7-b8d4-bc92bad9bc36",
+      "ingredient": "Mozzarella julienne",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "invoiceDate": "2026-05-19",
+      "invoiceItemId": "d13fce65-832c-4ca2-9c52-049579c99663",
+      "lineName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "invoiceQuantity": 10,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 20.03,
+      "boundTotal": 200.3,
+      "storedPurchaseQuantity": 1,
+      "storedPurchaseUnit": "un",
+      "catalogPurchaseQuantity": 1,
+      "lastPurchaseQuantity": 10,
+      "lastPurchaseLabel": "10 un",
+      "usableQuantity": 30000,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 10,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€6.68 / kg",
+      "procurementCost": "€20.03 / bag",
+      "mismatchTypes": [
+        "invoice_vs_stored_purchase_quantity",
+        "invoice_vs_catalog_purchase_quantity",
+        "last_purchase_display_vs_catalog_purchase_quantity",
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "bound qty=10 un vs stored purchase_quantity=1 un",
+        "bound qty=10 vs ingredients.purchase_quantity=1",
+        "Last Purchase=10 vs catalog purchase_quantity=1",
+        "structure outer count=10 > resolveCountablePurchaseQuantityForCost=1"
+      ]
+    },
+    {
+      "ingredientId": "4dd38782-c986-4d4b-8ecb-fd84359744b1",
+      "ingredient": "Rulo di capra",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "invoiceDate": "2026-05-19",
+      "invoiceItemId": "e418468e-cb13-44f3-93b2-1857ae6eaa4d",
+      "lineName": "Rulo Di Capra 1kg*2 Simonetta",
+      "invoiceQuantity": 1,
+      "invoiceUnit": "un",
+      "boundUnitPrice": 10.86,
+      "boundTotal": 10.86,
+      "storedPurchaseQuantity": 1,
+      "storedPurchaseUnit": "un",
+      "catalogPurchaseQuantity": 1,
+      "lastPurchaseQuantity": 1,
+      "lastPurchaseLabel": "1 un",
+      "usableQuantity": 2000,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 2,
+      "purchaseQtyForCost": 1,
+      "operationalCost": "€5.43 / kg",
+      "procurementCost": "€10.86 / unit",
+      "mismatchTypes": [
+        "usable_implies_more_units_than_purchased"
+      ],
+      "familyA": false,
+      "notes": [
+        "purchaseContainerCount=2 > purchaseQtyForCost=1"
+      ]
+    }
+  ]
+}

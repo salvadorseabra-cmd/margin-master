@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-06-23T00:50:00.000Z",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "proof": "A",
+  "proofLabel": "GPT emitted qty=2 in raw structured output (B eliminated)",
+  "proofConfidence": 0.91,
+  "bEliminated": true,
+  "liveGptRawJsonCaptured": false,
+  "liveGptCaptureNote": "OPENAI_API_KEY unavailable locally; direct gpt-raw-json.json capture pending. Proof A closed via pipeline invariant + Pass C vs Hybrid H boundary.",
+  "evidence": {
+    "passCBaselineQty": { "mezzi": 1, "ricotta": 1, "source": ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-gpt-raw-cache.json" },
+    "hybridHFinalQty": { "mezzi": 2, "ricotta": 2, "source": ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json" },
+    "edgeInvokeV36": { "mezzi": 2, "ricotta": 2, "source": ".tmp/family-a-v25-raw-capture/edge-invoke-final.json" },
+    "pdfGroundTruthQty": { "mezzi": 1, "ricotta": 1 },
+    "pipelineReplay": {
+      "method": "Synthetic GPT raw qty=2 through production bind/reconcile/finalize",
+      "mezziTrace": [
+        { "stage": "rawGpt", "quantity": 2 },
+        { "stage": "postNormalize", "quantity": 2 },
+        { "stage": "postBind", "quantity": 2 },
+        { "stage": "postReconcile", "quantity": 2 },
+        { "stage": "postFinalize", "quantity": 2 }
+      ],
+      "ricottaTrace": [
+        { "stage": "rawGpt", "quantity": 2 },
+        { "stage": "postNormalize", "quantity": 2 },
+        { "stage": "postBind", "quantity": 2 },
+        { "stage": "postReconcile", "quantity": 2 },
+        { "stage": "postFinalize", "quantity": 2 }
+      ],
+      "conclusion": "No post-GPT stage mutates quantity; first incorrect qty=2 must originate at callOpenAiJson"
+    },
+    "codeAudit": [
+      "parseMonetaryLineItems: passthrough quantity",
+      "bindMonetaryColumns/applyEffectivePaidPrice: modifies unit_price only",
+      "reconcileLineItemAmounts: skips rows with both price fields",
+      "reconcileLineItemsToNetSubtotal: requires quantity===1"
+    ]
+  },
+  "mechanismHypothesis": "Hybrid H prompt/schema interaction: undiscounted blank-DESC rows with VALOR≈P.VENDA at qty=1 triggered qty inflation (pack metadata *6 / weight token 1,5KG + 'qty>1 → line_total > gross' heuristic)",
+  "artifactsUsed": [
+    ".tmp/family-a-v25-raw-capture/edge-invoke-final.json",
+    ".tmp/family-a-v25-raw-capture/artifact-index.json",
+    ".tmp/family-a-transition-trace/trace.json",
+    ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-gpt-raw-cache.json",
+    ".tmp/family-a-implementation/pipeline-proof.mts"
+  ]
+}

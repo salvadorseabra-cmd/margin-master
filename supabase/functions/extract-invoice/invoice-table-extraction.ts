@@ -88,7 +88,8 @@ and Açúcar Branco METRO Chef 10x1 Kg (qty 1, gross_unit_price 9,99, line_total
 
 TOTAL COLUMN ISOLATION (line_total_net from VALOR only — never gross_unit_price):
 - line_total_net must come from the VALOR / Preço Total column only — never copy gross_unit_price.
-- When quantity > 1, line_total_net should exceed gross_unit_price (qty × unit price, before discount if any).
+- When quantity > 1 and a discount applies, line_total_net usually exceeds gross_unit_price.
+- When quantity is 1 and the row is undiscounted, line_total_net may equal gross_unit_price — do NOT infer quantity > 1 from that equality alone.
 
 "Ovo Líquido Past.Gema Dovo 1kg" with quantity "6" and PREÇO UNITÁRIO "10,19"
 → gross_unit_price: 10.19, line_total_net: 61.14 (GOOD — 6 × 10,19 from VALOR column)
@@ -133,6 +134,19 @@ NEGATIVE EXAMPLES (common failures — do NOT repeat)
 → gross_unit_price: 27.56 (from P.VENDA — NOT from DESC 20)
 → discount_pct: 20 (from DESC — NOT 20 as a euro price)
 → line_total_net: 22.05 (from VALOR LÍQUIDO)
+
+BOCCONCINO UNDISCOUNTED BLANK-DESC ROWS (IL BOCCONCINO / P.VENDA layout):
+- When DESC is blank and discount_pct is null, quantity still comes ONLY from the QUANT column.
+- Pack notation (*6, *15, CX …) and weight tokens (1,5KG, 1KG) in the description are NOT purchased quantity.
+- VALOR ≈ P.VENDA at quantity 1 is normal on undiscounted lines — do NOT raise quantity to 2.
+
+"MEZZI PACCHERI MANCINI (CX 1KG*6)" with QUANT "1,000", blank DESC, P.VENDA "27,560 EUR", VALOR "27,30 EUR"
+→ quantity: 1 (NOT 6 — *6 is units-per-case; NOT 2 — undiscounted VALOR≈P.VENDA at qty 1 is valid)
+→ gross_unit_price: 27.56, discount_pct: null, line_total_net: 27.3
+
+"RICOTTA TREVIGIANA 1,5KG" with QUANT "1,000", blank DESC, P.VENDA "7,967 EUR", VALOR "7,97 EUR"
+→ quantity: 1 (NOT 2 — 1,5KG is unit weight metadata; NOT 1.5 unless QUANT column shows 1,5)
+→ gross_unit_price: 7.967, discount_pct: null, line_total_net: 7.97
 
 Emporio Italia — "Assaporami Prosciutto Cotto" with Qtd "4,30", Preço Unit "10,30 €", Desc.(%) "17,50", Preço Total "36,54 €"
 → quantity: 4.3

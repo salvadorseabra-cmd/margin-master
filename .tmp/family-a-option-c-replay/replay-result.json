@@ -1,0 +1,784 @@
+{
+  "generatedAt": "2026-06-20T19:43:16.257Z",
+  "mode": "READ-ONLY OFFLINE REPLAY",
+  "vlProject": "bjhnlrgodcqoyzddbpbd",
+  "ruleSource": "family-a-fix-design/DESIGN.md minimum separating combination + qty inflation signature",
+  "ruleDefinition": {
+    "documentedCombo": [
+      "ocr_qty === 1",
+      "hybrid_h_qty === 2",
+      "hybrid_h_qty_2_stable (10/10 stability)",
+      "undiscounted_blank_desc",
+      "unit_price ≈ total at qty=1 (±2%)",
+      "supplier === IL BOCCONCINO"
+    ],
+    "qtyInflationSignature": [
+      "extracted qty > 1",
+      "binding_changed (effective paid halving)",
+      "arithmetic_consistent after binding",
+      "diff_pct >= 0.45 (~50% Family A)"
+    ],
+    "trigger": "documentedCombo AND qtyInflationSignature"
+  },
+  "replayResults": [
+    {
+      "product": "Mezzi Paccheri",
+      "category": "failure",
+      "runLabel": "v25 baseline",
+      "artifact": "final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+      "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+      "hybridHQty": 2,
+      "hybridHUnitPrice": 27.36,
+      "hybridHTotal": 27.3,
+      "ocrQty": 1,
+      "expectedQty": 1,
+      "expectedTrigger": true,
+      "wouldTriggerC": true,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": true,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": true,
+        "total_preserved": true,
+        "qty_inflation_signature": true,
+        "diff_pct_ge_45": true
+      },
+      "documentedCombo": true,
+      "binding": {
+        "raw": {
+          "qty": 2,
+          "unit_price": 27.36,
+          "total": 27.3
+        },
+        "bound": {
+          "qty": 2,
+          "unit_price": 13.65,
+          "total": 27.3
+        },
+        "bindingChanged": true,
+        "arithmeticConsistent": true,
+        "diffPct": 0.5011,
+        "unitApproxTotalAtQty1": true,
+        "totalPreserved": true
+      },
+      "investigationNotes": "passc qty=1; 10/10 stability qty=2"
+    },
+    {
+      "product": "Ricotta",
+      "category": "failure",
+      "runLabel": "v25 baseline",
+      "artifact": "final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+      "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+      "hybridHQty": 2,
+      "hybridHUnitPrice": 7.967,
+      "hybridHTotal": 7.97,
+      "ocrQty": 1,
+      "expectedQty": 1,
+      "expectedTrigger": true,
+      "wouldTriggerC": true,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": true,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": true,
+        "total_preserved": true,
+        "qty_inflation_signature": true,
+        "diff_pct_ge_45": true
+      },
+      "documentedCombo": true,
+      "binding": {
+        "raw": {
+          "qty": 2,
+          "unit_price": 7.967,
+          "total": 7.97
+        },
+        "bound": {
+          "qty": 2,
+          "unit_price": 3.99,
+          "total": 7.97
+        },
+        "bindingChanged": true,
+        "arithmeticConsistent": true,
+        "diffPct": 0.4992,
+        "unitApproxTotalAtQty1": true,
+        "totalPreserved": true
+      },
+      "investigationNotes": "passc qty=1; 10/10 stability qty=2"
+    },
+    {
+      "product": "Pomodori",
+      "category": "control",
+      "runLabel": "v25 baseline",
+      "artifact": "final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+      "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+      "hybridHQty": 1,
+      "hybridHUnitPrice": 22.05,
+      "hybridHTotal": 22.05,
+      "ocrQty": 1,
+      "expectedQty": 1,
+      "expectedTrigger": false,
+      "wouldTriggerC": false,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": false,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": true,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      },
+      "documentedCombo": false,
+      "binding": {
+        "raw": {
+          "qty": 1,
+          "unit_price": 22.05,
+          "total": 22.05
+        },
+        "bound": {
+          "qty": 1,
+          "unit_price": 22.05,
+          "total": 22.05
+        },
+        "bindingChanged": false,
+        "arithmeticConsistent": true,
+        "diffPct": 0,
+        "unitApproxTotalAtQty1": true,
+        "totalPreserved": false
+      },
+      "investigationNotes": "DESC 20% populated; 10/10 qty=1"
+    },
+    {
+      "product": "Rolo (stable v25)",
+      "category": "control",
+      "runLabel": "v25 baseline",
+      "artifact": "final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+      "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+      "hybridHQty": 1,
+      "hybridHUnitPrice": 12.71,
+      "hybridHTotal": 12.71,
+      "ocrQty": 1,
+      "expectedQty": 1,
+      "expectedTrigger": false,
+      "wouldTriggerC": false,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": true,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      },
+      "documentedCombo": false,
+      "binding": {
+        "raw": {
+          "qty": 1,
+          "unit_price": 12.71,
+          "total": 12.71
+        },
+        "bound": {
+          "qty": 1,
+          "unit_price": 12.71,
+          "total": 12.71
+        },
+        "bindingChanged": false,
+        "arithmeticConsistent": true,
+        "diffPct": 0,
+        "unitApproxTotalAtQty1": true,
+        "totalPreserved": false
+      },
+      "investigationNotes": "9/10 stable qty=1; unit≈total at qty=1"
+    },
+    {
+      "product": "Rolo (transient run 7)",
+      "category": "negative",
+      "runLabel": "stability run 7",
+      "artifact": "final-stability-audit/extracts/f0aa5a08-86a3-4938-99f0-711e86073968-run7.json",
+      "supplier": null,
+      "hybridHQty": 2,
+      "hybridHUnitPrice": 12.187,
+      "hybridHTotal": 12.17,
+      "ocrQty": 1,
+      "expectedQty": 2,
+      "expectedTrigger": false,
+      "wouldTriggerC": false,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": true,
+        "total_preserved": true,
+        "qty_inflation_signature": true,
+        "diff_pct_ge_45": true
+      },
+      "documentedCombo": false,
+      "binding": {
+        "raw": {
+          "qty": 2,
+          "unit_price": 12.187,
+          "total": 12.17
+        },
+        "bound": {
+          "qty": 2,
+          "unit_price": 6.09,
+          "total": 12.17
+        },
+        "bindingChanged": true,
+        "arithmeticConsistent": true,
+        "diffPct": 0.5003,
+        "unitApproxTotalAtQty1": true,
+        "totalPreserved": true
+      },
+      "investigationNotes": "1/10 transient qty=2; NOT stable Family A"
+    },
+    {
+      "product": "Acqua",
+      "category": "control",
+      "runLabel": "v25 baseline",
+      "artifact": "final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+      "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+      "hybridHQty": 2,
+      "hybridHUnitPrice": 23.19,
+      "hybridHTotal": 41.27,
+      "ocrQty": 2,
+      "expectedQty": 2,
+      "expectedTrigger": false,
+      "wouldTriggerC": false,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": false,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": true,
+        "total_preserved": true,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      },
+      "documentedCombo": false,
+      "binding": {
+        "raw": {
+          "qty": 2,
+          "unit_price": 23.19,
+          "total": 41.27
+        },
+        "bound": {
+          "qty": 2,
+          "unit_price": 20.64,
+          "total": 41.27
+        },
+        "bindingChanged": true,
+        "arithmeticConsistent": true,
+        "diffPct": 0.11,
+        "unitApproxTotalAtQty1": false,
+        "totalPreserved": true
+      },
+      "investigationNotes": "OCR qty=2 column-faithful; not 1→2 inflation"
+    },
+    {
+      "product": "Mozzarella (Bocconcino)",
+      "category": "control",
+      "runLabel": "v25 baseline",
+      "artifact": "final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+      "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+      "hybridHQty": 10,
+      "hybridHUnitPrice": 8.12,
+      "hybridHTotal": 81.23,
+      "ocrQty": 10,
+      "expectedQty": 10,
+      "expectedTrigger": false,
+      "wouldTriggerC": false,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": false,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": false,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": true,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      },
+      "documentedCombo": false,
+      "binding": {
+        "raw": {
+          "qty": 10,
+          "unit_price": 8.12,
+          "total": 81.23
+        },
+        "bound": {
+          "qty": 10,
+          "unit_price": 8.12,
+          "total": 81.23
+        },
+        "bindingChanged": false,
+        "arithmeticConsistent": false,
+        "diffPct": 0,
+        "unitApproxTotalAtQty1": false,
+        "totalPreserved": false
+      },
+      "investigationNotes": "discounted row qty=10"
+    },
+    {
+      "product": "Arroz",
+      "category": "control",
+      "runLabel": "v25 baseline",
+      "artifact": "final-validation-lab-rerun/extracts/3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json",
+      "supplier": "AVILUDO - Indústria e Comércio de Produtos Alimentares, S.A.",
+      "hybridHQty": 1,
+      "hybridHUnitPrice": 13.95,
+      "hybridHTotal": 13.95,
+      "ocrQty": 1,
+      "expectedQty": 1,
+      "expectedTrigger": false,
+      "wouldTriggerC": false,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": false,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      },
+      "documentedCombo": false,
+      "binding": {
+        "raw": {
+          "qty": 1,
+          "unit_price": 13.95,
+          "total": 13.95
+        },
+        "bound": {
+          "qty": 1,
+          "unit_price": 13.95,
+          "total": 13.95
+        },
+        "bindingChanged": false,
+        "arithmeticConsistent": true,
+        "diffPct": 0,
+        "unitApproxTotalAtQty1": true,
+        "totalPreserved": false
+      },
+      "investigationNotes": "Aviludo; qty=1 stable"
+    },
+    {
+      "product": "Açúcar",
+      "category": "control",
+      "runLabel": "v25 baseline",
+      "artifact": "final-validation-lab-rerun/extracts/3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json",
+      "supplier": "AVILUDO - Indústria e Comércio de Produtos Alimentares, S.A.",
+      "hybridHQty": 1,
+      "hybridHUnitPrice": 9.99,
+      "hybridHTotal": 9.99,
+      "ocrQty": 1,
+      "expectedQty": 1,
+      "expectedTrigger": false,
+      "wouldTriggerC": false,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": false,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      },
+      "documentedCombo": false,
+      "binding": {
+        "raw": {
+          "qty": 1,
+          "unit_price": 9.99,
+          "total": 9.99
+        },
+        "bound": {
+          "qty": 1,
+          "unit_price": 9.99,
+          "total": 9.99
+        },
+        "bindingChanged": false,
+        "arithmeticConsistent": true,
+        "diffPct": 0,
+        "unitApproxTotalAtQty1": true,
+        "totalPreserved": false
+      }
+    },
+    {
+      "product": "Pepinos",
+      "category": "control",
+      "runLabel": "v25 baseline",
+      "artifact": "final-validation-lab-rerun/extracts/3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json",
+      "supplier": "AVILUDO - Indústria e Comércio de Produtos Alimentares, S.A.",
+      "hybridHQty": 1,
+      "hybridHUnitPrice": 22.49,
+      "hybridHTotal": 22.49,
+      "ocrQty": 1,
+      "expectedQty": 1,
+      "expectedTrigger": false,
+      "wouldTriggerC": false,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": false,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      },
+      "documentedCombo": false,
+      "binding": {
+        "raw": {
+          "qty": 1,
+          "unit_price": 22.49,
+          "total": 22.49
+        },
+        "bound": {
+          "qty": 1,
+          "unit_price": 22.49,
+          "total": 22.49
+        },
+        "bindingChanged": false,
+        "arithmeticConsistent": true,
+        "diffPct": 0,
+        "unitApproxTotalAtQty1": true,
+        "totalPreserved": false
+      }
+    },
+    {
+      "product": "Aceto",
+      "category": "control",
+      "runLabel": "v25 baseline",
+      "artifact": "final-validation-lab-rerun/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d.json",
+      "supplier": "Mammafiore Portugal, Unipessoal Lda",
+      "hybridHQty": 1,
+      "hybridHUnitPrice": 15.55,
+      "hybridHTotal": 16.09,
+      "ocrQty": 1,
+      "expectedQty": 1,
+      "expectedTrigger": false,
+      "wouldTriggerC": false,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": false,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      },
+      "documentedCombo": false,
+      "binding": {
+        "raw": {
+          "qty": 1,
+          "unit_price": 15.55,
+          "total": 16.09
+        },
+        "bound": {
+          "qty": 1,
+          "unit_price": 15.55,
+          "total": 16.09
+        },
+        "bindingChanged": false,
+        "arithmeticConsistent": false,
+        "diffPct": 0,
+        "unitApproxTotalAtQty1": false,
+        "totalPreserved": false
+      },
+      "investigationNotes": "Mammafiore *2 pack; 10/10 qty=1"
+    },
+    {
+      "product": "Rulo Di Capra",
+      "category": "control",
+      "runLabel": "v25 baseline",
+      "artifact": "final-validation-lab-rerun/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d.json",
+      "supplier": "Mammafiore Portugal, Unipessoal Lda",
+      "hybridHQty": 1,
+      "hybridHUnitPrice": 10.86,
+      "hybridHTotal": 10.86,
+      "ocrQty": 1,
+      "expectedQty": 1,
+      "expectedTrigger": false,
+      "wouldTriggerC": false,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": false,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      },
+      "documentedCombo": false,
+      "binding": {
+        "raw": {
+          "qty": 1,
+          "unit_price": 10.86,
+          "total": 10.86
+        },
+        "bound": {
+          "qty": 1,
+          "unit_price": 10.86,
+          "total": 10.86
+        },
+        "bindingChanged": false,
+        "arithmeticConsistent": true,
+        "diffPct": 0,
+        "unitApproxTotalAtQty1": true,
+        "totalPreserved": false
+      },
+      "investigationNotes": "Mammafiore 1kg*2; 10/10 qty=1"
+    },
+    {
+      "product": "Farina",
+      "category": "control",
+      "runLabel": "v25 baseline",
+      "artifact": "final-validation-lab-rerun/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d.json",
+      "supplier": "Mammafiore Portugal, Unipessoal Lda",
+      "hybridHQty": 1,
+      "hybridHUnitPrice": 26.52,
+      "hybridHTotal": 25.52,
+      "ocrQty": 1,
+      "expectedQty": 1,
+      "expectedTrigger": false,
+      "wouldTriggerC": false,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": false,
+        "total_preserved": true,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      },
+      "documentedCombo": false,
+      "binding": {
+        "raw": {
+          "qty": 1,
+          "unit_price": 26.52,
+          "total": 25.52
+        },
+        "bound": {
+          "qty": 1,
+          "unit_price": 25.52,
+          "total": 25.52
+        },
+        "bindingChanged": true,
+        "arithmeticConsistent": true,
+        "diffPct": 0.0377,
+        "unitApproxTotalAtQty1": false,
+        "totalPreserved": true
+      }
+    },
+    {
+      "product": "Gorgonzola (v25 Emporio)",
+      "category": "negative",
+      "runLabel": "v25 baseline",
+      "artifact": "final-validation-lab-rerun/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+      "supplier": "Emporio Italia, Lda.",
+      "hybridHQty": 2,
+      "hybridHUnitPrice": 6.6,
+      "hybridHTotal": 13.44,
+      "ocrQty": 1.35,
+      "expectedQty": 2,
+      "expectedTrigger": false,
+      "wouldTriggerC": false,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": false,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": false,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": false,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      },
+      "documentedCombo": false,
+      "binding": {
+        "raw": {
+          "qty": 2,
+          "unit_price": 6.6,
+          "total": 13.44
+        },
+        "bound": {
+          "qty": 2,
+          "unit_price": 6.6,
+          "total": 13.44
+        },
+        "bindingChanged": false,
+        "arithmeticConsistent": false,
+        "diffPct": 0,
+        "unitApproxTotalAtQty1": false,
+        "totalPreserved": false
+      },
+      "investigationNotes": "Emporio; Desc 22.85%; visible qty 1.35; 6/10 runs qty=2 total=13.44"
+    },
+    {
+      "product": "Gorgonzola (effective-paid DB row)",
+      "category": "negative",
+      "runLabel": "effective-paid-contract-validation",
+      "artifact": "effective-paid-contract-validation-result.json",
+      "supplier": "Emporio Italia",
+      "hybridHQty": 2,
+      "hybridHUnitPrice": 10.22,
+      "hybridHTotal": 13.44,
+      "ocrQty": 1.35,
+      "expectedQty": 1.35,
+      "expectedTrigger": false,
+      "wouldTriggerC": false,
+      "outcome": "PASS",
+      "signals": {
+        "ocr_qty_eq_1": false,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": false,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": false,
+        "total_preserved": true,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      },
+      "documentedCombo": false,
+      "binding": {
+        "raw": {
+          "qty": 2,
+          "unit_price": 10.22,
+          "total": 13.44
+        },
+        "bound": {
+          "qty": 2,
+          "unit_price": 6.72,
+          "total": 13.44
+        },
+        "bindingChanged": true,
+        "arithmeticConsistent": true,
+        "diffPct": 0.3425,
+        "unitApproxTotalAtQty1": false,
+        "totalPreserved": true
+      },
+      "investigationNotes": "would_fix:true in effective-paid audit; diff_pct 34.25%",
+      "effectivePaidWouldFix": true
+    }
+  ],
+  "looserVariantNoStabilityGate": [
+    {
+      "product": "Mezzi Paccheri",
+      "strict": true,
+      "looserNoStability": true
+    },
+    {
+      "product": "Ricotta",
+      "strict": true,
+      "looserNoStability": true
+    },
+    {
+      "product": "Pomodori",
+      "strict": false,
+      "looserNoStability": false
+    },
+    {
+      "product": "Rolo (stable v25)",
+      "strict": false,
+      "looserNoStability": false
+    },
+    {
+      "product": "Rolo (transient run 7)",
+      "strict": false,
+      "looserNoStability": true
+    },
+    {
+      "product": "Acqua",
+      "strict": false,
+      "looserNoStability": false
+    },
+    {
+      "product": "Mozzarella (Bocconcino)",
+      "strict": false,
+      "looserNoStability": false
+    },
+    {
+      "product": "Arroz",
+      "strict": false,
+      "looserNoStability": false
+    },
+    {
+      "product": "Açúcar",
+      "strict": false,
+      "looserNoStability": false
+    },
+    {
+      "product": "Pepinos",
+      "strict": false,
+      "looserNoStability": false
+    },
+    {
+      "product": "Aceto",
+      "strict": false,
+      "looserNoStability": false
+    },
+    {
+      "product": "Rulo Di Capra",
+      "strict": false,
+      "looserNoStability": false
+    },
+    {
+      "product": "Farina",
+      "strict": false,
+      "looserNoStability": false
+    },
+    {
+      "product": "Gorgonzola (v25 Emporio)",
+      "strict": false,
+      "looserNoStability": false
+    },
+    {
+      "product": "Gorgonzola (effective-paid DB row)",
+      "strict": false,
+      "looserNoStability": false
+    }
+  ],
+  "metrics": {
+    "familyARecall": 1,
+    "controlPrecision": 1,
+    "falsePositiveCount": 0,
+    "falseNegativeCount": 0,
+    "totalRows": 15,
+    "passCount": 15
+  },
+  "readiness": "A) Replay proves Option C viable"
+}

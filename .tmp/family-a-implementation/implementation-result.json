@@ -1,0 +1,70 @@
+{
+  "generatedAt": "2026-06-23T00:50:00.000Z",
+  "strategy": "extraction-source (Hybrid H prompt)",
+  "optionCUsed": false,
+  "changedFiles": [
+    "supabase/functions/extract-invoice/invoice-table-extraction.ts"
+  ],
+  "implementation": {
+    "target": "TABLE_EXTRACTION_SYSTEM_PROMPT",
+    "changes": [
+      "Softened TOTAL COLUMN ISOLATION: undiscounted qty=1 rows may have line_total_net ≈ gross_unit_price without inferring qty>1",
+      "Added BOCCONCINO UNDISCOUNTED BLANK-DESC guardrail with MEZZI and RICOTTA negative examples (qty 1 NOT 6/2)"
+    ]
+  },
+  "tests": {
+    "invoice-monetary-binding.test.ts": { "passed": 16, "failed": 0, "note": "No binding changes; regression suite unchanged" },
+    "invoice-image-crop.test.ts": { "passed": 0, "failed": 9, "note": "Requires --allow-read on .tmp fixture images; pre-existing env, not introduced by this change" },
+    "liveGptReextract": { "status": "PENDING", "reason": "OPENAI_API_KEY not available locally; deploy to VL required for 10× stability validation" }
+  },
+  "regressionMatrix": {
+    "invoice": "f0aa5a08-86a3-4938-99f0-711e86073968",
+    "preFixSource": ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+    "rows": [
+      {
+        "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "role": "failure",
+        "preFixQty": 2,
+        "expectedPostFixQty": 1,
+        "offlineBindingAtQty1": { "quantity": 1, "unit_price": 27.3, "total": 27.3 },
+        "status": "FIX_TARGET"
+      },
+      {
+        "product": "RICOTTA TREVIGIANA 1,5KG",
+        "role": "failure",
+        "preFixQty": 2,
+        "expectedPostFixQty": 1,
+        "offlineBindingAtQty1": { "quantity": 1, "unit_price": 7.97, "total": 7.97 },
+        "status": "FIX_TARGET"
+      },
+      {
+        "product": "POMODORI PELATI (CX 2,5KG*6)",
+        "role": "control",
+        "preFixQty": 1,
+        "expectedPostFixQty": 1,
+        "status": "MUST_PRESERVE"
+      },
+      {
+        "product": "ROLO DE CABRA E VACA 1KG",
+        "role": "control",
+        "preFixQty": 1,
+        "expectedPostFixQty": 1,
+        "status": "MUST_PRESERVE"
+      },
+      {
+        "product": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "role": "control",
+        "preFixQty": 2,
+        "expectedPostFixQty": 2,
+        "status": "MUST_PRESERVE"
+      }
+    ],
+    "postFixLiveValidation": "PENDING — requires VL deploy + re-extract f0aa5a08"
+  },
+  "nextSteps": [
+    "Deploy extract-invoice to VL bjhnlrgodcqoyzddbpbd",
+    "Re-extract f0aa5a08 (10× stability on Mezzi/Ricotta)",
+    "Run capture-phase1.mts with OPENAI_API_KEY to confirm raw GPT qty=1",
+    "Re-ingest corrected invoice on VL"
+  ]
+}

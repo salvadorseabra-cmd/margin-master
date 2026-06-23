@@ -1,0 +1,510 @@
+{
+  "generatedAt": "2026-06-20T16:03:15.976Z",
+  "methodology": {
+    "ocrQtySource": "passc-refinement-validation/reextract/*.json (Pass C pre-Hybrid baseline) + manual visible overrides",
+    "hybridHSource": "final-validation-lab-rerun/extracts/*.json (deploy v25)",
+    "weightPattern": "\\b(\\d+[,.]?\\d*\\s*(kg|gr|g|cl|l|lt|ml))\\b|\\*\\s*\\d|\\*\\d|\\bcx\\b|\\b\\d+\\s*x\\s*\\d+|pack|embal|emb\\.|peso|weight|\\d+x\\d+",
+    "familyADefinition": "OCR qty=1, Hybrid H qty>1, total preserved or undiscounted (unit≈total at qty=1)"
+  },
+  "counts": {
+    "totalRowsAudited": 51,
+    "candidatePopulation": 15,
+    "familyAFailures": 2,
+    "invoicesWithFamilyA": [
+      "Bocconcino"
+    ],
+    "suppliersWithFamilyA": [
+      "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA"
+    ],
+    "falseNegativesCorrect": 2
+  },
+  "candidates": [
+    {
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "invoice": "Bidfood",
+      "supplier": "Bidfood Portugal, SA",
+      "product": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": 1,
+      "extractedUnitV25": "cx",
+      "extractedUnitPriceV25": 38.44,
+      "extractedTotalV25": 38.44,
+      "description": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "cxs": "",
+      "unit": "cx",
+      "baselineUnitPrice": 38.44,
+      "baselineTotal": 38.44,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "blank_CX"
+      ]
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoice": "Aviludo May",
+      "supplier": "AVIJUDO - Indústria e Comércio de Produtos Alimentares, S.A.",
+      "product": "Pepinos Extra Uli Frasco 6x720 g",
+      "ocrQty": 1,
+      "ocrSource": "chocolate-pantagruel visibleInvoice pattern",
+      "extractedQtyV25": 1,
+      "extractedUnitV25": "cx",
+      "extractedUnitPriceV25": 22.49,
+      "extractedTotalV25": 22.49,
+      "description": "Pepinos Extra Uli Frasco 6x720 g",
+      "cxs": "",
+      "unit": "cx",
+      "baselineUnitPrice": 22.49,
+      "baselineTotal": 22.49,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "blank_CX"
+      ]
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoice": "Aviludo May",
+      "supplier": "AVIJUDO - Indústria e Comércio de Produtos Alimentares, S.A.",
+      "product": "Arroz Agulha Metro Chef 12x1 kg",
+      "ocrQty": 1,
+      "ocrSource": "field-accuracy GT + visible pattern",
+      "extractedQtyV25": 1,
+      "extractedUnitV25": "cx",
+      "extractedUnitPriceV25": 13.95,
+      "extractedTotalV25": 13.95,
+      "description": "Arroz Agulha Metro Chef 12x1 kg",
+      "cxs": "",
+      "unit": "cx",
+      "baselineUnitPrice": 13.95,
+      "baselineTotal": 13.95,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "blank_CX"
+      ]
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "invoice": "Aviludo May",
+      "supplier": "AVIJUDO - Indústria e Comércio de Produtos Alimentares, S.A.",
+      "product": "Açucar Branco METRO Chef 10x1 Kg",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": 1,
+      "extractedUnitV25": null,
+      "extractedUnitPriceV25": null,
+      "extractedTotalV25": null,
+      "description": "Açucar Branco METRO Chef 10x1 Kg",
+      "cxs": "",
+      "unit": "cx",
+      "baselineUnitPrice": 9.99,
+      "baselineTotal": 9.99,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "blank_CX"
+      ]
+    },
+    {
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoice": "Aviludo April",
+      "supplier": "AVILUDO",
+      "product": "Pepinos Extra II Frasco 6x720g",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": null,
+      "extractedUnitV25": null,
+      "extractedUnitPriceV25": null,
+      "extractedTotalV25": null,
+      "description": "Pepinos Extra II Frasco 6x720g",
+      "cxs": "",
+      "unit": "CX",
+      "baselineUnitPrice": 21.99,
+      "baselineTotal": 21.99,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "blank_CX"
+      ]
+    },
+    {
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoice": "Aviludo April",
+      "supplier": "AVILUDO",
+      "product": "Arroz Agulha Metro Chef 12x1kg",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": null,
+      "extractedUnitV25": null,
+      "extractedUnitPriceV25": null,
+      "extractedTotalV25": null,
+      "description": "Arroz Agulha Metro Chef 12x1kg",
+      "cxs": "",
+      "unit": "CX",
+      "baselineUnitPrice": 13.45,
+      "baselineTotal": 13.45,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "blank_CX"
+      ]
+    },
+    {
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoice": "Aviludo April",
+      "supplier": "AVILUDO",
+      "product": "Açúcar Branco Metro Chef 10x1Kg",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": null,
+      "extractedUnitV25": null,
+      "extractedUnitPriceV25": null,
+      "extractedTotalV25": null,
+      "description": "Açúcar Branco Metro Chef 10x1Kg",
+      "cxs": "",
+      "unit": "CX",
+      "baselineUnitPrice": 9.29,
+      "baselineTotal": 9.29,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "blank_CX"
+      ]
+    },
+    {
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "invoice": "Aviludo April",
+      "supplier": "AVILUDO",
+      "product": "Mozzarella Fior di Latte 2Kg",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": null,
+      "extractedUnitV25": null,
+      "extractedUnitPriceV25": null,
+      "extractedTotalV25": null,
+      "description": "Mozzarella Fior di Latte 2Kg",
+      "cxs": "",
+      "unit": "UN",
+      "baselineUnitPrice": 13.69,
+      "baselineTotal": 13.69,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "weight_token",
+        "blank_CX"
+      ]
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice": "Bocconcino",
+      "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+      "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": 2,
+      "extractedUnitV25": "uni",
+      "extractedUnitPriceV25": 27.36,
+      "extractedTotalV25": 27.3,
+      "description": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "cxs": "",
+      "unit": "uni",
+      "baselineUnitPrice": 27.56,
+      "baselineTotal": 27.3,
+      "flagOcr1ExtractedGt1": true,
+      "flagOcr1ExtractedNe1": true,
+      "clusters": [
+        "CX+*N",
+        "pack_multiplier",
+        "blank_CX"
+      ],
+      "versionCheck": {
+        "25": 2,
+        "26": 2,
+        "27": 2,
+        "28": 2,
+        "30": 2
+      }
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice": "Bocconcino",
+      "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+      "product": "POMODORO PELATI (CX 2.5KG*6)",
+      "ocrQty": 1,
+      "ocrSource": "column-reconstruction.json QUANT.=1,000 (visible)",
+      "extractedQtyV25": 1,
+      "extractedUnitV25": null,
+      "extractedUnitPriceV25": 22.05,
+      "extractedTotalV25": 22.05,
+      "description": "POMODORO PELATI (CX 2.5KG*6)",
+      "cxs": "(blank)",
+      "unit": "uni",
+      "baselineUnitPrice": 20,
+      "baselineTotal": 40,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "decimal_weight_1,5KG",
+        "CX+*N",
+        "pack_multiplier",
+        "blank_CX"
+      ]
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice": "Bocconcino",
+      "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+      "product": "RICOTTA TREVIGIANA 1,5KG",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": 2,
+      "extractedUnitV25": "uni",
+      "extractedUnitPriceV25": 7.967,
+      "extractedTotalV25": 7.97,
+      "description": "RICOTTA TREVIGIANA 1,5KG",
+      "cxs": "",
+      "unit": "uni",
+      "baselineUnitPrice": 7.97,
+      "baselineTotal": 7.97,
+      "flagOcr1ExtractedGt1": true,
+      "flagOcr1ExtractedNe1": true,
+      "clusters": [
+        "decimal_weight_1,5KG",
+        "weight_token",
+        "blank_CX"
+      ],
+      "versionCheck": {
+        "25": 2,
+        "26": 2,
+        "27": 2,
+        "28": 2,
+        "30": 2
+      }
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice": "Bocconcino",
+      "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+      "product": "ROLO DE CABRA E VACA 1KG",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": 1,
+      "extractedUnitV25": "uni",
+      "extractedUnitPriceV25": 12.71,
+      "extractedTotalV25": 12.71,
+      "description": "ROLO DE CABRA E VACA 1KG",
+      "cxs": "",
+      "unit": "uni",
+      "baselineUnitPrice": 12.71,
+      "baselineTotal": 12.71,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "weight_token",
+        "blank_CX"
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice": "Mammafiore",
+      "supplier": "Mammafiore Portugal, Unipessoal Lda",
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": null,
+      "extractedUnitV25": null,
+      "extractedUnitPriceV25": null,
+      "extractedTotalV25": null,
+      "description": "Farina Speciale pizza 25kg Amoruso",
+      "cxs": "",
+      "unit": "UN",
+      "baselineUnitPrice": 33.154,
+      "baselineTotal": 33.15,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "weight_token",
+        "blank_CX"
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice": "Mammafiore",
+      "supplier": "Mammafiore Portugal, Unipessoal Lda",
+      "product": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": 1,
+      "extractedUnitV25": "UN",
+      "extractedUnitPriceV25": 15.55,
+      "extractedTotalV25": 16.09,
+      "description": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "cxs": "",
+      "unit": "UN",
+      "baselineUnitPrice": 18.298,
+      "baselineTotal": 16.09,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "blank_CX"
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice": "Mammafiore",
+      "supplier": "Mammafiore Portugal, Unipessoal Lda",
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": 1,
+      "extractedUnitV25": "UN",
+      "extractedUnitPriceV25": 10.86,
+      "extractedTotalV25": 10.86,
+      "description": "Rulo Di Capra 1kg*2 Simonetta",
+      "cxs": "",
+      "unit": "UN",
+      "baselineUnitPrice": 15.192,
+      "baselineTotal": 10.38,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "pack_multiplier",
+        "weight_token",
+        "blank_CX"
+      ]
+    }
+  ],
+  "familyA": [
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice": "Bocconcino",
+      "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+      "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": 2,
+      "extractedUnitV25": "uni",
+      "extractedUnitPriceV25": 27.36,
+      "extractedTotalV25": 27.3,
+      "description": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "cxs": "",
+      "unit": "uni",
+      "baselineUnitPrice": 27.56,
+      "baselineTotal": 27.3,
+      "flagOcr1ExtractedGt1": true,
+      "flagOcr1ExtractedNe1": true,
+      "clusters": [
+        "CX+*N",
+        "pack_multiplier",
+        "blank_CX"
+      ],
+      "versionCheck": {
+        "25": 2,
+        "26": 2,
+        "27": 2,
+        "28": 2,
+        "30": 2
+      }
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice": "Bocconcino",
+      "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+      "product": "RICOTTA TREVIGIANA 1,5KG",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": 2,
+      "extractedUnitV25": "uni",
+      "extractedUnitPriceV25": 7.967,
+      "extractedTotalV25": 7.97,
+      "description": "RICOTTA TREVIGIANA 1,5KG",
+      "cxs": "",
+      "unit": "uni",
+      "baselineUnitPrice": 7.97,
+      "baselineTotal": 7.97,
+      "flagOcr1ExtractedGt1": true,
+      "flagOcr1ExtractedNe1": true,
+      "clusters": [
+        "decimal_weight_1,5KG",
+        "weight_token",
+        "blank_CX"
+      ],
+      "versionCheck": {
+        "25": 2,
+        "26": 2,
+        "27": 2,
+        "28": 2,
+        "30": 2
+      }
+    }
+  ],
+  "falseNegatives": [
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoice": "Bocconcino",
+      "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+      "product": "ROLO DE CABRA E VACA 1KG",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": 1,
+      "extractedUnitV25": "uni",
+      "extractedUnitPriceV25": 12.71,
+      "extractedTotalV25": 12.71,
+      "description": "ROLO DE CABRA E VACA 1KG",
+      "cxs": "",
+      "unit": "uni",
+      "baselineUnitPrice": 12.71,
+      "baselineTotal": 12.71,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "weight_token",
+        "blank_CX"
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoice": "Mammafiore",
+      "supplier": "Mammafiore Portugal, Unipessoal Lda",
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "ocrQty": 1,
+      "ocrSource": "passc-refinement-validation/reextract (Pass C pre-Hybrid baseline)",
+      "extractedQtyV25": 1,
+      "extractedUnitV25": "UN",
+      "extractedUnitPriceV25": 10.86,
+      "extractedTotalV25": 10.86,
+      "description": "Rulo Di Capra 1kg*2 Simonetta",
+      "cxs": "",
+      "unit": "UN",
+      "baselineUnitPrice": 15.192,
+      "baselineTotal": 10.38,
+      "flagOcr1ExtractedGt1": false,
+      "flagOcr1ExtractedNe1": false,
+      "clusters": [
+        "pack_multiplier",
+        "weight_token",
+        "blank_CX"
+      ]
+    }
+  ],
+  "clusterMap": {
+    "CX+*N": [
+      "MEZZI PACCHERI MANCINI (CX 1KG*6)"
+    ],
+    "pack_multiplier": [
+      "MEZZI PACCHERI MANCINI (CX 1KG*6)"
+    ],
+    "blank_CX": [
+      "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "RICOTTA TREVIGIANA 1,5KG"
+    ],
+    "decimal_weight_1,5KG": [
+      "RICOTTA TREVIGIANA 1,5KG"
+    ],
+    "weight_token": [
+      "RICOTTA TREVIGIANA 1,5KG"
+    ]
+  }
+}

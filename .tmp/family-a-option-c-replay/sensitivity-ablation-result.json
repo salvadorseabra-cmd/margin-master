@@ -1,0 +1,600 @@
+{
+  "generatedAt": "2026-06-20T19:47:52.234Z",
+  "mode": "ADVERSARIAL SENSITIVITY ABLATION",
+  "baseline": {
+    "familyARecall": 1,
+    "familyARecallFraction": "2/2",
+    "controlPrecision": 1,
+    "controlsPreserved": "10/10",
+    "falsePositives": 0,
+    "falseNegatives": 0,
+    "falsePositiveProducts": [],
+    "falseNegativeProducts": []
+  },
+  "baselineRows": [
+    {
+      "product": "Mezzi Paccheri",
+      "category": "failure",
+      "wouldTrigger": true,
+      "outcome": "PASS",
+      "diffPct": 0.5011,
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": true,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": true,
+        "total_preserved": true,
+        "qty_inflation_signature": true,
+        "diff_pct_ge_45": true
+      }
+    },
+    {
+      "product": "Ricotta",
+      "category": "failure",
+      "wouldTrigger": true,
+      "outcome": "PASS",
+      "diffPct": 0.4992,
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": true,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": true,
+        "total_preserved": true,
+        "qty_inflation_signature": true,
+        "diff_pct_ge_45": true
+      }
+    },
+    {
+      "product": "Pomodori",
+      "category": "control",
+      "wouldTrigger": false,
+      "outcome": "PASS",
+      "diffPct": 0,
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": false,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": true,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      }
+    },
+    {
+      "product": "Rolo (stable v25)",
+      "category": "control",
+      "wouldTrigger": false,
+      "outcome": "PASS",
+      "diffPct": 0,
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": true,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      }
+    },
+    {
+      "product": "Rolo (transient run 7)",
+      "category": "negative",
+      "wouldTrigger": false,
+      "outcome": "PASS",
+      "diffPct": 0.5003,
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": true,
+        "total_preserved": true,
+        "qty_inflation_signature": true,
+        "diff_pct_ge_45": true
+      }
+    },
+    {
+      "product": "Acqua",
+      "category": "control",
+      "wouldTrigger": false,
+      "outcome": "PASS",
+      "diffPct": 0.11,
+      "signals": {
+        "ocr_qty_eq_1": false,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": true,
+        "total_preserved": true,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      }
+    },
+    {
+      "product": "Mozzarella (Bocconcino)",
+      "category": "control",
+      "wouldTrigger": false,
+      "outcome": "PASS",
+      "diffPct": 0,
+      "signals": {
+        "ocr_qty_eq_1": false,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": false,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": true,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      }
+    },
+    {
+      "product": "Arroz",
+      "category": "control",
+      "wouldTrigger": false,
+      "outcome": "PASS",
+      "diffPct": 0,
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": false,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      }
+    },
+    {
+      "product": "Açúcar",
+      "category": "control",
+      "wouldTrigger": false,
+      "outcome": "PASS",
+      "diffPct": 0,
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": false,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      }
+    },
+    {
+      "product": "Pepinos",
+      "category": "control",
+      "wouldTrigger": false,
+      "outcome": "PASS",
+      "diffPct": 0,
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": false,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      }
+    },
+    {
+      "product": "Aceto",
+      "category": "control",
+      "wouldTrigger": false,
+      "outcome": "PASS",
+      "diffPct": 0,
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": false,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      }
+    },
+    {
+      "product": "Rulo Di Capra",
+      "category": "control",
+      "wouldTrigger": false,
+      "outcome": "PASS",
+      "diffPct": 0,
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": true,
+        "supplier_il_bocconcino": false,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      }
+    },
+    {
+      "product": "Farina",
+      "category": "control",
+      "wouldTrigger": false,
+      "outcome": "PASS",
+      "diffPct": 0.0377,
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": false,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": false,
+        "total_preserved": true,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      }
+    },
+    {
+      "product": "Gorgonzola (v25 Emporio)",
+      "category": "negative",
+      "wouldTrigger": false,
+      "outcome": "PASS",
+      "diffPct": 0,
+      "signals": {
+        "ocr_qty_eq_1": false,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": false,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": false,
+        "total_preserved": false,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      }
+    },
+    {
+      "product": "Gorgonzola (effective-paid DB row)",
+      "category": "negative",
+      "wouldTrigger": false,
+      "outcome": "PASS",
+      "diffPct": 0.3425,
+      "signals": {
+        "ocr_qty_eq_1": false,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": false,
+        "undiscounted_blank_desc": false,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": false,
+        "total_preserved": true,
+        "qty_inflation_signature": false,
+        "diff_pct_ge_45": false
+      }
+    }
+  ],
+  "ablations": [
+    {
+      "ablatedCondition": "ocr_qty_eq_1",
+      "label": "Remove OCR qty=1 gate",
+      "metrics": {
+        "familyARecall": 1,
+        "familyARecallFraction": "2/2",
+        "controlPrecision": 1,
+        "controlsPreserved": "10/10",
+        "falsePositives": 0,
+        "falseNegatives": 0,
+        "falsePositiveProducts": [],
+        "falseNegativeProducts": []
+      }
+    },
+    {
+      "ablatedCondition": "hybrid_h_qty_eq_2",
+      "label": "Remove Hybrid H qty=2 gate",
+      "metrics": {
+        "familyARecall": 1,
+        "familyARecallFraction": "2/2",
+        "controlPrecision": 1,
+        "controlsPreserved": "10/10",
+        "falsePositives": 0,
+        "falseNegatives": 0,
+        "falsePositiveProducts": [],
+        "falseNegativeProducts": []
+      }
+    },
+    {
+      "ablatedCondition": "hybrid_h_qty_2_stable",
+      "label": "Remove stability gate (10/10)",
+      "metrics": {
+        "familyARecall": 1,
+        "familyARecallFraction": "2/2",
+        "controlPrecision": 1,
+        "controlsPreserved": "10/10",
+        "falsePositives": 1,
+        "falseNegatives": 0,
+        "falsePositiveProducts": [
+          "Rolo (transient run 7)"
+        ],
+        "falseNegativeProducts": []
+      }
+    },
+    {
+      "ablatedCondition": "undiscounted_blank_desc",
+      "label": "Remove undiscounted blank DESC gate",
+      "metrics": {
+        "familyARecall": 1,
+        "familyARecallFraction": "2/2",
+        "controlPrecision": 1,
+        "controlsPreserved": "10/10",
+        "falsePositives": 0,
+        "falseNegatives": 0,
+        "falsePositiveProducts": [],
+        "falseNegativeProducts": []
+      }
+    },
+    {
+      "ablatedCondition": "unit_price_approx_total_at_qty1",
+      "label": "Remove unit≈total at qty=1 gate",
+      "metrics": {
+        "familyARecall": 1,
+        "familyARecallFraction": "2/2",
+        "controlPrecision": 1,
+        "controlsPreserved": "10/10",
+        "falsePositives": 0,
+        "falseNegatives": 0,
+        "falsePositiveProducts": [],
+        "falseNegativeProducts": []
+      }
+    },
+    {
+      "ablatedCondition": "supplier_il_bocconcino",
+      "label": "Remove IL BOCCONCINO supplier gate",
+      "metrics": {
+        "familyARecall": 1,
+        "familyARecallFraction": "2/2",
+        "controlPrecision": 1,
+        "controlsPreserved": "10/10",
+        "falsePositives": 0,
+        "falseNegatives": 0,
+        "falsePositiveProducts": [],
+        "falseNegativeProducts": []
+      }
+    },
+    {
+      "ablatedCondition": "qty_inflation_signature",
+      "label": "Remove entire qty inflation signature",
+      "metrics": {
+        "familyARecall": 1,
+        "familyARecallFraction": "2/2",
+        "controlPrecision": 1,
+        "controlsPreserved": "10/10",
+        "falsePositives": 0,
+        "falseNegatives": 0,
+        "falsePositiveProducts": [],
+        "falseNegativeProducts": []
+      }
+    },
+    {
+      "ablatedCondition": "diff_pct_ge_45",
+      "label": "Remove diff_pct≥45% (keep binding_changed)",
+      "metrics": {
+        "familyARecall": 1,
+        "familyARecallFraction": "2/2",
+        "controlPrecision": 1,
+        "controlsPreserved": "10/10",
+        "falsePositives": 0,
+        "falseNegatives": 0,
+        "falsePositiveProducts": [],
+        "falseNegativeProducts": []
+      }
+    }
+  ],
+  "necessaryConditions": [
+    "hybrid_h_qty_2_stable"
+  ],
+  "gorgonzolaStress": {
+    "gorgonzolaRows": [
+      {
+        "product": "Gorgonzola (v25 Emporio)",
+        "category": "negative",
+        "expectedTrigger": false,
+        "wouldTrigger": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": false,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": false,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "binding": {
+          "raw": {
+            "qty": 2,
+            "unit_price": 6.6,
+            "total": 13.44
+          },
+          "bound": {
+            "qty": 2,
+            "unit_price": 6.6,
+            "total": 13.44
+          },
+          "bindingChanged": false,
+          "arithmeticConsistent": false,
+          "diffPct": 0,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": false
+        }
+      },
+      {
+        "product": "Gorgonzola (effective-paid DB row)",
+        "category": "negative",
+        "expectedTrigger": false,
+        "wouldTrigger": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": false,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": true,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "binding": {
+          "raw": {
+            "qty": 2,
+            "unit_price": 10.22,
+            "total": 13.44
+          },
+          "bound": {
+            "qty": 2,
+            "unit_price": 6.72,
+            "total": 13.44
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": true,
+          "diffPct": 0.3425,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": true
+        }
+      }
+    ],
+    "singleRemovalTriggers": {
+      "ocr_qty_eq_1": [],
+      "hybrid_h_qty_eq_2": [],
+      "hybrid_h_qty_2_stable": [],
+      "undiscounted_blank_desc": [],
+      "unit_price_approx_total_at_qty1": [],
+      "supplier_il_bocconcino": [],
+      "qty_inflation_signature": [],
+      "diff_pct_ge_45": []
+    }
+  },
+  "roloStress": {
+    "roloRows": [
+      {
+        "product": "Rolo (stable v25)",
+        "category": "control",
+        "expectedTrigger": false,
+        "wouldTrigger": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": true,
+          "hybrid_h_qty_eq_2": false,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": true,
+          "supplier_il_bocconcino": true,
+          "total_preserved": false,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "binding": {
+          "raw": {
+            "qty": 1,
+            "unit_price": 12.71,
+            "total": 12.71
+          },
+          "bound": {
+            "qty": 1,
+            "unit_price": 12.71,
+            "total": 12.71
+          },
+          "bindingChanged": false,
+          "arithmeticConsistent": true,
+          "diffPct": 0,
+          "unitApproxTotalAtQty1": true,
+          "totalPreserved": false
+        }
+      },
+      {
+        "product": "Rolo (transient run 7)",
+        "category": "negative",
+        "expectedTrigger": false,
+        "wouldTrigger": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": true,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": true,
+          "supplier_il_bocconcino": true,
+          "total_preserved": true,
+          "qty_inflation_signature": true,
+          "diff_pct_ge_45": true
+        },
+        "binding": {
+          "raw": {
+            "qty": 2,
+            "unit_price": 12.187,
+            "total": 12.17
+          },
+          "bound": {
+            "qty": 2,
+            "unit_price": 6.09,
+            "total": 12.17
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": true,
+          "diffPct": 0.5003,
+          "unitApproxTotalAtQty1": true,
+          "totalPreserved": true
+        }
+      }
+    ],
+    "perCondition": {
+      "ocr_qty_eq_1": {
+        "Rolo (stable v25)": false,
+        "Rolo (transient run 7)": false
+      },
+      "hybrid_h_qty_eq_2": {
+        "Rolo (stable v25)": false,
+        "Rolo (transient run 7)": false
+      },
+      "hybrid_h_qty_2_stable": {
+        "Rolo (stable v25)": false,
+        "Rolo (transient run 7)": true
+      },
+      "undiscounted_blank_desc": {
+        "Rolo (stable v25)": false,
+        "Rolo (transient run 7)": false
+      },
+      "unit_price_approx_total_at_qty1": {
+        "Rolo (stable v25)": false,
+        "Rolo (transient run 7)": false
+      },
+      "supplier_il_bocconcino": {
+        "Rolo (stable v25)": false,
+        "Rolo (transient run 7)": false
+      },
+      "qty_inflation_signature": {
+        "Rolo (stable v25)": false,
+        "Rolo (transient run 7)": false
+      },
+      "diff_pct_ge_45": {
+        "Rolo (stable v25)": false,
+        "Rolo (transient run 7)": false
+      }
+    },
+    "transientBlockingAtBaseline": [
+      "hybrid_h_qty_2_stable"
+    ]
+  }
+}

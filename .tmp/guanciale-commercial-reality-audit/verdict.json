@@ -1,0 +1,194 @@
+{
+  "auditedAt": "2026-06-23T00:00:00.000Z",
+  "mode": "STRICT_READ_ONLY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+  "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6",
+  "supplier": "Mammafiore Portugal",
+  "invoiceDate": "2026-05-19",
+  "verdict": "A",
+  "verdictLabel": "~5.996 kg purchased; *7 is supplier case metadata not purchased units",
+  "verdictOptions": {
+    "A": {
+      "label": "~5.996 kg purchased, *7 metadata",
+      "selected": true,
+      "purchasedKg": 5.996,
+      "usableKg": 5.996,
+      "usableGrams": 5996,
+      "operationalCostPerKg": 10.83
+    },
+    "B": {
+      "label": "~10.5 kg correct",
+      "selected": false,
+      "rejectionReason": "10.5 kg × €16.922 × (1−0.36) = €113.72 net; invoice Valor = €64.93 (Δ +€48.79)"
+    },
+    "C": {
+      "label": "Multiple plausible",
+      "selected": false,
+      "rejectionReason": "10.5 kg path eliminated by monetary proof; A and partial-case C converge on same mass"
+    }
+  },
+  "fundamentalAssumption": {
+    "statement": "Current: Purchased 5.996, Usable 10.5 kg, Op €6.18/kg — what was actually purchased and what usable quantity should enter inventory?",
+    "answer": {
+      "purchased": "~5.996 kg billed weight (partial delivery vs 7×1.5 kg standard case)",
+      "usableShouldBe": "~5,996 g (~6 kg)",
+      "systemUsableWrong": true,
+      "systemUsableGrams": 10500,
+      "correctOperationalCostPerKg": 10.83,
+      "systemOperationalCostPerKg": 6.18
+    },
+    "classification": "A",
+    "classificationLabel": "Proven"
+  },
+  "invoiceReality": {
+    "artigo": "1000000782",
+    "description": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+    "qty": { "value": 5.996, "class": "A_proven" },
+    "unitColumn": { "value": "un", "class": "A_proven", "note": "Label UN; economics prove kg billing" },
+    "grossUnitPricePerKg": { "value": 16.922, "class": "A_proven" },
+    "discountPct": { "value": 36, "class": "A_proven" },
+    "lineTotalNetEur": { "value": 64.93, "class": "A_proven" },
+    "effectiveUnitPricePerKg": { "value": 10.83, "class": "A_proven" },
+    "packNotation": { "value": "1,5kg*7", "role": "supplier standard case shape (7 × ~1.5 kg)", "class": "A_proven" },
+    "lotMetadata": "Nº Lote 140126 · Exp. 31/12/2026"
+  },
+  "interpretations": [
+    {
+      "id": "A",
+      "text": "Row qty is billed kilograms; *7 is supplier case metadata only",
+      "purchasedKg": 5.996,
+      "usableKg": 5.996,
+      "fitsEur6493": true,
+      "plausible": true,
+      "verdict": "correct"
+    },
+    {
+      "id": "B",
+      "text": "Full case purchased: 7 × 1.5 kg = 10.5 kg",
+      "purchasedKg": 10.5,
+      "usableKg": 10.5,
+      "fitsEur6493": false,
+      "impliedNetTotalEur": 113.72,
+      "plausible": false,
+      "verdict": "rejected"
+    },
+    {
+      "id": "C",
+      "text": "Partial case: ~4 pieces of ~1.5 kg (~5.996 kg total)",
+      "purchasedKg": 5.996,
+      "usableKg": 5.996,
+      "fitsEur6493": true,
+      "plausible": true,
+      "verdict": "equivalent_to_A"
+    },
+    {
+      "id": "D",
+      "text": "7 discrete UN pieces at ~0.856 kg each",
+      "purchasedKg": 5.996,
+      "usableKg": 5.996,
+      "fitsEur6493": true,
+      "plausible": false,
+      "verdict": "weak_semantics"
+    }
+  ],
+  "economicReconciliation": {
+    "correctPath": {
+      "formula": "5.996 × 16.922 × (1 − 0.36)",
+      "grossEur": 101.59,
+      "netEur": 64.93,
+      "operationalCostPerKg": 10.83
+    },
+    "systemPath": {
+      "usableKg": 10.5,
+      "operationalCostPerKg": 6.18,
+      "formula": "64.93 ÷ 10.5 kg",
+      "commerciallyWrong": true
+    },
+    "rejectedPath": {
+      "usableKg": 10.5,
+      "impliedNetFromInvoicePricing": 113.72,
+      "deltaVsInvoiceEur": 48.79
+    }
+  },
+  "supplierContextSameInvoice": [
+    {
+      "product": "Guanciale",
+      "notation": "1,5kg*7",
+      "nRole": "case shape metadata",
+      "invoiceQty": 5.996,
+      "commercialUsable": "~5.996 kg",
+      "systemUsable": "10.5 kg",
+      "economicsOk": false
+    },
+    {
+      "product": "Peroni",
+      "notation": "33cl*24",
+      "nRole": "bottles per case",
+      "invoiceQty": 24,
+      "commercialUsable": "7.92 L",
+      "systemUsable": "7.92 L",
+      "economicsOk": true
+    },
+    {
+      "product": "Aceto",
+      "notation": "5l*2",
+      "nRole": "2 × 5 L per sold unit",
+      "invoiceQty": 1,
+      "commercialUsable": "10 L",
+      "systemUsable": "10 L",
+      "economicsOk": true
+    },
+    {
+      "product": "Mozzarella julienne",
+      "notation": "3kg",
+      "nRole": "3 kg per bag (bare size)",
+      "invoiceQty": 10,
+      "commercialUsable": "30 kg",
+      "systemUsable": "30 kg",
+      "economicsOk": true
+    },
+    {
+      "product": "Rulo di capra",
+      "notation": "1kg*2",
+      "nRole": "2 × 1 kg per sold unit",
+      "invoiceQty": 1,
+      "commercialUsable": "2 kg",
+      "systemUsable": "2 kg",
+      "economicsOk": true
+    }
+  ],
+  "readinessImpact": {
+    "priorCommercialRealityClass": "B_likely",
+    "postAuditCommercialRealityClass": "A_proven",
+    "implementationReady": false,
+    "implementationVerdict": "NOT_READY",
+    "rationale": "Commercial truth is now A-Proven (verdict A), closing the dedicated commercial-reality audit gap. Implementation remains NOT READY due to unrelated blockers: no fix-design artifact, no implementation-prep artifact, no runtime discriminator, no positive regression matrix, re-ingest not validated.",
+    "verdictScenarioMatrix": {
+      "A": { "commercialClass": "A_proven", "implementationReady": false },
+      "B": { "commercialClass": "rejected", "implementationReady": false, "note": "Would falsely validate system usable" },
+      "C": { "commercialClass": "B_or_C_unresolved", "implementationReady": false }
+    }
+  },
+  "confidence": {
+    "level": "high",
+    "score": 0.94,
+    "rationale": "PDF discount math closes to €64.93 at 5.996 kg only; 10.5 kg path impossible; VL DB and extract corroborate qty/total; peer *N lines on same invoice follow column-qty × inner-content pattern"
+  },
+  "sources": [
+    ".tmp/geometry-audit/images/36c99d19-6f9f-413f-8c2d-ae3526291a2d.png",
+    ".tmp/mammafiore-line-audit/ground-truth.json",
+    ".tmp/mammafiore-line-audit/REPORT.md",
+    ".tmp/final-validation-lab-rerun/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d.json",
+    ".tmp/persistence-audit/pass-c-raw/36c99d19-6f9f-413f-8c2d-ae3526291a2d-gpt-raw.json",
+    ".tmp/remaining-bug-root-causes/",
+    ".tmp/stock-normalization-family-assessment/assessment.json",
+    ".tmp/quantity-mismatch-ui-audit/replay.json",
+    ".tmp/quantity-mismatch-ui-audit/classifications.json",
+    ".tmp/guanciale-readiness-audit/verdict.json",
+    ".tmp/mozzarella-commercial-reality-audit/",
+    "VL DB read-only bjhnlrgodcqoyzddbpbd 2026-06-23"
+  ]
+}

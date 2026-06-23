@@ -1,0 +1,277 @@
+{
+  "generatedAt": "2026-06-22T18:04:27.766Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "mode": "STRICT READ-ONLY pattern-expansion audit",
+  "scope": {
+    "invoiceItemsScanned": 51,
+    "invoices": 7,
+    "candidatePopulationFamilyA": 15,
+    "extractSources": [
+      "17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+      "36c99d19-6f9f-413f-8c2d-ae3526291a2d.json",
+      "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json",
+      "c2f52357-0f80-491a-ba14-c97ff4837472.json",
+      "da472b7f-0fd9-4a26-a37c-80ad335f7f7e.json",
+      "f0aa5a08-86a3-4938-99f0-711e86073968.json"
+    ],
+    "passcSources": [
+      "17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+      "36c99d19-6f9f-413f-8c2d-ae3526291a2d.json",
+      "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2.json",
+      "c2f52357-0f80-491a-ba14-c97ff4837472.json",
+      "da472b7f-0fd9-4a26-a37c-80ad335f7f7e.json",
+      "f0aa5a08-86a3-4938-99f0-711e86073968.json",
+      "summary.json"
+    ]
+  },
+  "mechanisms": {
+    "familyA": {
+      "definition": "PDF/OCR qty=1, Pass C qty=1, Hybrid H qty>1 (total preserved at qty=1 unit≈total)",
+      "confirmedProducts": [
+        "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "RICOTTA TREVIGIANA 1,5KG"
+      ],
+      "partialProducts": [],
+      "additionalBeyondConfirmed": [],
+      "totalAffected": 2,
+      "userVisibleAdditional": 0,
+      "rows": [
+        {
+          "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+          "invoice": "Il Bocconcino Distribuição Alimentar",
+          "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+          "passCQty": 1,
+          "pdfQty": 1,
+          "hybridHQty": 2,
+          "classification": "Confirmed",
+          "userVisibleBug": true,
+          "evidence": "family-a-scope-audit, mezzi-root-cause-trace, full-population-replay"
+        },
+        {
+          "product": "RICOTTA TREVIGIANA 1,5KG",
+          "invoice": "Il Bocconcino Distribuição Alimentar",
+          "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+          "passCQty": 1,
+          "pdfQty": 1,
+          "hybridHQty": 2,
+          "classification": "Confirmed",
+          "userVisibleBug": false,
+          "evidence": "family-a-scope-audit, ricotta-root-cause-trace; UI economics self-consistent with bound qty=2"
+        },
+        {
+          "product": "POMODORO PELATI (CX 2.5KG*6)",
+          "invoice": "Il Bocconcino Distribuição Alimentar",
+          "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+          "passCQty": 1,
+          "pdfQty": 1,
+          "hybridHQty": 1,
+          "classification": "Candidate rejected",
+          "note": "OCR=1, Hybrid H=1 — no qty inflation"
+        },
+        {
+          "product": "ROLO DE CABRA E VACA 1KG",
+          "invoice": "Il Bocconcino Distribuição Alimentar",
+          "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+          "passCQty": 1,
+          "pdfQty": 1,
+          "hybridHQty": 1,
+          "classification": "False negative (correct)",
+          "note": "family-a-scope-audit falseNegatives — OCR=1, Hybrid H=1"
+        }
+      ],
+      "rejectedCandidates": 13,
+      "vlStatus": "B) Small family <5"
+    },
+    "mozzarella": {
+      "definition": "size_count structure, invoice qty>1, usable=single-pack not scaled by outer qty (structureTotalIsFinalForGenericRow)",
+      "confirmedProducts": [
+        "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8"
+      ],
+      "partialProducts": [
+        "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro"
+      ],
+      "additionalBeyondConfirmed": [],
+      "userVisibleAdditional": 0,
+      "totalAffected": 1,
+      "structuralMatches": 5,
+      "rows": [
+        {
+          "product": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+          "invoiceQty": 10,
+          "expectedUsable": "10.0 kg",
+          "actualUsable": "1.0 kg",
+          "classification": "Confirmed",
+          "userVisibleBug": true,
+          "matchedToken": "125GR*8"
+        },
+        {
+          "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+          "invoiceQty": 2,
+          "expectedUsable": "12.0 kg",
+          "actualUsable": "6.0 kg",
+          "classification": "Structural only",
+          "userVisibleBug": false,
+          "note": "Family A extraction bug; UI €/kg correct at 6 kg when bound qty=2 treated as truth"
+        },
+        {
+          "product": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+          "invoiceQty": 2,
+          "expectedUsable": "22500 ml",
+          "actualUsable": "11250 ml",
+          "classification": "Structural only",
+          "userVisibleBug": false,
+          "note": "quantity-mismatch-ui-audit class C — operational €3.73/L correct"
+        },
+        {
+          "product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "invoiceQty": 2,
+          "expectedUsable": "22500 ml",
+          "actualUsable": "11250 ml",
+          "classification": "Structural only",
+          "userVisibleBug": false,
+          "note": "quantity-mismatch-ui-audit class C"
+        },
+        {
+          "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+          "invoiceQty": 5.996,
+          "expectedUsable": "63.0 kg",
+          "actualUsable": "10.5 kg",
+          "classification": "Different mechanism",
+          "userVisibleBug": true,
+          "note": "Guanciale over-count pattern, not Mozzarella under-count"
+        },
+        {
+          "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "invoiceQty": 24,
+          "expectedUsable": "190080 ml",
+          "actualUsable": "7920 ml",
+          "classification": "Structural only",
+          "userVisibleBug": false,
+          "note": "quantity-mismatch-ui-audit class C — 24 bottles → 7.92 L correct"
+        }
+      ],
+      "vlStatus": "A) Isolated"
+    },
+    "guanciale": {
+      "definition": "weight-based purchase treated as count pack; *N pack fiction exceeds purchased weight",
+      "confirmedProducts": [
+        "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino"
+      ],
+      "partialProducts": [],
+      "additionalBeyondConfirmed": [],
+      "totalAffected": 1,
+      "userVisibleAdditional": 0,
+      "rows": [
+        {
+          "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+          "purchasedWeight": "~5.996 kg",
+          "usableWeight": "10.5 kg",
+          "classification": "Confirmed",
+          "userVisibleBug": true,
+          "matchedToken": "1,5kg*7",
+          "direction": "over_count"
+        }
+      ],
+      "weightSemanticsScan": {
+        "candidatesScanned": 51,
+        "sizeCountKgMatches": 2,
+        "overCountMatches": 1,
+        "note": "Only Guanciale line has weight qty + +/- token + usable > purchased"
+      },
+      "vlStatus": "A) Isolated"
+    },
+    "gingerBeer": {
+      "definition": "decimal 0.XXcl volume parse → tiny ml; operational €/L outlier >€50/L",
+      "confirmedProducts": [
+        "Baladin - Ginger Beer 0.20cl"
+      ],
+      "partialProducts": [],
+      "additionalBeyondConfirmed": [],
+      "totalAffected": 1,
+      "userVisibleAdditional": 0,
+      "rows": [
+        {
+          "product": "Baladin - Ginger Beer 0.20cl",
+          "parsedVolume": "2 ml/bottle",
+          "expectedVolume": "200 ml/bottle (0.20 L typo on PDF)",
+          "operationalCost": "€405.00 / L",
+          "expectedOperationalCost": "~€4.03 / L",
+          "classification": "Confirmed",
+          "userVisibleBug": true,
+          "invoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb"
+        }
+      ],
+      "decimalClScan": {
+        "vlRowsScanned": 51,
+        "regexMatches": 1,
+        "productionMatches": 0,
+        "integerClControls": ["75cl", "33cl"],
+        "note": "decimal-cl-audit — integer CL parses correctly; failure requires 0.XXcl OCR typo"
+      },
+      "vlStatus": "A) Isolated"
+    }
+  },
+  "populationSummary": {
+    "familyA": {
+      "confirmed": 2,
+      "partial": 0,
+      "additional": 0,
+      "total": 2,
+      "vlStatus": "B) Small family <5"
+    },
+    "mozzarella": {
+      "confirmed": 1,
+      "partial": 0,
+      "structuralMatches": 5,
+      "additional": 0,
+      "total": 1,
+      "vlStatus": "A) Isolated"
+    },
+    "guanciale": {
+      "confirmed": 1,
+      "partial": 0,
+      "additional": 0,
+      "total": 1,
+      "vlStatus": "A) Isolated"
+    },
+    "gingerBeer": {
+      "confirmed": 1,
+      "partial": 0,
+      "additional": 0,
+      "total": 1,
+      "vlStatus": "A) Isolated"
+    }
+  },
+  "confidence": {
+    "familyA": 0.9,
+    "mozzarella": 0.92,
+    "guanciale": 0.85,
+    "gingerBeer": 0.92,
+    "notes": [
+      "Family A: 2/15 candidates confirmed; 13 rejected (Hybrid H qty=1 or no OCR=1 pattern)",
+      "Mozzarella: 1 user-visible bug; 5 structural SIZE_COUNT matches excluded — UI math correct per quantity-mismatch-ui-audit",
+      "Guanciale: weight-semantics scan found no additional over-count rows beyond confirmed line",
+      "Ginger Beer: decimal-cl-audit 1/51 VL rows; 0/207 production rows"
+    ]
+  },
+  "sources": [
+    ".tmp/ricotta-root-cause-trace/",
+    ".tmp/mezzi-root-cause-trace/",
+    ".tmp/remaining-bug-root-causes/",
+    ".tmp/stock-normalization-family-assessment/",
+    ".tmp/quantity-mismatch-validation/",
+    ".tmp/quantity-mismatch-ui-audit/",
+    ".tmp/final-validation-lab-rerun/extracts/",
+    ".tmp/passc-refinement-validation/reextract/",
+    ".tmp/family-a-scope-audit/",
+    ".tmp/family-a-full-population-replay/",
+    ".tmp/decimal-cl-audit/",
+    ".tmp/ginger-beer-audit/",
+    "src/lib/stock-normalization.ts",
+    "src/lib/ingredient-unit-inference.ts"
+  ]
+}

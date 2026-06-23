@@ -1,0 +1,286 @@
+{
+  "generatedAt": "2026-06-22T00:00:00.000Z",
+  "mode": "STRICT_READ_ONLY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR",
+  "failures": [
+    {
+      "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "invoiceItemId": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+      "ingredientId": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+      "pdfQty": 1,
+      "passCBaselineQty": 1,
+      "hybridHQty": 2,
+      "expectedQty": 1,
+      "stability": "10/10 qty=2"
+    },
+    {
+      "name": "RICOTTA TREVIGIANA 1,5KG",
+      "invoiceItemId": "409850ab-646d-44fa-b20c-c8a4a8570064",
+      "ingredientId": "6ec0bc6b-409a-4db2-b21f-fb01394f0014",
+      "pdfQty": 1,
+      "passCBaselineQty": 1,
+      "hybridHQty": 2,
+      "expectedQty": 1,
+      "stability": "10/10 qty=2"
+    }
+  ],
+  "implementationTarget": {
+    "quantityProducedAt": {
+      "file": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+      "function": "callOpenAiJson",
+      "lines": "383-399",
+      "responsibility": "GPT vision emits structured JSON quantity field from QUANT column"
+    },
+    "quantityPassThrough": {
+      "file": "supabase/functions/extract-invoice/invoice-monetary-binding.ts",
+      "function": "parseMonetaryLineItems",
+      "lines": "25-44",
+      "responsibility": "Copies GPT quantity unchanged; no mutation"
+    },
+    "earliestCorrectionPoint": {
+      "file": "supabase/functions/extract-invoice/invoice-monetary-binding.ts",
+      "function": "bindMonetaryColumns",
+      "lines": "214-217",
+      "strategy": "Option C — deterministic qty correction before applyEffectivePaidPrice",
+      "rationale": "Replay 100% recall/precision; fixes qty before unit halving; runtime signals available"
+    },
+    "pipelineOrder": [
+      "cropTableRegionForLineItems",
+      "callOpenAiJson",
+      "parseMonetaryLineItems",
+      "bindMonetaryColumns",
+      "monetaryToInvoiceLineItem",
+      "reconcileLineItemAmounts",
+      "finalizeExtractedLineItems",
+      "invoices.tsx runExtraction persist"
+    ],
+    "downstreamQtyInvariant": true,
+    "firstIncorrectStage": "Hybrid H table GPT pass (callOpenAiJson)",
+    "confidence": 0.91
+  },
+  "changeSurface": {
+    "direct": [
+      {
+        "file": "supabase/functions/extract-invoice/invoice-monetary-binding.ts",
+        "change": "Option C qty correction gate in bindMonetaryColumns",
+        "impact": "Corrects qty before applyEffectivePaidPrice; binding tests required"
+      },
+      {
+        "file": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+        "change": "Optional: thread supplier into binding; Option A prompt alt",
+        "impact": "Supplier gate for IL BOCCONCINO scope"
+      },
+      {
+        "file": "supabase/functions/extract-invoice/invoice-monetary-binding.test.ts",
+        "change": "Unit tests for Family A trigger + controls",
+        "impact": "Regression harness"
+      }
+    ],
+    "indirect": [
+      {
+        "file": "supabase/functions/extract-invoice/index.ts",
+        "change": "None expected; possible supplier threading",
+        "impact": "Signature only if supplier passed to binding"
+      },
+      {
+        "file": "src/routes/invoices.tsx",
+        "change": "None for extraction fix",
+        "impact": "Re-ingest propagates corrected qty to ingredients/history"
+      },
+      {
+        "file": "src/lib/stock-normalization.ts",
+        "change": "None",
+        "impact": "Ricotta usable scales with corrected qty"
+      }
+    ],
+    "outOfScope": [
+      "parseContinente.ts",
+      "parsePadaria.ts",
+      "stages.ts",
+      "invoice-crop-geometry.ts",
+      "DB migrations"
+    ]
+  },
+  "recommendedStrategy": {
+    "option": "C",
+    "name": "Post-extraction binding gate",
+    "location": "invoice-monetary-binding.ts bindMonetaryColumns",
+    "runtimeSignals": {
+      "green": [
+        "hybrid_h_qty_eq_2 → item.quantity === 2",
+        "supplier_il_bocconcino → Pass B supplier match",
+        "unit_price_approx_total_at_qty1 → hasInconsistentGrossLineTotal + gross≈total"
+      ],
+      "proxiesForInvestigationOnly": {
+        "ocr_qty_eq_1": "Inflation signature (qty=2, total preserved, unit≈total at qty=1)",
+        "hybrid_h_qty_2_stable": "Omit single-run gate; use conservative combo",
+        "undiscounted_blank_desc": "discount_pct == null || discount_pct === 0 at bind input"
+      }
+    },
+    "correction": "Set quantity = 1 before applyEffectivePaidPrice"
+  },
+  "regressionChecklist": {
+    "mustCorrect": [
+      { "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)", "field": "quantity", "from": 2, "to": 1 },
+      { "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)", "field": "bound.unit_price", "from": 13.65, "to": 27.30 },
+      { "product": "RICOTTA TREVIGIANA 1,5KG", "field": "quantity", "from": 2, "to": 1 },
+      { "product": "RICOTTA TREVIGIANA 1,5KG", "field": "bound.unit_price", "from": 3.99, "to": 7.97 },
+      { "product": "RICOTTA TREVIGIANA 1,5KG", "field": "usableStock", "from": "3 kg", "to": "1.5 kg" },
+      { "product": "RICOTTA TREVIGIANA 1,5KG", "field": "operationalCostPerKg", "from": 2.66, "to": 5.31 }
+    ],
+    "mustNotChange": [
+      { "product": "POMODORI PELATI (CX 2,5KG*6)", "qty": 1 },
+      { "product": "ROLO DE CABRA E VACA 1KG", "qty": 1 },
+      { "product": "ACQUA S.PELLEGRINO (CX 75CL*15)", "qty": 2 },
+      { "product": "MOZZARELLA FIOR DI LATTE 125GR*8", "qty": 10 },
+      { "product": "Arroz Agulha Metro Chef 12x1 kg", "qty": 1 },
+      { "product": "Açúcar Branco METRO Chef 10x1 Kg", "qty": 1 },
+      { "product": "Pepinos Extra Uli Frasco 6x720 g", "qty": 1 },
+      { "product": "Aceto balsamico pet 5l*2 Toschi", "qty": 1 },
+      { "product": "Rulo Di Capra 1kg*2 Simonetta", "qty": 1 },
+      { "product": "Farina Speciale pizza 25kg Amoruso", "qty": 1 },
+      { "product": "Gorgonzola DOP (Emporio)", "qty": 2, "note": "negative control" }
+    ],
+    "optionCReplay": {
+      "recall": 1.0,
+      "precision": 1.0,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "artifact": ".tmp/family-a-option-c-replay/replay-result.json"
+    },
+    "globalGates": {
+      "invoiceTotal": 290.64,
+      "candidateRegression": "13/13 non-failure unchanged",
+      "bocconcinoStability": "Mezzi/Ricotta qty=1 in >=9/10 post-fix runs"
+    }
+  },
+  "testPlan": {
+    "phases": [
+      {
+        "phase": 1,
+        "name": "Extraction",
+        "steps": [
+          "Re-extract f0aa5a08; Mezzi/Ricotta qty=1",
+          "Bound unit_price ≈ total at qty=1",
+          "10x Bocconcino stability",
+          "Control extracts unchanged",
+          "Gorgonzola negative preserved"
+        ]
+      },
+      {
+        "phase": 2,
+        "name": "Invoice",
+        "steps": [
+          "Re-ingest f0aa5a08",
+          "invoice_items qty=1 for failures",
+          "Line totals unchanged",
+          "Sibling lines unchanged"
+        ]
+      },
+      {
+        "phase": 3,
+        "name": "Purchase history",
+        "steps": [
+          "Last Purchase 1 uni for Ricotta/Mezzi",
+          "Unit prices €7.97 / €27.30"
+        ]
+      },
+      {
+        "phase": 4,
+        "name": "Ingredient",
+        "steps": [
+          "current_price corrected",
+          "purchase_quantity=1",
+          "price_history new_price corrected"
+        ]
+      },
+      {
+        "phase": 5,
+        "name": "Procurement",
+        "steps": [
+          "Display €7.97/unit Ricotta",
+          "Display €27.30/case Mezzi"
+        ]
+      },
+      {
+        "phase": 6,
+        "name": "Operational",
+        "steps": [
+          "Ricotta 1.5 kg usable, €5.31/kg",
+          "Mezzi 6 kg usable, €4.55/kg unchanged",
+          "Mezzi split-brain resolved",
+          "Family A mismatch alerts cleared"
+        ]
+      }
+    ]
+  },
+  "risks": {
+    "provenSafe": [
+      "Localized to Mezzi + Ricotta (2/15 candidates)",
+      "Downstream qty invariant",
+      "Option C replay 100% recall/precision on 15-row set",
+      "Gorgonzola excluded by supplier+discount gates",
+      "Rolo stable path excluded; stability gate blocks run 7 FP",
+      "No pattern expansion beyond 2 products",
+      "Invoice totals preserved on correction"
+    ],
+    "requiresValidation": [
+      "Runtime rule without passc ocr_qty proxy",
+      "Single-run vs 10-run stability tradeoff",
+      "discount_pct proxy for blank DESC",
+      "Re-ingest path for VL DB correction",
+      "Ricotta downstream economics shift expected",
+      "Pre-bind vs bound unit_price persistence"
+    ],
+    "unknown": [
+      "Bad-path Hybrid H structured GPT raw JSON missing",
+      "Prompt vs schema causality for qty=2",
+      "Rolo run 7 transient root cause",
+      "Global rule without supplier scope unsafe"
+    ]
+  },
+  "readiness": {
+    "verdict": "READY_FOR_IMPLEMENTATION_OPTION_C",
+    "overallConfidence": 0.82,
+    "gates": {
+      "rootCauseLocalized": { "status": "complete", "confidence": 0.91 },
+      "scopeBounded": { "status": "complete", "confidence": 0.92 },
+      "regressionDatasetFrozen": { "status": "complete" },
+      "optionCReplay": { "status": "complete", "recall": 1.0, "precision": 1.0 },
+      "fullPopulationReplay": { "status": "complete", "verified": "15/15" },
+      "implementabilityAudit": { "status": "complete", "verdict": "partially_runtime_adaptable" },
+      "impactMapping": { "status": "complete" },
+      "patternExpansion": { "status": "complete", "additionalProducts": 0 },
+      "badPathGptRawCapture": { "status": "optional_gap", "blocksOptionC": false },
+      "strategySelected": { "status": "complete", "choice": "Option C" },
+      "postFixStability": { "status": "pending_post_deploy" },
+      "vlReingest": { "status": "pending_post_deploy" }
+    },
+    "blockers": [],
+    "preFlightChecks": [
+      "Implement runtime-adapted Option C rule per implementability audit proxies",
+      "Add invoice-monetary-binding.test.ts fixtures from frozen extracts",
+      "Thread supplier to binding if IL BOCCONCINO gate required",
+      "Post-deploy: 10x Bocconcino stability + full test plan phases 1-6"
+    ]
+  },
+  "evidenceArtifacts": [
+    ".tmp/ricotta-root-cause-trace/",
+    ".tmp/mezzi-root-cause-trace/",
+    ".tmp/family-a-transition-trace/",
+    ".tmp/family-a-input-diff/",
+    ".tmp/family-a-hybrid-diff-attribution/",
+    ".tmp/family-a-causal-attribution/",
+    ".tmp/family-a-impact-analysis/",
+    ".tmp/bug-pattern-expansion-audit/",
+    ".tmp/family-a-option-c-replay/",
+    ".tmp/family-a-implementability-audit/",
+    ".tmp/family-a-scope-audit/",
+    ".tmp/passc-refinement-validation/",
+    ".tmp/family-a-correction-validation-plan/",
+    ".tmp/family-a-fix-design/DESIGN.md",
+    ".tmp/family-a-v25-raw-capture/artifact-index.json"
+  ]
+}

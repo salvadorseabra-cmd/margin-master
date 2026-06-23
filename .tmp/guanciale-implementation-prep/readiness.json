@@ -1,0 +1,508 @@
+{
+  "generatedAt": "2026-06-23T00:00:00.000Z",
+  "mode": "STRICT_READ_ONLY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "supplier": "Mammafiore Portugal",
+  "failures": [
+    {
+      "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+      "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6",
+      "invoiceQty": 5.996,
+      "unitPrice": 10.83,
+      "total": 64.93,
+      "currentUsableGrams": 10500,
+      "expectedUsableGrams": 5996,
+      "currentOperationalCostPerKg": 6.18,
+      "expectedOperationalCostPerKg": 10.83,
+      "firstIncorrectStage": 8,
+      "parseTier": "size_count",
+      "matchedToken": "1,5kg*7",
+      "errorDirection": "over_count",
+      "cluster": "B_guanciale_over_count"
+    }
+  ],
+  "implementationTarget": {
+    "pipeline": [
+      "invoice_items (persisted)",
+      "resolveInvoiceLinePurchaseFormat",
+      "parsePurchaseStructureFromText",
+      "computeUsableFromPurchaseStructure",
+      "structuredPurchaseToIngredientFields",
+      "recipeOperationalCostFieldsFromInvoiceLine",
+      "computeEffectiveUsableCost"
+    ],
+    "earliestIncorrectValue": {
+      "file": "src/lib/stock-normalization.ts",
+      "function": "buildStructure",
+      "lines": "578-614",
+      "field": "totalUsableAmount",
+      "incorrectValue": 10500,
+      "incorrectUnit": "g",
+      "expectedValue": 5996,
+      "expectedUnit": "g",
+      "mechanism": "SIZE_COUNT_RE match 1,5kg*7 → 1 × 7 × 1.5 kg = 10500 g; row qty 5.996 kg (billed weight) ignored",
+      "finalUsableAssignment": {
+        "file": "src/lib/stock-normalization.ts",
+        "function": "computeUsableFromPurchaseStructure",
+        "lines": "1307-1318",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack"
+      },
+      "blockingPolicy": {
+        "file": "src/lib/stock-normalization.ts",
+        "function": "structureTotalIsFinalForGenericRow",
+        "lines": "1092-1106"
+      },
+      "parseMatch": {
+        "file": "src/lib/stock-normalization.ts",
+        "regex": "SIZE_COUNT_RE",
+        "lines": "241-244",
+        "function": "parsePurchaseStructureFromText",
+        "linesParse": "725-743"
+      }
+    },
+    "orchestrationEntry": {
+      "file": "src/lib/invoice-purchase-format.ts",
+      "function": "resolveInvoiceLinePurchaseFormat"
+    },
+    "downstreamAmplification": {
+      "file": "src/lib/invoice-purchase-price-semantics.ts",
+      "functions": [
+        "resolveUsablePerPricedUnit",
+        "computeEffectiveUsableCost"
+      ],
+      "note": "64.93 ÷ 10500 g → €6.18/kg (should ÷ 5996 g → €10.83/kg)"
+    },
+    "firstIncorrectStage": "Purchase structure / stock normalization (stage 8)",
+    "extractionStagesCorrect": true,
+    "confidence": 0.94
+  },
+  "valueTrace": {
+    "stages": [
+      {
+        "stage": 1,
+        "quantity": 5.996,
+        "packageStructure": "+/- 1,5kg*7 (case metadata)",
+        "usableGrams": 5996,
+        "correct": true
+      },
+      {
+        "stage": 7,
+        "quantity": 5.996,
+        "packageStructure": "in name",
+        "usableGrams": null,
+        "correct": true
+      },
+      {
+        "stage": "8a",
+        "function": "parsePurchaseStructureFromText",
+        "packageStructure": "size_count inner=7 size=1.5kg",
+        "usableGrams": 10500,
+        "correct": false
+      },
+      {
+        "stage": "8b",
+        "function": "computeUsableFromPurchaseStructure",
+        "quantity": 5.996,
+        "usableGrams": 10500,
+        "correct": false
+      },
+      {
+        "stage": 9,
+        "quantity": 5.996,
+        "usableGrams": 10500,
+        "operationalCostPerKg": 6.18,
+        "correct": false
+      },
+      {
+        "stage": 11,
+        "expectedUsableGrams": 5996,
+        "expectedOperationalCostPerKg": 10.83
+      }
+    ],
+    "control": {
+      "product": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "quantity": 10,
+      "tier": "bare_measure",
+      "usableGrams": 30000,
+      "correct": true,
+      "note": "Same invoice; count-priced line with bare size token"
+    },
+    "monetaryProof": {
+      "formula": "5.996 × 16.922 × (1 − 0.36)",
+      "netEur": 64.93,
+      "correctOpPerKg": 10.83,
+      "rejectedPath": {
+        "usableKg": 10.5,
+        "impliedNetEur": 113.72,
+        "deltaVsInvoiceEur": 48.79
+      },
+      "classification": "A_proven",
+      "source": ".tmp/guanciale-commercial-reality-audit/verdict.json"
+    }
+  },
+  "changeSurface": {
+    "direct": [
+      {
+        "file": "src/lib/stock-normalization.ts",
+        "functions": [
+          "SIZE_COUNT_RE",
+          "parsePurchaseStructureFromText",
+          "buildInnerUnitsStructure",
+          "buildStructure",
+          "structureTotalIsFinalForGenericRow",
+          "resolveStructurePurchaseQuantity",
+          "computeUsableFromPurchaseStructure"
+        ],
+        "impact": "Earliest incorrect structure total and final usable assignment"
+      },
+      {
+        "file": "src/lib/stock-normalization.test.ts",
+        "change": "SIZE_COUNT weight-line regression cases",
+        "impact": "Guanciale + structural controls"
+      }
+    ],
+    "indirect": [
+      {
+        "file": "src/lib/invoice-purchase-format.ts",
+        "functions": [
+          "resolveInvoiceLinePurchaseFormat",
+          "structuredPurchaseToIngredientFields"
+        ],
+        "impact": "normalizedUsableQuantity, purchaseContainerCount"
+      },
+      {
+        "file": "src/lib/invoice-purchase-price-semantics.ts",
+        "functions": [
+          "resolveUsablePerPricedUnit",
+          "computeEffectiveUsableCost",
+          "recipeOperationalCostFieldsFromInvoiceLine"
+        ],
+        "impact": "Operational €/kg, usable_weight_grams overlay"
+      },
+      {
+        "file": "src/lib/ingredient-auto-persist.ts",
+        "function": "syncOperationalIngredientCostsFromInvoiceLines",
+        "impact": "Catalog field propagation on re-ingest"
+      },
+      {
+        "file": "src/routes/invoices.tsx",
+        "function": "runExtraction",
+        "impact": "Re-ingest path for 36c99d19"
+      }
+    ],
+    "outOfScope": [
+      "supabase/functions/extract-invoice/*",
+      "Mozzarella g-only outer scaling (shouldScaleOuterPackForSizeCountGenericRow)"
+    ],
+    "mozzarellaCouplingWarning": true,
+    "discriminatorGap": {
+      "verdict": "B",
+      "label": "Scalar divergence within shared path — no proven runtime branch",
+      "source": ".tmp/size-count-discriminator-audit/discriminator.json",
+      "mozzarellaHelperFiresOnGuanciale": false,
+      "guancialeUniqueSignals": [
+        "nameContainsTolerance",
+        "bound.qty fractional 5.996",
+        "direction over_count",
+        "structureOnlyMatchesPdfTruth false"
+      ]
+    }
+  },
+  "regressionPopulation": {
+    "vlInvoiceItemsScanned": 51,
+    "sizeCountStructuralMatches": 9,
+    "userVisibleGuancialeBugs": 1,
+    "userVisibleExpansion": 0,
+    "isolated": true,
+    "vlStatus": {
+      "userVisibleOverCount": "A) Isolated",
+      "codePathCoupling": "B) Coupled — 9 SIZE_COUNT rows share path",
+      "crossInvoiceRepeat": "C) Single exemplar — no second Guanciale invoice"
+    },
+    "rows": [
+      {
+        "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "invoiceQty": 5.996,
+        "expectedUsable": "~5.996 kg",
+        "actualUsable": "10.5 kg",
+        "correctToday": false,
+        "classification": "Confirmed — B_guanciale_over_count"
+      },
+      {
+        "product": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "invoiceQty": 10,
+        "expectedUsable": "10.0 kg",
+        "actualUsable": "1.0 kg",
+        "correctToday": false,
+        "classification": "Different mechanism — A_mozzarella_under_count"
+      },
+      {
+        "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "invoiceQty": 2,
+        "expectedUsable": "12.0 kg (PDF 1 case)",
+        "actualUsable": "6.0 kg",
+        "correctToday": "partial",
+        "classification": "Family A primary — C_mezzi_extraction"
+      },
+      {
+        "product": "POMODORI PELATI (CX 2,5KG*6)",
+        "invoiceQty": 1,
+        "expectedUsable": "15.0 kg",
+        "actualUsable": "15.0 kg",
+        "correctToday": true,
+        "classification": "Negative control"
+      },
+      {
+        "product": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "invoiceQty": 2,
+        "expectedUsable": "11.25 L",
+        "actualUsable": "11.25 L",
+        "correctToday": true,
+        "classification": "Negative control"
+      },
+      {
+        "product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "invoiceQty": 2,
+        "expectedUsable": "11.25 L",
+        "actualUsable": "11.25 L",
+        "correctToday": true,
+        "classification": "Negative control"
+      },
+      {
+        "product": "Birra Peroni 33cl*24",
+        "invoiceQty": 24,
+        "expectedUsable": "7.92 L",
+        "actualUsable": "7.92 L",
+        "correctToday": true,
+        "classification": "Negative control — rowQty=innerCount"
+      },
+      {
+        "product": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "invoiceQty": 1,
+        "expectedUsable": "10 L",
+        "actualUsable": "10 L",
+        "correctToday": true,
+        "classification": "Negative control — same invoice"
+      },
+      {
+        "product": "Rulo Di Capra 1kg*2 Simonetta",
+        "invoiceQty": 1,
+        "expectedUsable": "2 kg",
+        "actualUsable": "2 kg",
+        "correctToday": true,
+        "classification": "Negative control — same invoice"
+      }
+    ]
+  },
+  "impactAnalysis": {
+    "scenario": "usable 10.5 kg → 5.996 kg",
+    "surfaces": [
+      {
+        "surface": "usable_stock_ui",
+        "current": "10.5 kg",
+        "after": "~6 kg (5996 g)",
+        "class": "A",
+        "deltaPct": -75
+      },
+      {
+        "surface": "operational_cost_ui",
+        "current": "€6.18/kg",
+        "after": "€10.83/kg",
+        "class": "A",
+        "deltaPct": 75
+      },
+      {
+        "surface": "procurement_cost_ui",
+        "current": "€10.83/unit",
+        "after": "€10.83/unit",
+        "class": "C"
+      },
+      {
+        "surface": "invoice_items",
+        "current": "qty=5.996 unchanged",
+        "after": "unchanged",
+        "class": "C"
+      },
+      {
+        "surface": "ingredients_catalog",
+        "current": "usable 10500 g; purchaseContainerCount=7",
+        "after": "usable 5996 g; container semantics TBD at fix-design",
+        "class": "A"
+      },
+      {
+        "surface": "ingredient_price_history",
+        "current": "new_price=10.83",
+        "after": "may recompute",
+        "class": "B"
+      },
+      {
+        "surface": "recipe_cost",
+        "current": "~75% understated €/kg",
+        "after": "correct €10.83/kg denominator",
+        "class": "A"
+      },
+      {
+        "surface": "dashboard_margins",
+        "current": "overstated (low op cost)",
+        "after": "lower margin",
+        "class": "B"
+      },
+      {
+        "surface": "rejected_10.5kg_path",
+        "current": "implied net €113.72",
+        "after": "N/A — path rejected",
+        "class": "C",
+        "note": "Δ +€48.79 vs PDF Valor €64.93"
+      }
+    ]
+  },
+  "testPlan": {
+    "mustCorrect": [
+      {
+        "surface": "normalizedUsableQuantity",
+        "current": "10500 g",
+        "expected": "5996 g"
+      },
+      {
+        "surface": "usable_stock_label",
+        "current": "10.5 kg usable",
+        "expected": "~6 kg usable"
+      },
+      {
+        "surface": "operational_cost",
+        "current": "€6.18/kg",
+        "expected": "€10.83/kg"
+      },
+      {
+        "surface": "line_total",
+        "current": "€64.93",
+        "expected": "€64.93 unchanged"
+      }
+    ],
+    "mustNotRegress": [
+      "Birra Peroni 33cl*24 qty=24 → 7.92 L (same invoice)",
+      "Aceto balsamico 5l*2 qty=1 → 10 L (same invoice)",
+      "Rulo Di Capra 1kg*2 qty=1 → 2 kg (same invoice)",
+      "MOZZA Julienne 3kg qty=10 → 30 kg (same invoice)",
+      "Farina Amoruso 25kg qty=1 → 25 kg (same invoice)",
+      "POMODORI PELATI (CX 2,5KG*6) → 15 kg (cross-invoice)",
+      "ACQUA S.PELLEGRINO (CX 75CL*15) → 11.25 L (cross-invoice)",
+      "MOZZARELLA 125GR*8 — no flip to under-count; separate fix track"
+    ],
+    "reIngestInvoice": "36c99d19-6f9f-413f-8c2d-ae3526291a2d"
+  },
+  "readiness": {
+    "rootCauseLocalized": {
+      "status": "A",
+      "label": "Proven"
+    },
+    "extractionRuledOut": {
+      "status": "A",
+      "label": "Proven — stages 1-7"
+    },
+    "liveReplayMatchesPersisted": {
+      "status": "A",
+      "label": "Proven — 10500 g replay = UI 10.5 kg"
+    },
+    "commercialRealityProven": {
+      "status": "A",
+      "label": "Proven — guanciale-commercial-reality-audit verdict A"
+    },
+    "isolationConfirmed": {
+      "status": "A",
+      "label": "Proven — 1/51 user-visible over-count; 0 expansion"
+    },
+    "mozzarellaDecoupling": {
+      "status": "A",
+      "label": "Proven — opposite error direction; g-only helper excludes Guanciale"
+    },
+    "changeSurfaceMapped": {
+      "status": "A",
+      "label": "Proven — this prep artifact"
+    },
+    "fixDesign": {
+      "status": "C",
+      "label": "Not in scope — deferred to guanciale-fix-design"
+    },
+    "runtimeFixDiscriminator": {
+      "status": "C",
+      "label": "Missing — size-count-discriminator verdict B"
+    },
+    "regressionControls": {
+      "status": "B",
+      "label": "Identified — 8 negatives; positive matrix not post-design validated"
+    },
+    "reIngestPath": {
+      "status": "B",
+      "label": "Needs validation"
+    },
+    "priceHistoryFollowOn": {
+      "status": "B",
+      "label": "Needs validation — stale history signal"
+    },
+    "singleExemplar": {
+      "status": "B",
+      "label": "Residual — no second Guanciale invoice in VL"
+    },
+    "readyForFixDesign": true,
+    "readyForCodeChange": false,
+    "benchmark": "mozzarella-implementation-prep pre-fix-design level",
+    "preconditions": [
+      "Do not blanket-scale all size_count rows",
+      "Do not reuse Mozzarella g-only outer scaling for Guanciale",
+      "Design weight-line semantics guard proven safe vs Peroni/Rulo/Aceto/Pomodori",
+      "Frozen VL regression matrix required (Task 4 + Task 6)",
+      "Plan re-ingest of 36c99d19",
+      "Price-history follow-on, not blocking usable correction",
+      "guanciale-fix-design artifact required before code change"
+    ]
+  },
+  "comparisonAtPrepLevel": {
+    "mozzarella": {
+      "readyForFixDesign": true,
+      "commercialRealityClass": "A_proven",
+      "errorDirection": "under_count",
+      "overallConfidence": 0.91
+    },
+    "guanciale": {
+      "readyForFixDesign": true,
+      "commercialRealityClass": "A_proven",
+      "errorDirection": "over_count",
+      "overallConfidence": 0.9,
+      "additionalBlockers": [
+        "No runtime discriminator (C)",
+        "Single VL exemplar (B)",
+        "Mozzarella shared path coupling"
+      ]
+    }
+  },
+  "confidence": {
+    "rootCauseLocalization": 0.94,
+    "commercialReality": 0.94,
+    "valueTrace": 0.93,
+    "isolation": 0.92,
+    "changeSurface": 0.86,
+    "impactAnalysis": 0.91,
+    "overall": 0.9
+  },
+  "sources": [
+    ".tmp/guanciale-commercial-reality-audit/",
+    ".tmp/guanciale-readiness-audit/",
+    ".tmp/remaining-bug-root-causes/",
+    ".tmp/stock-normalization-family-assessment/",
+    ".tmp/stock-normalization-population-audit/",
+    ".tmp/size-count-discriminator-audit/",
+    ".tmp/quantity-mismatch-ui-audit/",
+    ".tmp/mammafiore-line-audit/",
+    ".tmp/mozzarella-implementation-prep/",
+    ".tmp/final-validation-lab-rerun/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d.json",
+    ".tmp/historical-pricing-integrity-audit/findings.json",
+    "src/lib/stock-normalization.ts",
+    "src/lib/invoice-purchase-format.ts",
+    "src/lib/invoice-purchase-price-semantics.ts",
+    "VL DB read-only bjhnlrgodcqoyzddbpbd 2026-06-23"
+  ]
+}

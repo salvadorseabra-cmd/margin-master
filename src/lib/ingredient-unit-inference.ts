@@ -98,6 +98,19 @@ function parseQuantityToken(raw: string): number | null {
 }
 
 /**
+ * Corrects supplier/OCR typo where a bottle size like 20cl is printed as `0.20cl`
+ * (missing leading digit). Interprets `0.XX` as XX centilitres, not 0.XX cl.
+ */
+export function normalizeDecimalLeadingClQuantity(raw: string, parsed: number): number {
+  if (parsed <= 0 || parsed >= 1) return parsed;
+  const match = /^0[.,](\d+)$/.exec(raw.trim());
+  if (!match) return parsed;
+  const reclaimed = parseQuantityToken(match[1] ?? "");
+  if (reclaimed == null || reclaimed < 1) return parsed;
+  return reclaimed;
+}
+
+/**
  * Detects a mass token (`KG`, `G`) and returns grams.
  * Examples: `1KG`, `500G`, `1,5 kg`, `CHEDDAR 1KG`.
  */
@@ -140,14 +153,19 @@ export function detectVolume(name: string): VolumeDetection | null {
     re.lastIndex = 0;
     let m: RegExpExecArray | null;
     while ((m = re.exec(s)) !== null) {
-      const qty = parseQuantityToken(m[1] ?? "");
+      const rawQty = m[1] ?? "";
+      const qty = parseQuantityToken(rawQty);
       if (qty == null) continue;
-      const ml = Math.max(1, Math.round(toMl(qty)));
+      const normalizedQty =
+        label === "CL" ? normalizeDecimalLeadingClQuantity(rawQty, qty) : qty;
+      const ml = Math.max(1, Math.round(toMl(normalizedQty)));
       const hit = m[0] ?? "";
+      const typoNote =
+        label === "CL" && normalizedQty !== qty ? ", decimal-leading typo" : "";
       const det: VolumeDetection = {
         milliliters: ml,
         confidence: label === "L" && ml < 50 ? 0.75 : 0.92,
-        reason: `volume token "${hit.trim()}" (${label}) → ${ml}ml`,
+        reason: `volume token "${hit.trim()}" (${label}${typoNote}) → ${ml}ml`,
       };
       if (
         !best ||

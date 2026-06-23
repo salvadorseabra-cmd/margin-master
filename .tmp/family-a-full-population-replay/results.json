@@ -1,0 +1,1195 @@
+{
+  "generatedAt": "2026-06-21T01:30:24.982Z",
+  "mode": "READ-ONLY FULL EFFECTIVE-PAID POPULATION REPLAY",
+  "vlProject": "bjhnlrgodcqoyzddbpbd",
+  "ruleSource": "family-a-option-c-replay/replay.mts evaluateOptionC — documentedCombo + qty_inflation_signature, DIFF_PCT_MIN=0.45",
+  "ruleDefinition": {
+    "documentedCombo": [
+      "ocr_qty === 1",
+      "hybrid_h_qty === 2",
+      "hybrid_h_qty_2_stable (10/10 stability)",
+      "undiscounted_blank_desc",
+      "unit_price ≈ total at qty=1 (±2%)",
+      "supplier === IL BOCCONCINO"
+    ],
+    "qtyInflationSignature": [
+      "extracted qty > 1",
+      "binding_changed (effective paid halving)",
+      "arithmetic_consistent after binding",
+      "diff_pct >= 0.45 (~50% Family A)"
+    ],
+    "trigger": "documentedCombo AND qtyInflationSignature"
+  },
+  "fullPopulation": {
+    "totalRows": 15,
+    "verifiedCount": 15,
+    "classificationCounts": {
+      "A) Confirmed Family A": 2,
+      "C) Gorgonzola-like": 1,
+      "E) Other (Bidfood ~20% line discount pattern)": 7,
+      "E) Other": 2,
+      "D) Legitimate quantity >1": 3
+    },
+    "rows": [
+      {
+        "invoice_item_id": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+        "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "supplier": "Il Bocconcino Distribuição Alimentar",
+        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "classification": "A) Confirmed Family A",
+        "family_a": true,
+        "would_fix": true,
+        "hybridHQty": 2,
+        "ocrQty": 1,
+        "expectedTrigger": true,
+        "wouldTriggerC": true,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": true,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": true,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": true,
+          "supplier_il_bocconcino": true,
+          "total_preserved": true,
+          "qty_inflation_signature": true,
+          "diff_pct_ge_45": true
+        },
+        "documentedCombo": true,
+        "binding": {
+          "raw": {
+            "qty": 2,
+            "unit_price": 27.31,
+            "total": 27.3
+          },
+          "bound": {
+            "qty": 2,
+            "unit_price": 13.65,
+            "total": 27.3
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": true,
+          "diffPct": 0.5002,
+          "unitApproxTotalAtQty1": true,
+          "totalPreserved": true
+        },
+        "triggerAnalysis": {
+          "status": "TRIGGERED",
+          "matchingConditions": [
+            "ocr_qty_eq_1",
+            "hybrid_h_qty_eq_2",
+            "hybrid_h_qty_2_stable",
+            "undiscounted_blank_desc",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino",
+            "qty_inflation_signature"
+          ]
+        },
+        "metaAssumptions": [
+          "Family A: stable_qty_2=true from risk-audit (10/10 stability for Mezzi/Ricotta)"
+        ],
+        "inPreviousReplayHarness": true
+      },
+      {
+        "invoice_item_id": "409850ab-646d-44fa-b20c-c8a4a8570064",
+        "product": "RICOTTA TREVIGIANA 1,5KG",
+        "supplier": "Il Bocconcino Distribuição Alimentar",
+        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "classification": "A) Confirmed Family A",
+        "family_a": true,
+        "would_fix": true,
+        "hybridHQty": 2,
+        "ocrQty": 1,
+        "expectedTrigger": true,
+        "wouldTriggerC": true,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": true,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": true,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": true,
+          "supplier_il_bocconcino": true,
+          "total_preserved": true,
+          "qty_inflation_signature": true,
+          "diff_pct_ge_45": true
+        },
+        "documentedCombo": true,
+        "binding": {
+          "raw": {
+            "qty": 2,
+            "unit_price": 7.97,
+            "total": 7.97
+          },
+          "bound": {
+            "qty": 2,
+            "unit_price": 3.99,
+            "total": 7.97
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": true,
+          "diffPct": 0.4994,
+          "unitApproxTotalAtQty1": true,
+          "totalPreserved": true
+        },
+        "triggerAnalysis": {
+          "status": "TRIGGERED",
+          "matchingConditions": [
+            "ocr_qty_eq_1",
+            "hybrid_h_qty_eq_2",
+            "hybrid_h_qty_2_stable",
+            "undiscounted_blank_desc",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino",
+            "qty_inflation_signature"
+          ]
+        },
+        "metaAssumptions": [
+          "Family A: stable_qty_2=true from risk-audit (10/10 stability for Mezzi/Ricotta)"
+        ],
+        "inPreviousReplayHarness": true
+      },
+      {
+        "invoice_item_id": "33dc7070-a202-4397-bba0-e7865bfb6931",
+        "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+        "supplier": "Emporio Italia",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "classification": "C) Gorgonzola-like",
+        "family_a": false,
+        "would_fix": true,
+        "hybridHQty": 2,
+        "ocrQty": 1.35,
+        "expectedTrigger": false,
+        "wouldTriggerC": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": false,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": true,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "documentedCombo": false,
+        "binding": {
+          "raw": {
+            "qty": 2,
+            "unit_price": 10.22,
+            "total": 13.44
+          },
+          "bound": {
+            "qty": 2,
+            "unit_price": 6.72,
+            "total": 13.44
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": true,
+          "diffPct": 0.3425,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": true
+        },
+        "triggerAnalysis": {
+          "status": "BLOCKED",
+          "blockingConditions": [
+            "ocr_qty_eq_1",
+            "hybrid_h_qty_2_stable",
+            "undiscounted_blank_desc",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino"
+          ],
+          "qtyInflationBlocked": true
+        },
+        "metaAssumptions": [
+          "stable_qty_2=false from risk-audit (no 10/10 qty=2 stability)"
+        ],
+        "inPreviousReplayHarness": true
+      },
+      {
+        "invoice_item_id": "4ad54bd5-6902-4443-89f9-8b0c3ecbde75",
+        "product": "Alho Francês",
+        "supplier": "Bidfood Portugal",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "classification": "E) Other (Bidfood ~20% line discount pattern)",
+        "family_a": false,
+        "would_fix": false,
+        "hybridHQty": 5.42,
+        "ocrQty": null,
+        "expectedTrigger": false,
+        "wouldTriggerC": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": false,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": false,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "documentedCombo": false,
+        "binding": {
+          "raw": {
+            "qty": 5.42,
+            "unit_price": 1.77,
+            "total": 7.67
+          },
+          "bound": {
+            "qty": 5.42,
+            "unit_price": 1.42,
+            "total": 7.67
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": false,
+          "diffPct": 0.1977,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": false
+        },
+        "triggerAnalysis": {
+          "status": "BLOCKED",
+          "blockingConditions": [
+            "ocr_qty_eq_1",
+            "hybrid_h_qty_eq_2",
+            "hybrid_h_qty_2_stable",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino"
+          ],
+          "qtyInflationBlocked": true
+        },
+        "metaAssumptions": [
+          "ocr_qty: null in risk-population — treated as NOT eq 1 (ocr_qty_eq_1=false)",
+          "stable_qty_2=false from risk-audit (no 10/10 qty=2 stability)"
+        ],
+        "inPreviousReplayHarness": false
+      },
+      {
+        "invoice_item_id": "41bf997f-a7cf-412f-9585-82b12a487ece",
+        "product": "Manjericão",
+        "supplier": "Bidfood Portugal",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "classification": "E) Other (Bidfood ~20% line discount pattern)",
+        "family_a": false,
+        "would_fix": false,
+        "hybridHQty": 5,
+        "ocrQty": null,
+        "expectedTrigger": false,
+        "wouldTriggerC": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": false,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": false,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "documentedCombo": false,
+        "binding": {
+          "raw": {
+            "qty": 5,
+            "unit_price": 2.57,
+            "total": 10.28
+          },
+          "bound": {
+            "qty": 5,
+            "unit_price": 2.06,
+            "total": 10.28
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": false,
+          "diffPct": 0.1984,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": false
+        },
+        "triggerAnalysis": {
+          "status": "BLOCKED",
+          "blockingConditions": [
+            "ocr_qty_eq_1",
+            "hybrid_h_qty_eq_2",
+            "hybrid_h_qty_2_stable",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino"
+          ],
+          "qtyInflationBlocked": true
+        },
+        "metaAssumptions": [
+          "ocr_qty: null in risk-population — treated as NOT eq 1 (ocr_qty_eq_1=false)",
+          "stable_qty_2=false from risk-audit (no 10/10 qty=2 stability)"
+        ],
+        "inPreviousReplayHarness": false
+      },
+      {
+        "invoice_item_id": "434e2500-cbee-430a-959a-58a483bf7972",
+        "product": "Pêra Abacate Hasse",
+        "supplier": "Bidfood Portugal",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "classification": "E) Other (Bidfood ~20% line discount pattern)",
+        "family_a": false,
+        "would_fix": true,
+        "hybridHQty": 3.28,
+        "ocrQty": null,
+        "expectedTrigger": false,
+        "wouldTriggerC": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": false,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": true,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "documentedCombo": false,
+        "binding": {
+          "raw": {
+            "qty": 3.28,
+            "unit_price": 5.32,
+            "total": 13.96
+          },
+          "bound": {
+            "qty": 3.28,
+            "unit_price": 4.26,
+            "total": 13.96
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": true,
+          "diffPct": 0.1992,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": true
+        },
+        "triggerAnalysis": {
+          "status": "BLOCKED",
+          "blockingConditions": [
+            "ocr_qty_eq_1",
+            "hybrid_h_qty_eq_2",
+            "hybrid_h_qty_2_stable",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino"
+          ],
+          "qtyInflationBlocked": true
+        },
+        "metaAssumptions": [
+          "ocr_qty: null in risk-population — treated as NOT eq 1 (ocr_qty_eq_1=false)",
+          "stable_qty_2=false from risk-audit (no 10/10 qty=2 stability)"
+        ],
+        "inPreviousReplayHarness": false
+      },
+      {
+        "invoice_item_id": "0d50905c-8f10-4a23-a7d2-14b0dd587e31",
+        "product": "Courgettes",
+        "supplier": "Bidfood Portugal",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "classification": "E) Other (Bidfood ~20% line discount pattern)",
+        "family_a": false,
+        "would_fix": true,
+        "hybridHQty": 3.3,
+        "ocrQty": null,
+        "expectedTrigger": false,
+        "wouldTriggerC": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": false,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": true,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "documentedCombo": false,
+        "binding": {
+          "raw": {
+            "qty": 3.3,
+            "unit_price": 1.95,
+            "total": 5.15
+          },
+          "bound": {
+            "qty": 3.3,
+            "unit_price": 1.56,
+            "total": 5.15
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": true,
+          "diffPct": 0.2,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": true
+        },
+        "triggerAnalysis": {
+          "status": "BLOCKED",
+          "blockingConditions": [
+            "ocr_qty_eq_1",
+            "hybrid_h_qty_eq_2",
+            "hybrid_h_qty_2_stable",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino"
+          ],
+          "qtyInflationBlocked": true
+        },
+        "metaAssumptions": [
+          "ocr_qty: null in risk-population — treated as NOT eq 1 (ocr_qty_eq_1=false)",
+          "stable_qty_2=false from risk-audit (no 10/10 qty=2 stability)"
+        ],
+        "inPreviousReplayHarness": false
+      },
+      {
+        "invoice_item_id": "1ddcdc66-e97a-406b-ab7f-c7b8ade65635",
+        "product": "Pepino",
+        "supplier": "Bidfood Portugal",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "classification": "E) Other (Bidfood ~20% line discount pattern)",
+        "family_a": false,
+        "would_fix": true,
+        "hybridHQty": 3.36,
+        "ocrQty": null,
+        "expectedTrigger": false,
+        "wouldTriggerC": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": false,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": true,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "documentedCombo": false,
+        "binding": {
+          "raw": {
+            "qty": 3.36,
+            "unit_price": 1.77,
+            "total": 4.76
+          },
+          "bound": {
+            "qty": 3.36,
+            "unit_price": 1.42,
+            "total": 4.76
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": true,
+          "diffPct": 0.1977,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": true
+        },
+        "triggerAnalysis": {
+          "status": "BLOCKED",
+          "blockingConditions": [
+            "ocr_qty_eq_1",
+            "hybrid_h_qty_eq_2",
+            "hybrid_h_qty_2_stable",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino"
+          ],
+          "qtyInflationBlocked": true
+        },
+        "metaAssumptions": [
+          "ocr_qty: null in risk-population — treated as NOT eq 1 (ocr_qty_eq_1=false)",
+          "stable_qty_2=false from risk-audit (no 10/10 qty=2 stability)"
+        ],
+        "inPreviousReplayHarness": false
+      },
+      {
+        "invoice_item_id": "43c623cb-bcd4-4821-ad5e-a2dcc825487e",
+        "product": "Hortelã",
+        "supplier": "Bidfood Portugal",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "classification": "E) Other (Bidfood ~20% line discount pattern)",
+        "family_a": false,
+        "would_fix": true,
+        "hybridHQty": 0.5,
+        "ocrQty": null,
+        "expectedTrigger": false,
+        "wouldTriggerC": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": false,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": true,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "documentedCombo": false,
+        "binding": {
+          "raw": {
+            "qty": 0.5,
+            "unit_price": 6.74,
+            "total": 2.7
+          },
+          "bound": {
+            "qty": 0.5,
+            "unit_price": 5.4,
+            "total": 2.7
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": true,
+          "diffPct": 0.1988,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": true
+        },
+        "triggerAnalysis": {
+          "status": "BLOCKED",
+          "blockingConditions": [
+            "ocr_qty_eq_1",
+            "hybrid_h_qty_eq_2",
+            "hybrid_h_qty_2_stable",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino"
+          ],
+          "qtyInflationBlocked": true
+        },
+        "metaAssumptions": [
+          "ocr_qty: null in risk-population — treated as NOT eq 1 (ocr_qty_eq_1=false)",
+          "stable_qty_2=false from risk-audit (no 10/10 qty=2 stability)"
+        ],
+        "inPreviousReplayHarness": false
+      },
+      {
+        "invoice_item_id": "d998575f-ad64-441e-b003-38785bcb4ca1",
+        "product": "Tomilho",
+        "supplier": "Bidfood Portugal",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "classification": "E) Other (Bidfood ~20% line discount pattern)",
+        "family_a": false,
+        "would_fix": true,
+        "hybridHQty": 1,
+        "ocrQty": null,
+        "expectedTrigger": false,
+        "wouldTriggerC": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": false,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": true,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "documentedCombo": false,
+        "binding": {
+          "raw": {
+            "qty": 1,
+            "unit_price": 2.57,
+            "total": 2.06
+          },
+          "bound": {
+            "qty": 1,
+            "unit_price": 2.06,
+            "total": 2.06
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": true,
+          "diffPct": 0.1984,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": true
+        },
+        "triggerAnalysis": {
+          "status": "BLOCKED",
+          "blockingConditions": [
+            "ocr_qty_eq_1",
+            "hybrid_h_qty_eq_2",
+            "hybrid_h_qty_2_stable",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino"
+          ],
+          "qtyInflationBlocked": true
+        },
+        "metaAssumptions": [
+          "ocr_qty: null in risk-population — treated as NOT eq 1 (ocr_qty_eq_1=false)",
+          "stable_qty_2=false from risk-audit (no 10/10 qty=2 stability)"
+        ],
+        "inPreviousReplayHarness": false
+      },
+      {
+        "invoice_item_id": "2ab220fa-f29a-48c6-8103-0d043a17f1be",
+        "product": "Abóbora Butternut",
+        "supplier": "Bidfood Portugal",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "classification": "E) Other",
+        "family_a": false,
+        "would_fix": true,
+        "hybridHQty": 5.42,
+        "ocrQty": null,
+        "expectedTrigger": false,
+        "wouldTriggerC": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": false,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": true,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "documentedCombo": false,
+        "binding": {
+          "raw": {
+            "qty": 5.42,
+            "unit_price": 1.24,
+            "total": 5.59
+          },
+          "bound": {
+            "qty": 5.42,
+            "unit_price": 1.03,
+            "total": 5.59
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": true,
+          "diffPct": 0.1694,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": true
+        },
+        "triggerAnalysis": {
+          "status": "BLOCKED",
+          "blockingConditions": [
+            "ocr_qty_eq_1",
+            "hybrid_h_qty_eq_2",
+            "hybrid_h_qty_2_stable",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino"
+          ],
+          "qtyInflationBlocked": true
+        },
+        "metaAssumptions": [
+          "ocr_qty: null in risk-population — treated as NOT eq 1 (ocr_qty_eq_1=false)",
+          "stable_qty_2=false from risk-audit (no 10/10 qty=2 stability)"
+        ],
+        "inPreviousReplayHarness": false
+      },
+      {
+        "invoice_item_id": "4843605f-3a77-47c8-bd98-fce79ba3a4b7",
+        "product": "Baladin - Ginger Beer 0.20cl",
+        "supplier": "Emporio Italia",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "classification": "D) Legitimate quantity >1",
+        "family_a": false,
+        "would_fix": true,
+        "hybridHQty": 2,
+        "ocrQty": null,
+        "expectedTrigger": false,
+        "wouldTriggerC": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": false,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": true,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "documentedCombo": false,
+        "binding": {
+          "raw": {
+            "qty": 2,
+            "unit_price": 10.85,
+            "total": 19.38
+          },
+          "bound": {
+            "qty": 2,
+            "unit_price": 9.69,
+            "total": 19.38
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": true,
+          "diffPct": 0.1069,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": true
+        },
+        "triggerAnalysis": {
+          "status": "BLOCKED",
+          "blockingConditions": [
+            "ocr_qty_eq_1",
+            "hybrid_h_qty_2_stable",
+            "undiscounted_blank_desc",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino"
+          ],
+          "qtyInflationBlocked": true
+        },
+        "metaAssumptions": [
+          "ocr_qty: null in risk-population — treated as NOT eq 1 (ocr_qty_eq_1=false)",
+          "stable_qty_2=false from risk-audit (no 10/10 qty=2 stability)"
+        ],
+        "inPreviousReplayHarness": false
+      },
+      {
+        "invoice_item_id": "867121e4-7284-4ed8-9610-46e78ba487aa",
+        "product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "supplier": "Emporio Italia",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "classification": "D) Legitimate quantity >1",
+        "family_a": false,
+        "would_fix": true,
+        "hybridHQty": 24,
+        "ocrQty": null,
+        "expectedTrigger": false,
+        "wouldTriggerC": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": false,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": false,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": true,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "documentedCombo": false,
+        "binding": {
+          "raw": {
+            "qty": 24,
+            "unit_price": 2.35,
+            "total": 50.4
+          },
+          "bound": {
+            "qty": 24,
+            "unit_price": 2.1,
+            "total": 50.4
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": true,
+          "diffPct": 0.1064,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": true
+        },
+        "triggerAnalysis": {
+          "status": "BLOCKED",
+          "blockingConditions": [
+            "ocr_qty_eq_1",
+            "hybrid_h_qty_eq_2",
+            "hybrid_h_qty_2_stable",
+            "undiscounted_blank_desc",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino"
+          ],
+          "qtyInflationBlocked": true
+        },
+        "metaAssumptions": [
+          "ocr_qty: null in risk-population — treated as NOT eq 1 (ocr_qty_eq_1=false)",
+          "stable_qty_2=false from risk-audit (no 10/10 qty=2 stability)"
+        ],
+        "inPreviousReplayHarness": false
+      },
+      {
+        "invoice_item_id": "709cda62-453a-4d5d-b51d-29788b0f1c12",
+        "product": "Salada Ibérica FSTK EMB. 250g",
+        "supplier": "Bidfood Portugal",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "classification": "D) Legitimate quantity >1",
+        "family_a": false,
+        "would_fix": true,
+        "hybridHQty": 4,
+        "ocrQty": null,
+        "expectedTrigger": false,
+        "wouldTriggerC": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": false,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": true,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "documentedCombo": false,
+        "binding": {
+          "raw": {
+            "qty": 4,
+            "unit_price": 2.33,
+            "total": 8.76
+          },
+          "bound": {
+            "qty": 4,
+            "unit_price": 2.19,
+            "total": 8.76
+          },
+          "bindingChanged": true,
+          "arithmeticConsistent": true,
+          "diffPct": 0.0601,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": true
+        },
+        "triggerAnalysis": {
+          "status": "BLOCKED",
+          "blockingConditions": [
+            "ocr_qty_eq_1",
+            "hybrid_h_qty_eq_2",
+            "hybrid_h_qty_2_stable",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino"
+          ],
+          "qtyInflationBlocked": true
+        },
+        "metaAssumptions": [
+          "ocr_qty: null in risk-population — treated as NOT eq 1 (ocr_qty_eq_1=false)",
+          "stable_qty_2=false from risk-audit (no 10/10 qty=2 stability)"
+        ],
+        "inPreviousReplayHarness": false
+      },
+      {
+        "invoice_item_id": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
+        "product": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "supplier": "Mammafiore Portugal",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "classification": "E) Other",
+        "family_a": false,
+        "would_fix": false,
+        "hybridHQty": 1,
+        "ocrQty": 1,
+        "expectedTrigger": false,
+        "wouldTriggerC": false,
+        "outcome": "PASS",
+        "signals": {
+          "ocr_qty_eq_1": true,
+          "hybrid_h_qty_eq_2": false,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": false,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "total_preserved": false,
+          "qty_inflation_signature": false,
+          "diff_pct_ge_45": false
+        },
+        "documentedCombo": false,
+        "binding": {
+          "raw": {
+            "qty": 1,
+            "unit_price": 15.55,
+            "total": 16.09
+          },
+          "bound": {
+            "qty": 1,
+            "unit_price": 15.55,
+            "total": 16.09
+          },
+          "bindingChanged": false,
+          "arithmeticConsistent": false,
+          "diffPct": 0,
+          "unitApproxTotalAtQty1": false,
+          "totalPreserved": false
+        },
+        "triggerAnalysis": {
+          "status": "BLOCKED",
+          "blockingConditions": [
+            "hybrid_h_qty_eq_2",
+            "hybrid_h_qty_2_stable",
+            "undiscounted_blank_desc",
+            "unit_price_approx_total_at_qty1",
+            "supplier_il_bocconcino"
+          ],
+          "qtyInflationBlocked": true
+        },
+        "metaAssumptions": [
+          "stable_qty_2=false from risk-audit (no 10/10 qty=2 stability)"
+        ],
+        "inPreviousReplayHarness": true
+      }
+    ]
+  },
+  "metrics": {
+    "fullPopulation": {
+      "populationSize": 15,
+      "triggeredRows": 2,
+      "familyARecall": 1,
+      "controlPrecision": 1,
+      "falsePositiveCount": 0,
+      "falseNegativeCount": 0,
+      "passCount": 15
+    },
+    "originalReplaySet": {
+      "familyARecall": 1,
+      "controlPrecision": 1,
+      "falsePositiveCount": 0,
+      "falseNegativeCount": 0,
+      "totalRows": 15,
+      "passCount": 15
+    }
+  },
+  "deltaVsPrevious": {
+    "overlappingEffectivePaidRows": [
+      {
+        "invoice_item_id": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+        "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "previousProduct": "Mezzi Paccheri",
+        "previousSource": "final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+        "fullPopSource": "effective-paid-contract-validation + risk-population",
+        "identical": true,
+        "differences": [],
+        "previous": {
+          "wouldTriggerC": true,
+          "outcome": "PASS"
+        },
+        "fullPopulation": {
+          "wouldTriggerC": true,
+          "outcome": "PASS"
+        }
+      },
+      {
+        "invoice_item_id": "409850ab-646d-44fa-b20c-c8a4a8570064",
+        "product": "RICOTTA TREVIGIANA 1,5KG",
+        "previousProduct": "Ricotta",
+        "previousSource": "final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+        "fullPopSource": "effective-paid-contract-validation + risk-population",
+        "identical": true,
+        "differences": [],
+        "previous": {
+          "wouldTriggerC": true,
+          "outcome": "PASS"
+        },
+        "fullPopulation": {
+          "wouldTriggerC": true,
+          "outcome": "PASS"
+        }
+      },
+      {
+        "invoice_item_id": "33dc7070-a202-4397-bba0-e7865bfb6931",
+        "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+        "previousProduct": "Gorgonzola (effective-paid DB row)",
+        "previousSource": "effective-paid-contract-validation-result.json",
+        "fullPopSource": "effective-paid-contract-validation + risk-population",
+        "identical": true,
+        "differences": [],
+        "previous": {
+          "wouldTriggerC": false,
+          "outcome": "PASS"
+        },
+        "fullPopulation": {
+          "wouldTriggerC": false,
+          "outcome": "PASS"
+        }
+      },
+      {
+        "invoice_item_id": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
+        "product": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "previousProduct": "Aceto",
+        "previousSource": "final-validation-lab-rerun/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d.json",
+        "fullPopSource": "effective-paid-contract-validation + risk-population",
+        "identical": false,
+        "differences": [
+          "signal.undiscounted_blank_desc: true → false"
+        ],
+        "previous": {
+          "wouldTriggerC": false,
+          "outcome": "PASS"
+        },
+        "fullPopulation": {
+          "wouldTriggerC": false,
+          "outcome": "PASS"
+        }
+      }
+    ],
+    "newRowsEvaluatedInFullPop": [
+      {
+        "invoice_item_id": "4ad54bd5-6902-4443-89f9-8b0c3ecbde75",
+        "product": "Alho Francês",
+        "wouldTriggerC": false,
+        "outcome": "PASS"
+      },
+      {
+        "invoice_item_id": "41bf997f-a7cf-412f-9585-82b12a487ece",
+        "product": "Manjericão",
+        "wouldTriggerC": false,
+        "outcome": "PASS"
+      },
+      {
+        "invoice_item_id": "434e2500-cbee-430a-959a-58a483bf7972",
+        "product": "Pêra Abacate Hasse",
+        "wouldTriggerC": false,
+        "outcome": "PASS"
+      },
+      {
+        "invoice_item_id": "0d50905c-8f10-4a23-a7d2-14b0dd587e31",
+        "product": "Courgettes",
+        "wouldTriggerC": false,
+        "outcome": "PASS"
+      },
+      {
+        "invoice_item_id": "1ddcdc66-e97a-406b-ab7f-c7b8ade65635",
+        "product": "Pepino",
+        "wouldTriggerC": false,
+        "outcome": "PASS"
+      },
+      {
+        "invoice_item_id": "43c623cb-bcd4-4821-ad5e-a2dcc825487e",
+        "product": "Hortelã",
+        "wouldTriggerC": false,
+        "outcome": "PASS"
+      },
+      {
+        "invoice_item_id": "d998575f-ad64-441e-b003-38785bcb4ca1",
+        "product": "Tomilho",
+        "wouldTriggerC": false,
+        "outcome": "PASS"
+      },
+      {
+        "invoice_item_id": "2ab220fa-f29a-48c6-8103-0d043a17f1be",
+        "product": "Abóbora Butternut",
+        "wouldTriggerC": false,
+        "outcome": "PASS"
+      },
+      {
+        "invoice_item_id": "4843605f-3a77-47c8-bd98-fce79ba3a4b7",
+        "product": "Baladin - Ginger Beer 0.20cl",
+        "wouldTriggerC": false,
+        "outcome": "PASS"
+      },
+      {
+        "invoice_item_id": "867121e4-7284-4ed8-9610-46e78ba487aa",
+        "product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "wouldTriggerC": false,
+        "outcome": "PASS"
+      },
+      {
+        "invoice_item_id": "709cda62-453a-4d5d-b51d-29788b0f1c12",
+        "product": "Salada Ibérica FSTK EMB. 250g",
+        "wouldTriggerC": false,
+        "outcome": "PASS"
+      }
+    ],
+    "previousReplayOnlyRows": [
+      {
+        "product": "Pomodori",
+        "category": "control",
+        "note": "Simulation control/negative — not in effective-paid flagged population"
+      },
+      {
+        "product": "Rolo (stable v25)",
+        "category": "control",
+        "note": "Simulation control/negative — not in effective-paid flagged population"
+      },
+      {
+        "product": "Rolo (transient run 7)",
+        "category": "negative",
+        "note": "Simulation control/negative — not in effective-paid flagged population"
+      },
+      {
+        "product": "Acqua",
+        "category": "control",
+        "note": "Simulation control/negative — not in effective-paid flagged population"
+      },
+      {
+        "product": "Mozzarella (Bocconcino)",
+        "category": "control",
+        "note": "Simulation control/negative — not in effective-paid flagged population"
+      },
+      {
+        "product": "Arroz",
+        "category": "control",
+        "note": "Simulation control/negative — not in effective-paid flagged population"
+      },
+      {
+        "product": "Açúcar",
+        "category": "control",
+        "note": "Simulation control/negative — not in effective-paid flagged population"
+      },
+      {
+        "product": "Pepinos",
+        "category": "control",
+        "note": "Simulation control/negative — not in effective-paid flagged population"
+      },
+      {
+        "product": "Rulo Di Capra",
+        "category": "control",
+        "note": "Simulation control/negative — not in effective-paid flagged population"
+      },
+      {
+        "product": "Farina",
+        "category": "control",
+        "note": "Simulation control/negative — not in effective-paid flagged population"
+      },
+      {
+        "product": "Gorgonzola (v25 Emporio)",
+        "category": "negative",
+        "note": "Simulation control/negative — not in effective-paid flagged population"
+      }
+    ]
+  },
+  "coverageClosure": {
+    "previousCoveragePct": 26.7,
+    "fullPopulationCoveragePct": 100,
+    "effectivePaidRowsTested": 15,
+    "effectivePaidRowsTotal": 15,
+    "remainingUntested": 0,
+    "unresolvedRiskClusters": [
+      {
+        "cluster": "C) Gorgonzola-like",
+        "count": 1,
+        "products": [
+          "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg"
+        ],
+        "allBlocked": true,
+        "note": "Highest similarity to Family A; blocked by supplier/OCR/discount/diff_pct gates"
+      },
+      {
+        "cluster": "D) Legitimate quantity >1",
+        "count": 3,
+        "products": [
+          "Baladin - Ginger Beer 0.20cl",
+          "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+          "Salada Ibérica FSTK EMB. 250g"
+        ],
+        "allBlocked": true,
+        "note": "would_fix via binding but not Family A; Option C does not trigger"
+      },
+      {
+        "cluster": "E) Bidfood ~20% discount",
+        "count": 7,
+        "products": [
+          "Alho Francês",
+          "Manjericão",
+          "Pêra Abacate Hasse",
+          "Courgettes",
+          "Pepino",
+          "Hortelã",
+          "Tomilho"
+        ],
+        "allBlocked": true,
+        "note": "Line-discount pattern; diff_pct ~20%, not qty inflation"
+      }
+    ]
+  },
+  "evidenceVerdict": "A) Option C survives full-population replay",
+  "confidence": {
+    "fullPopulationReplay": 90,
+    "ocrQtyProxyForNullRows": 55,
+    "stabilityGateForFamilyA": 85,
+    "supplierScopeEssential": 88,
+    "rationale": [
+      "15/15 effective-paid rows replayed with frozen binding + risk-audit metadata",
+      "Zero false positives on 13 non-Family-A effective-paid rows",
+      "100% Family A recall (Mezzi + Ricotta)",
+      "11 rows newly covered vs prior 4 direct effective-paid replays"
+    ]
+  }
+}

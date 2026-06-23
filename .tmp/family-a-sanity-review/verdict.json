@@ -1,0 +1,227 @@
+{
+  "generatedAt": "2026-06-22T00:00:00.000Z",
+  "mode": "STRICT_READ_ONLY_ADVERSARIAL_SANITY_REVIEW",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "verdict": "NOT READY",
+  "summary": "Root cause and scope are proven, but the rule that would ship tomorrow (runtime-adapted Option C without stability/OCR gates) has not been offline replay-validated as an integrated package. Implementability audit verdict B, Rolo run 7 FP under stability omission, and re-ingest/persistence paths remain class C unproven.",
+  "questions": {
+    "whatCouldStillGoWrong": [
+      {
+        "id": "runtime-rule-mismatch",
+        "severity": "critical",
+        "description": "Shipped rule differs from 100% replay-validated documented Option C combo; runtime proxies at 75% confidence with no integrated offline replay",
+        "evidence": [
+          ".tmp/family-a-implementability-audit/REPORT.md",
+          ".tmp/family-a-implementability-audit/signals.json",
+          ".tmp/family-a-implementation-prep/REPORT.md"
+        ]
+      },
+      {
+        "id": "rolo-false-positive",
+        "severity": "high",
+        "description": "Omitting hybrid_h_qty_2_stable (required at runtime) causes documented false positive on Rolo transient run 7 on same invoice f0aa5a08",
+        "evidence": [
+          ".tmp/family-a-option-c-replay/sensitivity-result.json",
+          ".tmp/family-a-option-c-replay/combo-stress-result.json",
+          ".tmp/family-a-option-c-replay/REPORT.md"
+        ]
+      },
+      {
+        "id": "gate-fragility",
+        "severity": "medium",
+        "description": "Combo-stress shows Gorgonzola triggers if blocking gates removed; 12/15 effective-paid rows would_fix under unscoped binding",
+        "evidence": [
+          ".tmp/family-a-option-c-replay/combo-stress-result.json",
+          ".tmp/family-a-full-population-replay/REPORT.md"
+        ]
+      },
+      {
+        "id": "reingest-unproven",
+        "severity": "high",
+        "description": "Extraction fix alone does not repair VL persisted qty=2; re-ingest, price history, purchase_quantity, pre-bind unit_price paths marked requires validation",
+        "evidence": [
+          ".tmp/family-a-impact-analysis/REPORT.md",
+          ".tmp/ricotta-root-cause-trace/REPORT.md",
+          ".tmp/family-a-implementation-prep/readiness.json"
+        ]
+      },
+      {
+        "id": "ricotta-economics-shift",
+        "severity": "medium",
+        "description": "Ricotta operational cost shifts €2.66→€5.31/kg and usable 3→1.5 kg on correction; intentional but downstream propagation unvalidated",
+        "evidence": [
+          ".tmp/family-a-impact-analysis/REPORT.md"
+        ]
+      },
+      {
+        "id": "gpt-layer-inferential",
+        "severity": "low",
+        "description": "Bad-path GPT raw JSON missing; Option C patches binding not GPT; prompt causality unproven",
+        "evidence": [
+          ".tmp/family-a-implementation-prep/REPORT.md"
+        ]
+      }
+    ],
+    "unprovenAssumptions": [
+      {
+        "id": "A1",
+        "assumption": "Runtime proxy rule equals documented Option C replay rule",
+        "proven": false,
+        "confidence": 0.75,
+        "evidence": ".tmp/family-a-implementability-audit/REPORT.md Task 7"
+      },
+      {
+        "id": "A2",
+        "assumption": "discount_pct proxy equals undiscounted_blank_desc",
+        "proven": false,
+        "evidence": ".tmp/family-a-implementability-audit/signals.json undiscounted_blank_desc RED"
+      },
+      {
+        "id": "A3",
+        "assumption": "Inflation signature proxies ocr_qty_eq_1",
+        "proven": "partial",
+        "evidence": ".tmp/family-a-option-c-replay/sensitivity-result.json omit_ocr_qty_eq_1"
+      },
+      {
+        "id": "A4",
+        "assumption": "Dropping stability gate is safe on Bocconcino invoice",
+        "proven": false,
+        "evidence": ".tmp/family-a-option-c-replay/sensitivity-result.json omit_hybrid_h_qty_2_stable"
+      },
+      {
+        "id": "A5",
+        "assumption": "Scope closed at 2 products zero expansion",
+        "proven": true,
+        "confidence": 0.9,
+        "evidence": ".tmp/bug-pattern-expansion-audit/REPORT.md"
+      },
+      {
+        "id": "A6",
+        "assumption": "Full-population replay validates production safety without investigation metadata",
+        "proven": false,
+        "confidence": 0.55,
+        "evidence": ".tmp/family-a-full-population-replay/REPORT.md Confidence section"
+      },
+      {
+        "id": "A7",
+        "assumption": "Re-ingest propagates corrected qty through ingredients history alerts",
+        "proven": false,
+        "evidence": ".tmp/family-a-impact-analysis/REPORT.md section 5"
+      },
+      {
+        "id": "A8",
+        "assumption": "Pre-bind unit_price persistence aligns after qty=1 correction",
+        "proven": false,
+        "evidence": ".tmp/family-a-impact-analysis/REPORT.md section 5"
+      },
+      {
+        "id": "A9",
+        "assumption": "Post-fix 10x Bocconcino stability holds Mezzi Ricotta at qty=1",
+        "proven": false,
+        "evidence": ".tmp/family-a-implementation-prep/readiness.json gates.postFixStability pending"
+      },
+      {
+        "id": "A10",
+        "assumption": "Root cause is Hybrid H GPT qty inflation not downstream",
+        "proven": true,
+        "confidence": 0.91,
+        "evidence": [
+          ".tmp/ricotta-root-cause-trace/REPORT.md",
+          ".tmp/mezzi-root-cause-trace/REPORT.md"
+        ]
+      }
+    ],
+    "reasonsNotToImplementNow": [
+      {
+        "id": "blocker-1",
+        "title": "Validated fix is not the implementable fix",
+        "description": "Implementability audit verdict B: three of six documented combo gates are investigation-only RED signals. Tomorrow's code ships adapted proxies at 75% confidence with no integrated offline replay of that package.",
+        "blocking": true,
+        "evidence": [
+          ".tmp/family-a-implementability-audit/REPORT.md",
+          ".tmp/family-a-implementation-prep/REPORT.md"
+        ]
+      },
+      {
+        "id": "blocker-2",
+        "title": "Known FP path with no runtime mitigation proof",
+        "description": "Rolo run 7 false-positives when stability gate omitted; stability gate cannot run in production; proposed conservative combo not replay-validated to block run 7.",
+        "blocking": true,
+        "evidence": [
+          ".tmp/family-a-option-c-replay/sensitivity-result.json",
+          ".tmp/family-a-option-c-replay/REPORT.md"
+        ]
+      },
+      {
+        "id": "blocker-3",
+        "title": "End-to-end correction path unproven",
+        "description": "Re-ingest persistence price history and catalog fields marked class C requires validation; VL re-ingest pending post-deploy.",
+        "blocking": true,
+        "evidence": [
+          ".tmp/family-a-impact-analysis/REPORT.md",
+          ".tmp/family-a-implementation-prep/readiness.json"
+        ]
+      }
+    ]
+  },
+  "provenReady": {
+    "rootCauseLocalized": {
+      "confidence": 0.91,
+      "stage": 4,
+      "products": [
+        "RICOTTA TREVIGIANA 1,5KG",
+        "MEZZI PACCHERI MANCINI (CX 1KG*6)"
+      ],
+      "evidence": [
+        ".tmp/ricotta-root-cause-trace/",
+        ".tmp/mezzi-root-cause-trace/"
+      ]
+    },
+    "scopeBounded": {
+      "confirmedProducts": 2,
+      "expansionProducts": 0,
+      "evidence": ".tmp/bug-pattern-expansion-audit/REPORT.md"
+    },
+    "documentedOptionCReplay": {
+      "recall": 1.0,
+      "precision": 1.0,
+      "falsePositives": 0,
+      "population15of15": true,
+      "evidence": [
+        ".tmp/family-a-option-c-replay/replay-result.json",
+        ".tmp/family-a-full-population-replay/results.json"
+      ]
+    },
+    "impactMappingComplete": {
+      "evidence": ".tmp/family-a-impact-analysis/REPORT.md"
+    }
+  },
+  "conflictsWithPriorArtifacts": [
+    {
+      "artifact": ".tmp/family-a-implementation-prep/REPORT.md",
+      "priorVerdict": "READY FOR IMPLEMENTATION (Option C)",
+      "thisReview": "NOT READY — runtime proxy gap and stability FP unresolved before ship"
+    },
+    {
+      "artifact": ".tmp/implementation-priority-audit/REPORT.md",
+      "priorVerdict": "Family A Readiness A — proceed with pre-flight only",
+      "thisReview": "NOT READY — pre-flight items include unvalidated runtime rule replay"
+    }
+  ],
+  "preImplementationGates": [
+    "Offline replay exact runtime proxy rule (no stability, no passc OCR) on 15-row extract + effective-paid sets including Rolo run 7",
+    "Confirm supplier threading into bindMonetaryColumns or document fallback",
+    "Read-only dry-run re-ingest impact for f0aa5a08 Ricotta and Mezzi on class C fields"
+  ],
+  "artifactSources": [
+    ".tmp/ricotta-root-cause-trace/",
+    ".tmp/mezzi-root-cause-trace/",
+    ".tmp/family-a-impact-analysis/",
+    ".tmp/family-a-implementation-prep/",
+    ".tmp/family-a-implementability-audit/",
+    ".tmp/family-a-option-c-replay/",
+    ".tmp/family-a-full-population-replay/",
+    ".tmp/bug-pattern-expansion-audit/",
+    ".tmp/implementation-priority-audit/"
+  ]
+}

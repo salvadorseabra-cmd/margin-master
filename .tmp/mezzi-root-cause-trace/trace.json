@@ -1,0 +1,169 @@
+{
+  "generatedAt": "2026-06-22T00:00:00.000Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "invoiceItemId": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+  "ingredientId": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+  "lineName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+  "pdfRealitySource": ".tmp/geometry-audit/images/f0aa5a08-86a3-4938-99f0-711e86073968.png (manual image inspection; corroborated by .tmp/field-accuracy-audit/ground-truth.json, .tmp/bocconcino-investigation/REPORT.md, .tmp/family-a-scope-audit/audit-result.json)",
+  "stages": [
+    {
+      "stage": 1,
+      "name": "PDF reality",
+      "quantity": 1,
+      "unitPrice": 27.3,
+      "total": 27.3,
+      "source": "Visible invoice row: QUANT=1,000 · CXs=(blank) · UNI · P.VENDA S/IVA=27,300 EUR · DESC blank · VALOR LÍQUIDO=27,30 EUR · IVA 6% (.tmp/geometry-audit/images/f0aa5a08-86a3-4938-99f0-711e86073968.png)"
+    },
+    {
+      "stage": 2,
+      "name": "OCR / table GPT raw (Pass C era, cropped table)",
+      "quantity": 1,
+      "unitPrice": 27.3,
+      "total": 27.3,
+      "source": ".tmp/bocconcino-investigation/extract-invoice-response.json (Pass C re-invoke, cropped 5-row table); .tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-gpt-raw-cache.json (qty=1, unit_price=27.56)"
+    },
+    {
+      "stage": 3,
+      "name": "Pass C baseline (passc-refinement-validation reextract)",
+      "quantity": 1,
+      "unitPrice": 27.56,
+      "total": 27.3,
+      "source": ".tmp/passc-refinement-validation/reextract/f0aa5a08-86a3-4938-99f0-711e86073968.json; .tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-extract-invoice.json"
+    },
+    {
+      "stage": 4,
+      "name": "Hybrid H output (v25 full-7-row path)",
+      "quantity": 2,
+      "unitPrice": 27.36,
+      "total": 27.3,
+      "matchesPdf": false,
+      "firstDeviation": "quantity",
+      "source": ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json (deployVersion 25); .tmp/final-stability-audit/extracts/f0aa5a08-86a3-4938-99f0-711e86073968-all-runs.json (10/10 runs qty=2); .tmp/family-a-scope-audit/audit-result.json (ocrQty=1, extractedQtyV25=2)"
+    },
+    {
+      "stage": 5,
+      "name": "bindMonetaryColumns input",
+      "quantity": 2,
+      "unitPrice": 27.36,
+      "total": 27.3,
+      "source": "Same as Hybrid H legacy fields; replayed via production bindMonetaryColumns(parseMonetaryLineItems(...))"
+    },
+    {
+      "stage": 5,
+      "name": "bindMonetaryColumns output",
+      "quantity": 2,
+      "unitPrice": 13.65,
+      "total": 27.3,
+      "matchesPdf": false,
+      "note": "Rule B / total÷qty collapse: 27.30÷2=13.65. Mathematically consistent with qty=2 fiction; unit_price now also differs from PDF gross 27.30.",
+      "source": "Production replay; .tmp/phase1-validation-forensics-result.json paccheri.lines[0].replay.bound; .tmp/family-a-v25-raw-capture/edge-invoke-final.json (deploy v36 post-bind unit_price=13.65)"
+    },
+    {
+      "stage": 6,
+      "name": "reconcileLineItemAmounts input",
+      "quantity": 2,
+      "unitPrice": 13.65,
+      "total": 27.3,
+      "source": "Post-bind monetary line mapped to InvoiceLineItem"
+    },
+    {
+      "stage": 6,
+      "name": "reconcileLineItemAmounts output",
+      "quantity": 2,
+      "unitPrice": 13.65,
+      "total": 27.3,
+      "modified": false,
+      "source": "Production replay; .tmp/persistence-audit/REPORT.md — reconcile does not alter qty/unit_price/total on audited Bocconcino rows"
+    },
+    {
+      "stage": 7,
+      "name": "invoice_items persisted (VL DB)",
+      "quantity": 2,
+      "unitPrice": 27.31,
+      "total": 27.3,
+      "matchesPdf": false,
+      "note": "Stores pre-bind unit_price (27.36→27.31), not post-bind 13.65. qty×unit_price≠total (2×27.31=54.62≠27.30). First ingest 2026-06-11 held qty=1 (.tmp/vl-final-state-audit/per-invoice/...); current row qty=2 from 2026-06-16 re-ingest.",
+      "source": ".tmp/phase1-validation-forensics-result.json paccheri.lines[0].persisted; .tmp/vl-final-state-audit/per-invoice/f0aa5a08-86a3-4938-99f0-711e86073968.json (earlier snapshot qty=1)"
+    },
+    {
+      "stage": 8,
+      "name": "Purchase history / ingredient catalog",
+      "quantity": 2,
+      "unitPrice": 27.31,
+      "total": 27.3,
+      "operationalUnitCost": 13.655,
+      "catalogPurchaseQuantity": 2,
+      "source": ".tmp/historical-pricing-integrity-audit/per-ingredient/6a7d0b80-764a-40e8-a3fb-9361e7d9ee98.json; price_history new_price=13.655"
+    },
+    {
+      "stage": 9,
+      "name": "Ingredient detail page (Purchase economics)",
+      "lastPurchase": "2 un",
+      "procurementCost": "€13.65 / case",
+      "operationalCost": "€4.55 / kg",
+      "usableQuantity": "6 kg usable",
+      "source": ".tmp/quantity-mismatch-ui-audit/replay.json (invoiceItemId bb4bbfac…); .tmp/phase1-validation-forensics-result.json paccheri.lines[0].replay.presentation"
+    },
+    {
+      "stage": 10,
+      "name": "Procurement cost calculation",
+      "currentPrice": 13.65,
+      "purchaseQuantityForCost": 1,
+      "storedPurchaseQuantity": 1,
+      "catalogPurchaseQuantity": 2,
+      "source": "resolveCountablePurchaseQuantityForCost → 1 (Family A collapse); .tmp/quantity-mismatch-ui-audit/replay.json math"
+    },
+    {
+      "stage": 11,
+      "name": "Operational cost calculation",
+      "effectiveUsableCost": 4.55,
+      "unit": "kg",
+      "usableGrams": 6000,
+      "expression": "27.30 total ÷ 6 kg usable (1 case × 6×1 kg from CX 1KG*6 via purchaseQtyForCost=1)",
+      "source": "computeEffectiveUsableCost via .tmp/quantity-mismatch-ui-audit/replay.json; .tmp/phase1-validation-forensics-result.json paccheri.lines[0].replay.effectiveCost"
+    }
+  ],
+  "firstIncorrectValue": {
+    "stage": "Hybrid H output (stage 4)",
+    "field": "quantity",
+    "pdfValue": 1,
+    "incorrectValue": 2,
+    "evidence": [
+      ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+      ".tmp/final-stability-audit/extracts/f0aa5a08-86a3-4938-99f0-711e86073968-all-runs.json",
+      ".tmp/family-a-scope-audit/audit-result.json"
+    ],
+    "priorStagesCorrect": [
+      "PDF reality qty=1",
+      "Pass C era OCR/table GPT qty=1 (.tmp/bocconcino-investigation/extract-invoice-response.json)",
+      "Pass C baseline reextract qty=1 (.tmp/passc-refinement-validation/reextract/...)"
+    ]
+  },
+  "downstreamConsistency": {
+    "bindMonetaryColumns": "Given qty=2 and total=27.30, derives unit_price=13.65 (internally consistent; does not restore PDF qty=1)",
+    "reconcileLineItemAmounts": "No change",
+    "costAndUI": "Split-brain: invoice-line qty=2 drives Last Purchase and bound per-case price; resolveCountablePurchaseQuantityForCost=1 drives usable at one-case volume (6 kg). Usable/op €/kg match PDF 1-case truth by accident; Last Purchase and procurement contradict PDF."
+  },
+  "uiVerdict": {
+    "extractionWrongNotDownstreamTransform": true,
+    "quantityMismatchUiAuditClassification": "A — Confirmed Bug",
+    "classificationCaveat": "UI audit assumed invoice reality was 2 cases (12 kg) from bound qty=2. True PDF shows qty=1 (1 case, 6 kg). Against PDF: Last Purchase (2 vs 1) and procurement (€13.65 vs €27.30) are wrong; usable 6 kg and €4.55/kg are accidentally correct. User still sees internal contradiction: Last Purchase 2 un vs usable 6 kg (one case only).",
+    "storedVsDisplaySplit": "invoice_items stores unit_price=27.31 (pre-bind); detail page displays bound €13.65/case via resolveInvoiceLinePricingPresentation"
+  },
+  "correctBaselineIfQty1": {
+    "bound": { "quantity": 1, "unitPrice": 27.3, "total": 27.3 },
+    "operationalCostPerKg": 4.55,
+    "usableKg": 6,
+    "procurementPerCase": 27.3,
+    "lastPurchase": "1 un",
+    "note": "Derived from PDF qty=1 and CX 1KG*6 pack structure; matches current usable/op €/kg but not Last Purchase or procurement display"
+  },
+  "comparisonWithRicotta": {
+    "sameFirstIncorrectStage": true,
+    "sameDownstreamFamilyAPattern": true,
+    "sameUserVisibleProfile": false,
+    "ricottaTrace": ".tmp/ricotta-root-cause-trace/trace.json",
+    "notes": "Both Family A Hybrid H qty 1→2 on Bocconcino. Ricotta downstream scales all economics to wrong qty=2 consistently (UI class C vs bound fiction). Mezzi adds multi_unit_pack collapse: purchaseQtyForCost=1 leaves usable at one-case volume while Last Purchase shows doubled invoice qty — split-brain UI (class A)."
+  }
+}

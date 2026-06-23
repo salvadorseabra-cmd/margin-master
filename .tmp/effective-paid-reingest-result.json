@@ -1,0 +1,310 @@
+{
+  "generated_at": "2026-06-20T01:25:18.684Z",
+  "dry_run": false,
+  "commit": "20001b424826731c650c02c5935e739160ecbb9e",
+  "deploy": "extract-invoice deployed to bjhnlrgodcqoyzddbpbd",
+  "affected_invoices": [
+    {
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "affected_row_count": 6,
+      "affected_rows": [
+        {
+          "id": "4e504f4c-3a93-4745-b9c2-48cae181fdc6",
+          "name": "Salada Ibérica FSTK EMB. 250g",
+          "unit_price": 2.33,
+          "bound": 2.19
+        },
+        {
+          "id": "f192e3f8-3e45-431b-b4af-f72f1f1e5d78",
+          "name": "Hortelã",
+          "unit_price": 6.74,
+          "bound": 5.4
+        },
+        {
+          "id": "fb8e8560-2994-402b-b4e4-bf71316a078c",
+          "name": "Pepino",
+          "unit_price": 1.77,
+          "bound": 1.42
+        },
+        {
+          "id": "1490ecce-d8f8-4c79-a5d3-c1df07a4853a",
+          "name": "Pêra Abacate Hasse",
+          "unit_price": 5.32,
+          "bound": 4.26
+        },
+        {
+          "id": "23a80c60-d0db-4b8e-83e3-4cc43772bdc5",
+          "name": "Courgettes",
+          "unit_price": 1.95,
+          "bound": 1.56
+        },
+        {
+          "id": "8a2b50d0-45fa-47a3-81a9-026f601f35af",
+          "name": "Abóbora Butternut",
+          "unit_price": 1.24,
+          "bound": 0.99
+        }
+      ]
+    },
+    {
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "affected_row_count": 3,
+      "affected_rows": [
+        {
+          "id": "1059c67d-1bcb-4d8d-88e2-55431249fc18",
+          "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+          "unit_price": 2.35,
+          "bound": 2.1
+        },
+        {
+          "id": "701e3b04-a756-4993-baf5-aca2bf8c09a9",
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "unit_price": 10.22,
+          "bound": 6.72
+        },
+        {
+          "id": "579464cb-11b9-4700-ac43-040afd90ff24",
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "unit_price": 10.85,
+          "bound": 9.69
+        }
+      ]
+    }
+  ],
+  "reingest_results": [
+    {
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "itemCount": 11,
+      "sampleItems": [
+        {
+          "name": "Manjericão",
+          "quantity": 5,
+          "unit_price": 2.06,
+          "total": 10.28
+        },
+        {
+          "name": "Courgettes",
+          "quantity": 3.3,
+          "unit_price": 1.56,
+          "total": 5.15
+        },
+        {
+          "name": "Alho Francês",
+          "quantity": 5.42,
+          "unit_price": 1.42,
+          "total": 7.67
+        }
+      ]
+    },
+    {
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "itemCount": 8,
+      "sampleItems": [
+        {
+          "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+          "quantity": 24,
+          "unit_price": 2.1,
+          "total": 50.4
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 2,
+          "unit_price": 6.72,
+          "total": 13.44
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "pattern": "Paccheri",
+      "before": {
+        "invoice_unit_price": 2.35,
+        "current_price": 2.35,
+        "purchase_quantity": 1,
+        "purchase_unit": "un",
+        "operational_eur": 2.35,
+        "history_new_price": 2.35
+      },
+      "after": {
+        "invoice_unit_price": 27.31,
+        "current_price": 27.31,
+        "purchase_quantity": 2,
+        "purchase_unit": "un",
+        "operational_eur": 13.655,
+        "history_new_price": 13.655
+      },
+      "expected_unit_price": 2.1,
+      "unit_price_ok": false
+    },
+    {
+      "pattern": "Courgettes",
+      "before": {
+        "invoice_unit_price": 1.95,
+        "current_price": 1.95,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "operational_eur": 0.00195,
+        "history_new_price": 0.00195
+      },
+      "after": {
+        "invoice_unit_price": 1.56,
+        "current_price": 1.56,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "operational_eur": 0.00156,
+        "history_new_price": 0.00156
+      },
+      "expected_unit_price": 1.56,
+      "unit_price_ok": true
+    },
+    {
+      "pattern": "Alho Francês",
+      "before": {
+        "invoice_unit_price": 1.77,
+        "current_price": 1.77,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "operational_eur": 0.00177,
+        "history_new_price": 0.00177
+      },
+      "after": {
+        "invoice_unit_price": 1.42,
+        "current_price": 1.42,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "operational_eur": 0.0014199999999999998,
+        "history_new_price": 0.0014199999999999998
+      },
+      "expected_unit_price": 1.42,
+      "unit_price_ok": true
+    },
+    {
+      "pattern": "Manjericão",
+      "before": {
+        "invoice_unit_price": 2.57,
+        "current_price": 2.57,
+        "purchase_quantity": 100,
+        "purchase_unit": "g",
+        "operational_eur": 0.025699999999999997,
+        "history_new_price": 0.025699999999999997
+      },
+      "after": {
+        "invoice_unit_price": 2.06,
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "purchase_unit": "g",
+        "operational_eur": 0.0206,
+        "history_new_price": 0.0206
+      },
+      "expected_unit_price": 2.06,
+      "unit_price_ok": true
+    },
+    {
+      "pattern": "Gorgonzola",
+      "before": {
+        "invoice_unit_price": 10.22,
+        "current_price": 10.22,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "operational_eur": 0.01022,
+        "history_new_price": 0.01022
+      },
+      "after": {
+        "invoice_unit_price": 6.72,
+        "current_price": 6.72,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "operational_eur": 0.006719999999999999,
+        "history_new_price": 0.006719999999999999
+      },
+      "expected_unit_price": 6.72,
+      "unit_price_ok": true
+    }
+  ],
+  "regression": [
+    {
+      "pattern": "Prosciutto",
+      "before_operational": 0.0085,
+      "after_operational": 0.0085,
+      "before_current_price": 8.5,
+      "after_current_price": 8.5,
+      "before_purchase_quantity": 1000,
+      "after_purchase_quantity": 1000,
+      "no_drift": true
+    },
+    {
+      "pattern": "San Pellegrino",
+      "before_operational": 1.2853333333333334,
+      "after_operational": 1.2853333333333334,
+      "before_current_price": 19.28,
+      "after_current_price": 19.28,
+      "before_purchase_quantity": 15,
+      "after_purchase_quantity": 15,
+      "no_drift": true
+    },
+    {
+      "pattern": "Mortadella",
+      "before_operational": 0.00999,
+      "after_operational": 0.00999,
+      "before_current_price": 9.99,
+      "after_current_price": 9.99,
+      "before_purchase_quantity": 1000,
+      "after_purchase_quantity": 1000,
+      "no_drift": true
+    },
+    {
+      "pattern": "Atum",
+      "before_operational": 6.29,
+      "after_operational": 6.29,
+      "before_current_price": 6.29,
+      "after_current_price": 6.29,
+      "before_purchase_quantity": 1,
+      "after_purchase_quantity": 1,
+      "no_drift": true
+    },
+    {
+      "pattern": "Anchoas",
+      "before_operational": 9.49,
+      "after_operational": 9.49,
+      "before_current_price": 9.49,
+      "after_current_price": 9.49,
+      "before_purchase_quantity": 1,
+      "after_purchase_quantity": 1,
+      "no_drift": true
+    },
+    {
+      "pattern": "Aceto",
+      "before_operational": 7.775,
+      "after_operational": 7.775,
+      "before_current_price": 15.55,
+      "after_current_price": 15.55,
+      "before_purchase_quantity": 2,
+      "after_purchase_quantity": 2,
+      "no_drift": true
+    }
+  ],
+  "history_validation": {
+    "ok": true,
+    "issues": []
+  },
+  "before_history_row_ids": [
+    "d35170c1-d94e-49d5-ac45-1871e00bd98b",
+    "27ebdf67-4ae7-4b2e-b55b-b818dda5f5aa",
+    "3d1220e6-024b-46db-9d4a-088fbc83f166",
+    "cd8d2350-7ccc-4ff8-8a83-625975ea45a0",
+    "cab6571b-919b-4572-860e-7fb3a59fd8e8",
+    "d94a0f16-8696-4457-a42f-85ac05b417bc",
+    "b0e17b8b-22d5-4b02-8477-dca1b913f986",
+    "4a00605a-a9e7-4b93-969b-92e5aae8e714",
+    "4bd5e0f1-8579-4726-9b1b-9c4a53e188a7",
+    "2440697f-8dbd-403f-8cfe-c43ca03642f9",
+    "781ab1ac-39d2-4462-9106-635e5603c466",
+    "61c51696-acd8-4a58-878f-a588c1878af0",
+    "908de185-e61a-4f41-af4c-3b70f69bd08f",
+    "952119dc-8645-4a5f-a3ff-191ae1a57ea8",
+    "3bedfab2-8567-4059-a931-e8473cccabbc"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "generatedAt": "2026-06-20T14:45:00.000Z",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "searchedPaths": [
+    ".tmp/**",
+    "logs/**",
+    "audits/**",
+    "reruns/**",
+    "validation/**",
+    "extracts/**",
+    "pass-c/**",
+    "cache/**",
+    "gpt/**",
+    "openai/**",
+    "responses/**",
+    "traces/**"
+  ],
+  "missingTopLevelDirs": ["logs", "audits", "reruns", "validation", "pass-c", "cache", "gpt", "openai", "responses", "traces"],
+  "v25BadPathFinal": ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+  "goodPathRawGpt": ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-gpt-raw-cache.json",
+  "goodPathExtract": ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-extract-invoice.json",
+  "v25HybridHRawGptCapture": "none — no archived gpt-raw-json for Hybrid H v25 bad path",
+  "postNormalizeSnapshots": "none — .tmp/persistence-audit/post-normalize/f0aa5a08* absent",
+  "stabilityRuns10of10Qty2": ".tmp/final-stability-audit/extracts/f0aa5a08-86a3-4938-99f0-711e86073968-all-runs.json",
+  "freshEdgeInvoke": ".tmp/family-a-v25-raw-capture/edge-invoke-final.json",
+  "ocrSource": ".tmp/field-accuracy-audit/ground-truth.json + invoice image (.tmp/geometry-audit/images/f0aa5a08-86a3-4938-99f0-711e86073968.png)"
+}

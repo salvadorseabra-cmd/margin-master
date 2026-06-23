@@ -8,6 +8,7 @@
  */
 
 import { looksLikeInvoiceShorthandName } from "@/lib/ingredient-kind";
+import { normalizeDecimalLeadingClQuantity } from "@/lib/ingredient-unit-inference";
 import { extractLineWeightGrams } from "@/lib/ingredient-weight-match";
 
 export type UnitFamily = "mass" | "volume" | "count";
@@ -562,8 +563,12 @@ function parseSizeAndUnit(
   sizeRaw: string | undefined,
   unitRaw: string | undefined,
 ): { unitSize: number | null; unitMeasurement: PackMeasureUnit | null } {
-  const unitSize = parseQuantityToken(sizeRaw ?? "");
+  const rawSize = sizeRaw ?? "";
+  let unitSize = parseQuantityToken(rawSize);
   const unitMeasurement = normalizeMeasureUnit(unitRaw ?? "");
+  if (unitSize != null && unitMeasurement === "cl") {
+    unitSize = normalizeDecimalLeadingClQuantity(rawSize, unitSize);
+  }
   if (unitSize == null || !unitMeasurement || unitMeasurement === "un") {
     return { unitSize: null, unitMeasurement: null };
   }
@@ -1100,6 +1105,45 @@ function structureTotalIsFinalForGenericRow(
   );
 }
 
+/**
+ * size_count g packs (e.g. 125GR*8): invoice outer qty scales usable; cl/L volume packs keep
+ * structure_total (Pellegrino, Peroni rowQty=innerCount).
+ */
+function shouldScaleOuterPackForSizeCountGenericRow(
+  structure: PurchaseStructure,
+  rowQuantity: number | null,
+  rowUnit: string | null,
+): boolean {
+  if (structure.tier !== "size_count") return false;
+  if (!isGenericPurchaseUnit(rowUnit)) return false;
+  if (rowQuantity == null || !Number.isFinite(rowQuantity) || rowQuantity <= 1) return false;
+  const inner = structure.innerUnitCount ?? 1;
+  if (Math.abs(rowQuantity - inner) < 0.01) return false;
+  return structure.unitMeasurement === "g";
+}
+
+function hasFractionalQuantity(qty: number): boolean {
+  return Math.abs(qty - Math.round(qty)) > 0.001;
+}
+
+/** size_count kg generic rows where invoice qty is billed weight, not inner pack count (Guanciale). */
+function shouldUseRowQtyAsBilledKgForSizeCountGenericRow(
+  structure: PurchaseStructure,
+  rowQuantity: number | null,
+  rowUnit: string | null,
+): boolean {
+  if (structure.tier !== "size_count") return false;
+  if (structure.unitMeasurement !== "kg") return false;
+  if (!isGenericPurchaseUnit(rowUnit)) return false;
+  if (rowQuantity == null || !Number.isFinite(rowQuantity) || rowQuantity <= 0) return false;
+  const inner = structure.innerUnitCount ?? 1;
+  if (Math.abs(rowQuantity - inner) < 0.01) return false;
+  if (!hasFractionalQuantity(rowQuantity)) return false;
+  const rowMassGrams = measureToBase(rowQuantity, "kg").amount;
+  if (rowMassGrams >= structure.totalUsableAmount * 0.99) return false;
+  return rowMassGrams < structure.totalUsableAmount;
+}
+
 /** OCR row pack count matches outer purchase count but unit is g/ml (e.g. row `24 g` on `24x80g`). */
 function isRowQtyConflatedWithPurchaseCount(
   structure: PurchaseStructure,
@@ -1147,6 +1191,12 @@ export function resolveStructurePurchaseQuantity(
       return fromName;
     }
     if (isGenericPurchaseUnit(rowUnit)) {
+      if (shouldUseRowQtyAsBilledKgForSizeCountGenericRow(structure, rowQuantity, rowUnit)) {
+        return 1;
+      }
+      if (shouldScaleOuterPackForSizeCountGenericRow(structure, rowQuantity, rowUnit)) {
+        return Math.max(1, Math.round(rowQuantity));
+      }
       return structureTotalIsFinalForGenericRow(structure, rowUnit) ? 1 : Math.max(1, Math.round(rowQuantity));
     }
     if (isWeakRowAgainstStructure(structure, rowQuantity, rowUnit)) {
@@ -1203,6 +1253,7 @@ export type UsableQuantitySource =
   | "structure_total"
   | "structure_scaled_outer"
   | "structure_recomputed"
+  | "row_weight_billed"
   | "phrase_weak_row"
   | "phrase_generic_row"
   | "phrase_direct"
@@ -1275,6 +1326,14 @@ export function computeUsableFromPurchaseStructure(
       total = rowBase.amount;
       usableSource = "structure_total";
       fallbackReason = "weak invoice row g/ml; row amount as partial usable";
+    } else if (shouldUseRowQtyAsBilledKgForSizeCountGenericRow(structure, rowQuantity, rowUnit)) {
+      total = measureToBase(rowQuantity!, "kg").amount;
+      usableSource = "row_weight_billed";
+      fallbackReason = "size_count kg row qty is billed weight; *N case metadata not purchased mass";
+    } else if (shouldScaleOuterPackForSizeCountGenericRow(structure, rowQuantity, rowUnit)) {
+      total = scaleStructureTotal(structure, purchaseContainerCount);
+      usableSource = "structure_scaled_outer";
+      fallbackReason = `outer count ${purchaseContainerCount} (name ${structure.purchaseQuantity})`;
     } else if (
       rowConflatedInner ||
       purchaseContainerCount === structure.purchaseQuantity ||

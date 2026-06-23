@@ -1,0 +1,927 @@
+{
+  "generatedAt": "2026-06-20T02:37:22.287Z",
+  "vl": "bjhnlrgodcqoyzddbpbd",
+  "ricotta": {
+    "db": {
+      "invoice": {
+        "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "supplier_name": "Il Bocconcino Distribuição Alimentar",
+        "invoice_date": "2026-05-08",
+        "total": 290.64
+      },
+      "lines": [
+        {
+          "persisted": {
+            "id": "409850ab-646d-44fa-b20c-c8a4a8570064",
+            "name": "RICOTTA TREVIGIANA 1,5KG",
+            "quantity": 2,
+            "unit": "un",
+            "unit_price": 7.97,
+            "total": 7.97,
+            "created_at": "2026-06-16T18:46:12.036503+00:00"
+          },
+          "replay": {
+            "bound": {
+              "quantity": 2,
+              "unit": "un",
+              "unit_price": 3.99,
+              "total": 7.97
+            },
+            "structured": {
+              "kind": "weight_or_volume",
+              "packageQuantity": 1.5,
+              "packageMeasurementUnit": "kg",
+              "normalizedUsableQuantity": 3000,
+              "usableQuantityUnit": "g",
+              "purchaseContainerCount": 2,
+              "purchaseContainerUnit": "kg"
+            },
+            "purchaseQty": 1,
+            "usablePerUnit": {
+              "amount": 1500,
+              "unit": "g"
+            },
+            "effectiveCost": {
+              "cost": 2.66,
+              "unit": "kg"
+            },
+            "operational": {
+              "current_price": 3.99,
+              "purchase_quantity": 1,
+              "cost_base_unit": "un",
+              "usable_weight_grams": 1500
+            },
+            "procurement": {
+              "current_price": 3.99,
+              "purchase_quantity": 1,
+              "purchase_unit": "un",
+              "base_unit": "un",
+              "unit": "un",
+              "includeCatalogUnitFields": true
+            },
+            "operationalHistoryPrice": 3.99,
+            "presentation": {
+              "purchaseQuantityLine": "2 un",
+              "usableStockLine": null,
+              "purchasePriceLine": "€3.99 / unit · €7.97 total",
+              "usableCostLine": "€2.66 / kg usable",
+              "priceDisplay": "€3.99 / unit",
+              "usableStockLabel": "3 kg usable",
+              "effectiveUsableCostLabel": "€2.66 / kg"
+            },
+            "rowQtyLabel": "2 un"
+          }
+        }
+      ]
+    },
+    "ingredients": [],
+    "artifacts": {
+      "bocconcino-extract-response": {
+        "raw": {
+          "name": "RICOTTA TREVIGIANA 1,5KG",
+          "quantity": 1,
+          "unit": "uni",
+          "unit_price": 7.967,
+          "total": 7.97
+        },
+        "replay": {
+          "bound": {
+            "quantity": 1,
+            "unit": "uni",
+            "unit_price": 7.967,
+            "total": 7.97
+          },
+          "structured": {
+            "kind": "weight_or_volume",
+            "packageQuantity": 1.5,
+            "packageMeasurementUnit": "kg",
+            "normalizedUsableQuantity": 1500,
+            "usableQuantityUnit": "g",
+            "purchaseContainerCount": 1,
+            "purchaseContainerUnit": "kg"
+          },
+          "purchaseQty": 1,
+          "usablePerUnit": {
+            "amount": 1500,
+            "unit": "g"
+          },
+          "effectiveCost": {
+            "cost": 5.311333333333333,
+            "unit": "kg"
+          },
+          "operational": {
+            "current_price": 7.967,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1500
+          },
+          "procurement": {
+            "current_price": 7.967,
+            "purchase_quantity": 1,
+            "purchase_unit": "un",
+            "base_unit": "un",
+            "unit": "un",
+            "includeCatalogUnitFields": true
+          },
+          "operationalHistoryPrice": 7.967,
+          "presentation": {
+            "purchaseQuantityLine": "1 uni",
+            "usableStockLine": null,
+            "purchasePriceLine": "€7.97 / unit",
+            "usableCostLine": "€5.31 / kg usable",
+            "priceDisplay": "€7.97 / unit",
+            "usableStockLabel": "1.5 kg usable",
+            "effectiveUsableCostLabel": "€5.31 / kg"
+          },
+          "rowQtyLabel": "1 uni"
+        }
+      },
+      "final-residual-extract": {
+        "raw": {
+          "name": "RICOTTA TREVIGIANA 1,5KG",
+          "quantity": 2,
+          "unit": "uni",
+          "unit_price": 7.967,
+          "total": 7.97
+        },
+        "replay": {
+          "bound": {
+            "quantity": 2,
+            "unit": "uni",
+            "unit_price": 3.99,
+            "total": 7.97
+          },
+          "structured": {
+            "kind": "weight_or_volume",
+            "packageQuantity": 1.5,
+            "packageMeasurementUnit": "kg",
+            "normalizedUsableQuantity": 3000,
+            "usableQuantityUnit": "g",
+            "purchaseContainerCount": 2,
+            "purchaseContainerUnit": "kg"
+          },
+          "purchaseQty": 1,
+          "usablePerUnit": {
+            "amount": 1500,
+            "unit": "g"
+          },
+          "effectiveCost": {
+            "cost": 2.66,
+            "unit": "kg"
+          },
+          "operational": {
+            "current_price": 3.99,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1500
+          },
+          "procurement": {
+            "current_price": 3.99,
+            "purchase_quantity": 1,
+            "purchase_unit": "un",
+            "base_unit": "un",
+            "unit": "un",
+            "includeCatalogUnitFields": true
+          },
+          "operationalHistoryPrice": 3.99,
+          "presentation": {
+            "purchaseQuantityLine": "2 uni",
+            "usableStockLine": null,
+            "purchasePriceLine": "€3.99 / unit · €7.97 total",
+            "usableCostLine": "€2.66 / kg usable",
+            "priceDisplay": "€3.99 / unit",
+            "usableStockLabel": "3 kg usable",
+            "effectiveUsableCostLabel": "€2.66 / kg"
+          },
+          "rowQtyLabel": "2 uni"
+        }
+      },
+      "vl-final-state-extract": {
+        "raw": {
+          "name": "RICOTTA TREVIGIANA 1,5KG",
+          "quantity": 2,
+          "unit": "uni",
+          "unit_price": 7.967,
+          "total": 7.97
+        },
+        "replay": {
+          "bound": {
+            "quantity": 2,
+            "unit": "uni",
+            "unit_price": 3.99,
+            "total": 7.97
+          },
+          "structured": {
+            "kind": "weight_or_volume",
+            "packageQuantity": 1.5,
+            "packageMeasurementUnit": "kg",
+            "normalizedUsableQuantity": 3000,
+            "usableQuantityUnit": "g",
+            "purchaseContainerCount": 2,
+            "purchaseContainerUnit": "kg"
+          },
+          "purchaseQty": 1,
+          "usablePerUnit": {
+            "amount": 1500,
+            "unit": "g"
+          },
+          "effectiveCost": {
+            "cost": 2.66,
+            "unit": "kg"
+          },
+          "operational": {
+            "current_price": 3.99,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1500
+          },
+          "procurement": {
+            "current_price": 3.99,
+            "purchase_quantity": 1,
+            "purchase_unit": "un",
+            "base_unit": "un",
+            "unit": "un",
+            "includeCatalogUnitFields": true
+          },
+          "operationalHistoryPrice": 3.99,
+          "presentation": {
+            "purchaseQuantityLine": "2 uni",
+            "usableStockLine": null,
+            "purchasePriceLine": "€3.99 / unit · €7.97 total",
+            "usableCostLine": "€2.66 / kg usable",
+            "priceDisplay": "€3.99 / unit",
+            "usableStockLabel": "3 kg usable",
+            "effectiveUsableCostLabel": "€2.66 / kg"
+          },
+          "rowQtyLabel": "2 uni"
+        }
+      },
+      "binding_qty1_vs_qty2": {
+        "qty1": {
+          "bound": {
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 7.967,
+            "total": 7.97
+          },
+          "structured": {
+            "kind": "weight_or_volume",
+            "packageQuantity": 1.5,
+            "packageMeasurementUnit": "kg",
+            "normalizedUsableQuantity": 1500,
+            "usableQuantityUnit": "g",
+            "purchaseContainerCount": 1,
+            "purchaseContainerUnit": "kg"
+          },
+          "purchaseQty": 1,
+          "usablePerUnit": {
+            "amount": 1500,
+            "unit": "g"
+          },
+          "effectiveCost": {
+            "cost": 5.311333333333333,
+            "unit": "kg"
+          },
+          "operational": {
+            "current_price": 7.967,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1500
+          },
+          "procurement": {
+            "current_price": 7.967,
+            "purchase_quantity": 1,
+            "purchase_unit": "un",
+            "base_unit": "un",
+            "unit": "un",
+            "includeCatalogUnitFields": true
+          },
+          "operationalHistoryPrice": 7.967,
+          "presentation": {
+            "purchaseQuantityLine": "1 un",
+            "usableStockLine": null,
+            "purchasePriceLine": "€7.97 / unit",
+            "usableCostLine": "€5.31 / kg usable",
+            "priceDisplay": "€7.97 / unit",
+            "usableStockLabel": "1.5 kg usable",
+            "effectiveUsableCostLabel": "€5.31 / kg"
+          },
+          "rowQtyLabel": "1 un"
+        },
+        "qty2": {
+          "bound": {
+            "quantity": 2,
+            "unit": "un",
+            "unit_price": 3.99,
+            "total": 7.97
+          },
+          "structured": {
+            "kind": "weight_or_volume",
+            "packageQuantity": 1.5,
+            "packageMeasurementUnit": "kg",
+            "normalizedUsableQuantity": 3000,
+            "usableQuantityUnit": "g",
+            "purchaseContainerCount": 2,
+            "purchaseContainerUnit": "kg"
+          },
+          "purchaseQty": 1,
+          "usablePerUnit": {
+            "amount": 1500,
+            "unit": "g"
+          },
+          "effectiveCost": {
+            "cost": 2.66,
+            "unit": "kg"
+          },
+          "operational": {
+            "current_price": 3.99,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1500
+          },
+          "procurement": {
+            "current_price": 3.99,
+            "purchase_quantity": 1,
+            "purchase_unit": "un",
+            "base_unit": "un",
+            "unit": "un",
+            "includeCatalogUnitFields": true
+          },
+          "operationalHistoryPrice": 3.99,
+          "presentation": {
+            "purchaseQuantityLine": "2 un",
+            "usableStockLine": null,
+            "purchasePriceLine": "€3.99 / unit · €7.97 total",
+            "usableCostLine": "€2.66 / kg usable",
+            "priceDisplay": "€3.99 / unit",
+            "usableStockLabel": "3 kg usable",
+            "effectiveUsableCostLabel": "€2.66 / kg"
+          },
+          "rowQtyLabel": "2 un"
+        }
+      }
+    }
+  },
+  "spellegrino": {
+    "bocconcino": {
+      "invoice": {
+        "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "supplier_name": "Il Bocconcino Distribuição Alimentar",
+        "invoice_date": "2026-05-08",
+        "total": 290.64
+      },
+      "lines": [
+        {
+          "persisted": {
+            "id": "f25feb92-3477-41a4-9a81-c556a90a0814",
+            "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+            "quantity": 2,
+            "unit": "un",
+            "unit_price": 20.97,
+            "total": 42.07,
+            "created_at": "2026-06-16T18:46:12.036503+00:00"
+          },
+          "replay": {
+            "bound": {
+              "quantity": 2,
+              "unit": "un",
+              "unit_price": 20.97,
+              "total": 42.07
+            },
+            "structured": {
+              "kind": "multi_unit_pack",
+              "packageQuantity": 75,
+              "packageMeasurementUnit": "cl",
+              "normalizedUsableQuantity": 11250,
+              "usableQuantityUnit": "ml",
+              "purchaseContainerCount": 15,
+              "purchaseContainerUnit": "un"
+            },
+            "purchaseQty": 1,
+            "usablePerUnit": {
+              "amount": 11250,
+              "unit": "ml"
+            },
+            "effectiveCost": {
+              "cost": 3.7279999999999998,
+              "unit": "L"
+            },
+            "operational": {
+              "current_price": 20.97,
+              "purchase_quantity": 11250,
+              "cost_base_unit": "ml"
+            },
+            "procurement": {
+              "current_price": 20.97,
+              "purchase_quantity": 15,
+              "purchase_unit": "un",
+              "base_unit": "un",
+              "unit": "un",
+              "includeCatalogUnitFields": true
+            },
+            "operationalHistoryPrice": 1.398,
+            "presentation": {
+              "purchaseQuantityLine": "2 un · 15 × 75 cl",
+              "usableStockLine": null,
+              "purchasePriceLine": "€20.97 / case · €42.07 total",
+              "usableCostLine": "€3.73 / L usable",
+              "priceDisplay": "€20.97 / case",
+              "usableStockLabel": "11.25 L usable",
+              "effectiveUsableCostLabel": "€3.73 / L"
+            },
+            "rowQtyLabel": "2 un"
+          }
+        }
+      ]
+    },
+    "emporio": {
+      "invoice": null,
+      "lines": []
+    },
+    "ingredients": [],
+    "artifacts": {
+      "bocconcino-extract": {
+        "raw": {
+          "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+          "quantity": 2,
+          "unit": "uni",
+          "unit_price": 26.292,
+          "total": 42.07
+        },
+        "replay": {
+          "bound": {
+            "quantity": 2,
+            "unit": "uni",
+            "unit_price": 21.04,
+            "total": 42.07
+          },
+          "structured": {
+            "kind": "multi_unit_pack",
+            "packageQuantity": 75,
+            "packageMeasurementUnit": "cl",
+            "normalizedUsableQuantity": 11250,
+            "usableQuantityUnit": "ml",
+            "purchaseContainerCount": 15,
+            "purchaseContainerUnit": "un"
+          },
+          "purchaseQty": 1,
+          "usablePerUnit": {
+            "amount": 11250,
+            "unit": "ml"
+          },
+          "effectiveCost": {
+            "cost": 3.7404444444444445,
+            "unit": "L"
+          },
+          "operational": {
+            "current_price": 21.04,
+            "purchase_quantity": 11250,
+            "cost_base_unit": "ml"
+          },
+          "procurement": {
+            "current_price": 21.04,
+            "purchase_quantity": 15,
+            "purchase_unit": "un",
+            "base_unit": "un",
+            "unit": "un",
+            "includeCatalogUnitFields": true
+          },
+          "operationalHistoryPrice": 1.4026666666666665,
+          "presentation": {
+            "purchaseQuantityLine": "2 uni · 15 × 75 cl",
+            "usableStockLine": null,
+            "purchasePriceLine": "€21.04 / case · €42.07 total",
+            "usableCostLine": "€3.74 / L usable",
+            "priceDisplay": "€21.04 / case",
+            "usableStockLabel": "11.25 L usable",
+            "effectiveUsableCostLabel": "€3.74 / L"
+          },
+          "rowQtyLabel": "2 uni"
+        }
+      },
+      "emporio-db-record": {
+        "raw": {
+          "id": "2c21f0de-3d7c-4de2-8543-833b1d059986",
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "cx",
+          "unit_price": 19.3,
+          "total": 38.56
+        },
+        "replay": {
+          "bound": {
+            "quantity": 2,
+            "unit": "cx",
+            "unit_price": 19.28,
+            "total": 38.56
+          },
+          "structured": {
+            "kind": "multi_unit_pack",
+            "packageQuantity": 75,
+            "packageMeasurementUnit": "cl",
+            "normalizedUsableQuantity": 11250,
+            "usableQuantityUnit": "ml",
+            "purchaseContainerCount": 15,
+            "purchaseContainerUnit": "unit"
+          },
+          "purchaseQty": 15,
+          "usablePerUnit": {
+            "amount": 11250,
+            "unit": "ml"
+          },
+          "effectiveCost": {
+            "cost": 1.7137777777777778,
+            "unit": "L"
+          },
+          "operational": {
+            "current_price": 19.28,
+            "purchase_quantity": 15,
+            "cost_base_unit": "un",
+            "usable_volume_ml": 11250
+          },
+          "procurement": {
+            "current_price": 19.28,
+            "purchase_quantity": 15,
+            "purchase_unit": "un",
+            "base_unit": "un",
+            "unit": "un",
+            "includeCatalogUnitFields": true
+          },
+          "operationalHistoryPrice": 1.2853333333333334,
+          "presentation": {
+            "purchaseQuantityLine": "2 cases · 15 × 75 cl",
+            "usableStockLine": null,
+            "purchasePriceLine": "€19.28 / case · €38.56 total",
+            "usableCostLine": "€1.71 / L usable",
+            "priceDisplay": "€19.28 / case",
+            "usableStockLabel": "11.25 L usable",
+            "effectiveUsableCostLabel": "€1.71 / L"
+          },
+          "rowQtyLabel": "2 cases"
+        }
+      }
+    }
+  },
+  "additional": {
+    "mozzarella fior": {
+      "invoice": {
+        "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "supplier_name": "Il Bocconcino Distribuição Alimentar",
+        "invoice_date": "2026-05-08",
+        "total": 290.64
+      },
+      "lines": [
+        {
+          "persisted": {
+            "id": "095b2bb9-bd36-44c2-a1f9-7c50fa9c0cc6",
+            "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+            "quantity": 10,
+            "unit": "un",
+            "unit_price": 8.12,
+            "total": 81.23,
+            "created_at": "2026-06-16T18:46:12.036503+00:00"
+          },
+          "replay": {
+            "bound": {
+              "quantity": 10,
+              "unit": "un",
+              "unit_price": 8.12,
+              "total": 81.23
+            },
+            "structured": {
+              "kind": "multi_unit_pack",
+              "packageQuantity": 125,
+              "packageMeasurementUnit": "g",
+              "normalizedUsableQuantity": 1000,
+              "usableQuantityUnit": "g",
+              "purchaseContainerCount": 8,
+              "purchaseContainerUnit": "un"
+            },
+            "purchaseQty": 1,
+            "usablePerUnit": {
+              "amount": 1000,
+              "unit": "g"
+            },
+            "effectiveCost": {
+              "cost": 81.19999999999999,
+              "unit": "kg"
+            },
+            "operational": {
+              "current_price": 8.12,
+              "purchase_quantity": 1,
+              "cost_base_unit": "un",
+              "usable_weight_grams": 1000
+            },
+            "procurement": {
+              "current_price": 8.12,
+              "purchase_quantity": 1,
+              "purchase_unit": "un",
+              "base_unit": "un",
+              "unit": "un",
+              "includeCatalogUnitFields": true
+            },
+            "operationalHistoryPrice": 8.12,
+            "presentation": {
+              "purchaseQuantityLine": "10 un · 8 × 125 g",
+              "usableStockLine": null,
+              "purchasePriceLine": "€8.12 / unit · €81.23 total",
+              "usableCostLine": "€81.20 / kg usable",
+              "priceDisplay": "€8.12 / unit",
+              "usableStockLabel": "1 kg usable",
+              "effectiveUsableCostLabel": "€81.20 / kg"
+            },
+            "rowQtyLabel": "10 un"
+          }
+        }
+      ]
+    },
+    "stracciatella": {
+      "invoice": {
+        "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "supplier_name": "Il Bocconcino Distribuição Alimentar",
+        "invoice_date": "2026-05-08",
+        "total": 290.64
+      },
+      "lines": [
+        {
+          "persisted": {
+            "id": "da2ad0fc-eb56-4506-8ba4-ae22b3cb6a5a",
+            "name": "STRACCIATELLA 250 GR",
+            "quantity": 24,
+            "unit": "un",
+            "unit_price": 3.11,
+            "total": 74.54,
+            "created_at": "2026-06-16T18:46:12.036503+00:00"
+          },
+          "replay": {
+            "bound": {
+              "quantity": 24,
+              "unit": "un",
+              "unit_price": 3.11,
+              "total": 74.54
+            },
+            "structured": {
+              "kind": "weight_or_volume",
+              "packageQuantity": 250,
+              "packageMeasurementUnit": "g",
+              "normalizedUsableQuantity": 6000,
+              "usableQuantityUnit": "g",
+              "purchaseContainerCount": 24,
+              "purchaseContainerUnit": "g"
+            },
+            "purchaseQty": 1,
+            "usablePerUnit": {
+              "amount": 250,
+              "unit": "g"
+            },
+            "effectiveCost": {
+              "cost": 12.44,
+              "unit": "kg"
+            },
+            "operational": {
+              "current_price": 3.11,
+              "purchase_quantity": 1,
+              "cost_base_unit": "un",
+              "usable_weight_grams": 250
+            },
+            "procurement": {
+              "current_price": 3.11,
+              "purchase_quantity": 1,
+              "purchase_unit": "un",
+              "base_unit": "un",
+              "unit": "un",
+              "includeCatalogUnitFields": true
+            },
+            "operationalHistoryPrice": 3.11,
+            "presentation": {
+              "purchaseQuantityLine": "24 un",
+              "usableStockLine": null,
+              "purchasePriceLine": "€3.11 / unit · €74.54 total",
+              "usableCostLine": "€12.44 / kg usable",
+              "priceDisplay": "€3.11 / unit",
+              "usableStockLabel": "6 kg usable",
+              "effectiveUsableCostLabel": "€12.44 / kg"
+            },
+            "rowQtyLabel": "24 un"
+          }
+        }
+      ]
+    },
+    "paccheri": {
+      "invoice": {
+        "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "supplier_name": "Il Bocconcino Distribuição Alimentar",
+        "invoice_date": "2026-05-08",
+        "total": 290.64
+      },
+      "lines": [
+        {
+          "persisted": {
+            "id": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+            "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+            "quantity": 2,
+            "unit": "un",
+            "unit_price": 27.31,
+            "total": 27.3,
+            "created_at": "2026-06-16T18:46:12.036503+00:00"
+          },
+          "replay": {
+            "bound": {
+              "quantity": 2,
+              "unit": "un",
+              "unit_price": 13.65,
+              "total": 27.3
+            },
+            "structured": {
+              "kind": "multi_unit_pack",
+              "packageQuantity": 1,
+              "packageMeasurementUnit": "kg",
+              "normalizedUsableQuantity": 6000,
+              "usableQuantityUnit": "g",
+              "purchaseContainerCount": 6,
+              "purchaseContainerUnit": "un"
+            },
+            "purchaseQty": 1,
+            "usablePerUnit": {
+              "amount": 6000,
+              "unit": "g"
+            },
+            "effectiveCost": {
+              "cost": 4.55,
+              "unit": "kg"
+            },
+            "operational": {
+              "current_price": 13.65,
+              "purchase_quantity": 1,
+              "cost_base_unit": "un",
+              "usable_weight_grams": 6000
+            },
+            "procurement": {
+              "current_price": 13.65,
+              "purchase_quantity": 1,
+              "purchase_unit": "un",
+              "base_unit": "un",
+              "unit": "un",
+              "includeCatalogUnitFields": true
+            },
+            "operationalHistoryPrice": 13.65,
+            "presentation": {
+              "purchaseQuantityLine": "2 un · 6 × 1 kg",
+              "usableStockLine": null,
+              "purchasePriceLine": "€13.65 / case · €27.30 total",
+              "usableCostLine": "€4.55 / kg usable",
+              "priceDisplay": "€13.65 / case",
+              "usableStockLabel": "6 kg usable",
+              "effectiveUsableCostLabel": "€4.55 / kg"
+            },
+            "rowQtyLabel": "2 un"
+          }
+        }
+      ]
+    },
+    "pomodori pelati": {
+      "invoice": {
+        "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "supplier_name": "Il Bocconcino Distribuição Alimentar",
+        "invoice_date": "2026-05-08",
+        "total": 290.64
+      },
+      "lines": [
+        {
+          "persisted": {
+            "id": "fd24d2dc-238a-43f2-ac2a-755361a083f0",
+            "name": "POMODORI PELATI (CX 2,5KG*6)",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 22.05,
+            "total": 22.05,
+            "created_at": "2026-06-16T18:46:12.036503+00:00"
+          },
+          "replay": {
+            "bound": {
+              "quantity": 1,
+              "unit": "un",
+              "unit_price": 22.05,
+              "total": 22.05
+            },
+            "structured": {
+              "kind": "multi_unit_pack",
+              "packageQuantity": 2.5,
+              "packageMeasurementUnit": "kg",
+              "normalizedUsableQuantity": 15000,
+              "usableQuantityUnit": "g",
+              "purchaseContainerCount": 6,
+              "purchaseContainerUnit": "un"
+            },
+            "purchaseQty": 1,
+            "usablePerUnit": {
+              "amount": 15000,
+              "unit": "g"
+            },
+            "effectiveCost": {
+              "cost": 1.47,
+              "unit": "kg"
+            },
+            "operational": {
+              "current_price": 22.05,
+              "purchase_quantity": 1,
+              "cost_base_unit": "un",
+              "usable_weight_grams": 15000
+            },
+            "procurement": {
+              "current_price": 22.05,
+              "purchase_quantity": 1,
+              "purchase_unit": "un",
+              "base_unit": "un",
+              "unit": "un",
+              "includeCatalogUnitFields": true
+            },
+            "operationalHistoryPrice": 22.05,
+            "presentation": {
+              "purchaseQuantityLine": "1 un · 6 × 2.5 kg",
+              "usableStockLine": null,
+              "purchasePriceLine": "€22.05 / case",
+              "usableCostLine": "€1.47 / kg usable",
+              "priceDisplay": "€22.05 / case",
+              "usableStockLabel": "15 kg usable",
+              "effectiveUsableCostLabel": "€1.47 / kg"
+            },
+            "rowQtyLabel": "1 un"
+          }
+        }
+      ]
+    },
+    "rolo de cabra": {
+      "invoice": {
+        "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "supplier_name": "Il Bocconcino Distribuição Alimentar",
+        "invoice_date": "2026-05-08",
+        "total": 290.64
+      },
+      "lines": [
+        {
+          "persisted": {
+            "id": "3886253a-ea88-48e0-aa2f-d66f689fc104",
+            "name": "ROLO DE CABRA E VACA 1KG",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 12.87,
+            "total": 12.87,
+            "created_at": "2026-06-16T18:46:12.036503+00:00"
+          },
+          "replay": {
+            "bound": {
+              "quantity": 1,
+              "unit": "un",
+              "unit_price": 12.87,
+              "total": 12.87
+            },
+            "structured": {
+              "kind": "weight_or_volume",
+              "packageQuantity": 1,
+              "packageMeasurementUnit": "kg",
+              "normalizedUsableQuantity": 1000,
+              "usableQuantityUnit": "g",
+              "purchaseContainerCount": 1,
+              "purchaseContainerUnit": "kg"
+            },
+            "purchaseQty": 1,
+            "usablePerUnit": {
+              "amount": 1000,
+              "unit": "g"
+            },
+            "effectiveCost": {
+              "cost": 12.87,
+              "unit": "kg"
+            },
+            "operational": {
+              "current_price": 12.87,
+              "purchase_quantity": 1,
+              "cost_base_unit": "un",
+              "usable_weight_grams": 1000
+            },
+            "procurement": {
+              "current_price": 12.87,
+              "purchase_quantity": 1,
+              "purchase_unit": "un",
+              "base_unit": "un",
+              "unit": "un",
+              "includeCatalogUnitFields": true
+            },
+            "operationalHistoryPrice": 12.87,
+            "presentation": {
+              "purchaseQuantityLine": "1 un",
+              "usableStockLine": null,
+              "purchasePriceLine": "€12.87 / unit",
+              "usableCostLine": "€12.87 / kg usable",
+              "priceDisplay": "€12.87 / unit",
+              "usableStockLabel": "1 kg usable",
+              "effectiveUsableCostLabel": "€12.87 / kg"
+            },
+            "rowQtyLabel": "1 un"
+          }
+        }
+      ]
+    }
+  }
+}

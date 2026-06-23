@@ -1,0 +1,159 @@
+{
+  "generatedAt": "2026-06-21T00:00:00.000Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "invoiceItemId": "409850ab-646d-44fa-b20c-c8a4a8570064",
+  "ingredientId": "6ec0bc6b-409a-4db2-b21f-fb01394f0014",
+  "lineName": "RICOTTA TREVIGIANA 1,5KG",
+  "pdfRealitySource": ".tmp/geometry-audit/images/f0aa5a08-86a3-4938-99f0-711e86073968.png (manual image inspection; corroborated by .tmp/bocconcino-investigation/REPORT.md, .tmp/field-accuracy-audit/ground-truth.json)",
+  "stages": [
+    {
+      "stage": 1,
+      "name": "PDF reality",
+      "quantity": 1,
+      "unitPrice": 7.967,
+      "total": 7.97,
+      "source": "Visible invoice row: QUANT=1,000 · CXs=0 · UNI · P.VENDA S/IVA=7,967 EUR · DESC blank · VALOR LÍQUIDO=7,97 EUR · IVA 6% (.tmp/geometry-audit/images/f0aa5a08-86a3-4938-99f0-711e86073968.png)"
+    },
+    {
+      "stage": 2,
+      "name": "OCR / table GPT raw (Pass C era, cropped table)",
+      "quantity": 1,
+      "unitPrice": 7.967,
+      "total": 7.97,
+      "source": ".tmp/bocconcino-investigation/extract-invoice-response.json (Pass C re-invoke, 2026-06-10); .tmp/bocconcino-investigation/summary.json eligibility raw"
+    },
+    {
+      "stage": 3,
+      "name": "Pass C baseline (passc-refinement-validation reextract)",
+      "quantity": 1,
+      "unitPrice": 7.97,
+      "total": 7.97,
+      "source": ".tmp/passc-refinement-validation/reextract/f0aa5a08-86a3-4938-99f0-711e86073968.json; .tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-gpt-raw-cache.json"
+    },
+    {
+      "stage": 4,
+      "name": "Hybrid H output (v25 full-7-row path)",
+      "quantity": 2,
+      "unitPrice": 7.967,
+      "total": 7.97,
+      "matchesPdf": false,
+      "firstDeviation": "quantity",
+      "source": ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json (deployVersion 25); .tmp/final-stability-audit/extracts/f0aa5a08-86a3-4938-99f0-711e86073968-all-runs.json (10/10 runs qty=2)"
+    },
+    {
+      "stage": 5,
+      "name": "bindMonetaryColumns input",
+      "quantity": 2,
+      "unitPrice": 7.967,
+      "total": 7.97,
+      "source": "Same as Hybrid H legacy fields; replayed via production bindMonetaryColumns(parseMonetaryLineItems(...))"
+    },
+    {
+      "stage": 5,
+      "name": "bindMonetaryColumns output",
+      "quantity": 2,
+      "unitPrice": 3.99,
+      "total": 7.97,
+      "matchesPdf": false,
+      "note": "Rule B / total÷qty collapse: 7.97÷2=3.985→3.99. Mathematically consistent with qty=2 fiction; unit_price now also differs from PDF gross 7.967.",
+      "source": "Production replay 2026-06-21; corroborated .tmp/phase1-validation-forensics-result.json ricotta.db.replay.bound; .tmp/family-a-v25-raw-capture/edge-invoke-final.json (deploy v36 post-bind unit_price=3.99)"
+    },
+    {
+      "stage": 6,
+      "name": "reconcileLineItemAmounts input",
+      "quantity": 2,
+      "unitPrice": 3.99,
+      "total": 7.97,
+      "source": "Post-bind monetary line mapped to InvoiceLineItem"
+    },
+    {
+      "stage": 6,
+      "name": "reconcileLineItemAmounts output",
+      "quantity": 2,
+      "unitPrice": 3.99,
+      "total": 7.97,
+      "modified": false,
+      "source": "Production replay 2026-06-21; .tmp/persistence-audit/reconcile-trace.json has no Ricotta row (Bocconcino pomodor only)"
+    },
+    {
+      "stage": 7,
+      "name": "invoice_items persisted (VL DB)",
+      "quantity": 2,
+      "unitPrice": 7.97,
+      "total": 7.97,
+      "matchesPdf": false,
+      "note": "Stores pre-bind unit_price (7.967→7.97), not post-bind 3.99. qty×unit_price≠total (2×7.97=15.94≠7.97).",
+      "source": "VL SELECT 2026-06-21 (.tmp/quantity-mismatch-validation/check-ricotta.mts); .tmp/phase1-validation-forensics-result.json ricotta.db.persisted"
+    },
+    {
+      "stage": 8,
+      "name": "Purchase history / ingredient catalog",
+      "quantity": 2,
+      "unitPrice": 7.97,
+      "total": 7.97,
+      "operationalUnitCost": 3.985,
+      "catalogPurchaseQuantity": 2,
+      "source": ".tmp/historical-pricing-integrity-audit/per-ingredient/6ec0bc6b-409a-4db2-b21f-fb01394f0014.json; VL ingredients.purchase_quantity=2 (check-ricotta.mts)"
+    },
+    {
+      "stage": 9,
+      "name": "Ingredient detail page (Purchase economics)",
+      "lastPurchase": "2 un",
+      "procurementCost": "€3.99 / unit",
+      "operationalCost": "€2.66 / kg",
+      "usableQuantity": "3 kg usable",
+      "source": ".tmp/quantity-mismatch-ui-audit/replay.json (invoiceItemId 409850ab…); .tmp/phase1-validation-forensics-result.json ricotta.db.replay.presentation"
+    },
+    {
+      "stage": 10,
+      "name": "Procurement cost calculation",
+      "currentPrice": 3.99,
+      "purchaseQuantityForCost": 1,
+      "storedPurchaseQuantity": 1,
+      "catalogPurchaseQuantity": 2,
+      "source": "resolveCountablePurchaseQuantityForCost → 1 (Family A collapse); recipeOperationalCostFieldsFromInvoiceLine current_price=3.99 (.tmp/quantity-mismatch-ui-audit/replay.json math)"
+    },
+    {
+      "stage": 11,
+      "name": "Operational cost calculation",
+      "effectiveUsableCost": 2.66,
+      "unit": "kg",
+      "usableGrams": 3000,
+      "expression": "7.97 total ÷ 3 kg usable (2 un × 1.5 kg from name)",
+      "source": "computeEffectiveUsableCost via .tmp/quantity-mismatch-ui-audit/replay.json; .tmp/phase1-validation-forensics-result.json ricotta.db.replay.effectiveCost"
+    }
+  ],
+  "firstIncorrectValue": {
+    "stage": "Hybrid H output (stage 4)",
+    "field": "quantity",
+    "pdfValue": 1,
+    "incorrectValue": 2,
+    "evidence": [
+      ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+      ".tmp/final-stability-audit/extracts/f0aa5a08-86a3-4938-99f0-711e86073968-all-runs.json"
+    ],
+    "priorStagesCorrect": [
+      "PDF reality qty=1",
+      "Pass C era OCR/table GPT qty=1 (.tmp/bocconcino-investigation/extract-invoice-response.json)",
+      "Pass C baseline reextract qty=1 (.tmp/passc-refinement-validation/reextract/...)"
+    ]
+  },
+  "downstreamConsistency": {
+    "bindMonetaryColumns": "Given qty=2 and total=7.97, derives unit_price=3.99 (internally consistent; does not restore PDF qty=1)",
+    "reconcileLineItemAmounts": "No change",
+    "costAndUI": "All downstream stages derive economics from bound qty=2; math self-consistent (€3.99×2≈€7.97; €2.66/kg=€7.97÷3kg) but anchored to wrong quantity"
+  },
+  "uiVerdict": {
+    "extractionWrongNotDownstreamTransform": true,
+    "quantityMismatchUiAuditClassification": "C — Operationally Correct",
+    "classificationCaveat": "UI audit used bound qty=2 × €3.99 as 'invoice reality'; true PDF shows qty=1 × €7.967. Against PDF, UI Last Purchase (2 un), procurement (€3.99/unit), operational (€2.66/kg), and usable (3 kg) all reflect the extraction error, not a separate downstream transform bug.",
+    "storedVsDisplaySplit": "invoice_items stores unit_price=7.97 (pre-bind); detail page displays bound €3.99/unit via resolveInvoiceLinePricingPresentation"
+  },
+  "correctBaselineIfQty1": {
+    "bound": { "quantity": 1, "unitPrice": 7.97, "total": 7.97 },
+    "operationalCostPerKg": 5.31,
+    "usableKg": 1.5,
+    "source": ".tmp/phase1-validation-forensics-result.json artifacts.bocconcino-extract-response.replay"
+  }
+}

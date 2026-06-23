@@ -1,0 +1,162 @@
+{
+  "generatedAt": "2026-06-23T00:00:00.000Z",
+  "mode": "STRICT_READ_ONLY_IMPLEMENTATION_READINESS",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+  "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+  "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+  "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6",
+  "verdict": "NOT_READY",
+  "verdictMeaning": "Root cause is proven (stage 8 stock normalization over-count), but Guanciale lacks fix design, implementation prep, A-Proven commercial weight semantics, a runtime fix discriminator, and a positive regression matrix required at Mozzarella/Ginger Beer READY bar.",
+  "currentState": {
+    "invoiceQty": 5.996,
+    "invoiceUnit": "un",
+    "unitPriceNet": 10.83,
+    "lineTotalEur": 64.93,
+    "currentUsableGrams": 10500,
+    "currentOperationalCostPerKg": 6.18,
+    "uiLastPurchase": "6.00 un",
+    "uiUsableLabel": "10.5 kg usable"
+  },
+  "expectedState": {
+    "usableGrams": 5996,
+    "usableKgApprox": 6,
+    "operationalCostPerKg": 10.83,
+    "commercialRealityClass": "B_likely",
+    "note": "Weight inferred from fractional qty + €/kg pricing; PDF unit column is UN not kg"
+  },
+  "rootCauseCertainty": {
+    "firstIncorrectStage": 8,
+    "firstIncorrectStageName": "Purchase structure / stock normalization",
+    "firstIncorrectField": "usable_weight",
+    "correctValueGrams": 5996,
+    "incorrectValueGrams": 10500,
+    "classification": "A_proven",
+    "parserPath": [
+      "resolveInvoiceLinePurchaseFormat",
+      "parsePurchaseStructureFromText → SIZE_COUNT_RE match 1,5kg*7",
+      "computeUsableFromPurchaseStructure",
+      "structureTotalIsFinalForGenericRow → true",
+      "usableSource: structure_total"
+    ],
+    "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+    "matchedToken": "1,5kg*7",
+    "parseTier": "size_count",
+    "extractionBug": false,
+    "downstreamBug": true,
+    "bugFamily": "B_downstreamTransformationOriginated",
+    "errorDirection": "over_count",
+    "competingExplanationsEliminated": [
+      "7 pieces × 1.5 kg purchased (contradicts €64.93 total)",
+      "extraction qty/total corruption (stages 4-7 correct)",
+      "outer case count multiply like Mozzarella (row qty is weight not cases)"
+    ],
+    "primaryExplanation": "Weight-priced line (qty 5.996 ≈ kg); supplier *7 case metadata applied as usable fiction 7×1.5 kg"
+  },
+  "commercialReality": {
+    "purchasedQty": { "value": 5.996, "class": "A_proven" },
+    "purchasedUnitPdf": { "value": "un", "class": "A_proven" },
+    "grossUnitPricePerKg": { "value": 16.922, "class": "A_proven" },
+    "discountPct": { "value": 36, "class": "A_proven" },
+    "lineTotalNetEur": { "value": 64.93, "class": "A_proven" },
+    "effectiveUnitPricePerKg": { "value": 10.83, "class": "A_proven" },
+    "expectedUsableKg": { "value": 5.996, "class": "B_likely" },
+    "expectedOperationalCostPerKg": { "value": 10.83, "class": "B_likely" },
+    "packNotationRole": { "value": "supplier case metadata not purchased units", "class": "B_likely" },
+    "monetaryReconciliation": "5.996 × 10.83 ≈ 64.93; 10.5 kg path implies €6.18/kg understates true cost"
+  },
+  "implementationReadiness": {
+    "rootCauseLocalized": { "status": "A", "label": "Proven" },
+    "extractionRuledOut": { "status": "A", "label": "Proven — stages 1-7" },
+    "liveReplayMatchesPersisted": { "status": "A", "label": "Proven — 10500 g replay = UI 10.5 kg" },
+    "commercialRealityProven": { "status": "B", "label": "Likely — weight from qty+€/kg; unit UN not kg" },
+    "dedicatedCommercialRealityAudit": { "status": "C", "label": "Missing" },
+    "populationIsolation": { "status": "A", "label": "Proven — 1/51 VL; cluster B_guanciale_over_count" },
+    "fixDesignArtifact": { "status": "C", "label": "Missing — no guanciale-fix-design" },
+    "implementationPrepArtifact": { "status": "C", "label": "Missing — no guanciale-implementation-prep" },
+    "runtimeFixDiscriminator": { "status": "C", "label": "Missing — size-count-discriminator: scalar divergence only" },
+    "positiveRegressionMatrix": { "status": "C", "label": "Missing" },
+    "negativeRegressionControls": { "status": "B", "label": "Partial — Mozzarella design controls only" },
+    "reIngestPathValidated": { "status": "B", "label": "Not validated for Guanciale" },
+    "mozzarellaDecoupling": { "status": "B", "label": "Shared SIZE_COUNT path; opposite error direction" },
+    "implementationValidationReplay": { "status": "C", "label": "Missing" },
+    "priceHistoryFollowOn": { "status": "B", "label": "Stale history signal; post-fix validation needed" }
+  },
+  "blockers": [
+    "No fix-design artifact",
+    "No implementation-prep artifact",
+    "No runtime discriminator for safe code change (discriminator audit verdict B)",
+    "Opposite over-count vs Mozzarella under-count — cannot share naive SIZE_COUNT fix",
+    "Commercial weight semantics B not A — PDF unit UN not kg",
+    "Single VL exemplar — no second Guanciale invoice",
+    "Conflicting prior audit (purchase-unit-intelligence VALID vs quantity-mismatch class A)",
+    "Mozzarella fix track explicitly deferred Guanciale",
+    "No post-design implementation-validation baseline"
+  ],
+  "comparisonAtReadyMoment": {
+    "mozzarella": {
+      "verdict": "READY",
+      "commercialRealityClass": "A_proven",
+      "fixDesign": "yes",
+      "implementationPrep": "yes",
+      "overallConfidence": 0.91
+    },
+    "gingerBeer": {
+      "verdict": "READY",
+      "commercialRealityClass": "A_primary_B_alt",
+      "fixDesign": "partial",
+      "implementationPrep": "closure_only",
+      "overallConfidence": 0.92
+    },
+    "guanciale": {
+      "verdict": "NOT_READY",
+      "commercialRealityClass": "B_likely",
+      "fixDesign": "none",
+      "implementationPrep": "none",
+      "overallConfidence": 0.84
+    }
+  },
+  "missingEvidence": [
+    "Dedicated commercial-reality audit with A-Proven weight semantics",
+    "guanciale-fix-design with change locus and guard conditions",
+    "Runtime discriminator proven safe vs Peroni/Rulo/Aceto/Mozzarella",
+    "guanciale-implementation-prep (pipeline, change surface, test plan)",
+    "Positive regression matrix (must-correct + must-not-regress)",
+    "Re-ingest validation for invoice 36c99d19",
+    "Price-history semantics post-fix"
+  ],
+  "postImplementationValidationSequence": [
+    "Production replay: normalizedUsableQuantity ≈ 5996 g not 10500 g",
+    "computeEffectiveUsableCost ≈ €10.83/kg",
+    "UI: usable ~6 kg; op €10.83/kg; invoice row unchanged",
+    "Re-ingest 36c99d19 — catalog usable propagates",
+    "Negative: Peroni, Aceto, Mozzarella julienne, Rulo, Farina lines unchanged on same invoice",
+    "Negative: cross-invoice SIZE_COUNT controls (Pomodori, S.Pellegrino)",
+    "Mozzarella coupling: no under-count flip if Mozzarella fix present",
+    "ingredient_price_history operational semantics validated"
+  ],
+  "confidence": {
+    "rootCauseLocalization": 0.92,
+    "commercialReality": 0.86,
+    "parserReplay": 0.94,
+    "fixSurfaceReadiness": 0.58,
+    "regressionIsolation": 0.80,
+    "overall": 0.84
+  },
+  "sources": [
+    ".tmp/remaining-bug-root-causes/",
+    ".tmp/stock-normalization-family-assessment/",
+    ".tmp/stock-normalization-population-audit/",
+    ".tmp/size-count-discriminator-audit/",
+    ".tmp/quantity-mismatch-ui-audit/",
+    ".tmp/mammafiore-line-audit/",
+    ".tmp/mozzarella-implementation-prep/",
+    ".tmp/mozzarella-commercial-reality-audit/",
+    ".tmp/mozzarella-fix-design/",
+    ".tmp/ginger-beer-root-cause-closure/",
+    ".tmp/final-validation-lab-rerun/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d.json",
+    ".tmp/historical-pricing-integrity-audit/findings.json",
+    "src/lib/stock-normalization.ts",
+    "live resolveInvoiceLinePurchaseFormat replay 2026-06-23"
+  ]
+}

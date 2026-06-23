@@ -1,0 +1,327 @@
+{
+  "generatedAt": "2026-06-22T00:00:00.000Z",
+  "mode": "STRICT_READ_ONLY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR UNIPESSOAL LDA",
+  "scope": "Pass C baseline vs Hybrid H table GPT boundary only",
+  "artifactGaps": [
+    "No archived Hybrid H structured GPT raw JSON (gpt-raw-json.json) for Ricotta/Mezzi bad path",
+    "capture-hybrid-h.deno.ts exists; stage-trace.json / gpt-raw-json.json absent in family-a-v25-raw-capture",
+    "Hybrid H row-level structured fields inferred from API output + production replay"
+  ],
+  "pdfGroundTruth": {
+    "source": ".tmp/geometry-audit/images/f0aa5a08-86a3-4938-99f0-711e86073968.png",
+    "ricotta": {
+      "description": "RICOTTA TREVIGIANA 1,5KG",
+      "quantity": 1,
+      "cxs": "(blank)",
+      "unit": "UNI",
+      "unitPriceGross": 7.967,
+      "discount": "(blank)",
+      "totalNet": 7.97,
+      "ocrText": "QUANT=1,000 · CXs=0 · UNI · P.VENDA S/IVA=7,967 EUR · DESC blank · VALOR LÍQUIDO=7,97 EUR · IVA 6%"
+    },
+    "mezzi": {
+      "description": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "quantity": 1,
+      "cxs": "(blank)",
+      "unit": "UNI",
+      "unitPriceGross": 27.3,
+      "discount": "(blank)",
+      "totalNet": 27.3,
+      "ocrText": "QUANT=1,000 · CXs=(blank) · UNI · P.VENDA S/IVA=27,300 EUR · DESC blank · VALOR LÍQUIDO=27,30 EUR · IVA 6%"
+    }
+  },
+  "passC": {
+    "era": "Pre-Hybrid baseline (passc-refinement-validation 2026-06-11)",
+    "sources": {
+      "gptRaw": ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-gpt-raw-cache.json",
+      "reextract": ".tmp/passc-refinement-validation/reextract/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+      "croppedInvoke": ".tmp/bocconcino-investigation/extract-invoice-response.json",
+      "prompt": ".tmp/passc-prompt-audit/passc-prompt.txt"
+    },
+    "gptCall": {
+      "model": "gpt-4.1",
+      "temperature": 0,
+      "seed": 42,
+      "responseFormat": "json_object (legacy items schema)",
+      "systemPrompt": "TABLE_EXTRACTION_SYSTEM_PROMPT ~125 lines (passc-prompt-audit snapshot)",
+      "userMessage": "Extract all invoice line items from this restaurant invoice table image.",
+      "imageInput": "5-row cropped table (y=561, Mozzarella/Stracciatella excluded)",
+      "supplierInPrompt": false,
+      "footerTotalInPrompt": false
+    },
+    "postGpt": ["reconcileLineItemAmounts", "finalizeExtractedLineItems"],
+    "ricotta": {
+      "name": "RICOTTA TREVIGIANA 1,5KG",
+      "quantity": 1,
+      "unit": "uni",
+      "unit_price": 7.97,
+      "total": 7.97,
+      "gross_unit_price": null,
+      "discount_pct": null,
+      "line_total_net": null,
+      "cxs": "(not in GPT schema)",
+      "ocrTextVisible": "QUANT=1,000 · blank DESC · P.VENDA=7,967 · VALOR=7,97",
+      "neighbouringRows": [
+        "ACQUA S.PELLEGRINO (CX 75CL*15) qty=2",
+        "ROLO DE CABRA E VACA 1KG qty=1"
+      ],
+      "rowIndexInCrop": 4
+    },
+    "mezzi": {
+      "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "quantity": 1,
+      "unit": "uni",
+      "unit_price": 27.56,
+      "total": 27.3,
+      "gross_unit_price": null,
+      "discount_pct": null,
+      "line_total_net": null,
+      "cxs": "(not in GPT schema)",
+      "ocrTextVisible": "QUANT=1,000 · blank DESC · P.VENDA=27,300/27,560 · VALOR=27,30",
+      "neighbouringRows": [
+        "(first complete row in 5-row crop)",
+        "POMODORI PELATI (CX 2,5KG*6) qty=1"
+      ],
+      "rowIndexInCrop": 1
+    }
+  },
+  "hybridH": {
+    "era": "Deploy v25+ (final-validation-lab-rerun 2026-06-12; edge v36 2026-06-20)",
+    "sources": {
+      "apiOutput": ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+      "edgeInvoke": ".tmp/family-a-v25-raw-capture/edge-invoke-final.json",
+      "stability": ".tmp/final-stability-audit/extracts/f0aa5a08-86a3-4938-99f0-711e86073968-all-runs.json",
+      "prompt": "supabase/functions/extract-invoice/invoice-table-extraction.ts TABLE_EXTRACTION_SYSTEM_PROMPT"
+    },
+    "gptCall": {
+      "model": "gpt-4.1",
+      "temperature": 0,
+      "seed": 42,
+      "responseFormat": "json_schema strict invoice_line_items (structured columns)",
+      "systemPrompt": "TABLE_EXTRACTION_SYSTEM_PROMPT ~250 lines (column-faithful + pack-metadata negatives)",
+      "userMessage": "Extract each visible invoice line item. Copy quantity, gross_unit_price, discount_pct, and line_total_net from their labeled table columns.",
+      "imageInput": "7-row cropped table (post 2edcd02 geometry fix; Mozzarella+Stracciatella included)",
+      "supplierInPrompt": false,
+      "footerTotalInPrompt": false,
+      "knownTotalUsedFor": "empty-table full-image retry only (not injected into GPT messages)"
+    },
+    "postGpt": [
+      "parseMonetaryLineItems",
+      "bindMonetaryColumns",
+      "monetaryToInvoiceLineItem",
+      "reconcileLineItemAmounts",
+      "finalizeExtractedLineItems"
+    ],
+    "ricotta": {
+      "name": "RICOTTA TREVIGIANA 1,5KG",
+      "quantity": 2,
+      "unit": "uni",
+      "unit_price": 7.967,
+      "total": 7.97,
+      "gross_unit_price": null,
+      "discount_pct": null,
+      "line_total_net": null,
+      "cxs": "(not in GPT schema)",
+      "ocrTextVisible": "QUANT=1,000 · blank DESC · P.VENDA=7,967 · VALOR=7,97 (unchanged vs PDF)",
+      "neighbouringRows": [
+        "ACQUA S.PELLEGRINO (CX 75CL*15) qty=2",
+        "ROLO DE CABRA E VACA 1KG qty=1"
+      ],
+      "rowIndexInCrop": 6,
+      "stabilityQty2": "10/10",
+      "postBindUnitPrice": 3.99
+    },
+    "mezzi": {
+      "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "quantity": 2,
+      "unit": "uni",
+      "unit_price": 27.36,
+      "total": 27.3,
+      "gross_unit_price": null,
+      "discount_pct": null,
+      "line_total_net": null,
+      "cxs": "(not in GPT schema)",
+      "ocrTextVisible": "QUANT=1,000 · blank DESC · P.VENDA=27,300 · VALOR=27,30 (unchanged vs PDF)",
+      "neighbouringRows": [
+        "MOZZARELLA FIOR DI LATTE 125GR*8 qty=10",
+        "STRACCIATELLA 250 GR qty=24",
+        "POMODORI PELATI (CX 2,5KG*6) qty=1"
+      ],
+      "rowIndexInCrop": 3,
+      "stabilityQty2": "10/10",
+      "postBindUnitPrice": 13.65
+    }
+  },
+  "fieldDiffTables": {
+    "ricotta": [
+      { "field": "description / name", "passC": "RICOTTA TREVIGIANA 1,5KG", "hybridH": "RICOTTA TREVIGIANA 1,5KG", "same": true },
+      { "field": "quantity (GPT-emitted)", "passC": 1, "hybridH": 2, "same": false },
+      { "field": "CX / CXs column", "passC": "(blank on invoice; not in schema)", "hybridH": "(blank on invoice; not in schema)", "same": true },
+      { "field": "unit", "passC": "uni", "hybridH": "uni", "same": true },
+      { "field": "unit_price / gross_unit_price", "passC": "unit_price 7.97", "hybridH": "unit_price 7.967; gross_unit_price null", "same": false, "note": "Minor digit precision; both ≈ PDF P.VENDA" },
+      { "field": "total / line_total_net", "passC": "total 7.97", "hybridH": "total 7.97; line_total_net null", "same": true, "note": "Total preserved; matches PDF VALOR" },
+      { "field": "discount / discount_pct", "passC": "(blank DESC; not emitted)", "hybridH": "discount_pct null", "same": true },
+      { "field": "OCR text (PDF QUANT/DESC/P.VENDA/VALOR)", "passC": "QUANT=1,000 · blank DESC · 7,967 · 7,97", "hybridH": "QUANT=1,000 · blank DESC · 7,967 · 7,97", "same": true },
+      { "field": "row context / neighbours", "passC": "Row 4/5 in 5-row crop", "hybridH": "Row 6/7 in 7-row crop", "same": false },
+      { "field": "supplier metadata in GPT prompt", "passC": "none", "hybridH": "none", "same": true },
+      { "field": "hidden prompt context", "passC": "legacy pack-inference examples (*24→qty 24); infer qty from names allowed", "hybridH": "PACK NOTATION IS METADATA; trust QUANT column; POMODORI negative example", "same": false }
+    ],
+    "mezzi": [
+      { "field": "description / name", "passC": "MEZZI PACCHERI MANCINI (CX 1KG*6)", "hybridH": "MEZZI PACCHERI MANCINI (CX 1KG*6)", "same": true },
+      { "field": "quantity (GPT-emitted)", "passC": 1, "hybridH": 2, "same": false },
+      { "field": "CX / CXs column", "passC": "(blank on invoice; not in schema)", "hybridH": "(blank on invoice; not in schema)", "same": true },
+      { "field": "unit", "passC": "uni", "hybridH": "uni", "same": true },
+      { "field": "unit_price / gross_unit_price", "passC": "unit_price 27.56", "hybridH": "unit_price 27.36; gross_unit_price null", "same": false, "note": "Both ≈ PDF P.VENDA 27.30–27.56" },
+      { "field": "total / line_total_net", "passC": "total 27.30", "hybridH": "total 27.30; line_total_net null", "same": true },
+      { "field": "discount / discount_pct", "passC": "(blank DESC)", "hybridH": "discount_pct null", "same": true },
+      { "field": "OCR text (PDF QUANT/DESC/P.VENDA/VALOR)", "passC": "QUANT=1,000 · blank DESC · 27,300 · 27,30", "hybridH": "QUANT=1,000 · blank DESC · 27,300 · 27,30", "same": true },
+      { "field": "row context / neighbours", "passC": "First complete row in 5-row crop", "hybridH": "Row 3/7; preceded by Mozzarella qty=10, Stracciatella qty=24", "same": false },
+      { "field": "supplier metadata in GPT prompt", "passC": "none", "hybridH": "none", "same": true },
+      { "field": "hidden prompt context", "passC": "legacy pack-inference examples; no CX+*N negative", "hybridH": "PACK NOTATION IS METADATA; POMODORI *6 negative; column-faithful QUANT", "same": false }
+    ]
+  },
+  "gptPathComparison": {
+    "shared": {
+      "model": "gpt-4.1",
+      "temperature": 0,
+      "seed": 42,
+      "entrypoint": "runTableExtractionPass → callOpenAiJson",
+      "imagePipeline": "cropTableRegionForLineItems → croppedDataUrl attachment",
+      "supplierPassedToTableGpt": false
+    },
+    "differences": [
+      {
+        "dimension": "system prompt",
+        "passC": "~125 lines; legacy unit_price/total; allows infer qty from product names; pack-count examples (*24→24)",
+        "hybridH": "~250 lines; column-faithful; structured monetary columns; PACK NOTATION IS METADATA; POMODORI/CX+*N negatives"
+      },
+      {
+        "dimension": "user message",
+        "passC": "Extract all invoice line items from this restaurant invoice table image.",
+        "hybridH": "Extract each visible invoice line item. Copy quantity, gross_unit_price, discount_pct, and line_total_net from their labeled table columns."
+      },
+      {
+        "dimension": "response schema",
+        "passC": "{ name, quantity, unit, unit_price, total }",
+        "hybridH": "{ name, quantity, unit, gross_unit_price, discount_pct, line_total_net } strict json_schema"
+      },
+      {
+        "dimension": "table crop image",
+        "passC": "5 rows (pre 2edcd02); Mezzi first complete row",
+        "hybridH": "7 rows (post 2edcd02); Mezzi row 3"
+      },
+      {
+        "dimension": "post-GPT pipeline",
+        "passC": "reconcileLineItemAmounts only",
+        "hybridH": "parseMonetaryLineItems → bindMonetaryColumns → reconcileLineItemAmounts"
+      }
+    ]
+  },
+  "familyASignals": {
+    "ricotta": [
+      { "signal": "decimal_weight_1,5KG in description", "visibleToHybridH": true, "couldImplyQty2": true, "evidence": "1,5KG weight token; no *N pack multiplier" },
+      { "signal": "blank DESC (undiscounted)", "visibleToHybridH": true, "couldImplyQty2": false, "evidence": "unit≈total at qty=1; no discount column to anchor" },
+      { "signal": "unit_price ≈ total at qty=1", "visibleToHybridH": true, "couldImplyQty2": true, "evidence": "7.967≈7.97; bindMonetaryColumns later halves unit when qty=2" },
+      { "signal": "blank CXs", "visibleToHybridH": true, "couldImplyQty2": false, "evidence": "Shared with controls Pomodori/Rolo" },
+      { "signal": "QUANT column 1,000", "visibleToHybridH": true, "couldImplyQty2": false, "evidence": "PDF + Pass C both read 1; Hybrid H ignores" },
+      { "signal": "neighbour ACQUA qty=2", "visibleToHybridH": true, "couldImplyQty2": false, "evidence": "Acqua PDF QUANT=2,000 — legitimate multi-qty control" },
+      { "signal": "supplier IL BOCCONCINO", "visibleToHybridH": false, "couldImplyQty2": false, "evidence": "Not in table GPT prompt" },
+      { "signal": "prompt POMODORI *6 negative", "visibleToHybridH": true, "couldImplyQty2": false, "evidence": "Applies to discounted CX+*N only; Ricotta has no CX token" }
+    ],
+    "mezzi": [
+      { "signal": "CX 1KG*6 pack notation", "visibleToHybridH": true, "couldImplyQty2": true, "evidence": "*6 units-per-case; prompt L65-67 says metadata not qty unless column shows it" },
+      { "signal": "blank DESC (undiscounted)", "visibleToHybridH": true, "couldImplyQty2": false, "evidence": "Same as Ricotta/Rolo" },
+      { "signal": "unit_price ≈ total at qty=1", "visibleToHybridH": true, "couldImplyQty2": true, "evidence": "27.36 vs 27.30 (~1% spread)" },
+      { "signal": "blank CXs", "visibleToHybridH": true, "couldImplyQty2": false, "evidence": "CXs column empty despite (CX ...) in description" },
+      { "signal": "QUANT column 1,000", "visibleToHybridH": true, "couldImplyQty2": false, "evidence": "PDF ground truth; Pass C correct" },
+      { "signal": "neighbours Mozzarella qty=10, Stracciatella qty=24", "visibleToHybridH": true, "couldImplyQty2": false, "evidence": "Only in 7-row Hybrid H crop; high multi-qty rows above Mezzi" },
+      { "signal": "first-row-in-crop (Pass C era)", "visibleToHybridH": false, "couldImplyQty2": false, "evidence": "Pass C only; Hybrid H has 2 rows above" },
+      { "signal": "prompt POMODORI (CX 2,5KG*6) negative", "visibleToHybridH": true, "couldImplyQty2": false, "evidence": "Explicit qty=1 NOT 6; Mezzi still qty=2 despite adjacent row sharing CX+*N pattern" }
+    ]
+  },
+  "controlComparison": {
+    "controls": ["POMODORI PELATI (CX 2,5KG*6)", "ROLO DE CABRA E VACA 1KG", "ACQUA S.PELLEGRINO (CX 75CL*15)"],
+    "sharedWithFamilyA": [
+      "Same invoice and supplier template",
+      "Same Hybrid H pipeline (prompt, schema, crop era)",
+      "QUANT column visible",
+      "blank CXs column"
+    ],
+    "uniqueToFamilyA": [
+      "Pass C qty=1 → Hybrid H qty=2 (stable 10/10)",
+      "undiscounted blank DESC",
+      "unit_price ≈ total at qty=1 (total preserved when qty doubled)",
+      "Mezzi: CX+*N pack_multiplier cluster",
+      "Ricotta: decimal_weight_1,5KG cluster (no CX token)"
+    ],
+    "controlsDetail": {
+      "pomodori": {
+        "passCQty": 1,
+        "hybridHQty": 1,
+        "differentiator": "DESC 20% present; prompt negative example L131-135; discounted total≠gross unit",
+        "sharedSignals": ["CX+*N", "pack_multiplier", "blank_CX"]
+      },
+      "rolo": {
+        "passCQty": 1,
+        "hybridHQty": 1,
+        "differentiator": "weight token 1KG only; no *N pack multiplier",
+        "sharedSignals": ["weight_token", "blank_CX", "undiscounted blank DESC"]
+      },
+      "acqua": {
+        "passCQty": 2,
+        "hybridHQty": 2,
+        "differentiator": "PDF QUANT=2,000 — true multi-qty; not 1→2 inflation",
+        "sharedSignals": ["CX+*N in description", "IL BOCCONCINO template"]
+      }
+    },
+    "minimumSeparatingCombo": [
+      "ocr/passc qty=1",
+      "hybridH qty=2 stable 10/10",
+      "undiscounted blank DESC",
+      "unit_price ≈ total at qty=1",
+      "supplier IL BOCCONCINO"
+    ]
+  },
+  "boundaryAssessment": {
+    "choice": "A",
+    "label": "Different input",
+    "eliminated": {
+      "C_qtyAlteredBeforeGpt": "No deterministic pre-GPT qty mutation; crop changes image only",
+      "D_qtyAlteredAfterGpt": "parseMonetaryLineItems, bindMonetaryColumns, reconcile, finalize all preserve quantity (production replay)"
+    },
+    "rationale": [
+      "Table crop geometry changed 5-row → 7-row (different vision input and neighbour context)",
+      "System prompt and user message differ materially",
+      "Response schema changed legacy unit_price/total → structured gross/discount/net",
+      "Model identical (gpt-4.1); not option B (same input)",
+      "First qty=2 appears at Hybrid H table GPT output; downstream invariant proven"
+    ],
+    "notPurely": "Prompt/schema delta alone insufficient to explain — Pomodori/Rolo share Hybrid H input but qty correct"
+  },
+  "confidence": {
+    "downstreamQtyInvariant": 0.97,
+    "qtyDeviationAtTableGptPass": 0.91,
+    "differentInputBetweenEras": 0.95,
+    "badPathGptRawQtyEquals2": 0.78,
+    "overall": 0.88
+  },
+  "sources": [
+    ".tmp/passc-refinement-validation/reextract/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+    ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-gpt-raw-cache.json",
+    ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+    ".tmp/family-a-transition-trace/trace.json",
+    ".tmp/family-a-v25-raw-capture/artifact-index.json",
+    ".tmp/family-a-v25-raw-capture/edge-invoke-final.json",
+    ".tmp/family-a-scope-audit/audit-result.json",
+    ".tmp/ricotta-root-cause-trace/trace.json",
+    ".tmp/mezzi-root-cause-trace/trace.json",
+    ".tmp/bocconcino-investigation/extract-invoice-response.json",
+    ".tmp/passc-prompt-audit/passc-prompt.txt",
+    ".tmp/column-selection-deep-dive/column-reconstruction.json",
+    "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+    "supabase/functions/extract-invoice/index.ts"
+  ]
+}

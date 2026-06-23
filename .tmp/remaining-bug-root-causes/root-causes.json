@@ -1,0 +1,202 @@
+{
+  "generatedAt": "2026-06-22T00:00:00.000Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "methodology": "Same stage-by-stage trace as .tmp/ricotta-root-cause-trace/ and .tmp/mezzi-root-cause-trace/",
+  "products": [
+    {
+      "key": "mozzarella",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "invoiceItemId": "095b2bb9-bd36-44c2-a1f9-7c50fa9c0cc6",
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "lineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "pdfRealitySource": ".tmp/geometry-audit/images/f0aa5a08-86a3-4938-99f0-711e86073968.png; .tmp/field-accuracy-audit/ground-truth.json",
+      "stages": [
+        { "stage": 1, "name": "PDF reality", "quantity": 10, "unitPrice": 9.5, "total": 81.23, "source": "QUANT=10,000 · P.VENDA=9,500 · DESC 14,50% · VALOR LÍQUIDO=81,23" },
+        { "stage": 2, "name": "OCR / table GPT raw (Pass C era)", "quantity": 10, "unitPrice": 9.5, "total": 81.23, "source": ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-gpt-raw-cache.json" },
+        { "stage": 3, "name": "Pass C baseline", "quantity": 10, "unitPrice": 9.5, "total": 81.23, "source": ".tmp/passc-refinement-validation/reextract/f0aa5a08-86a3-4938-99f0-711e86073968.json" },
+        { "stage": 4, "name": "Hybrid H output (v25)", "quantity": 10, "unitPrice": 8.12, "total": 81.23, "matchesPdf": true, "source": ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json" },
+        { "stage": 5, "name": "bindMonetaryColumns input", "quantity": 10, "unitPrice": 8.12, "total": 81.23, "source": "Hybrid H legacy fields" },
+        { "stage": 5, "name": "bindMonetaryColumns output", "quantity": 10, "unitPrice": 8.12, "total": 81.23, "modified": false, "source": ".tmp/quantity-mismatch-ui-audit/replay.json" },
+        { "stage": 6, "name": "reconcileLineItemAmounts input", "quantity": 10, "unitPrice": 8.12, "total": 81.23, "source": "Post-bind" },
+        { "stage": 6, "name": "reconcileLineItemAmounts output", "quantity": 10, "unitPrice": 8.12, "total": 81.23, "modified": false, "source": "Production replay" },
+        { "stage": 7, "name": "invoice_items persisted (VL DB)", "quantity": 10, "unitPrice": 8.12, "total": 81.23, "matchesPdf": true, "source": ".tmp/phase1-validation-forensics-result.json mozzarella fior" },
+        { "stage": 8, "name": "Purchase history / structure resolution", "quantity": 10, "unitPrice": 8.12, "total": 81.23, "usableKg": 1, "matchesPdf": false, "note": "normalizedUsableQuantity=1000g; purchaseContainerCount=8; catalog purchase_quantity=1", "source": ".tmp/phase1-validation-forensics-result.json structured block" },
+        { "stage": 9, "name": "Ingredient detail page", "lastPurchase": "10 un", "procurementCost": "€8.12 / unit", "operationalCost": "€81.20 / kg", "usableQuantity": "1 kg usable", "source": ".tmp/quantity-mismatch-ui-audit/replay.json" },
+        { "stage": 10, "name": "Procurement cost calculation", "purchaseQuantityForCost": 1, "storedPurchaseQuantity": 1, "currentPrice": 8.12, "source": "resolveCountablePurchaseQuantityForCost collapse" },
+        { "stage": 11, "name": "Operational cost calculation", "effectiveUsableCost": 81.2, "unit": "kg", "usableGrams": 1000, "expression": "81.23 ÷ 1 kg (should ÷ 10 kg)", "source": "computeEffectiveUsableCost replay" }
+      ],
+      "firstIncorrectValue": {
+        "stage": "Purchase structure / stock normalization (stage 8)",
+        "field": "usable_weight",
+        "pdfValue": 10000,
+        "pdfUnit": "g",
+        "incorrectValue": 1000,
+        "incorrectUnit": "g",
+        "evidence": [
+          ".tmp/phase1-validation-forensics-result.json additional.mozzarella fior.replay.structured",
+          ".tmp/quantity-mismatch-ui-audit/replay.json invoiceItemId 095b2bb9…"
+        ],
+        "priorStagesCorrect": [
+          "PDF qty=10 unit_price=9.50 total=81.23",
+          "Hybrid H qty=10 unit_price=8.12 total=81.23",
+          "bindMonetaryColumns unchanged",
+          "reconcileLineItemAmounts unchanged",
+          "DB persist qty=10 unit_price=8.12 total=81.23"
+        ]
+      },
+      "classification": {
+        "extractionBug": false,
+        "downstreamBug": true,
+        "userVisible": true,
+        "bugFamily": "B"
+      }
+    },
+    {
+      "key": "ginger_beer",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoiceItemId": "634a418b-1509-42a9-bf01-563705967b6f",
+      "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+      "lineName": "Baladin - Ginger Beer 0.20cl",
+      "extractCorroborationInvoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "pdfRealitySource": ".tmp/ginger-beer-ground-truth/invoice-full.png; .tmp/ginger-beer-audit/INVOICE_GROUND_TRUTH.md",
+      "stages": [
+        { "stage": 1, "name": "PDF reality", "quantity": 24, "unitPrice": 0.85, "total": 19.38, "source": "Qtd=24,00 · Pr.=0,85 € · Desc 5% · Valor=19,38 €" },
+        { "stage": 2, "name": "OCR / table GPT raw (Pass C era)", "quantity": 24, "unitPrice": 0.85, "total": 19.38, "source": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json" },
+        { "stage": 3, "name": "Pass C baseline", "quantity": 2, "unitPrice": 9.69, "total": 19.38, "note": "Case framing; total preserved", "source": ".tmp/passc-refinement-validation/reextract/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json" },
+        { "stage": 4, "name": "Hybrid H output (v25)", "quantity": 24, "unitPrice": 0.81, "total": 19.38, "matchesPdf": true, "source": ".tmp/final-validation-lab-rerun/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json" },
+        { "stage": 5, "name": "bindMonetaryColumns input", "quantity": 24, "unitPrice": 0.81, "total": 19.38, "source": "Hybrid H legacy fields" },
+        { "stage": 5, "name": "bindMonetaryColumns output", "quantity": 24, "unitPrice": 0.81, "total": 19.38, "modified": false, "source": ".tmp/quantity-mismatch-ui-audit/replay.json" },
+        { "stage": 6, "name": "reconcileLineItemAmounts input", "quantity": 24, "unitPrice": 0.81, "total": 19.38, "source": "Post-bind" },
+        { "stage": 6, "name": "reconcileLineItemAmounts output", "quantity": 24, "unitPrice": 0.81, "total": 19.38, "modified": false, "source": "Production replay" },
+        { "stage": 7, "name": "invoice_items persisted (VL DB)", "quantity": 24, "unitPrice": 0.81, "total": 19.38, "matchesPdf": true, "source": ".tmp/quantity-mismatch-validation/mismatches.json" },
+        { "stage": 8, "name": "Purchase history / volume inference", "quantity": 24, "unitPrice": 0.81, "total": 19.38, "usableMl": 48, "perBottleMl": 2, "matchesPdf": false, "note": "detectVolume parses 0.20cl as 0.20 centilitres = 2 ml", "source": ".tmp/quantity-mismatch-ui-audit/replay.json; src/lib/ingredient-unit-inference.ts detectVolume" },
+        { "stage": 9, "name": "Ingredient detail page", "lastPurchase": "24", "procurementCost": "€0.81", "operationalCost": "€405.00 / L", "usableQuantity": "48 ml usable", "source": ".tmp/quantity-mismatch-ui-audit/replay.json" },
+        { "stage": 10, "name": "Procurement cost calculation", "purchaseQuantityForCost": 1, "storedPurchaseQuantity": 2, "storedBaseUnit": "ml", "currentPrice": 0.81, "source": "Volume parse seeds catalog" },
+        { "stage": 11, "name": "Operational cost calculation", "effectiveUsableCost": 405, "unit": "L", "usableMl": 48, "expression": "19.38 ÷ 0.048 L (should ÷ ~4.8 L)", "source": "computeEffectiveUsableCost replay" }
+      ],
+      "firstIncorrectValue": {
+        "stage": "Volume inference from product name (stage 8)",
+        "field": "per_bottle_volume",
+        "pdfValue": 200,
+        "pdfUnit": "ml",
+        "incorrectValue": 2,
+        "incorrectUnit": "ml",
+        "evidence": [
+          ".tmp/ginger-beer-ground-truth/stage-table.json",
+          ".tmp/quantity-mismatch-ui-audit/replay.json invoiceItemId 634a418b…",
+          "src/lib/ingredient-unit-inference.ts detectVolume CL regex"
+        ],
+        "priorStagesCorrect": [
+          "PDF qty=24 unit_price=0.85 total=19.38",
+          "Hybrid H qty=24 unit_price=0.81 total=19.38",
+          "bindMonetaryColumns unchanged",
+          "DB persist qty=24 unit_price=0.81 total=19.38",
+          "Name 0.20cl faithfully copied from PDF (typo on source document)"
+        ]
+      },
+      "classification": {
+        "extractionBug": false,
+        "downstreamBug": true,
+        "userVisible": true,
+        "bugFamily": "B"
+      }
+    },
+    {
+      "key": "guanciale",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+      "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6",
+      "lineName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "pdfRealitySource": ".tmp/geometry-audit/images/36c99d19-6f9f-413f-8c2d-ae3526291a2d.png; .tmp/mammafiore-line-audit/ground-truth.json",
+      "stages": [
+        { "stage": 1, "name": "PDF reality", "quantity": 5.996, "unitPrice": 16.922, "total": 64.93, "source": "Qtd=5,996 · Un.=UN · Pr.=16,922 · Desc 36% · Valor=64,93" },
+        { "stage": 2, "name": "OCR / table GPT raw (Pass C era)", "quantity": 5.996, "unitPrice": 16.922, "total": 64.93, "source": ".tmp/persistence-audit/pass-c-raw/36c99d19-6f9f-413f-8c2d-ae3526291a2d-gpt-raw-cache.json" },
+        { "stage": 3, "name": "Pass C baseline", "quantity": 5.996, "unitPrice": 16.922, "total": 101.59, "note": "Total variance on run; qty correct", "source": ".tmp/passc-refinement-validation/reextract/36c99d19-6f9f-413f-8c2d-ae3526291a2d.json" },
+        { "stage": 4, "name": "Hybrid H output (v25)", "quantity": 5.996, "unitPrice": 10.83, "total": 64.93, "matchesPdf": true, "source": ".tmp/final-validation-lab-rerun/extracts/36c99d19-6f9f-413f-8c2d-ae3526291a2d.json" },
+        { "stage": 5, "name": "bindMonetaryColumns input", "quantity": 5.996, "unitPrice": 10.83, "total": 64.93, "source": "Hybrid H legacy fields" },
+        { "stage": 5, "name": "bindMonetaryColumns output", "quantity": 5.996, "unitPrice": 10.83, "total": 64.93, "modified": false, "source": ".tmp/quantity-mismatch-ui-audit/replay.json" },
+        { "stage": 6, "name": "reconcileLineItemAmounts input", "quantity": 5.996, "unitPrice": 10.83, "total": 64.93, "source": "Post-bind" },
+        { "stage": 6, "name": "reconcileLineItemAmounts output", "quantity": 5.996, "unitPrice": 10.83, "total": 64.93, "modified": false, "source": "Production replay" },
+        { "stage": 7, "name": "invoice_items persisted (VL DB)", "quantity": 5.996, "unitPrice": 10.83, "total": 64.93, "matchesPdf": true, "source": ".tmp/quantity-mismatch-validation/mismatches.json" },
+        { "stage": 8, "name": "Purchase history / structure resolution", "quantity": 5.996, "unitPrice": 10.83, "total": 64.93, "usableKg": 10.5, "matchesPdf": false, "note": "purchaseContainerCount=7 from *7; normalizedUsable=10500g not 5996g", "source": ".tmp/quantity-mismatch-ui-audit/replay.json" },
+        { "stage": 9, "name": "Ingredient detail page", "lastPurchase": "6.00 un", "procurementCost": "€10.83 / unit", "operationalCost": "€6.18 / kg", "usableQuantity": "10.5 kg usable", "source": ".tmp/quantity-mismatch-ui-audit/replay.json" },
+        { "stage": 10, "name": "Procurement cost calculation", "purchaseQuantityForCost": 1, "purchaseContainerCount": 7, "currentPrice": 10.83, "source": "Pack *7 applied as container count" },
+        { "stage": 11, "name": "Operational cost calculation", "effectiveUsableCost": 6.18, "unit": "kg", "usableGrams": 10500, "expression": "64.93 ÷ 10.5 kg (should ÷ 5.996 kg)", "source": "computeEffectiveUsableCost replay" }
+      ],
+      "firstIncorrectValue": {
+        "stage": "Purchase structure / stock normalization (stage 8)",
+        "field": "usable_weight",
+        "pdfValue": 5996,
+        "pdfUnit": "g",
+        "incorrectValue": 10500,
+        "incorrectUnit": "g",
+        "evidence": [
+          ".tmp/quantity-mismatch-ui-audit/replay.json invoiceItemId 6efebedf…",
+          "src/lib/stock-normalization.ts resolvePurchaseContainerCount / deriveUsableFromPackPhrase"
+        ],
+        "priorStagesCorrect": [
+          "PDF qty=5.996 unit_price=16.922 total=64.93",
+          "Hybrid H qty=5.996 unit_price=10.83 total=64.93",
+          "bindMonetaryColumns unchanged",
+          "reconcileLineItemAmounts unchanged",
+          "DB persist qty=5.996 unit_price=10.83 total=64.93"
+        ]
+      },
+      "classification": {
+        "extractionBug": false,
+        "downstreamBug": true,
+        "userVisible": true,
+        "bugFamily": "B"
+      }
+    }
+  ],
+  "comparisonMatrix": [
+    {
+      "product": "Ricotta trevigiana",
+      "invoiceItemId": "409850ab-646d-44fa-b20c-c8a4a8570064",
+      "firstIncorrectStage": "Hybrid H (stage 4) — qty 1→2",
+      "extractionBug": true,
+      "downstreamBug": false,
+      "userVisible": true,
+      "source": ".tmp/ricotta-root-cause-trace/REPORT.md"
+    },
+    {
+      "product": "Mezzi paccheri mancini",
+      "invoiceItemId": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+      "firstIncorrectStage": "Hybrid H (stage 4) — qty 1→2",
+      "extractionBug": true,
+      "downstreamBug": "partial",
+      "userVisible": true,
+      "source": ".tmp/mezzi-root-cause-trace/REPORT.md"
+    },
+    {
+      "product": "Mozzarella fior di latte",
+      "invoiceItemId": "095b2bb9-bd36-44c2-a1f9-7c50fa9c0cc6",
+      "firstIncorrectStage": "Stock normalization (stage 8) — usable 1 kg not 10 kg",
+      "extractionBug": false,
+      "downstreamBug": true,
+      "userVisible": true
+    },
+    {
+      "product": "Ginger beer",
+      "invoiceItemId": "634a418b-1509-42a9-bf01-563705967b6f",
+      "firstIncorrectStage": "Volume inference (stage 8) — 2 ml/bottle from 0.20cl",
+      "extractionBug": false,
+      "downstreamBug": true,
+      "userVisible": true
+    },
+    {
+      "product": "Guanciale stagionato",
+      "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+      "firstIncorrectStage": "Stock normalization (stage 8) — usable 10.5 kg not ~6 kg",
+      "extractionBug": false,
+      "downstreamBug": true,
+      "userVisible": true
+    }
+  ],
+  "bugFamilyAssessment": {
+    "A_extractionOriginated": ["Ricotta trevigiana", "Mezzi paccheri mancini"],
+    "B_downstreamTransformationOriginated": ["Mozzarella fior di latte", "Ginger beer", "Guanciale stagionato"],
+    "C_mixed": []
+  }
+}

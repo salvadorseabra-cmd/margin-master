@@ -1,5 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { inferPurchaseUnitsFromLineItemName } from "./ingredient-unit-inference";
+import { detectVolume, inferPurchaseUnitsFromLineItemName } from "./ingredient-unit-inference";
+
+describe("detectVolume — decimal-leading CL typo", () => {
+  it.each([
+    { token: "Baladin - Ginger Beer 0.20cl", ml: 200 },
+    { token: "20cl", ml: 200 },
+    { token: "200ml", ml: 200 },
+    { token: "Óleo 0.75L", ml: 750 },
+    { token: "75cl", ml: 750 },
+    { token: "Acqua 5L", ml: 5000 },
+  ])("parses $token → $ml ml", ({ token, ml }) => {
+    expect(detectVolume(token)?.milliliters).toBe(ml);
+  });
+});
 
 describe("inferPurchaseUnitsFromLineItemName — beverage multipacks", () => {
   it.each([

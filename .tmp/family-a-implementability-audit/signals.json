@@ -1,0 +1,220 @@
+{
+  "generated_at": "2026-06-21T00:00:00.000Z",
+  "mode": "READ-ONLY OPTION C IMPLEMENTABILITY AUDIT",
+  "vl_project": "bjhnlrgodcqoyzddbpbd",
+  "question": "Can the replay logic be expressed using real pipeline data at runtime?",
+  "replay_sources": [
+    ".tmp/family-a-option-c-replay/replay.mts",
+    ".tmp/family-a-full-population-replay/replay.mts",
+    ".tmp/family-a-full-population-replay/results.json"
+  ],
+  "pipeline_entry": "supabase/functions/extract-invoice/index.ts",
+  "persistence_schema": "supabase/migrations/20260511115814_625d8b2b-28d8-4400-b815-d2e6173f063e.sql",
+  "signals": [
+    {
+      "id": "ocr_qty_eq_1",
+      "used_in_replay": true,
+      "documented_combo_member": true,
+      "runtime_available": false,
+      "classification": "D",
+      "classification_label": "Not available",
+      "pipeline_stage_earliest": null,
+      "source_in_replay": "Frozen meta.ocrQty from passc-refinement reextract + scope-audit manual overrides (.tmp/family-a-scope-audit/audit-result.json)",
+      "source_in_production": "Single quantity field from Pass C GPT; no separate OCR/pre-Hybrid qty preserved",
+      "deterministic": false,
+      "implementability": "RED",
+      "evidence": [
+        "replay.mts L96: ocr_qty_eq_1: meta.ocrQty === 1",
+        "replay.mts L139-144: ocrQty hardcoded per RowSpec from investigation",
+        "scope-audit audit-result.json methodology: passc-refinement-validation/reextract as OCR qty proxy",
+        "passc Mezzi qty=1 vs v25 Hybrid qty=2 (.tmp/passc-refinement-validation/reextract/f0aa5a08....json L26 vs final-validation-lab-rerun extract L28)",
+        "index.ts L69: deterministic OCR parsers not invoked",
+        "invoice_items schema: quantity only — no ocr_qty column"
+      ]
+    },
+    {
+      "id": "hybrid_h_qty_eq_2",
+      "used_in_replay": true,
+      "documented_combo_member": true,
+      "runtime_available": true,
+      "classification": "A",
+      "classification_label": "Available during extraction",
+      "pipeline_stage_earliest": "finalizeExtractedLineItems (post-reconcile; qty unchanged by reconcile stages)",
+      "source_in_replay": "item.quantity from frozen extract artifacts / binding.raw.qty from effective-paid rows",
+      "source_in_production": "Pass C GPT quantity → bindMonetaryColumns (qty preserved) → reconcileLineItemAmounts (qty preserved) → API response → invoice_items.quantity",
+      "deterministic": true,
+      "implementability": "GREEN",
+      "evidence": [
+        "replay.mts L351-352: hybridHQty = item.quantity",
+        "invoice-table-extraction.ts L401-404: bind + reconcile; reconcileLineItemAmounts does not modify quantity (invoice-line-reconcile.ts L68-85)",
+        "capture-hybrid-h.deno.ts L134-138: reconcileModifiedQty/finalizeModifiedQty false for Family A rows",
+        "invoices.tsx L1453: quantity persisted from normalized extract"
+      ]
+    },
+    {
+      "id": "hybrid_h_qty_2_stable",
+      "used_in_replay": true,
+      "documented_combo_member": true,
+      "runtime_available": false,
+      "classification": "D",
+      "classification_label": "Investigation-only",
+      "pipeline_stage_earliest": null,
+      "source_in_replay": "meta.hybridHQty2Stable from 10/10 stability audit (.tmp/final-stability-audit/) or risk-population stable_qty_2",
+      "source_in_production": "No production code computes multi-run qty stability; no DB field",
+      "deterministic": false,
+      "implementability": "RED",
+      "evidence": [
+        "replay.mts L98: hybrid_h_qty_2_stable: meta.hybridHQty2Stable === true",
+        "family-a-effective-paid-risk-audit/audit.mts L125: stable_qty_2: FAMILY_A_IDS.has(id) — not computed from runs",
+        "family-a-scope-audit/REPORT.md L45-50: 10/10 qty=2 from cross-version + final-stability-audit",
+        "final-stability-audit/extracts/f0aa5a08-all-runs.json: Mezzi/Ricotta qty=2 all 10 runs; Rolo qty=2 only run 7",
+        "grep production src/ + supabase/functions/extract-invoice/: zero stable_qty references"
+      ]
+    },
+    {
+      "id": "undiscounted_blank_desc",
+      "used_in_replay": true,
+      "documented_combo_member": true,
+      "runtime_available": "partial",
+      "classification": "A_then_C",
+      "classification_label": "Available during extraction (Pass C discount_pct); lost after persistence",
+      "pipeline_stage_earliest": "Pass C GPT parse (before bindMonetaryColumns)",
+      "source_in_replay": "Manual RowSpec meta + risk-audit heuristic (exclude gorgonzola/mozzarella/pomodori; default true for Bocconcino/Bidfood)",
+      "source_in_production": "Pass C returns discount_pct in parsed GPT JSON; stripped by monetaryToInvoiceLineItem; not in invoice_items",
+      "deterministic": true,
+      "implementability": "RED",
+      "evidence": [
+        "replay.mts L99: undiscounted_blank_desc: meta.undiscountedBlankDesc",
+        "invoice-table-extraction.ts L29-33: GPT schema includes discount_pct",
+        "invoice-monetary-binding.ts L219-226: monetaryToInvoiceLineItem drops discount_pct",
+        "invoice_items schema: no discount_pct column",
+        "risk-audit audit.mts L126-128: blank_desc_undiscounted heuristic, not DESC column read",
+        "scope-audit REPORT.md L32: Pomodori has 20% DESC — undiscounted=false requires visible invoice / passc"
+      ]
+    },
+    {
+      "id": "supplier_il_bocconcino",
+      "used_in_replay": true,
+      "documented_combo_member": true,
+      "runtime_available": true,
+      "classification": "A",
+      "classification_label": "Available during extraction",
+      "pipeline_stage_earliest": "Pass B supplier metadata (extractMetadataFromImage)",
+      "source_in_replay": "meta.supplierIsIlBocconcino or extract.supplier in frozen artifacts",
+      "source_in_production": "index.ts supplier pass → normalized.supplier → invoices.supplier on client persist",
+      "deterministic": true,
+      "implementability": "GREEN",
+      "evidence": [
+        "index.ts L91-110: supplier-specialist pass",
+        "index.ts L191-196: supplier in API response",
+        "invoices migration L23: invoices.supplier text",
+        "replay.mts L101: supplier_il_bocconcino from meta"
+      ]
+    },
+    {
+      "id": "unit_price_approx_total_at_qty1",
+      "used_in_replay": true,
+      "documented_combo_member": true,
+      "runtime_available": true,
+      "classification": "B",
+      "classification_label": "After persistence (from unit_price + total on line item)",
+      "pipeline_stage_earliest": "bindMonetaryColumns output (unit_price, total on InvoiceLineItem)",
+      "source_in_replay": "replayBinding L72: |rawUnit - total| / max(total, 0.01) <= 0.02",
+      "source_in_production": "Computed from persisted invoice_items.unit_price and invoice_items.total",
+      "deterministic": true,
+      "implementability": "GREEN",
+      "evidence": [
+        "replay.mts L72-73",
+        "effective-paid risk-population Mezzi: unit 27.31 ≈ total 27.30",
+        "invoice_items stores unit_price and total"
+      ]
+    },
+    {
+      "id": "total_preserved",
+      "used_in_replay": true,
+      "documented_combo_member": false,
+      "runtime_available": "conditional",
+      "classification": "B",
+      "classification_label": "After persistence — recomputed via bindMonetaryColumns replay",
+      "pipeline_stage_earliest": "bindMonetaryColumns (applyEffectivePaidPrice detects gross inconsistency)",
+      "source_in_replay": "replayBinding L73: |qty*rawUnit - total| > TOL && arithmeticConsistent",
+      "source_in_production": "Not emitted by pipeline; recomputable offline from invoice_items if unit_price reflects pre-effective-paid gross (VL DB evidence: yes for Family A)",
+      "deterministic": true,
+      "implementability": "YELLOW",
+      "evidence": [
+        "replay.mts L73",
+        "invoice-monetary-binding.ts L109-118 hasInconsistentGrossLineTotal",
+        "v25 extract Mezzi unit_price 27.36, total 27.30, qty 2 → total preserved pattern",
+        "If pipeline persisted post-effective-paid unit (13.65), total_preserved signal would not fire on replay"
+      ]
+    },
+    {
+      "id": "binding_changed",
+      "used_in_replay": true,
+      "documented_combo_member": false,
+      "runtime_available": "conditional",
+      "classification": "B",
+      "classification_label": "After persistence — offline re-bind only (not stored)",
+      "pipeline_stage_earliest": "bindMonetaryColumns / applyEffectivePaidPrice",
+      "source_in_replay": "replayBinding L68: |boundUnit - rawUnit| > TOL after re-invoking bindMonetaryColumns",
+      "source_in_production": "bindMonetaryColumns runs once in invoice-table-extraction.ts L401; binding delta not logged or persisted",
+      "deterministic": true,
+      "implementability": "YELLOW",
+      "evidence": [
+        "replay.mts L63-68",
+        "invoice-table-extraction.ts L401",
+        "effective-paid-contract-validation.mts L100-132 replayBinding on DB rows",
+        "invoice-monetary-binding.ts L120-129 applyEffectivePaidPrice"
+      ]
+    },
+    {
+      "id": "diff_pct_ge_45",
+      "used_in_replay": true,
+      "documented_combo_member": false,
+      "runtime_available": "conditional",
+      "classification": "B",
+      "classification_label": "Derived from binding_changed replay",
+      "pipeline_stage_earliest": "bindMonetaryColumns (same as binding_changed)",
+      "source_in_replay": "replayBinding L71: |rawUnit - boundUnit| / rawUnit >= 0.45",
+      "source_in_production": "Not stored; derived from binding replay",
+      "deterministic": true,
+      "implementability": "YELLOW",
+      "evidence": [
+        "replay.mts L19-20 DIFF_PCT_MIN = 0.45",
+        "replay.mts L108"
+      ]
+    },
+    {
+      "id": "qty_inflation_signature",
+      "used_in_replay": true,
+      "documented_combo_member": false,
+      "runtime_available": "partial",
+      "classification": "B",
+      "classification_label": "Composite — depends on hybrid qty + binding replay signals",
+      "pipeline_stage_earliest": "bindMonetaryColumns + persisted quantity",
+      "source_in_replay": "replay.mts L103-107: hybridHQty > 1 && bindingChanged && arithmeticConsistent && diffPct >= 0.45",
+      "source_in_production": "Not computed in production; partially expressible from invoice_items + bindMonetaryColumns re-run",
+      "deterministic": true,
+      "implementability": "YELLOW",
+      "evidence": [
+        "replay.mts L103-107",
+        "full-population replay results.json: triggers only when binding + documented combo all true"
+      ]
+    }
+  ],
+  "implementability_totals": {
+    "GREEN": 3,
+    "YELLOW": 4,
+    "RED": 3
+  },
+  "classification_totals": {
+    "A_available_during_extraction": 3,
+    "B_after_persistence": 5,
+    "C_investigation_only": 0,
+    "D_not_available": 2,
+    "partial_A_then_lost": 1
+  },
+  "verdict": "B",
+  "verdict_label": "Partially depends on investigation-only signals",
+  "verdict_rationale": "Three documented-combo gates (ocr_qty_eq_1, hybrid_h_qty_2_stable, undiscounted_blank_desc as replayed) are not expressible from a single production extraction without frozen passc/stability/scope artifacts. Binding-derived signals are recomputable from invoice_items only when gross unit_price is preserved; they are never emitted as runtime signals by the pipeline."
+}

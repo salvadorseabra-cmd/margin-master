@@ -1,0 +1,261 @@
+{
+  "generatedAt": "2026-06-22T00:00:00.000Z",
+  "mode": "STRICT_READ_ONLY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "supplier": "IL BOCCONCINO DISTRIBUIÇÃO ALIMENTAR",
+  "failures": [
+    {
+      "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "invoiceItemId": "095b2bb9-bd36-44c2-a1f9-7c50fa9c0cc6",
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "invoiceQty": 10,
+      "unitPrice": 8.12,
+      "total": 81.23,
+      "currentUsableGrams": 1000,
+      "expectedUsableGrams": 10000,
+      "currentOperationalCostPerKg": 81.2,
+      "expectedOperationalCostPerKg": 8.12,
+      "firstIncorrectStage": 8,
+      "parseTier": "size_count",
+      "matchedToken": "125GR*8"
+    }
+  ],
+  "implementationTarget": {
+    "pipeline": [
+      "invoice_items (persisted)",
+      "resolveInvoiceLinePurchaseFormat",
+      "parsePurchaseStructureFromText",
+      "computeUsableFromPurchaseStructure",
+      "structuredPurchaseToIngredientFields",
+      "recipeOperationalCostFieldsFromInvoiceLine",
+      "computeEffectiveUsableCost"
+    ],
+    "earliestIncorrectValue": {
+      "file": "src/lib/stock-normalization.ts",
+      "function": "computeUsableFromPurchaseStructure",
+      "lines": "1278-1288",
+      "field": "usableQuantity",
+      "incorrectValue": 1000,
+      "incorrectUnit": "g",
+      "expectedValue": 10000,
+      "expectedUnit": "g",
+      "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+      "blockingPolicy": {
+        "file": "src/lib/stock-normalization.ts",
+        "function": "structureTotalIsFinalForGenericRow",
+        "lines": "1087-1100"
+      }
+    },
+    "orchestrationEntry": {
+      "file": "src/lib/invoice-purchase-format.ts",
+      "function": "resolveInvoiceLinePurchaseFormat",
+      "lines": "655-735"
+    },
+    "downstreamAmplification": {
+      "file": "src/lib/invoice-purchase-price-semantics.ts",
+      "functions": [
+        "resolveUsablePerPricedUnit",
+        "resolveOperationalUsablePerPricedUnit",
+        "computeEffectiveUsableCost"
+      ],
+      "note": "1000g line total ÷ rowQty 10 → 100g per priced unit → €81.20/kg"
+    },
+    "firstIncorrectStage": "Purchase structure / stock normalization (stage 8)",
+    "extractionStagesCorrect": true,
+    "confidence": 0.94
+  },
+  "valueTrace": {
+    "stages": [
+      { "stage": 1, "quantity": 10, "packageStructure": "125GR*8 = 1 kg/pack", "usableGrams": 10000, "correct": true },
+      { "stage": 7, "quantity": 10, "packageStructure": "in name", "usableGrams": null, "correct": true },
+      { "stage": "8a", "function": "parsePurchaseStructureFromText", "packageStructure": "size_count inner=8 size=125g", "usableGrams": 1000, "correct": false },
+      { "stage": "8b", "function": "computeUsableFromPurchaseStructure", "quantity": 10, "usableGrams": 1000, "correct": false },
+      { "stage": 9, "quantity": 10, "usableGrams": 1000, "operationalCostPerKg": 81.2, "correct": false },
+      { "stage": 11, "expectedUsableGrams": 10000, "expectedOperationalCostPerKg": 8.12 }
+    ],
+    "control": {
+      "product": "STRACCIATELLA 250 GR",
+      "quantity": 24,
+      "tier": "bare_measure",
+      "usableGrams": 6000,
+      "correct": true
+    }
+  },
+  "changeSurface": {
+    "direct": [
+      {
+        "file": "src/lib/stock-normalization.ts",
+        "functions": [
+          "structureTotalIsFinalForGenericRow",
+          "resolveStructurePurchaseQuantity",
+          "computeUsableFromPurchaseStructure",
+          "buildInnerUnitsStructure"
+        ],
+        "impact": "Earliest incorrect usable assignment"
+      },
+      {
+        "file": "src/lib/stock-normalization.test.ts",
+        "change": "SIZE_COUNT outer-pack regression cases",
+        "impact": "Mozzarella + structural controls"
+      }
+    ],
+    "indirect": [
+      {
+        "file": "src/lib/invoice-purchase-format.ts",
+        "functions": ["resolveInvoiceLinePurchaseFormat", "structuredPurchaseToIngredientFields"],
+        "impact": "normalizedUsableQuantity, purchaseContainerCount"
+      },
+      {
+        "file": "src/lib/invoice-purchase-price-semantics.ts",
+        "functions": [
+          "resolveUsablePerPricedUnit",
+          "resolveOperationalUsablePerPricedUnit",
+          "computeEffectiveUsableCost",
+          "recipeOperationalCostFieldsFromInvoiceLine"
+        ],
+        "impact": "Operational €/kg, usable_weight_grams overlay"
+      },
+      {
+        "file": "src/lib/ingredient-auto-persist.ts",
+        "function": "syncOperationalIngredientCostsFromInvoiceLines",
+        "impact": "Catalog field propagation on re-ingest"
+      },
+      {
+        "file": "src/routes/invoices.tsx",
+        "function": "runExtraction",
+        "impact": "Re-ingest path for f0aa5a08"
+      }
+    ],
+    "outOfScope": [
+      "supabase/functions/extract-invoice/*",
+      "Guanciale weight-semantics fix (separate track)"
+    ],
+    "guancialeCouplingWarning": true
+  },
+  "regressionPopulation": {
+    "vlInvoiceItemsScanned": 51,
+    "sizeCountStructuralMatches": 6,
+    "userVisibleMozzarellaBugs": 1,
+    "userVisibleExpansion": 0,
+    "isolated": true,
+    "vlStatus": "A) Isolated",
+    "rows": [
+      {
+        "product": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "invoiceQty": 10,
+        "expectedUsable": "10.0 kg",
+        "actualUsable": "1.0 kg",
+        "correctToday": false,
+        "classification": "Confirmed"
+      },
+      {
+        "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "invoiceQty": 2,
+        "expectedUsable": "12.0 kg",
+        "actualUsable": "6.0 kg",
+        "correctToday": "partial",
+        "classification": "Family A primary"
+      },
+      {
+        "product": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "invoiceQty": 2,
+        "expectedUsable": "22.5 L",
+        "actualUsable": "11.25 L",
+        "correctToday": true,
+        "classification": "Structural only — UI correct"
+      },
+      {
+        "product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "invoiceQty": 2,
+        "expectedUsable": "22.5 L",
+        "actualUsable": "11.25 L",
+        "correctToday": true,
+        "classification": "Structural only — UI correct"
+      },
+      {
+        "product": "Birra Peroni 33cl*24",
+        "invoiceQty": 24,
+        "expectedUsable": "190 L",
+        "actualUsable": "7.92 L",
+        "correctToday": true,
+        "classification": "Structural only — UI correct"
+      },
+      {
+        "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "invoiceQty": 5.996,
+        "expectedUsable": "~6 kg",
+        "actualUsable": "10.5 kg",
+        "correctToday": false,
+        "classification": "Different mechanism (over-count)"
+      }
+    ]
+  },
+  "impactAnalysis": {
+    "scenario": "usable 1 kg → 10 kg",
+    "surfaces": [
+      { "surface": "usable_stock_ui", "current": "1 kg", "after": "10 kg", "class": "A" },
+      { "surface": "operational_cost_ui", "current": "€81.20/kg", "after": "€8.12/kg", "class": "A" },
+      { "surface": "procurement_cost_ui", "current": "€8.12/unit", "after": "€8.12/unit", "class": "C" },
+      { "surface": "invoice_items", "current": "qty=10 unchanged", "after": "unchanged", "class": "C" },
+      { "surface": "ingredients_catalog", "current": "purchase_quantity=1", "after": "may update on re-ingest", "class": "B" },
+      { "surface": "ingredient_price_history", "current": "new_price=0.812 Bocconcino row", "after": "may recompute", "class": "B" },
+      { "surface": "recipe_cost", "current": "~10× inflated €/kg", "after": "~10× decrease", "class": "A" },
+      { "surface": "dashboard_margins", "current": "understated", "after": "higher margin", "class": "B" },
+      { "surface": "opportunities_alerts", "current": "P0 guard suppressed", "after": "may change", "class": "B" },
+      { "surface": "cross_format_comparison", "current": "41% invalid signal", "after": "still invalid (identity)", "class": "C" }
+    ]
+  },
+  "testPlan": {
+    "mustCorrect": [
+      { "surface": "normalizedUsableQuantity", "current": "1000 g", "expected": "10000 g" },
+      { "surface": "usable_stock_label", "current": "1 kg usable", "expected": "10 kg usable" },
+      { "surface": "operational_cost", "current": "€81.20/kg", "expected": "€8.12/kg" }
+    ],
+    "mustNotRegress": [
+      "STRACCIATELLA 250 GR qty=24 → 6 kg",
+      "Birra Peroni 33cl*24 → 7.92 L",
+      "ACQUA S.PELLEGRINO qty=2 → op €3.73/L",
+      "Guanciale — no flip to under-count"
+    ],
+    "reIngestInvoice": "f0aa5a08-86a3-4938-99f0-711e86073968"
+  },
+  "readiness": {
+    "rootCauseLocalized": { "status": "A", "label": "Proven" },
+    "extractionRuledOut": { "status": "A", "label": "Proven" },
+    "liveReplayMatchesPersisted": { "status": "A", "label": "Proven" },
+    "isolationConfirmed": { "status": "A", "label": "Proven" },
+    "guancialeDecoupling": { "status": "A", "label": "Proven" },
+    "fixDesign": { "status": "C", "label": "Unknown — not in scope" },
+    "regressionControls": { "status": "B", "label": "Needs validation" },
+    "reIngestPath": { "status": "B", "label": "Needs validation" },
+    "crossFormatIdentity": { "status": "B", "label": "Needs validation — separate track" },
+    "readyForImplementation": true,
+    "preconditions": [
+      "Do not blanket-scale all size_count rows",
+      "Frozen VL regression matrix required",
+      "Plan re-ingest of f0aa5a08",
+      "Price-history / identity follow-on, not blocking"
+    ]
+  },
+  "confidence": {
+    "rootCauseLocalization": 0.94,
+    "valueTrace": 0.93,
+    "isolation": 0.92,
+    "changeSurface": 0.88,
+    "impactAnalysis": 0.9,
+    "overall": 0.91
+  },
+  "sources": [
+    ".tmp/remaining-bug-root-causes/",
+    ".tmp/stock-normalization-family-assessment/",
+    ".tmp/bug-pattern-expansion-audit/",
+    ".tmp/quantity-mismatch-ui-audit/",
+    ".tmp/phase1-validation-forensics-result.json",
+    ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+    ".tmp/mozzarella-localized-investigation/",
+    "src/lib/stock-normalization.ts",
+    "src/lib/invoice-purchase-format.ts",
+    "src/lib/invoice-purchase-price-semantics.ts"
+  ]
+}

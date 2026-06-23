@@ -1,0 +1,1176 @@
+{
+  "generatedAt": "2026-06-22T21:05:18.221Z",
+  "mode": "STRICT_READ_ONLY_STRUCTURAL_SEPARATION_AUDIT",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "vlRowsFetched": 3,
+  "rows": [
+    {
+      "key": "mozzarella",
+      "label": "MOZZARELLA FIOR DI LATTE 125GR*8",
+      "invoiceItemId": "095b2bb9-bd36-44c2-a1f9-7c50fa9c0cc6",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "dataSource": "vl_db_readonly",
+      "lineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "bound": {
+        "qty": 10,
+        "unit": "un",
+        "unitPrice": 8.12,
+        "total": 81.23
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 8,
+        "unitSize": 125,
+        "unitMeasurement": "g",
+        "totalUsableAmount": 1000,
+        "usableUnit": "g",
+        "matchedText": "125GR*8",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 8,
+        "unitSize": 125,
+        "unitMeasurement": "g",
+        "perItemBase": 125,
+        "usableUnit": "g",
+        "totalUsableAmount": 1000,
+        "expression": "1 × 8 × 125 g"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 1000,
+        "usableUnit": "g",
+        "unitFamily": "mass",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity (1149-1150) → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure (1278-1288) → structure_total branch",
+        "branchConditions": {
+          "hasInner": true,
+          "tier": "size_count",
+          "rowUnit": "un",
+          "rowQuantity": 10,
+          "purchaseContainerCount": 1,
+          "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack"
+        },
+        "allThreeIdenticalPath": true
+      },
+      "sizeCountIntermediate": {
+        "matchedToken": "125GR*8",
+        "unitSize": 125,
+        "unitMeasurement": "g",
+        "innerUnitCount": 8,
+        "perItemBase": 125,
+        "expression": "1 × 8 × 125 g",
+        "totalUsableAmount": 1000,
+        "usableUnit": "g",
+        "purchaseQuantity": 1,
+        "rowQuantity": 10,
+        "rowQtyNeInner": true,
+        "scaledOuterWouldBe": 10000
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 8,
+        "normalizedUsableQuantity": 1000,
+        "usableQuantityUnit": "g",
+        "packageQuantity": 125,
+        "packageMeasurementUnit": "g"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "1 kg usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 1000,
+        "usableUnit": "g",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 1000,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 1000,
+          "unit": "g"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 81.19999999999999,
+          "unit": "kg"
+        },
+        "effectiveUsableCostLabel": "€81.20 / kg"
+      },
+      "proposedHelper": {
+        "wouldFire": true,
+        "conditions": {
+          "tier_size_count": true,
+          "generic_row": true,
+          "rowQty_gt_1": true,
+          "rowQty_ne_inner": true,
+          "unit_not_kg_L": true
+        }
+      },
+      "uiObserved": {
+        "usable": "1 kg",
+        "opCost": "€81.20/kg",
+        "userVisibleBug": true
+      }
+    },
+    {
+      "key": "pellegrino_bocconcino",
+      "label": "SAN PELLEGRINO 75CL*15 (Bocconcino)",
+      "invoiceItemId": "f25feb92-3477-41a4-9a81-c556a90a0814",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "dataSource": "vl_db_readonly",
+      "lineName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "bound": {
+        "qty": 2,
+        "unit": "un",
+        "unitPrice": 20.97,
+        "total": 42.07
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 15,
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "totalUsableAmount": 11250,
+        "usableUnit": "ml",
+        "matchedText": "75CL*15",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 15,
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "perItemBase": 750,
+        "usableUnit": "ml",
+        "totalUsableAmount": 11250,
+        "expression": "1 × 15 × 75 cl"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 11250,
+        "usableUnit": "ml",
+        "unitFamily": "volume",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity (1149-1150) → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure (1278-1288) → structure_total branch",
+        "branchConditions": {
+          "hasInner": true,
+          "tier": "size_count",
+          "rowUnit": "un",
+          "rowQuantity": 2,
+          "purchaseContainerCount": 1,
+          "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack"
+        },
+        "allThreeIdenticalPath": true
+      },
+      "sizeCountIntermediate": {
+        "matchedToken": "75CL*15",
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "innerUnitCount": 15,
+        "perItemBase": 750,
+        "expression": "1 × 15 × 75 cl",
+        "totalUsableAmount": 11250,
+        "usableUnit": "ml",
+        "purchaseQuantity": 1,
+        "rowQuantity": 2,
+        "rowQtyNeInner": true,
+        "scaledOuterWouldBe": 22500
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 15,
+        "normalizedUsableQuantity": 11250,
+        "usableQuantityUnit": "ml",
+        "packageQuantity": 75,
+        "packageMeasurementUnit": "cl"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "11.25 L usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 11250,
+        "usableUnit": "ml",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 11250,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 11250,
+          "unit": "ml"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 3.7279999999999998,
+          "unit": "L"
+        },
+        "effectiveUsableCostLabel": "€3.73 / L"
+      },
+      "proposedHelper": {
+        "wouldFire": true,
+        "conditions": {
+          "tier_size_count": true,
+          "generic_row": true,
+          "rowQty_gt_1": true,
+          "rowQty_ne_inner": true,
+          "unit_not_kg_L": true
+        }
+      },
+      "uiObserved": {
+        "usable": "11.25 L",
+        "opCost": "€3.73/L",
+        "userVisibleBug": false
+      }
+    },
+    {
+      "key": "pellegrino_emporio",
+      "label": "SAN PELLEGRINO 75CL*15 (Emporio)",
+      "invoiceItemId": "9cdd22ba-051b-4422-a122-3e6a39e9ef8c",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "dataSource": "vl_db_readonly",
+      "lineName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "bound": {
+        "qty": 2,
+        "unit": "un",
+        "unitPrice": 19.28,
+        "total": 38.56
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 15,
+        "innerUnitType": "unit",
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "totalUsableAmount": 11250,
+        "usableUnit": "ml",
+        "matchedText": "75cl x 15ud",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 15,
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "perItemBase": 750,
+        "usableUnit": "ml",
+        "totalUsableAmount": 11250,
+        "expression": "1 × 15 × 75 cl"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 11250,
+        "usableUnit": "ml",
+        "unitFamily": "volume",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity (1149-1150) → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure (1278-1288) → structure_total branch",
+        "branchConditions": {
+          "hasInner": true,
+          "tier": "size_count",
+          "rowUnit": "un",
+          "rowQuantity": 2,
+          "purchaseContainerCount": 1,
+          "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack"
+        },
+        "allThreeIdenticalPath": true
+      },
+      "sizeCountIntermediate": {
+        "matchedToken": "75cl x 15ud",
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "innerUnitCount": 15,
+        "perItemBase": 750,
+        "expression": "1 × 15 × 75 cl",
+        "totalUsableAmount": 11250,
+        "usableUnit": "ml",
+        "purchaseQuantity": 1,
+        "rowQuantity": 2,
+        "rowQtyNeInner": true,
+        "scaledOuterWouldBe": 22500
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 15,
+        "normalizedUsableQuantity": 11250,
+        "usableQuantityUnit": "ml",
+        "packageQuantity": 75,
+        "packageMeasurementUnit": "cl"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "11.25 L usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 11250,
+        "usableUnit": "ml",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 11250,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 11250,
+          "unit": "ml"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 3.4275555555555557,
+          "unit": "L"
+        },
+        "effectiveUsableCostLabel": "€3.43 / L"
+      },
+      "proposedHelper": {
+        "wouldFire": true,
+        "conditions": {
+          "tier_size_count": true,
+          "generic_row": true,
+          "rowQty_gt_1": true,
+          "rowQty_ne_inner": true,
+          "unit_not_kg_L": true
+        }
+      },
+      "uiObserved": {
+        "usable": "11.25 L",
+        "opCost": "€3.43/L",
+        "userVisibleBug": false
+      }
+    }
+  ],
+  "task1_structureTraceTable": [
+    {
+      "product": "MOZZARELLA FIOR DI LATTE 125GR*8",
+      "lineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "tier": "size_count",
+      "matchedText": "125GR*8",
+      "innerUnitCount": 8,
+      "unitSize": 125,
+      "unitMeasurement": "g",
+      "totalUsableAmount": 1000,
+      "purchaseQuantity": 1,
+      "rowQty": 10,
+      "rowUnit": "un",
+      "resolveStructurePurchaseQty": 1,
+      "usableSource": "structure_total",
+      "normalizedUsable": 1000,
+      "usableUnit": "g",
+      "opCost": {
+        "cost": 81.19999999999999,
+        "unit": "kg"
+      }
+    },
+    {
+      "product": "SAN PELLEGRINO 75CL*15 (Bocconcino)",
+      "lineName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "tier": "size_count",
+      "matchedText": "75CL*15",
+      "innerUnitCount": 15,
+      "unitSize": 75,
+      "unitMeasurement": "cl",
+      "totalUsableAmount": 11250,
+      "purchaseQuantity": 1,
+      "rowQty": 2,
+      "rowUnit": "un",
+      "resolveStructurePurchaseQty": 1,
+      "usableSource": "structure_total",
+      "normalizedUsable": 11250,
+      "usableUnit": "ml",
+      "opCost": {
+        "cost": 3.7279999999999998,
+        "unit": "L"
+      }
+    },
+    {
+      "product": "SAN PELLEGRINO 75CL*15 (Emporio)",
+      "lineName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "tier": "size_count",
+      "matchedText": "75cl x 15ud",
+      "innerUnitCount": 15,
+      "unitSize": 75,
+      "unitMeasurement": "cl",
+      "totalUsableAmount": 11250,
+      "purchaseQuantity": 1,
+      "rowQty": 2,
+      "rowUnit": "un",
+      "resolveStructurePurchaseQty": 1,
+      "usableSource": "structure_total",
+      "normalizedUsable": 11250,
+      "usableUnit": "ml",
+      "opCost": {
+        "cost": 3.4275555555555557,
+        "unit": "L"
+      }
+    }
+  ],
+  "task2_parserFieldComparison": [
+    {
+      "key": "mozzarella",
+      "label": "MOZZARELLA FIOR DI LATTE 125GR*8",
+      "invoiceItemId": "095b2bb9-bd36-44c2-a1f9-7c50fa9c0cc6",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "dataSource": "vl_db_readonly",
+      "lineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "bound": {
+        "qty": 10,
+        "unit": "un",
+        "unitPrice": 8.12,
+        "total": 81.23
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 8,
+        "unitSize": 125,
+        "unitMeasurement": "g",
+        "totalUsableAmount": 1000,
+        "usableUnit": "g",
+        "matchedText": "125GR*8",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 8,
+        "unitSize": 125,
+        "unitMeasurement": "g",
+        "perItemBase": 125,
+        "usableUnit": "g",
+        "totalUsableAmount": 1000,
+        "expression": "1 × 8 × 125 g"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 1000,
+        "usableUnit": "g",
+        "unitFamily": "mass",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity (1149-1150) → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure (1278-1288) → structure_total branch",
+        "branchConditions": {
+          "hasInner": true,
+          "tier": "size_count",
+          "rowUnit": "un",
+          "rowQuantity": 10,
+          "purchaseContainerCount": 1,
+          "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack"
+        },
+        "allThreeIdenticalPath": true
+      },
+      "sizeCountIntermediate": {
+        "matchedToken": "125GR*8",
+        "unitSize": 125,
+        "unitMeasurement": "g",
+        "innerUnitCount": 8,
+        "perItemBase": 125,
+        "expression": "1 × 8 × 125 g",
+        "totalUsableAmount": 1000,
+        "usableUnit": "g",
+        "purchaseQuantity": 1,
+        "rowQuantity": 10,
+        "rowQtyNeInner": true,
+        "scaledOuterWouldBe": 10000
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 8,
+        "normalizedUsableQuantity": 1000,
+        "usableQuantityUnit": "g",
+        "packageQuantity": 125,
+        "packageMeasurementUnit": "g"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "1 kg usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 1000,
+        "usableUnit": "g",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 1000,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 1000,
+          "unit": "g"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 81.19999999999999,
+          "unit": "kg"
+        },
+        "effectiveUsableCostLabel": "€81.20 / kg"
+      },
+      "proposedHelper": {
+        "wouldFire": true,
+        "conditions": {
+          "tier_size_count": true,
+          "generic_row": true,
+          "rowQty_gt_1": true,
+          "rowQty_ne_inner": true,
+          "unit_not_kg_L": true
+        }
+      },
+      "uiObserved": {
+        "usable": "1 kg",
+        "opCost": "€81.20/kg",
+        "userVisibleBug": true
+      }
+    },
+    {
+      "key": "pellegrino_bocconcino",
+      "label": "SAN PELLEGRINO 75CL*15 (Bocconcino)",
+      "invoiceItemId": "f25feb92-3477-41a4-9a81-c556a90a0814",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "dataSource": "vl_db_readonly",
+      "lineName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "bound": {
+        "qty": 2,
+        "unit": "un",
+        "unitPrice": 20.97,
+        "total": 42.07
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 15,
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "totalUsableAmount": 11250,
+        "usableUnit": "ml",
+        "matchedText": "75CL*15",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 15,
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "perItemBase": 750,
+        "usableUnit": "ml",
+        "totalUsableAmount": 11250,
+        "expression": "1 × 15 × 75 cl"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 11250,
+        "usableUnit": "ml",
+        "unitFamily": "volume",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity (1149-1150) → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure (1278-1288) → structure_total branch",
+        "branchConditions": {
+          "hasInner": true,
+          "tier": "size_count",
+          "rowUnit": "un",
+          "rowQuantity": 2,
+          "purchaseContainerCount": 1,
+          "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack"
+        },
+        "allThreeIdenticalPath": true
+      },
+      "sizeCountIntermediate": {
+        "matchedToken": "75CL*15",
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "innerUnitCount": 15,
+        "perItemBase": 750,
+        "expression": "1 × 15 × 75 cl",
+        "totalUsableAmount": 11250,
+        "usableUnit": "ml",
+        "purchaseQuantity": 1,
+        "rowQuantity": 2,
+        "rowQtyNeInner": true,
+        "scaledOuterWouldBe": 22500
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 15,
+        "normalizedUsableQuantity": 11250,
+        "usableQuantityUnit": "ml",
+        "packageQuantity": 75,
+        "packageMeasurementUnit": "cl"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "11.25 L usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 11250,
+        "usableUnit": "ml",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 11250,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 11250,
+          "unit": "ml"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 3.7279999999999998,
+          "unit": "L"
+        },
+        "effectiveUsableCostLabel": "€3.73 / L"
+      },
+      "proposedHelper": {
+        "wouldFire": true,
+        "conditions": {
+          "tier_size_count": true,
+          "generic_row": true,
+          "rowQty_gt_1": true,
+          "rowQty_ne_inner": true,
+          "unit_not_kg_L": true
+        }
+      },
+      "uiObserved": {
+        "usable": "11.25 L",
+        "opCost": "€3.73/L",
+        "userVisibleBug": false
+      }
+    },
+    {
+      "key": "pellegrino_emporio",
+      "label": "SAN PELLEGRINO 75CL*15 (Emporio)",
+      "invoiceItemId": "9cdd22ba-051b-4422-a122-3e6a39e9ef8c",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "dataSource": "vl_db_readonly",
+      "lineName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "bound": {
+        "qty": 2,
+        "unit": "un",
+        "unitPrice": 19.28,
+        "total": 38.56
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 15,
+        "innerUnitType": "unit",
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "totalUsableAmount": 11250,
+        "usableUnit": "ml",
+        "matchedText": "75cl x 15ud",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 15,
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "perItemBase": 750,
+        "usableUnit": "ml",
+        "totalUsableAmount": 11250,
+        "expression": "1 × 15 × 75 cl"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 11250,
+        "usableUnit": "ml",
+        "unitFamily": "volume",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity (1149-1150) → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure (1278-1288) → structure_total branch",
+        "branchConditions": {
+          "hasInner": true,
+          "tier": "size_count",
+          "rowUnit": "un",
+          "rowQuantity": 2,
+          "purchaseContainerCount": 1,
+          "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack"
+        },
+        "allThreeIdenticalPath": true
+      },
+      "sizeCountIntermediate": {
+        "matchedToken": "75cl x 15ud",
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "innerUnitCount": 15,
+        "perItemBase": 750,
+        "expression": "1 × 15 × 75 cl",
+        "totalUsableAmount": 11250,
+        "usableUnit": "ml",
+        "purchaseQuantity": 1,
+        "rowQuantity": 2,
+        "rowQtyNeInner": true,
+        "scaledOuterWouldBe": 22500
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 15,
+        "normalizedUsableQuantity": 11250,
+        "usableQuantityUnit": "ml",
+        "packageQuantity": 75,
+        "packageMeasurementUnit": "cl"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "11.25 L usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 11250,
+        "usableUnit": "ml",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 11250,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 11250,
+          "unit": "ml"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 3.4275555555555557,
+          "unit": "L"
+        },
+        "effectiveUsableCostLabel": "€3.43 / L"
+      },
+      "proposedHelper": {
+        "wouldFire": true,
+        "conditions": {
+          "tier_size_count": true,
+          "generic_row": true,
+          "rowQty_gt_1": true,
+          "rowQty_ne_inner": true,
+          "unit_not_kg_L": true
+        }
+      },
+      "uiObserved": {
+        "usable": "11.25 L",
+        "opCost": "€3.43/L",
+        "userVisibleBug": false
+      }
+    }
+  ],
+  "task3_genericRowAnalysis": [
+    {
+      "isGenericPurchaseUnit": true,
+      "structureTotalIsFinalForGenericRow": true,
+      "exactCodePath": "resolveStructurePurchaseQuantity (1149-1150) → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure (1278-1288) → structure_total branch",
+      "branchConditions": {
+        "hasInner": true,
+        "tier": "size_count",
+        "rowUnit": "un",
+        "rowQuantity": 10,
+        "purchaseContainerCount": 1,
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack"
+      },
+      "allThreeIdenticalPath": true
+    },
+    {
+      "isGenericPurchaseUnit": true,
+      "structureTotalIsFinalForGenericRow": true,
+      "exactCodePath": "resolveStructurePurchaseQuantity (1149-1150) → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure (1278-1288) → structure_total branch",
+      "branchConditions": {
+        "hasInner": true,
+        "tier": "size_count",
+        "rowUnit": "un",
+        "rowQuantity": 2,
+        "purchaseContainerCount": 1,
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack"
+      },
+      "allThreeIdenticalPath": true
+    },
+    {
+      "isGenericPurchaseUnit": true,
+      "structureTotalIsFinalForGenericRow": true,
+      "exactCodePath": "resolveStructurePurchaseQuantity (1149-1150) → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure (1278-1288) → structure_total branch",
+      "branchConditions": {
+        "hasInner": true,
+        "tier": "size_count",
+        "rowUnit": "un",
+        "rowQuantity": 2,
+        "purchaseContainerCount": 1,
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack"
+      },
+      "allThreeIdenticalPath": true
+    }
+  ],
+  "task4_sizeCountIntermediate": [
+    {
+      "product": "MOZZARELLA FIOR DI LATTE 125GR*8",
+      "matchedToken": "125GR*8",
+      "unitSize": 125,
+      "unitMeasurement": "g",
+      "innerUnitCount": 8,
+      "perItemBase": 125,
+      "expression": "1 × 8 × 125 g",
+      "totalUsableAmount": 1000,
+      "usableUnit": "g",
+      "purchaseQuantity": 1,
+      "rowQuantity": 10,
+      "rowQtyNeInner": true,
+      "scaledOuterWouldBe": 10000
+    },
+    {
+      "product": "SAN PELLEGRINO 75CL*15 (Bocconcino)",
+      "matchedToken": "75CL*15",
+      "unitSize": 75,
+      "unitMeasurement": "cl",
+      "innerUnitCount": 15,
+      "perItemBase": 750,
+      "expression": "1 × 15 × 75 cl",
+      "totalUsableAmount": 11250,
+      "usableUnit": "ml",
+      "purchaseQuantity": 1,
+      "rowQuantity": 2,
+      "rowQtyNeInner": true,
+      "scaledOuterWouldBe": 22500
+    },
+    {
+      "product": "SAN PELLEGRINO 75CL*15 (Emporio)",
+      "matchedToken": "75cl x 15ud",
+      "unitSize": 75,
+      "unitMeasurement": "cl",
+      "innerUnitCount": 15,
+      "perItemBase": 750,
+      "expression": "1 × 15 × 75 cl",
+      "totalUsableAmount": 11250,
+      "usableUnit": "ml",
+      "purchaseQuantity": 1,
+      "rowQuantity": 2,
+      "rowQtyNeInner": true,
+      "scaledOuterWouldBe": 22500
+    }
+  ],
+  "task5_signalSearch": [
+    {
+      "signal": "structure.tier",
+      "mozzarella": "size_count",
+      "pellegrinoBoc": "size_count",
+      "pellegrinoEmp": "size_count",
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": false
+    },
+    {
+      "signal": "isGenericPurchaseUnit(rowUnit)",
+      "mozzarella": true,
+      "pellegrinoBoc": true,
+      "pellegrinoEmp": true,
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": false
+    },
+    {
+      "signal": "structureTotalIsFinalForGenericRow",
+      "mozzarella": true,
+      "pellegrinoBoc": true,
+      "pellegrinoEmp": true,
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": false
+    },
+    {
+      "signal": "usableSource",
+      "mozzarella": "structure_total",
+      "pellegrinoBoc": "structure_total",
+      "pellegrinoEmp": "structure_total",
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": false
+    },
+    {
+      "signal": "resolveStructurePurchaseQuantity",
+      "mozzarella": 1,
+      "pellegrinoBoc": 1,
+      "pellegrinoEmp": 1,
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": false
+    },
+    {
+      "signal": "structure.unitMeasurement",
+      "mozzarella": "g",
+      "pellegrinoBoc": "cl",
+      "pellegrinoEmp": "cl",
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": true
+    },
+    {
+      "signal": "structure.unitSize",
+      "mozzarella": 125,
+      "pellegrinoBoc": 75,
+      "pellegrinoEmp": 75,
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": true
+    },
+    {
+      "signal": "structure.innerUnitCount",
+      "mozzarella": 8,
+      "pellegrinoBoc": 15,
+      "pellegrinoEmp": 15,
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": true
+    },
+    {
+      "signal": "bound.qty (invoice row qty)",
+      "mozzarella": 10,
+      "pellegrinoBoc": 2,
+      "pellegrinoEmp": 2,
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": true
+    },
+    {
+      "signal": "structure.totalUsableAmount",
+      "mozzarella": 1000,
+      "pellegrinoBoc": 11250,
+      "pellegrinoEmp": 11250,
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": true
+    },
+    {
+      "signal": "chain.usableUnit (mass g vs volume ml)",
+      "mozzarella": "g",
+      "pellegrinoBoc": "ml",
+      "pellegrinoEmp": "ml",
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": true
+    },
+    {
+      "signal": "matchedText / SIZE_COUNT token",
+      "mozzarella": "125GR*8",
+      "pellegrinoBoc": "75CL*15",
+      "pellegrinoEmp": "75cl x 15ud",
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": true
+    },
+    {
+      "signal": "name contains CX/caixa token",
+      "mozzarella": false,
+      "pellegrinoBoc": true,
+      "pellegrinoEmp": false,
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": true
+    },
+    {
+      "signal": "parser tier caixa_units_size (design assumption)",
+      "mozzarella": false,
+      "pellegrinoBoc": false,
+      "pellegrinoEmp": false,
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": true
+    },
+    {
+      "signal": "priceSemantics.singleUnitEqualsLineUsable",
+      "mozzarella": true,
+      "pellegrinoBoc": true,
+      "pellegrinoEmp": true,
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": false
+    },
+    {
+      "signal": "priceSemantics.effectiveUsableCost correct vs UI",
+      "mozzarella": "81.20/kg (UI bug)",
+      "pellegrinoBoc": "3.73/L (UI ok)",
+      "pellegrinoEmp": "3.43/L (UI ok)",
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": true
+    },
+    {
+      "signal": "proposedHelper.wouldFire (Option A)",
+      "mozzarella": true,
+      "pellegrinoBoc": true,
+      "pellegrinoEmp": true,
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": false
+    },
+    {
+      "signal": "proposedHelper + unitMeasurement==='g' only",
+      "mozzarella": true,
+      "pellegrinoBoc": false,
+      "pellegrinoEmp": false,
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": true
+    },
+    {
+      "signal": "rowQty !== innerCount",
+      "mozzarella": true,
+      "pellegrinoBoc": true,
+      "pellegrinoEmp": true,
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": false
+    },
+    {
+      "signal": "resolveInvoiceLinePurchaseFormat.kind",
+      "mozzarella": "multi_unit_pack",
+      "pellegrinoBoc": "multi_unit_pack",
+      "pellegrinoEmp": "multi_unit_pack",
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": false
+    },
+    {
+      "signal": "purchaseContainerCount (structured)",
+      "mozzarella": 8,
+      "pellegrinoBoc": 15,
+      "pellegrinoEmp": 15,
+      "runtimeAvailable": true,
+      "separatesMozzarellaFromPellegrino": true
+    }
+  ],
+  "task6_minimumDifferenceSet": [
+    {
+      "signal": "structure.unitMeasurement",
+      "mozzarella": "g",
+      "pellegrino": {
+        "bocconcino": "cl",
+        "emporio": "cl"
+      }
+    },
+    {
+      "signal": "structure.unitSize",
+      "mozzarella": 125,
+      "pellegrino": {
+        "bocconcino": 75,
+        "emporio": 75
+      }
+    },
+    {
+      "signal": "structure.innerUnitCount",
+      "mozzarella": 8,
+      "pellegrino": {
+        "bocconcino": 15,
+        "emporio": 15
+      }
+    },
+    {
+      "signal": "bound.qty (invoice row qty)",
+      "mozzarella": 10,
+      "pellegrino": {
+        "bocconcino": 2,
+        "emporio": 2
+      }
+    },
+    {
+      "signal": "structure.totalUsableAmount",
+      "mozzarella": 1000,
+      "pellegrino": {
+        "bocconcino": 11250,
+        "emporio": 11250
+      }
+    },
+    {
+      "signal": "chain.usableUnit (mass g vs volume ml)",
+      "mozzarella": "g",
+      "pellegrino": {
+        "bocconcino": "ml",
+        "emporio": "ml"
+      }
+    },
+    {
+      "signal": "matchedText / SIZE_COUNT token",
+      "mozzarella": "125GR*8",
+      "pellegrino": {
+        "bocconcino": "75CL*15",
+        "emporio": "75cl x 15ud"
+      }
+    },
+    {
+      "signal": "name contains CX/caixa token",
+      "mozzarella": false,
+      "pellegrino": {
+        "bocconcino": true,
+        "emporio": false
+      }
+    },
+    {
+      "signal": "parser tier caixa_units_size (design assumption)",
+      "mozzarella": false,
+      "pellegrino": {
+        "bocconcino": false,
+        "emporio": false
+      }
+    },
+    {
+      "signal": "priceSemantics.effectiveUsableCost correct vs UI",
+      "mozzarella": "81.20/kg (UI bug)",
+      "pellegrino": {
+        "bocconcino": "3.73/L (UI ok)",
+        "emporio": "3.43/L (UI ok)"
+      }
+    },
+    {
+      "signal": "proposedHelper + unitMeasurement==='g' only",
+      "mozzarella": true,
+      "pellegrino": {
+        "bocconcino": false,
+        "emporio": false
+      }
+    },
+    {
+      "signal": "purchaseContainerCount (structured)",
+      "mozzarella": 8,
+      "pellegrino": {
+        "bocconcino": 15,
+        "emporio": 15
+      }
+    }
+  ],
+  "sharedPathEvidence": {
+    "identicalStockNormalizationPath": true,
+    "sharedTier": "size_count",
+    "sharedGenericRow": true,
+    "sharedFinalPolicy": true,
+    "sharedUsableSource": "structure_total",
+    "sharedResolvePurchaseQty": 1,
+    "sharedHelperWouldFire": true,
+    "divergenceNote": "Stock-normalization code path is identical; divergence is in scalar field values and downstream economics outcome only"
+  },
+  "task7_readiness": {
+    "verdict": "B",
+    "label": "Shared normalization path — scalar signals exist but proposed helper fires on all three",
+    "rationale": "All three share size_count + generic + structureTotalIsFinal path; unitMeasurement g vs cl separates at scalar level but Option A helper fires on both cl rows"
+  },
+  "confidence": {
+    "structureTrace": 0.96,
+    "parserReplay": 0.94,
+    "signalSearch": 0.91,
+    "minimumDifferenceSet": 0.89,
+    "overall": 0.92
+  },
+  "sources": [
+    ".tmp/mozzarella-regression-matrix/",
+    ".tmp/mozzarella-fix-design/",
+    ".tmp/mozzarella-implementation-prep/",
+    ".tmp/final-validation-lab-rerun/extracts/",
+    ".tmp/quantity-mismatch-ui-audit/replay.json",
+    "src/lib/stock-normalization.ts",
+    "src/lib/invoice-purchase-format.ts",
+    "VL bjhnlrgodcqoyzddbpbd invoice_items (read-only)"
+  ]
+}

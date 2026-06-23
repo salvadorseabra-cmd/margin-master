@@ -1,0 +1,321 @@
+{
+  "generatedAt": "2026-06-22T00:00:00.000Z",
+  "mode": "STRICT_READ_ONLY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "recommendedOrder": [
+    {
+      "rank": 1,
+      "id": "family-a",
+      "label": "Family A (Ricotta, Mezzi)",
+      "products": [
+        "RICOTTA TREVIGIANA 1,5KG",
+        "MEZZI PACCHERI MANCINI (CX 1KG*6)"
+      ],
+      "invoiceIds": ["f0aa5a08-86a3-4938-99f0-711e86073968"],
+      "whyNow": "Only Readiness-A family; Option C 100% recall/precision on 15-row set; extraction-layer fix isolated from stock-normalization; 0 pattern expansion",
+      "readinessGrade": "A",
+      "overallConfidence": 0.91
+    },
+    {
+      "rank": 2,
+      "id": "mozzarella",
+      "label": "Mozzarella Fior di Latte 125GR*8",
+      "products": [
+        "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8"
+      ],
+      "invoiceIds": ["f0aa5a08-86a3-4938-99f0-711e86073968"],
+      "whyNow": "Proven root cause and fix design; blocked until unitMeasurement=g-only helper validated against S.Pellegrino controls; deploy after Family A to avoid same-invoice bundled risk",
+      "readinessGrade": "B",
+      "overallConfidence": 0.85,
+      "blocker": "mozzarella-regression-matrix S.Pellegrino unexpected change under bare Option A"
+    },
+    {
+      "rank": 3,
+      "id": "ginger-beer",
+      "label": "Ginger Beer 0.20cl",
+      "products": [
+        "Baladin - Ginger Beer 0.20cl"
+      ],
+      "invoiceIds": ["ab52796d-de1d-418d-86e7-230c8f056f09"],
+      "whyNow": "Isolated mechanism in ingredient-unit-inference.ts; independent of stock-normalization; safest blast radius after scoped Mozzarella",
+      "readinessGrade": "B",
+      "overallConfidence": 0.82,
+      "blocker": "No fix design or offline replay matrix in completed investigations"
+    },
+    {
+      "rank": 4,
+      "id": "guanciale",
+      "label": "Guanciale Stagionato",
+      "products": [
+        "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino"
+      ],
+      "invoiceIds": ["36c99d19-6f9f-413f-8c2d-ae3526291a2d"],
+      "whyNow": "Proven root cause but no fix design; shares stock-normalization.ts with Mozzarella in opposite error direction; must wait for Mozzarella decoupling proof",
+      "readinessGrade": "C",
+      "overallConfidence": 0.78,
+      "blocker": "Separate weight-semantics fix track required; no scoped fix validated"
+    }
+  ],
+  "bugSummary": [
+    {
+      "id": "family-a",
+      "symptom": "Mezzi split-brain (2 un vs 6 kg usable vs PDF 1 case). Ricotta vs PDF: 2 un, €3.99/unit, 3 kg, €2.66/kg instead of 1 un, €7.97, 1.5 kg, €5.31/kg",
+      "rootCauseKnown": true,
+      "rootCauseConfidence": 0.91,
+      "firstIncorrectStage": 4,
+      "firstIncorrectStageLabel": "Hybrid H table GPT extraction (qty 1→2)",
+      "firstIncorrectField": "quantity",
+      "bugFamily": "A_extraction_originated",
+      "userVisible": true,
+      "userVisibleNote": "Mezzi UI class A; Ricotta UI class C vs bound fiction but wrong vs PDF"
+    },
+    {
+      "id": "mozzarella",
+      "symptom": "Usable 1 kg instead of 10 kg; operational €81.20/kg instead of €8.12/kg; Last Purchase 10 un correct",
+      "rootCauseKnown": true,
+      "rootCauseConfidence": 0.94,
+      "firstIncorrectStage": 8,
+      "firstIncorrectStageLabel": "stock normalization (computeUsableFromPurchaseStructure)",
+      "firstIncorrectField": "usableQuantity",
+      "bugFamily": "B_downstream_stock_normalization",
+      "userVisible": true
+    },
+    {
+      "id": "ginger-beer",
+      "symptom": "Usable 48 ml instead of ~4.8 L; operational €405/L instead of ~€4/L; Last Purchase 24 correct",
+      "rootCauseKnown": true,
+      "rootCauseConfidence": 0.92,
+      "firstIncorrectStage": 8,
+      "firstIncorrectStageLabel": "volume inference (detectVolume 0.20cl → 2 ml)",
+      "firstIncorrectField": "perBottleVolume",
+      "bugFamily": "B_downstream_volume_inference",
+      "userVisible": true
+    },
+    {
+      "id": "guanciale",
+      "symptom": "Usable 10.5 kg instead of ~6 kg; operational €6.18/kg instead of €10.83/kg",
+      "rootCauseKnown": true,
+      "rootCauseConfidence": 0.92,
+      "firstIncorrectStage": 8,
+      "firstIncorrectStageLabel": "stock normalization (*7 pack fiction on weight line)",
+      "firstIncorrectField": "usableQuantity",
+      "bugFamily": "B_downstream_stock_normalization",
+      "userVisible": true
+    }
+  ],
+  "implementationConfidence": {
+    "family-a": {
+      "rootCause": "High",
+      "scope": "High",
+      "validationCoverage": "High",
+      "overall": "High",
+      "scores": { "rootCause": 0.91, "scope": 0.9, "validation": 0.92 }
+    },
+    "mozzarella": {
+      "rootCause": "High",
+      "scope": "High",
+      "validationCoverage": "Medium",
+      "overall": "Medium-High",
+      "scores": { "rootCause": 0.94, "scope": 0.92, "validation": 0.62 }
+    },
+    "ginger-beer": {
+      "rootCause": "High",
+      "scope": "High",
+      "validationCoverage": "Medium",
+      "overall": "Medium",
+      "scores": { "rootCause": 0.92, "scope": 0.92, "validation": 0.7 }
+    },
+    "guanciale": {
+      "rootCause": "High",
+      "scope": "High",
+      "validationCoverage": "Low",
+      "overall": "Medium-Low",
+      "scores": { "rootCause": 0.92, "scope": 0.85, "validation": 0.4 }
+    }
+  },
+  "regressionRisk": {
+    "family-a": {
+      "codeArea": "supabase/functions/extract-invoice/invoice-monetary-binding.ts",
+      "populationSize": 15,
+      "failures": 2,
+      "riskLevel": "Low",
+      "controls": ["Pomodori", "Rolo", "Acqua", "Mozzarella qty=10", "Gorgonzola", "13/13 non-failures"]
+    },
+    "mozzarella": {
+      "codeArea": "src/lib/stock-normalization.ts",
+      "populationSize": 9,
+      "sizeCountRows": 9,
+      "riskLevel": "Medium",
+      "blocker": "S.Pellegrino Bocconcino + Emporio regress under bare Option A",
+      "controls": ["Peroni", "Guanciale kg-exclusion", "Stracciatella bare_measure", "Pomodori"]
+    },
+    "ginger-beer": {
+      "codeArea": "src/lib/ingredient-unit-inference.ts",
+      "populationSize": 1,
+      "riskLevel": "Low",
+      "controls": ["Peroni 33cl", "S.Pellegrino 75cl integer CL"]
+    },
+    "guanciale": {
+      "codeArea": "src/lib/stock-normalization.ts",
+      "populationSize": 9,
+      "riskLevel": "High",
+      "note": "Opposite direction from Mozzarella; no scoped fix validated"
+    }
+  },
+  "blastRadius": {
+    "family-a": {
+      "knownAffected": 2,
+      "potentialAdditional": 0,
+      "expansionStatus": "B_small_family",
+      "spillover": "none — invoice total and sibling lines unchanged"
+    },
+    "mozzarella": {
+      "knownAffected": 1,
+      "potentialAdditional": 0,
+      "expansionStatus": "A_isolated",
+      "atRiskControls": 2,
+      "atRiskProducts": ["ACQUA S.PELLEGRINO (CX 75CL*15)", "SanPellegrino 75cl x 15ud"]
+    },
+    "ginger-beer": {
+      "knownAffected": 1,
+      "potentialAdditional": 0,
+      "expansionStatus": "A_isolated",
+      "spillover": "none — independent code path"
+    },
+    "guanciale": {
+      "knownAffected": 1,
+      "potentialAdditional": 0,
+      "expansionStatus": "A_isolated",
+      "coupling": "stock-normalization.ts shared with Mozzarella"
+    }
+  },
+  "readiness": {
+    "family-a": {
+      "grade": "A",
+      "verdict": "READY_FOR_IMPLEMENTATION_OPTION_C",
+      "overallConfidence": 0.82,
+      "evidence": [
+        ".tmp/family-a-implementation-prep/REPORT.md",
+        ".tmp/family-a-option-c-replay/replay-result.json",
+        ".tmp/family-a-full-population-replay/results.json"
+      ],
+      "blockers": []
+    },
+    "mozzarella": {
+      "grade": "B",
+      "verdict": "NEEDS_VALIDATION",
+      "overallConfidence": 0.65,
+      "evidence": [
+        ".tmp/mozzarella-fix-design/REPORT.md",
+        ".tmp/mozzarella-regression-matrix/REPORT.md",
+        ".tmp/mozzarella-vs-pellegrino-separation/REPORT.md"
+      ],
+      "blockers": [
+        "Re-run regression matrix with unitMeasurement=g-only helper",
+        "Confirm S.Pellegrino op €/L unchanged"
+      ]
+    },
+    "ginger-beer": {
+      "grade": "B",
+      "verdict": "NEEDS_FIX_DESIGN",
+      "overallConfidence": 0.75,
+      "evidence": [
+        ".tmp/remaining-bug-root-causes/REPORT.md",
+        ".tmp/bug-pattern-expansion-audit/REPORT.md"
+      ],
+      "blockers": [
+        "Fix design document",
+        "Offline replay matrix for detectVolume decimal-cl handling"
+      ]
+    },
+    "guanciale": {
+      "grade": "C",
+      "verdict": "NOT_READY",
+      "overallConfidence": 0.55,
+      "evidence": [
+        ".tmp/stock-normalization-family-assessment/REPORT.md",
+        ".tmp/size-count-discriminator-audit/REPORT.md"
+      ],
+      "blockers": [
+        "Weight-semantics fix design",
+        "Must follow Mozzarella with proven decoupling",
+        "No offline replay matrix"
+      ]
+    }
+  },
+  "prioritizationMatrix": {
+    "scale": "1=lowest/worst, 5=highest/best",
+    "rows": [
+      {
+        "id": "family-a",
+        "impact": 4,
+        "confidence": 5,
+        "safety": 5,
+        "readiness": 5,
+        "total": 19
+      },
+      {
+        "id": "mozzarella",
+        "impact": 5,
+        "confidence": 4,
+        "safety": 3,
+        "readiness": 3,
+        "total": 15
+      },
+      {
+        "id": "ginger-beer",
+        "impact": 3,
+        "confidence": 4,
+        "safety": 5,
+        "readiness": 2,
+        "total": 14
+      },
+      {
+        "id": "guanciale",
+        "impact": 4,
+        "confidence": 3,
+        "safety": 2,
+        "readiness": 1,
+        "total": 10
+      }
+    ]
+  },
+  "stopCondition": {
+    "family-a": "No additional investigation required. Proceed with pre-flight: runtime proxy validation, unit tests, post-deploy 10x stability.",
+    "mozzarella": "Re-run regression matrix with unitMeasurement=g-only tightened helper before merge.",
+    "ginger-beer": "Fix design + offline replay matrix required before implementation.",
+    "guanciale": "Weight-semantics fix design required; must not proceed until Mozzarella track complete.",
+    "global": "No additional root-cause investigation required for any family."
+  },
+  "dependencies": {
+    "family-a": [],
+    "mozzarella": ["family-a deploy complete (same invoice f0aa5a08 sequencing)"],
+    "ginger-beer": ["mozzarella merge (parallel-safe after stock-norm decoupling proven)"],
+    "guanciale": ["mozzarella merge with proven g-only decoupling"]
+  },
+  "auditConfidence": {
+    "overall": 0.88,
+    "bugSummary": 0.95,
+    "familyAPrioritization": 0.91,
+    "mozzarellaPrioritization": 0.88,
+    "gingerBeerPrioritization": 0.85,
+    "guancialePrioritization": 0.9
+  },
+  "sources": [
+    ".tmp/ricotta-root-cause-trace/",
+    ".tmp/mezzi-root-cause-trace/",
+    ".tmp/family-a-impact-analysis/",
+    ".tmp/family-a-implementation-prep/",
+    ".tmp/mozzarella-implementation-prep/",
+    ".tmp/mozzarella-fix-design/",
+    ".tmp/mozzarella-regression-matrix/",
+    ".tmp/mozzarella-commercial-reality-audit/",
+    ".tmp/mozzarella-vs-pellegrino-separation/",
+    ".tmp/stock-normalization-family-assessment/",
+    ".tmp/stock-normalization-population-audit/",
+    ".tmp/size-count-discriminator-audit/",
+    ".tmp/remaining-bug-root-causes/",
+    ".tmp/bug-pattern-expansion-audit/",
+    ".tmp/quantity-mismatch-ui-audit/"
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "generatedAt": "2026-06-22T00:00:00.000Z",
+  "mode": "STRICT_READ_ONLY_ROOT_CAUSE_CLOSURE",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "product": "Baladin - Ginger Beer 0.20cl",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "invoiceItemId": "634a418b-1509-42a9-bf01-563705967b6f",
+  "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+  "extractCorroborationInvoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "answers": {
+    "quantityPurchased": 24,
+    "quantityPurchasedUnit": "bottles (un)",
+    "quantityPurchasedEvidence": "PDF Qtd column 24,00; VL DB qty=24; Hybrid H extract qty=24; UI Last Purchase 24",
+    "usableQuantityShouldExistMl": 4800,
+    "usableQuantityShouldExistL": 4.8,
+    "usableQuantityInterpretation": "24 bottles × 200 ml (20 cl/bottle — 0.20cl is supplier typo for 20cl)",
+    "usableQuantityAlternateMl": 7920,
+    "usableQuantityAlternateNote": "SKU BBB-GINGER33ITA implies 33 cl/bottle → 7.92 L; secondary interpretation",
+    "where48mlComesFrom": "24 invoice qty × 2 ml/bottle; 2 ml from detectVolume parsing 0.20cl as 0.20 centilitres (0.2 × 10)",
+    "parserStageCreatingError": "Stage 8 volume inference: detectVolume (ingredient-unit-inference.ts) + parsePurchaseStructureFromText bare_measure tier (stock-normalization.ts) → resolveInvoiceLinePurchaseFormat (invoice-purchase-format.ts)"
+  },
+  "firstIncorrectValue": {
+    "stage": 8,
+    "stageName": "Purchase history / volume inference",
+    "field": "per_bottle_volume_ml",
+    "correctValue": 200,
+    "correctUnit": "ml",
+    "incorrectValue": 2,
+    "incorrectUnit": "ml",
+    "function": "detectVolume",
+    "file": "src/lib/ingredient-unit-inference.ts",
+    "lines": "130-161",
+    "supportingFunction": "parsePurchaseStructureFromText / measureToBase",
+    "supportingFile": "src/lib/stock-normalization.ts",
+    "priorStagesCorrect": true
+  },
+  "rootCauseClassification": {
+    "code": "C",
+    "label": "Conversion — decimal-leading CL token interpreted literally as 0.2 centilitres",
+    "rationale": "Stages 1–7 faithfully preserve PDF text and monetary fields. First computed wrong value is 2 ml at detectVolume (0.20 × 10). Source-document typo (0.20cl) is precondition A but not the first incorrect pipeline transformation.",
+    "notPrimary": {
+      "A": "Source PDF prints 0.20cl — upstream typo, faithfully copied; not pipeline invention",
+      "B": "bare_measure tier correctly matches token; structure parse is faithful to wrong conversion",
+      "E": "Pricing math is self-consistent given 48 ml usable",
+      "F": "UI displays parsed values faithfully"
+    }
+  },
+  "bugFamily": "B_downstreamTransformationOriginated",
+  "extractionBug": false,
+  "downstreamBug": true,
+  "userVisible": true,
+  "commercialReality": {
+    "lineTotalEur": 19.38,
+    "purchasedBottles": 24,
+    "expectedTotalLiters20cl": 4.8,
+    "expectedOpCostPerLiter20cl": 4.0375,
+    "actualUsableLiters": 0.048,
+    "actualOpCostPerLiter": 405,
+    "inflationFactor": 100
+  },
+  "populationScan": {
+    "vlRowsScanned": 51,
+    "decimalClMatches": 1,
+    "productionDecimalClMatches": 0,
+    "status": "isolated"
+  },
+  "implementationReadiness": {
+    "rootCauseLocalized": { "status": "A", "label": "Proven" },
+    "extractionRuledOut": { "status": "A", "label": "Proven" },
+    "liveReplayMatchesPersisted": { "status": "A", "label": "Proven" },
+    "isolationConfirmed": { "status": "A", "label": "Proven — 1/51 VL" },
+    "fixDesignDocumented": { "status": "B", "label": "Partial — guard exists; no dedicated fix-design artifact" },
+    "regressionControlsIdentified": { "status": "A", "label": "Proven — Peroni 33cl, S.Pellegrino 75cl" },
+    "qtySemanticsSeparateTrack": { "status": "A", "label": "Documented — 24 vs 2 case framing is orthogonal; €0 financial delta" }
+  },
+  "verdict": "READY",
+  "verdictMeaning": "Root-cause investigation closed. First incorrect stage, mechanism, and fix surface are proven with production replay. Safe to proceed to implementation design.",
+  "confidence": {
+    "rootCauseLocalization": 0.94,
+    "commercialReality": 0.90,
+    "isolation": 0.92,
+    "overall": 0.92
+  },
+  "sources": [
+    ".tmp/remaining-bug-root-causes/root-causes.json",
+    ".tmp/quantity-mismatch-ui-audit/replay.json",
+    ".tmp/quantity-mismatch-ui-audit/classifications.json",
+    ".tmp/bug-pattern-expansion-audit/REPORT.md",
+    ".tmp/final-validation-lab-rerun/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+    ".tmp/ginger-beer-ground-truth/stage-table.json",
+    ".tmp/ginger-beer-audit/parsing-chain.json",
+    ".tmp/ginger-beer-audit/math-audit.json",
+    ".tmp/decimal-cl-audit/REPORT.md",
+    ".tmp/purchase-unit-corruption-audit/GINGER_BEER_ANALYSIS.md",
+    "src/lib/ingredient-unit-inference.ts",
+    "src/lib/stock-normalization.ts",
+    "src/lib/invoice-purchase-format.ts"
+  ]
+}

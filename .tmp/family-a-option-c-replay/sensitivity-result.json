@@ -1,0 +1,101 @@
+{
+  "generatedAt": "2026-06-20T19:47:44.804Z",
+  "ablations": {
+    "baseline_strict": {
+      "recall": "2/2",
+      "recallPct": 1,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "fpProducts": [],
+      "fnProducts": []
+    },
+    "omit_ocr_qty_eq_1": {
+      "recall": "2/2",
+      "recallPct": 1,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "fpProducts": [],
+      "fnProducts": []
+    },
+    "omit_hybrid_h_qty_eq_2": {
+      "recall": "2/2",
+      "recallPct": 1,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "fpProducts": [],
+      "fnProducts": []
+    },
+    "omit_hybrid_h_qty_2_stable": {
+      "recall": "2/2",
+      "recallPct": 1,
+      "falsePositives": 1,
+      "falseNegatives": 0,
+      "fpProducts": [
+        "Rolo (transient run 7)"
+      ],
+      "fnProducts": []
+    },
+    "omit_undiscounted_blank_desc": {
+      "recall": "2/2",
+      "recallPct": 1,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "fpProducts": [],
+      "fnProducts": []
+    },
+    "omit_unit_price_approx_total_at_qty1": {
+      "recall": "2/2",
+      "recallPct": 1,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "fpProducts": [],
+      "fnProducts": []
+    },
+    "omit_supplier_il_bocconcino": {
+      "recall": "2/2",
+      "recallPct": 1,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "fpProducts": [],
+      "fnProducts": []
+    },
+    "omit_qty_inflation_signature": {
+      "recall": "2/2",
+      "recallPct": 1,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "fpProducts": [],
+      "fnProducts": []
+    },
+    "omit_diff_pct_ge_45": {
+      "recall": "2/2",
+      "recallPct": 1,
+      "falsePositives": 0,
+      "falseNegatives": 0,
+      "fpProducts": [],
+      "fnProducts": []
+    }
+  },
+  "gorgonzolaEffectivePaid": {
+    "baseline_strict": false,
+    "omit_ocr_qty_eq_1": false,
+    "omit_hybrid_h_qty_eq_2": false,
+    "omit_hybrid_h_qty_2_stable": false,
+    "omit_undiscounted_blank_desc": false,
+    "omit_unit_price_approx_total_at_qty1": false,
+    "omit_supplier_il_bocconcino": false,
+    "omit_qty_inflation_signature": false,
+    "omit_diff_pct_ge_45": false
+  },
+  "roloTransientRun7": {
+    "baseline_strict": false,
+    "omit_ocr_qty_eq_1": false,
+    "omit_hybrid_h_qty_eq_2": false,
+    "omit_hybrid_h_qty_2_stable": true,
+    "omit_undiscounted_blank_desc": false,
+    "omit_unit_price_approx_total_at_qty1": false,
+    "omit_supplier_il_bocconcino": false,
+    "omit_qty_inflation_signature": false,
+    "omit_diff_pct_ge_45": false
+  }
+}

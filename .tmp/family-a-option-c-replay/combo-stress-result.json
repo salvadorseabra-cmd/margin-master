@@ -1,0 +1,254 @@
+{
+  "results": [
+    {
+      "product": "Gorgonzola (effective-paid DB row)",
+      "baseline": {
+        "wouldTrigger": false,
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": false,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "qty_inflation_signature": false
+        },
+        "combo": false,
+        "inflation": false
+      },
+      "removeAllBlocking": {
+        "ablated": [
+          "ocr_qty_eq_1",
+          "hybrid_h_qty_2_stable",
+          "undiscounted_blank_desc",
+          "unit_price_approx_total_at_qty1",
+          "supplier_il_bocconcino",
+          "qty_inflation_signature"
+        ],
+        "wouldTrigger": true,
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": false,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "qty_inflation_signature": false
+        },
+        "combo": true,
+        "inflation": true
+      }
+    },
+    {
+      "product": "Gorgonzola (v25 Emporio extract)",
+      "baseline": {
+        "wouldTrigger": false,
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": false,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "qty_inflation_signature": false
+        },
+        "combo": false,
+        "inflation": false
+      },
+      "removeAllBlocking": {
+        "ablated": [
+          "ocr_qty_eq_1",
+          "hybrid_h_qty_2_stable",
+          "undiscounted_blank_desc",
+          "unit_price_approx_total_at_qty1",
+          "supplier_il_bocconcino",
+          "qty_inflation_signature"
+        ],
+        "wouldTrigger": true,
+        "signals": {
+          "ocr_qty_eq_1": false,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": false,
+          "unit_price_approx_total_at_qty1": false,
+          "supplier_il_bocconcino": false,
+          "qty_inflation_signature": false
+        },
+        "combo": true,
+        "inflation": true
+      }
+    },
+    {
+      "product": "Rolo (transient run 7)",
+      "baseline": {
+        "wouldTrigger": false,
+        "signals": {
+          "ocr_qty_eq_1": true,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": true,
+          "supplier_il_bocconcino": true,
+          "qty_inflation_signature": true
+        },
+        "combo": false,
+        "inflation": true
+      },
+      "removeAllBlocking": {
+        "ablated": [
+          "hybrid_h_qty_2_stable"
+        ],
+        "wouldTrigger": true,
+        "signals": {
+          "ocr_qty_eq_1": true,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": false,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": true,
+          "supplier_il_bocconcino": true,
+          "qty_inflation_signature": true
+        },
+        "combo": true,
+        "inflation": true
+      }
+    },
+    {
+      "product": "Mezzi Paccheri (failure)",
+      "baseline": {
+        "wouldTrigger": true,
+        "signals": {
+          "ocr_qty_eq_1": true,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": true,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": true,
+          "supplier_il_bocconcino": true,
+          "qty_inflation_signature": true
+        },
+        "combo": true,
+        "inflation": true
+      },
+      "removeAllBlocking": {
+        "ablated": [],
+        "wouldTrigger": true,
+        "signals": {
+          "ocr_qty_eq_1": true,
+          "hybrid_h_qty_eq_2": true,
+          "hybrid_h_qty_2_stable": true,
+          "undiscounted_blank_desc": true,
+          "unit_price_approx_total_at_qty1": true,
+          "supplier_il_bocconcino": true,
+          "qty_inflation_signature": true
+        },
+        "combo": true,
+        "inflation": true
+      }
+    }
+  ],
+  "gorgonzolaCounterfactual": {
+    "baseline": {
+      "wouldTrigger": false,
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": true,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": true,
+        "qty_inflation_signature": false
+      },
+      "combo": false,
+      "inflation": false
+    },
+    "noDiffPctGate": {
+      "wouldTrigger": false,
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": true,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": true,
+        "qty_inflation_signature": false
+      },
+      "combo": false,
+      "inflation": true
+    },
+    "noDiffPctAndUnitGate": {
+      "wouldTrigger": true,
+      "signals": {
+        "ocr_qty_eq_1": true,
+        "hybrid_h_qty_eq_2": true,
+        "hybrid_h_qty_2_stable": true,
+        "undiscounted_blank_desc": true,
+        "unit_price_approx_total_at_qty1": false,
+        "supplier_il_bocconcino": true,
+        "qty_inflation_signature": false
+      },
+      "combo": true,
+      "inflation": true
+    }
+  },
+  "thresholdSweep": [
+    {
+      "threshold": 0,
+      "gorgonzolaDiffPct": 0.3425,
+      "wouldInflate": true
+    },
+    {
+      "threshold": 0.05,
+      "gorgonzolaDiffPct": 0.3425,
+      "wouldInflate": true
+    },
+    {
+      "threshold": 0.1,
+      "gorgonzolaDiffPct": 0.3425,
+      "wouldInflate": true
+    },
+    {
+      "threshold": 0.15000000000000002,
+      "gorgonzolaDiffPct": 0.3425,
+      "wouldInflate": true
+    },
+    {
+      "threshold": 0.2,
+      "gorgonzolaDiffPct": 0.3425,
+      "wouldInflate": true
+    },
+    {
+      "threshold": 0.25,
+      "gorgonzolaDiffPct": 0.3425,
+      "wouldInflate": true
+    },
+    {
+      "threshold": 0.3,
+      "gorgonzolaDiffPct": 0.3425,
+      "wouldInflate": true
+    },
+    {
+      "threshold": 0.35,
+      "gorgonzolaDiffPct": 0.3425,
+      "wouldInflate": false
+    },
+    {
+      "threshold": 0.39999999999999997,
+      "gorgonzolaDiffPct": 0.3425,
+      "wouldInflate": false
+    },
+    {
+      "threshold": 0.44999999999999996,
+      "gorgonzolaDiffPct": 0.3425,
+      "wouldInflate": false
+    },
+    {
+      "threshold": 0.49999999999999994,
+      "gorgonzolaDiffPct": 0.3425,
+      "wouldInflate": false
+    },
+    {
+      "threshold": 0.5499999999999999,
+      "gorgonzolaDiffPct": 0.3425,
+      "wouldInflate": false
+    }
+  ]
+}

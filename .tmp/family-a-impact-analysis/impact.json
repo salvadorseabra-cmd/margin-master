@@ -1,0 +1,822 @@
+{
+  "generatedAt": "2026-06-22T15:49:29.646Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "invoice": {
+    "id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+    "supplier_name": "Il Bocconcino Distribuição Alimentar",
+    "invoice_date": "2026-05-08",
+    "total": 290.64
+  },
+  "method": "Read-only VL SELECT + production replay (bindMonetaryColumns → resolveInvoiceLinePurchaseFormat → resolveCountablePurchaseQuantityForCost → computeEffectiveUsableCost → procurementPackFieldsFromInvoiceLine → operationalUnitPriceForPriceHistory)",
+  "counterfactual": "Extraction quantity 2→1 at Hybrid H source; unit_price and total held from v25 extract",
+  "products": [
+    {
+      "product": "ricotta",
+      "lineName": "RICOTTA TREVIGIANA 1,5KG",
+      "invoiceItemId": "409850ab-646d-44fa-b20c-c8a4a8570064",
+      "ingredientId": "6ec0bc6b-409a-4db2-b21f-fb01394f0014",
+      "ingredientName": "Ricotta trevigiana",
+      "pdfTruth": {
+        "quantity": 1,
+        "note": "QUANT=1,000 on invoice PNG"
+      },
+      "persisted": {
+        "id": "409850ab-646d-44fa-b20c-c8a4a8570064",
+        "name": "RICOTTA TREVIGIANA 1,5KG",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 7.97,
+        "total": 7.97,
+        "created_at": "2026-06-16T18:46:12.036503+00:00"
+      },
+      "extractAtSource": {
+        "name": "RICOTTA TREVIGIANA 1,5KG",
+        "quantity": 2,
+        "unit": "uni",
+        "unit_price": 7.967,
+        "total": 7.97
+      },
+      "currentReplay": {
+        "bound": {
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 3.99,
+          "total": 7.97
+        },
+        "structured": {
+          "kind": "weight_or_volume",
+          "normalizedUsableQuantity": 3000,
+          "usableQuantityUnit": "g",
+          "purchaseContainerCount": 2
+        },
+        "purchaseQtyForCost": 1,
+        "operational": {
+          "current_price": 3.99,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1500
+        },
+        "procurement": {
+          "current_price": 3.99,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "effectiveCost": {
+          "cost": 2.66,
+          "unit": "kg"
+        },
+        "historyPrice": 3.99,
+        "presentation": {
+          "lastPurchase": "2 un",
+          "procurementCost": "€3.99 / unit",
+          "operationalCost": "€2.66 / kg",
+          "usableQuantity": "3 kg usable",
+          "purchasePriceLine": "€3.99 / unit · €7.97 total"
+        },
+        "catalogOperationalUnitCost": 3.99,
+        "catalogUnitCostEur": 3.99
+      },
+      "correctReplay": {
+        "bound": {
+          "quantity": 1,
+          "unit": "uni",
+          "unit_price": 7.967,
+          "total": 7.97
+        },
+        "structured": {
+          "kind": "weight_or_volume",
+          "normalizedUsableQuantity": 1500,
+          "usableQuantityUnit": "g",
+          "purchaseContainerCount": 1
+        },
+        "purchaseQtyForCost": 1,
+        "operational": {
+          "current_price": 7.967,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1500
+        },
+        "procurement": {
+          "current_price": 7.967,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "effectiveCost": {
+          "cost": 5.311333333333333,
+          "unit": "kg"
+        },
+        "historyPrice": 7.967,
+        "presentation": {
+          "lastPurchase": "1 uni",
+          "procurementCost": "€7.97 / unit",
+          "operationalCost": "€5.31 / kg",
+          "usableQuantity": "1.5 kg usable",
+          "purchasePriceLine": "€7.97 / unit"
+        },
+        "catalogOperationalUnitCost": 7.967,
+        "catalogUnitCostEur": 7.967
+      },
+      "purchases": {
+        "current": {
+          "quantityLabel": "2 un",
+          "unitPriceEur": 3.99,
+          "totalEur": 7.97,
+          "procurementLabel": "€3.99 / unit",
+          "operationalLabel": "€2.66 / kg"
+        },
+        "correct": {
+          "quantityLabel": "1 uni",
+          "unitPriceEur": 7.967,
+          "totalEur": 7.97,
+          "procurementLabel": "€7.97 / unit",
+          "operationalLabel": "€5.31 / kg"
+        }
+      },
+      "priceHistory": [
+        {
+          "id": "3219f379-1e51-4e6c-b1ee-a5cd1af1a989",
+          "ingredient_id": "6ec0bc6b-409a-4db2-b21f-fb01394f0014",
+          "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+          "new_price": 3.985,
+          "previous_price": null,
+          "created_at": "2026-05-08T12:00:00+00:00"
+        }
+      ],
+      "recipeImpact": [],
+      "fields": [
+        {
+          "field": "invoice_items.quantity",
+          "current": 2,
+          "correctIfQty1": 1,
+          "delta": -1,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "invoice_items.unit_price (persisted pre-bind)",
+          "current": 7.97,
+          "correctIfQty1": 7.967,
+          "delta": -0.003,
+          "classification": "A",
+          "notes": "Persistence stores extraction gross unit; bind would set total÷qty when qty=1"
+        },
+        {
+          "field": "invoice_items.total",
+          "current": 7.97,
+          "correctIfQty1": 7.97,
+          "delta": 0,
+          "classification": "B",
+          "notes": "Line total unchanged (PDF truth)"
+        },
+        {
+          "field": "invoice_items.unit",
+          "current": "un",
+          "correctIfQty1": "uni",
+          "delta": "changed",
+          "classification": "B",
+          "notes": null
+        },
+        {
+          "field": "bound.unit_price (post-bindMonetaryColumns)",
+          "current": 3.99,
+          "correctIfQty1": 7.967,
+          "delta": 3.977,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "purchase_history.lastPurchase.quantityLabel",
+          "current": "2 un",
+          "correctIfQty1": "1 uni",
+          "delta": "changed",
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "purchase_history.lastPurchase.unitPriceEur",
+          "current": 3.99,
+          "correctIfQty1": 7.967,
+          "delta": 3.977,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "purchase_history.lastPurchase.totalEur",
+          "current": 7.97,
+          "correctIfQty1": 7.97,
+          "delta": 0,
+          "classification": "B",
+          "notes": null
+        },
+        {
+          "field": "procurement.current_price (display)",
+          "current": 3.99,
+          "correctIfQty1": 7.967,
+          "delta": 3.977,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "procurement.purchase_quantity (stored catalog)",
+          "current": 2,
+          "correctIfQty1": 1,
+          "delta": -1,
+          "classification": "A",
+          "notes": "Historical audit catalog PQ=2; correct aligns to invoice qty=1"
+        },
+        {
+          "field": "operational.current_price (per priced unit)",
+          "current": 3.99,
+          "correctIfQty1": 7.967,
+          "delta": 3.977,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "operational.usable_weight_grams (per unit)",
+          "current": 1500,
+          "correctIfQty1": 1500,
+          "delta": 0,
+          "classification": "B",
+          "notes": "Per-unit pack size unchanged; total usable scales via row qty"
+        },
+        {
+          "field": "usable_quantity.normalizedUsableQuantity",
+          "current": 3000,
+          "correctIfQty1": 1500,
+          "delta": -1500,
+          "classification": "A",
+          "notes": "Scales with invoice qty for weight_or_volume"
+        },
+        {
+          "field": "usable_quantity.presentationLabel",
+          "current": "3 kg usable",
+          "correctIfQty1": "1.5 kg usable",
+          "delta": "changed",
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "operational_cost.effectiveUsableCost",
+          "current": 2.66,
+          "correctIfQty1": 5.311333333333333,
+          "delta": 2.6513,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "operational_cost.unit",
+          "current": "kg",
+          "correctIfQty1": "kg",
+          "delta": "unchanged",
+          "classification": "B",
+          "notes": null
+        },
+        {
+          "field": "ingredient.current_price (catalog pack price)",
+          "current": 7.97,
+          "correctIfQty1": 7.967,
+          "delta": -0.003,
+          "classification": "A",
+          "notes": "Catalog stores pack/case price from last matched invoice (.tmp/historical-pricing-integrity-audit)"
+        },
+        {
+          "field": "ingredient.purchase_quantity",
+          "current": 2,
+          "correctIfQty1": 1,
+          "delta": -1,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "ingredient.catalogOperationalUnitCost",
+          "current": 3.985,
+          "correctIfQty1": 7.967,
+          "delta": 3.982,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "ingredient_price_history.new_price (operational unit)",
+          "current": 3.985,
+          "correctIfQty1": 7.967,
+          "delta": 3.982,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "ingredient_price_history.previous_price",
+          "current": null,
+          "correctIfQty1": null,
+          "delta": "unchanged",
+          "classification": "B",
+          "notes": "First history row; unchanged if only this invoice exists"
+        },
+        {
+          "field": "opportunities.priceChangeSignal",
+          "current": "none (single history row)",
+          "correctIfQty1": "none (single history row)",
+          "delta": "unchanged",
+          "classification": "B",
+          "notes": "No prior price to compare; opportunity alerts depend on delta vs previous"
+        },
+        {
+          "field": "alerts.quantityMismatch",
+          "current": "family_a_mismatch (qty 2 vs PQ 1)",
+          "correctIfQty1": "resolved or reduced",
+          "delta": "changed",
+          "classification": "A",
+          "notes": "Mismatch signals in .tmp/quantity-mismatch-validation/mismatches.json should clear or change"
+        },
+        {
+          "field": "dashboard.recipeFoodCost (affected recipes)",
+          "current": null,
+          "correctIfQty1": null,
+          "delta": "unchanged",
+          "classification": "B",
+          "notes": "No recipe references found"
+        },
+        {
+          "field": "supplier_metrics.spendOnLine",
+          "current": 7.97,
+          "correctIfQty1": 7.97,
+          "delta": 0,
+          "classification": "B",
+          "notes": "Invoice line total unchanged"
+        },
+        {
+          "field": "supplier_metrics.avgUnitPrice",
+          "current": 7.97,
+          "correctIfQty1": 7.967,
+          "delta": -0.003,
+          "classification": "A",
+          "notes": "Supplier rollups using persisted unit_price would change"
+        }
+      ],
+      "summary": {
+        "mustChange": [
+          "invoice_items.quantity",
+          "invoice_items.unit_price (persisted pre-bind)",
+          "bound.unit_price (post-bindMonetaryColumns)",
+          "purchase_history.lastPurchase.quantityLabel",
+          "purchase_history.lastPurchase.unitPriceEur",
+          "procurement.current_price (display)",
+          "procurement.purchase_quantity (stored catalog)",
+          "operational.current_price (per priced unit)",
+          "usable_quantity.normalizedUsableQuantity",
+          "usable_quantity.presentationLabel",
+          "operational_cost.effectiveUsableCost",
+          "ingredient.current_price (catalog pack price)",
+          "ingredient.purchase_quantity",
+          "ingredient.catalogOperationalUnitCost",
+          "ingredient_price_history.new_price (operational unit)",
+          "alerts.quantityMismatch",
+          "supplier_metrics.avgUnitPrice"
+        ],
+        "shouldNotChange": [
+          "invoice_items.total",
+          "invoice_items.unit",
+          "purchase_history.lastPurchase.totalEur",
+          "operational.usable_weight_grams (per unit)",
+          "operational_cost.unit",
+          "ingredient_price_history.previous_price",
+          "opportunities.priceChangeSignal",
+          "dashboard.recipeFoodCost (affected recipes)",
+          "supplier_metrics.spendOnLine"
+        ],
+        "requiresValidation": [
+          "Unit normalization un vs uni on persist",
+          "Re-ingest path: gross vs bound unit_price alignment when qty=1"
+        ]
+      }
+    },
+    {
+      "product": "mezzi",
+      "lineName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "invoiceItemId": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+      "ingredientId": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+      "ingredientName": "Mezzi paccheri mancini",
+      "pdfTruth": {
+        "quantity": 1,
+        "note": "QUANT=1,000 on invoice PNG"
+      },
+      "persisted": {
+        "id": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+        "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 27.31,
+        "total": 27.3,
+        "created_at": "2026-06-16T18:46:12.036503+00:00"
+      },
+      "extractAtSource": {
+        "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "quantity": 2,
+        "unit": "uni",
+        "unit_price": 27.36,
+        "total": 27.3
+      },
+      "currentReplay": {
+        "bound": {
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 13.65,
+          "total": 27.3
+        },
+        "structured": {
+          "kind": "multi_unit_pack",
+          "normalizedUsableQuantity": 6000,
+          "usableQuantityUnit": "g",
+          "purchaseContainerCount": 6
+        },
+        "purchaseQtyForCost": 1,
+        "operational": {
+          "current_price": 13.65,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 6000
+        },
+        "procurement": {
+          "current_price": 13.65,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "effectiveCost": {
+          "cost": 4.55,
+          "unit": "kg"
+        },
+        "historyPrice": 13.65,
+        "presentation": {
+          "lastPurchase": "2 un",
+          "procurementCost": "€13.65 / case",
+          "operationalCost": "€4.55 / kg",
+          "usableQuantity": "6 kg usable",
+          "purchasePriceLine": "€13.65 / case · €27.30 total"
+        },
+        "catalogOperationalUnitCost": 13.65,
+        "catalogUnitCostEur": 13.65
+      },
+      "correctReplay": {
+        "bound": {
+          "quantity": 1,
+          "unit": "uni",
+          "unit_price": 27.3,
+          "total": 27.3
+        },
+        "structured": {
+          "kind": "multi_unit_pack",
+          "normalizedUsableQuantity": 6000,
+          "usableQuantityUnit": "g",
+          "purchaseContainerCount": 6
+        },
+        "purchaseQtyForCost": 1,
+        "operational": {
+          "current_price": 27.3,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 6000
+        },
+        "procurement": {
+          "current_price": 27.3,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "effectiveCost": {
+          "cost": 4.55,
+          "unit": "kg"
+        },
+        "historyPrice": 27.3,
+        "presentation": {
+          "lastPurchase": "1 uni",
+          "procurementCost": "€27.30 / case",
+          "operationalCost": "€4.55 / kg",
+          "usableQuantity": "6 kg usable",
+          "purchasePriceLine": "€27.30 / case"
+        },
+        "catalogOperationalUnitCost": 27.3,
+        "catalogUnitCostEur": 27.3
+      },
+      "purchases": {
+        "current": {
+          "quantityLabel": "2 un",
+          "unitPriceEur": 13.65,
+          "totalEur": 27.3,
+          "procurementLabel": "€13.65 / case",
+          "operationalLabel": "€4.55 / kg"
+        },
+        "correct": {
+          "quantityLabel": "1 uni",
+          "unitPriceEur": 27.3,
+          "totalEur": 27.3,
+          "procurementLabel": "€27.30 / case",
+          "operationalLabel": "€4.55 / kg"
+        }
+      },
+      "priceHistory": [
+        {
+          "id": "27ebdf67-4ae7-4b2e-b55b-b818dda5f5aa",
+          "ingredient_id": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+          "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+          "new_price": 13.655,
+          "previous_price": null,
+          "created_at": "2026-05-08T12:00:00+00:00"
+        }
+      ],
+      "recipeImpact": [],
+      "fields": [
+        {
+          "field": "invoice_items.quantity",
+          "current": 2,
+          "correctIfQty1": 1,
+          "delta": -1,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "invoice_items.unit_price (persisted pre-bind)",
+          "current": 27.31,
+          "correctIfQty1": 27.3,
+          "delta": -0.01,
+          "classification": "A",
+          "notes": "Persistence stores extraction gross unit; bind would set total÷qty when qty=1"
+        },
+        {
+          "field": "invoice_items.total",
+          "current": 27.3,
+          "correctIfQty1": 27.3,
+          "delta": 0,
+          "classification": "B",
+          "notes": "Line total unchanged (PDF truth)"
+        },
+        {
+          "field": "invoice_items.unit",
+          "current": "un",
+          "correctIfQty1": "uni",
+          "delta": "changed",
+          "classification": "B",
+          "notes": null
+        },
+        {
+          "field": "bound.unit_price (post-bindMonetaryColumns)",
+          "current": 13.65,
+          "correctIfQty1": 27.3,
+          "delta": 13.65,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "purchase_history.lastPurchase.quantityLabel",
+          "current": "2 un",
+          "correctIfQty1": "1 uni",
+          "delta": "changed",
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "purchase_history.lastPurchase.unitPriceEur",
+          "current": 13.65,
+          "correctIfQty1": 27.3,
+          "delta": 13.65,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "purchase_history.lastPurchase.totalEur",
+          "current": 27.3,
+          "correctIfQty1": 27.3,
+          "delta": 0,
+          "classification": "B",
+          "notes": null
+        },
+        {
+          "field": "procurement.current_price (display)",
+          "current": 13.65,
+          "correctIfQty1": 27.3,
+          "delta": 13.65,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "procurement.purchase_quantity (stored catalog)",
+          "current": 2,
+          "correctIfQty1": 1,
+          "delta": -1,
+          "classification": "A",
+          "notes": "Historical audit catalog PQ=2; purchaseQtyForCost collapse stays 1 in both states"
+        },
+        {
+          "field": "operational.current_price (per priced unit)",
+          "current": 13.65,
+          "correctIfQty1": 27.3,
+          "delta": 13.65,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "operational.usable_weight_grams (per unit)",
+          "current": 6000,
+          "correctIfQty1": 6000,
+          "delta": 0,
+          "classification": "B",
+          "notes": null
+        },
+        {
+          "field": "usable_quantity.normalizedUsableQuantity",
+          "current": 6000,
+          "correctIfQty1": 6000,
+          "delta": 0,
+          "classification": "B",
+          "notes": "Family A collapse: usable stays at one-case 6000g"
+        },
+        {
+          "field": "usable_quantity.presentationLabel",
+          "current": "6 kg usable",
+          "correctIfQty1": "6 kg usable",
+          "delta": "unchanged",
+          "classification": "B",
+          "notes": null
+        },
+        {
+          "field": "operational_cost.effectiveUsableCost",
+          "current": 4.55,
+          "correctIfQty1": 4.55,
+          "delta": 0,
+          "classification": "B",
+          "notes": "€/kg unchanged: total÷6kg in both states"
+        },
+        {
+          "field": "operational_cost.unit",
+          "current": "kg",
+          "correctIfQty1": "kg",
+          "delta": "unchanged",
+          "classification": "B",
+          "notes": null
+        },
+        {
+          "field": "ingredient.current_price (catalog pack price)",
+          "current": 27.31,
+          "correctIfQty1": 27.3,
+          "delta": -0.01,
+          "classification": "A",
+          "notes": "Catalog stores pack/case price from last matched invoice (.tmp/historical-pricing-integrity-audit)"
+        },
+        {
+          "field": "ingredient.purchase_quantity",
+          "current": 2,
+          "correctIfQty1": 1,
+          "delta": -1,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "ingredient.catalogOperationalUnitCost",
+          "current": 13.655,
+          "correctIfQty1": 27.3,
+          "delta": 13.645,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "ingredient_price_history.new_price (operational unit)",
+          "current": 13.655,
+          "correctIfQty1": 27.3,
+          "delta": 13.645,
+          "classification": "A",
+          "notes": null
+        },
+        {
+          "field": "ingredient_price_history.previous_price",
+          "current": null,
+          "correctIfQty1": null,
+          "delta": "unchanged",
+          "classification": "B",
+          "notes": "First history row; unchanged if only this invoice exists"
+        },
+        {
+          "field": "opportunities.priceChangeSignal",
+          "current": "none (single history row)",
+          "correctIfQty1": "none (single history row)",
+          "delta": "unchanged",
+          "classification": "B",
+          "notes": "No prior price to compare; opportunity alerts depend on delta vs previous"
+        },
+        {
+          "field": "alerts.quantityMismatch",
+          "current": "family_a_mismatch + split_brain",
+          "correctIfQty1": "resolved or reduced",
+          "delta": "changed",
+          "classification": "A",
+          "notes": "Mismatch signals in .tmp/quantity-mismatch-validation/mismatches.json should clear or change"
+        },
+        {
+          "field": "dashboard.recipeFoodCost (affected recipes)",
+          "current": null,
+          "correctIfQty1": null,
+          "delta": "unchanged",
+          "classification": "B",
+          "notes": "No recipe references found"
+        },
+        {
+          "field": "supplier_metrics.spendOnLine",
+          "current": 27.3,
+          "correctIfQty1": 27.3,
+          "delta": 0,
+          "classification": "B",
+          "notes": "Invoice line total unchanged"
+        },
+        {
+          "field": "supplier_metrics.avgUnitPrice",
+          "current": 27.31,
+          "correctIfQty1": 27.3,
+          "delta": -0.01,
+          "classification": "A",
+          "notes": "Supplier rollups using persisted unit_price would change"
+        }
+      ],
+      "summary": {
+        "mustChange": [
+          "invoice_items.quantity",
+          "invoice_items.unit_price (persisted pre-bind)",
+          "bound.unit_price (post-bindMonetaryColumns)",
+          "purchase_history.lastPurchase.quantityLabel",
+          "purchase_history.lastPurchase.unitPriceEur",
+          "procurement.current_price (display)",
+          "procurement.purchase_quantity (stored catalog)",
+          "operational.current_price (per priced unit)",
+          "ingredient.current_price (catalog pack price)",
+          "ingredient.purchase_quantity",
+          "ingredient.catalogOperationalUnitCost",
+          "ingredient_price_history.new_price (operational unit)",
+          "alerts.quantityMismatch",
+          "supplier_metrics.avgUnitPrice"
+        ],
+        "shouldNotChange": [
+          "invoice_items.total",
+          "invoice_items.unit",
+          "purchase_history.lastPurchase.totalEur",
+          "operational.usable_weight_grams (per unit)",
+          "usable_quantity.normalizedUsableQuantity",
+          "usable_quantity.presentationLabel",
+          "operational_cost.effectiveUsableCost",
+          "operational_cost.unit",
+          "ingredient_price_history.previous_price",
+          "opportunities.priceChangeSignal",
+          "dashboard.recipeFoodCost (affected recipes)",
+          "supplier_metrics.spendOnLine"
+        ],
+        "requiresValidation": [
+          "UI audit classification shift A→C against PDF truth"
+        ]
+      }
+    }
+  ],
+  "otherIngredientsAffected": {
+    "onSameInvoice": [
+      {
+        "id": "095b2bb9-bd36-44c2-a1f9-7c50fa9c0cc6",
+        "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8"
+      },
+      {
+        "id": "da2ad0fc-eb56-4506-8ba4-ae22b3cb6a5a",
+        "name": "STRACCIATELLA 250 GR"
+      },
+      {
+        "id": "fd24d2dc-238a-43f2-ac2a-755361a083f0",
+        "name": "POMODORI PELATI (CX 2,5KG*6)"
+      },
+      {
+        "id": "f25feb92-3477-41a4-9a81-c556a90a0814",
+        "name": "ACQUA S.PELLEGRINO (CX 75CL*15)"
+      },
+      {
+        "id": "3886253a-ea88-48e0-aa2f-d66f689fc104",
+        "name": "ROLO DE CABRA E VACA 1KG"
+      }
+    ],
+    "crossIngredientImpact": false,
+    "rationale": "Qty correction is line-local. No shared pack collapse, alias, or supplier rollup field couples Ricotta/Mezzi to other invoice lines. Recipe graph references only these two ingredient IDs.",
+    "otherIngredientIdsChecked": [
+      "6ec0bc6b-409a-4db2-b21f-fb01394f0014",
+      "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98"
+    ]
+  },
+  "invoiceLevel": {
+    "total": 290.64,
+    "deltaIfQty1": 0,
+    "classification": "B",
+    "note": "Invoice header total unchanged; only per-line unit economics change"
+  }
+}

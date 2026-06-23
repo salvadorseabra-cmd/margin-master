@@ -1,0 +1,1313 @@
+{
+  "generated_at": "2026-06-20T01:04:39.699Z",
+  "vl_project": "bjhnlrgodcqoyzddbpbd",
+  "summary": {
+    "flagged_rows_total": 15,
+    "would_fix_via_binding": 12,
+    "would_not_fix": 3,
+    "affected_ingredients_found": 6,
+    "regression_all_unchanged": false
+  },
+  "flagged_all_15": [
+    {
+      "invoice_item_id": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+      "description": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "effective_paid": 13.65,
+      "binding": {
+        "raw": {
+          "qty": 2,
+          "unit_price": 27.31,
+          "total": 27.3
+        },
+        "bound": {
+          "qty": 2,
+          "unit_price": 13.65,
+          "total": 27.3
+        },
+        "binding_changed": true,
+        "arithmetic_consistent": true,
+        "diff_pct": 0.5002
+      },
+      "procurement": {
+        "current_price": 13.65,
+        "purchase_quantity": 1,
+        "purchase_unit": "un",
+        "base_unit": "un",
+        "unit": "un"
+      },
+      "operational": {
+        "current_price": 13.65,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "operational_eur": 13.65
+      },
+      "effective_usable": {
+        "cost": 4.55,
+        "unit": "kg"
+      },
+      "history": {
+        "new_price": 13.65
+      },
+      "would_fix": true
+    },
+    {
+      "invoice_item_id": "409850ab-646d-44fa-b20c-c8a4a8570064",
+      "description": "RICOTTA TREVIGIANA 1,5KG",
+      "effective_paid": 3.985,
+      "binding": {
+        "raw": {
+          "qty": 2,
+          "unit_price": 7.97,
+          "total": 7.97
+        },
+        "bound": {
+          "qty": 2,
+          "unit_price": 3.99,
+          "total": 7.97
+        },
+        "binding_changed": true,
+        "arithmetic_consistent": true,
+        "diff_pct": 0.4994
+      },
+      "procurement": {
+        "current_price": 3.99,
+        "purchase_quantity": 1,
+        "purchase_unit": "un",
+        "base_unit": "un",
+        "unit": "un"
+      },
+      "operational": {
+        "current_price": 3.99,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "operational_eur": 3.99
+      },
+      "effective_usable": {
+        "cost": 2.66,
+        "unit": "kg"
+      },
+      "history": {
+        "new_price": 3.99
+      },
+      "would_fix": true
+    },
+    {
+      "invoice_item_id": "33dc7070-a202-4397-bba0-e7865bfb6931",
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "effective_paid": 6.72,
+      "binding": {
+        "raw": {
+          "qty": 2,
+          "unit_price": 10.22,
+          "total": 13.44
+        },
+        "bound": {
+          "qty": 2,
+          "unit_price": 6.72,
+          "total": 13.44
+        },
+        "binding_changed": true,
+        "arithmetic_consistent": true,
+        "diff_pct": 0.3425
+      },
+      "procurement": {
+        "current_price": 6.72,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g"
+      },
+      "operational": {
+        "current_price": 6.72,
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g",
+        "operational_eur": 0.0067
+      },
+      "effective_usable": {
+        "cost": 6.72,
+        "unit": "kg"
+      },
+      "history": {
+        "new_price": 0.0067
+      },
+      "would_fix": true
+    },
+    {
+      "invoice_item_id": "4ad54bd5-6902-4443-89f9-8b0c3ecbde75",
+      "description": "Alho Francês",
+      "effective_paid": 1.4151,
+      "binding": {
+        "raw": {
+          "qty": 5.42,
+          "unit_price": 1.77,
+          "total": 7.67
+        },
+        "bound": {
+          "qty": 5.42,
+          "unit_price": 1.42,
+          "total": 7.67
+        },
+        "binding_changed": true,
+        "arithmetic_consistent": false,
+        "diff_pct": 0.1977
+      },
+      "procurement": {
+        "current_price": 1.42,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g"
+      },
+      "operational": {
+        "current_price": 1.42,
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g",
+        "operational_eur": 0.0014
+      },
+      "effective_usable": {
+        "cost": 1.42,
+        "unit": "kg"
+      },
+      "history": {
+        "new_price": 0.0014
+      },
+      "would_fix": false
+    },
+    {
+      "invoice_item_id": "41bf997f-a7cf-412f-9585-82b12a487ece",
+      "description": "Manjericão",
+      "effective_paid": 2.056,
+      "binding": {
+        "raw": {
+          "qty": 5,
+          "unit_price": 2.57,
+          "total": 10.28
+        },
+        "bound": {
+          "qty": 5,
+          "unit_price": 2.06,
+          "total": 10.28
+        },
+        "binding_changed": true,
+        "arithmetic_consistent": false,
+        "diff_pct": 0.1984
+      },
+      "procurement": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g"
+      },
+      "operational": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "cost_base_unit": "g",
+        "operational_eur": 0.0206
+      },
+      "effective_usable": {
+        "cost": 20.6,
+        "unit": "kg"
+      },
+      "history": {
+        "new_price": 0.0206
+      },
+      "would_fix": false
+    },
+    {
+      "invoice_item_id": "434e2500-cbee-430a-959a-58a483bf7972",
+      "description": "Pêra Abacate Hasse",
+      "effective_paid": 4.2561,
+      "binding": {
+        "raw": {
+          "qty": 3.28,
+          "unit_price": 5.32,
+          "total": 13.96
+        },
+        "bound": {
+          "qty": 3.28,
+          "unit_price": 4.26,
+          "total": 13.96
+        },
+        "binding_changed": true,
+        "arithmetic_consistent": true,
+        "diff_pct": 0.1992
+      },
+      "procurement": {
+        "current_price": 4.26,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g"
+      },
+      "operational": {
+        "current_price": 4.26,
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g",
+        "operational_eur": 0.0043
+      },
+      "effective_usable": {
+        "cost": 4.26,
+        "unit": "kg"
+      },
+      "history": {
+        "new_price": 0.0043
+      },
+      "would_fix": true
+    },
+    {
+      "invoice_item_id": "0d50905c-8f10-4a23-a7d2-14b0dd587e31",
+      "description": "Courgettes",
+      "effective_paid": 1.5606,
+      "binding": {
+        "raw": {
+          "qty": 3.3,
+          "unit_price": 1.95,
+          "total": 5.15
+        },
+        "bound": {
+          "qty": 3.3,
+          "unit_price": 1.56,
+          "total": 5.15
+        },
+        "binding_changed": true,
+        "arithmetic_consistent": true,
+        "diff_pct": 0.2
+      },
+      "procurement": {
+        "current_price": 1.56,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g"
+      },
+      "operational": {
+        "current_price": 1.56,
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g",
+        "operational_eur": 0.0016
+      },
+      "effective_usable": {
+        "cost": 1.56,
+        "unit": "kg"
+      },
+      "history": {
+        "new_price": 0.0016
+      },
+      "would_fix": true
+    },
+    {
+      "invoice_item_id": "1ddcdc66-e97a-406b-ab7f-c7b8ade65635",
+      "description": "Pepino",
+      "effective_paid": 1.4167,
+      "binding": {
+        "raw": {
+          "qty": 3.36,
+          "unit_price": 1.77,
+          "total": 4.76
+        },
+        "bound": {
+          "qty": 3.36,
+          "unit_price": 1.42,
+          "total": 4.76
+        },
+        "binding_changed": true,
+        "arithmetic_consistent": true,
+        "diff_pct": 0.1977
+      },
+      "procurement": {
+        "current_price": 1.42,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g"
+      },
+      "operational": {
+        "current_price": 1.42,
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g",
+        "operational_eur": 0.0014
+      },
+      "effective_usable": {
+        "cost": 1.42,
+        "unit": "kg"
+      },
+      "history": {
+        "new_price": 0.0014
+      },
+      "would_fix": true
+    },
+    {
+      "invoice_item_id": "43c623cb-bcd4-4821-ad5e-a2dcc825487e",
+      "description": "Hortelã",
+      "effective_paid": 5.4,
+      "binding": {
+        "raw": {
+          "qty": 0.5,
+          "unit_price": 6.74,
+          "total": 2.7
+        },
+        "bound": {
+          "qty": 0.5,
+          "unit_price": 5.4,
+          "total": 2.7
+        },
+        "binding_changed": true,
+        "arithmetic_consistent": true,
+        "diff_pct": 0.1988
+      },
+      "procurement": {
+        "current_price": 5.4,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g"
+      },
+      "operational": {
+        "current_price": 5.4,
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g",
+        "operational_eur": 0.0054
+      },
+      "effective_usable": {
+        "cost": 5.4,
+        "unit": "kg"
+      },
+      "history": {
+        "new_price": 0.0054
+      },
+      "would_fix": true
+    },
+    {
+      "invoice_item_id": "d998575f-ad64-441e-b003-38785bcb4ca1",
+      "description": "Tomilho",
+      "effective_paid": 2.06,
+      "binding": {
+        "raw": {
+          "qty": 1,
+          "unit_price": 2.57,
+          "total": 2.06
+        },
+        "bound": {
+          "qty": 1,
+          "unit_price": 2.06,
+          "total": 2.06
+        },
+        "binding_changed": true,
+        "arithmetic_consistent": true,
+        "diff_pct": 0.1984
+      },
+      "procurement": {
+        "current_price": 2.06,
+        "purchase_quantity": 1,
+        "purchase_unit": "un",
+        "base_unit": "un",
+        "unit": "un"
+      },
+      "operational": {
+        "current_price": 2.06,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "operational_eur": 2.06
+      },
+      "effective_usable": null,
+      "history": {
+        "new_price": 2.06
+      },
+      "would_fix": true
+    },
+    {
+      "invoice_item_id": "2ab220fa-f29a-48c6-8103-0d043a17f1be",
+      "description": "Abóbora Butternut",
+      "effective_paid": 1.0314,
+      "binding": {
+        "raw": {
+          "qty": 5.42,
+          "unit_price": 1.24,
+          "total": 5.59
+        },
+        "bound": {
+          "qty": 5.42,
+          "unit_price": 1.03,
+          "total": 5.59
+        },
+        "binding_changed": true,
+        "arithmetic_consistent": true,
+        "diff_pct": 0.1694
+      },
+      "procurement": {
+        "current_price": 1.03,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g"
+      },
+      "operational": {
+        "current_price": 1.03,
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g",
+        "operational_eur": 0.001
+      },
+      "effective_usable": {
+        "cost": 1.03,
+        "unit": "kg"
+      },
+      "history": {
+        "new_price": 0.001
+      },
+      "would_fix": true
+    },
+    {
+      "invoice_item_id": "4843605f-3a77-47c8-bd98-fce79ba3a4b7",
+      "description": "Baladin - Ginger Beer 0.20cl",
+      "effective_paid": 9.69,
+      "binding": {
+        "raw": {
+          "qty": 2,
+          "unit_price": 10.85,
+          "total": 19.38
+        },
+        "bound": {
+          "qty": 2,
+          "unit_price": 9.69,
+          "total": 19.38
+        },
+        "binding_changed": true,
+        "arithmetic_consistent": true,
+        "diff_pct": 0.1069
+      },
+      "procurement": {
+        "current_price": 9.69,
+        "purchase_quantity": 2,
+        "purchase_unit": "ml",
+        "base_unit": "ml",
+        "unit": "ml"
+      },
+      "operational": {
+        "current_price": 9.69,
+        "purchase_quantity": 2,
+        "cost_base_unit": "ml",
+        "operational_eur": 4.845
+      },
+      "effective_usable": {
+        "cost": 4845,
+        "unit": "L"
+      },
+      "history": {
+        "new_price": 4.845
+      },
+      "would_fix": true
+    },
+    {
+      "invoice_item_id": "867121e4-7284-4ed8-9610-46e78ba487aa",
+      "description": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "effective_paid": 2.1,
+      "binding": {
+        "raw": {
+          "qty": 24,
+          "unit_price": 2.35,
+          "total": 50.4
+        },
+        "bound": {
+          "qty": 24,
+          "unit_price": 2.1,
+          "total": 50.4
+        },
+        "binding_changed": true,
+        "arithmetic_consistent": true,
+        "diff_pct": 0.1064
+      },
+      "procurement": {
+        "current_price": 2.1,
+        "purchase_quantity": 1,
+        "purchase_unit": "un",
+        "base_unit": "un",
+        "unit": "un"
+      },
+      "operational": {
+        "current_price": 2.1,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "operational_eur": 2.1
+      },
+      "effective_usable": {
+        "cost": 4.2,
+        "unit": "kg"
+      },
+      "history": {
+        "new_price": 2.1
+      },
+      "would_fix": true
+    },
+    {
+      "invoice_item_id": "709cda62-453a-4d5d-b51d-29788b0f1c12",
+      "description": "Salada Ibérica FSTK EMB. 250g",
+      "effective_paid": 2.19,
+      "binding": {
+        "raw": {
+          "qty": 4,
+          "unit_price": 2.33,
+          "total": 8.76
+        },
+        "bound": {
+          "qty": 4,
+          "unit_price": 2.19,
+          "total": 8.76
+        },
+        "binding_changed": true,
+        "arithmetic_consistent": true,
+        "diff_pct": 0.0601
+      },
+      "procurement": {
+        "current_price": 2.19,
+        "purchase_quantity": 250,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g"
+      },
+      "operational": {
+        "current_price": 2.19,
+        "purchase_quantity": 250,
+        "cost_base_unit": "g",
+        "operational_eur": 0.0088
+      },
+      "effective_usable": {
+        "cost": 2.19,
+        "unit": "case"
+      },
+      "history": {
+        "new_price": 0.0088
+      },
+      "would_fix": true
+    },
+    {
+      "invoice_item_id": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
+      "description": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "effective_paid": 16.09,
+      "binding": {
+        "raw": {
+          "qty": 1,
+          "unit_price": 15.55,
+          "total": 16.09
+        },
+        "bound": {
+          "qty": 1,
+          "unit_price": 15.55,
+          "total": 16.09
+        },
+        "binding_changed": false,
+        "arithmetic_consistent": false,
+        "diff_pct": 0
+      },
+      "procurement": {
+        "current_price": 15.55,
+        "purchase_quantity": 2,
+        "purchase_unit": "un",
+        "base_unit": "un",
+        "unit": "un"
+      },
+      "operational": {
+        "current_price": 15.55,
+        "purchase_quantity": 10000,
+        "cost_base_unit": "ml",
+        "operational_eur": 0.0016
+      },
+      "effective_usable": {
+        "cost": 1.555,
+        "unit": "L"
+      },
+      "history": {
+        "new_price": 0.0016
+      },
+      "would_fix": false
+    }
+  ],
+  "affected": [
+    {
+      "pattern": "Paccheri",
+      "ingredient": {
+        "id": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+        "name": "Mezzi paccheri mancini",
+        "current_price": 27.31,
+        "purchase_quantity": 2,
+        "purchase_unit": "un",
+        "base_unit": "un"
+      },
+      "invoice_line": {
+        "id": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "supplier": "Il Bocconcino Distribuição Alimentar",
+        "invoice_date": "2026-05-08",
+        "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "qty": 2,
+        "unit": "un",
+        "persisted_unit_price": 27.31,
+        "total": 27.3
+      },
+      "replay": {
+        "binding": {
+          "raw": {
+            "qty": 2,
+            "unit_price": 27.31,
+            "total": 27.3
+          },
+          "bound": {
+            "qty": 2,
+            "unit_price": 13.65,
+            "total": 27.3
+          },
+          "binding_changed": true,
+          "arithmetic_consistent": true,
+          "diff_pct": 0.5002
+        },
+        "procurement": {
+          "current_price": 13.65,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un"
+        },
+        "operational": {
+          "current_price": 13.65,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "operational_eur": 13.65
+        },
+        "effective_usable": {
+          "cost": 4.55,
+          "unit": "kg"
+        },
+        "history": {
+          "new_price": 13.65
+        }
+      },
+      "current": {
+        "operational_eur": 13.655,
+        "procurement": {
+          "current_price": 27.31,
+          "purchase_quantity": 2,
+          "purchase_unit": "un"
+        }
+      },
+      "expected_after_reingestion": {
+        "operational_eur": 13.65,
+        "procurement": {
+          "current_price": 13.65,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un"
+        },
+        "history_new_price": 13.65
+      },
+      "procurement_match": {
+        "current_price": false,
+        "purchase_quantity": false,
+        "purchase_unit": true
+      },
+      "operational_match": false,
+      "history": {
+        "linked_row": {
+          "id": "27ebdf67-4ae7-4b2e-b55b-b818dda5f5aa",
+          "new_price": 13.655,
+          "previous_price": null
+        },
+        "expected_new_price": 13.65,
+        "history_would_change": true
+      },
+      "recipe_count": 0,
+      "recipe_impact": {
+        "current_operational_eur": 13.655,
+        "expected_operational_eur": 13.65,
+        "diff_pct": 0.0004
+      }
+    },
+    {
+      "pattern": "Paccheri",
+      "ingredient": {
+        "id": "d7fcbb41-4e19-47ee-bbea-058e7b44a040",
+        "name": "Paccheri lisci",
+        "current_price": 2.35,
+        "purchase_quantity": 1,
+        "purchase_unit": "un",
+        "base_unit": "un"
+      },
+      "invoice_line": {
+        "id": "867121e4-7284-4ed8-9610-46e78ba487aa",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "supplier": "Emporio Italia",
+        "invoice_date": "2026-05-19",
+        "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "qty": 24,
+        "unit": null,
+        "persisted_unit_price": 2.35,
+        "total": 50.4
+      },
+      "replay": {
+        "binding": {
+          "raw": {
+            "qty": 24,
+            "unit_price": 2.35,
+            "total": 50.4
+          },
+          "bound": {
+            "qty": 24,
+            "unit_price": 2.1,
+            "total": 50.4
+          },
+          "binding_changed": true,
+          "arithmetic_consistent": true,
+          "diff_pct": 0.1064
+        },
+        "procurement": {
+          "current_price": 2.1,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un"
+        },
+        "operational": {
+          "current_price": 2.1,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "operational_eur": 2.1
+        },
+        "effective_usable": {
+          "cost": 4.2,
+          "unit": "kg"
+        },
+        "history": {
+          "new_price": 2.1
+        }
+      },
+      "current": {
+        "operational_eur": 2.35,
+        "procurement": {
+          "current_price": 2.35,
+          "purchase_quantity": 1,
+          "purchase_unit": "un"
+        }
+      },
+      "expected_after_reingestion": {
+        "operational_eur": 2.1,
+        "procurement": {
+          "current_price": 2.1,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un"
+        },
+        "history_new_price": 2.1
+      },
+      "procurement_match": {
+        "current_price": false,
+        "purchase_quantity": true,
+        "purchase_unit": true
+      },
+      "operational_match": false,
+      "history": {
+        "linked_row": {
+          "id": "d35170c1-d94e-49d5-ac45-1871e00bd98b",
+          "new_price": 2.35,
+          "previous_price": null
+        },
+        "expected_new_price": 2.1,
+        "history_would_change": true
+      },
+      "recipe_count": 0,
+      "recipe_impact": {
+        "current_operational_eur": 2.35,
+        "expected_operational_eur": 2.1,
+        "diff_pct": 0.1064
+      }
+    },
+    {
+      "pattern": "Courgettes",
+      "ingredient": {
+        "id": "6c7ab001-9f87-448e-9b34-87d3aa21f9ca",
+        "name": "Courgettes",
+        "current_price": 1.95,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g"
+      },
+      "invoice_line": {
+        "id": "0d50905c-8f10-4a23-a7d2-14b0dd587e31",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "supplier": "Bidfood Portugal",
+        "invoice_date": "2026-05-25",
+        "name": "Courgettes",
+        "qty": 3.3,
+        "unit": "kg",
+        "persisted_unit_price": 1.95,
+        "total": 5.15
+      },
+      "replay": {
+        "binding": {
+          "raw": {
+            "qty": 3.3,
+            "unit_price": 1.95,
+            "total": 5.15
+          },
+          "bound": {
+            "qty": 3.3,
+            "unit_price": 1.56,
+            "total": 5.15
+          },
+          "binding_changed": true,
+          "arithmetic_consistent": true,
+          "diff_pct": 0.2
+        },
+        "procurement": {
+          "current_price": 1.56,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g",
+          "unit": "g"
+        },
+        "operational": {
+          "current_price": 1.56,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g",
+          "operational_eur": 0.0016
+        },
+        "effective_usable": {
+          "cost": 1.56,
+          "unit": "kg"
+        },
+        "history": {
+          "new_price": 0.0016
+        }
+      },
+      "current": {
+        "operational_eur": 0.002,
+        "procurement": {
+          "current_price": 1.95,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g"
+        }
+      },
+      "expected_after_reingestion": {
+        "operational_eur": 0.0016,
+        "procurement": {
+          "current_price": 1.56,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g",
+          "unit": "g"
+        },
+        "history_new_price": 0.0016
+      },
+      "procurement_match": {
+        "current_price": false,
+        "purchase_quantity": true,
+        "purchase_unit": true
+      },
+      "operational_match": false,
+      "history": {
+        "linked_row": {
+          "id": "3d1220e6-024b-46db-9d4a-088fbc83f166",
+          "new_price": 0.00195,
+          "previous_price": null
+        },
+        "expected_new_price": 0.0016,
+        "history_would_change": false
+      },
+      "recipe_count": 0,
+      "recipe_impact": {
+        "current_operational_eur": 0.002,
+        "expected_operational_eur": 0.0016,
+        "diff_pct": 0.2
+      }
+    },
+    {
+      "pattern": "Alho Francês",
+      "ingredient": {
+        "id": "446f3217-9a6f-428a-abc6-10927a958168",
+        "name": "Alho francês",
+        "current_price": 1.77,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g"
+      },
+      "invoice_line": {
+        "id": "4ad54bd5-6902-4443-89f9-8b0c3ecbde75",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "supplier": "Bidfood Portugal",
+        "invoice_date": "2026-05-25",
+        "name": "Alho Francês",
+        "qty": 5.42,
+        "unit": "kg",
+        "persisted_unit_price": 1.77,
+        "total": 7.67
+      },
+      "replay": {
+        "binding": {
+          "raw": {
+            "qty": 5.42,
+            "unit_price": 1.77,
+            "total": 7.67
+          },
+          "bound": {
+            "qty": 5.42,
+            "unit_price": 1.42,
+            "total": 7.67
+          },
+          "binding_changed": true,
+          "arithmetic_consistent": false,
+          "diff_pct": 0.1977
+        },
+        "procurement": {
+          "current_price": 1.42,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g",
+          "unit": "g"
+        },
+        "operational": {
+          "current_price": 1.42,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g",
+          "operational_eur": 0.0014
+        },
+        "effective_usable": {
+          "cost": 1.42,
+          "unit": "kg"
+        },
+        "history": {
+          "new_price": 0.0014
+        }
+      },
+      "current": {
+        "operational_eur": 0.0018,
+        "procurement": {
+          "current_price": 1.77,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g"
+        }
+      },
+      "expected_after_reingestion": {
+        "operational_eur": 0.0014,
+        "procurement": {
+          "current_price": 1.42,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g",
+          "unit": "g"
+        },
+        "history_new_price": 0.0014
+      },
+      "procurement_match": {
+        "current_price": false,
+        "purchase_quantity": true,
+        "purchase_unit": true
+      },
+      "operational_match": false,
+      "history": {
+        "linked_row": {
+          "id": "cd8d2350-7ccc-4ff8-8a83-625975ea45a0",
+          "new_price": 0.00177,
+          "previous_price": null
+        },
+        "expected_new_price": 0.0014,
+        "history_would_change": false
+      },
+      "recipe_count": 0,
+      "recipe_impact": {
+        "current_operational_eur": 0.0018,
+        "expected_operational_eur": 0.0014,
+        "diff_pct": 0.2222
+      }
+    },
+    {
+      "pattern": "Manjericão",
+      "ingredient": {
+        "id": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+        "name": "Manjericão",
+        "current_price": 2.57,
+        "purchase_quantity": 100,
+        "purchase_unit": "g",
+        "base_unit": "g"
+      },
+      "invoice_line": {
+        "id": "41bf997f-a7cf-412f-9585-82b12a487ece",
+        "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "supplier": "Bidfood Portugal",
+        "invoice_date": "2026-05-25",
+        "name": "Manjericão",
+        "qty": 5,
+        "unit": "mo",
+        "persisted_unit_price": 2.57,
+        "total": 10.28
+      },
+      "replay": {
+        "binding": {
+          "raw": {
+            "qty": 5,
+            "unit_price": 2.57,
+            "total": 10.28
+          },
+          "bound": {
+            "qty": 5,
+            "unit_price": 2.06,
+            "total": 10.28
+          },
+          "binding_changed": true,
+          "arithmetic_consistent": false,
+          "diff_pct": 0.1984
+        },
+        "procurement": {
+          "current_price": 2.06,
+          "purchase_quantity": 100,
+          "purchase_unit": "g",
+          "base_unit": "g",
+          "unit": "g"
+        },
+        "operational": {
+          "current_price": 2.06,
+          "purchase_quantity": 100,
+          "cost_base_unit": "g",
+          "operational_eur": 0.0206
+        },
+        "effective_usable": {
+          "cost": 20.6,
+          "unit": "kg"
+        },
+        "history": {
+          "new_price": 0.0206
+        }
+      },
+      "current": {
+        "operational_eur": 0.0257,
+        "procurement": {
+          "current_price": 2.57,
+          "purchase_quantity": 100,
+          "purchase_unit": "g"
+        }
+      },
+      "expected_after_reingestion": {
+        "operational_eur": 0.0206,
+        "procurement": {
+          "current_price": 2.06,
+          "purchase_quantity": 100,
+          "purchase_unit": "g",
+          "base_unit": "g",
+          "unit": "g"
+        },
+        "history_new_price": 0.0206
+      },
+      "procurement_match": {
+        "current_price": false,
+        "purchase_quantity": true,
+        "purchase_unit": true
+      },
+      "operational_match": false,
+      "history": {
+        "linked_row": {
+          "id": "cab6571b-919b-4572-860e-7fb3a59fd8e8",
+          "new_price": 0.025699999999999997,
+          "previous_price": null
+        },
+        "expected_new_price": 0.0206,
+        "history_would_change": true
+      },
+      "recipe_count": 0,
+      "recipe_impact": {
+        "current_operational_eur": 0.0257,
+        "expected_operational_eur": 0.0206,
+        "diff_pct": 0.1984
+      }
+    },
+    {
+      "pattern": "Gorgonzola",
+      "ingredient": {
+        "id": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+        "name": "Gorgonzola DOP dolce",
+        "current_price": 10.22,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g"
+      },
+      "invoice_line": {
+        "id": "33dc7070-a202-4397-bba0-e7865bfb6931",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "supplier": "Emporio Italia",
+        "invoice_date": "2026-05-19",
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+        "qty": 2,
+        "unit": "kg",
+        "persisted_unit_price": 10.22,
+        "total": 13.44
+      },
+      "replay": {
+        "binding": {
+          "raw": {
+            "qty": 2,
+            "unit_price": 10.22,
+            "total": 13.44
+          },
+          "bound": {
+            "qty": 2,
+            "unit_price": 6.72,
+            "total": 13.44
+          },
+          "binding_changed": true,
+          "arithmetic_consistent": true,
+          "diff_pct": 0.3425
+        },
+        "procurement": {
+          "current_price": 6.72,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g",
+          "unit": "g"
+        },
+        "operational": {
+          "current_price": 6.72,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g",
+          "operational_eur": 0.0067
+        },
+        "effective_usable": {
+          "cost": 6.72,
+          "unit": "kg"
+        },
+        "history": {
+          "new_price": 0.0067
+        }
+      },
+      "current": {
+        "operational_eur": 0.0102,
+        "procurement": {
+          "current_price": 10.22,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g"
+        }
+      },
+      "expected_after_reingestion": {
+        "operational_eur": 0.0067,
+        "procurement": {
+          "current_price": 6.72,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g",
+          "unit": "g"
+        },
+        "history_new_price": 0.0067
+      },
+      "procurement_match": {
+        "current_price": false,
+        "purchase_quantity": true,
+        "purchase_unit": true
+      },
+      "operational_match": false,
+      "history": {
+        "linked_row": {
+          "id": "d94a0f16-8696-4457-a42f-85ac05b417bc",
+          "new_price": 0.01022,
+          "previous_price": null
+        },
+        "expected_new_price": 0.0067,
+        "history_would_change": true
+      },
+      "recipe_count": 0,
+      "recipe_impact": {
+        "current_operational_eur": 0.0102,
+        "expected_operational_eur": 0.0067,
+        "diff_pct": 0.3431
+      }
+    }
+  ],
+  "regression": [
+    {
+      "pattern": "Prosciutto",
+      "ingredient": "Prosciutto cotto scelto",
+      "error": "no_match"
+    },
+    {
+      "pattern": "San Pellegrino",
+      "ingredient": "Água san pellegrino",
+      "invoice_line": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "binding_changed": false,
+      "current": {
+        "current_price": 19.28,
+        "purchase_quantity": 15,
+        "operational_eur": 1.2853
+      },
+      "expected": {
+        "current_price": 19.28,
+        "purchase_quantity": 15,
+        "operational_eur": 0.0017
+      },
+      "unchanged": false
+    },
+    {
+      "pattern": "Mortadella",
+      "ingredient": "Mortadella IGP massima con pistacchio",
+      "invoice_line": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5kg",
+      "binding_changed": false,
+      "current": {
+        "current_price": 9.99,
+        "purchase_quantity": 1000,
+        "operational_eur": 0.01
+      },
+      "expected": {
+        "current_price": 9.99,
+        "purchase_quantity": 1000,
+        "operational_eur": 0.01
+      },
+      "unchanged": true
+    },
+    {
+      "pattern": "Atum",
+      "ingredient": "Atum em óleo",
+      "invoice_line": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+      "binding_changed": false,
+      "current": {
+        "current_price": 6.29,
+        "purchase_quantity": 1,
+        "operational_eur": 6.29
+      },
+      "expected": {
+        "current_price": 13.1,
+        "purchase_quantity": 1,
+        "operational_eur": 13.1
+      },
+      "unchanged": false
+    },
+    {
+      "pattern": "Anchoas",
+      "ingredient": "Anchoas",
+      "invoice_line": "Filete de Anchoas Alconfirosa LI 495 g",
+      "binding_changed": false,
+      "current": {
+        "current_price": 9.49,
+        "purchase_quantity": 1,
+        "operational_eur": 9.49
+      },
+      "expected": {
+        "current_price": 9.99,
+        "purchase_quantity": 1,
+        "operational_eur": 9.99
+      },
+      "unchanged": false
+    },
+    {
+      "pattern": "Aceto",
+      "ingredient": "Aceto balsamico di modena IGP",
+      "invoice_line": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "binding_changed": false,
+      "current": {
+        "current_price": 15.55,
+        "purchase_quantity": 2,
+        "operational_eur": 7.775
+      },
+      "expected": {
+        "current_price": 15.55,
+        "purchase_quantity": 2,
+        "operational_eur": 0.0016
+      },
+      "unchanged": false
+    }
+  ]
+}

@@ -1,0 +1,738 @@
+{
+  "generatedAt": "2026-06-22T20:56:17.897Z",
+  "mode": "STRICT_READ_ONLY_REGRESSION_MATRIX",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "proposedFix": {
+    "name": "size_count outer-pack scaling exception (Option A)",
+    "helper": "shouldScaleOuterPackForSizeCountGenericRow",
+    "conditions": [
+      "structure.tier === 'size_count'",
+      "isGenericPurchaseUnit(rowUnit)",
+      "rowQuantity > 1",
+      "rowQuantity !== innerUnitCount (±0.01)",
+      "structure.unitMeasurement not in ['kg', 'L']"
+    ],
+    "integrationPoints": [
+      "resolveStructurePurchaseQuantity",
+      "computeUsableFromPurchaseStructure"
+    ]
+  },
+  "task1_usableReplay": [
+    {
+      "product": "Mozzarella",
+      "currentUsable": "1 kg",
+      "simulatedUsable": "10 kg",
+      "changed": true
+    },
+    {
+      "product": "Stracciatella",
+      "currentUsable": "6 kg",
+      "simulatedUsable": "6 kg",
+      "changed": false
+    },
+    {
+      "product": "Peroni",
+      "currentUsable": "7.92 L",
+      "simulatedUsable": "7.92 L",
+      "changed": false
+    },
+    {
+      "product": "S.Pellegrino (Bocconcino)",
+      "currentUsable": "11.25 L",
+      "simulatedUsable": "22.50 L",
+      "changed": true
+    },
+    {
+      "product": "S.Pellegrino (Emporio)",
+      "currentUsable": "11.25 L",
+      "simulatedUsable": "22.50 L",
+      "changed": true
+    },
+    {
+      "product": "Guanciale",
+      "currentUsable": "10.5 kg",
+      "simulatedUsable": "10.5 kg",
+      "changed": false
+    },
+    {
+      "product": "Mezzi",
+      "currentUsable": "6 kg",
+      "simulatedUsable": "6 kg",
+      "changed": false
+    },
+    {
+      "product": "Ricotta",
+      "currentUsable": "3 kg",
+      "simulatedUsable": "3 kg",
+      "changed": false
+    }
+  ],
+  "task2_opCostReplay": [
+    {
+      "product": "Mozzarella",
+      "currentOpCost": "€81.20/kg",
+      "simulatedOpCost": "€8.12/kg",
+      "changed": true
+    },
+    {
+      "product": "Stracciatella",
+      "currentOpCost": "€12.44/kg",
+      "simulatedOpCost": "€12.44/kg",
+      "changed": false
+    },
+    {
+      "product": "Peroni",
+      "currentOpCost": "€3.24/L",
+      "simulatedOpCost": "€3.24/L",
+      "changed": false
+    },
+    {
+      "product": "S.Pellegrino (Bocconcino)",
+      "currentOpCost": "€3.73/L",
+      "simulatedOpCost": "€1.86/L",
+      "changed": true
+    },
+    {
+      "product": "S.Pellegrino (Emporio)",
+      "currentOpCost": "€3.43/L",
+      "simulatedOpCost": "€1.71/L",
+      "changed": true
+    },
+    {
+      "product": "Guanciale",
+      "currentOpCost": "€6.18/kg",
+      "simulatedOpCost": "€6.18/kg",
+      "changed": false
+    },
+    {
+      "product": "Mezzi",
+      "currentOpCost": "€4.55/kg",
+      "simulatedOpCost": "€4.55/kg",
+      "changed": false
+    },
+    {
+      "product": "Ricotta",
+      "currentOpCost": "€2.66/kg",
+      "simulatedOpCost": "€2.66/kg",
+      "changed": false
+    }
+  ],
+  "task3_controlValidation": [
+    {
+      "product": "Mozzarella",
+      "classification": "A",
+      "expected": "A",
+      "match": true
+    },
+    {
+      "product": "Stracciatella",
+      "classification": "C",
+      "expected": "C",
+      "match": true
+    },
+    {
+      "product": "Peroni",
+      "classification": "C",
+      "expected": "C",
+      "match": true
+    },
+    {
+      "product": "S.Pellegrino (Bocconcino)",
+      "classification": "B",
+      "expected": "C",
+      "match": false
+    },
+    {
+      "product": "S.Pellegrino (Emporio)",
+      "classification": "B",
+      "expected": "C",
+      "match": false
+    },
+    {
+      "product": "Guanciale",
+      "classification": "C",
+      "expected": "C",
+      "match": true
+    },
+    {
+      "product": "Mezzi",
+      "classification": "C",
+      "expected": "C",
+      "match": true
+    },
+    {
+      "product": "Ricotta",
+      "classification": "C",
+      "expected": "C",
+      "match": true
+    }
+  ],
+  "task4_blastRadius": {
+    "totalEvaluated": 8,
+    "changed": 3,
+    "expectedChange": 1,
+    "unexpectedChange": 2,
+    "noChange": 5,
+    "onlyMozzarellaChanged": false
+  },
+  "task5_implementationBlockers": {
+    "rootCauseLocalized": {
+      "status": "A",
+      "label": "Proven"
+    },
+    "helperLogicScoped": {
+      "status": "B",
+      "label": "Needs validation"
+    },
+    "productionReplayMatchesVl": {
+      "status": "A",
+      "label": "Proven"
+    },
+    "reIngestPath": {
+      "status": "B",
+      "label": "Needs validation"
+    },
+    "sanPellegrinoClCaveat": {
+      "status": "B",
+      "label": "Needs validation — helper fires on Emporio row"
+    }
+  },
+  "task6_finalReadiness": "B) Control impact",
+  "confidence": {
+    "regressionMatrix": 0.62,
+    "mozzarellaFixTarget": 0.94,
+    "controlPreservation": 0.55,
+    "overall": 0.65
+  },
+  "vlRowsFetched": 8,
+  "rows": [
+    {
+      "key": "mozzarella",
+      "label": "Mozzarella",
+      "invoiceItemId": "095b2bb9-bd36-44c2-a1f9-7c50fa9c0cc6",
+      "lineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "bound": {
+        "qty": 10,
+        "unit": "un",
+        "unitPrice": 8.12,
+        "total": 81.23
+      },
+      "structure": {
+        "tier": "size_count",
+        "innerUnitCount": 8,
+        "unitMeasurement": "g",
+        "unitSize": 125,
+        "totalUsableAmount": 1000,
+        "purchaseQuantity": 1
+      },
+      "helper": {
+        "wouldFire": true,
+        "conditions": {
+          "tier_size_count": true,
+          "generic_row": true,
+          "rowQty_gt_1": true,
+          "rowQty_ne_inner": true,
+          "unit_not_kg_L": true
+        }
+      },
+      "current": {
+        "usableQuantity": 1000,
+        "usableUnit": "g",
+        "usableLabel": "1 kg usable",
+        "purchaseContainerCount": 8,
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "resolveStructurePurchaseQty": 1,
+        "operationalCost": 81.19999999999999,
+        "operationalCostUnit": "kg",
+        "operationalCostLabel": "€81.20 / kg"
+      },
+      "simulated": {
+        "usableQuantity": 10000,
+        "usableUnit": "g",
+        "usableLabel": "10 kg",
+        "purchaseContainerCount": 10,
+        "usableSource": "structure_scaled_outer",
+        "fallbackReason": "outer count 10 (name 1)",
+        "resolveStructurePurchaseQty": 10,
+        "operationalCost": 8.12,
+        "operationalCostUnit": "kg",
+        "operationalCostLabel": "€8.12/kg"
+      },
+      "changed": {
+        "usable": true,
+        "operationalCost": true
+      },
+      "expectedChange": true,
+      "classification": "A",
+      "expectedClassification": "A",
+      "classificationMatch": true,
+      "notes": "Fix target — size_count 125GR*8, qty=10",
+      "dataSource": "vl_db_readonly"
+    },
+    {
+      "key": "stracciatella",
+      "label": "Stracciatella",
+      "invoiceItemId": "da2ad0fc-eb56-4506-8ba4-ae22b3cb6a5a",
+      "lineName": "STRACCIATELLA 250 GR",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "bound": {
+        "qty": 24,
+        "unit": "un",
+        "unitPrice": 3.11,
+        "total": 74.54
+      },
+      "structure": {
+        "tier": "bare_measure",
+        "unitMeasurement": "g",
+        "unitSize": 250,
+        "totalUsableAmount": 250,
+        "purchaseQuantity": 1
+      },
+      "helper": {
+        "wouldFire": false,
+        "conditions": {
+          "tier_size_count": false,
+          "generic_row": true,
+          "rowQty_gt_1": true,
+          "rowQty_ne_inner": false,
+          "unit_not_kg_L": true
+        }
+      },
+      "current": {
+        "usableQuantity": 6000,
+        "usableUnit": "g",
+        "usableLabel": "6 kg usable",
+        "purchaseContainerCount": 24,
+        "usableSource": "structure_recomputed",
+        "fallbackReason": "generic row unit × per-item (24 × 250 g)",
+        "resolveStructurePurchaseQty": 24,
+        "operationalCost": 12.44,
+        "operationalCostUnit": "kg",
+        "operationalCostLabel": "€12.44 / kg"
+      },
+      "simulated": {
+        "usableQuantity": 6000,
+        "usableUnit": "g",
+        "usableLabel": "6 kg",
+        "purchaseContainerCount": 24,
+        "usableSource": "structure_recomputed",
+        "fallbackReason": "generic row unit × per-item (24 × 250 g)",
+        "resolveStructurePurchaseQty": 24,
+        "operationalCost": 12.44,
+        "operationalCostUnit": "kg",
+        "operationalCostLabel": "€12.44/kg"
+      },
+      "changed": {
+        "usable": false,
+        "operationalCost": false
+      },
+      "expectedChange": false,
+      "classification": "C",
+      "expectedClassification": "C",
+      "classificationMatch": true,
+      "notes": "bare_measure tier — not size_count",
+      "dataSource": "vl_db_readonly"
+    },
+    {
+      "key": "peroni",
+      "label": "Peroni",
+      "invoiceItemId": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+      "lineName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "bound": {
+        "qty": 24,
+        "unit": "un",
+        "unitPrice": 1.07,
+        "total": 25.69
+      },
+      "structure": {
+        "tier": "size_count",
+        "innerUnitCount": 24,
+        "unitMeasurement": "cl",
+        "unitSize": 33,
+        "totalUsableAmount": 7920,
+        "purchaseQuantity": 1
+      },
+      "helper": {
+        "wouldFire": false,
+        "conditions": {
+          "tier_size_count": true,
+          "generic_row": true,
+          "rowQty_gt_1": true,
+          "rowQty_ne_inner": false,
+          "unit_not_kg_L": true
+        }
+      },
+      "current": {
+        "usableQuantity": 7920,
+        "usableUnit": "ml",
+        "usableLabel": "7.92 L usable",
+        "purchaseContainerCount": 24,
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "resolveStructurePurchaseQty": 1,
+        "operationalCost": 3.2424242424242427,
+        "operationalCostUnit": "L",
+        "operationalCostLabel": "€3.24 / L"
+      },
+      "simulated": {
+        "usableQuantity": 7920,
+        "usableUnit": "ml",
+        "usableLabel": "7.92 L",
+        "purchaseContainerCount": 24,
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "resolveStructurePurchaseQty": 1,
+        "operationalCost": 3.2424242424242427,
+        "operationalCostUnit": "L",
+        "operationalCostLabel": "€3.24/L"
+      },
+      "changed": {
+        "usable": false,
+        "operationalCost": false
+      },
+      "expectedChange": false,
+      "classification": "C",
+      "expectedClassification": "C",
+      "classificationMatch": true,
+      "notes": "rowQty === innerCount (24)",
+      "dataSource": "vl_db_readonly"
+    },
+    {
+      "key": "pellegrino_bocconcino",
+      "label": "S.Pellegrino (Bocconcino)",
+      "invoiceItemId": "f25feb92-3477-41a4-9a81-c556a90a0814",
+      "lineName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "bound": {
+        "qty": 2,
+        "unit": "un",
+        "unitPrice": 20.97,
+        "total": 42.07
+      },
+      "structure": {
+        "tier": "size_count",
+        "innerUnitCount": 15,
+        "unitMeasurement": "cl",
+        "unitSize": 75,
+        "totalUsableAmount": 11250,
+        "purchaseQuantity": 1
+      },
+      "helper": {
+        "wouldFire": true,
+        "conditions": {
+          "tier_size_count": true,
+          "generic_row": true,
+          "rowQty_gt_1": true,
+          "rowQty_ne_inner": true,
+          "unit_not_kg_L": true
+        }
+      },
+      "current": {
+        "usableQuantity": 11250,
+        "usableUnit": "ml",
+        "usableLabel": "11.25 L usable",
+        "purchaseContainerCount": 15,
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "resolveStructurePurchaseQty": 1,
+        "operationalCost": 3.7279999999999998,
+        "operationalCostUnit": "L",
+        "operationalCostLabel": "€3.73 / L"
+      },
+      "simulated": {
+        "usableQuantity": 22500,
+        "usableUnit": "ml",
+        "usableLabel": "22.50 L",
+        "purchaseContainerCount": 2,
+        "usableSource": "structure_scaled_outer",
+        "fallbackReason": "outer count 2 (name 1)",
+        "resolveStructurePurchaseQty": 2,
+        "operationalCost": 1.8639999999999999,
+        "operationalCostUnit": "L",
+        "operationalCostLabel": "€1.86/L"
+      },
+      "changed": {
+        "usable": true,
+        "operationalCost": true
+      },
+      "expectedChange": false,
+      "classification": "B",
+      "expectedClassification": "C",
+      "classificationMatch": false,
+      "notes": "Parser tier=size_count (75CL*15), not caixa_units_size — helper fires on cl unit",
+      "dataSource": "vl_db_readonly"
+    },
+    {
+      "key": "pellegrino_emporio",
+      "label": "S.Pellegrino (Emporio)",
+      "invoiceItemId": "9cdd22ba-051b-4422-a122-3e6a39e9ef8c",
+      "lineName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "bound": {
+        "qty": 2,
+        "unit": "un",
+        "unitPrice": 19.28,
+        "total": 38.56
+      },
+      "structure": {
+        "tier": "size_count",
+        "innerUnitCount": 15,
+        "unitMeasurement": "cl",
+        "unitSize": 75,
+        "totalUsableAmount": 11250,
+        "purchaseQuantity": 1
+      },
+      "helper": {
+        "wouldFire": true,
+        "conditions": {
+          "tier_size_count": true,
+          "generic_row": true,
+          "rowQty_gt_1": true,
+          "rowQty_ne_inner": true,
+          "unit_not_kg_L": true
+        }
+      },
+      "current": {
+        "usableQuantity": 11250,
+        "usableUnit": "ml",
+        "usableLabel": "11.25 L usable",
+        "purchaseContainerCount": 15,
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "resolveStructurePurchaseQty": 1,
+        "operationalCost": 3.4275555555555557,
+        "operationalCostUnit": "L",
+        "operationalCostLabel": "€3.43 / L"
+      },
+      "simulated": {
+        "usableQuantity": 22500,
+        "usableUnit": "ml",
+        "usableLabel": "22.50 L",
+        "purchaseContainerCount": 2,
+        "usableSource": "structure_scaled_outer",
+        "fallbackReason": "outer count 2 (name 1)",
+        "resolveStructurePurchaseQty": 2,
+        "operationalCost": 1.7137777777777778,
+        "operationalCostUnit": "L",
+        "operationalCostLabel": "€1.71/L"
+      },
+      "changed": {
+        "usable": true,
+        "operationalCost": true
+      },
+      "expectedChange": false,
+      "classification": "B",
+      "expectedClassification": "C",
+      "classificationMatch": false,
+      "notes": "size_count cl — unitMeasurement ∉ {kg,L}; rowQty≠inner but volume unit caveat",
+      "dataSource": "vl_db_readonly"
+    },
+    {
+      "key": "guanciale",
+      "label": "Guanciale",
+      "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+      "lineName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "bound": {
+        "qty": 5.996,
+        "unit": "un",
+        "unitPrice": 10.83,
+        "total": 64.93
+      },
+      "structure": {
+        "tier": "size_count",
+        "innerUnitCount": 7,
+        "unitMeasurement": "kg",
+        "unitSize": 1.5,
+        "totalUsableAmount": 10500,
+        "purchaseQuantity": 1
+      },
+      "helper": {
+        "wouldFire": false,
+        "conditions": {
+          "tier_size_count": true,
+          "generic_row": true,
+          "rowQty_gt_1": true,
+          "rowQty_ne_inner": true,
+          "unit_not_kg_L": false
+        }
+      },
+      "current": {
+        "usableQuantity": 10500,
+        "usableUnit": "g",
+        "usableLabel": "10.5 kg usable",
+        "purchaseContainerCount": 7,
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "resolveStructurePurchaseQty": 1,
+        "operationalCost": 6.184445714285714,
+        "operationalCostUnit": "kg",
+        "operationalCostLabel": "€6.18 / kg"
+      },
+      "simulated": {
+        "usableQuantity": 10500,
+        "usableUnit": "g",
+        "usableLabel": "10.5 kg",
+        "purchaseContainerCount": 7,
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "resolveStructurePurchaseQty": 1,
+        "operationalCost": 6.184445714285714,
+        "operationalCostUnit": "kg",
+        "operationalCostLabel": "€6.18/kg"
+      },
+      "changed": {
+        "usable": false,
+        "operationalCost": false
+      },
+      "expectedChange": false,
+      "classification": "C",
+      "expectedClassification": "C",
+      "classificationMatch": true,
+      "notes": "unitMeasurement=kg excluded",
+      "dataSource": "vl_db_readonly"
+    },
+    {
+      "key": "mezzi",
+      "label": "Mezzi",
+      "invoiceItemId": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+      "lineName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "bound": {
+        "qty": 2,
+        "unit": "un",
+        "unitPrice": 13.65,
+        "total": 27.3
+      },
+      "structure": {
+        "tier": "size_count",
+        "innerUnitCount": 6,
+        "unitMeasurement": "kg",
+        "unitSize": 1,
+        "totalUsableAmount": 6000,
+        "purchaseQuantity": 1
+      },
+      "helper": {
+        "wouldFire": false,
+        "conditions": {
+          "tier_size_count": true,
+          "generic_row": true,
+          "rowQty_gt_1": true,
+          "rowQty_ne_inner": true,
+          "unit_not_kg_L": false
+        }
+      },
+      "current": {
+        "usableQuantity": 6000,
+        "usableUnit": "g",
+        "usableLabel": "6 kg usable",
+        "purchaseContainerCount": 6,
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "resolveStructurePurchaseQty": 1,
+        "operationalCost": 4.55,
+        "operationalCostUnit": "kg",
+        "operationalCostLabel": "€4.55 / kg"
+      },
+      "simulated": {
+        "usableQuantity": 6000,
+        "usableUnit": "g",
+        "usableLabel": "6 kg",
+        "purchaseContainerCount": 6,
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "resolveStructurePurchaseQty": 1,
+        "operationalCost": 4.55,
+        "operationalCostUnit": "kg",
+        "operationalCostLabel": "€4.55/kg"
+      },
+      "changed": {
+        "usable": false,
+        "operationalCost": false
+      },
+      "expectedChange": false,
+      "classification": "C",
+      "expectedClassification": "C",
+      "classificationMatch": true,
+      "notes": "Parser tier=size_count (1KG*6); kg exclusion blocks helper — Family A separate track",
+      "dataSource": "vl_db_readonly"
+    },
+    {
+      "key": "ricotta",
+      "label": "Ricotta",
+      "invoiceItemId": "409850ab-646d-44fa-b20c-c8a4a8570064",
+      "lineName": "RICOTTA TREVIGIANA 1,5KG",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "bound": {
+        "qty": 2,
+        "unit": "un",
+        "unitPrice": 3.99,
+        "total": 7.97
+      },
+      "structure": {
+        "tier": "bare_measure",
+        "unitMeasurement": "kg",
+        "unitSize": 1.5,
+        "totalUsableAmount": 1500,
+        "purchaseQuantity": 1
+      },
+      "helper": {
+        "wouldFire": false,
+        "conditions": {
+          "tier_size_count": false,
+          "generic_row": true,
+          "rowQty_gt_1": true,
+          "rowQty_ne_inner": false,
+          "unit_not_kg_L": false
+        }
+      },
+      "current": {
+        "usableQuantity": 3000,
+        "usableUnit": "g",
+        "usableLabel": "3 kg usable",
+        "purchaseContainerCount": 2,
+        "usableSource": "structure_recomputed",
+        "fallbackReason": "generic row unit × per-item (2 × 1.5 kg)",
+        "resolveStructurePurchaseQty": 2,
+        "operationalCost": 2.66,
+        "operationalCostUnit": "kg",
+        "operationalCostLabel": "€2.66 / kg"
+      },
+      "simulated": {
+        "usableQuantity": 3000,
+        "usableUnit": "g",
+        "usableLabel": "3 kg",
+        "purchaseContainerCount": 2,
+        "usableSource": "structure_recomputed",
+        "fallbackReason": "generic row unit × per-item (2 × 1.5 kg)",
+        "resolveStructurePurchaseQty": 2,
+        "operationalCost": 2.66,
+        "operationalCostUnit": "kg",
+        "operationalCostLabel": "€2.66/kg"
+      },
+      "changed": {
+        "usable": false,
+        "operationalCost": false
+      },
+      "expectedChange": false,
+      "classification": "C",
+      "expectedClassification": "C",
+      "classificationMatch": true,
+      "notes": "bare/kg — no size_count token",
+      "dataSource": "vl_db_readonly"
+    }
+  ],
+  "sources": [
+    ".tmp/mozzarella-fix-design/design.json",
+    ".tmp/mozzarella-implementation-prep/readiness.json",
+    ".tmp/stock-normalization-family-assessment/assessment.json",
+    ".tmp/bug-pattern-expansion-audit/population.json",
+    ".tmp/quantity-mismatch-ui-audit/replay.json",
+    "src/lib/stock-normalization.ts",
+    "src/lib/invoice-purchase-format.ts",
+    "VL bjhnlrgodcqoyzddbpbd invoice_items (read-only)"
+  ]
+}

@@ -800,6 +800,179 @@ describe("computeUsableFromPurchaseStructure", () => {
   });
 });
 
+describe("size_count outer-pack scaling — Mozzarella fix", () => {
+  it.each([
+    {
+      name: 'MOZZARELLA FIOR DI LATTE "IL BOCCONCINO" 125GR*8',
+      rowQuantity: 10,
+      rowUnit: "un",
+      usable: 10000,
+      usableSource: "structure_scaled_outer" as const,
+      purchaseContainerCount: 10,
+    },
+    {
+      name: "Birra Peroni 33cl*24",
+      rowQuantity: 24,
+      rowUnit: "un",
+      usable: 7920,
+      usableSource: "structure_total" as const,
+      purchaseContainerCount: 1,
+    },
+    {
+      name: "Guanciale +/- 1,5kg*7",
+      rowQuantity: 5.996,
+      rowUnit: "un",
+      usable: 5996,
+      usableSource: "row_weight_billed" as const,
+      purchaseContainerCount: 1,
+    },
+    {
+      name: "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      rowQuantity: 2,
+      rowUnit: "un",
+      usable: 11250,
+      usableSource: "structure_total" as const,
+      purchaseContainerCount: 1,
+    },
+    {
+      name: "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      rowQuantity: 2,
+      rowUnit: "un",
+      usable: 11250,
+      usableSource: "structure_total" as const,
+      purchaseContainerCount: 1,
+    },
+  ] as const)(
+    "$name (row $rowQuantity $rowUnit) → $usable g/ml",
+    ({ name, rowQuantity, rowUnit, usable, usableSource, purchaseContainerCount }) => {
+      const structure = parsePurchaseStructureFromText(name);
+      expect(structure).not.toBeNull();
+      const derived = computeUsableFromPurchaseStructure(structure!, rowQuantity, rowUnit);
+      expect(derived.usableQuantity).toBe(usable);
+      expect(derived.usableSource).toBe(usableSource);
+      expect(derived.purchaseContainerCount).toBe(purchaseContainerCount);
+
+      const resolved = resolveInvoiceLinePurchaseFormat({
+        name,
+        quantity: rowQuantity,
+        unit: rowUnit,
+      });
+      expect(resolved.normalizedUsableQuantity).toBe(usable);
+    },
+  );
+
+  it("Mozzarella VL invoice — €8.12/kg operational cost after fix", () => {
+    const name = 'MOZZARELLA FIOR DI LATTE "IL BOCCONCINO" 125GR*8';
+    const resolved = resolveInvoiceLinePurchaseFormat({
+      name,
+      quantity: 10,
+      unit: "un",
+      unit_price: 8.12,
+      line_total: 81.23,
+    });
+    expect(resolved.normalizedUsableQuantity).toBe(10000);
+    expect(resolved.usableQuantityUnit).toBe("g");
+    // Structured purchaseContainerCount reflects inner pack count (8), not outer invoice qty.
+    expect(resolved.purchaseContainerCount).toBe(8);
+  });
+});
+
+describe("size_count weight-billed row — Guanciale fix", () => {
+  it.each([
+    {
+      name: "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      rowQuantity: 5.996,
+      rowUnit: "un",
+      usable: 5996,
+      usableSource: "row_weight_billed" as const,
+      purchaseContainerCount: 1,
+    },
+    {
+      name: "Birra Peroni 33cl*24",
+      rowQuantity: 24,
+      rowUnit: "un",
+      usable: 7920,
+      usableSource: "structure_total" as const,
+      purchaseContainerCount: 1,
+    },
+    {
+      name: "Aceto balsamico 5l*2",
+      rowQuantity: 1,
+      rowUnit: "un",
+      usable: 10000,
+      usableSource: "structure_total" as const,
+      purchaseContainerCount: 1,
+    },
+    {
+      name: "Rulo Di Capra 1kg*2",
+      rowQuantity: 1,
+      rowUnit: "un",
+      usable: 2000,
+      usableSource: "structure_total" as const,
+      purchaseContainerCount: 1,
+    },
+    {
+      name: "POMODORI PELATI (CX 2,5KG*6)",
+      rowQuantity: 1,
+      rowUnit: "un",
+      usable: 15000,
+      usableSource: "structure_total" as const,
+      purchaseContainerCount: 1,
+    },
+    {
+      name: "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      rowQuantity: 10,
+      rowUnit: "un",
+      usable: 30000,
+      usableSource: "structure_recomputed" as const,
+      purchaseContainerCount: 10,
+    },
+    {
+      name: 'MOZZARELLA FIOR DI LATTE "IL BOCCONCINO" 125GR*8',
+      rowQuantity: 10,
+      rowUnit: "un",
+      usable: 10000,
+      usableSource: "structure_scaled_outer" as const,
+      purchaseContainerCount: 10,
+    },
+    {
+      name: "Baladin Ginger Beer 0.20cl",
+      rowQuantity: 24,
+      rowUnit: "un",
+      usable: 4800,
+      usableSource: "structure_recomputed" as const,
+      purchaseContainerCount: 24,
+    },
+  ] as const)(
+    "$name (row $rowQuantity $rowUnit) → $usable g/ml",
+    ({ name, rowQuantity, rowUnit, usable, usableSource, purchaseContainerCount }) => {
+      const structure = parsePurchaseStructureFromText(name);
+      expect(structure).not.toBeNull();
+      const derived = computeUsableFromPurchaseStructure(structure!, rowQuantity, rowUnit);
+      expect(derived.usableQuantity).toBe(usable);
+      expect(derived.usableSource).toBe(usableSource);
+      expect(derived.purchaseContainerCount).toBe(purchaseContainerCount);
+    },
+  );
+
+  it("Guanciale VL invoice — €10.83/kg operational cost after fix", async () => {
+    const { computeEffectiveUsableCost } = await import("./invoice-purchase-price-semantics");
+    const name = "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino";
+    const resolved = resolveInvoiceLinePurchaseFormat({
+      name,
+      quantity: 5.996,
+      unit: "un",
+      unit_price: 10.83,
+      line_total: 64.93,
+    });
+    expect(resolved.normalizedUsableQuantity).toBe(5996);
+    expect(resolved.usableQuantityUnit).toBe("g");
+    const op = computeEffectiveUsableCost(10.83, { name, quantity: 5.996, unit: "un" }, resolved, name);
+    expect(op?.cost).toBeCloseTo(10.83, 2);
+    expect(op?.unit).toBe("kg");
+  });
+});
+
 describe("bakery and compact purchase structures", () => {
   it.each([
     { name: "24x80g", usable: 1920 },

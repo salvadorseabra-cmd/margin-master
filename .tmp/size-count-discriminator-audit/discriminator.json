@@ -1,0 +1,3179 @@
+{
+  "generatedAt": "2026-06-22T21:29:55.248Z",
+  "mode": "STRICT_READ_ONLY_STRUCTURAL_DISCRIMINATOR_AUDIT",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "vlRowsFetched": 9,
+  "population": {
+    "incorrect": [
+      "mozzarella",
+      "guanciale",
+      "mezzi"
+    ],
+    "correct": [
+      "pomodori",
+      "pellegrino_boc",
+      "pellegrino_emp",
+      "peroni",
+      "aceto",
+      "rulo"
+    ],
+    "total": 9
+  },
+  "rows": [
+    {
+      "key": "mozzarella",
+      "label": "Mozzarella 125GR*8",
+      "group": "incorrect",
+      "cluster": "A_mozzarella_under_count",
+      "invoiceItemId": "095b2bb9-bd36-44c2-a1f9-7c50fa9c0cc6",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "dataSource": "vl_db_readonly",
+      "lineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "bound": {
+        "qty": 10,
+        "unit": "un",
+        "unitPrice": 8.12,
+        "total": 81.23
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 8,
+        "unitSize": 125,
+        "unitMeasurement": "g",
+        "totalUsableAmount": 1000,
+        "usableUnit": "g",
+        "matchedText": "125GR*8",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 8,
+        "unitSize": 125,
+        "unitMeasurement": "g",
+        "perItemBase": 125,
+        "usableUnit": "g",
+        "totalUsableAmount": 1000,
+        "expression": "1 × 8 × 125 g"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 1000,
+        "usableUnit": "g",
+        "unitFamily": "mass",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure → structure_total branch"
+      },
+      "derivedSignals": {
+        "rowQtyEqInner": false,
+        "rowQtyEqOne": false,
+        "rowQtyNeInner": true,
+        "rowQtyGtInner": true,
+        "nameContainsCX": false,
+        "nameContainsTolerance": false,
+        "unitFamily": "mass",
+        "unitMeasurementIsKg": false,
+        "unitMeasurementIsL": false,
+        "unitMeasurementIsG": true,
+        "unitMeasurementIsCl": false,
+        "perItemBaseNeUnitSize": false,
+        "scaledOuterWouldBe": 10000,
+        "scaledOuterMatchesPdfTruth": true,
+        "structureOnlyMatchesPdfTruth": false,
+        "usableMatchesPdfTruth": false,
+        "extractionQtyMismatch": false,
+        "pdfQty": 10,
+        "direction": "under_count",
+        "familyA": false,
+        "purchaseQtyForCost": 1,
+        "userVisibleBug": true
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 8,
+        "normalizedUsableQuantity": 1000,
+        "usableQuantityUnit": "g",
+        "packageQuantity": 125,
+        "packageMeasurementUnit": "g"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "1 kg usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 1000,
+        "usableUnit": "g",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 1000,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 1000,
+          "unit": "g"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 81.19999999999999,
+          "unit": "kg"
+        },
+        "effectiveUsableCostLabel": "€81.20 / kg"
+      },
+      "proposedHelper": {
+        "wouldFire": true,
+        "wouldFireAndUnitG": true
+      },
+      "uiObserved": {
+        "lastPurchase": "10 un",
+        "procurementCost": "€8.12 / unit",
+        "operationalCost": "€81.20 / kg",
+        "usableQuantity": "1 kg usable"
+      },
+      "pdfTruth": {
+        "qty": 10,
+        "usableBase": 10000,
+        "usableUnit": "g"
+      }
+    },
+    {
+      "key": "guanciale",
+      "label": "Guanciale",
+      "group": "incorrect",
+      "cluster": "B_guanciale_over_count",
+      "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "dataSource": "vl_db_readonly",
+      "lineName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "bound": {
+        "qty": 5.996,
+        "unit": "un",
+        "unitPrice": 10.83,
+        "total": 64.93
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 7,
+        "unitSize": 1.5,
+        "unitMeasurement": "kg",
+        "totalUsableAmount": 10500,
+        "usableUnit": "g",
+        "matchedText": "1,5kg*7 ",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 7,
+        "unitSize": 1.5,
+        "unitMeasurement": "kg",
+        "perItemBase": 1500,
+        "usableUnit": "g",
+        "totalUsableAmount": 10500,
+        "expression": "1 × 7 × 1.5 kg"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 10500,
+        "usableUnit": "g",
+        "unitFamily": "mass",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure → structure_total branch"
+      },
+      "derivedSignals": {
+        "rowQtyEqInner": false,
+        "rowQtyEqOne": false,
+        "rowQtyNeInner": true,
+        "rowQtyGtInner": false,
+        "nameContainsCX": false,
+        "nameContainsTolerance": true,
+        "unitFamily": "mass",
+        "unitMeasurementIsKg": true,
+        "unitMeasurementIsL": false,
+        "unitMeasurementIsG": false,
+        "unitMeasurementIsCl": false,
+        "perItemBaseNeUnitSize": true,
+        "scaledOuterWouldBe": 63000,
+        "scaledOuterMatchesPdfTruth": false,
+        "structureOnlyMatchesPdfTruth": false,
+        "usableMatchesPdfTruth": false,
+        "extractionQtyMismatch": false,
+        "pdfQty": 5.996,
+        "direction": "over_count",
+        "familyA": false,
+        "purchaseQtyForCost": 1,
+        "userVisibleBug": true
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 7,
+        "normalizedUsableQuantity": 10500,
+        "usableQuantityUnit": "g",
+        "packageQuantity": 1.5,
+        "packageMeasurementUnit": "kg"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "10.5 kg usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 10500,
+        "usableUnit": "g",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 10500,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 10500,
+          "unit": "g"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 6.184445714285714,
+          "unit": "kg"
+        },
+        "effectiveUsableCostLabel": "€6.18 / kg"
+      },
+      "proposedHelper": {
+        "wouldFire": false,
+        "wouldFireAndUnitG": false
+      },
+      "uiObserved": {
+        "lastPurchase": "6.00 un",
+        "procurementCost": "€10.83 / unit",
+        "operationalCost": "€6.18 / kg",
+        "usableQuantity": "10.5 kg usable"
+      },
+      "pdfTruth": {
+        "qty": 5.996,
+        "usableBase": 5996,
+        "usableUnit": "g",
+        "note": "row weight line ~6 kg"
+      }
+    },
+    {
+      "key": "mezzi",
+      "label": "Mezzi Paccheri (CX 1KG*6)",
+      "group": "incorrect",
+      "cluster": "C_mezzi_extraction",
+      "invoiceItemId": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "dataSource": "vl_db_readonly",
+      "lineName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "bound": {
+        "qty": 2,
+        "unit": "un",
+        "unitPrice": 13.65,
+        "total": 27.3
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 6,
+        "unitSize": 1,
+        "unitMeasurement": "kg",
+        "totalUsableAmount": 6000,
+        "usableUnit": "g",
+        "matchedText": "1KG*6",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 6,
+        "unitSize": 1,
+        "unitMeasurement": "kg",
+        "perItemBase": 1000,
+        "usableUnit": "g",
+        "totalUsableAmount": 6000,
+        "expression": "1 × 6 × 1 kg"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 6000,
+        "usableUnit": "g",
+        "unitFamily": "mass",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure → structure_total branch"
+      },
+      "derivedSignals": {
+        "rowQtyEqInner": false,
+        "rowQtyEqOne": false,
+        "rowQtyNeInner": true,
+        "rowQtyGtInner": false,
+        "nameContainsCX": true,
+        "nameContainsTolerance": false,
+        "unitFamily": "mass",
+        "unitMeasurementIsKg": true,
+        "unitMeasurementIsL": false,
+        "unitMeasurementIsG": false,
+        "unitMeasurementIsCl": false,
+        "perItemBaseNeUnitSize": true,
+        "scaledOuterWouldBe": 12000,
+        "scaledOuterMatchesPdfTruth": false,
+        "structureOnlyMatchesPdfTruth": true,
+        "usableMatchesPdfTruth": true,
+        "extractionQtyMismatch": true,
+        "pdfQty": 1,
+        "direction": "mixed",
+        "familyA": true,
+        "purchaseQtyForCost": 1,
+        "userVisibleBug": true
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 6,
+        "normalizedUsableQuantity": 6000,
+        "usableQuantityUnit": "g",
+        "packageQuantity": 1,
+        "packageMeasurementUnit": "kg"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "6 kg usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 6000,
+        "usableUnit": "g",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 6000,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 6000,
+          "unit": "g"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 4.55,
+          "unit": "kg"
+        },
+        "effectiveUsableCostLabel": "€4.55 / kg"
+      },
+      "proposedHelper": {
+        "wouldFire": false,
+        "wouldFireAndUnitG": false
+      },
+      "uiObserved": {
+        "lastPurchase": "2 un",
+        "procurementCost": "€13.65 / case",
+        "operationalCost": "€4.55 / kg",
+        "usableQuantity": "6 kg usable"
+      },
+      "pdfTruth": {
+        "qty": 1,
+        "usableBase": 6000,
+        "usableUnit": "g",
+        "note": "PDF qty=1 case; extracted qty=2"
+      }
+    },
+    {
+      "key": "pomodori",
+      "label": "Pomodori",
+      "group": "correct",
+      "cluster": null,
+      "invoiceItemId": "fd24d2dc-238a-43f2-ac2a-755361a083f0",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "dataSource": "vl_db_readonly",
+      "lineName": "POMODORI PELATI (CX 2,5KG*6)",
+      "bound": {
+        "qty": 1,
+        "unit": "un",
+        "unitPrice": 22.05,
+        "total": 22.05
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 6,
+        "unitSize": 2.5,
+        "unitMeasurement": "kg",
+        "totalUsableAmount": 15000,
+        "usableUnit": "g",
+        "matchedText": "2,5KG*6",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 6,
+        "unitSize": 2.5,
+        "unitMeasurement": "kg",
+        "perItemBase": 2500,
+        "usableUnit": "g",
+        "totalUsableAmount": 15000,
+        "expression": "1 × 6 × 2.5 kg"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 15000,
+        "usableUnit": "g",
+        "unitFamily": "mass",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure → structure_total branch"
+      },
+      "derivedSignals": {
+        "rowQtyEqInner": false,
+        "rowQtyEqOne": true,
+        "rowQtyNeInner": true,
+        "rowQtyGtInner": false,
+        "nameContainsCX": true,
+        "nameContainsTolerance": false,
+        "unitFamily": "mass",
+        "unitMeasurementIsKg": true,
+        "unitMeasurementIsL": false,
+        "unitMeasurementIsG": false,
+        "unitMeasurementIsCl": false,
+        "perItemBaseNeUnitSize": true,
+        "scaledOuterWouldBe": 15000,
+        "scaledOuterMatchesPdfTruth": true,
+        "structureOnlyMatchesPdfTruth": true,
+        "usableMatchesPdfTruth": true,
+        "extractionQtyMismatch": false,
+        "pdfQty": 1,
+        "direction": "correct",
+        "familyA": false,
+        "purchaseQtyForCost": 1,
+        "userVisibleBug": false
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 6,
+        "normalizedUsableQuantity": 15000,
+        "usableQuantityUnit": "g",
+        "packageQuantity": 2.5,
+        "packageMeasurementUnit": "kg"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "15 kg usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 15000,
+        "usableUnit": "g",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 15000,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 15000,
+          "unit": "g"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 1.47,
+          "unit": "kg"
+        },
+        "effectiveUsableCostLabel": "€1.47 / kg"
+      },
+      "proposedHelper": {
+        "wouldFire": false,
+        "wouldFireAndUnitG": false
+      },
+      "uiObserved": {
+        "lastPurchase": "1 un",
+        "procurementCost": "€22.05 / case",
+        "operationalCost": "€1.47 / kg",
+        "usableQuantity": "15 kg usable"
+      },
+      "pdfTruth": {
+        "qty": 1,
+        "usableBase": 15000,
+        "usableUnit": "g"
+      }
+    },
+    {
+      "key": "pellegrino_boc",
+      "label": "S.Pellegrino Bocconcino",
+      "group": "correct",
+      "cluster": null,
+      "invoiceItemId": "f25feb92-3477-41a4-9a81-c556a90a0814",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "dataSource": "vl_db_readonly",
+      "lineName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "bound": {
+        "qty": 2,
+        "unit": "un",
+        "unitPrice": 20.97,
+        "total": 42.07
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 15,
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "totalUsableAmount": 11250,
+        "usableUnit": "ml",
+        "matchedText": "75CL*15",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 15,
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "perItemBase": 750,
+        "usableUnit": "ml",
+        "totalUsableAmount": 11250,
+        "expression": "1 × 15 × 75 cl"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 11250,
+        "usableUnit": "ml",
+        "unitFamily": "volume",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure → structure_total branch"
+      },
+      "derivedSignals": {
+        "rowQtyEqInner": false,
+        "rowQtyEqOne": false,
+        "rowQtyNeInner": true,
+        "rowQtyGtInner": false,
+        "nameContainsCX": true,
+        "nameContainsTolerance": false,
+        "unitFamily": "volume",
+        "unitMeasurementIsKg": false,
+        "unitMeasurementIsL": false,
+        "unitMeasurementIsG": false,
+        "unitMeasurementIsCl": true,
+        "perItemBaseNeUnitSize": true,
+        "scaledOuterWouldBe": 22500,
+        "scaledOuterMatchesPdfTruth": false,
+        "structureOnlyMatchesPdfTruth": true,
+        "usableMatchesPdfTruth": true,
+        "extractionQtyMismatch": false,
+        "pdfQty": 2,
+        "direction": "correct",
+        "familyA": false,
+        "purchaseQtyForCost": 1,
+        "userVisibleBug": false
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 15,
+        "normalizedUsableQuantity": 11250,
+        "usableQuantityUnit": "ml",
+        "packageQuantity": 75,
+        "packageMeasurementUnit": "cl"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "11.25 L usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 11250,
+        "usableUnit": "ml",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 11250,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 11250,
+          "unit": "ml"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 3.7279999999999998,
+          "unit": "L"
+        },
+        "effectiveUsableCostLabel": "€3.73 / L"
+      },
+      "proposedHelper": {
+        "wouldFire": true,
+        "wouldFireAndUnitG": false
+      },
+      "uiObserved": {
+        "lastPurchase": "2 un",
+        "procurementCost": "€20.97 / case",
+        "operationalCost": "€3.73 / L",
+        "usableQuantity": "11.25 L usable"
+      },
+      "pdfTruth": {
+        "qty": 2,
+        "usableBase": 11250,
+        "usableUnit": "ml",
+        "note": "proven-correct UI economics at structure_total"
+      }
+    },
+    {
+      "key": "pellegrino_emp",
+      "label": "S.Pellegrino Emporio",
+      "group": "correct",
+      "cluster": null,
+      "invoiceItemId": "9cdd22ba-051b-4422-a122-3e6a39e9ef8c",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "dataSource": "vl_db_readonly",
+      "lineName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "bound": {
+        "qty": 2,
+        "unit": "un",
+        "unitPrice": 19.28,
+        "total": 38.56
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 15,
+        "innerUnitType": "unit",
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "totalUsableAmount": 11250,
+        "usableUnit": "ml",
+        "matchedText": "75cl x 15ud",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 15,
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "perItemBase": 750,
+        "usableUnit": "ml",
+        "totalUsableAmount": 11250,
+        "expression": "1 × 15 × 75 cl"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 11250,
+        "usableUnit": "ml",
+        "unitFamily": "volume",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure → structure_total branch"
+      },
+      "derivedSignals": {
+        "rowQtyEqInner": false,
+        "rowQtyEqOne": false,
+        "rowQtyNeInner": true,
+        "rowQtyGtInner": false,
+        "nameContainsCX": false,
+        "nameContainsTolerance": false,
+        "unitFamily": "volume",
+        "unitMeasurementIsKg": false,
+        "unitMeasurementIsL": false,
+        "unitMeasurementIsG": false,
+        "unitMeasurementIsCl": true,
+        "perItemBaseNeUnitSize": true,
+        "scaledOuterWouldBe": 22500,
+        "scaledOuterMatchesPdfTruth": false,
+        "structureOnlyMatchesPdfTruth": true,
+        "usableMatchesPdfTruth": true,
+        "extractionQtyMismatch": false,
+        "pdfQty": 2,
+        "direction": "correct",
+        "familyA": false,
+        "purchaseQtyForCost": 1,
+        "userVisibleBug": false
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 15,
+        "normalizedUsableQuantity": 11250,
+        "usableQuantityUnit": "ml",
+        "packageQuantity": 75,
+        "packageMeasurementUnit": "cl"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "11.25 L usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 11250,
+        "usableUnit": "ml",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 11250,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 11250,
+          "unit": "ml"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 3.4275555555555557,
+          "unit": "L"
+        },
+        "effectiveUsableCostLabel": "€3.43 / L"
+      },
+      "proposedHelper": {
+        "wouldFire": true,
+        "wouldFireAndUnitG": false
+      },
+      "uiObserved": {
+        "lastPurchase": "2 un",
+        "procurementCost": "€19.28 / case",
+        "operationalCost": "€3.43 / L",
+        "usableQuantity": "11.25 L usable"
+      },
+      "pdfTruth": {
+        "qty": 2,
+        "usableBase": 11250,
+        "usableUnit": "ml",
+        "note": "proven-correct UI economics at structure_total"
+      }
+    },
+    {
+      "key": "peroni",
+      "label": "Peroni",
+      "group": "correct",
+      "cluster": null,
+      "invoiceItemId": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "dataSource": "vl_db_readonly",
+      "lineName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "bound": {
+        "qty": 24,
+        "unit": "un",
+        "unitPrice": 1.07,
+        "total": 25.69
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 24,
+        "unitSize": 33,
+        "unitMeasurement": "cl",
+        "totalUsableAmount": 7920,
+        "usableUnit": "ml",
+        "matchedText": "33cl*24 ",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 24,
+        "unitSize": 33,
+        "unitMeasurement": "cl",
+        "perItemBase": 330,
+        "usableUnit": "ml",
+        "totalUsableAmount": 7920,
+        "expression": "1 × 24 × 33 cl"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 7920,
+        "usableUnit": "ml",
+        "unitFamily": "volume",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure → structure_total branch"
+      },
+      "derivedSignals": {
+        "rowQtyEqInner": true,
+        "rowQtyEqOne": false,
+        "rowQtyNeInner": false,
+        "rowQtyGtInner": false,
+        "nameContainsCX": false,
+        "nameContainsTolerance": false,
+        "unitFamily": "volume",
+        "unitMeasurementIsKg": false,
+        "unitMeasurementIsL": false,
+        "unitMeasurementIsG": false,
+        "unitMeasurementIsCl": true,
+        "perItemBaseNeUnitSize": true,
+        "scaledOuterWouldBe": 190080,
+        "scaledOuterMatchesPdfTruth": false,
+        "structureOnlyMatchesPdfTruth": true,
+        "usableMatchesPdfTruth": true,
+        "extractionQtyMismatch": false,
+        "pdfQty": 24,
+        "direction": "correct",
+        "familyA": false,
+        "purchaseQtyForCost": 1,
+        "userVisibleBug": false
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 24,
+        "normalizedUsableQuantity": 7920,
+        "usableQuantityUnit": "ml",
+        "packageQuantity": 33,
+        "packageMeasurementUnit": "cl"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "7.92 L usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 7920,
+        "usableUnit": "ml",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 7920,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 7920,
+          "unit": "ml"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 3.2424242424242427,
+          "unit": "L"
+        },
+        "effectiveUsableCostLabel": "€3.24 / L"
+      },
+      "proposedHelper": {
+        "wouldFire": false,
+        "wouldFireAndUnitG": false
+      },
+      "uiObserved": {
+        "lastPurchase": "24 un",
+        "procurementCost": "€1.07 / bottle",
+        "operationalCost": "€3.24 / L",
+        "usableQuantity": "7.92 L usable"
+      },
+      "pdfTruth": {
+        "qty": 24,
+        "usableBase": 7920,
+        "usableUnit": "ml"
+      }
+    },
+    {
+      "key": "aceto",
+      "label": "Aceto",
+      "group": "correct",
+      "cluster": null,
+      "invoiceItemId": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "dataSource": "vl_db_readonly",
+      "lineName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "bound": {
+        "qty": 1,
+        "unit": "un",
+        "unitPrice": 15.55,
+        "total": 16.09
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 2,
+        "unitSize": 5,
+        "unitMeasurement": "L",
+        "totalUsableAmount": 10000,
+        "usableUnit": "ml",
+        "matchedText": "5l*2 ",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 2,
+        "unitSize": 5,
+        "unitMeasurement": "L",
+        "perItemBase": 5000,
+        "usableUnit": "ml",
+        "totalUsableAmount": 10000,
+        "expression": "1 × 2 × 5 L"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 10000,
+        "usableUnit": "ml",
+        "unitFamily": "volume",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure → structure_total branch"
+      },
+      "derivedSignals": {
+        "rowQtyEqInner": false,
+        "rowQtyEqOne": true,
+        "rowQtyNeInner": true,
+        "rowQtyGtInner": false,
+        "nameContainsCX": false,
+        "nameContainsTolerance": false,
+        "unitFamily": "volume",
+        "unitMeasurementIsKg": false,
+        "unitMeasurementIsL": true,
+        "unitMeasurementIsG": false,
+        "unitMeasurementIsCl": false,
+        "perItemBaseNeUnitSize": true,
+        "scaledOuterWouldBe": 10000,
+        "scaledOuterMatchesPdfTruth": true,
+        "structureOnlyMatchesPdfTruth": true,
+        "usableMatchesPdfTruth": true,
+        "extractionQtyMismatch": false,
+        "pdfQty": 1,
+        "direction": "correct",
+        "familyA": false,
+        "purchaseQtyForCost": 1,
+        "userVisibleBug": false
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 2,
+        "normalizedUsableQuantity": 10000,
+        "usableQuantityUnit": "ml",
+        "packageQuantity": 5,
+        "packageMeasurementUnit": "L"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "10 L usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 10000,
+        "usableUnit": "ml",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 10000,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 10000,
+          "unit": "ml"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 1.5550000000000002,
+          "unit": "L"
+        },
+        "effectiveUsableCostLabel": "€1.56 / L"
+      },
+      "proposedHelper": {
+        "wouldFire": false,
+        "wouldFireAndUnitG": false
+      },
+      "uiObserved": {
+        "lastPurchase": "1 un",
+        "procurementCost": "€15.55 / unit",
+        "operationalCost": "€1.56 / L",
+        "usableQuantity": "10 L usable"
+      },
+      "pdfTruth": {
+        "qty": 1,
+        "usableBase": 10000,
+        "usableUnit": "ml"
+      }
+    },
+    {
+      "key": "rulo",
+      "label": "Rulo di capra",
+      "group": "correct",
+      "cluster": null,
+      "invoiceItemId": "e418468e-cb13-44f3-93b2-1857ae6eaa4d",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "dataSource": "vl_db_readonly",
+      "lineName": "Rulo Di Capra 1kg*2 Simonetta",
+      "bound": {
+        "qty": 1,
+        "unit": "un",
+        "unitPrice": 10.86,
+        "total": 10.86
+      },
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 2,
+        "unitSize": 1,
+        "unitMeasurement": "kg",
+        "totalUsableAmount": 2000,
+        "usableUnit": "g",
+        "matchedText": "1kg*2 ",
+        "tier": "size_count"
+      },
+      "purchaseStructureMultiplierChain": {
+        "purchaseQuantity": 1,
+        "innerUnitCount": 2,
+        "unitSize": 1,
+        "unitMeasurement": "kg",
+        "perItemBase": 1000,
+        "usableUnit": "g",
+        "totalUsableAmount": 2000,
+        "expression": "1 × 2 × 1 kg"
+      },
+      "computeUsableFromPurchaseStructure": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 2000,
+        "usableUnit": "g",
+        "unitFamily": "mass",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "resolveStructurePurchaseQuantity": 1,
+      "genericRowAnalysis": {
+        "isGenericPurchaseUnit": true,
+        "structureTotalIsFinalForGenericRow": true,
+        "exactCodePath": "resolveStructurePurchaseQuantity → structureTotalIsFinalForGenericRow ? 1; computeUsableFromPurchaseStructure → structure_total branch"
+      },
+      "derivedSignals": {
+        "rowQtyEqInner": false,
+        "rowQtyEqOne": true,
+        "rowQtyNeInner": true,
+        "rowQtyGtInner": false,
+        "nameContainsCX": false,
+        "nameContainsTolerance": false,
+        "unitFamily": "mass",
+        "unitMeasurementIsKg": true,
+        "unitMeasurementIsL": false,
+        "unitMeasurementIsG": false,
+        "unitMeasurementIsCl": false,
+        "perItemBaseNeUnitSize": true,
+        "scaledOuterWouldBe": 2000,
+        "scaledOuterMatchesPdfTruth": true,
+        "structureOnlyMatchesPdfTruth": true,
+        "usableMatchesPdfTruth": true,
+        "extractionQtyMismatch": false,
+        "pdfQty": 1,
+        "direction": "correct",
+        "familyA": false,
+        "purchaseQtyForCost": 1,
+        "userVisibleBug": false
+      },
+      "resolveInvoiceLinePurchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 2,
+        "normalizedUsableQuantity": 2000,
+        "usableQuantityUnit": "g",
+        "packageQuantity": 1,
+        "packageMeasurementUnit": "kg"
+      },
+      "resolveInvoiceLineStockPresentation": {
+        "quantityLabel": "2 kg usable",
+        "detailLabel": null,
+        "pipelineId": "unified",
+        "usableQuantity": 2000,
+        "usableUnit": "g",
+        "renderSource": "unified"
+      },
+      "priceSemantics": {
+        "singleUnitReplayUsable": 2000,
+        "singleUnitEqualsLineUsable": true,
+        "resolveUsablePerPricedUnit": {
+          "amount": 2000,
+          "unit": "g"
+        },
+        "resolveCountablePurchaseQuantityForCost": 1,
+        "effectiveUsableCost": {
+          "cost": 5.43,
+          "unit": "kg"
+        },
+        "effectiveUsableCostLabel": "€5.43 / kg"
+      },
+      "proposedHelper": {
+        "wouldFire": false,
+        "wouldFireAndUnitG": false
+      },
+      "uiObserved": {
+        "lastPurchase": "1 un",
+        "procurementCost": "€10.86 / unit",
+        "operationalCost": "€5.43 / kg",
+        "usableQuantity": "2 kg usable"
+      },
+      "pdfTruth": {
+        "qty": 1,
+        "usableBase": 2000,
+        "usableUnit": "g"
+      }
+    }
+  ],
+  "task1_comparisonMatrix": [
+    {
+      "key": "mozzarella",
+      "label": "Mozzarella 125GR*8",
+      "group": "incorrect",
+      "cluster": "A_mozzarella_under_count",
+      "lineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "tier": "size_count",
+      "matchedToken": "125GR*8",
+      "innerUnitCount": 8,
+      "unitSize": 125,
+      "unitMeasurement": "g",
+      "structureTotal": 1000,
+      "rowQty": 10,
+      "rowUnit": "un",
+      "resolveStructurePurchaseQty": 1,
+      "usableSource": "structure_total",
+      "normalizedUsable": 1000,
+      "usableUnit": "g",
+      "purchaseContainerCount": 8,
+      "purchaseQtyForCost": 1,
+      "scaledOuterWouldBe": 10000,
+      "pdfTruthUsable": 10000,
+      "usableMatchesPdf": false,
+      "userVisibleBug": true,
+      "direction": "under_count"
+    },
+    {
+      "key": "guanciale",
+      "label": "Guanciale",
+      "group": "incorrect",
+      "cluster": "B_guanciale_over_count",
+      "lineName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "tier": "size_count",
+      "matchedToken": "1,5kg*7 ",
+      "innerUnitCount": 7,
+      "unitSize": 1.5,
+      "unitMeasurement": "kg",
+      "structureTotal": 10500,
+      "rowQty": 5.996,
+      "rowUnit": "un",
+      "resolveStructurePurchaseQty": 1,
+      "usableSource": "structure_total",
+      "normalizedUsable": 10500,
+      "usableUnit": "g",
+      "purchaseContainerCount": 7,
+      "purchaseQtyForCost": 1,
+      "scaledOuterWouldBe": 63000,
+      "pdfTruthUsable": 5996,
+      "usableMatchesPdf": false,
+      "userVisibleBug": true,
+      "direction": "over_count"
+    },
+    {
+      "key": "mezzi",
+      "label": "Mezzi Paccheri (CX 1KG*6)",
+      "group": "incorrect",
+      "cluster": "C_mezzi_extraction",
+      "lineName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "tier": "size_count",
+      "matchedToken": "1KG*6",
+      "innerUnitCount": 6,
+      "unitSize": 1,
+      "unitMeasurement": "kg",
+      "structureTotal": 6000,
+      "rowQty": 2,
+      "rowUnit": "un",
+      "resolveStructurePurchaseQty": 1,
+      "usableSource": "structure_total",
+      "normalizedUsable": 6000,
+      "usableUnit": "g",
+      "purchaseContainerCount": 6,
+      "purchaseQtyForCost": 1,
+      "scaledOuterWouldBe": 12000,
+      "pdfTruthUsable": 6000,
+      "usableMatchesPdf": true,
+      "userVisibleBug": true,
+      "direction": "mixed"
+    },
+    {
+      "key": "pomodori",
+      "label": "Pomodori",
+      "group": "correct",
+      "cluster": null,
+      "lineName": "POMODORI PELATI (CX 2,5KG*6)",
+      "tier": "size_count",
+      "matchedToken": "2,5KG*6",
+      "innerUnitCount": 6,
+      "unitSize": 2.5,
+      "unitMeasurement": "kg",
+      "structureTotal": 15000,
+      "rowQty": 1,
+      "rowUnit": "un",
+      "resolveStructurePurchaseQty": 1,
+      "usableSource": "structure_total",
+      "normalizedUsable": 15000,
+      "usableUnit": "g",
+      "purchaseContainerCount": 6,
+      "purchaseQtyForCost": 1,
+      "scaledOuterWouldBe": 15000,
+      "pdfTruthUsable": 15000,
+      "usableMatchesPdf": true,
+      "userVisibleBug": false,
+      "direction": "correct"
+    },
+    {
+      "key": "pellegrino_boc",
+      "label": "S.Pellegrino Bocconcino",
+      "group": "correct",
+      "cluster": null,
+      "lineName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "tier": "size_count",
+      "matchedToken": "75CL*15",
+      "innerUnitCount": 15,
+      "unitSize": 75,
+      "unitMeasurement": "cl",
+      "structureTotal": 11250,
+      "rowQty": 2,
+      "rowUnit": "un",
+      "resolveStructurePurchaseQty": 1,
+      "usableSource": "structure_total",
+      "normalizedUsable": 11250,
+      "usableUnit": "ml",
+      "purchaseContainerCount": 15,
+      "purchaseQtyForCost": 1,
+      "scaledOuterWouldBe": 22500,
+      "pdfTruthUsable": 11250,
+      "usableMatchesPdf": true,
+      "userVisibleBug": false,
+      "direction": "correct"
+    },
+    {
+      "key": "pellegrino_emp",
+      "label": "S.Pellegrino Emporio",
+      "group": "correct",
+      "cluster": null,
+      "lineName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "tier": "size_count",
+      "matchedToken": "75cl x 15ud",
+      "innerUnitCount": 15,
+      "unitSize": 75,
+      "unitMeasurement": "cl",
+      "structureTotal": 11250,
+      "rowQty": 2,
+      "rowUnit": "un",
+      "resolveStructurePurchaseQty": 1,
+      "usableSource": "structure_total",
+      "normalizedUsable": 11250,
+      "usableUnit": "ml",
+      "purchaseContainerCount": 15,
+      "purchaseQtyForCost": 1,
+      "scaledOuterWouldBe": 22500,
+      "pdfTruthUsable": 11250,
+      "usableMatchesPdf": true,
+      "userVisibleBug": false,
+      "direction": "correct"
+    },
+    {
+      "key": "peroni",
+      "label": "Peroni",
+      "group": "correct",
+      "cluster": null,
+      "lineName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "tier": "size_count",
+      "matchedToken": "33cl*24 ",
+      "innerUnitCount": 24,
+      "unitSize": 33,
+      "unitMeasurement": "cl",
+      "structureTotal": 7920,
+      "rowQty": 24,
+      "rowUnit": "un",
+      "resolveStructurePurchaseQty": 1,
+      "usableSource": "structure_total",
+      "normalizedUsable": 7920,
+      "usableUnit": "ml",
+      "purchaseContainerCount": 24,
+      "purchaseQtyForCost": 1,
+      "scaledOuterWouldBe": 190080,
+      "pdfTruthUsable": 7920,
+      "usableMatchesPdf": true,
+      "userVisibleBug": false,
+      "direction": "correct"
+    },
+    {
+      "key": "aceto",
+      "label": "Aceto",
+      "group": "correct",
+      "cluster": null,
+      "lineName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "tier": "size_count",
+      "matchedToken": "5l*2 ",
+      "innerUnitCount": 2,
+      "unitSize": 5,
+      "unitMeasurement": "L",
+      "structureTotal": 10000,
+      "rowQty": 1,
+      "rowUnit": "un",
+      "resolveStructurePurchaseQty": 1,
+      "usableSource": "structure_total",
+      "normalizedUsable": 10000,
+      "usableUnit": "ml",
+      "purchaseContainerCount": 2,
+      "purchaseQtyForCost": 1,
+      "scaledOuterWouldBe": 10000,
+      "pdfTruthUsable": 10000,
+      "usableMatchesPdf": true,
+      "userVisibleBug": false,
+      "direction": "correct"
+    },
+    {
+      "key": "rulo",
+      "label": "Rulo di capra",
+      "group": "correct",
+      "cluster": null,
+      "lineName": "Rulo Di Capra 1kg*2 Simonetta",
+      "tier": "size_count",
+      "matchedToken": "1kg*2 ",
+      "innerUnitCount": 2,
+      "unitSize": 1,
+      "unitMeasurement": "kg",
+      "structureTotal": 2000,
+      "rowQty": 1,
+      "rowUnit": "un",
+      "resolveStructurePurchaseQty": 1,
+      "usableSource": "structure_total",
+      "normalizedUsable": 2000,
+      "usableUnit": "g",
+      "purchaseContainerCount": 2,
+      "purchaseQtyForCost": 1,
+      "scaledOuterWouldBe": 2000,
+      "pdfTruthUsable": 2000,
+      "usableMatchesPdf": true,
+      "userVisibleBug": false,
+      "direction": "correct"
+    }
+  ],
+  "task2_signalInventory": {
+    "parsePurchaseStructureFromText.tier": {
+      "mozzarella": "size_count",
+      "guanciale": "size_count",
+      "mezzi": "size_count",
+      "pomodori": "size_count",
+      "pellegrino_boc": "size_count",
+      "pellegrino_emp": "size_count",
+      "peroni": "size_count",
+      "aceto": "size_count",
+      "rulo": "size_count"
+    },
+    "genericRowAnalysis.isGenericPurchaseUnit": {
+      "mozzarella": true,
+      "guanciale": true,
+      "mezzi": true,
+      "pomodori": true,
+      "pellegrino_boc": true,
+      "pellegrino_emp": true,
+      "peroni": true,
+      "aceto": true,
+      "rulo": true
+    },
+    "genericRowAnalysis.structureTotalIsFinalForGenericRow": {
+      "mozzarella": true,
+      "guanciale": true,
+      "mezzi": true,
+      "pomodori": true,
+      "pellegrino_boc": true,
+      "pellegrino_emp": true,
+      "peroni": true,
+      "aceto": true,
+      "rulo": true
+    },
+    "computeUsableFromPurchaseStructure.usableSource": {
+      "mozzarella": "structure_total",
+      "guanciale": "structure_total",
+      "mezzi": "structure_total",
+      "pomodori": "structure_total",
+      "pellegrino_boc": "structure_total",
+      "pellegrino_emp": "structure_total",
+      "peroni": "structure_total",
+      "aceto": "structure_total",
+      "rulo": "structure_total"
+    },
+    "computeUsableFromPurchaseStructure.fallbackReason": {
+      "mozzarella": "name N×SIZE total is final; generic row does not rescale inner pack",
+      "guanciale": "name N×SIZE total is final; generic row does not rescale inner pack",
+      "mezzi": "name N×SIZE total is final; generic row does not rescale inner pack",
+      "pomodori": "name N×SIZE total is final; generic row does not rescale inner pack",
+      "pellegrino_boc": "name N×SIZE total is final; generic row does not rescale inner pack",
+      "pellegrino_emp": "name N×SIZE total is final; generic row does not rescale inner pack",
+      "peroni": "name N×SIZE total is final; generic row does not rescale inner pack",
+      "aceto": "name N×SIZE total is final; generic row does not rescale inner pack",
+      "rulo": "name N×SIZE total is final; generic row does not rescale inner pack"
+    },
+    "resolveStructurePurchaseQuantity": {
+      "mozzarella": 1,
+      "guanciale": 1,
+      "mezzi": 1,
+      "pomodori": 1,
+      "pellegrino_boc": 1,
+      "pellegrino_emp": 1,
+      "peroni": 1,
+      "aceto": 1,
+      "rulo": 1
+    },
+    "parsePurchaseStructureFromText.unitMeasurement": {
+      "mozzarella": "g",
+      "guanciale": "kg",
+      "mezzi": "kg",
+      "pomodori": "kg",
+      "pellegrino_boc": "cl",
+      "pellegrino_emp": "cl",
+      "peroni": "cl",
+      "aceto": "L",
+      "rulo": "kg"
+    },
+    "parsePurchaseStructureFromText.unitSize": {
+      "mozzarella": 125,
+      "guanciale": 1.5,
+      "mezzi": 1,
+      "pomodori": 2.5,
+      "pellegrino_boc": 75,
+      "pellegrino_emp": 75,
+      "peroni": 33,
+      "aceto": 5,
+      "rulo": 1
+    },
+    "parsePurchaseStructureFromText.innerUnitCount": {
+      "mozzarella": 8,
+      "guanciale": 7,
+      "mezzi": 6,
+      "pomodori": 6,
+      "pellegrino_boc": 15,
+      "pellegrino_emp": 15,
+      "peroni": 24,
+      "aceto": 2,
+      "rulo": 2
+    },
+    "parsePurchaseStructureFromText.totalUsableAmount": {
+      "mozzarella": 1000,
+      "guanciale": 10500,
+      "mezzi": 6000,
+      "pomodori": 15000,
+      "pellegrino_boc": 11250,
+      "pellegrino_emp": 11250,
+      "peroni": 7920,
+      "aceto": 10000,
+      "rulo": 2000
+    },
+    "parsePurchaseStructureFromText.matchedText": {
+      "mozzarella": "125GR*8",
+      "guanciale": "1,5kg*7 ",
+      "mezzi": "1KG*6",
+      "pomodori": "2,5KG*6",
+      "pellegrino_boc": "75CL*15",
+      "pellegrino_emp": "75cl x 15ud",
+      "peroni": "33cl*24 ",
+      "aceto": "5l*2 ",
+      "rulo": "1kg*2 "
+    },
+    "purchaseStructureMultiplierChain.usableUnit": {
+      "mozzarella": "g",
+      "guanciale": "g",
+      "mezzi": "g",
+      "pomodori": "g",
+      "pellegrino_boc": "ml",
+      "pellegrino_emp": "ml",
+      "peroni": "ml",
+      "aceto": "ml",
+      "rulo": "g"
+    },
+    "purchaseStructureMultiplierChain.perItemBase": {
+      "mozzarella": 125,
+      "guanciale": 1500,
+      "mezzi": 1000,
+      "pomodori": 2500,
+      "pellegrino_boc": 750,
+      "pellegrino_emp": 750,
+      "peroni": 330,
+      "aceto": 5000,
+      "rulo": 1000
+    },
+    "bound.qty": {
+      "mozzarella": 10,
+      "guanciale": 5.996,
+      "mezzi": 2,
+      "pomodori": 1,
+      "pellegrino_boc": 2,
+      "pellegrino_emp": 2,
+      "peroni": 24,
+      "aceto": 1,
+      "rulo": 1
+    },
+    "derivedSignals.rowQtyEqInner": {
+      "mozzarella": false,
+      "guanciale": false,
+      "mezzi": false,
+      "pomodori": false,
+      "pellegrino_boc": false,
+      "pellegrino_emp": false,
+      "peroni": true,
+      "aceto": false,
+      "rulo": false
+    },
+    "derivedSignals.rowQtyEqOne": {
+      "mozzarella": false,
+      "guanciale": false,
+      "mezzi": false,
+      "pomodori": true,
+      "pellegrino_boc": false,
+      "pellegrino_emp": false,
+      "peroni": false,
+      "aceto": true,
+      "rulo": true
+    },
+    "derivedSignals.rowQtyNeInner": {
+      "mozzarella": true,
+      "guanciale": true,
+      "mezzi": true,
+      "pomodori": true,
+      "pellegrino_boc": true,
+      "pellegrino_emp": true,
+      "peroni": false,
+      "aceto": true,
+      "rulo": true
+    },
+    "derivedSignals.rowQtyGtInner": {
+      "mozzarella": true,
+      "guanciale": false,
+      "mezzi": false,
+      "pomodori": false,
+      "pellegrino_boc": false,
+      "pellegrino_emp": false,
+      "peroni": false,
+      "aceto": false,
+      "rulo": false
+    },
+    "derivedSignals.nameContainsCX": {
+      "mozzarella": false,
+      "guanciale": false,
+      "mezzi": true,
+      "pomodori": true,
+      "pellegrino_boc": true,
+      "pellegrino_emp": false,
+      "peroni": false,
+      "aceto": false,
+      "rulo": false
+    },
+    "derivedSignals.nameContainsTolerance": {
+      "mozzarella": false,
+      "guanciale": true,
+      "mezzi": false,
+      "pomodori": false,
+      "pellegrino_boc": false,
+      "pellegrino_emp": false,
+      "peroni": false,
+      "aceto": false,
+      "rulo": false
+    },
+    "derivedSignals.unitFamily": {
+      "mozzarella": "mass",
+      "guanciale": "mass",
+      "mezzi": "mass",
+      "pomodori": "mass",
+      "pellegrino_boc": "volume",
+      "pellegrino_emp": "volume",
+      "peroni": "volume",
+      "aceto": "volume",
+      "rulo": "mass"
+    },
+    "derivedSignals.unitMeasurementIsKg": {
+      "mozzarella": false,
+      "guanciale": true,
+      "mezzi": true,
+      "pomodori": true,
+      "pellegrino_boc": false,
+      "pellegrino_emp": false,
+      "peroni": false,
+      "aceto": false,
+      "rulo": true
+    },
+    "derivedSignals.unitMeasurementIsL": {
+      "mozzarella": false,
+      "guanciale": false,
+      "mezzi": false,
+      "pomodori": false,
+      "pellegrino_boc": false,
+      "pellegrino_emp": false,
+      "peroni": false,
+      "aceto": true,
+      "rulo": false
+    },
+    "derivedSignals.unitMeasurementIsG": {
+      "mozzarella": true,
+      "guanciale": false,
+      "mezzi": false,
+      "pomodori": false,
+      "pellegrino_boc": false,
+      "pellegrino_emp": false,
+      "peroni": false,
+      "aceto": false,
+      "rulo": false
+    },
+    "derivedSignals.unitMeasurementIsCl": {
+      "mozzarella": false,
+      "guanciale": false,
+      "mezzi": false,
+      "pomodori": false,
+      "pellegrino_boc": true,
+      "pellegrino_emp": true,
+      "peroni": true,
+      "aceto": false,
+      "rulo": false
+    },
+    "derivedSignals.perItemBaseNeUnitSize": {
+      "mozzarella": false,
+      "guanciale": true,
+      "mezzi": true,
+      "pomodori": true,
+      "pellegrino_boc": true,
+      "pellegrino_emp": true,
+      "peroni": true,
+      "aceto": true,
+      "rulo": true
+    },
+    "derivedSignals.scaledOuterMatchesPdfTruth": {
+      "mozzarella": true,
+      "guanciale": false,
+      "mezzi": false,
+      "pomodori": true,
+      "pellegrino_boc": false,
+      "pellegrino_emp": false,
+      "peroni": false,
+      "aceto": true,
+      "rulo": true
+    },
+    "derivedSignals.structureOnlyMatchesPdfTruth": {
+      "mozzarella": false,
+      "guanciale": false,
+      "mezzi": true,
+      "pomodori": true,
+      "pellegrino_boc": true,
+      "pellegrino_emp": true,
+      "peroni": true,
+      "aceto": true,
+      "rulo": true
+    },
+    "derivedSignals.usableMatchesPdfTruth": {
+      "mozzarella": false,
+      "guanciale": false,
+      "mezzi": true,
+      "pomodori": true,
+      "pellegrino_boc": true,
+      "pellegrino_emp": true,
+      "peroni": true,
+      "aceto": true,
+      "rulo": true
+    },
+    "derivedSignals.extractionQtyMismatch": {
+      "mozzarella": false,
+      "guanciale": false,
+      "mezzi": true,
+      "pomodori": false,
+      "pellegrino_boc": false,
+      "pellegrino_emp": false,
+      "peroni": false,
+      "aceto": false,
+      "rulo": false
+    },
+    "derivedSignals.familyA": {
+      "mozzarella": false,
+      "guanciale": false,
+      "mezzi": true,
+      "pomodori": false,
+      "pellegrino_boc": false,
+      "pellegrino_emp": false,
+      "peroni": false,
+      "aceto": false,
+      "rulo": false
+    },
+    "derivedSignals.purchaseQtyForCost": {
+      "mozzarella": 1,
+      "guanciale": 1,
+      "mezzi": 1,
+      "pomodori": 1,
+      "pellegrino_boc": 1,
+      "pellegrino_emp": 1,
+      "peroni": 1,
+      "aceto": 1,
+      "rulo": 1
+    },
+    "derivedSignals.direction": {
+      "mozzarella": "under_count",
+      "guanciale": "over_count",
+      "mezzi": "mixed",
+      "pomodori": "correct",
+      "pellegrino_boc": "correct",
+      "pellegrino_emp": "correct",
+      "peroni": "correct",
+      "aceto": "correct",
+      "rulo": "correct"
+    },
+    "resolveInvoiceLinePurchaseFormat.kind": {
+      "mozzarella": "multi_unit_pack",
+      "guanciale": "multi_unit_pack",
+      "mezzi": "multi_unit_pack",
+      "pomodori": "multi_unit_pack",
+      "pellegrino_boc": "multi_unit_pack",
+      "pellegrino_emp": "multi_unit_pack",
+      "peroni": "multi_unit_pack",
+      "aceto": "multi_unit_pack",
+      "rulo": "multi_unit_pack"
+    },
+    "resolveInvoiceLinePurchaseFormat.purchaseContainerCount": {
+      "mozzarella": 8,
+      "guanciale": 7,
+      "mezzi": 6,
+      "pomodori": 6,
+      "pellegrino_boc": 15,
+      "pellegrino_emp": 15,
+      "peroni": 24,
+      "aceto": 2,
+      "rulo": 2
+    },
+    "priceSemantics.singleUnitEqualsLineUsable": {
+      "mozzarella": true,
+      "guanciale": true,
+      "mezzi": true,
+      "pomodori": true,
+      "pellegrino_boc": true,
+      "pellegrino_emp": true,
+      "peroni": true,
+      "aceto": true,
+      "rulo": true
+    },
+    "priceSemantics.resolveCountablePurchaseQuantityForCost": {
+      "mozzarella": 1,
+      "guanciale": 1,
+      "mezzi": 1,
+      "pomodori": 1,
+      "pellegrino_boc": 1,
+      "pellegrino_emp": 1,
+      "peroni": 1,
+      "aceto": 1,
+      "rulo": 1
+    },
+    "proposedHelper.wouldFire": {
+      "mozzarella": true,
+      "guanciale": false,
+      "mezzi": false,
+      "pomodori": false,
+      "pellegrino_boc": true,
+      "pellegrino_emp": true,
+      "peroni": false,
+      "aceto": false,
+      "rulo": false
+    },
+    "proposedHelper.wouldFireAndUnitG": {
+      "mozzarella": true,
+      "guanciale": false,
+      "mezzi": false,
+      "pomodori": false,
+      "pellegrino_boc": false,
+      "pellegrino_emp": false,
+      "peroni": false,
+      "aceto": false,
+      "rulo": false
+    },
+    "derivedSignals.userVisibleBug": {
+      "mozzarella": true,
+      "guanciale": true,
+      "mezzi": true,
+      "pomodori": false,
+      "pellegrino_boc": false,
+      "pellegrino_emp": false,
+      "peroni": false,
+      "aceto": false,
+      "rulo": false
+    }
+  },
+  "task3_differenceSearch": [
+    {
+      "signal": "parsePurchaseStructureFromText.tier",
+      "incorrectValues": {
+        "\"size_count\"": 3
+      },
+      "correctValues": {
+        "\"size_count\"": 6
+      },
+      "sharedAcrossGroups": [
+        "size_count"
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "genericRowAnalysis.isGenericPurchaseUnit",
+      "incorrectValues": {
+        "true": 3
+      },
+      "correctValues": {
+        "true": 6
+      },
+      "sharedAcrossGroups": [
+        true
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "genericRowAnalysis.structureTotalIsFinalForGenericRow",
+      "incorrectValues": {
+        "true": 3
+      },
+      "correctValues": {
+        "true": 6
+      },
+      "sharedAcrossGroups": [
+        true
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "computeUsableFromPurchaseStructure.usableSource",
+      "incorrectValues": {
+        "\"structure_total\"": 3
+      },
+      "correctValues": {
+        "\"structure_total\"": 6
+      },
+      "sharedAcrossGroups": [
+        "structure_total"
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "computeUsableFromPurchaseStructure.fallbackReason",
+      "incorrectValues": {
+        "\"name N×SIZE total is final; generic row does not rescale inner pack\"": 3
+      },
+      "correctValues": {
+        "\"name N×SIZE total is final; generic row does not rescale inner pack\"": 6
+      },
+      "sharedAcrossGroups": [
+        "name N×SIZE total is final; generic row does not rescale inner pack"
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "resolveStructurePurchaseQuantity",
+      "incorrectValues": {
+        "1": 3
+      },
+      "correctValues": {
+        "1": 6
+      },
+      "sharedAcrossGroups": [
+        1
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "parsePurchaseStructureFromText.unitMeasurement",
+      "incorrectValues": {
+        "\"g\"": 1,
+        "\"kg\"": 2
+      },
+      "correctValues": {
+        "\"kg\"": 2,
+        "\"cl\"": 3,
+        "\"L\"": 1
+      },
+      "sharedAcrossGroups": [
+        "kg"
+      ],
+      "incorrectOnly": [
+        "g"
+      ],
+      "correctOnly": [
+        "cl",
+        "L"
+      ],
+      "separatesGroups": true,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "parsePurchaseStructureFromText.unitSize",
+      "incorrectValues": {
+        "1": 1,
+        "125": 1,
+        "1.5": 1
+      },
+      "correctValues": {
+        "1": 1,
+        "5": 1,
+        "33": 1,
+        "75": 2,
+        "2.5": 1
+      },
+      "sharedAcrossGroups": [
+        1
+      ],
+      "incorrectOnly": [
+        125,
+        1.5
+      ],
+      "correctOnly": [
+        2.5,
+        75,
+        33,
+        5
+      ],
+      "separatesGroups": true,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "parsePurchaseStructureFromText.innerUnitCount",
+      "incorrectValues": {
+        "6": 1,
+        "7": 1,
+        "8": 1
+      },
+      "correctValues": {
+        "2": 2,
+        "6": 1,
+        "15": 2,
+        "24": 1
+      },
+      "sharedAcrossGroups": [
+        6
+      ],
+      "incorrectOnly": [
+        8,
+        7
+      ],
+      "correctOnly": [
+        15,
+        24,
+        2
+      ],
+      "separatesGroups": true,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "parsePurchaseStructureFromText.totalUsableAmount",
+      "incorrectValues": {
+        "1000": 1,
+        "6000": 1,
+        "10500": 1
+      },
+      "correctValues": {
+        "2000": 1,
+        "7920": 1,
+        "10000": 1,
+        "11250": 2,
+        "15000": 1
+      },
+      "sharedAcrossGroups": [],
+      "incorrectOnly": [
+        1000,
+        10500,
+        6000
+      ],
+      "correctOnly": [
+        15000,
+        11250,
+        7920,
+        10000,
+        2000
+      ],
+      "separatesGroups": true,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "parsePurchaseStructureFromText.matchedText",
+      "incorrectValues": {
+        "\"125GR*8\"": 1,
+        "\"1,5kg*7 \"": 1,
+        "\"1KG*6\"": 1
+      },
+      "correctValues": {
+        "\"2,5KG*6\"": 1,
+        "\"75CL*15\"": 1,
+        "\"75cl x 15ud\"": 1,
+        "\"33cl*24 \"": 1,
+        "\"5l*2 \"": 1,
+        "\"1kg*2 \"": 1
+      },
+      "sharedAcrossGroups": [],
+      "incorrectOnly": [
+        "125GR*8",
+        "1,5kg*7 ",
+        "1KG*6"
+      ],
+      "correctOnly": [
+        "2,5KG*6",
+        "75CL*15",
+        "75cl x 15ud",
+        "33cl*24 ",
+        "5l*2 ",
+        "1kg*2 "
+      ],
+      "separatesGroups": true,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "purchaseStructureMultiplierChain.usableUnit",
+      "incorrectValues": {
+        "\"g\"": 3
+      },
+      "correctValues": {
+        "\"g\"": 2,
+        "\"ml\"": 4
+      },
+      "sharedAcrossGroups": [
+        "g"
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [
+        "ml"
+      ],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "purchaseStructureMultiplierChain.perItemBase",
+      "incorrectValues": {
+        "125": 1,
+        "1000": 1,
+        "1500": 1
+      },
+      "correctValues": {
+        "330": 1,
+        "750": 2,
+        "1000": 1,
+        "2500": 1,
+        "5000": 1
+      },
+      "sharedAcrossGroups": [
+        1000
+      ],
+      "incorrectOnly": [
+        125,
+        1500
+      ],
+      "correctOnly": [
+        2500,
+        750,
+        330,
+        5000
+      ],
+      "separatesGroups": true,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "bound.qty",
+      "incorrectValues": {
+        "2": 1,
+        "10": 1,
+        "5.996": 1
+      },
+      "correctValues": {
+        "1": 3,
+        "2": 2,
+        "24": 1
+      },
+      "sharedAcrossGroups": [
+        2
+      ],
+      "incorrectOnly": [
+        10,
+        5.996
+      ],
+      "correctOnly": [
+        1,
+        24
+      ],
+      "separatesGroups": true,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.rowQtyEqInner",
+      "incorrectValues": {
+        "false": 3
+      },
+      "correctValues": {
+        "false": 5,
+        "true": 1
+      },
+      "sharedAcrossGroups": [
+        false
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [
+        true
+      ],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.rowQtyEqOne",
+      "incorrectValues": {
+        "false": 3
+      },
+      "correctValues": {
+        "true": 3,
+        "false": 3
+      },
+      "sharedAcrossGroups": [
+        false
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [
+        true
+      ],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.rowQtyNeInner",
+      "incorrectValues": {
+        "true": 3
+      },
+      "correctValues": {
+        "true": 5,
+        "false": 1
+      },
+      "sharedAcrossGroups": [
+        true
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [
+        false
+      ],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.rowQtyGtInner",
+      "incorrectValues": {
+        "true": 1,
+        "false": 2
+      },
+      "correctValues": {
+        "false": 6
+      },
+      "sharedAcrossGroups": [
+        false
+      ],
+      "incorrectOnly": [
+        true
+      ],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.nameContainsCX",
+      "incorrectValues": {
+        "false": 2,
+        "true": 1
+      },
+      "correctValues": {
+        "true": 2,
+        "false": 4
+      },
+      "sharedAcrossGroups": [
+        false,
+        true
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.nameContainsTolerance",
+      "incorrectValues": {
+        "false": 2,
+        "true": 1
+      },
+      "correctValues": {
+        "false": 6
+      },
+      "sharedAcrossGroups": [
+        false
+      ],
+      "incorrectOnly": [
+        true
+      ],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.unitFamily",
+      "incorrectValues": {
+        "\"mass\"": 3
+      },
+      "correctValues": {
+        "\"mass\"": 2,
+        "\"volume\"": 4
+      },
+      "sharedAcrossGroups": [
+        "mass"
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [
+        "volume"
+      ],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.unitMeasurementIsKg",
+      "incorrectValues": {
+        "false": 1,
+        "true": 2
+      },
+      "correctValues": {
+        "true": 2,
+        "false": 4
+      },
+      "sharedAcrossGroups": [
+        false,
+        true
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.unitMeasurementIsL",
+      "incorrectValues": {
+        "false": 3
+      },
+      "correctValues": {
+        "false": 5,
+        "true": 1
+      },
+      "sharedAcrossGroups": [
+        false
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [
+        true
+      ],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.unitMeasurementIsG",
+      "incorrectValues": {
+        "true": 1,
+        "false": 2
+      },
+      "correctValues": {
+        "false": 6
+      },
+      "sharedAcrossGroups": [
+        false
+      ],
+      "incorrectOnly": [
+        true
+      ],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.unitMeasurementIsCl",
+      "incorrectValues": {
+        "false": 3
+      },
+      "correctValues": {
+        "false": 3,
+        "true": 3
+      },
+      "sharedAcrossGroups": [
+        false
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [
+        true
+      ],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.perItemBaseNeUnitSize",
+      "incorrectValues": {
+        "false": 1,
+        "true": 2
+      },
+      "correctValues": {
+        "true": 6
+      },
+      "sharedAcrossGroups": [
+        true
+      ],
+      "incorrectOnly": [
+        false
+      ],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.scaledOuterMatchesPdfTruth",
+      "incorrectValues": {
+        "true": 1,
+        "false": 2
+      },
+      "correctValues": {
+        "true": 3,
+        "false": 3
+      },
+      "sharedAcrossGroups": [
+        true,
+        false
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.structureOnlyMatchesPdfTruth",
+      "incorrectValues": {
+        "false": 2,
+        "true": 1
+      },
+      "correctValues": {
+        "true": 6
+      },
+      "sharedAcrossGroups": [
+        true
+      ],
+      "incorrectOnly": [
+        false
+      ],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.usableMatchesPdfTruth",
+      "incorrectValues": {
+        "false": 2,
+        "true": 1
+      },
+      "correctValues": {
+        "true": 6
+      },
+      "sharedAcrossGroups": [
+        true
+      ],
+      "incorrectOnly": [
+        false
+      ],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.extractionQtyMismatch",
+      "incorrectValues": {
+        "false": 2,
+        "true": 1
+      },
+      "correctValues": {
+        "false": 6
+      },
+      "sharedAcrossGroups": [
+        false
+      ],
+      "incorrectOnly": [
+        true
+      ],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.familyA",
+      "incorrectValues": {
+        "false": 2,
+        "true": 1
+      },
+      "correctValues": {
+        "false": 6
+      },
+      "sharedAcrossGroups": [
+        false
+      ],
+      "incorrectOnly": [
+        true
+      ],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.purchaseQtyForCost",
+      "incorrectValues": {
+        "1": 3
+      },
+      "correctValues": {
+        "1": 6
+      },
+      "sharedAcrossGroups": [
+        1
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.direction",
+      "incorrectValues": {
+        "\"under_count\"": 1,
+        "\"over_count\"": 1,
+        "\"mixed\"": 1
+      },
+      "correctValues": {
+        "\"correct\"": 6
+      },
+      "sharedAcrossGroups": [],
+      "incorrectOnly": [
+        "under_count",
+        "over_count",
+        "mixed"
+      ],
+      "correctOnly": [
+        "correct"
+      ],
+      "separatesGroups": true,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "resolveInvoiceLinePurchaseFormat.kind",
+      "incorrectValues": {
+        "\"multi_unit_pack\"": 3
+      },
+      "correctValues": {
+        "\"multi_unit_pack\"": 6
+      },
+      "sharedAcrossGroups": [
+        "multi_unit_pack"
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "resolveInvoiceLinePurchaseFormat.purchaseContainerCount",
+      "incorrectValues": {
+        "6": 1,
+        "7": 1,
+        "8": 1
+      },
+      "correctValues": {
+        "2": 2,
+        "6": 1,
+        "15": 2,
+        "24": 1
+      },
+      "sharedAcrossGroups": [
+        6
+      ],
+      "incorrectOnly": [
+        8,
+        7
+      ],
+      "correctOnly": [
+        15,
+        24,
+        2
+      ],
+      "separatesGroups": true,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "priceSemantics.singleUnitEqualsLineUsable",
+      "incorrectValues": {
+        "true": 3
+      },
+      "correctValues": {
+        "true": 6
+      },
+      "sharedAcrossGroups": [
+        true
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "priceSemantics.resolveCountablePurchaseQuantityForCost",
+      "incorrectValues": {
+        "1": 3
+      },
+      "correctValues": {
+        "1": 6
+      },
+      "sharedAcrossGroups": [
+        1
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "proposedHelper.wouldFire",
+      "incorrectValues": {
+        "true": 1,
+        "false": 2
+      },
+      "correctValues": {
+        "false": 4,
+        "true": 2
+      },
+      "sharedAcrossGroups": [
+        true,
+        false
+      ],
+      "incorrectOnly": [],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "proposedHelper.wouldFireAndUnitG",
+      "incorrectValues": {
+        "true": 1,
+        "false": 2
+      },
+      "correctValues": {
+        "false": 6
+      },
+      "sharedAcrossGroups": [
+        false
+      ],
+      "incorrectOnly": [
+        true
+      ],
+      "correctOnly": [],
+      "separatesGroups": false,
+      "incorrectCount": 3,
+      "correctCount": 6
+    },
+    {
+      "signal": "derivedSignals.userVisibleBug",
+      "incorrectValues": {
+        "true": 3
+      },
+      "correctValues": {
+        "false": 6
+      },
+      "sharedAcrossGroups": [],
+      "incorrectOnly": [
+        true
+      ],
+      "correctOnly": [
+        false
+      ],
+      "separatesGroups": true,
+      "incorrectCount": 3,
+      "correctCount": 6
+    }
+  ],
+  "task4_eliminationTable": [
+    {
+      "signal": "parsePurchaseStructureFromText.tier",
+      "separates": "No",
+      "why": "Uniform across all 9: \"size_count\""
+    },
+    {
+      "signal": "genericRowAnalysis.isGenericPurchaseUnit",
+      "separates": "No",
+      "why": "Uniform across all 9: true"
+    },
+    {
+      "signal": "genericRowAnalysis.structureTotalIsFinalForGenericRow",
+      "separates": "No",
+      "why": "Uniform across all 9: true"
+    },
+    {
+      "signal": "computeUsableFromPurchaseStructure.usableSource",
+      "separates": "No",
+      "why": "Uniform across all 9: \"structure_total\""
+    },
+    {
+      "signal": "computeUsableFromPurchaseStructure.fallbackReason",
+      "separates": "No",
+      "why": "Uniform across all 9: \"name N×SIZE total is final; generic row does not rescale inner pack\""
+    },
+    {
+      "signal": "resolveStructurePurchaseQuantity",
+      "separates": "No",
+      "why": "Uniform across all 9: 1"
+    },
+    {
+      "signal": "parsePurchaseStructureFromText.unitMeasurement",
+      "separates": "Yes",
+      "why": "Incorrect-only: [\"g\"]; correct-only: [\"cl\",\"L\"]"
+    },
+    {
+      "signal": "parsePurchaseStructureFromText.unitSize",
+      "separates": "Yes",
+      "why": "Incorrect-only: [125,1.5]; correct-only: [2.5,75,33,5]"
+    },
+    {
+      "signal": "parsePurchaseStructureFromText.innerUnitCount",
+      "separates": "Yes",
+      "why": "Incorrect-only: [8,7]; correct-only: [15,24,2]"
+    },
+    {
+      "signal": "parsePurchaseStructureFromText.totalUsableAmount",
+      "separates": "Yes",
+      "why": "Incorrect-only: [1000,10500,6000]; correct-only: [15000,11250,7920,10000,2000]"
+    },
+    {
+      "signal": "parsePurchaseStructureFromText.matchedText",
+      "separates": "Yes",
+      "why": "Incorrect-only: [\"125GR*8\",\"1,5kg*7 \",\"1KG*6\"]; correct-only: [\"2,5KG*6\",\"75CL*15\",\"75cl x 15ud\",\"33cl*24 \",\"5l*2 \",\"1kg*2 \"]"
+    },
+    {
+      "signal": "purchaseStructureMultiplierChain.usableUnit",
+      "separates": "No",
+      "why": "Uniform across all 9: \"g\""
+    },
+    {
+      "signal": "purchaseStructureMultiplierChain.perItemBase",
+      "separates": "Yes",
+      "why": "Incorrect-only: [125,1500]; correct-only: [2500,750,330,5000]"
+    },
+    {
+      "signal": "bound.qty",
+      "separates": "Yes",
+      "why": "Incorrect-only: [10,5.996]; correct-only: [1,24]"
+    },
+    {
+      "signal": "derivedSignals.rowQtyEqInner",
+      "separates": "No",
+      "why": "Uniform across all 9: false"
+    },
+    {
+      "signal": "derivedSignals.rowQtyEqOne",
+      "separates": "No",
+      "why": "Uniform across all 9: false"
+    },
+    {
+      "signal": "derivedSignals.rowQtyNeInner",
+      "separates": "No",
+      "why": "Uniform across all 9: true"
+    },
+    {
+      "signal": "derivedSignals.rowQtyGtInner",
+      "separates": "No",
+      "why": "Uniform across all 9: false"
+    },
+    {
+      "signal": "derivedSignals.nameContainsCX",
+      "separates": "No",
+      "why": "Non-uniform within groups; no clean partition"
+    },
+    {
+      "signal": "derivedSignals.nameContainsTolerance",
+      "separates": "No",
+      "why": "Uniform across all 9: false"
+    },
+    {
+      "signal": "derivedSignals.unitFamily",
+      "separates": "No",
+      "why": "Uniform across all 9: \"mass\""
+    },
+    {
+      "signal": "derivedSignals.unitMeasurementIsKg",
+      "separates": "No",
+      "why": "Non-uniform within groups; no clean partition"
+    },
+    {
+      "signal": "derivedSignals.unitMeasurementIsL",
+      "separates": "No",
+      "why": "Uniform across all 9: false"
+    },
+    {
+      "signal": "derivedSignals.unitMeasurementIsG",
+      "separates": "No",
+      "why": "Uniform across all 9: false"
+    },
+    {
+      "signal": "derivedSignals.unitMeasurementIsCl",
+      "separates": "No",
+      "why": "Uniform across all 9: false"
+    },
+    {
+      "signal": "derivedSignals.perItemBaseNeUnitSize",
+      "separates": "No",
+      "why": "Uniform across all 9: true"
+    },
+    {
+      "signal": "derivedSignals.scaledOuterMatchesPdfTruth",
+      "separates": "No",
+      "why": "Non-uniform within groups; no clean partition"
+    },
+    {
+      "signal": "derivedSignals.structureOnlyMatchesPdfTruth",
+      "separates": "No",
+      "why": "Uniform across all 9: true"
+    },
+    {
+      "signal": "derivedSignals.usableMatchesPdfTruth",
+      "separates": "No",
+      "why": "Uniform across all 9: true"
+    },
+    {
+      "signal": "derivedSignals.extractionQtyMismatch",
+      "separates": "No",
+      "why": "Uniform across all 9: false"
+    },
+    {
+      "signal": "derivedSignals.familyA",
+      "separates": "No",
+      "why": "Uniform across all 9: false"
+    },
+    {
+      "signal": "derivedSignals.purchaseQtyForCost",
+      "separates": "No",
+      "why": "Uniform across all 9: 1"
+    },
+    {
+      "signal": "derivedSignals.direction",
+      "separates": "Yes",
+      "why": "Incorrect-only: [\"under_count\",\"over_count\",\"mixed\"]; correct-only: [\"correct\"]"
+    },
+    {
+      "signal": "resolveInvoiceLinePurchaseFormat.kind",
+      "separates": "No",
+      "why": "Uniform across all 9: \"multi_unit_pack\""
+    },
+    {
+      "signal": "resolveInvoiceLinePurchaseFormat.purchaseContainerCount",
+      "separates": "Yes",
+      "why": "Incorrect-only: [8,7]; correct-only: [15,24,2]"
+    },
+    {
+      "signal": "priceSemantics.singleUnitEqualsLineUsable",
+      "separates": "No",
+      "why": "Uniform across all 9: true"
+    },
+    {
+      "signal": "priceSemantics.resolveCountablePurchaseQuantityForCost",
+      "separates": "No",
+      "why": "Uniform across all 9: 1"
+    },
+    {
+      "signal": "proposedHelper.wouldFire",
+      "separates": "No",
+      "why": "Non-uniform within groups; no clean partition"
+    },
+    {
+      "signal": "proposedHelper.wouldFireAndUnitG",
+      "separates": "No",
+      "why": "Uniform across all 9: false"
+    },
+    {
+      "signal": "derivedSignals.userVisibleBug",
+      "separates": "Yes",
+      "why": "Incorrect-only: [true]; correct-only: [false]"
+    }
+  ],
+  "task5_clusterAnalysis": [
+    {
+      "cluster": "A_mozzarella_under_count",
+      "product": "Mozzarella 125GR*8",
+      "direction": "under_count",
+      "firstIncorrectMechanism": "structure_total omits outer pack count (qty=10 not applied)",
+      "runtimeSignalsUnique": [
+        "parsePurchaseStructureFromText.unitMeasurement",
+        "parsePurchaseStructureFromText.unitSize",
+        "parsePurchaseStructureFromText.innerUnitCount",
+        "parsePurchaseStructureFromText.totalUsableAmount",
+        "parsePurchaseStructureFromText.matchedText",
+        "purchaseStructureMultiplierChain.perItemBase",
+        "bound.qty",
+        "derivedSignals.rowQtyGtInner",
+        "derivedSignals.unitMeasurementIsG",
+        "derivedSignals.perItemBaseNeUnitSize",
+        "derivedSignals.direction",
+        "resolveInvoiceLinePurchaseFormat.purchaseContainerCount",
+        "proposedHelper.wouldFireAndUnitG"
+      ],
+      "runtimeSignalsSharedWithAllCorrect": [
+        "parsePurchaseStructureFromText.tier",
+        "genericRowAnalysis.isGenericPurchaseUnit",
+        "genericRowAnalysis.structureTotalIsFinalForGenericRow",
+        "computeUsableFromPurchaseStructure.usableSource",
+        "computeUsableFromPurchaseStructure.fallbackReason",
+        "resolveStructurePurchaseQuantity",
+        "derivedSignals.nameContainsTolerance",
+        "derivedSignals.extractionQtyMismatch",
+        "derivedSignals.familyA",
+        "derivedSignals.purchaseQtyForCost",
+        "resolveInvoiceLinePurchaseFormat.kind",
+        "priceSemantics.singleUnitEqualsLineUsable",
+        "priceSemantics.resolveCountablePurchaseQuantityForCost"
+      ],
+      "normalizedUsable": 1000,
+      "pdfTruthUsable": 10000,
+      "scaledOuterWouldBe": 10000
+    },
+    {
+      "cluster": "B_guanciale_over_count",
+      "product": "Guanciale",
+      "direction": "over_count",
+      "firstIncorrectMechanism": "weight line qty=5.996 kg misread; *7 pack fiction used",
+      "runtimeSignalsUnique": [
+        "parsePurchaseStructureFromText.unitSize",
+        "parsePurchaseStructureFromText.innerUnitCount",
+        "parsePurchaseStructureFromText.totalUsableAmount",
+        "parsePurchaseStructureFromText.matchedText",
+        "purchaseStructureMultiplierChain.perItemBase",
+        "bound.qty",
+        "derivedSignals.nameContainsTolerance",
+        "derivedSignals.direction",
+        "resolveInvoiceLinePurchaseFormat.purchaseContainerCount"
+      ],
+      "runtimeSignalsSharedWithAllCorrect": [
+        "parsePurchaseStructureFromText.tier",
+        "genericRowAnalysis.isGenericPurchaseUnit",
+        "genericRowAnalysis.structureTotalIsFinalForGenericRow",
+        "computeUsableFromPurchaseStructure.usableSource",
+        "computeUsableFromPurchaseStructure.fallbackReason",
+        "resolveStructurePurchaseQuantity",
+        "derivedSignals.rowQtyGtInner",
+        "derivedSignals.unitMeasurementIsG",
+        "derivedSignals.perItemBaseNeUnitSize",
+        "derivedSignals.extractionQtyMismatch",
+        "derivedSignals.familyA",
+        "derivedSignals.purchaseQtyForCost",
+        "resolveInvoiceLinePurchaseFormat.kind",
+        "priceSemantics.singleUnitEqualsLineUsable",
+        "priceSemantics.resolveCountablePurchaseQuantityForCost",
+        "proposedHelper.wouldFireAndUnitG"
+      ],
+      "normalizedUsable": 10500,
+      "pdfTruthUsable": 5996,
+      "scaledOuterWouldBe": 63000
+    },
+    {
+      "cluster": "C_mezzi_extraction",
+      "product": "Mezzi Paccheri (CX 1KG*6)",
+      "direction": "mixed",
+      "firstIncorrectMechanism": "Hybrid H qty 1→2 extraction; structure path yields 1-case usable at 2-case invoice qty",
+      "runtimeSignalsUnique": [
+        "parsePurchaseStructureFromText.totalUsableAmount",
+        "parsePurchaseStructureFromText.matchedText",
+        "derivedSignals.extractionQtyMismatch",
+        "derivedSignals.familyA",
+        "derivedSignals.direction"
+      ],
+      "runtimeSignalsSharedWithAllCorrect": [
+        "parsePurchaseStructureFromText.tier",
+        "genericRowAnalysis.isGenericPurchaseUnit",
+        "genericRowAnalysis.structureTotalIsFinalForGenericRow",
+        "computeUsableFromPurchaseStructure.usableSource",
+        "computeUsableFromPurchaseStructure.fallbackReason",
+        "resolveStructurePurchaseQuantity",
+        "derivedSignals.rowQtyGtInner",
+        "derivedSignals.nameContainsTolerance",
+        "derivedSignals.unitMeasurementIsG",
+        "derivedSignals.perItemBaseNeUnitSize",
+        "derivedSignals.structureOnlyMatchesPdfTruth",
+        "derivedSignals.usableMatchesPdfTruth",
+        "derivedSignals.purchaseQtyForCost",
+        "resolveInvoiceLinePurchaseFormat.kind",
+        "priceSemantics.singleUnitEqualsLineUsable",
+        "priceSemantics.resolveCountablePurchaseQuantityForCost",
+        "proposedHelper.wouldFireAndUnitG"
+      ],
+      "normalizedUsable": 6000,
+      "pdfTruthUsable": 6000,
+      "scaledOuterWouldBe": 12000
+    }
+  ],
+  "task6_minimumDistinguishingSet": [
+    {
+      "signal": "parsePurchaseStructureFromText.unitMeasurement",
+      "incorrectOnly": [
+        "g"
+      ],
+      "correctOnly": [
+        "cl",
+        "L"
+      ],
+      "evidenceOnly": true
+    },
+    {
+      "signal": "parsePurchaseStructureFromText.unitSize",
+      "incorrectOnly": [
+        125,
+        1.5
+      ],
+      "correctOnly": [
+        2.5,
+        75,
+        33,
+        5
+      ],
+      "evidenceOnly": true
+    },
+    {
+      "signal": "parsePurchaseStructureFromText.innerUnitCount",
+      "incorrectOnly": [
+        8,
+        7
+      ],
+      "correctOnly": [
+        15,
+        24,
+        2
+      ],
+      "evidenceOnly": true
+    },
+    {
+      "signal": "parsePurchaseStructureFromText.totalUsableAmount",
+      "incorrectOnly": [
+        1000,
+        10500,
+        6000
+      ],
+      "correctOnly": [
+        15000,
+        11250,
+        7920,
+        10000,
+        2000
+      ],
+      "evidenceOnly": true
+    },
+    {
+      "signal": "parsePurchaseStructureFromText.matchedText",
+      "incorrectOnly": [
+        "125GR*8",
+        "1,5kg*7 ",
+        "1KG*6"
+      ],
+      "correctOnly": [
+        "2,5KG*6",
+        "75CL*15",
+        "75cl x 15ud",
+        "33cl*24 ",
+        "5l*2 ",
+        "1kg*2 "
+      ],
+      "evidenceOnly": true
+    },
+    {
+      "signal": "purchaseStructureMultiplierChain.perItemBase",
+      "incorrectOnly": [
+        125,
+        1500
+      ],
+      "correctOnly": [
+        2500,
+        750,
+        330,
+        5000
+      ],
+      "evidenceOnly": true
+    },
+    {
+      "signal": "bound.qty",
+      "incorrectOnly": [
+        10,
+        5.996
+      ],
+      "correctOnly": [
+        1,
+        24
+      ],
+      "evidenceOnly": true
+    },
+    {
+      "signal": "derivedSignals.direction",
+      "incorrectOnly": [
+        "under_count",
+        "over_count",
+        "mixed"
+      ],
+      "correctOnly": [
+        "correct"
+      ],
+      "evidenceOnly": true
+    },
+    {
+      "signal": "resolveInvoiceLinePurchaseFormat.purchaseContainerCount",
+      "incorrectOnly": [
+        8,
+        7
+      ],
+      "correctOnly": [
+        15,
+        24,
+        2
+      ],
+      "evidenceOnly": true
+    },
+    {
+      "signal": "derivedSignals.userVisibleBug",
+      "incorrectOnly": [
+        true
+      ],
+      "correctOnly": [
+        false
+      ],
+      "evidenceOnly": true
+    }
+  ],
+  "task7_finalAssessment": {
+    "verdict": "B",
+    "label": "Scalar divergence within shared path — discriminators are field values, not code branches",
+    "rationale": "Shared path confirmed (26 uniform path signals). 8 scalar signals partition groups but do not imply distinct parser branches. Proposed outer-pack helper fires on some incorrect and some correct.",
+    "pathSignalsUniform": [
+      "parsePurchaseStructureFromText.tier",
+      "genericRowAnalysis.isGenericPurchaseUnit",
+      "genericRowAnalysis.structureTotalIsFinalForGenericRow",
+      "computeUsableFromPurchaseStructure.usableSource",
+      "computeUsableFromPurchaseStructure.fallbackReason",
+      "resolveStructurePurchaseQuantity",
+      "purchaseStructureMultiplierChain.usableUnit",
+      "derivedSignals.rowQtyEqInner",
+      "derivedSignals.rowQtyEqOne",
+      "derivedSignals.rowQtyNeInner",
+      "derivedSignals.rowQtyGtInner",
+      "derivedSignals.nameContainsTolerance",
+      "derivedSignals.unitFamily",
+      "derivedSignals.unitMeasurementIsL",
+      "derivedSignals.unitMeasurementIsG",
+      "derivedSignals.unitMeasurementIsCl",
+      "derivedSignals.perItemBaseNeUnitSize",
+      "derivedSignals.structureOnlyMatchesPdfTruth",
+      "derivedSignals.usableMatchesPdfTruth",
+      "derivedSignals.extractionQtyMismatch",
+      "derivedSignals.familyA",
+      "derivedSignals.purchaseQtyForCost",
+      "resolveInvoiceLinePurchaseFormat.kind",
+      "priceSemantics.singleUnitEqualsLineUsable",
+      "priceSemantics.resolveCountablePurchaseQuantityForCost",
+      "proposedHelper.wouldFireAndUnitG"
+    ],
+    "separatingSignalCount": 10,
+    "outcomeOnlySeparators": [
+      "derivedSignals.direction",
+      "derivedSignals.userVisibleBug"
+    ],
+    "scalarSeparators": [
+      "parsePurchaseStructureFromText.unitMeasurement",
+      "parsePurchaseStructureFromText.unitSize",
+      "parsePurchaseStructureFromText.innerUnitCount",
+      "parsePurchaseStructureFromText.totalUsableAmount",
+      "parsePurchaseStructureFromText.matchedText",
+      "purchaseStructureMultiplierChain.perItemBase",
+      "bound.qty",
+      "resolveInvoiceLinePurchaseFormat.purchaseContainerCount"
+    ],
+    "incorrectClusters": {
+      "A": "Mozzarella — under_count, downstream normalization",
+      "B": "Guanciale — over_count, weight-semantics + *7 fiction",
+      "C": "Mezzi — extraction qty mismatch (Family A), partial structure path"
+    }
+  },
+  "sharedPathEvidence": {
+    "identicalStockNormalizationPath": true,
+    "sharedTier": "size_count",
+    "sharedGenericRow": true,
+    "sharedFinalPolicy": true,
+    "sharedUsableSource": "structure_total",
+    "sharedResolvePurchaseQty": 1,
+    "sharedPurchaseQtyForCost": 1,
+    "sharedKind": "multi_unit_pack",
+    "divergenceNote": "Parser path identical for all 9; incorrect vs correct separation requires scalar comparison or post-hoc economics, not branch detection"
+  },
+  "confidence": {
+    "structureTrace": 0.96,
+    "parserReplay": 0.95,
+    "signalSearch": 0.93,
+    "minimumDifferenceSet": 0.9,
+    "overall": 0.94
+  },
+  "sources": [
+    ".tmp/stock-normalization-population-audit/",
+    ".tmp/stock-normalization-family-assessment/",
+    ".tmp/mozzarella-commercial-reality-audit/",
+    ".tmp/mozzarella-vs-pellegrino-separation/",
+    ".tmp/remaining-bug-root-causes/",
+    ".tmp/quantity-mismatch-ui-audit/replay.json",
+    ".tmp/final-validation-lab-rerun/extracts/",
+    "src/lib/stock-normalization.ts",
+    "src/lib/invoice-purchase-format.ts",
+    "VL bjhnlrgodcqoyzddbpbd invoice_items (read-only)"
+  ]
+}

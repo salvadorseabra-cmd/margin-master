@@ -1,0 +1,1109 @@
+{
+  "generatedAt": "2026-06-23T00:25:39.105Z",
+  "mode": "POST_IMPLEMENTATION_VALIDATION",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "verdict": "A) Safe to merge",
+  "implementation": {
+    "helper": "shouldUseRowQtyAsBilledKgForSizeCountGenericRow",
+    "file": "src/lib/stock-normalization.ts",
+    "conditions": [
+      "structure.tier === 'size_count'",
+      "structure.unitMeasurement === 'kg'",
+      "isGenericPurchaseUnit(rowUnit)",
+      "rowQuantity > 0 and finite",
+      "Math.abs(rowQuantity - innerUnitCount) >= 0.01",
+      "hasFractionalQuantity(rowQuantity)",
+      "measureToBase(rowQuantity, 'kg').amount < structure.totalUsableAmount * 0.99"
+    ],
+    "integrationPoints": [
+      "computeUsableFromPurchaseStructure (~1303)",
+      "resolveStructurePurchaseQuantity (~1171)"
+    ],
+    "changedFiles": [
+      "src/lib/stock-normalization.ts",
+      "src/lib/stock-normalization.test.ts"
+    ]
+  },
+  "controls": {
+    "beforeAfterUsable": [
+      {
+        "product": "Guanciale",
+        "before": "10.5 kg",
+        "after": "6.0 kg",
+        "expectedChange": true,
+        "match": true
+      },
+      {
+        "product": "Peroni",
+        "before": "7.92 L",
+        "after": "7.92 L",
+        "expectedChange": false,
+        "match": true
+      },
+      {
+        "product": "Aceto",
+        "before": "10.00 L",
+        "after": "10.00 L",
+        "expectedChange": false,
+        "match": true
+      },
+      {
+        "product": "Rulo",
+        "before": "2 kg",
+        "after": "2 kg",
+        "expectedChange": false,
+        "match": true
+      },
+      {
+        "product": "Julienne",
+        "before": "30 kg",
+        "after": "30 kg",
+        "expectedChange": false,
+        "match": true
+      },
+      {
+        "product": "Ginger Beer",
+        "before": "4.80 L",
+        "after": "4.80 L",
+        "expectedChange": false,
+        "match": true
+      }
+    ],
+    "beforeAfterOpCost": [
+      {
+        "product": "Guanciale",
+        "before": "€6.18/kg",
+        "after": "€10.83/kg",
+        "expectedChange": true,
+        "match": true
+      },
+      {
+        "product": "Peroni",
+        "before": "€3.24/L",
+        "after": "€3.24/L",
+        "expectedChange": false,
+        "match": true
+      },
+      {
+        "product": "Aceto",
+        "before": "€1.56/L",
+        "after": "€1.56/L",
+        "expectedChange": false,
+        "match": true
+      },
+      {
+        "product": "Rulo",
+        "before": "€5.43/kg",
+        "after": "€5.43/kg",
+        "expectedChange": false,
+        "match": true
+      },
+      {
+        "product": "Julienne",
+        "before": "€6.68/kg",
+        "after": "€6.68/kg",
+        "expectedChange": false,
+        "match": true
+      },
+      {
+        "product": "Ginger Beer",
+        "before": "€4.03/L",
+        "after": "€4.05/L",
+        "expectedChange": false,
+        "match": true
+      }
+    ],
+    "classification": [
+      {
+        "product": "Guanciale",
+        "classification": "A",
+        "expected": "A",
+        "match": true
+      },
+      {
+        "product": "Peroni",
+        "classification": "C",
+        "expected": "C",
+        "match": true
+      },
+      {
+        "product": "Aceto",
+        "classification": "C",
+        "expected": "C",
+        "match": true
+      },
+      {
+        "product": "Rulo",
+        "classification": "C",
+        "expected": "C",
+        "match": true
+      },
+      {
+        "product": "Julienne",
+        "classification": "C",
+        "expected": "C",
+        "match": true
+      },
+      {
+        "product": "Ginger Beer",
+        "classification": "C",
+        "expected": "C",
+        "match": true
+      }
+    ],
+    "rows": [
+      {
+        "key": "guanciale",
+        "label": "Guanciale",
+        "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+        "expectedChange": true,
+        "before": {
+          "usable": "10.5 kg",
+          "opCost": "€6.18/kg"
+        },
+        "after": {
+          "usable": "6.0 kg",
+          "opCost": "€10.83/kg"
+        },
+        "replay": {
+          "lineName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+          "bound": {
+            "qty": 5.996,
+            "unit": "un",
+            "unitPrice": 10.83,
+            "total": 64.93
+          },
+          "usableQuantity": 5996,
+          "usableUnit": "g",
+          "usableLabel": "6 kg usable",
+          "purchaseContainerCount": 7,
+          "resolveStructurePurchaseQty": 1,
+          "usableSource": "row_weight_billed",
+          "operationalCost": 10.830000000000002,
+          "operationalCostUnit": "kg",
+          "operationalCostLabel": "€10.83 / kg",
+          "structure": {
+            "tier": "size_count",
+            "innerUnitCount": 7,
+            "unitMeasurement": "kg",
+            "totalUsableAmount": 10500
+          }
+        },
+        "usableMatch": true,
+        "opMatch": true,
+        "changed": true,
+        "classification": "A",
+        "classificationMatch": true
+      },
+      {
+        "key": "peroni",
+        "label": "Peroni",
+        "invoiceItemId": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+        "expectedChange": false,
+        "before": {
+          "usable": "7.92 L",
+          "opCost": "€3.24/L"
+        },
+        "after": {
+          "usable": "7.92 L",
+          "opCost": "€3.24/L"
+        },
+        "replay": {
+          "lineName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "bound": {
+            "qty": 24,
+            "unit": "un",
+            "unitPrice": 1.07,
+            "total": 25.69
+          },
+          "usableQuantity": 7920,
+          "usableUnit": "ml",
+          "usableLabel": "7.92 L usable",
+          "purchaseContainerCount": 24,
+          "resolveStructurePurchaseQty": 1,
+          "usableSource": "structure_total",
+          "operationalCost": 3.2424242424242427,
+          "operationalCostUnit": "L",
+          "operationalCostLabel": "€3.24 / L",
+          "structure": {
+            "tier": "size_count",
+            "innerUnitCount": 24,
+            "unitMeasurement": "cl",
+            "totalUsableAmount": 7920
+          }
+        },
+        "usableMatch": true,
+        "opMatch": true,
+        "changed": false,
+        "classification": "C",
+        "classificationMatch": true
+      },
+      {
+        "key": "aceto",
+        "label": "Aceto",
+        "invoiceItemId": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
+        "expectedChange": false,
+        "before": {
+          "usable": "10.00 L",
+          "opCost": "€1.56/L"
+        },
+        "after": {
+          "usable": "10.00 L",
+          "opCost": "€1.56/L"
+        },
+        "replay": {
+          "lineName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+          "bound": {
+            "qty": 1,
+            "unit": "un",
+            "unitPrice": 15.55,
+            "total": 16.09
+          },
+          "usableQuantity": 10000,
+          "usableUnit": "ml",
+          "usableLabel": "10 L usable",
+          "purchaseContainerCount": 2,
+          "resolveStructurePurchaseQty": 1,
+          "usableSource": "structure_total",
+          "operationalCost": 1.5550000000000002,
+          "operationalCostUnit": "L",
+          "operationalCostLabel": "€1.56 / L",
+          "structure": {
+            "tier": "size_count",
+            "innerUnitCount": 2,
+            "unitMeasurement": "L",
+            "totalUsableAmount": 10000
+          }
+        },
+        "usableMatch": true,
+        "opMatch": true,
+        "changed": false,
+        "classification": "C",
+        "classificationMatch": true
+      },
+      {
+        "key": "rulo",
+        "label": "Rulo",
+        "invoiceItemId": "e418468e-cb13-44f3-93b2-1857ae6eaa4d",
+        "expectedChange": false,
+        "before": {
+          "usable": "2 kg",
+          "opCost": "€5.43/kg"
+        },
+        "after": {
+          "usable": "2 kg",
+          "opCost": "€5.43/kg"
+        },
+        "replay": {
+          "lineName": "Rulo Di Capra 1kg*2 Simonetta",
+          "bound": {
+            "qty": 1,
+            "unit": "un",
+            "unitPrice": 10.86,
+            "total": 10.86
+          },
+          "usableQuantity": 2000,
+          "usableUnit": "g",
+          "usableLabel": "2 kg usable",
+          "purchaseContainerCount": 2,
+          "resolveStructurePurchaseQty": 1,
+          "usableSource": "structure_total",
+          "operationalCost": 5.43,
+          "operationalCostUnit": "kg",
+          "operationalCostLabel": "€5.43 / kg",
+          "structure": {
+            "tier": "size_count",
+            "innerUnitCount": 2,
+            "unitMeasurement": "kg",
+            "totalUsableAmount": 2000
+          }
+        },
+        "usableMatch": true,
+        "opMatch": true,
+        "changed": false,
+        "classification": "C",
+        "classificationMatch": true
+      },
+      {
+        "key": "pomodori",
+        "label": "Pomodori",
+        "invoiceItemId": "fd24d2dc-238a-43f2-ac2a-755361a083f0",
+        "expectedChange": false,
+        "before": {
+          "usableGramsOrMl": 15000,
+          "opCost": 1.47,
+          "opUnit": "kg"
+        },
+        "after": {
+          "usableGramsOrMl": 15000,
+          "opCost": 1.47,
+          "opUnit": "kg"
+        },
+        "error": "VL row not found"
+      },
+      {
+        "key": "julienne",
+        "label": "Julienne",
+        "invoiceItemId": "d13fce65-832c-4ca2-9c52-049579c99663",
+        "expectedChange": false,
+        "before": {
+          "usable": "30 kg",
+          "opCost": "€6.68/kg"
+        },
+        "after": {
+          "usable": "30 kg",
+          "opCost": "€6.68/kg"
+        },
+        "replay": {
+          "lineName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+          "bound": {
+            "qty": 10,
+            "unit": "un",
+            "unitPrice": 20.03,
+            "total": 200.3
+          },
+          "usableQuantity": 30000,
+          "usableUnit": "g",
+          "usableLabel": "30 kg usable",
+          "purchaseContainerCount": 10,
+          "resolveStructurePurchaseQty": 10,
+          "usableSource": "structure_recomputed",
+          "operationalCost": 6.676666666666667,
+          "operationalCostUnit": "kg",
+          "operationalCostLabel": "€6.68 / kg",
+          "structure": {
+            "tier": "bare_measure",
+            "unitMeasurement": "kg",
+            "totalUsableAmount": 3000
+          }
+        },
+        "usableMatch": true,
+        "opMatch": true,
+        "changed": false,
+        "classification": "C",
+        "classificationMatch": true
+      },
+      {
+        "key": "mozzarella",
+        "label": "Mozzarella",
+        "invoiceItemId": "095b2bb9-bd36-44c2-a1f9-7c50fa9c0cc6",
+        "expectedChange": false,
+        "before": {
+          "usableGramsOrMl": 10000,
+          "opCost": 8.12,
+          "opUnit": "kg"
+        },
+        "after": {
+          "usableGramsOrMl": 10000,
+          "opCost": 8.12,
+          "opUnit": "kg"
+        },
+        "error": "VL row not found"
+      },
+      {
+        "key": "ginger_beer",
+        "label": "Ginger Beer",
+        "invoiceItemId": "634a418b-1509-42a9-bf01-563705967b6f",
+        "expectedChange": false,
+        "before": {
+          "usable": "4.80 L",
+          "opCost": "€4.03/L"
+        },
+        "after": {
+          "usable": "4.80 L",
+          "opCost": "€4.05/L"
+        },
+        "replay": {
+          "lineName": "Baladin - Ginger Beer 0.20cl",
+          "bound": {
+            "qty": 24,
+            "unit": null,
+            "unitPrice": 0.81,
+            "total": 19.38
+          },
+          "usableQuantity": 4800,
+          "usableUnit": "ml",
+          "usableLabel": "4.8 L usable",
+          "purchaseContainerCount": 24,
+          "resolveStructurePurchaseQty": 24,
+          "usableSource": "structure_recomputed",
+          "operationalCost": 4.05,
+          "operationalCostUnit": "L",
+          "operationalCostLabel": "€4.05 / L",
+          "structure": {
+            "tier": "bare_measure",
+            "unitMeasurement": "cl",
+            "totalUsableAmount": 200
+          }
+        },
+        "usableMatch": true,
+        "opMatch": true,
+        "changed": false,
+        "classification": "C",
+        "classificationMatch": true
+      }
+    ]
+  },
+  "blastRadius": {
+    "expected": {
+      "changedItems": 1,
+      "changedProducts": [
+        "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino"
+      ],
+      "unchangedControls": 7
+    },
+    "actual": {
+      "populationScanned": 51,
+      "usableChanged": 2,
+      "changedItems": [
+        {
+          "invoiceItemId": "634a418b-1509-42a9-bf01-563705967b6f",
+          "lineName": "Baladin - Ginger Beer 0.20cl",
+          "priorUsable": 48,
+          "currentUsable": 4800,
+          "usableUnit": "ml"
+        },
+        {
+          "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+          "lineName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+          "priorUsable": 10500,
+          "currentUsable": 5996,
+          "usableUnit": "g"
+        }
+      ],
+      "guancialeInPopChanges": true,
+      "onlyExpectedPopChanges": true,
+      "unexpectedControlChanges": []
+    }
+  },
+  "population": {
+    "scanned": 51,
+    "changed": 2,
+    "rows": [
+      {
+        "invoiceItemId": "7e6f6f69-81ed-42be-a062-e28ffc015f0c",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "lineName": "Filete de Anchoas Alconfirosa LI 495 g",
+        "priorUsable": 990,
+        "currentUsable": 990,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_recomputed",
+        "tier": "bare_measure",
+        "unitMeasurement": "g"
+      },
+      {
+        "invoiceItemId": "77d804e3-b2ff-4a06-b4df-a78d3ff405a5",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "lineName": "Ovo Líquido Past.Gema Dovo 1 Kg",
+        "priorUsable": 6000,
+        "currentUsable": 6000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_recomputed",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "86d75d64-4a8a-4fc5-95d5-cd352ba29b5f",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "lineName": "Pepinos Extra Uli Frasco 6x720 g",
+        "priorUsable": 4320,
+        "currentUsable": 4320,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "count_size",
+        "unitMeasurement": "g"
+      },
+      {
+        "invoiceItemId": "c7c7f16b-917f-4ce6-80ad-e8484bda1bbe",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "lineName": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+        "priorUsable": 1000,
+        "currentUsable": 1000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_recomputed",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "8e36bac6-c3b6-4bc3-885c-e81514feba61",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "lineName": "Arroz Agulha Metro Chef 12x1 kg",
+        "priorUsable": 12000,
+        "currentUsable": 12000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "count_size",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "fa0d0138-577e-42fe-9212-fe5f53c7ead8",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "lineName": "Chocolate Culinaria Pantagruel 10x200 g",
+        "priorUsable": 2000,
+        "currentUsable": 2000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "count_size",
+        "unitMeasurement": "g"
+      },
+      {
+        "invoiceItemId": "478442d5-cf8f-4e21-a905-01b7cc327fab",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "lineName": "Açucar Branco METRO Chef 10x1 Kg",
+        "priorUsable": 10000,
+        "currentUsable": 10000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "count_size",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "2b5cea32-ec1f-4454-a4d9-cb4bb2612866",
+        "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "lineName": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+        "priorUsable": 6000,
+        "currentUsable": 6000,
+        "usableUnit": "ml",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "count_size",
+        "unitMeasurement": "L"
+      },
+      {
+        "invoiceItemId": "8476c916-26a1-4d2a-b6e7-f211560f6e95",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "lineName": "Filete de Anchovas Alconfrista Lt 495 g",
+        "priorUsable": 990,
+        "currentUsable": 990,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_recomputed",
+        "tier": "bare_measure",
+        "unitMeasurement": "g"
+      },
+      {
+        "invoiceItemId": "c3533ceb-8784-49de-a0a9-ecf168d68c40",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "lineName": "Ovo Líquido Past.Gema Dovo 1kg",
+        "priorUsable": 6000,
+        "currentUsable": 6000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_recomputed",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "a352ec6f-8e78-4752-9eee-47f900e4a916",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "lineName": "Pepinos Extra II Frasco 6X720g",
+        "priorUsable": 4320,
+        "currentUsable": 4320,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "count_size",
+        "unitMeasurement": "g"
+      },
+      {
+        "invoiceItemId": "9af131b9-159f-48d6-807b-47b6124a9045",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "lineName": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "priorUsable": 2000,
+        "currentUsable": 2000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_recomputed",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "a5771209-414e-4fd4-81eb-2b1ba7cc52a6",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "lineName": "Arroz Agulha Metro Chef 12x1kg",
+        "priorUsable": 12000,
+        "currentUsable": 12000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "count_size",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "11024922-0c2b-4daf-b178-06d622899b18",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "lineName": "Chocolate Pantagruel 10x200g",
+        "priorUsable": 2000,
+        "currentUsable": 2000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "count_size",
+        "unitMeasurement": "g"
+      },
+      {
+        "invoiceItemId": "693004ee-b902-4e18-8442-5d488e175e42",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "lineName": "Açúcar Branco Metro Chef 10x1Kg",
+        "priorUsable": 10000,
+        "currentUsable": 10000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "count_size",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "fead3fbb-df70-439c-b9e0-1ceb58cecc0e",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "lineName": "Nata Reny Picot 22% 6x1L",
+        "priorUsable": 6000,
+        "currentUsable": 6000,
+        "usableUnit": "ml",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "count_size",
+        "unitMeasurement": "L"
+      },
+      {
+        "invoiceItemId": "27144491-6c66-4f0a-a6d4-659623a785b5",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "lineName": "Mozzarella Flor di Latte 2Kg",
+        "priorUsable": 2000,
+        "currentUsable": 2000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_recomputed",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "802dc396-d1df-4724-b966-e83ff549b9b1",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "lineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "priorUsable": null,
+        "currentUsable": 10000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_scaled_outer",
+        "tier": "size_count",
+        "unitMeasurement": "g"
+      },
+      {
+        "invoiceItemId": "26c91ae4-2b93-4421-806c-8fb109531c32",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "lineName": "STRACCIATELLA 250 GR",
+        "priorUsable": null,
+        "currentUsable": 6000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_recomputed",
+        "tier": "bare_measure",
+        "unitMeasurement": "g"
+      },
+      {
+        "invoiceItemId": "8143bf0e-891e-4c89-a310-a9d7f4ea3685",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "lineName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "priorUsable": null,
+        "currentUsable": 6000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "size_count",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "6ec3a2e7-37fd-43bb-8b3c-6605b55d8480",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "lineName": "POMODORI PELATI (CX 2,5KG*6)",
+        "priorUsable": null,
+        "currentUsable": 15000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "size_count",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "5abc588c-19df-4243-926b-dbbe90922d8a",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "lineName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "priorUsable": null,
+        "currentUsable": 11250,
+        "usableUnit": "ml",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "size_count",
+        "unitMeasurement": "cl"
+      },
+      {
+        "invoiceItemId": "fe246334-bce7-4e02-bfb5-03a50b42164b",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "lineName": "RICOTTA TREVIGIANA 1,5KG",
+        "priorUsable": null,
+        "currentUsable": 3000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_recomputed",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "f377c962-ed15-436e-b4d4-2ee5b7c32664",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "lineName": "ROLO DE CABRA E VACA 1KG",
+        "priorUsable": null,
+        "currentUsable": 1000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_recomputed",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "e1fcc019-499b-46a9-a99e-e5b51a7578db",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "lineName": "Manteiga Coimbra s/Sal EMB 1 Kg",
+        "priorUsable": 1000,
+        "currentUsable": 1000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "lineName": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+        "priorUsable": null,
+        "currentUsable": null,
+        "usableUnit": null,
+        "usableChanged": false,
+        "usableSource": null,
+        "tier": null,
+        "unitMeasurement": null
+      },
+      {
+        "invoiceItemId": "f2d094ab-f50a-483d-b6cb-76554d5bf195",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "lineName": "Tomilho",
+        "priorUsable": null,
+        "currentUsable": null,
+        "usableUnit": null,
+        "usableChanged": false,
+        "usableSource": null,
+        "tier": null,
+        "unitMeasurement": null
+      },
+      {
+        "invoiceItemId": "593e7560-ba2a-4c60-8300-ff34a26335b9",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "lineName": "Salada Ibérica FSTK EMB. 250g",
+        "priorUsable": 250,
+        "currentUsable": 250,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "bare_measure",
+        "unitMeasurement": "g"
+      },
+      {
+        "invoiceItemId": "b47828a9-e042-4437-b0b7-8944c812509a",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "lineName": "Manjericão",
+        "priorUsable": 500,
+        "currentUsable": 500,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": null,
+        "tier": null,
+        "unitMeasurement": null
+      },
+      {
+        "invoiceItemId": "90823d87-6da6-414b-8a5e-1f8787db4aa9",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "lineName": "Hortelã",
+        "priorUsable": 500,
+        "currentUsable": 500,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": null,
+        "tier": null,
+        "unitMeasurement": null
+      },
+      {
+        "invoiceItemId": "0b373627-9e78-4387-9945-35a504174b93",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "lineName": "Pepino",
+        "priorUsable": 3360,
+        "currentUsable": 3360,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": null,
+        "tier": null,
+        "unitMeasurement": null
+      },
+      {
+        "invoiceItemId": "dd6efa1e-60a0-471a-87b8-0c8df1bafcf0",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "lineName": "Pêra Abacate Hasse",
+        "priorUsable": 3280,
+        "currentUsable": 3280,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": null,
+        "tier": null,
+        "unitMeasurement": null
+      },
+      {
+        "invoiceItemId": "b64d5a44-d15b-4c1e-8f25-5809fa3f5541",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "lineName": "Courgettes",
+        "priorUsable": 3300,
+        "currentUsable": 3300,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": null,
+        "tier": null,
+        "unitMeasurement": null
+      },
+      {
+        "invoiceItemId": "5700a733-3cd9-4147-8d21-cb524976a3d7",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "lineName": "Alho Francês",
+        "priorUsable": 5420,
+        "currentUsable": 5420,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": null,
+        "tier": null,
+        "unitMeasurement": null
+      },
+      {
+        "invoiceItemId": "dee41356-7df1-430e-a288-7de2a40ff979",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "lineName": "Abóbora Butternut",
+        "priorUsable": 5640,
+        "currentUsable": 5640,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": null,
+        "tier": null,
+        "unitMeasurement": null
+      },
+      {
+        "invoiceItemId": "728517aa-8578-4f6f-a415-aae06f05f5c4",
+        "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "lineName": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "priorUsable": 12000,
+        "currentUsable": 12000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_recomputed",
+        "tier": "bare_measure",
+        "unitMeasurement": "g"
+      },
+      {
+        "invoiceItemId": "4251c737-1554-4ef3-9424-0707d4889292",
+        "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "lineName": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+        "priorUsable": 1500,
+        "currentUsable": 1500,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "388d8654-69f2-46e5-999c-9a87d0efe26c",
+        "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "lineName": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+        "priorUsable": 4500,
+        "currentUsable": 4500,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "663013ff-dcf1-4741-894e-e9c453c90b80",
+        "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "lineName": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+        "priorUsable": 3500,
+        "currentUsable": 3500,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "9cdd22ba-051b-4422-a122-3e6a39e9ef8c",
+        "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "lineName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "priorUsable": 11250,
+        "currentUsable": 11250,
+        "usableUnit": "ml",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "size_count",
+        "unitMeasurement": "cl"
+      },
+      {
+        "invoiceItemId": "d45b4c8b-c47d-4e4c-ad97-d2073f1287b2",
+        "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "lineName": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+        "priorUsable": 1500,
+        "currentUsable": 1500,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "634a418b-1509-42a9-bf01-563705967b6f",
+        "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "lineName": "Baladin - Ginger Beer 0.20cl",
+        "priorUsable": 48,
+        "currentUsable": 4800,
+        "usableUnit": "ml",
+        "usableChanged": true,
+        "usableSource": "structure_recomputed",
+        "tier": "bare_measure",
+        "unitMeasurement": "cl"
+      },
+      {
+        "invoiceItemId": "a3713087-1d87-40b2-b05a-8e4bea2976f3",
+        "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "lineName": "Rovagnati - Salame Ventricina 2,5 Kg",
+        "priorUsable": 2500,
+        "currentUsable": 2500,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "lineName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "priorUsable": 10500,
+        "currentUsable": 5996,
+        "usableUnit": "g",
+        "usableChanged": true,
+        "usableSource": "row_weight_billed",
+        "tier": "size_count",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "65ced122-bedd-4f87-bc23-3b85477ebe8b",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "lineName": "Farina Speciale pizza 25kg Amoruso",
+        "priorUsable": 25000,
+        "currentUsable": 25000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_recomputed",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "lineName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "priorUsable": 7920,
+        "currentUsable": 7920,
+        "usableUnit": "ml",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "size_count",
+        "unitMeasurement": "cl"
+      },
+      {
+        "invoiceItemId": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "lineName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "priorUsable": 10000,
+        "currentUsable": 10000,
+        "usableUnit": "ml",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "size_count",
+        "unitMeasurement": "L"
+      },
+      {
+        "invoiceItemId": "d13fce65-832c-4ca2-9c52-049579c99663",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "lineName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+        "priorUsable": 30000,
+        "currentUsable": 30000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_recomputed",
+        "tier": "bare_measure",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "e418468e-cb13-44f3-93b2-1857ae6eaa4d",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "lineName": "Rulo Di Capra 1kg*2 Simonetta",
+        "priorUsable": 2000,
+        "currentUsable": 2000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": "structure_total",
+        "tier": "size_count",
+        "unitMeasurement": "kg"
+      },
+      {
+        "invoiceItemId": "53167dd9-c734-412f-9679-10b022060980",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "lineName": "Recargo por combustivel",
+        "priorUsable": null,
+        "currentUsable": null,
+        "usableUnit": null,
+        "usableChanged": false,
+        "usableSource": null,
+        "tier": null,
+        "unitMeasurement": null
+      },
+      {
+        "invoiceItemId": "d69123d3-40af-4b9e-a566-bde7a8989e49",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "lineName": "Farina do pasta fresca e gnocchi25kg Caputo",
+        "priorUsable": 25000,
+        "currentUsable": 25000,
+        "usableUnit": "g",
+        "usableChanged": false,
+        "usableSource": null,
+        "tier": null,
+        "unitMeasurement": null
+      }
+    ]
+  },
+  "tests": {
+    "command": "npm test -- src/lib/stock-normalization.test.ts src/lib/ingredient-unit-inference.test.ts",
+    "status": "pass",
+    "passed": 121,
+    "failed": 0
+  },
+  "confidence": {
+    "guancialeFix": 0.94,
+    "controlPreservation": 0.9,
+    "blastRadius": 0.88,
+    "overall": 0.9
+  }
+}

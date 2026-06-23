@@ -1,0 +1,504 @@
+{
+  "generatedAt": "2026-06-22",
+  "mode": "STRICT_READ_ONLY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "scope": "Family A extraction layer only — NOT Option C binding, NOT fix design",
+  "acceptedRootCause": {
+    "summary": "PDF/OCR/Pass C qty=1, Hybrid H qty=2, first error at Hybrid H table GPT pass",
+    "confirmedProducts": ["MEZZI PACCHERI MANCINI (CX 1KG*6)", "RICOTTA TREVIGIANA 1,5KG"],
+    "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+    "supplier": "IL BOCCONCINO",
+    "confidence": 0.88
+  },
+  "extractionOwnershipChain": [
+    {
+      "stage": 0,
+      "name": "PDF / manual geometry audit",
+      "module": ".tmp/geometry-audit/images/f0aa5a08-….png",
+      "producesQty": false,
+      "modifiesQty": false,
+      "familyAStatus": "GROUND_TRUTH — QUANT=1,000 for Ricotta and Mezzi"
+    },
+    {
+      "stage": 1,
+      "name": "Pass A — issue date",
+      "module": "invoice-date-extraction.ts → extractIssueDateFromImage",
+      "producesQty": false,
+      "modifiesQty": false,
+      "familyAStatus": "OUT_OF_SCOPE"
+    },
+    {
+      "stage": 2,
+      "name": "Pass B — supplier metadata",
+      "module": "invoice-metadata-extraction.ts → extractMetadataFromImage",
+      "producesQty": false,
+      "modifiesQty": false,
+      "familyAStatus": "NOT_FED_TO_TABLE_GPT — supplier gate unavailable at GPT call"
+    },
+    {
+      "stage": 3,
+      "name": "Pass C — footer totals",
+      "module": "invoice-footer-metadata-extraction.ts → extractFooterMetadataFromImage",
+      "producesQty": false,
+      "modifiesQty": false,
+      "familyAStatus": "knownTotal used only for empty-table retry"
+    },
+    {
+      "stage": 4,
+      "name": "Table crop geometry",
+      "module": "invoice-image-crop.ts → cropTableRegionForLineItems",
+      "producesQty": false,
+      "modifiesQty": false,
+      "familyAStatus": "ELIMINATED — 7-row passc-refinement reextract still qty=1"
+    },
+    {
+      "stage": 5,
+      "name": "Hybrid H table GPT pass",
+      "module": "invoice-table-extraction.ts → callOpenAiJson (runTableExtractionPass L346–404)",
+      "producesQty": true,
+      "modifiesQty": true,
+      "familyAStatus": "PROVEN_MUTATION_SITE — qty 1→2 first appears here (10/10 stable)"
+    },
+    {
+      "stage": 6,
+      "name": "parseMonetaryLineItems",
+      "module": "invoice-monetary-binding.ts L25–44",
+      "producesQty": false,
+      "modifiesQty": false,
+      "familyAStatus": "PRESERVES qty=2"
+    },
+    {
+      "stage": 7,
+      "name": "bindMonetaryColumns",
+      "module": "invoice-monetary-binding.ts L214–217",
+      "producesQty": false,
+      "modifiesQty": false,
+      "familyAStatus": "PRESERVES qty=2 — halves unit_price only"
+    },
+    {
+      "stage": 8,
+      "name": "reconcileLineItemAmounts",
+      "module": "invoice-line-reconcile.ts L68–85",
+      "producesQty": false,
+      "modifiesQty": false,
+      "familyAStatus": "PRESERVES — both price fields present"
+    },
+    {
+      "stage": 9,
+      "name": "finalizeExtractedLineItems",
+      "module": "invoice-table-extraction.ts → reconcileLineItemsToNetSubtotal",
+      "producesQty": false,
+      "modifiesQty": false,
+      "familyAStatus": "PRESERVES — net-subtotal rule requires qty=1"
+    },
+    {
+      "stage": 10,
+      "name": "Client normalizeInvoiceItemFields",
+      "module": "src/routes/invoices.tsx",
+      "producesQty": false,
+      "modifiesQty": false,
+      "familyAStatus": "OUT_OF_SCOPE — name cleanup only"
+    },
+    {
+      "stage": 11,
+      "name": "Persistence invoice_items",
+      "module": "src/routes/invoices.tsx → runExtraction",
+      "producesQty": false,
+      "modifiesQty": false,
+      "familyAStatus": "STORES Hybrid H qty=2"
+    }
+  ],
+  "hybridHChangeSurface": {
+    "prompt": {
+      "location": "invoice-table-extraction.ts L18–255 TABLE_EXTRACTION_SYSTEM_PROMPT",
+      "passCEraLines": 125,
+      "hybridHEraLines": 250,
+      "userMessageChanged": true,
+      "keyQtyDeltas": [
+        "Infer-from-name removed; column-faithful qty added",
+        "PACK NOTATION IS METADATA (L65–67)",
+        "POMODORI (CX 2,5KG*6) → qty 1 NOT 6 negative (L131–135)",
+        "FRACTIONAL QUANTITIES copy 1,5 exactly (L118–125)",
+        "User message couples qty + gross/discount/net column copy"
+      ],
+      "attributionRank": 1,
+      "attributionConfidence": 0.82
+    },
+    "schema": {
+      "location": "invoice-table-extraction.ts L257–293 TABLE_EXTRACTION_RESPONSE_FORMAT",
+      "passCFields": ["name", "quantity", "unit", "unit_price", "total"],
+      "hybridHFields": ["name", "quantity", "unit", "gross_unit_price", "discount_pct", "line_total_net"],
+      "enforcement": "json_object → json_schema strict (ec5f42f v23)",
+      "badPathStructuredNull": true,
+      "attributionRank": 2,
+      "attributionConfidence": 0.68
+    },
+    "gptCall": {
+      "location": "invoice-table-extraction.ts L383–399 callOpenAiJson",
+      "model": "gpt-4.1",
+      "temperature": 0,
+      "seed": 42,
+      "qtyAuthor": true,
+      "rawCaptureStatus": "MISSING — artifact-index v25HybridHRawGptCapture: none"
+    },
+    "crop": {
+      "location": "invoice-image-crop.ts → cropTableRegionForLineItems",
+      "passCEra": "5-row (pre 2edcd02)",
+      "hybridHEra": "7-row (post 2edcd02)",
+      "isolationControl": "passc-refinement 7-row reextract qty=1 vs v25 Hybrid H 7-row qty=2",
+      "attributionRank": 3,
+      "attributionConfidence": 0.22,
+      "status": "ELIMINATED_AS_PRIMARY"
+    },
+    "pipeline": {
+      "postGptStages": ["parseMonetaryLineItems", "bindMonetaryColumns", "reconcileLineItemAmounts", "finalizeExtractedLineItems"],
+      "qtyInvariantProven": true,
+      "qtyInvariantConfidence": 0.97
+    }
+  },
+  "hypothesisEvidenceStrength": [
+    {
+      "hypothesis": "crop_geometry_5_to_7_rows",
+      "supportsQty2": "partial",
+      "contradicts": "passc-refinement 7-row control qty=1; Pomodori/Rolo/Acqua correct on same 7-row crop",
+      "strength": "WEAK",
+      "confidence": 0.22
+    },
+    {
+      "hypothesis": "prompt_delta_system_and_user_message",
+      "supportsQty2": "yes",
+      "contradicts": "Pass C refinement already has anti-inflation core; explicit negatives exist yet Mezzi/Ricotta fail",
+      "strength": "MODERATE",
+      "confidence": 0.82,
+      "causalSharePct": 30
+    },
+    {
+      "hypothesis": "schema_strict_structured_monetary",
+      "supportsQty2": "possible",
+      "contradicts": "Pomodori/Rolo same schema qty=1; v23 live before v25 Family A capture",
+      "strength": "MODERATE",
+      "confidence": 0.68,
+      "causalSharePct": 25
+    },
+    {
+      "hypothesis": "prompt_schema_interaction",
+      "supportsQty2": "yes",
+      "contradicts": "Rolo control same bad-path null structured profile qty=1",
+      "strength": "STRONG",
+      "confidence": 0.74,
+      "causalSharePct": 45,
+      "primaryCause": true
+    },
+    {
+      "hypothesis": "downstream_binding_inflation",
+      "supportsQty2": "no",
+      "contradicts": "Production replay qty-invariant; bind never assigns quantity",
+      "strength": "ELIMINATED",
+      "confidence": 0.97
+    },
+    {
+      "hypothesis": "binding_option_c_symptom_fix",
+      "supportsQty2": "n/a",
+      "contradicts": "Out of scope — binding preserves qty; runtime-equivalence verdict C not equivalent",
+      "strength": "NOT_EXTRACTION",
+      "confidence": null,
+      "note": "Included for context on why extraction-first per strategy-comparison"
+    }
+  ],
+  "strategyFamilies": {
+    "A_prompt": {
+      "label": "Prompt refinement at TABLE_EXTRACTION_SYSTEM_PROMPT + user message",
+      "locus": "invoice-table-extraction.ts callOpenAiJson envelope",
+      "complexity": "HIGH",
+      "complexityScore": 2,
+      "observability": "LOW — requires live GPT invokes; bad-path raw missing",
+      "observabilityScore": 2,
+      "validationBurden": "HIGH — 10× Bocconcino stability + 15-row regression + Mammafiore counterfactual audit",
+      "validationBurdenScore": 2,
+      "blastRadiusScoped": "LOW (Bocconcino undiscounted template)",
+      "blastRadiusBroad": "MEDIUM–HIGH (Mammafiore Aceto/Rulo *2 history)",
+      "promptOnlySufficiencyConfidence": 0.40,
+      "selectableToday": false,
+      "fixDesignIncluded": false
+    },
+    "B_schema": {
+      "label": "Schema / response contract change (TABLE_EXTRACTION_RESPONSE_FORMAT)",
+      "locus": "invoice-table-extraction.ts L257–293",
+      "complexity": "HIGH",
+      "complexityScore": 2,
+      "observability": "LOW — not isolable from prompt deploy; bad-path raw missing",
+      "observabilityScore": 2,
+      "validationBurden": "HIGH — full VL re-extract; v21–v23 Ricotta/Mezzi gap",
+      "validationBurdenScore": 2,
+      "blastRadiusScoped": "MEDIUM — all table GPT outputs",
+      "blastRadiusBroad": "MEDIUM — Pomodori/Rolo unaffected today but contract change global",
+      "schemaAloneSufficient": false,
+      "selectableToday": false,
+      "fixDesignIncluded": false
+    },
+    "C_extractionValidation": {
+      "label": "Post-GPT pre-bind extraction validation gate",
+      "locus": "Between parseMonetaryLineItems and bindMonetaryColumns in runTableExtractionPass",
+      "complexity": "MEDIUM",
+      "complexityScore": 3,
+      "observability": "MEDIUM — operates on GPT JSON in-process; still needs heuristics without column OCR",
+      "observabilityScore": 3,
+      "validationBurden": "MEDIUM–HIGH — deterministic replay possible on frozen GPT output if captured; heuristics risk Rolo/Gorgonzola class",
+      "validationBurdenScore": 2,
+      "blastRadiusScoped": "MEDIUM — all table pass outputs if global",
+      "note": "Extraction-layer placement; distinct from Option C binding correction (out of scope)",
+      "selectableToday": false,
+      "fixDesignIncluded": false
+    },
+    "D_other": {
+      "label": "Other extraction-layer levers (crop, model, supplier threading, retry logic)",
+      "locus": "invoice-image-crop.ts, runTableExtractionPass retry, index.ts Pass B→D wiring",
+      "complexity": "LOW–MEDIUM",
+      "complexityScore": 3,
+      "observability": "VARIABLE",
+      "observabilityScore": 3,
+      "validationBurden": "LOW for crop (eliminated); HIGH for model change",
+      "validationBurdenScore": 3,
+      "cropStatus": "ELIMINATED",
+      "supplierThreading": "Not in table GPT prompt today — would enable template-scoped prompt only if added",
+      "selectableToday": false,
+      "fixDesignIncluded": false
+    }
+  },
+  "validationRequirementsMatrix": {
+    "ricotta": {
+      "role": "PRIMARY_FAILURE",
+      "mustCorrect": { "quantity": "2→1", "boundUnitPrice": "3.99→7.967", "usableKg": "3→1.5", "opCostPerKg": "2.66→5.31" },
+      "preFixEvidence": "10/10 qty=2 stable; passc qty=1; PDF QUANT=1,000",
+      "postFixGates": ["10× Bocconcino extract qty=1", "15-row regression unchanged controls", "phase1 forensics qty=1 replay", "VL re-ingest class C fields"],
+      "cluster": "decimal_weight_1,5KG"
+    },
+    "mezzi": {
+      "role": "PRIMARY_FAILURE",
+      "mustCorrect": { "quantity": "2→1", "boundUnitPrice": "13.65→27.30", "lastPurchaseQty": "2→1 un" },
+      "preFixEvidence": "10/10 qty=2 stable; passc qty=1; split-brain UI",
+      "postFixGates": ["10× Bocconcino extract qty=1", "usable/op €/kg remain €4.55/kg", "mismatch alert clearance"],
+      "cluster": "CX+*N pack_multiplier"
+    },
+    "pomodori": {
+      "role": "IN_INVOICE_CONTROL",
+      "mustPreserve": { "quantity": 1, "discountContext": "DESC 20%" },
+      "preFixEvidence": "10/10 qty=1; prompt negative example L131–135",
+      "postFixGates": ["qty=1 after any prompt/schema change", "discount_pct populated or legacy bleed unchanged"],
+      "riskIfPromptBroad": "LOW"
+    },
+    "rolo": {
+      "role": "HARDEST_IN_INVOICE_NEGATIVE",
+      "mustPreserve": { "quantity": 1, "stableRuns": "9/10 qty=1" },
+      "preFixEvidence": "Shares undiscounted blank DESC + unit≈total; lacks *N and 1,5KG tokens",
+      "postFixGates": ["qty=1 on baseline and run-7 variance path", "no regression on transient qty=2 run"],
+      "riskIfPromptBroad": "LOW–MEDIUM",
+      "riskIfValidationLoose": "MEDIUM–HIGH (run 7 profile)"
+    },
+    "acqua": {
+      "role": "TRUE_MULTI_QTY_CONTROL",
+      "mustPreserve": { "quantity": 2 },
+      "preFixEvidence": "PDF QUANT=2,000; not 1→2 inflation",
+      "postFixGates": ["qty=2 preserved", "pack *15 in description not conflated"],
+      "riskIfPromptBroad": "LOW"
+    },
+    "gorgonzola": {
+      "role": "CROSS_INVOICE_VARIANCE_CLASS",
+      "mustPreserve": { "quantity": "1 or 2 per GPT variance", "notFamilyA": true },
+      "preFixEvidence": "6/10 qty=2 total-preserved; Emporio layout; effective-paid would_fix confound for binding",
+      "postFixGates": ["no qty correction on Emporio discounted rows", "extraction fix must not treat as Bocconcino blank-DESC class"],
+      "riskIfPromptBroad": "LOW",
+      "riskIfExtractionValidationGlobal": "MEDIUM–HIGH"
+    },
+    "fullVlInvoice_f0aa5a08": {
+      "role": "PRIMARY_INVOICE_REGRESSION",
+      "lineCount": 7,
+      "mustCorrectLines": 2,
+      "mustPreserveLines": 5,
+      "headerTotalUnchanged": 290.64,
+      "postFixGates": [
+        "10× stability Mezzi+Ricotta qty=1",
+        "All 5 sibling lines field-identical except corrected failures",
+        "Invoice total unchanged",
+        "Dry-run re-ingest impact analysis class C fields"
+      ]
+    },
+    "fullVlCorpus": {
+      "role": "POPULATION_REGRESSION",
+      "candidateRows": 15,
+      "confirmedFailures": 2,
+      "expansionHits": 0,
+      "postFixGates": ["15-row passc+baseline comparison", "6-invoice VL corpus unchanged non-Family-A rows"]
+    }
+  },
+  "readiness": {
+    "A_proven": [
+      {
+        "item": "Root cause localized to Hybrid H table GPT pass (stage 5)",
+        "confidence": 0.91,
+        "sources": ["family-a-transition-trace", "ricotta-root-cause-trace", "mezzi-root-cause-trace"]
+      },
+      {
+        "item": "Downstream qty-invariant through bind/reconcile/finalize/persist",
+        "confidence": 0.97,
+        "sources": ["family-a-transition-trace", "family-a-runtime-equivalence"]
+      },
+      {
+        "item": "Scope bounded: 2 products, 1 invoice, 0 pattern expansion",
+        "confidence": 0.90,
+        "sources": ["family-a-scope-audit", "bug-pattern-expansion-audit"]
+      },
+      {
+        "item": "Pass C baseline qty=1 for both failures (5-row + 7-row reextract + gpt-raw cache)",
+        "confidence": 0.97,
+        "sources": ["passc-refinement-validation", "family-a-input-diff"]
+      },
+      {
+        "item": "Hybrid H qty=2 stable 10/10",
+        "confidence": 0.97,
+        "sources": ["final-stability-audit", "final-validation-lab-rerun"]
+      },
+      {
+        "item": "Crop eliminated as primary cause (7-row passc control)",
+        "confidence": 0.92,
+        "sources": ["family-a-hybrid-diff-attribution"]
+      },
+      {
+        "item": "Minimum separating combo documented",
+        "confidence": 0.75,
+        "sources": ["family-a-scope-audit"]
+      },
+      {
+        "item": "Extraction-source aligns with data-foundation principle vs Option C symptom patch",
+        "confidence": 0.85,
+        "sources": ["family-a-strategy-comparison"]
+      },
+      {
+        "item": "Option C binding not equivalent at runtime — supports extraction-first strategy",
+        "confidence": 0.88,
+        "sources": ["family-a-runtime-equivalence", "family-a-sanity-review"]
+      }
+    ],
+    "B_missingButUseful": [
+      {
+        "item": "Bad-path Hybrid H structured GPT raw JSON capture",
+        "why": "Confirm GPT emits qty=2 at source vs inference from downstream invariant",
+        "confidenceIfPresent": 0.95,
+        "sources": ["family-a-v25-raw-capture/artifact-index.json"]
+      },
+      {
+        "item": "Post-prompt/schema 10× Bocconcino stability run",
+        "why": "Required to validate any extraction-source change; current failure is 10/10 stable wrong",
+        "sources": ["family-a-strategy-validation"]
+      },
+      {
+        "item": "Prompt vs schema A/B isolation deploy",
+        "why": "Causal attribution 45% interaction; deployed atomically v21–v25",
+        "sources": ["family-a-causal-attribution"]
+      },
+      {
+        "item": "v21–v23 Ricotta/Mezzi version-staged captures",
+        "why": "Pinpoint when qty=2 first appeared between prompt-only and schema-only phases",
+        "sources": ["family-a-causal-attribution"]
+      },
+      {
+        "item": "15-row + 6-invoice regression harness execution post hypothetical prompt edit",
+        "why": "Frozen extracts cannot prove new GPT behavior",
+        "sources": ["family-a-strategy-validation", "family-a-fix-design"]
+      },
+      {
+        "item": "passc-prompt-audit counterfactual re-run after scoped prompt draft",
+        "why": "Mammafiore Aceto/Rulo *2 regression surface documented",
+        "sources": ["passc-prompt-audit", "family-a-strategy-validation"]
+      },
+      {
+        "item": "Dry-run VL re-ingest for f0aa5a08 Ricotta + Mezzi",
+        "why": "Impact analysis class C — catalog, price history, usable stock propagation",
+        "sources": ["family-a-impact-analysis", "family-a-sanity-review"]
+      },
+      {
+        "item": "Rolo run-7 transient path monitoring",
+        "why": "Same invoice GPT variance; relevant if extraction-validation heuristics added",
+        "sources": ["family-a-option-c-replay/sensitivity-result.json"]
+      }
+    ],
+    "C_blocking": [
+      {
+        "item": "Bad-path GPT raw capture absent",
+        "impact": "Cannot confirm emission-level qty=2; blocks confident prompt/schema fix selection",
+        "sources": ["family-a-v25-raw-capture/artifact-index.json"]
+      },
+      {
+        "item": "Prompt-only sufficiency assessed LOW (40%)",
+        "impact": "Existing anti-inflation rules present; Mezzi/Ricotta still fail — prompt edit alone unproven",
+        "sources": ["family-a-fix-design", "family-a-causal-attribution"]
+      },
+      {
+        "item": "Prompt vs schema not isolable without new deploy artifacts",
+        "impact": "Cannot target minimal extraction change surface",
+        "sources": ["family-a-causal-attribution"]
+      },
+      {
+        "item": "No post-fix extraction stability evidence",
+        "impact": "Cannot close validation gates for Ricotta/Mezzi or full VL invoice",
+        "sources": ["family-a-strategy-validation"]
+      },
+      {
+        "item": "Interaction primary (45%) — single-lever strategies insufficient by evidence",
+        "impact": "Prompt-only OR schema-only planning incomplete without joint validation design",
+        "sources": ["family-a-causal-attribution"]
+      },
+      {
+        "item": "Neither extraction strategy selectable today per strategy-validation",
+        "impact": "Decision gates not met for implementation",
+        "sources": ["family-a-strategy-validation"]
+      }
+    ]
+  },
+  "finalVerdict": {
+    "code": "B",
+    "label": "Plan-first — correct extraction locus, pre-implementation gates required",
+    "notA_because": "Bad-path GPT raw missing; post-prompt 10× stability not run; prompt-only sufficiency LOW; interaction model requires joint prompt+schema validation — not ready to implement",
+    "notC_because": "Root cause proven at extraction; scope closed at 2 products; passc 7-row control isolates Hybrid H delta; downstream binding ruled out; extraction-source strategically correct per strategy-comparison",
+    "recommendedSequence": [
+      "1. Capture bad-path Hybrid H structured GPT raw (capture-hybrid-h.deno.ts)",
+      "2. Characterize structured-null bad-path profile vs Rolo control at emission",
+      "3. Design joint prompt+schema validation plan (not single-lever) — planning only",
+      "4. Execute scoped prompt counterfactual audit against Mammafiore controls",
+      "5. Live 10× Bocconcino re-extract after candidate extraction change",
+      "6. Full validation matrix: Ricotta, Mezzi, Pomodori, Rolo, Acqua, Gorgonzola, f0aa5a08, 15-row corpus",
+      "7. Dry-run VL re-ingest impact before any persist"
+    ],
+    "confidence": 0.78,
+    "strategicAlignment": "Extraction-source (Hybrid H) is the correct foundation fix locus; implementation blocked until blocking items resolved",
+    "optionCContext": "Binding Option C has offline replay path but runtime-equivalence verdict C (not equivalent); sanity review NOT READY — reinforces extraction-first planning priority without selecting binding path"
+  },
+  "confidenceSummary": {
+    "rootCauseAtHybridH": 0.91,
+    "downstreamQtyInvariant": 0.97,
+    "scopeLocalizedTwoProducts": 0.90,
+    "interactionPrimaryCause": 0.74,
+    "extractionStrategyCorrectLocus": 0.85,
+    "readyToImplementExtractionFix": 0.25,
+    "overallPlanningConfidence": 0.78
+  },
+  "synthesisSources": [
+    "family-a-transition-trace",
+    "family-a-input-diff",
+    "family-a-hybrid-diff-attribution",
+    "family-a-causal-attribution",
+    "family-a-strategy-comparison",
+    "family-a-strategy-validation",
+    "family-a-fix-design",
+    "family-a-v25-raw-capture",
+    "passc-refinement-validation",
+    "ricotta-root-cause-trace",
+    "mezzi-root-cause-trace",
+    "bug-pattern-expansion-audit",
+    "family-a-scope-audit",
+    "family-a-runtime-equivalence",
+    "family-a-sanity-review",
+    "family-a-impact-analysis",
+    "family-a-implementation-prep"
+  ]
+}

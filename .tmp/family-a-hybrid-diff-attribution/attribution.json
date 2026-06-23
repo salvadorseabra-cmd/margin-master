@@ -1,0 +1,201 @@
+{
+  "generatedAt": "2026-06-22T00:00:00.000Z",
+  "mode": "STRICT_READ_ONLY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "scope": "Prompt, Crop, Schema only — no downstream",
+  "targetRows": [
+    "RICOTTA TREVIGIANA 1,5KG",
+    "MEZZI PACCHERI MANCINI (CX 1KG*6)"
+  ],
+  "artifactGaps": [
+    "No archived Hybrid H structured GPT raw JSON (family-a-v25-raw-capture/artifact-index.json)"
+  ],
+  "quantities": {
+    "pdfOcr": { "ricotta": 1, "mezzi": 1 },
+    "passC5RowCrop": { "ricotta": 1, "mezzi": 1, "source": "bocconcino-investigation/extract-invoice-response.json" },
+    "passC7RowReextract": { "ricotta": 1, "mezzi": 1, "source": "passc-refinement-validation/reextract/f0aa5a08-86a3-4938-99f0-711e86073968.json", "extractedAt": "2026-06-11" },
+    "hybridHv25": { "ricotta": 2, "mezzi": 2, "stability": "10/10", "source": "final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json", "deployVersion": 25 }
+  },
+  "promptDiff": {
+    "passCSource": ".tmp/passc-prompt-audit/passc-prompt.txt",
+    "hybridHSource": "supabase/functions/extract-invoice/invoice-table-extraction.ts TABLE_EXTRACTION_SYSTEM_PROMPT",
+    "sections": [
+      { "section": "JSON schema in prompt", "passC": "{ name, quantity, unit, unit_price, total }", "hybridH": "{ name, quantity, unit, gross_unit_price, discount_pct, line_total_net }", "new": true },
+      { "section": "User message", "passC": "Extract all invoice line items from this restaurant invoice table image.", "hybridH": "Extract each visible invoice line item. Copy quantity, gross_unit_price, discount_pct, and line_total_net from their labeled table columns.", "new": true },
+      { "section": "Infer qty from description", "passC": "But DO infer quantity/unit when clearly present inside product names", "hybridH": "Descriptions NEVER override table quantities or prices", "new": true },
+      { "section": "Pack-count examples", "passC": "Coca-Cola Pack 24 → qty 24; Caixa 40 un → 40", "hybridH": "PACK NOTATION IS METADATA — *N not purchased qty", "new": true },
+      { "section": "COLUMN-FAITHFUL EXTRACTION", "passC": "absent", "hybridH": "full section L36-46", "new": true },
+      { "section": "QUANTITY COLUMN ISOLATION", "passC": "absent in snapshot", "hybridH": "L71-78", "new": true },
+      { "section": "FRACTIONAL QUANTITIES (1,5)", "passC": "absent", "hybridH": "L118-125 copy 0,5/1,5 exactly", "new": true },
+      { "section": "POMODORI CX+*N negative", "passC": "absent", "hybridH": "L131-135 qty 1 NOT 6", "new": true },
+      { "section": "Rulo/Aceto *2 negatives", "passC": "absent", "hybridH": "L159-165 qty 1 NOT 2", "new": true },
+      { "section": "Bocconcino DESC rule", "passC": "absent", "hybridH": "L240 Bocconcino DESC 20% → discount_pct", "new": true },
+      { "section": "Acém 15kg example", "passC": "infer qty 15 from name", "hybridH": "qty null when no column", "new": true },
+      { "section": "PRICE ACCURACY", "passC": "unit_price + total authoritative", "hybridH": "gross_unit_price + discount_pct + line_total_net from columns", "new": true }
+    ],
+    "quantityInstructionsAddedInHybridH": [
+      "Copy quantity ONLY from the quantity column. Never override with numbers from the description.",
+      "Descriptions NEVER override table quantities or prices.",
+      "PACK NOTATION IN DESCRIPTIONS IS METADATA (*2, *6, *24, x15, 1kg*2, CX6, (CX 2.5KG*6))",
+      "When quantity column AND description disagree → ALWAYS trust the quantity column.",
+      "QUANTITY COLUMN ISOLATION — qty never from PREÇO, VALOR, or description pack tokens.",
+      "Do not take the leading digit of a price (e.g. 9,99) as quantity.",
+      "Açúcar negative: qty 1 NOT 9 from 9,99.",
+      "FRACTIONAL QUANTITIES — copy 0,5/1,5 exactly; do NOT round 0,5 to 1.",
+      "POMODORI (CX 2,5KG*6) → qty 1 NOT 6.",
+      "Aceto pet 5l*2 → qty 1 NOT 2.",
+      "Rulo 1kg*2 → qty 1 NOT 2.",
+      "Ginger Beer → qty 2 NOT 24.",
+      "User message: Copy quantity from labeled table columns.",
+      "Acém: no qty column → null (reverses Pass C infer-15-from-name)."
+    ],
+    "quantityInstructionsRemovedFromPassC": [
+      "But DO infer quantity/unit when clearly present inside product names",
+      "Pack 24 → quantity 24 positive examples",
+      "Acém 15kg → quantity 15 from description weight"
+    ]
+  },
+  "schemaDiff": {
+    "fields": [
+      { "field": "name", "passC": "string", "hybridH": "string", "change": "unchanged" },
+      { "field": "quantity", "passC": "number|null", "hybridH": "number|null", "change": "type unchanged; prompt semantics changed to column-only" },
+      { "field": "unit", "passC": "string|null", "hybridH": "string|null", "change": "unchanged" },
+      { "field": "unit_price", "passC": "number|null", "hybridH": "removed from GPT schema", "change": "removed" },
+      { "field": "total", "passC": "number|null", "hybridH": "removed from GPT schema", "change": "removed" },
+      { "field": "gross_unit_price", "passC": "absent", "hybridH": "number|null", "change": "new" },
+      { "field": "discount_pct", "passC": "absent", "hybridH": "number|null", "change": "new" },
+      { "field": "line_total_net", "passC": "absent", "hybridH": "number|null", "change": "new" }
+    ],
+    "responseFormat": {
+      "passC": "json_object",
+      "hybridH": "json_schema strict invoice_line_items"
+    },
+    "quantityMeaningChanged": true,
+    "quantityMeaningNote": "Prompt: infer-from-name allowed (Pass C) → column-only (Hybrid H). JSON type unchanged.",
+    "familyABadPathStructuredFields": {
+      "ricotta": { "gross_unit_price": null, "discount_pct": null, "line_total_net": null },
+      "mezzi": { "gross_unit_price": null, "discount_pct": null, "line_total_net": null }
+    }
+  },
+  "cropDiff": {
+    "passC": { "rows": 5, "top": 561, "bottom": 881, "source": "bocconcino-investigation/crop-bounds.json" },
+    "hybridH": { "rows": 7, "source": "hallucination-audit/REPORT.md post 2edcd02" },
+    "rowVisibility": [
+      { "row": "MOZZARELLA FIOR DI LATTE 125GR*8", "passCVisible": false, "hybridHVisible": true, "onlyInHybridH": true },
+      { "row": "STRACCIATELLA 250 GR", "passCVisible": "partial_metadata_only", "hybridHVisible": true, "onlyInHybridH": true },
+      { "row": "MEZZI PACCHERI MANCINI (CX 1KG*6)", "passCVisible": true, "hybridHVisible": true, "onlyInHybridH": false },
+      { "row": "POMODORI PELATI (CX 2,5KG*6)", "passCVisible": true, "hybridHVisible": true, "onlyInHybridH": false },
+      { "row": "ACQUA S.PELLEGRINO (CX 75CL*15)", "passCVisible": true, "hybridHVisible": true, "onlyInHybridH": false },
+      { "row": "RICOTTA TREVIGIANA 1,5KG", "passCVisible": true, "hybridHVisible": true, "onlyInHybridH": false },
+      { "row": "ROLO DE CABRA E VACA 1KG", "passCVisible": true, "hybridHVisible": true, "onlyInHybridH": false }
+    ],
+    "rowsOnlyInHybridHCrop": [
+      "MOZZARELLA FIOR DI LATTE (full row)",
+      "STRACCIATELLA 250 GR (full row vs metadata fragment in Pass C)"
+    ],
+    "neighbours": {
+      "ricotta": {
+        "passC": { "above": "ACQUA qty=2", "below": "ROLO qty=1", "indexInCrop": "4/5" },
+        "hybridH": { "above": "ACQUA qty=2", "below": "ROLO qty=1", "indexInCrop": "6/7" }
+      },
+      "mezzi": {
+        "passC": { "above": "none_first_complete_row", "below": "POMODORI qty=1", "indexInCrop": "1/5" },
+        "hybridH": { "above": "MOZZARELLA qty=10, STRACCIATELLA qty=24", "below": "POMODORI qty=1", "indexInCrop": "3/7" }
+      }
+    },
+    "isolationControl": {
+      "passC7RowReextract": {
+        "source": "passc-refinement-validation/reextract/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+        "date": "2026-06-11",
+        "ricottaQty": 1,
+        "mezziQty": 1,
+        "rowCount": 7
+      },
+      "hybridH7Row": {
+        "source": "final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+        "date": "2026-06-12",
+        "ricottaQty": 2,
+        "mezziQty": 2,
+        "rowCount": 7
+      },
+      "conclusion": "Same 7-row crop geometry; Pass C-era qty=1, Hybrid H qty=2 — crop delta alone cannot explain qty=2"
+    }
+  },
+  "familyASignalElimination": [
+    { "signal": "1,5KG decimal weight (Ricotta)", "visiblePassC": true, "visibleHybridH": true, "both": true, "eliminated": true, "reason": "Pass C qty=1 with same OCR token" },
+    { "signal": "CX 1KG*6 pack notation (Mezzi)", "visiblePassC": true, "visibleHybridH": true, "both": true, "eliminated": true, "reason": "Pass C qty=1 with same token" },
+    { "signal": "blank DESC undiscounted", "visiblePassC": true, "visibleHybridH": true, "both": true, "eliminated": true, "reason": "Rolo shares; Hybrid H qty=1" },
+    { "signal": "unit_price ≈ total at qty=1", "visiblePassC": true, "visibleHybridH": true, "both": true, "eliminated": true, "reason": "Necessary not sufficient; Rolo qty=1" },
+    { "signal": "neighbouring Acqua qty=2", "visiblePassC": true, "visibleHybridH": true, "both": true, "eliminated": true, "reason": "Legitimate PDF multi-qty control" },
+    { "signal": "neighbouring Pomodori discount DESC 20%", "visiblePassC": true, "visibleHybridH": true, "both": true, "eliminated": true, "reason": "Pomodori Hybrid H qty=1" },
+    { "signal": "row ordering in crop", "visiblePassC": "differs_5vs7", "visibleHybridH": true, "both": false, "eliminated": true, "reason": "passc-refinement 7-row same order as Hybrid H; qty=1" },
+    { "signal": "supplier IL BOCCONCINO context", "visiblePassC": false, "visibleHybridH": false, "both": true, "eliminated": true, "reason": "Not in table GPT prompt" },
+    { "signal": "Mozzarella qty=10 / Stracciatella qty=24 above Mezzi", "visiblePassC": false, "visibleHybridH": true, "both": false, "eliminated": true, "reason": "Present in passc-refinement 7-row; Mezzi qty=1" },
+    { "signal": "QUANT column 1,000", "visiblePassC": true, "visibleHybridH": true, "both": true, "eliminated": true, "reason": "PDF ground truth; Pass C correct" }
+  ],
+  "eliminationTable": [
+    { "candidate": "prompt additions", "presentOnlyInHybridH": true, "couldExplainQty2": true },
+    { "candidate": "schema additions", "presentOnlyInHybridH": true, "couldExplainQty2": "possible_correlated" },
+    { "candidate": "additional crop rows", "presentOnlyInHybridH": "vs_5row_only", "couldExplainQty2": false },
+    { "candidate": "supplier metadata", "presentOnlyInHybridH": false, "couldExplainQty2": false },
+    { "candidate": "monetary binding", "presentOnlyInHybridH": true, "couldExplainQty2": false, "note": "downstream out of scope; qty-invariant" },
+    { "candidate": "reconcile", "presentOnlyInHybridH": false, "couldExplainQty2": false, "note": "downstream out of scope" },
+    { "candidate": "persistence", "presentOnlyInHybridH": false, "couldExplainQty2": false, "note": "out of scope" }
+  ],
+  "candidateRanking": [
+    {
+      "rank": 1,
+      "candidate": "Hybrid H prompt delta (system + user message)",
+      "evidence": [
+        "passc-refinement 7-row reextract 2026-06-11: ricotta qty=1, mezzi qty=1",
+        "final-validation-lab-rerun v25 2026-06-12: ricotta qty=2, mezzi qty=2 stable 10/10",
+        "Same crop row set and identical target-row OCR text between controls",
+        "Pass C infer-from-name + pack examples replaced by column-faithful + PACK METADATA"
+      ]
+    },
+    {
+      "rank": 2,
+      "candidate": "Structured response schema (gross_unit_price, discount_pct, line_total_net)",
+      "evidence": [
+        "Deployed atomically with prompt; cannot isolate",
+        "Family A rows return null structured fields at API layer",
+        "Pomodori/Rolo same schema on same invoice yield qty=1"
+      ]
+    },
+    {
+      "rank": 3,
+      "candidate": "Crop geometry 5→7 rows",
+      "evidence": [
+        "True for DB-ingest-era 5-row Pass C vs 7-row Hybrid H",
+        "Disproven as primary: passc-refinement 7-row control qty=1",
+        "Mozzarella/Stracciatella neighbours do not correlate with qty=2"
+      ]
+    }
+  ],
+  "confidence": {
+    "pdfOcrQty1": 0.97,
+    "passCEmitsQty1": 0.97,
+    "hybridHEmitsQty2Stable": 0.97,
+    "downstreamQtyInvariant": 0.97,
+    "cropAloneDoesNotExplain": 0.92,
+    "promptDeltaMostLikely": 0.82,
+    "schemaDeltaSecondMostLikely": 0.68,
+    "badPathGptRawQtyEquals2": 0.78,
+    "overall": 0.80
+  },
+  "sources": [
+    "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+    ".tmp/passc-prompt-audit/passc-prompt.txt",
+    ".tmp/passc-refinement-validation/reextract/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+    ".tmp/persistence-audit/pass-c-raw/f0aa5a08-86a3-4938-99f0-711e86073968-gpt-raw-cache.json",
+    ".tmp/bocconcino-investigation/",
+    ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+    ".tmp/final-stability-audit/extracts/f0aa5a08-86a3-4938-99f0-711e86073968-all-runs.json",
+    ".tmp/family-a-input-diff/",
+    ".tmp/family-a-transition-trace/",
+    ".tmp/family-a-v25-raw-capture/",
+    ".tmp/family-a-scope-audit/audit-result.json",
+    ".tmp/hallucination-audit/REPORT.md"
+  ]
+}

@@ -1,0 +1,184 @@
+{
+  "generatedAt": "2026-06-22T00:00:00.000Z",
+  "mode": "STRICT_READ_ONLY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "scope": "Prompt vs Schema causality only",
+  "targetRows": [
+    "RICOTTA TREVIGIANA 1,5KG",
+    "MEZZI PACCHERI MANCINI (CX 1KG*6)"
+  ],
+  "artifactGaps": [
+    "No archived Hybrid H structured GPT raw JSON (family-a-v25-raw-capture/artifact-index.json)",
+    "No Ricotta/Mezzi captures at v21-v23 deploys"
+  ],
+  "quantities": {
+    "pdfOcr": { "ricotta": 1, "mezzi": 1 },
+    "passC7RowReextract": {
+      "ricotta": 1,
+      "mezzi": 1,
+      "source": "passc-refinement-validation/reextract/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+      "extractedAt": "2026-06-11"
+    },
+    "hybridHv25Plus": {
+      "ricotta": 2,
+      "mezzi": 2,
+      "stability": "10/10",
+      "source": "final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+      "deployVersions": [25, 26, 28, 30, 36]
+    }
+  },
+  "timeline": [
+    { "change": "crop_5_to_7_rows", "commit": "2edcd02", "date": "2026-06-10", "sameDeployAsFamilyA": false, "note": "passc-refinement 7-row control qty=1" },
+    { "change": "pass_c_column_faithful_prompt", "commit": "c33a7f1", "date": "2026-06-11T01:48:34+0100", "sameDeployAsFamilyA": false },
+    { "change": "pass_c_refinement_isolation_fractional", "commit": "04c0d88", "date": "2026-06-11T02:05:29+0100", "sameDeployAsFamilyA": false },
+    { "change": "model", "value": "gpt-4.1", "sameDeployAsFamilyA": false },
+    { "change": "hybrid_h_phase_1_2_prompt", "commit": "65452a9", "deployVersion": 21, "deployedAt": "2026-06-11T23:19:43Z", "sameDeployAsFamilyA": "partial", "note": "prompt live v21; Family A first at v25" },
+    { "change": "phase_3_monetary_binder", "commit": "de556e0", "deployVersion": 22, "deployedAt": "2026-06-11T23:35:30Z", "sameDeployAsFamilyA": false, "note": "qty-invariant downstream" },
+    { "change": "strict_json_schema", "commit": "ec5f42f", "deployVersion": 23, "deployedAt": "2026-06-12T00:03:48Z", "sameDeployAsFamilyA": "partial", "note": "schema live v23; Family A first at v25" },
+    { "change": "emporio_discount_prompt", "commit": "792adb8", "date": "2026-06-12T23:06:53+0100", "sameDeployAsFamilyA": false },
+    { "change": "family_a_qty_2_first_observed", "deployVersion": 25, "date": "2026-06-12T22:44:37Z", "sameDeployAsFamilyA": true }
+  ],
+  "versionStagedControls": {
+    "pomodorProxy": [
+      { "version": "pass_c_reextract", "pomodorQty": 2, "ricottaMezziCaptured": true, "ricottaQty": 1, "mezziQty": 1 },
+      { "version": 21, "pomodorQty": 1, "ricottaMezziCaptured": false, "source": "monetary-binding-final-validation/pomodor-5run-stability.json" },
+      { "version": 22, "pomodorQty": 1, "ricottaMezziCaptured": false, "source": "monetary-binding-final-validation/v22-final-validation-report.md" },
+      { "version": 23, "pomodorQty": 1, "ricottaMezziCaptured": false, "source": "monetary-binding-final-validation/pomodor-v23-stability.json" },
+      { "version": 25, "pomodorQty": 1, "ricottaMezziCaptured": true, "ricottaQty": 2, "mezziQty": 2 }
+    ],
+    "preV21Bocconcino": {
+      "source": "bocconcino-hybrid-validation/deployed-extract.json",
+      "ricottaQty": 1,
+      "mezziQty": 1,
+      "note": "Pass C era pre-v21 deploy"
+    }
+  },
+  "promptCausality": {
+    "instructionsAdded": [
+      { "instruction": "User message: copy quantity + gross_unit_price + discount_pct + line_total_net together", "couldIncreaseInflation": true, "couldDecrease": false, "classification": "supports_prompt_interaction" },
+      { "instruction": "TOTAL COLUMN ISOLATION: when qty>1, line_total_net should exceed gross_unit_price", "couldIncreaseInflation": true, "couldDecrease": false, "classification": "supports_prompt" },
+      { "instruction": "ROW-ISOLATION MONETARY COLUMNS", "couldIncreaseInflation": false, "couldDecrease": false, "classification": "neutral" },
+      { "instruction": "Emporio / Mammafiore dense-table blocks", "couldIncreaseInflation": false, "couldDecrease": false, "classification": "neutral" },
+      { "instruction": "PACK NOTATION IS METADATA", "couldIncreaseInflation": false, "couldDecrease": true, "classification": "contradicts" },
+      { "instruction": "Copy quantity ONLY from quantity column", "couldIncreaseInflation": false, "couldDecrease": true, "classification": "contradicts" },
+      { "instruction": "FRACTIONAL QUANTITIES — copy 1,5 exactly", "couldIncreaseInflation": false, "couldDecrease": true, "classification": "contradicts" },
+      { "instruction": "POMODORI/Rulo/Aceto *N negatives", "couldIncreaseInflation": false, "couldDecrease": true, "classification": "contradicts" }
+    ],
+    "instructionsRemoved": [
+      { "instruction": "Infer quantity/unit from product names", "effect": "decrease_inflation", "classification": "contradicts_prompt_cause" },
+      { "instruction": "Pack-count positive examples (Pack 24 → qty 24)", "effect": "decrease_inflation", "classification": "contradicts_prompt_cause" }
+    ],
+    "summary": "Hybrid adds more anti-inflation than pro-inflation qty rules; Pass C refinement with overlapping core produced qty=1"
+  },
+  "schemaCausality": {
+    "fieldChanges": [
+      { "field": "quantity", "passC": "number|null", "hybridH": "number|null", "qtyMeaningChanged": false },
+      { "field": "unit_price", "passC": "in GPT contract", "hybridH": "removed from strict schema (ec5f42f)", "qtyImpact": "blocks legacy direct-copy escape hatch" },
+      { "field": "total", "passC": "in GPT contract", "hybridH": "removed", "qtyImpact": "blocks legacy closure path" },
+      { "field": "gross_unit_price", "passC": "absent", "hybridH": "required nullable", "qtyImpact": "model must emit; often null on bad path" },
+      { "field": "discount_pct", "passC": "absent", "hybridH": "required nullable", "qtyImpact": "null on blank DESC rows" },
+      { "field": "line_total_net", "passC": "absent", "hybridH": "required nullable", "qtyImpact": "null on bad path" }
+    ],
+    "enforcement": { "passC": "json_object", "hybridH": "json_schema strict" },
+    "familyABadPath": {
+      "ricotta": { "gross_unit_price": null, "discount_pct": null, "line_total_net": null, "quantity": 2 },
+      "mezzi": { "gross_unit_price": null, "discount_pct": null, "line_total_net": null, "quantity": 2 },
+      "pomodoriControl": { "gross_unit_price": null, "discount_pct": null, "line_total_net": null, "quantity": 1 },
+      "roloControl": { "gross_unit_price": null, "discount_pct": null, "line_total_net": null, "quantity": 1 }
+    },
+    "summary": "Schema shift is monetary-contract; same strict schema yields qty=1 on Pomodori and Rolo"
+  },
+  "familyACompatibility": {
+    "ricotta": {
+      "signals": ["decimal_weight_1,5KG", "blank_DESC", "unit_approx_total", "QUANT_1"],
+      "promptWouldAffect": "partial — fractional rule contradicts inflation",
+      "schemaWouldAffect": "bad-path null structured — shared with Rolo",
+      "bothRequired": true
+    },
+    "mezzi": {
+      "signals": ["CX_1KG*6_pack_notation", "blank_DESC", "unit_approx_total", "QUANT_1"],
+      "promptWouldAffect": "partial — pack-metadata negatives contradict inflation",
+      "schemaWouldAffect": "bad-path null structured — shared with Rolo",
+      "bothRequired": true
+    },
+    "nearestControl": {
+      "product": "ROLO DE CABRA E VACA 1KG",
+      "sharedWithFamilyA": ["blank_DESC", "undiscounted", "unit_approx_total", "same_strict_schema", "same_invoice"],
+      "differentiator": "no *N pack multiplier; no 1,5KG decimal weight token",
+      "hybridHQty": 1
+    },
+    "minimumSeparatingCombo": [
+      "ocr_qty_eq_1",
+      "hybrid_h_qty_eq_2_stable",
+      "undiscounted_blank_DESC",
+      "unit_price_approx_total_at_qty1",
+      "supplier_il_bocconcino",
+      "pack_or_weight_token_in_description"
+    ]
+  },
+  "contradictions": {
+    "againstPromptPrimary": [
+      "passc-refinement 7-row reextract qty=1 with overlapping anti-inflation prompt core",
+      "explicit POMODORI/FRACTIONAL/PACK METADATA negatives exist yet Family A still qty=2",
+      "v21 Hybrid prompt deployed before v25 Family A capture; pre-v21 Mezzi/Ricotta qty=1",
+      "removed infer-from-name should decrease inflation"
+    ],
+    "againstSchemaPrimary": [
+      "Pomodori and Rolo same strict schema on same invoice — qty=1",
+      "v23 strict schema before v25 without captured Family A regression",
+      "quantity field type unchanged",
+      "downstream binding preserves qty=2 — inflation pre-binder"
+    ],
+    "againstInteractionPrimary": [
+      "Rolo shares undiscounted blank-DESC bad-path profile — qty=1",
+      "no raw GPT JSON proving structured-null + qty=2 co-emission",
+      "v21-v23 Ricotta/Mezzi not captured"
+    ]
+  },
+  "probabilityAttribution": {
+    "promptPct": 30,
+    "schemaPct": 25,
+    "interactionPct": 45,
+    "assumptions": [
+      "First qty deviation at table GPT pass (downstream qty-invariant proven)",
+      "passc-refinement 7-row reextract valid Pass C-era control",
+      "v21-v23 absence of Family A captures widens uncertainty",
+      "Rolo is strongest in-invoice differential control",
+      "Crop, binding, reconcile, persistence excluded per prior work"
+    ]
+  },
+  "finalAssessment": {
+    "choice": "C",
+    "label": "Interaction primary",
+    "rationale": "Prompt-only and schema-only each fail Rolo control and Pass C 7-row isolation. Joint strict-schema bad-path plus description pack/weight tokens best explains Family A subset."
+  },
+  "confidence": {
+    "pdfOcrQty1": 0.97,
+    "passCEmitsQty1": 0.97,
+    "hybridHEmitsQty2Stable": 0.97,
+    "downstreamQtyInvariant": 0.97,
+    "cropEliminated": 0.92,
+    "familyAFirstAtV25": 0.90,
+    "promptSchemaNotIsolable": 0.88,
+    "interactionMoreLikelyThanEitherAlone": 0.74,
+    "badPathGptRawQtyEquals2": 0.78,
+    "overall": 0.72
+  },
+  "sources": [
+    ".tmp/family-a-hybrid-diff-attribution/",
+    ".tmp/family-a-input-diff/",
+    ".tmp/family-a-transition-trace/",
+    ".tmp/passc-refinement-validation/reextract/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+    ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+    ".tmp/final-stability-audit/extracts/f0aa5a08-86a3-4938-99f0-711e86073968-all-runs.json",
+    ".tmp/family-a-v25-raw-capture/artifact-index.json",
+    ".tmp/family-a-scope-audit/audit-result.json",
+    ".tmp/bocconcino-hybrid-validation/deployed-extract.json",
+    ".tmp/monetary-binding-final-validation/pomodor-5run-stability.json",
+    ".tmp/monetary-binding-final-validation/pomodor-v23-stability.json",
+    ".tmp/structured-monetary-trace/REPORT.md",
+    ".tmp/passc-prompt-audit/passc-prompt.txt",
+    "supabase/functions/extract-invoice/invoice-table-extraction.ts"
+  ]
+}

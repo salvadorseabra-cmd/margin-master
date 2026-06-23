@@ -1,0 +1,223 @@
+{
+  "generatedAt": "2026-06-21T00:00:00.000Z",
+  "vl": "bjhnlrgodcqoyzddbpbd",
+  "methodology": {
+    "scope": "19 quantity-mismatch rows from mismatches.json",
+    "codePaths": [
+      "bindMonetaryColumns",
+      "resolveInvoiceLinePurchaseFormat",
+      "resolveCountablePurchaseQuantityForCost",
+      "recipeOperationalCostFieldsFromInvoiceLine",
+      "resolveInvoiceLinePricingPresentation",
+      "resolveInvoiceLineStockPresentation",
+      "formatRowPurchaseQuantityLabel",
+      "buildLastPurchaseCostPresentation (ingredient-detail-operational-layout.tsx)"
+    ],
+    "uiSurfaces": [
+      "Purchase economics card: Last Purchase, Procurement Cost, Operational Cost",
+      "Matched invoice product usable quantity label (normalizedUsableQuantityLabel)"
+    ],
+    "classificationRules": {
+      "A": "UI contradicts invoice reality or shows materially wrong economics/usable stock",
+      "B": "Ambiguous interpretation; UI partially correct but misleading",
+      "C": "Internal stored purchase_quantity may differ; displayed economics match invoice operational reality"
+    }
+  },
+  "summary": {
+    "totalRows": 19,
+    "uniqueIngredients": 16,
+    "A_confirmedBug": 4,
+    "B_suspicious": 0,
+    "C_operationallyCorrect": 15,
+    "familyARows": 2,
+    "familyAUserVisibleBugs": 1,
+    "familyAOperationallyCorrect": 1
+  },
+  "conclusion": {
+    "onlyRicottaMezziPattern": false,
+    "realUserVisibleBugs": [
+      "Ginger beer — volume parse (0.20cl → 2 ml/bottle)",
+      "Mezzi paccheri mancini — usable 6 kg for 2 cases (should 12 kg)",
+      "Mozzarella fior di latte — usable 1 kg for 10 packs (should 10 kg)",
+      "Guanciale stagionato — usable 10.5 kg from *7 pack notation vs ~6 kg weight line"
+    ],
+    "familyANote": "Ricotta trevigiana (Family A) shows correct UI economics; Mezzi paccheri (Family A) shows wrong usable quantity despite correct Last Purchase count.",
+    "collapsePatternNote": "9 multi-unit collapse rows (Anchoas, Gema, Atum, Stracciatella, Mozzarella julienne) show correct Purchase economics card despite stored purchase_quantity=1; not user-visible bugs on detail page.",
+    "packInnerCountNote": "8 pack-inner-count rows (Pomodori, S.Pellegrino×2, Paccheri, Peroni, Aceto, Rulo) show correct total/usable operational math; criterion-3 mismatch is internal only."
+  },
+  "rows": [
+    {
+      "invoiceItemId": "7e6f6f69-81ed-42be-a062-e28ffc015f0c",
+      "ingredient": "Anchoas",
+      "lineName": "Filete de Anchoas Alconfirosa LI 495 g",
+      "classification": "C",
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "Last Purchase 2 un, usable 990 g, operational €20.18/kg = €19.98÷0.99 kg; per-can procurement €9.99 matches invoice."
+    },
+    {
+      "invoiceItemId": "77d804e3-b2ff-4a06-b4df-a78d3ff405a5",
+      "ingredient": "Gema líquida",
+      "lineName": "Ovo Líquido Past.Gema Dovo 1 Kg",
+      "classification": "C",
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "Last Purchase 6 un, usable 6 kg, operational €10.49/kg matches €62.94÷6 kg."
+    },
+    {
+      "invoiceItemId": "8476c916-26a1-4d2a-b6e7-f211560f6e95",
+      "ingredient": "Anchoas",
+      "lineName": "Filete de Anchovas Alconfrista Lt 495 g",
+      "classification": "C",
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "Last Purchase 2 un, usable 990 g, operational €19.17/kg = €18.98÷0.99 kg."
+    },
+    {
+      "invoiceItemId": "c3533ceb-8784-49de-a0a9-ecf168d68c40",
+      "ingredient": "Gema líquida",
+      "lineName": "Ovo Líquido Past.Gema Dovo 1kg",
+      "classification": "C",
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "Last Purchase 6 un, usable 6 kg, operational €10.19/kg = €61.14÷6 kg."
+    },
+    {
+      "invoiceItemId": "9af131b9-159f-48d6-807b-47b6124a9045",
+      "ingredient": "Atum em óleo",
+      "lineName": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+      "classification": "C",
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "Last Purchase 2 un, usable 2 kg, operational €6.29/kg = €12.58÷2 kg."
+    },
+    {
+      "invoiceItemId": "095b2bb9-bd36-44c2-a1f9-7c50fa9c0cc6",
+      "ingredient": "Mozzarella fior di latte",
+      "lineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "classification": "A",
+      "mathCorrect": false,
+      "userVisibleBug": true,
+      "reason": "Invoice 10 packs (10×1 kg = 10 kg). UI usable 1 kg; operational €81.20/kg is 10× inflated vs true €8.12/kg."
+    },
+    {
+      "invoiceItemId": "da2ad0fc-eb56-4506-8ba4-ae22b3cb6a5a",
+      "ingredient": "Stracciatella",
+      "lineName": "STRACCIATELLA 250 GR",
+      "classification": "C",
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "Last Purchase 24 un, usable 6 kg (24×250 g), operational €12.44/kg = €74.54÷6 kg."
+    },
+    {
+      "invoiceItemId": "bb4bbfac-a59b-4d0b-9844-ba773c1f261e",
+      "ingredient": "Mezzi paccheri mancini",
+      "lineName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "classification": "A",
+      "familyA": true,
+      "mathCorrect": false,
+      "userVisibleBug": true,
+      "reason": "Invoice 2 cases (12 kg). UI usable 6 kg (one case); operational €4.55/kg uses wrong denominator. Last Purchase 2 un contradicts 6 kg usable."
+    },
+    {
+      "invoiceItemId": "fd24d2dc-238a-43f2-ac2a-755361a083f0",
+      "ingredient": "Pomodori pelati",
+      "lineName": "POMODORI PELATI (CX 2,5KG*6)",
+      "classification": "C",
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "1 case → usable 15 kg (6×2.5 kg), operational €1.47/kg = €22.05÷15 kg."
+    },
+    {
+      "invoiceItemId": "f25feb92-3477-41a4-9a81-c556a90a0814",
+      "ingredient": "Água san pellegrino",
+      "lineName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "classification": "C",
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "2 cases → usable 11.25 L, operational €3.73/L ≈ €42.07÷11.25 L."
+    },
+    {
+      "invoiceItemId": "409850ab-646d-44fa-b20c-c8a4a8570064",
+      "ingredient": "Ricotta trevigiana",
+      "lineName": "RICOTTA TREVIGIANA 1,5KG",
+      "classification": "C",
+      "familyA": true,
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "Family A internal collapse (stored PQ=1) but UI shows Last Purchase 2 un, usable 3 kg, operational €2.66/kg = €7.97÷3 kg — all match invoice."
+    },
+    {
+      "invoiceItemId": "728517aa-8578-4f6f-a415-aae06f05f5c4",
+      "ingredient": "Paccheri lisci",
+      "lineName": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "classification": "C",
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "24×500 g → usable 12 kg, operational €4.20/kg = €50.40÷12 kg."
+    },
+    {
+      "invoiceItemId": "9cdd22ba-051b-4422-a122-3e6a39e9ef8c",
+      "ingredient": "Água san pellegrino",
+      "lineName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "classification": "C",
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "2 cases → usable 11.25 L, operational €3.43/L = €38.56÷11.25 L."
+    },
+    {
+      "invoiceItemId": "634a418b-1509-42a9-bf01-563705967b6f",
+      "ingredient": "Ginger beer",
+      "lineName": "Baladin - Ginger Beer 0.20cl",
+      "classification": "A",
+      "mathCorrect": false,
+      "userVisibleBug": true,
+      "reason": "Invoice 24 bottles. UI usable 48 ml (parsed 0.20cl as 2 ml×24); operational €405/L is nonsensical vs ~€4/L for 24×20 cl."
+    },
+    {
+      "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+      "ingredient": "Guanciale stagionato",
+      "lineName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "classification": "A",
+      "mathCorrect": false,
+      "userVisibleBug": true,
+      "reason": "Invoice ~6 kg at €10.83/kg (qty 5.996, total €64.93). UI usable 10.5 kg from *7 pack notation; operational €6.18/kg understates true €10.83/kg."
+    },
+    {
+      "invoiceItemId": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+      "ingredient": "Peroni nastro azzurro 33cl",
+      "lineName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "classification": "C",
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "24 bottles → usable 7.92 L, operational €3.24/L = €25.69÷7.92 L."
+    },
+    {
+      "invoiceItemId": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
+      "ingredient": "Aceto balsamico di modena IGP",
+      "lineName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "classification": "C",
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "1 outer unit with 2×5 L → usable 10 L; operational €1.56/L from unit price (total €16.09 incl. small VAT delta)."
+    },
+    {
+      "invoiceItemId": "d13fce65-832c-4ca2-9c52-049579c99663",
+      "ingredient": "Mozzarella julienne",
+      "lineName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "classification": "C",
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "10 bags × 3 kg → usable 30 kg, operational €6.68/kg = €200.30÷30 kg."
+    },
+    {
+      "invoiceItemId": "e418468e-cb13-44f3-93b2-1857ae6eaa4d",
+      "ingredient": "Rulo di capra",
+      "lineName": "Rulo Di Capra 1kg*2 Simonetta",
+      "classification": "C",
+      "mathCorrect": true,
+      "userVisibleBug": false,
+      "reason": "1 unit with 2×1 kg → usable 2 kg, operational €5.43/kg = €10.86÷2 kg."
+    }
+  ]
+}
