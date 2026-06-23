@@ -1,0 +1,138 @@
+{
+  "generatedAt": "2026-06-23T12:30:00.000Z",
+  "mode": "read-only",
+  "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+  "invoiceLabel": "IL BOCCONCINO",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "priorAudit": ".tmp/family-a-deployment-path-audit/path.json",
+  "questions": {
+    "q1_modifiedInvoiceTableExtractionExecuted": {
+      "verdict": "NO",
+      "summary": "Re-read ran Hybrid H table pass on Supabase, but the active bundle is extract-invoice v36 (commit 853e02c), not Family A commit 03ae903."
+    },
+    "q2_executionSurface": {
+      "verdict": "DEPLOYED_EDGE_FUNCTION",
+      "rejected": ["LOCAL_CODE", "CACHED_EXTRACTION"],
+      "summary": "runExtraction invokes remote extract-invoice; no extraction cache in client or edge function."
+    },
+    "q3_newPromptReachedCallOpenAiJson": {
+      "verdict": "NO",
+      "summary": "BOCCONCINO UNDISCOUNTED BLANK-DESC guardrail and softened TOTAL COLUMN ISOLATION exist only in 03ae903; absent from v36 (853e02c)."
+    },
+    "q4_ifYesGptStillQty2": {
+      "verdict": "N/A",
+      "summary": "Q3 is NO. Deployed v36 path still returns qty=2 for Mezzi/Ricotta (edge invoke + post-re-read DB)."
+    },
+    "q5_whereBypassed": {
+      "verdict": "SUPABASE_EDGE_DEPLOYMENT_BOUNDARY",
+      "summary": "Family A committed to git at 2026-06-23T00:53:19Z; Re-read at 2026-06-23T00:56:44Z hit undeployed v36. No v37+ deploy found."
+    }
+  },
+  "timeline": {
+    "familyACommit": {
+      "hash": "03ae903",
+      "committedAt": "2026-06-23T00:53:19.000Z",
+      "message": "Family A extraction fix - Hybrid H prompt guardrails"
+    },
+    "vlDeployV36": {
+      "version": 36,
+      "updatedAt": "2026-06-20T01:22:46.863Z",
+      "mappedCommit": "853e02c"
+    },
+    "postFamilyAReReadPersist": {
+      "createdAt": "2026-06-23T00:56:44.621803+00:00",
+      "note": "All 7 invoice_items rows share this timestamp — DELETE+INSERT from runExtraction after successful Re-read",
+      "minutesAfterFamilyACommit": 3.4
+    }
+  },
+  "evidencePath": [
+    {
+      "stage": "UI Re-read",
+      "verdict": "INVOKED",
+      "source": "src/routes/invoices.tsx",
+      "lines": { "reExtract": 2393, "runExtraction": 1339, "invokeExtractInvoice": 1368 },
+      "detail": "reExtract → signed URL → fileToExtractionDataUrl → runExtraction(invoiceId, dataUrl)"
+    },
+    {
+      "stage": "Function invoked",
+      "verdict": "extract-invoice",
+      "source": "src/routes/invoices.tsx:1368",
+      "detail": "supabase.functions.invoke('extract-invoice', { body: { imageDataUrl } })",
+      "supabaseProject": "bjhnlrgodcqoyzddbpbd",
+      "envSource": ".env.local VITE_SUPABASE_URL"
+    },
+    {
+      "stage": "Code version (deployed)",
+      "verdict": "v36 / 853e02c — NOT 03ae903",
+      "sources": [
+        "supabase functions list --project-ref bjhnlrgodcqoyzddbpbd (2026-06-23 audit)",
+        ".tmp/family-a-deployment-path-audit/path.json"
+      ],
+      "deployVersion": 36,
+      "deployUpdatedAt": "2026-06-20T01:22:46.863Z",
+      "familyAPresentInDeployed": false,
+      "familyAPresentInLocalGit": true
+    },
+    {
+      "stage": "Hybrid H table pass",
+      "verdict": "EXECUTED (pre-Family-A prompt)",
+      "source": "supabase/functions/extract-invoice/index.ts:148",
+      "module": "invoice-table-extraction.ts",
+      "callOpenAiJsonLine": 397
+    },
+    {
+      "stage": "GPT request (prompt content)",
+      "verdict": "OLD_PROMPT_ONLY",
+      "familyAMarkers": {
+        "BOCCONCINO_UNDISCOUNTED_BLANK_DESC": {
+          "in03ae903": true,
+          "in853e02c": false,
+          "evidence": "git show 853e02c:.../invoice-table-extraction.ts | rg BOCCONCINO → no match"
+        },
+        "TOTAL_COLUMN_ISOLATION_softened": {
+          "in03ae903": true,
+          "in853e02c": false,
+          "v36Text": "When quantity > 1, line_total_net should exceed gross_unit_price"
+        }
+      },
+      "liveGptRawFromThisReRead": "UNAVAILABLE — extract-invoice response does not include raw GPT JSON"
+    },
+    {
+      "stage": "GPT response (proxy)",
+      "verdict": "qty=2 for Mezzi and Ricotta",
+      "sources": [
+        ".tmp/family-a-v25-raw-capture/edge-invoke-final.json (v36, 2026-06-20)",
+        "VL DB invoice_items query 2026-06-23T01:17:28Z"
+      ],
+      "mezziQty": 2,
+      "ricottaQty": 2,
+      "pipelineInvariant": ".tmp/family-a-implementation/capture-result.json — post-GPT stages do not mutate quantity"
+    },
+    {
+      "stage": "Persisted extraction",
+      "verdict": "qty=2 WRITTEN",
+      "source": "VL DB service-role query",
+      "queriedAt": "2026-06-23T01:17:28.343Z",
+      "rows": {
+        "MEZZI PACCHERI MANCINI (CX 1KG*6)": { "quantity": 2, "unit_price": 27.31, "total": 27.3, "created_at": "2026-06-23T00:56:44.621803+00:00" },
+        "RICOTTA TREVIGIANA 1,5KG": { "quantity": 2, "unit_price": 7.97, "total": 7.97, "created_at": "2026-06-23T00:56:44.621803+00:00" }
+      },
+      "persistenceMechanism": "runExtraction DELETE invoice_items + INSERT at invoices.tsx:1430-1461"
+    }
+  ],
+  "cachingAudit": {
+    "clientRunExtraction": "NO — always invokes edge function; no skip/cache flags",
+    "edgeExtractInvoice": "NO — grep cache in supabase/functions/extract-invoice → no matches",
+    "gptRawCache": "Pass C only (.tmp/persistence-audit/pass-c-raw/...-gpt-raw-cache.json); not used by Hybrid H Re-read path",
+    "verdict": "NOT_CACHED_EXTRACTION"
+  },
+  "rootCauseForNoChange": "Family A prompt edits exist only in local git (03ae903). Re-read after commit executed undeployed VL extract-invoice v36 (853e02c), which still emits Mezzi/Ricotta qty=2. Client faithfully persisted that output.",
+  "artifactIndex": [
+    ".tmp/family-a-deployment-path-audit/path.json",
+    ".tmp/family-a-deployment-path-audit/REPORT.md",
+    ".tmp/family-a-implementation/implementation-result.json",
+    ".tmp/family-a-v25-raw-capture/edge-invoke-final.json",
+    ".tmp/family-a-implementation/capture-result.json",
+    "VL DB invoice_items f0aa5a08 (queried 2026-06-23)"
+  ]
+}

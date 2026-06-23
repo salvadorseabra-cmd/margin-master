@@ -1,0 +1,152 @@
+{
+  "generatedAt": "2026-06-23T12:00:00.000Z",
+  "mode": "read-only",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "questions": {
+    "doesReReadInvokeExtractInvoice": true,
+    "doesReReadUseHybridHTablePass": true,
+    "isReReadSamePathAsInitialUpload": true,
+    "areLocalFamilyAPromptChangesDeployedToVL": false,
+    "areLocalFamilyAPromptChangesDeployedToProduction": false
+  },
+  "ui": {
+    "route": "src/routes/invoices.tsx",
+    "reReadButtonLabels": ["Re-read", "Reading…"],
+    "reReadButtonLocations": [
+      { "component": "ItemsTable expanded panel", "line": 3483, "handler": "onExtract prop" },
+      { "component": "Invoice list row wand icon", "line": 2761, "handler": "reExtract(r)" }
+    ],
+    "reExtractFunction": {
+      "file": "src/routes/invoices.tsx",
+      "line": 2393,
+      "steps": [
+        "guard: row.file_path present",
+        "guard: isExtractableInvoicePath(row.file_path)",
+        "supabase.storage.from('invoices').createSignedUrl(row.file_path, 120)",
+        "fetch signed URL blob",
+        "fileToExtractionDataUrl(blob, filename) — PDF rasterized client-side",
+        "runExtraction(row.id, dataUrl)"
+      ]
+    },
+    "initialUploadFunction": {
+      "file": "src/routes/invoices.tsx",
+      "line": 1584,
+      "handler": "uploadOne",
+      "extractionCall": "runExtraction(inserted.id, dataUrl) at line 1638",
+      "note": "Same runExtraction helper as reExtract; only input acquisition differs (local file vs storage signed URL)"
+    }
+  },
+  "clientExtraction": {
+    "function": "runExtraction",
+    "file": "src/routes/invoices.tsx",
+    "line": 1339,
+    "apiCall": {
+      "method": "supabase.functions.invoke",
+      "functionName": "extract-invoice",
+      "body": { "imageDataUrl": "<data URL string>" },
+      "line": 1368
+    },
+    "persistence": {
+      "deleteExistingItems": "invoice_items.delete().eq('invoice_id', invoiceId) at line 1430",
+      "insertNewItems": "invoice_items.insert(insertRows) at line 1461",
+      "note": "Client-side persistence after edge function returns JSON; edge function does not write DB"
+    }
+  },
+  "edgeFunction": {
+    "name": "extract-invoice",
+    "entrypoint": "supabase/functions/extract-invoice/index.ts",
+    "passes": [
+      { "id": "A", "name": "date-specialist", "module": "invoice-date-extraction.ts" },
+      { "id": "B", "name": "supplier-specialist", "module": "invoice-metadata-extraction.ts" },
+      { "id": "C", "name": "footer-totals-specialist", "module": "invoice-footer-metadata-extraction.ts" },
+      { "id": "D", "name": "table-specialist (Hybrid H)", "module": "invoice-table-extraction.ts" }
+    ],
+    "hybridH": {
+      "export": "extractTableItemsFromImage",
+      "pipeline": [
+        "cropTableRegionForLineItems (invoice-image-crop.ts)",
+        "runTableExtractionPass",
+        "callOpenAiJson with TABLE_EXTRACTION_SYSTEM_PROMPT + TABLE_EXTRACTION_RESPONSE_FORMAT",
+        "parseMonetaryLineItems → bindMonetaryColumns → reconcileLineItemAmounts",
+        "finalizeExtractedLineItems (net subtotal reconcile)"
+      ],
+      "promptConstant": "TABLE_EXTRACTION_SYSTEM_PROMPT",
+      "promptFile": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+      "callOpenAiJsonLine": 397
+    }
+  },
+  "supabaseProjects": {
+    "validationLab": {
+      "ref": "bjhnlrgodcqoyzddbpbd",
+      "url": "https://bjhnlrgodcqoyzddbpbd.supabase.co",
+      "extractInvoice": {
+        "version": 36,
+        "status": "ACTIVE",
+        "updatedAt": "2026-06-20T01:22:46.863Z",
+        "mappedCommit": "853e02c",
+        "mappedCommitMessage": "fix: derive effective paid unit when gross column lacks discount_pct",
+        "verifyJwt": true,
+        "evidence": "supabase functions list --project-ref bjhnlrgodcqoyzddbpbd -o json (2026-06-23 audit)"
+      }
+    },
+    "productionDefaultEnv": {
+      "ref": "lhackrnlnrsiamorzmkb",
+      "url": "https://lhackrnlnrsiamorzmkb.supabase.co",
+      "configTomlProjectId": "lhackrnlnrsiamorzmkb",
+      "envSource": ".env VITE_SUPABASE_URL",
+      "extractInvoice": {
+        "version": 17,
+        "status": "ACTIVE",
+        "updatedAt": "2026-05-18T22:20:50.093Z",
+        "note": "Pre-Hybrid-H era; no structured monetary schema",
+        "evidence": "supabase functions list --project-ref lhackrnlnrsiamorzmkb -o json (2026-06-23 audit)"
+      }
+    }
+  },
+  "familyAChanges": {
+    "commit": "03ae903",
+    "committedAt": "2026-06-23T01:53:19+01:00",
+    "message": "Family A extraction fix - Hybrid H prompt guardrails",
+    "changedFile": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+    "promptEdits": [
+      "Softened TOTAL COLUMN ISOLATION: undiscounted qty=1 may have line_total_net ≈ gross_unit_price",
+      "Added BOCCONCINO UNDISCOUNTED BLANK-DESC guardrail with MEZZI and RICOTTA negative examples"
+    ],
+    "presentInLocalCommittedCode": true,
+    "presentInVLv36DeployedCode": false,
+    "presentInProductionV17": false,
+    "diffBase": "853e02c..03ae903",
+    "vlv36BehaviorEvidence": {
+      "artifact": ".tmp/family-a-v25-raw-capture/edge-invoke-final.json",
+      "capturedAt": "2026-06-20T14:44:49.203Z",
+      "deployVersion": 36,
+      "mezziQty": 2,
+      "ricottaQty": 2,
+      "note": "Pre-Family-A behavior; v36 deployed before 03ae903 commit"
+    }
+  },
+  "deployMechanism": {
+    "packageJsonDeployScript": null,
+    "supabaseConfig": "supabase/config.toml project_id = lhackrnlnrsiamorzmkb",
+    "documentedDeployCommand": "supabase functions deploy extract-invoice --project-ref bjhnlrgodcqoyzddbpbd",
+    "deployEvidenceSources": [
+      ".tmp/lenha-re-extract-investigation/DEPLOYMENT_STATUS.md",
+      ".tmp/lenha-deploy-evidence/DEPLOY_HISTORY.md",
+      ".tmp/family-a-implementation/REPORT.md"
+    ],
+    "localCodeLiveWithoutDeploy": false
+  },
+  "artifactIndex": {
+    "path": ".tmp/family-a-v25-raw-capture/artifact-index.json",
+    "v25BadPathFinal": ".tmp/final-validation-lab-rerun/extracts/f0aa5a08-86a3-4938-99f0-711e86073968.json",
+    "freshEdgeInvoke": ".tmp/family-a-v25-raw-capture/edge-invoke-final.json",
+    "deployVersionAtCapture": 36
+  },
+  "requiredForReReadToUseFamilyA": [
+    "Commit 03ae903 is already in git HEAD for invoice-table-extraction.ts",
+    "Deploy extract-invoice to target Supabase project: supabase functions deploy extract-invoice --project-ref bjhnlrgodcqoyzddbpbd",
+    "Ensure UI VITE_SUPABASE_URL points at bjhnlrgodcqoyzddbpbd (VL) or deploy to whichever project the app uses",
+    "Re-read invoice in UI (or invoke edge function directly) — no separate re-read code path exists",
+    "Post-deploy: validate f0aa5a08 Mezzi/Ricotta qty=1 per family-a-implementation/REPORT.md"
+  ]
+}
