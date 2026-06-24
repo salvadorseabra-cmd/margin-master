@@ -1,0 +1,272 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T14:00:00.000Z",
+  "mode": "STRICT_DESIGN_ONLY",
+  "noCodeChanges": true,
+  "noDbWrites": true,
+  "noDeployments": true,
+  "fixture": {
+    "geometryInvoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+    "persistedInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "invoiceItemId": "bece238e-fd6d-493c-8555-6921b164f97c",
+    "deployVersions": { "v28Failure": 28, "v38Reread": 38 }
+  },
+  "groundTruth": {
+    "pdf": { "quantity": 1.35, "unit": "kg", "grossUnitPrice": 12.9, "discountPct": 22.85, "netUnitPrice": 9.95, "total": 13.44, "reconciles": true },
+    "ocrPassCRaw": { "quantity": 1.35, "unitPrice": 9.82, "total": 13.44, "note": "audit artifact only; not in current pipeline" },
+    "structuredV28": { "quantity": 1.05, "unitPrice": 10.88, "total": 13.44, "qtyXPrice": 11.42, "reconciles": false },
+    "v38Reread": { "quantity": 2.0, "unitPrice": 9.35, "total": 18.72, "qtyXPrice": 18.7, "reconciles": true, "matchesPdf": false }
+  },
+  "task1_architectureTrace": {
+    "passes": [
+      { "id": "A", "fn": "extractIssueDateFromImage", "output": "invoice_date" },
+      { "id": "B", "fn": "extractMetadataFromImage", "output": "supplier" },
+      { "id": "C1", "fn": "extractFooterMetadataFromImage", "output": "total, net_subtotal, vat" },
+      { "id": "C2", "fn": "extractTableItemsFromImage", "alias": "Hybrid H", "output": "line items" }
+    ],
+    "hybridHSubPipeline": [
+      "cropTableRegionForLineItems",
+      "callOpenAiJson(TABLE_EXTRACTION_SYSTEM_PROMPT, TABLE_EXTRACTION_RESPONSE_FORMAT)",
+      "parseMonetaryLineItems",
+      "bindMonetaryColumns",
+      "reconcileLineItemAmounts",
+      "monetaryToInvoiceLineItem",
+      "finalizeExtractedLineItems(net_subtotal)"
+    ],
+    "clientPipeline": [
+      "runExtraction → extract-invoice API",
+      "normalizeInvoiceItemFields",
+      "insert invoice_items",
+      "needsExtractionConfirmation (includes needsMathematicalReconciliationReview)",
+      "autoPersistUnmatchedInvoiceItems"
+    ],
+    "ocrQtyAvailability": {
+      "deterministicParsers": { "available": false, "reason": "parseContinente/stages.ts not invoked (index.ts L69)" },
+      "passCRawLegacy": { "available": false, "reason": "audit artifact only; pre-Hybrid H schema" },
+      "hybridHPassC": { "available": true, "reason": "sole qty source in production" },
+      "footerPass": { "available": false, "reason": "invoice-level total only" }
+    },
+    "qtyOverwritePoint": "callOpenAiJson response → parseMonetaryLineItems accepts GPT quantity without cross-check",
+    "downstreamQtyMutation": false,
+    "bindingPassThrough": true,
+    "persistencePassThrough": true
+  },
+  "task2_designOptions": {
+    "A_promptOnly": {
+      "effectiveness": "LOW",
+      "blastRadius": "minimal",
+      "complexity": "~12 prompt lines",
+      "risk": "high residual",
+      "preventsOcrOverride": false,
+      "verdict": "insufficient"
+    },
+    "B_ocrAnchoringOnly": {
+      "effectiveness": "HIGH on qty",
+      "blastRadius": "fractional kg Emporio rows with disagreement",
+      "complexity": "~80-100 lines + 1 GPT call",
+      "risk": "low on controls",
+      "preventsOcrOverride": true,
+      "gap": "misses self-consistent 2/9.35/18.72 when total also wrong",
+      "verdict": "incomplete alone"
+    },
+    "C_validationOnly": {
+      "effectiveness": "PARTIAL",
+      "blastRadius": "1 VL row at 5% threshold",
+      "complexity": "already implemented",
+      "risk": "low false positives",
+      "preventsOcrOverride": false,
+      "implementedIn": "src/lib/invoice-extraction-review.ts",
+      "wiredIn": "src/routes/invoices.tsx L527",
+      "catchesV28": true,
+      "catchesV38Reread": false,
+      "verdict": "incomplete alone"
+    },
+    "D_ocrAnchoringPlusValidation": {
+      "effectiveness": "HIGH",
+      "blastRadius": "Gorgonzola + future fractional Emporio divergence",
+      "complexity": "~100-120 lines + 1 GPT call",
+      "risk": "LOW",
+      "preventsOcrOverride": true,
+      "verdict": "recommended"
+    },
+    "E_other": {
+      "rowReextractOnMathFail": "defer",
+      "dualFullSchemaParallelPass": "defer — 2x cost",
+      "stripLegacyUnitPriceInParser": "adjunct only"
+    }
+  },
+  "task3_ocrAnchoringDesign": {
+    "proposedModule": "supabase/functions/extract-invoice/invoice-qty-prepass.ts",
+    "prepassSchema": {
+      "items": [{ "name": "string", "quantity": "number|null", "unit": "string|null" }]
+    },
+    "hookPoint": "after cropTableRegionForLineItems, before Hybrid H bindMonetaryColumns",
+    "anchorFunction": "anchorQuantities(prepassRows, structuredRows)",
+    "decisionTree": {
+      "agreementThresholdPct": 2,
+      "anchorWhen": "score_ocr < score_passC - 0.10 OR (mathReviewFails AND score_ocr <= 0.50)",
+      "scoreFormula": "|line_total_net - qty × deriveNet(gross, discount)|"
+    },
+    "scopeGate": {
+      "applyWhen": [
+        "unit is kg (normalized weight)",
+        "ocr_qty is fractional or < 10 with decimal",
+        "Emporio dense table OR discount_pct column semantics"
+      ],
+      "exclude": ["integer pack rows", "MO/em herbs", "non-weight units"]
+    },
+    "scenarios": [
+      {
+        "id": "S1",
+        "ocrQty": 1.35,
+        "passCQty": 1.05,
+        "lineTotalNet": 13.44,
+        "deltaPct": 22.2,
+        "decision": "ANCHOR 1.35",
+        "after": { "quantity": 1.35, "unitPrice": 9.96, "total": 13.44 }
+      },
+      {
+        "id": "S2",
+        "ocrQty": 1.35,
+        "passCQty": 2.0,
+        "lineTotalNet": 13.44,
+        "deltaPct": 48.1,
+        "decision": "ANCHOR 1.35",
+        "after": { "quantity": 1.35, "unitPrice": 9.96, "total": 13.44 }
+      },
+      {
+        "id": "S3",
+        "ocrQty": 1.35,
+        "passCQty": 2.0,
+        "lineTotalNet": 18.72,
+        "deltaPct": 48.1,
+        "decision": "KEEP passC on score; FLAG OCR_QTY_MISMATCH REVIEW",
+        "note": "total also hallucinated; anchoring alone insufficient"
+      },
+      {
+        "id": "S4_control",
+        "ocrQty": 4.3,
+        "passCQty": 4.3,
+        "product": "Prosciutto",
+        "deltaPct": 0,
+        "decision": "NO-OP"
+      }
+    ]
+  },
+  "task4_validationLayer": {
+    "existingMathGuard": {
+      "module": "src/lib/invoice-extraction-review.ts",
+      "function": "needsMathematicalReconciliationReview",
+      "threshold": "variance_abs > 0.50 AND variance_pct > 5%",
+      "status": "IMPLEMENTED",
+      "wiredAt": "src/routes/invoices.tsx needsExtractionConfirmation L527"
+    },
+    "proposedThresholds": {
+      "SAFE": { "condition": "variance_abs <= 0.10 OR variance_pct < 1%", "action": "auto-persist" },
+      "WARNING": { "condition": "1% <= variance_pct < 3%", "action": "log only" },
+      "REVIEW": { "condition": "variance_abs > 0.50 AND variance_pct > 5%", "action": "block auto cost persist" },
+      "REVIEW_PLUS": { "condition": "|ocr_qty - passC_qty| / ocr_qty > 10% on scoped family", "action": "OCR_QTY_MISMATCH flag" },
+      "CRITICAL": { "condition": "variance_pct > 10%", "action": "same as REVIEW" }
+    },
+    "layerCoverage": {
+      "v28_1.05_10.88_13.44": { "mathGate": true, "ocrAnchor": true, "ocrMismatchFlag": true },
+      "v38_2.00_9.35_18.72": { "mathGate": false, "ocrAnchor": false, "ocrMismatchFlag": true },
+      "correct_1.35_9.95_13.44": { "mathGate": false, "ocrAnchor": "no-op", "ocrMismatchFlag": false },
+      "prosciutto_4.3_8.5_36.54": { "mathGate": false, "ocrAnchor": "no-op", "ocrMismatchFlag": false }
+    }
+  },
+  "task5_promptHardening": {
+    "location": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+    "insertAfter": "L125 FRACTIONAL QUANTITIES",
+    "lines": [
+      "FRACTIONAL DIGIT GUARD: 1,35 is 1.35 kg — NOT 1,05 (3 vs 5) and NOT 2.",
+      "EMPORIO DISCOUNT MANDATORY: Desc.(%) MUST be populated when Preço Total < Qtd × Preço Unit.",
+      "NEGATIVE: Gorgonzola 1,05/10,88/13,44 BAD; Qtd 2,00 with total 13,44 BAD."
+    ],
+    "preserveExisting": "L107-108 positive Gorgonzola example",
+    "role": "adjunct only — proven insufficient alone",
+    "ruleFFromPriorDesign": {
+      "location": "invoice-monetary-binding.ts",
+      "condition": "gross_unit_price && discount_pct && line_total_net all non-null",
+      "action": "verify qty×gross×(1-disc/100)≈line_total_net; rebind on fail"
+    }
+  },
+  "task6_regressionTable": [
+    { "product": "Gorgonzola", "invoice": "Emporio ab52796d", "current": "1.05/10.88/13.44 or 2/9.35/18.72", "afterFix": "1.35/9.96/13.44 or REVIEW", "risk": "TARGET" },
+    { "product": "Prosciutto", "invoice": "Emporio ab52796d", "current": "4.30/8.50/36.54", "afterFix": "4.30/8.50/36.54 no-op", "risk": "NONE" },
+    { "product": "Mortadella", "invoice": "Emporio ab52796d", "current": "3.11/9.99/31.07", "afterFix": "3.11/9.99/31.07 no-op", "risk": "LOW" },
+    { "product": "Bresaola", "invoice": "Emporio ab52796d", "current": "1.83/27.04/49.48", "afterFix": "1.83/27.04/49.48 no-op", "risk": "NONE" },
+    { "product": "Pellegrino", "invoice": "Emporio ab52796d", "current": "2/19.28/38.56", "afterFix": "2/19.28/38.56 no-op", "risk": "NONE" },
+    { "product": "Ovo Líquido", "invoice": "Aviludo", "current": "6/10.19/61.14", "afterFix": "6/10.19/61.14 no-op", "risk": "NONE" },
+    { "product": "Tomilho", "invoice": "Bidfood", "current": "1/2.06/2.06", "afterFix": "1/2.06/2.06 no-op", "risk": "NONE" },
+    { "product": "Salada", "invoice": "Bidfood", "current": "4/2.19/8.76", "afterFix": "4/2.19/8.76 no-op", "risk": "NONE" }
+  ],
+  "task7_beforeAfterMatrix": {
+    "gorgonzola": {
+      "pdf": { "qty": 1.35, "netUnitPrice": 9.95, "total": 13.44 },
+      "beforeWorst": [
+        { "qty": 1.05, "unitPrice": 10.88, "total": 13.44, "source": "v28" },
+        { "qty": 2.0, "unitPrice": 9.35, "total": 18.72, "source": "v38-reread" }
+      ],
+      "after": { "qty": 1.35, "unitPrice": 9.96, "total": 13.44, "or": "REVIEW if total wrong" }
+    },
+    "controls": [
+      { "product": "Prosciutto", "pdf": "4.30/8.50/36.54", "before": "4.30/8.50/36.54", "after": "4.30/8.50/36.54", "stable": true },
+      { "product": "Mortadella", "pdf": "3.11/9.99/31.07", "before": "3.11/9.99/31.07", "after": "3.11/9.99/31.07", "stable": true },
+      { "product": "Bresaola", "pdf": "1.83/27.04/49.48", "before": "1.83/27.04/49.48", "after": "1.83/27.04/49.48", "stable": true }
+    ]
+  },
+  "requiredQuestion": {
+    "selected": "B",
+    "label": "Small OCR-vs-Pass-C family",
+    "rejected": {
+      "A": "Gorgonzola only — too narrow; name-specific rules unmaintainable",
+      "C": "Broad robustness — over-scoped; +1 GPT on all invoices unjustified"
+    }
+  },
+  "finalVerdict": {
+    "selected": "D",
+    "label": "OCR anchoring + validation",
+    "rejected": {
+      "A": "Prompt only — proven insufficient",
+      "B": "OCR anchoring only — misses self-consistent 2/9.35/18.72",
+      "C": "Validation only — already implemented; incomplete",
+      "E": "Other — defer dual full-schema pass"
+    }
+  },
+  "differentiationFromPriorDesign": {
+    "priorPath": ".tmp/gorgonzola-fix-design/",
+    "priorVerdict": "C — Prompt + validation",
+    "thisVerdict": "D — OCR anchoring + validation",
+    "keyAddition": "qty pre-pass + anchorQuantities — direct fix for OCR override",
+    "alreadyImplemented": "needsMathematicalReconciliationReview in invoice-extraction-review.ts",
+    "retainedFromPrior": ["prompt adjunct ~12 lines", "Rule F structured rebind"]
+  },
+  "implementationScope": {
+    "estimatedLines": "100-120",
+    "additionalGptCalls": 1,
+    "files": [
+      { "path": "supabase/functions/extract-invoice/invoice-qty-prepass.ts", "change": "NEW qty pre-pass" },
+      { "path": "supabase/functions/extract-invoice/invoice-table-extraction.ts", "change": "anchorQuantities hook + prompt adjunct" },
+      { "path": "supabase/functions/extract-invoice/invoice-monetary-binding.ts", "change": "Rule F from prior design" },
+      { "path": "src/lib/invoice-extraction-review.ts", "change": "OCR_QTY_MISMATCH reason" },
+      { "path": "src/routes/invoices.tsx", "change": "wire OCR mismatch flag" }
+    ],
+    "noSchemaMigration": true,
+    "noDbBackfill": true
+  },
+  "artifactIndex": [
+    ".tmp/gorgonzola-fix-design/",
+    ".tmp/gorgonzola-vs-prosciutto-differential-audit/",
+    ".tmp/reread-pipeline-forensics-audit/",
+    ".tmp/emporio-deli-stability-audit/",
+    ".tmp/gorgonzola-structured-extraction-failure-audit/",
+    ".tmp/mathematical-consistency-coverage-audit/",
+    ".tmp/persistence-audit/pass-c-raw/",
+    "supabase/functions/extract-invoice/index.ts",
+    "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+    "supabase/functions/extract-invoice/invoice-monetary-binding.ts",
+    "src/lib/invoice-extraction-review.ts",
+    "src/routes/invoices.tsx"
+  ]
+}

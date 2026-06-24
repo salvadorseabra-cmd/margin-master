@@ -1,0 +1,194 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T11:55:34.917Z",
+  "auditType": "STRICT_READ_ONLY_OCR_ANCHORING_ACTIVATION",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "currentInvoiceItemId": "091d5bc2-b041-4a65-b652-d9be15b5fd3f",
+  "rereadTimestamp": "2026-06-24T10:45:37.333848+00:00",
+  "finalFiveQuestions": {
+    "activeInLocalCode": true,
+    "executedDuringLiveReread": false,
+    "bypassedByGating": false,
+    "neverWiredToProduction": true,
+    "whyNoReview": "VL extract-invoice v38 (deployed 2026-06-23) lacks qty pre-pass; OCR anchoring + client review exist only in uncommitted local files; extraction_meta is session-only and not persisted; persisted 2/9.35/18.72 is math-consistent so math review would not fire even on committed client."
+  },
+  "verdict": "NEVER_RUNNING_AT_REREAD",
+  "verdictDetail": "OCR quantity anchoring was implemented locally after the live re-read and was never deployed to Validation Lab extract-invoice v38.",
+  "task1_pipelineTrace": {
+    "ui": "reExtract(row) → invoices.tsx:2438",
+    "runExtraction": "supabase.functions.invoke('extract-invoice', { imageDataUrl }) — invoices.tsx:1389",
+    "edgeIndex": "extract-invoice/index.ts → extractTableItemsFromImage",
+    "deployedV38Pipeline": "crop → Pass C GPT (parseMonetaryLineItems) → bindMonetaryColumns → reconcileLineItemAmounts → finalize",
+    "localUncommittedPipeline": "crop → runQuantityPrePass → Pass C GPT → anchorQuantities → bindMonetaryColumns → reconcile → attach extraction_meta per item",
+    "persist": "DELETE invoice_items → INSERT quantity/unit_price/total only (no ocr_quantity, extraction_meta) — invoices.tsx:1475-1494",
+    "sessionMeta": "extraction_meta stripped before insert; mapped to extractionMetaByItemId by name after insert — invoices.tsx:1401-1566 (uncommitted)"
+  },
+  "task2_runQuantityPrePass": {
+    "executedDuringLiveReread": false,
+    "evidence": [
+      "HEAD commit has no runQuantityPrePass in invoice-table-extraction.ts",
+      "invoice-qty-prepass.ts is untracked (??) — never committed",
+      "VL extract-invoice still version 38 updated 2026-06-23T10:13:38.814Z",
+      "Live re-read 2026-06-24T10:45:37.333848+00:00 predates hardening implementation 2026-06-24T11:46:08Z",
+      "No qty-prepass-result logs available; edge logs not queried"
+    ],
+    "logsExpectedIfRan": "[invoice-ocr] qty-prepass-result / qty-prepass-failed",
+    "extractionMetaInDb": false,
+    "artifacts": "none captured for 2026-06-24 live invoke"
+  },
+  "task3_anchorQuantities": {
+    "executedDuringLiveReread": false,
+    "wouldHaveInputsIfRan": {
+      "ocr_quantity": 1.35,
+      "pass_c_quantity": 2,
+      "line_total_net": 18.72,
+      "selected_quantity_expected": 2,
+      "quantity_anchored": false,
+      "ocr_qty_mismatch": true
+    },
+    "evidence": [
+      "anchorQuantities only called when prepassRows.length > 0 in local invoice-table-extraction.ts:447-448",
+      "Deployed v38 calls bindMonetaryColumns(parseMonetaryLineItems(...)) directly — no anchorQuantities"
+    ]
+  },
+  "task4_gatingConditions": {
+    "source": "supabase/functions/extract-invoice/invoice-qty-prepass.ts",
+    "isQtyAnchorScopeRow": {
+      "unitMustBeKg": "normalizeWeightUnit(structured.unit ?? prepass.unit) === 'kg'",
+      "ocrQtyMustBeFractional": "isFractionalQty(ocrQty) — abs(qty % 1) > 0.001",
+      "emporioDiscountSemantics": "discount_pct != null OR (gross_unit_price > line_total_net when both present)"
+    },
+    "anchorWhen": {
+      "agreementSkip": "deltaPct <= 2%",
+      "noLineTotal": "if line_total_net null → no anchor; may set ocr_qty_mismatch if delta > 10%",
+      "shouldAnchor": "scoreOcr < scorePassC - 0.1 OR (mathReviewFails(passC) AND scoreOcr <= 0.5)",
+      "mismatchFlag": "delta > 10% when anchor not applied"
+    },
+    "gorgonzolaS3ScopeGate": true,
+    "gorgonzolaS3GateNotes": "fractional 1.35 kg + discount_pct 22.85 → IN SCOPE; anchoring declined because Pass C qty×net unit fits line_total better than OCR qty"
+  },
+  "task5_persistedInvoiceItem": {
+    "historicalRereadRow": {
+      "id": "091d5bc2-b041-4a65-b652-d9be15b5fd3f",
+      "quantity": 2,
+      "unit_price": 9.35,
+      "total": 18.72,
+      "created_at": "2026-06-24T10:45:37.333848+00:00",
+      "note": "Live re-read batch per reread-pipeline-forensics-audit; row superseded by later re-read"
+    },
+    "currentVlRow": {
+      "id": "8eb3b794-19d7-452e-81ec-1b14a21ea80f",
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 2,
+      "unit": "kg",
+      "unit_price": 9.35,
+      "total": 18.73,
+      "created_at": "2026-06-24T11:49:15.77353+00:00",
+      "updated_at": "2026-06-24T11:49:15.77353+00:00",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09"
+    },
+    "itemId091d5bc2StillPresent": false,
+    "itemSuperseded": true,
+    "queryError": null,
+    "columnNames": [
+      "id",
+      "invoice_id",
+      "user_id",
+      "name",
+      "quantity",
+      "unit",
+      "unit_price",
+      "total",
+      "created_at",
+      "updated_at"
+    ],
+    "ocr_quantity_present": false,
+    "anchored_quantity_present": false,
+    "extraction_meta_present": false,
+    "gorgonzolaHistory": [
+      {
+        "id": "8eb3b794-19d7-452e-81ec-1b14a21ea80f",
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+        "quantity": 2,
+        "unit": "kg",
+        "unit_price": 9.35,
+        "total": 18.73,
+        "created_at": "2026-06-24T11:49:15.77353+00:00",
+        "updated_at": "2026-06-24T11:49:15.77353+00:00"
+      }
+    ],
+    "note": "invoice_items schema stores only quantity/unit_price/total; anchoring metadata is API-only (extraction_meta) and session state"
+  },
+  "task6_ocrMismatchTrigger": {
+    "wouldTriggerWithCurrentCodeIfAnchoringRan": true,
+    "persistedQuantity": 2,
+    "hypotheticalOcrQuantity": 1.35,
+    "deltaPct": 48.15,
+    "whyClientDidNotShowReview": [
+      "Edge v38 did not run anchorQuantities → no extraction_meta in API response",
+      "Client OCR review wiring (needsOcrQtyMismatchReview + extractionMetaByItemId) is uncommitted local change",
+      "Committed needsExtractionConfirmation only checks placeholder/qty/unit/amount — not OCR mismatch",
+      "Persisted 2×9.35≈18.72 passes math reconciliation — no MATHEMATICAL_RECONCILIATION_FAILURE",
+      "extractionMetaByItemId is React session state; lost on full page reload"
+    ]
+  },
+  "task7_replay": {
+    "inputs": {
+      "ocrQty": 1.35,
+      "passCQty": 2,
+      "lineTotalNet": 18.72,
+      "gross": 12.9,
+      "discount": 22.85
+    },
+    "anchorMeta": {
+      "ocr_quantity": 1.35,
+      "pass_c_quantity": 2,
+      "quantity_anchored": false,
+      "ocr_qty_mismatch": true
+    },
+    "expectedPersisted": {
+      "quantity": 2,
+      "unit_price": 9.95,
+      "total": 18.72
+    },
+    "actualPersistedFromDb": {
+      "id": "091d5bc2-b041-4a65-b652-d9be15b5fd3f",
+      "quantity": 2,
+      "unit_price": 9.35,
+      "total": 18.72,
+      "created_at": "2026-06-24T10:45:37.333848+00:00"
+    },
+    "ocrReview": true,
+    "mathReviewOnBoundNetUnit": true,
+    "mathReviewOnActualPersistedUnitPrice935": false,
+    "matchActualToReplay": true,
+    "interpretation": "Replay confirms Pass C hallucination (2/18.72) would be KEPT with ocr_qty_mismatch=true IF anchoring ran; actual DB matches Pass C output because anchoring never ran"
+  },
+  "deployGap": {
+    "extractInvoice": {
+      "created_at": 1780868892649,
+      "entrypoint_path": "file:///tmp/user_fn_bjhnlrgodcqoyzddbpbd_a0f05e1d-cafc-4065-8962-e117703a17c5_38/source/supabase/functions/extract-invoice/index.ts",
+      "ezbr_sha256": "c3f7c5a5240ff98ab4ea12b360349d81769fa874427dd461034b00a2af28f8d8",
+      "id": "a0f05e1d-cafc-4065-8962-e117703a17c5",
+      "import_map": false,
+      "name": "extract-invoice",
+      "slug": "extract-invoice",
+      "status": "ACTIVE",
+      "updated_at": 1782209618814,
+      "verify_jwt": true,
+      "version": 38
+    },
+    "deployedUpdatedAt": "2026-06-23T10:13:38.814Z",
+    "hardeningImplementedAt": "2026-06-24T11:46:08.586Z",
+    "rereadBeforeHardening": true,
+    "gitStatus": {
+      "invoice-qty-prepass.ts": "?? supabase/functions/extract-invoice/invoice-qty-prepass.ts",
+      "invoice-table-extraction.ts": "M supabase/functions/extract-invoice/invoice-table-extraction.ts",
+      "invoice-extraction-review.ts": "?? src/lib/invoice-extraction-review.ts",
+      "invoices.tsx": "M src/routes/invoices.tsx"
+    },
+    "headHasAnchoring": false,
+    "localHasAnchoring": true,
+    "parallelToFamilyA": "Same pattern as Family A Hybrid H — local code ahead of VL edge deploy; live re-read hit pre-anchoring v38"
+  }
+}

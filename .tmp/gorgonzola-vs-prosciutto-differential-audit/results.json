@@ -1,0 +1,227 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T14:00:00.000Z",
+  "auditType": "STRICT_READ_ONLY_GORGONZOLA_VS_PROSCIUTTO_DIFFERENTIAL",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "geometryFixture": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "note": "ab52796d is VL-persisted replacement upload; same Emporio May-19 screenshot as 17aa3591 geometry audits",
+  "task1_pdfSideBySide": {
+    "gorgonzola": {
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelregio* 1/8\" ~1,5kg (Produto de Stock)",
+      "productCode": "GD87813",
+      "qty": 1.35,
+      "unit": "kg",
+      "grossUnitPrice": 12.9,
+      "discountPct": 22.85,
+      "netUnitPrice": 9.95,
+      "lineTotal": 13.44,
+      "source": ".tmp/gorgonzola-root-cause/stage-trace.json"
+    },
+    "prosciutto": {
+      "description": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC ~4,25KG",
+      "productCode": "UO502",
+      "qty": 4.3,
+      "unit": "kg",
+      "grossUnitPrice": 10.3,
+      "discountPct": 17.5,
+      "netUnitPrice": 8.5,
+      "lineTotal": 36.54,
+      "source": ".tmp/column-shift-audit/ground-truth.json"
+    }
+  },
+  "task2_ocrComparison": {
+    "question": "Did OCR struggle on Gorgonzola?",
+    "answer": "NO",
+    "gorgonzola": {
+      "source": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json",
+      "qty": 1.35,
+      "unit_price": 9.82,
+      "total": 13.44,
+      "qtyMatchesPdf": true,
+      "totalMatchesPdf": true,
+      "note": "OCR-era API read Qtd 1,35 correctly; net unit €9.82 (minor slip vs €9.95, not instability driver)"
+    },
+    "prosciutto": {
+      "source": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json",
+      "qty": 4.3,
+      "unit_price": 17.06,
+      "total": 36.54,
+      "qtyMatchesPdf": true,
+      "totalMatchesPdf": true,
+      "unitColumnShift": "€17.06 ≈ Desc.(%) 17,50 — discount bleed, not OCR qty failure",
+      "note": "Prosciutto OCR-era had column-shift on unit_price; qty and total correct"
+    },
+    "differential": "Neither row shows OCR qty failure. Gorgonzola OCR is stable; instability begins at Pass C structured extraction. Prosciutto OCR had discount-column bleed (historical), closed at v28+."
+  },
+  "task3_allRuns": {
+    "gorgonzola": [
+      { "run": "pass-c-raw (ocr-era)", "deploy": "pre-v28", "qty": 1.35, "unit_price": 9.82, "total": 13.44 },
+      { "run": "v23-run1", "deploy": 23, "qty": 1, "unit_price": 9.9, "total": 13.44 },
+      { "run": "v23-run2", "deploy": 23, "qty": 2, "unit_price": 10.62, "total": 13.44 },
+      { "run": "v27-stab-1", "deploy": 27, "qty": 2.6, "unit_price": 10.22, "total": 13.44 },
+      { "run": "v27-stab-2", "deploy": 27, "qty": 2, "unit_price": 13.22, "total": 13.44 },
+      { "run": "v27-stab-3", "deploy": 27, "qty": 2, "unit_price": 9.45, "total": 13.44 },
+      { "run": "v27-stab-4", "deploy": 27, "qty": 2, "unit_price": 12.2, "total": 13.44 },
+      { "run": "v27-stab-5", "deploy": 27, "qty": 2, "unit_price": 16.55, "total": 33.14 },
+      { "run": "v28-single", "deploy": 28, "qty": 1.05, "unit_price": 10.88, "total": 13.44 },
+      { "run": "v28-cluster-1", "deploy": 28, "qty": 1.05, "unit_price": 9.88, "total": 13.44 },
+      { "run": "v28-cluster-2", "deploy": 28, "qty": 2, "unit_price": 12.87, "total": 25.73 },
+      { "run": "v30-run1", "deploy": 30, "qty": 1.05, "unit_price": 9.88, "total": 13.44 },
+      { "run": "v30-run2", "deploy": 30, "qty": 2, "unit_price": 9.35, "total": 18.68 },
+      { "run": "v30-run3", "deploy": 30, "qty": 2, "unit_price": 10.22, "total": 13.44 },
+      { "run": "v30-run4", "deploy": 30, "qty": 2, "unit_price": 8.43, "total": 13.44 },
+      { "run": "v30-run5", "deploy": 30, "qty": 2, "unit_price": 10.2, "total": 13.44 },
+      { "run": "v30-run6", "deploy": 30, "qty": 2, "unit_price": 13.43, "total": 26.85 },
+      { "run": "v30-run7", "deploy": 30, "qty": 2, "unit_price": 10.22, "total": 13.44 },
+      { "run": "v30-run8", "deploy": 30, "qty": 2, "unit_price": 22.85, "total": 45.7 },
+      { "run": "v30-run9", "deploy": 30, "qty": 2, "unit_price": 13.22, "total": 13.44 },
+      { "run": "v30-run10", "deploy": 30, "qty": 2, "unit_price": 8.69, "total": 17.38 },
+      { "run": "ab52796d-persisted", "deploy": "v38-db", "qty": 1.05, "unit_price": 10.88, "total": 13.44 },
+      { "run": "v38-reread", "deploy": 38, "qty": 2, "unit_price": 9.35, "total": 18.72 }
+    ],
+    "prosciutto": [
+      { "run": "pass-c-raw (ocr-era)", "deploy": "pre-v28", "qty": 4.3, "unit_price": 17.06, "total": 36.54 },
+      { "run": "v23-run1", "deploy": 23, "qty": 4.3, "unit_price": 10.56, "total": 36.44 },
+      { "run": "v23-run2", "deploy": 23, "qty": 4.3, "unit_price": 10.7, "total": 46.01 },
+      { "run": "v23-run3", "deploy": 23, "qty": 4.3, "unit_price": 10.22, "total": 43.95 },
+      { "run": "v28-single", "deploy": 28, "qty": 4.3, "unit_price": 8.5, "total": 36.54 },
+      { "run": "v30-run1", "deploy": 30, "qty": 4.3, "unit_price": 8.5, "total": 36.54 },
+      { "run": "v30-run2", "deploy": 30, "qty": 4.3, "unit_price": 8.5, "total": 36.54 },
+      { "run": "v30-run3", "deploy": 30, "qty": 4.3, "unit_price": 8.5, "total": 36.54 },
+      { "run": "v30-run4", "deploy": 30, "qty": 4.3, "unit_price": 8.5, "total": 36.54 },
+      { "run": "v30-run5", "deploy": 30, "qty": 4.3, "unit_price": 8.5, "total": 36.54 },
+      { "run": "v30-run6", "deploy": 30, "qty": 4.3, "unit_price": 8.5, "total": 36.54 },
+      { "run": "v30-run7", "deploy": 30, "qty": 4.3, "unit_price": 8.5, "total": 36.54 },
+      { "run": "v30-run8", "deploy": 30, "qty": 4.3, "unit_price": 8.5, "total": 36.54 },
+      { "run": "v30-run9", "deploy": 30, "qty": 4.3, "unit_price": 8.5, "total": 36.54 },
+      { "run": "v30-run10", "deploy": 30, "qty": 4.3, "unit_price": 8.5, "total": 36.54 },
+      { "run": "v38-reread", "deploy": 38, "qty": 4.3, "unit_price": 8.5, "total": 36.54 }
+    ]
+  },
+  "task4_fieldStability": {
+    "gorgonzola": {
+      "v30TenRun": {
+        "qty": { "unique": [1.05, 2], "stable": false },
+        "unit_price": { "unique": [8.43, 8.69, 9.35, 9.88, 10.2, 10.22, 13.22, 13.43, 22.85], "stable": false },
+        "total": { "unique": [13.44, 17.38, 18.68, 26.85, 45.7], "stable": false }
+      },
+      "allArtifactsV23ToV38": {
+        "qty": { "min": 1, "max": 2.6, "uniqueCount": 4, "stable": false },
+        "unit_price": { "min": 8.43, "max": 22.85, "uniqueCount": 13, "stable": false },
+        "total": { "min": 13.44, "max": 45.7, "uniqueCount": 8, "stable": false }
+      }
+    },
+    "prosciutto": {
+      "v30TenRun": {
+        "qty": { "unique": [4.3], "stable": true },
+        "unit_price": { "unique": [8.5], "stable": true },
+        "total": { "unique": [36.54], "stable": true }
+      },
+      "allArtifactsV23ToV38": {
+        "qty": { "min": 4.3, "max": 4.3, "uniqueCount": 1, "stable": true },
+        "unit_price": { "min": 8.5, "max": 10.7, "uniqueCount": 4, "stable": false, "note": "v23 only; v28+ locked at 8.50" },
+        "total": { "min": 36.44, "max": 46.01, "uniqueCount": 4, "stable": false, "note": "v23 only; v28+ locked at 36.54" }
+      }
+    }
+  },
+  "task5_columnAmbiguity": {
+    "gorgonzola": {
+      "wrappedText": true,
+      "lineBreaksInDescription": true,
+      "descriptionTokens": ["1/8*", "~1,5kg", "Produto de Stock", "Castel* variants"],
+      "shiftedCols": false,
+      "qtyAmbiguity": "Fractional 1,35 confusable with description 1/8 and ~1,5kg; runs flip to qty 2",
+      "discountFormat": "22,85 without % symbol",
+      "note": "Description complexity drives qty hallucination more than column pixel shift"
+    },
+    "prosciutto": {
+      "wrappedText": false,
+      "lineBreaksInDescription": false,
+      "descriptionTokens": ["~4,25KG"],
+      "shiftedCols": "Historical v23: unit_price read Desc 17,50 as €17.06 (pass-c-raw); closed v28+",
+      "qtyAmbiguity": false,
+      "discountFormat": "17,50 without % symbol",
+      "note": "Four numerics in 286px cluster; v28 prompt hardening resolved discount extraction"
+    },
+    "differential": "Gorgonzola has higher description-token ambiguity (1/8 cheese-wheel notation); Prosciutto had discount-column bleed (historical) now closed"
+  },
+  "task6_tokenComplexity": {
+    "question": "Gorgonzola objectively harder?",
+    "answer": "YES",
+    "gorgonzola": {
+      "descriptionLength": "~95 chars with pack metadata",
+      "numericTokensInDescription": ["1/8", "1,5kg", "1,8-1,9kg variants"],
+      "qtyDigitPattern": "1,35 — small fractional, 3↔0/5 confusion documented",
+      "hallucinatedBrandVariants": ["Castelfrigo", "Castelfiorito", "Castelgrotti", "Casaleggio", "Castelli"],
+      "score": "HIGH"
+    },
+    "prosciutto": {
+      "descriptionLength": "~55 chars",
+      "numericTokensInDescription": ["~4,25KG"],
+      "qtyDigitPattern": "4,30 — unambiguous integer+fraction",
+      "hallucinatedBrandVariants": ["minor HC range variants only"],
+      "score": "LOW"
+    }
+  },
+  "task7_firstDivergence": {
+    "pipeline": ["PDF", "OCR", "Structured (Pass C)", "Binding", "Persistence"],
+    "gorgonzola": {
+      "pdf": "PASS — 1.35 / 9.95 net / 13.44",
+      "ocr": "PASS qty — 1.35 / 9.82 / 13.44",
+      "structured": "FIRST DIVERGENCE — qty 1.05 (v28) or 2 (majority v27–v38); unit_price invented",
+      "binding": "PASS-THROUGH",
+      "persistence": "PASS-THROUGH"
+    },
+    "prosciutto": {
+      "pdf": "PASS — 4.30 / 8.50 net / 36.54",
+      "ocr": "PARTIAL — qty 4.30 OK; unit 17.06 discount bleed; total 36.54 OK",
+      "structured_v23": "FIRST DIVERGENCE (historical) — discount_pct null → gross unit",
+      "structured_v28plus": "PASS — 4.30 / 8.50 / 36.54",
+      "binding": "PASS-THROUGH when structured complete",
+      "persistence": "PASS-THROUGH"
+    },
+    "firstRealDifferenceUnstableVsStable": "Pass C structured extraction — Gorgonzola diverges on every probe generation; Prosciutto converged at v28 and holds through v38"
+  },
+  "task8_rootCause": {
+    "options": {
+      "A": "OCR/vision input failure on Gorgonzola row",
+      "B": "discount_pct omission only (Prosciutto v23 pattern)",
+      "C": "LLM hallucinated both qty and unit_price at Pass C",
+      "D": "Post-processing/binding corruption",
+      "E": "Persistence or re-read cache mutation"
+    },
+    "answer": "C",
+    "rationale": "Gorgonzola OCR reads qty 1.35 correctly; binding/persistence are lossless pass-through. Instability is dual-field Pass C hallucination (1,35→1,05/2; invented unit_price 8.43–22.85). Prosciutto v23 was pattern B (discount omission), fixed v28; not Gorgonzola's mechanism."
+  },
+  "task9_fixGorgonzolaFixesOthers": {
+    "answer": "NO",
+    "rationale": "Prosciutto already stable v28–v38 via discount-column hardening (different sub-pattern). Mortadella/Bresaola have adjacent-row bleed and intermittent discount failures — Gorgonzola-specific qty-digit and 1/8 description fix would not close those. Shared Emporio family prompt block helps partially but Gorgonzola-only fix insufficient."
+  },
+  "requiredStageTable": [
+    { "stage": "PDF", "gorgonzola": "1.35 / €9.95 net / €13.44", "prosciutto": "4.30 / €8.50 net / €36.54", "divergence": false },
+    { "stage": "OCR (pass-c-raw)", "gorgonzola": "1.35 / €9.82 / €13.44", "prosciutto": "4.30 / €17.06 / €36.54", "divergence": true, "note": "Prosciutto unit discount-bleed only; Gorgonzola qty correct" },
+    { "stage": "Pass C v28+", "gorgonzola": "1.05–2.00 / €8.43–€22.85 / €13.44–€45.70", "prosciutto": "4.30 / €8.50 / €36.54", "divergence": true, "note": "FIRST real unstable-vs-stable split" },
+    { "stage": "Binding", "gorgonzola": "pass-through", "prosciutto": "pass-through", "divergence": false },
+    { "stage": "Persistence (ab52796d)", "gorgonzola": "2.00 / €9.35 / €18.72 (v38 re-read)", "prosciutto": "4.30 / €8.50 / €36.54", "divergence": true, "note": "Reflects Pass C; no post-insert mutation" }
+  ],
+  "final": {
+    "whyGorgonzolaUnstable": "Pass C GPT non-determinism on fractional qty (1,35→1,05 or 2) and invented unit_price, amplified by description tokens 1/8 ~1,5kg; totals sometimes copied (13.44) sometimes synthesized (18.72–45.70). v38 re-read regressed to 2/9.35/18.72.",
+    "whyProsciuttoStable": "Qty 4,30 unambiguous; v28 EMPORIO discount-column hardening populates gross+discount+net consistently; v30 10/10 and v38 re-read identical at 4.3/8.5/36.54.",
+    "firstDifferingStage": "Pass C structured extraction (v28+ for Gorgonzola qty; Prosciutto stable from same stage onward)",
+    "uniqueEdgeCaseOrDeliFamily": "Unique Gorgonzola edge case within shared Emporio deli-family Pass C variance cluster — not a separate pipeline mode",
+    "fixTarget": "C",
+    "fixTargetLabel": "Prompt + validation (Pass C fractional-digit fidelity + math guard when qty×unit ≠ line_total_net)"
+  },
+  "artifactIndex": [
+    ".tmp/emporio-deli-stability-audit/",
+    ".tmp/gorgonzola-reread-validation-audit/",
+    ".tmp/reread-pipeline-forensics-audit/",
+    ".tmp/gorgonzola-structured-extraction-failure-audit/",
+    ".tmp/gorgonzola-root-cause/stage-trace.json",
+    ".tmp/prosciutto-v23-audit/",
+    ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json",
+    ".tmp/column-shift-audit/ground-truth.json",
+    ".tmp/emporio-discount-column-audit/",
+    ".tmp/final-stability-audit/"
+  ]
+}

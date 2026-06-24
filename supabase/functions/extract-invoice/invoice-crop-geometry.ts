@@ -92,3 +92,7 @@ export const HEADER_RULE_OFFSETS = [12, 16, 20, 24] as const;
 
 /** Totals-band edge scan reaches the lower page even when the header sits higher. */
 export const TOTALS_SCAN_END_FRACTION = 0.88;
+
+/** Emporio Italia Qtd column (438–478 on 724px reference raster). */
+export const EMPORIO_QTD_COLUMN_X_FRAC = { x0: 0.605, x1: 0.661 } as const;
+export const QTD_STRIP_MIN_WIDTH_PX = 24;

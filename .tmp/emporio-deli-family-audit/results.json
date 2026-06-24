@@ -1,0 +1,1975 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "emporioInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "emporioInvoice": {
+    "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "supplier_name": "Emporio Italia",
+    "invoice_date": "2026-05-19",
+    "created_at": "2026-06-11T22:53:16.723511+00:00"
+  },
+  "generatedAt": "2026-06-24T02:50:39.733Z",
+  "priorAudit": ".tmp/ingredient-procurement-operational-duplication-audit",
+  "codePaths": {
+    "invoiceBinding": "bindMonetaryColumns → normalizeInvoiceItemFields",
+    "purchaseFormat": "resolveInvoiceLinePurchaseFormat",
+    "stockNormalization": "parsePurchaseStructureFromText → computeUsableFromPurchaseStructure",
+    "procurement": "procurementPackFieldsFromInvoiceLine",
+    "operational": "operationalCostFieldsFromInvoiceLine",
+    "recipeCosting": "recipeOperationalCostFieldsFromInvoiceLine → ingredientLineCostEur",
+    "presentation": "resolveInvoiceLinePricingPresentation → buildLastPurchaseCostPresentation",
+    "purchaseMemory": "resolvePurchaseCostLabels (ingredient-purchase-memory.ts)"
+  },
+  "targets": [
+    {
+      "key": "gorgonzola",
+      "displayName": "Gorgonzola DOP dolce",
+      "ingredient": {
+        "id": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+        "name": "Gorgonzola DOP dolce",
+        "current_price": 10.88,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g",
+        "normalized_name": "gorgonzola dop dolce",
+        "supplier": null
+      },
+      "latestInvoiceItem": {
+        "id": "bece238e-fd6d-493c-8555-6921b164f97c",
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+        "unit": "kg",
+        "total": 13.44,
+        "invoices": {
+          "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "created_at": "2026-06-11T22:53:16.723511+00:00",
+          "invoice_date": "2026-05-19",
+          "supplier_name": "Emporio Italia"
+        },
+        "quantity": 1.05,
+        "created_at": "2026-06-23T10:41:31.22202+00:00",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "unit_price": 10.88
+      },
+      "emporioInvoiceLine": {
+        "id": "bece238e-fd6d-493c-8555-6921b164f97c",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+        "quantity": 1.05,
+        "unit": "kg",
+        "unit_price": 10.88,
+        "total": 13.44,
+        "created_at": "2026-06-23T10:41:31.22202+00:00"
+      },
+      "match": {
+        "invoice_item_id": "bece238e-fd6d-493c-8555-6921b164f97c",
+        "status": "confirmed",
+        "match_kind": "confirmed-override",
+        "invoice_items": {
+          "id": "bece238e-fd6d-493c-8555-6921b164f97c",
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "unit": "kg",
+          "total": 13.44,
+          "invoices": {
+            "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+            "created_at": "2026-06-11T22:53:16.723511+00:00",
+            "invoice_date": "2026-05-19",
+            "supplier_name": "Emporio Italia"
+          },
+          "quantity": 1.05,
+          "created_at": "2026-06-23T10:41:31.22202+00:00",
+          "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "unit_price": 10.88
+        }
+      },
+      "fullTrace": {
+        "stage1_invoiceItem": {
+          "id": "bece238e-fd6d-493c-8555-6921b164f97c",
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 1.05,
+          "unit": "kg",
+          "unit_price": 10.88,
+          "line_total": 13.44
+        },
+        "stage2_bound": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 10.88,
+          "total": 13.44
+        },
+        "stage3_purchaseStructure": {
+          "purchaseQuantity": 1,
+          "purchaseFormat": "unit",
+          "unitSize": 1.5,
+          "unitMeasurement": "kg",
+          "totalUsableAmount": 1500,
+          "usableUnit": "g",
+          "matchedText": "1,5kg",
+          "tier": "bare_measure"
+        },
+        "stage4_stockNormalization": {
+          "purchaseContainerCount": 1,
+          "usableQuantity": 1500,
+          "usableUnit": "g",
+          "unitFamily": "mass",
+          "usableSource": "structure_total",
+          "fallbackReason": null,
+          "weak_scalar_activated": false
+        },
+        "stage5_structuredPurchase": {
+          "kind": "weight_or_volume",
+          "purchaseContainerCount": 1,
+          "purchaseContainerUnit": "kg",
+          "packageQuantity": 1.5,
+          "packageMeasurementUnit": "kg",
+          "normalizedUsableQuantity": 1500,
+          "usableQuantityUnit": "g",
+          "inferred": {
+            "purchase_quantity": 1500,
+            "purchase_unit": "g",
+            "base_unit": "g",
+            "package_type": null,
+            "package_count": null,
+            "confidence": 0.98,
+            "reason": "weight token \"1,5KG\" → 1500g",
+            "purchase_unit_count": 1,
+            "pack_size": 1500,
+            "pack_size_unit": "g",
+            "size_is_metadata_only": false,
+            "normalized_stock_quantity": 1500,
+            "stock_unit": "g",
+            "recipe_usage_unit": "g",
+            "conversion_hint": null
+          }
+        },
+        "stage6_procurement": {
+          "current_price": 10.88,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g",
+          "unit": "g",
+          "includeCatalogUnitFields": false
+        },
+        "stage7_operationalPersist": {
+          "current_price": 10.88,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "stage8_recipeFields": {
+          "current_price": 10.88,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "stage9_presentation": {
+          "priceDisplay": "€10.88 / kg",
+          "effectiveUsableCostLabel": "€10.88 / kg",
+          "usableStockLabel": "1.5 kg usable",
+          "card": {
+            "purchaseQuantityLine": "1.05 kg",
+            "purchasePriceLine": "€10.88 / kg · €13.44 total",
+            "normalizedLine": "1.5 kg usable",
+            "usableCostLine": "€10.88 / kg"
+          },
+          "collapseOperational": false
+        },
+        "stage10_detailPresentation": {
+          "lastPurchase": "1.05 kg",
+          "procurementCost": "€10.88 / kg",
+          "operationalCost": "€10.88 / kg",
+          "totalPaid": "€13.44",
+          "supplier": null,
+          "purchaseDate": null,
+          "lines": [
+            {
+              "label": "Last Purchase",
+              "value": "1.05 kg"
+            },
+            {
+              "label": "Procurement Cost",
+              "value": "€10.88 / kg"
+            },
+            {
+              "label": "Operational Cost",
+              "value": "€10.88 / kg"
+            },
+            {
+              "label": "Total Paid",
+              "value": "€13.44"
+            }
+          ]
+        },
+        "stage11_recipeCosting": {
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g",
+          "current_price": 10.88,
+          "unitCostEurPerBase": 0.01088,
+          "cost100g": 1.088,
+          "cost250g": 2.72,
+          "cost1kg": 10.88,
+          "displayDenominator": "1000g",
+          "kpiLabel": "€10.88/kg",
+          "operationalDisplayEurPerKg": 10.88
+        },
+        "perUnit": {
+          "amount": 1000,
+          "unit": "g"
+        },
+        "effective": {
+          "cost": 10.88,
+          "unit": "kg"
+        },
+        "conversionHint": null
+      },
+      "equality": {
+        "sameUnit": true,
+        "sameCost": true,
+        "same": true,
+        "transformation": null,
+        "formula": "unit_price (10.88) / (usable_per_unit 1000g) = effective.cost (10.8800) kg"
+      },
+      "recipeCosting": {
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g",
+        "current_price": 10.88,
+        "unitCostEurPerBase": 0.01088,
+        "cost100g": 1.088,
+        "cost250g": 2.72,
+        "cost1kg": 10.88,
+        "displayDenominator": "1000g",
+        "kpiLabel": "€10.88/kg",
+        "operationalDisplayEurPerKg": 10.88
+      },
+      "presentation": {
+        "resolvePurchaseCostLabels": {
+          "procurementCostLabel": "€10.88 / kg",
+          "operationalCostLabel": "€10.88 / kg",
+          "presentation": {
+            "card": {
+              "purchaseQuantityLine": "1.05 kg",
+              "purchasePriceLine": "€10.88 / kg · €13.44 total",
+              "normalizedLine": "1.5 kg usable",
+              "usableCostLine": "€10.88 / kg"
+            },
+            "blocks": [
+              {
+                "id": "purchase",
+                "title": "Purchase",
+                "lines": [
+                  {
+                    "text": "1.05 kg",
+                    "variant": "default"
+                  },
+                  {
+                    "text": "€10.88 / kg · €13.44 total",
+                    "variant": "secondary"
+                  }
+                ]
+              },
+              {
+                "id": "normalized",
+                "title": "Normalized",
+                "lines": [
+                  {
+                    "text": "1.5 kg usable",
+                    "variant": "default"
+                  }
+                ]
+              },
+              {
+                "id": "recipe-cost",
+                "title": "Normalized",
+                "lines": [
+                  {
+                    "text": "€10.88 / kg",
+                    "variant": "emphasis"
+                  }
+                ]
+              }
+            ],
+            "badges": [],
+            "insights": [],
+            "priceLabel": "Purchase price",
+            "priceDisplay": "€10.88 / kg",
+            "purchasedPackDetail": null,
+            "usableStockLabel": "1.5 kg usable",
+            "effectiveUsableCostLabel": "€10.88 / kg"
+          }
+        },
+        "buildLastPurchaseCostPresentation": {
+          "lastPurchase": "1.05 kg",
+          "procurementCost": "€10.88 / kg",
+          "operationalCost": "€10.88 / kg",
+          "totalPaid": "€13.44",
+          "supplier": null,
+          "purchaseDate": null,
+          "lines": [
+            {
+              "label": "Last Purchase",
+              "value": "1.05 kg"
+            },
+            {
+              "label": "Procurement Cost",
+              "value": "€10.88 / kg"
+            },
+            {
+              "label": "Operational Cost",
+              "value": "€10.88 / kg"
+            },
+            {
+              "label": "Total Paid",
+              "value": "€13.44"
+            }
+          ]
+        },
+        "effectiveUsableCostLabel": "€10.88 / kg",
+        "addsInformation": false
+      },
+      "catalogPersisted": {
+        "current_price": 10.88,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g",
+        "matchesRecipeFields": true
+      },
+      "recipeLines": []
+    },
+    {
+      "key": "prosciutto",
+      "displayName": "Prosciutto cotto scelto",
+      "ingredient": {
+        "id": "b924480a-91f3-4aa2-9852-a900795a6f92",
+        "name": "Prosciutto cotto scelto",
+        "current_price": 8.5,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g",
+        "normalized_name": "prosciutto cotto scelto",
+        "supplier": null
+      },
+      "latestInvoiceItem": {
+        "id": "a8b35610-6459-404a-96be-12fe970a50bc",
+        "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+        "unit": "kg",
+        "total": 36.54,
+        "invoices": {
+          "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "created_at": "2026-06-11T22:53:16.723511+00:00",
+          "invoice_date": "2026-05-19",
+          "supplier_name": "Emporio Italia"
+        },
+        "quantity": 4.3,
+        "created_at": "2026-06-23T10:41:31.22202+00:00",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "unit_price": 8.5
+      },
+      "emporioInvoiceLine": {
+        "id": "a8b35610-6459-404a-96be-12fe970a50bc",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+        "quantity": 4.3,
+        "unit": "kg",
+        "unit_price": 8.5,
+        "total": 36.54,
+        "created_at": "2026-06-23T10:41:31.22202+00:00"
+      },
+      "match": {
+        "invoice_item_id": "a8b35610-6459-404a-96be-12fe970a50bc",
+        "status": "confirmed",
+        "match_kind": "confirmed-override",
+        "invoice_items": {
+          "id": "a8b35610-6459-404a-96be-12fe970a50bc",
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+          "unit": "kg",
+          "total": 36.54,
+          "invoices": {
+            "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+            "created_at": "2026-06-11T22:53:16.723511+00:00",
+            "invoice_date": "2026-05-19",
+            "supplier_name": "Emporio Italia"
+          },
+          "quantity": 4.3,
+          "created_at": "2026-06-23T10:41:31.22202+00:00",
+          "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "unit_price": 8.5
+        }
+      },
+      "fullTrace": {
+        "stage1_invoiceItem": {
+          "id": "a8b35610-6459-404a-96be-12fe970a50bc",
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 8.5,
+          "line_total": 36.54
+        },
+        "stage2_bound": {
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+          "quantity": 4.3,
+          "unit": "kg",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 8.5,
+          "total": 36.54
+        },
+        "stage3_purchaseStructure": {
+          "purchaseQuantity": 1,
+          "purchaseFormat": "unit",
+          "unitSize": 4.5,
+          "unitMeasurement": "kg",
+          "totalUsableAmount": 4500,
+          "usableUnit": "g",
+          "matchedText": "4,5KG",
+          "tier": "bare_measure"
+        },
+        "stage4_stockNormalization": {
+          "purchaseContainerCount": 1,
+          "usableQuantity": 4500,
+          "usableUnit": "g",
+          "unitFamily": "mass",
+          "usableSource": "structure_total",
+          "fallbackReason": null,
+          "weak_scalar_activated": false
+        },
+        "stage5_structuredPurchase": {
+          "kind": "weight_or_volume",
+          "purchaseContainerCount": 1,
+          "purchaseContainerUnit": "kg",
+          "packageQuantity": 4.5,
+          "packageMeasurementUnit": "kg",
+          "normalizedUsableQuantity": 4500,
+          "usableQuantityUnit": "g",
+          "inferred": {
+            "purchase_quantity": 4500,
+            "purchase_unit": "g",
+            "base_unit": "g",
+            "package_type": null,
+            "package_count": null,
+            "confidence": 0.98,
+            "reason": "weight token \"4,5KG\" → 4500g",
+            "purchase_unit_count": 1,
+            "pack_size": 4500,
+            "pack_size_unit": "g",
+            "size_is_metadata_only": false,
+            "normalized_stock_quantity": 4500,
+            "stock_unit": "g",
+            "recipe_usage_unit": "g",
+            "conversion_hint": null
+          }
+        },
+        "stage6_procurement": {
+          "current_price": 8.5,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g",
+          "unit": "g",
+          "includeCatalogUnitFields": false
+        },
+        "stage7_operationalPersist": {
+          "current_price": 8.5,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "stage8_recipeFields": {
+          "current_price": 8.5,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "stage9_presentation": {
+          "priceDisplay": "€8.50 / kg",
+          "effectiveUsableCostLabel": "€8.50 / kg",
+          "usableStockLabel": "4.5 kg usable",
+          "card": {
+            "purchaseQuantityLine": "4.30 kg",
+            "purchasePriceLine": "€8.50 / kg · €36.54 total",
+            "normalizedLine": "4.5 kg usable",
+            "usableCostLine": "€8.50 / kg"
+          },
+          "collapseOperational": false
+        },
+        "stage10_detailPresentation": {
+          "lastPurchase": "4.30 kg",
+          "procurementCost": "€8.50 / kg",
+          "operationalCost": "€8.50 / kg",
+          "totalPaid": "€36.54",
+          "supplier": null,
+          "purchaseDate": null,
+          "lines": [
+            {
+              "label": "Last Purchase",
+              "value": "4.30 kg"
+            },
+            {
+              "label": "Procurement Cost",
+              "value": "€8.50 / kg"
+            },
+            {
+              "label": "Operational Cost",
+              "value": "€8.50 / kg"
+            },
+            {
+              "label": "Total Paid",
+              "value": "€36.54"
+            }
+          ]
+        },
+        "stage11_recipeCosting": {
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g",
+          "current_price": 8.5,
+          "unitCostEurPerBase": 0.0085,
+          "cost100g": 0.8500000000000001,
+          "cost250g": 2.125,
+          "cost1kg": 8.5,
+          "displayDenominator": "1000g",
+          "kpiLabel": "€8.50/kg",
+          "operationalDisplayEurPerKg": 8.5
+        },
+        "perUnit": {
+          "amount": 1000,
+          "unit": "g"
+        },
+        "effective": {
+          "cost": 8.5,
+          "unit": "kg"
+        },
+        "conversionHint": null
+      },
+      "equality": {
+        "sameUnit": true,
+        "sameCost": true,
+        "same": true,
+        "transformation": null,
+        "formula": "unit_price (8.5) / (usable_per_unit 1000g) = effective.cost (8.5000) kg"
+      },
+      "recipeCosting": {
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g",
+        "current_price": 8.5,
+        "unitCostEurPerBase": 0.0085,
+        "cost100g": 0.8500000000000001,
+        "cost250g": 2.125,
+        "cost1kg": 8.5,
+        "displayDenominator": "1000g",
+        "kpiLabel": "€8.50/kg",
+        "operationalDisplayEurPerKg": 8.5
+      },
+      "presentation": {
+        "resolvePurchaseCostLabels": {
+          "procurementCostLabel": "€8.50 / kg",
+          "operationalCostLabel": "€8.50 / kg",
+          "presentation": {
+            "card": {
+              "purchaseQuantityLine": "4.30 kg",
+              "purchasePriceLine": "€8.50 / kg · €36.54 total",
+              "normalizedLine": "4.5 kg usable",
+              "usableCostLine": "€8.50 / kg"
+            },
+            "blocks": [
+              {
+                "id": "purchase",
+                "title": "Purchase",
+                "lines": [
+                  {
+                    "text": "4.30 kg",
+                    "variant": "default"
+                  },
+                  {
+                    "text": "€8.50 / kg · €36.54 total",
+                    "variant": "secondary"
+                  }
+                ]
+              },
+              {
+                "id": "normalized",
+                "title": "Normalized",
+                "lines": [
+                  {
+                    "text": "4.5 kg usable",
+                    "variant": "default"
+                  }
+                ]
+              },
+              {
+                "id": "recipe-cost",
+                "title": "Normalized",
+                "lines": [
+                  {
+                    "text": "€8.50 / kg",
+                    "variant": "emphasis"
+                  }
+                ]
+              }
+            ],
+            "badges": [],
+            "insights": [],
+            "priceLabel": "Purchase price",
+            "priceDisplay": "€8.50 / kg",
+            "purchasedPackDetail": null,
+            "usableStockLabel": "4.5 kg usable",
+            "effectiveUsableCostLabel": "€8.50 / kg"
+          }
+        },
+        "buildLastPurchaseCostPresentation": {
+          "lastPurchase": "4.30 kg",
+          "procurementCost": "€8.50 / kg",
+          "operationalCost": "€8.50 / kg",
+          "totalPaid": "€36.54",
+          "supplier": null,
+          "purchaseDate": null,
+          "lines": [
+            {
+              "label": "Last Purchase",
+              "value": "4.30 kg"
+            },
+            {
+              "label": "Procurement Cost",
+              "value": "€8.50 / kg"
+            },
+            {
+              "label": "Operational Cost",
+              "value": "€8.50 / kg"
+            },
+            {
+              "label": "Total Paid",
+              "value": "€36.54"
+            }
+          ]
+        },
+        "effectiveUsableCostLabel": "€8.50 / kg",
+        "addsInformation": false
+      },
+      "catalogPersisted": {
+        "current_price": 8.5,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g",
+        "matchesRecipeFields": true
+      },
+      "recipeLines": []
+    },
+    {
+      "key": "mortadella",
+      "displayName": "Mortadella IGP massima con pistacchio",
+      "ingredient": {
+        "id": "9c853a47-82fe-4d6d-88bc-f0aa007e0a59",
+        "name": "Mortadella IGP massima con pistacchio",
+        "current_price": 9.99,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g",
+        "normalized_name": "mortadella igp massima con pistacchio",
+        "supplier": null
+      },
+      "latestInvoiceItem": {
+        "id": "b28d90e7-e53d-4365-b535-5abe7addebdb",
+        "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+        "unit": "kg",
+        "total": 31.07,
+        "invoices": {
+          "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "created_at": "2026-06-11T22:53:16.723511+00:00",
+          "invoice_date": "2026-05-19",
+          "supplier_name": "Emporio Italia"
+        },
+        "quantity": 3.11,
+        "created_at": "2026-06-23T10:41:31.22202+00:00",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "unit_price": 9.99
+      },
+      "emporioInvoiceLine": {
+        "id": "b28d90e7-e53d-4365-b535-5abe7addebdb",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+        "quantity": 3.11,
+        "unit": "kg",
+        "unit_price": 9.99,
+        "total": 31.07,
+        "created_at": "2026-06-23T10:41:31.22202+00:00"
+      },
+      "match": {
+        "invoice_item_id": "b28d90e7-e53d-4365-b535-5abe7addebdb",
+        "status": "confirmed",
+        "match_kind": "confirmed-override",
+        "invoice_items": {
+          "id": "b28d90e7-e53d-4365-b535-5abe7addebdb",
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+          "unit": "kg",
+          "total": 31.07,
+          "invoices": {
+            "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+            "created_at": "2026-06-11T22:53:16.723511+00:00",
+            "invoice_date": "2026-05-19",
+            "supplier_name": "Emporio Italia"
+          },
+          "quantity": 3.11,
+          "created_at": "2026-06-23T10:41:31.22202+00:00",
+          "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "unit_price": 9.99
+        }
+      },
+      "fullTrace": {
+        "stage1_invoiceItem": {
+          "id": "b28d90e7-e53d-4365-b535-5abe7addebdb",
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+          "quantity": 3.11,
+          "unit": "kg",
+          "unit_price": 9.99,
+          "line_total": 31.07
+        },
+        "stage2_bound": {
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+          "quantity": 3.11,
+          "unit": "kg",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 9.99,
+          "total": 31.07
+        },
+        "stage3_purchaseStructure": {
+          "purchaseQuantity": 1,
+          "purchaseFormat": "unit",
+          "unitSize": 3.5,
+          "unitMeasurement": "kg",
+          "totalUsableAmount": 3500,
+          "usableUnit": "g",
+          "matchedText": "3,5kg",
+          "tier": "bare_measure"
+        },
+        "stage4_stockNormalization": {
+          "purchaseContainerCount": 1,
+          "usableQuantity": 3500,
+          "usableUnit": "g",
+          "unitFamily": "mass",
+          "usableSource": "structure_total",
+          "fallbackReason": null,
+          "weak_scalar_activated": false
+        },
+        "stage5_structuredPurchase": {
+          "kind": "weight_or_volume",
+          "purchaseContainerCount": 1,
+          "purchaseContainerUnit": "kg",
+          "packageQuantity": 3.5,
+          "packageMeasurementUnit": "kg",
+          "normalizedUsableQuantity": 3500,
+          "usableQuantityUnit": "g",
+          "inferred": {
+            "purchase_quantity": 3500,
+            "purchase_unit": "g",
+            "base_unit": "g",
+            "package_type": null,
+            "package_count": null,
+            "confidence": 0.98,
+            "reason": "weight token \"3,5KG\" → 3500g",
+            "purchase_unit_count": 1,
+            "pack_size": 3500,
+            "pack_size_unit": "g",
+            "size_is_metadata_only": false,
+            "normalized_stock_quantity": 3500,
+            "stock_unit": "g",
+            "recipe_usage_unit": "g",
+            "conversion_hint": null
+          }
+        },
+        "stage6_procurement": {
+          "current_price": 9.99,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g",
+          "unit": "g",
+          "includeCatalogUnitFields": false
+        },
+        "stage7_operationalPersist": {
+          "current_price": 9.99,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "stage8_recipeFields": {
+          "current_price": 9.99,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "stage9_presentation": {
+          "priceDisplay": "€9.99 / kg",
+          "effectiveUsableCostLabel": "€9.99 / kg",
+          "usableStockLabel": "3.5 kg usable",
+          "card": {
+            "purchaseQuantityLine": "3.11 kg",
+            "purchasePriceLine": "€9.99 / kg · €31.07 total",
+            "normalizedLine": "3.5 kg usable",
+            "usableCostLine": "€9.99 / kg"
+          },
+          "collapseOperational": false
+        },
+        "stage10_detailPresentation": {
+          "lastPurchase": "3.11 kg",
+          "procurementCost": "€9.99 / kg",
+          "operationalCost": "€9.99 / kg",
+          "totalPaid": "€31.07",
+          "supplier": null,
+          "purchaseDate": null,
+          "lines": [
+            {
+              "label": "Last Purchase",
+              "value": "3.11 kg"
+            },
+            {
+              "label": "Procurement Cost",
+              "value": "€9.99 / kg"
+            },
+            {
+              "label": "Operational Cost",
+              "value": "€9.99 / kg"
+            },
+            {
+              "label": "Total Paid",
+              "value": "€31.07"
+            }
+          ]
+        },
+        "stage11_recipeCosting": {
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g",
+          "current_price": 9.99,
+          "unitCostEurPerBase": 0.00999,
+          "cost100g": 0.9990000000000001,
+          "cost250g": 2.4975,
+          "cost1kg": 9.99,
+          "displayDenominator": "1000g",
+          "kpiLabel": "€9.99/kg",
+          "operationalDisplayEurPerKg": 9.99
+        },
+        "perUnit": {
+          "amount": 1000,
+          "unit": "g"
+        },
+        "effective": {
+          "cost": 9.99,
+          "unit": "kg"
+        },
+        "conversionHint": null
+      },
+      "equality": {
+        "sameUnit": true,
+        "sameCost": true,
+        "same": true,
+        "transformation": null,
+        "formula": "unit_price (9.99) / (usable_per_unit 1000g) = effective.cost (9.9900) kg"
+      },
+      "recipeCosting": {
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g",
+        "current_price": 9.99,
+        "unitCostEurPerBase": 0.00999,
+        "cost100g": 0.9990000000000001,
+        "cost250g": 2.4975,
+        "cost1kg": 9.99,
+        "displayDenominator": "1000g",
+        "kpiLabel": "€9.99/kg",
+        "operationalDisplayEurPerKg": 9.99
+      },
+      "presentation": {
+        "resolvePurchaseCostLabels": {
+          "procurementCostLabel": "€9.99 / kg",
+          "operationalCostLabel": "€9.99 / kg",
+          "presentation": {
+            "card": {
+              "purchaseQuantityLine": "3.11 kg",
+              "purchasePriceLine": "€9.99 / kg · €31.07 total",
+              "normalizedLine": "3.5 kg usable",
+              "usableCostLine": "€9.99 / kg"
+            },
+            "blocks": [
+              {
+                "id": "purchase",
+                "title": "Purchase",
+                "lines": [
+                  {
+                    "text": "3.11 kg",
+                    "variant": "default"
+                  },
+                  {
+                    "text": "€9.99 / kg · €31.07 total",
+                    "variant": "secondary"
+                  }
+                ]
+              },
+              {
+                "id": "normalized",
+                "title": "Normalized",
+                "lines": [
+                  {
+                    "text": "3.5 kg usable",
+                    "variant": "default"
+                  }
+                ]
+              },
+              {
+                "id": "recipe-cost",
+                "title": "Normalized",
+                "lines": [
+                  {
+                    "text": "€9.99 / kg",
+                    "variant": "emphasis"
+                  }
+                ]
+              }
+            ],
+            "badges": [],
+            "insights": [],
+            "priceLabel": "Purchase price",
+            "priceDisplay": "€9.99 / kg",
+            "purchasedPackDetail": null,
+            "usableStockLabel": "3.5 kg usable",
+            "effectiveUsableCostLabel": "€9.99 / kg"
+          }
+        },
+        "buildLastPurchaseCostPresentation": {
+          "lastPurchase": "3.11 kg",
+          "procurementCost": "€9.99 / kg",
+          "operationalCost": "€9.99 / kg",
+          "totalPaid": "€31.07",
+          "supplier": null,
+          "purchaseDate": null,
+          "lines": [
+            {
+              "label": "Last Purchase",
+              "value": "3.11 kg"
+            },
+            {
+              "label": "Procurement Cost",
+              "value": "€9.99 / kg"
+            },
+            {
+              "label": "Operational Cost",
+              "value": "€9.99 / kg"
+            },
+            {
+              "label": "Total Paid",
+              "value": "€31.07"
+            }
+          ]
+        },
+        "effectiveUsableCostLabel": "€9.99 / kg",
+        "addsInformation": false
+      },
+      "catalogPersisted": {
+        "current_price": 9.99,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g",
+        "matchesRecipeFields": true
+      },
+      "recipeLines": []
+    },
+    {
+      "key": "bresaola",
+      "displayName": "Bresaola punta d'anca oro",
+      "ingredient": {
+        "id": "31d6da3f-d812-4836-9086-92a5616250d1",
+        "name": "Rigamonti bresaola punta d'anca oro",
+        "current_price": 27.04,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g",
+        "normalized_name": "rigamonti bresaola punta d'anca oro",
+        "supplier": null
+      },
+      "latestInvoiceItem": {
+        "id": "5dc2c383-4d58-4de3-b829-60d111357c40",
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+        "unit": "kg",
+        "total": 49.48,
+        "invoices": {
+          "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "created_at": "2026-06-11T22:53:16.723511+00:00",
+          "invoice_date": "2026-05-19",
+          "supplier_name": "Emporio Italia"
+        },
+        "quantity": 1.83,
+        "created_at": "2026-06-23T10:41:31.22202+00:00",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "unit_price": 27.04
+      },
+      "emporioInvoiceLine": {
+        "id": "5dc2c383-4d58-4de3-b829-60d111357c40",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+        "quantity": 1.83,
+        "unit": "kg",
+        "unit_price": 27.04,
+        "total": 49.48,
+        "created_at": "2026-06-23T10:41:31.22202+00:00"
+      },
+      "match": {
+        "invoice_item_id": "5dc2c383-4d58-4de3-b829-60d111357c40",
+        "status": "confirmed",
+        "match_kind": "confirmed-override",
+        "invoice_items": {
+          "id": "5dc2c383-4d58-4de3-b829-60d111357c40",
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+          "unit": "kg",
+          "total": 49.48,
+          "invoices": {
+            "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+            "created_at": "2026-06-11T22:53:16.723511+00:00",
+            "invoice_date": "2026-05-19",
+            "supplier_name": "Emporio Italia"
+          },
+          "quantity": 1.83,
+          "created_at": "2026-06-23T10:41:31.22202+00:00",
+          "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "unit_price": 27.04
+        }
+      },
+      "fullTrace": {
+        "stage1_invoiceItem": {
+          "id": "5dc2c383-4d58-4de3-b829-60d111357c40",
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+          "quantity": 1.83,
+          "unit": "kg",
+          "unit_price": 27.04,
+          "line_total": 49.48
+        },
+        "stage2_bound": {
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+          "quantity": 1.83,
+          "unit": "kg",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 27.04,
+          "total": 49.48
+        },
+        "stage3_purchaseStructure": {
+          "purchaseQuantity": 1,
+          "purchaseFormat": "unit",
+          "unitSize": 1.5,
+          "unitMeasurement": "kg",
+          "totalUsableAmount": 1500,
+          "usableUnit": "g",
+          "matchedText": "1,5kg",
+          "tier": "bare_measure"
+        },
+        "stage4_stockNormalization": {
+          "purchaseContainerCount": 1,
+          "usableQuantity": 1500,
+          "usableUnit": "g",
+          "unitFamily": "mass",
+          "usableSource": "structure_total",
+          "fallbackReason": null,
+          "weak_scalar_activated": false
+        },
+        "stage5_structuredPurchase": {
+          "kind": "weight_or_volume",
+          "purchaseContainerCount": 1,
+          "purchaseContainerUnit": "kg",
+          "packageQuantity": 1.5,
+          "packageMeasurementUnit": "kg",
+          "normalizedUsableQuantity": 1500,
+          "usableQuantityUnit": "g",
+          "inferred": {
+            "purchase_quantity": 1500,
+            "purchase_unit": "g",
+            "base_unit": "g",
+            "package_type": null,
+            "package_count": null,
+            "confidence": 0.98,
+            "reason": "weight token \"1,5KG\" → 1500g",
+            "purchase_unit_count": 1,
+            "pack_size": 1500,
+            "pack_size_unit": "g",
+            "size_is_metadata_only": false,
+            "normalized_stock_quantity": 1500,
+            "stock_unit": "g",
+            "recipe_usage_unit": "g",
+            "conversion_hint": null
+          }
+        },
+        "stage6_procurement": {
+          "current_price": 27.04,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g",
+          "unit": "g",
+          "includeCatalogUnitFields": false
+        },
+        "stage7_operationalPersist": {
+          "current_price": 27.04,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "stage8_recipeFields": {
+          "current_price": 27.04,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "stage9_presentation": {
+          "priceDisplay": "€27.04 / kg",
+          "effectiveUsableCostLabel": "€27.04 / kg",
+          "usableStockLabel": "1.5 kg usable",
+          "card": {
+            "purchaseQuantityLine": "1.83 kg",
+            "purchasePriceLine": "€27.04 / kg · €49.48 total",
+            "normalizedLine": "1.5 kg usable",
+            "usableCostLine": "€27.04 / kg"
+          },
+          "collapseOperational": false
+        },
+        "stage10_detailPresentation": {
+          "lastPurchase": "1.83 kg",
+          "procurementCost": "€27.04 / kg",
+          "operationalCost": "€27.04 / kg",
+          "totalPaid": "€49.48",
+          "supplier": null,
+          "purchaseDate": null,
+          "lines": [
+            {
+              "label": "Last Purchase",
+              "value": "1.83 kg"
+            },
+            {
+              "label": "Procurement Cost",
+              "value": "€27.04 / kg"
+            },
+            {
+              "label": "Operational Cost",
+              "value": "€27.04 / kg"
+            },
+            {
+              "label": "Total Paid",
+              "value": "€49.48"
+            }
+          ]
+        },
+        "stage11_recipeCosting": {
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g",
+          "current_price": 27.04,
+          "unitCostEurPerBase": 0.027039999999999998,
+          "cost100g": 2.7039999999999997,
+          "cost250g": 6.76,
+          "cost1kg": 27.04,
+          "displayDenominator": "1000g",
+          "kpiLabel": "€27.04/kg",
+          "operationalDisplayEurPerKg": 27.04
+        },
+        "perUnit": {
+          "amount": 1000,
+          "unit": "g"
+        },
+        "effective": {
+          "cost": 27.04,
+          "unit": "kg"
+        },
+        "conversionHint": null
+      },
+      "equality": {
+        "sameUnit": true,
+        "sameCost": true,
+        "same": true,
+        "transformation": null,
+        "formula": "unit_price (27.04) / (usable_per_unit 1000g) = effective.cost (27.0400) kg"
+      },
+      "recipeCosting": {
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g",
+        "current_price": 27.04,
+        "unitCostEurPerBase": 0.027039999999999998,
+        "cost100g": 2.7039999999999997,
+        "cost250g": 6.76,
+        "cost1kg": 27.04,
+        "displayDenominator": "1000g",
+        "kpiLabel": "€27.04/kg",
+        "operationalDisplayEurPerKg": 27.04
+      },
+      "presentation": {
+        "resolvePurchaseCostLabels": {
+          "procurementCostLabel": "€27.04 / kg",
+          "operationalCostLabel": "€27.04 / kg",
+          "presentation": {
+            "card": {
+              "purchaseQuantityLine": "1.83 kg",
+              "purchasePriceLine": "€27.04 / kg · €49.48 total",
+              "normalizedLine": "1.5 kg usable",
+              "usableCostLine": "€27.04 / kg"
+            },
+            "blocks": [
+              {
+                "id": "purchase",
+                "title": "Purchase",
+                "lines": [
+                  {
+                    "text": "1.83 kg",
+                    "variant": "default"
+                  },
+                  {
+                    "text": "€27.04 / kg · €49.48 total",
+                    "variant": "secondary"
+                  }
+                ]
+              },
+              {
+                "id": "normalized",
+                "title": "Normalized",
+                "lines": [
+                  {
+                    "text": "1.5 kg usable",
+                    "variant": "default"
+                  }
+                ]
+              },
+              {
+                "id": "recipe-cost",
+                "title": "Normalized",
+                "lines": [
+                  {
+                    "text": "€27.04 / kg",
+                    "variant": "emphasis"
+                  }
+                ]
+              }
+            ],
+            "badges": [],
+            "insights": [],
+            "priceLabel": "Purchase price",
+            "priceDisplay": "€27.04 / kg",
+            "purchasedPackDetail": null,
+            "usableStockLabel": "1.5 kg usable",
+            "effectiveUsableCostLabel": "€27.04 / kg"
+          }
+        },
+        "buildLastPurchaseCostPresentation": {
+          "lastPurchase": "1.83 kg",
+          "procurementCost": "€27.04 / kg",
+          "operationalCost": "€27.04 / kg",
+          "totalPaid": "€49.48",
+          "supplier": null,
+          "purchaseDate": null,
+          "lines": [
+            {
+              "label": "Last Purchase",
+              "value": "1.83 kg"
+            },
+            {
+              "label": "Procurement Cost",
+              "value": "€27.04 / kg"
+            },
+            {
+              "label": "Operational Cost",
+              "value": "€27.04 / kg"
+            },
+            {
+              "label": "Total Paid",
+              "value": "€49.48"
+            }
+          ]
+        },
+        "effectiveUsableCostLabel": "€27.04 / kg",
+        "addsInformation": false
+      },
+      "catalogPersisted": {
+        "current_price": 27.04,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g",
+        "matchesRecipeFields": true
+      },
+      "recipeLines": []
+    }
+  ],
+  "equalityTable": [
+    {
+      "product": "Gorgonzola DOP dolce",
+      "procurement_unit": "kg",
+      "operational_unit": "kg",
+      "procurement_unit_eq_operational_unit": "YES",
+      "procurement_cost": "€10.88 / kg",
+      "operational_cost": "€10.88 / kg",
+      "procurement_cost_eq_operational_cost": "YES",
+      "equal": "YES",
+      "transformation": null
+    },
+    {
+      "product": "Prosciutto cotto scelto",
+      "procurement_unit": "kg",
+      "operational_unit": "kg",
+      "procurement_unit_eq_operational_unit": "YES",
+      "procurement_cost": "€8.50 / kg",
+      "operational_cost": "€8.50 / kg",
+      "procurement_cost_eq_operational_cost": "YES",
+      "equal": "YES",
+      "transformation": null
+    },
+    {
+      "product": "Mortadella IGP massima con pistacchio",
+      "procurement_unit": "kg",
+      "operational_unit": "kg",
+      "procurement_unit_eq_operational_unit": "YES",
+      "procurement_cost": "€9.99 / kg",
+      "operational_cost": "€9.99 / kg",
+      "procurement_cost_eq_operational_cost": "YES",
+      "equal": "YES",
+      "transformation": null
+    },
+    {
+      "product": "Bresaola punta d'anca oro",
+      "procurement_unit": "kg",
+      "operational_unit": "kg",
+      "procurement_unit_eq_operational_unit": "YES",
+      "procurement_cost": "€27.04 / kg",
+      "operational_cost": "€27.04 / kg",
+      "procurement_cost_eq_operational_cost": "YES",
+      "equal": "YES",
+      "transformation": null
+    }
+  ],
+  "requiredTable": [
+    {
+      "product": "Gorgonzola DOP dolce",
+      "procurementCost": "€10.88 / kg",
+      "operationalCost": "€10.88 / kg",
+      "sameUnit": "YES",
+      "sameCost": "YES",
+      "addsInformation": "NO"
+    },
+    {
+      "product": "Prosciutto cotto scelto",
+      "procurementCost": "€8.50 / kg",
+      "operationalCost": "€8.50 / kg",
+      "sameUnit": "YES",
+      "sameCost": "YES",
+      "addsInformation": "NO"
+    },
+    {
+      "product": "Mortadella IGP massima con pistacchio",
+      "procurementCost": "€9.99 / kg",
+      "operationalCost": "€9.99 / kg",
+      "sameUnit": "YES",
+      "sameCost": "YES",
+      "addsInformation": "NO"
+    },
+    {
+      "product": "Bresaola punta d'anca oro",
+      "procurementCost": "€27.04 / kg",
+      "operationalCost": "€27.04 / kg",
+      "sameUnit": "YES",
+      "sameCost": "YES",
+      "addsInformation": "NO"
+    }
+  ],
+  "gorgonzolaDeepAudit": {
+    "invoiceItem": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "gross_unit_price": null,
+      "discount_pct": null,
+      "line_total_net": null,
+      "unit_price": 10.88,
+      "total": 13.44
+    },
+    "extractedQtyUnit": {
+      "quantity": 1.05,
+      "unit": "kg"
+    },
+    "purchase_structure_kind": "weight_or_volume",
+    "usable_quantity": {
+      "purchaseContainerCount": 1,
+      "usableQuantity": 1500,
+      "usableUnit": "g",
+      "unitFamily": "mass",
+      "usableSource": "structure_total",
+      "fallbackReason": null,
+      "weak_scalar_activated": false
+    },
+    "purchase_quantity": 1000,
+    "current_price": 10.88,
+    "operational_denominator": {
+      "amount": 1000,
+      "unit": "g"
+    },
+    "math": {
+      "line_total": 13.44,
+      "unit_price": 10.88,
+      "extractedQty": 1.05,
+      "extractedUnit": "kg",
+      "purchase_structure_kind": "weight_or_volume",
+      "usable_quantity_from_structure": 1500,
+      "usable_unit": "g",
+      "purchase_quantity_recipe": 1000,
+      "current_price": 10.88,
+      "operational_denominator_g": 1000,
+      "operational_denominator_kg": 1,
+      "formula_effective": "unit_price / (operational_denominator_g / 1000) = effective.cost €/kg",
+      "computed_effective_eur_per_kg": 10.88,
+      "line_total_div_operational_denominator_g": 0.013439999999999999,
+      "line_total_div_purchased_g": 0.012799999999999999,
+      "line_total_div_qty_kg": 12.799999999999999,
+      "recipe_eur_per_kg": 10.88,
+      "reconciles_to_expected_eur_per_kg": true
+    },
+    "expectedEurPerKg": 10.88,
+    "proof": {
+      "unit_price_is_operational_for_kg_row": true,
+      "effective_cost_equals_unit_price": true,
+      "recipe_current_price_over_purchase_quantity_times_1000": 10.88,
+      "reconciles_to_10_88_eur_per_kg": true,
+      "note_line_total_not_used_for_operational_cost": "Operational cost derives from unit_price (€/kg), not line_total/qty. line_total/qty_kg = weighed effective rate; line_total/operational_denominator_g ≠ €/kg because denominator is per-priced-kg (1000g), not purchased weight."
+    }
+  },
+  "blastRadius": {
+    "totalIngredients": 40,
+    "ingredientsWithMatchedInvoiceLine": 40,
+    "procurementEqualsOperationalCount": 12,
+    "duplicateRows": [
+      {
+        "ingredientId": "9338970d-b55b-4526-be36-ab8497cd9da8",
+        "name": "Abóbora butternut",
+        "procurementCost": "€0.99 / kg",
+        "operationalCost": "€0.99 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "446f3217-9a6f-428a-abc6-10927a958168",
+        "name": "Alho francês",
+        "procurementCost": "€1.42 / kg",
+        "operationalCost": "€1.42 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "6c7ab001-9f87-448e-9b34-87d3aa21f9ca",
+        "name": "Courgettes",
+        "procurementCost": "€1.56 / kg",
+        "operationalCost": "€1.56 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+        "name": "Gorgonzola DOP dolce",
+        "procurementCost": "€10.88 / kg",
+        "operationalCost": "€10.88 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "6e3011e0-b160-48c9-867c-1234cd743802",
+        "name": "Hortelã",
+        "procurementCost": "€5.40 / kg",
+        "operationalCost": "€5.40 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "30fd4652-be74-47eb-afb1-60b2a15a14fc",
+        "name": "Manteiga s/sal",
+        "procurementCost": "€8.90 / kg",
+        "operationalCost": "€8.90 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "9c853a47-82fe-4d6d-88bc-f0aa007e0a59",
+        "name": "Mortadella IGP massima con pistacchio",
+        "procurementCost": "€9.99 / kg",
+        "operationalCost": "€9.99 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "963d3a72-6f74-427b-8658-8d98b6a8d8df",
+        "name": "Pepino fresco",
+        "procurementCost": "€1.42 / kg",
+        "operationalCost": "€1.42 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "d8a90b20-f20c-464f-a153-d65e062d5ff9",
+        "name": "Pêra abacate",
+        "procurementCost": "€4.26 / kg",
+        "operationalCost": "€4.26 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+        "name": "Prosciutto cotto scelto",
+        "procurementCost": "€8.50 / kg",
+        "operationalCost": "€8.50 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "31d6da3f-d812-4836-9086-92a5616250d1",
+        "name": "Rigamonti bresaola punta d'anca oro",
+        "procurementCost": "€27.04 / kg",
+        "operationalCost": "€27.04 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "06cc0c4d-9933-4ae2-8abe-64d196575f9f",
+        "name": "Rovagnati salame ventricina",
+        "procurementCost": "€15.19 / kg",
+        "operationalCost": "€15.19 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      }
+    ],
+    "allRows": [
+      {
+        "ingredientId": "9338970d-b55b-4526-be36-ab8497cd9da8",
+        "name": "Abóbora butternut",
+        "procurementCost": "€0.99 / kg",
+        "operationalCost": "€0.99 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4",
+        "name": "Aceto balsamico di modena IGP",
+        "procurementCost": "€15.55 / unit",
+        "operationalCost": "€1.56 / L",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+        "name": "Açúcar branco",
+        "procurementCost": "€9.29 / case",
+        "operationalCost": "€0.929 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+        "name": "Água san pellegrino",
+        "procurementCost": "€19.28 / case",
+        "operationalCost": "€1.71 / L",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "446f3217-9a6f-428a-abc6-10927a958168",
+        "name": "Alho francês",
+        "procurementCost": "€1.42 / kg",
+        "operationalCost": "€1.42 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+        "name": "Anchoas",
+        "procurementCost": "€9.49 / can",
+        "operationalCost": "€19.17 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+        "name": "Arroz agulha",
+        "procurementCost": "€13.45 / case",
+        "operationalCost": "€1.12 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+        "name": "Atum em óleo",
+        "procurementCost": "€6.29 / bag",
+        "operationalCost": "€6.29 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+        "name": "Chocolate culinária",
+        "procurementCost": "€29.19 / case",
+        "operationalCost": "€14.60 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "6c7ab001-9f87-448e-9b34-87d3aa21f9ca",
+        "name": "Courgettes",
+        "procurementCost": "€1.56 / kg",
+        "operationalCost": "€1.56 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "7c850fb7-71e5-4649-8ecc-d1641d5b9e95",
+        "name": "Farina do pasta fresca e gnocchi",
+        "procurementCost": "€30.11 / bag",
+        "operationalCost": "€1.20 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "3976c267-f8aa-4173-abc7-55410811f399",
+        "name": "Farine speciale pizza",
+        "procurementCost": "€26.52 / bag",
+        "operationalCost": "€1.06 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+        "name": "Gema líquida",
+        "procurementCost": "€10.19 / unit",
+        "operationalCost": "€10.19 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+        "name": "Ginger beer",
+        "procurementCost": "€0.81 / unit",
+        "operationalCost": "€4.05 / L",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+        "name": "Gorgonzola DOP dolce",
+        "procurementCost": "€10.88 / kg",
+        "operationalCost": "€10.88 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6",
+        "name": "Guanciale stagionato",
+        "procurementCost": "€10.83 / unit",
+        "operationalCost": "€10.83 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "6e3011e0-b160-48c9-867c-1234cd743802",
+        "name": "Hortelã",
+        "procurementCost": "€5.40 / kg",
+        "operationalCost": "€5.40 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+        "name": "Manjericão",
+        "procurementCost": "€2.06 / bunch",
+        "operationalCost": "€20.60 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "30fd4652-be74-47eb-afb1-60b2a15a14fc",
+        "name": "Manteiga s/sal",
+        "procurementCost": "€8.90 / kg",
+        "operationalCost": "€8.90 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+        "name": "Mezzi paccheri mancini",
+        "procurementCost": "€22.05 / case",
+        "operationalCost": "€3.68 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "9c853a47-82fe-4d6d-88bc-f0aa007e0a59",
+        "name": "Mortadella IGP massima con pistacchio",
+        "procurementCost": "€9.99 / kg",
+        "operationalCost": "€9.99 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+        "name": "Mozzarella fior di latte",
+        "procurementCost": "€8.12 / unit",
+        "operationalCost": "€8.12 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "5e9e7f89-7141-44f7-b8d4-bc92bad9bc36",
+        "name": "Mozzarella julienne",
+        "procurementCost": "€20.03 / bag",
+        "operationalCost": "€6.68 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+        "name": "Nata culinária",
+        "procurementCost": "€18.29 / case",
+        "operationalCost": "€3.05 / L",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+        "name": "Ovo classe M",
+        "procurementCost": "€38.44 / case",
+        "operationalCost": "€0.2136 / egg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "d7fcbb41-4e19-47ee-bbea-058e7b44a040",
+        "name": "Paccheri lisci",
+        "procurementCost": "€2.10 / unit",
+        "operationalCost": "€4.20 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "name": "Pepino conserva",
+        "procurementCost": "€21.99 / case",
+        "operationalCost": "€5.09 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "963d3a72-6f74-427b-8658-8d98b6a8d8df",
+        "name": "Pepino fresco",
+        "procurementCost": "€1.42 / kg",
+        "operationalCost": "€1.42 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "d8a90b20-f20c-464f-a153-d65e062d5ff9",
+        "name": "Pêra abacate",
+        "procurementCost": "€4.26 / kg",
+        "operationalCost": "€4.26 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b",
+        "name": "Peroni nastro azzurro 33cl",
+        "procurementCost": "€1.07 / bottle",
+        "operationalCost": "€3.24 / L",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "52f7bf70-eeca-4039-987d-241b35248119",
+        "name": "Pomodori pelati",
+        "procurementCost": "€22.05 / case",
+        "operationalCost": "€1.47 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+        "name": "Prosciutto cotto scelto",
+        "procurementCost": "€8.50 / kg",
+        "operationalCost": "€8.50 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "6ec0bc6b-409a-4db2-b21f-fb01394f0014",
+        "name": "Ricotta trevigiana",
+        "procurementCost": "€7.97 / unit",
+        "operationalCost": "€5.31 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "31d6da3f-d812-4836-9086-92a5616250d1",
+        "name": "Rigamonti bresaola punta d'anca oro",
+        "procurementCost": "€27.04 / kg",
+        "operationalCost": "€27.04 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "b091e1d0-e7e2-49a8-a9a7-f61c8a4d4263",
+        "name": "Rolo de cabra e vaca",
+        "procurementCost": "€12.71 / unit",
+        "operationalCost": "€12.71 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "06cc0c4d-9933-4ae2-8abe-64d196575f9f",
+        "name": "Rovagnati salame ventricina",
+        "procurementCost": "€15.19 / kg",
+        "operationalCost": "€15.19 / kg",
+        "sameUnit": true,
+        "sameCost": true,
+        "duplicate": true,
+        "addsInformation": false
+      },
+      {
+        "ingredientId": "4dd38782-c986-4d4b-8ecb-fd84359744b1",
+        "name": "Rulo di capra",
+        "procurementCost": "€10.86 / unit",
+        "operationalCost": "€5.43 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "47cd8362-79f4-4285-8491-f016229eaa21",
+        "name": "Salada ibérica",
+        "procurementCost": "€2.19 / pack",
+        "operationalCost": "€8.76 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "d96e176e-7fa7-438d-beda-6b9d7fe7b41d",
+        "name": "Stracciatella",
+        "procurementCost": "€3.11 / unit",
+        "operationalCost": "€12.44 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      },
+      {
+        "ingredientId": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041",
+        "name": "Tomilho",
+        "procurementCost": "€2.06 / bunch",
+        "operationalCost": "€20.60 / kg",
+        "sameUnit": false,
+        "sameCost": false,
+        "duplicate": false,
+        "addsInformation": true
+      }
+    ]
+  },
+  "verdict": {
+    "classification": "B",
+    "finalVerdictLetter": "B",
+    "question": "Would hiding Operational Cost change recipe costing, intelligence, pricing history, or operational calculations?",
+    "answer": "NO",
+    "answerText": "For all four Emporio deli family products, procurement and operational €/kg are mathematically identical. Recipe costing uses recipeOperationalCostFieldsFromInvoiceLine (current_price=unit_price, purchase_quantity=1000, cost_base_unit=g) yielding the same €/kg as procurement display. Hiding Operational Cost on ingredient detail removes no computation input; presentation-only duplicate.",
+    "blastRadiusDuplicateCount": 12,
+    "deliFamilyInBlastRadius": [
+      "Gorgonzola DOP dolce",
+      "Mortadella IGP massima con pistacchio",
+      "Prosciutto cotto scelto",
+      "Rigamonti bresaola punta d'anca oro"
+    ]
+  }
+}

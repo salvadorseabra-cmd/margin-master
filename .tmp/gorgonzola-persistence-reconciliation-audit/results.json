@@ -1,0 +1,485 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T03:03:28.563Z",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "invoiceItemId": "bece238e-fd6d-493c-8555-6921b164f97c",
+  "invoice": null,
+  "gorgItem": {
+    "id": "bece238e-fd6d-493c-8555-6921b164f97c",
+    "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+    "quantity": 1.05,
+    "unit": "kg",
+    "unit_price": 10.88,
+    "total": 13.44,
+    "created_at": "2026-06-23T10:41:31.22202+00:00",
+    "updated_at": "2026-06-23T10:41:31.22202+00:00",
+    "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5"
+  },
+  "ingredient": {
+    "id": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+    "name": "Gorgonzola DOP dolce",
+    "current_price": 10.88,
+    "purchase_quantity": 1000,
+    "base_unit": "g",
+    "updated_at": "2026-06-23T10:41:32.81021+00:00"
+  },
+  "storage": {
+    "storage_path": null,
+    "pdfImageArtifact": ".tmp/emporio-italia-investigation/invoice-full.png",
+    "note": "ab52796d replacement upload; same Emporio May-19 table as 17aa3591 geometry audits"
+  },
+  "task1_pdfSource": {
+    "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelregio 1/8 ~1,5kg (GD87813)",
+    "quantity": 1.35,
+    "unit": "kg",
+    "unit_price_gross": 12.9,
+    "discount_pct": 22.85,
+    "unit_price_net_implied": 9.95,
+    "line_total": 13.44,
+    "source": ".tmp/gorgonzola-root-cause/stage-trace.json visibleInvoice + invoice-table-extraction.ts L107-108",
+    "arithmetic": "1.35 × 12.90 × (1 − 0.2285) = 13.44",
+    "reconciles_qty_x_gross_disc": true,
+    "reconciles_qty_x_net_gt": false
+  },
+  "task2_ocrVsPdf": {
+    "passCRawGorgonzola": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castagna 1/8 ~1.5Kg",
+      "quantity": 1.35,
+      "unit": "kg",
+      "unit_price": 9.82,
+      "total": 13.44
+    },
+    "v28ExtractGorgonzola": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrotti 1/8 - 1,8-1,9kg",
+      "quantity": 1.05,
+      "unit": null,
+      "unit_price": 10.88,
+      "total": 13.44
+    },
+    "pdfQty": 1.35,
+    "ocrQty_passCRaw": 1.35,
+    "ocrQty_v28": 1.05,
+    "pdfUnitPriceNet": 9.95,
+    "ocrUnitPrice_passCRaw": 9.82,
+    "ocrUnitPrice_v28": 10.88,
+    "pdfTotal": 13.44,
+    "ocrTotal": 13.44,
+    "passCRawReconciles": false,
+    "v28Reconciles": false
+  },
+  "task3_structuredBeforeNormalization": {
+    "pdfStructuredInput": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.35,
+      "unit": "kg",
+      "gross_unit_price": 12.9,
+      "discount_pct": 22.85,
+      "line_total_net": 13.44,
+      "unit_price": null,
+      "total": null
+    },
+    "pdfStructuredAfterBind": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.35,
+      "unit": "kg",
+      "gross_unit_price": 12.9,
+      "discount_pct": 22.85,
+      "line_total_net": 13.44,
+      "unit_price": 9.95,
+      "total": 13.44
+    },
+    "dbLegacyStructuredInput": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "gross_unit_price": null,
+      "discount_pct": null,
+      "line_total_net": 13.44,
+      "unit_price": 10.88,
+      "total": 13.44
+    },
+    "dbLegacyAfterBind": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "gross_unit_price": null,
+      "discount_pct": null,
+      "line_total_net": 13.44,
+      "unit_price": 10.88,
+      "total": 13.44
+    },
+    "note": "API strips gross_unit_price/discount_pct; v28 output matches DB → inconsistent trio present at extract-invoice response"
+  },
+  "task4_normalizeInvoiceItemFields": {
+    "input": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "unit_price": 10.88,
+      "total": 13.44
+    },
+    "output": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "unit_price": 10.88,
+      "total": 13.44,
+      "id": "bece238e-fd6d-493c-8555-6921b164f97c"
+    },
+    "changed": false,
+    "fieldsChanged": {
+      "quantity": false,
+      "unit": false,
+      "unit_price": false,
+      "total": false,
+      "name": false
+    }
+  },
+  "task5_persistenceVsDb": {
+    "insertPayload": {
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "unit_price": 10.88,
+      "total": 13.44
+    },
+    "dbRow": {
+      "id": "bece238e-fd6d-493c-8555-6921b164f97c",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "unit_price": 10.88,
+      "total": 13.44,
+      "created_at": "2026-06-23T10:41:31.22202+00:00",
+      "updated_at": "2026-06-23T10:41:31.22202+00:00",
+      "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5"
+    },
+    "matches": true,
+    "v28ExtractMatchesDb": true,
+    "created_at": "2026-06-23T10:41:31.22202+00:00"
+  },
+  "task6_reconciliationTable": [
+    {
+      "stage": "PDF",
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelregio 1/8 ~1,5kg (GD87813)",
+      "quantity": 1.35,
+      "unit": "kg",
+      "unit_price": 9.95,
+      "discount_pct": 22.85,
+      "gross_unit_price": 12.9,
+      "line_total": 13.44,
+      "qty_x_price": 13.43,
+      "reconciles": true,
+      "source": "invoice-full.png visible row (stage-trace.json)"
+    },
+    {
+      "stage": "OCR / extract-invoice API (pass-c-raw)",
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castagna 1/8 ~1.5Kg",
+      "quantity": 1.35,
+      "unit": "kg",
+      "unit_price": 9.82,
+      "line_total": 13.44,
+      "qty_x_price": 13.26,
+      "reconciles": false,
+      "source": ".tmp/persistence-audit/pass-c-raw/17aa3591-extract-invoice.json (2026-06-11)"
+    },
+    {
+      "stage": "Structured / API output (v28 deploy replay)",
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrotti 1/8 - 1,8-1,9kg",
+      "quantity": 1.05,
+      "unit": null,
+      "unit_price": 10.88,
+      "line_total": 13.44,
+      "qty_x_price": 11.42,
+      "reconciles": false,
+      "source": ".tmp/final-validation-lab-rerun-v28/extracts/17aa3591.json deploy v28"
+    },
+    {
+      "stage": "Structured (pre-bind replay: PDF columns)",
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.35,
+      "unit": "kg",
+      "unit_price": 12.9,
+      "discount_pct": 22.85,
+      "gross_unit_price": 12.9,
+      "line_total": 13.44,
+      "qty_x_price": null,
+      "reconciles": null,
+      "source": "invoice-table-extraction.ts Emporio Gorgonzola prompt example → parseMonetaryLineItems input"
+    },
+    {
+      "stage": "After bindMonetaryColumns (PDF structured)",
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.35,
+      "unit": "kg",
+      "unit_price": 9.95,
+      "discount_pct": 22.85,
+      "gross_unit_price": 12.9,
+      "line_total": 13.44,
+      "qty_x_price": 13.43,
+      "reconciles": true,
+      "source": "bindMonetaryColumns replay"
+    },
+    {
+      "stage": "Structured (pre-bind: DB legacy fields)",
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "unit_price": 10.88,
+      "line_total": 13.44,
+      "qty_x_price": 11.42,
+      "reconciles": false,
+      "source": "Inferred Pass C handoff matching persisted invoice_items (discount cols stripped at API)"
+    },
+    {
+      "stage": "After bindMonetaryColumns (DB legacy)",
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "unit_price": 10.88,
+      "line_total": 13.44,
+      "qty_x_price": 11.42,
+      "reconciles": false,
+      "source": "bindMonetaryColumns pass-through (applyEffectivePaidPrice skipped: total > qty×unit_price)"
+    },
+    {
+      "stage": "After normalizeInvoiceItemFields",
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "unit_price": 10.88,
+      "line_total": 13.44,
+      "qty_x_price": 11.42,
+      "reconciles": false,
+      "source": "src/lib/invoice-item-fields.ts normalizeInvoiceItemFields"
+    },
+    {
+      "stage": "Persistence insert payload",
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "unit_price": 10.88,
+      "line_total": 13.44,
+      "qty_x_price": 11.42,
+      "reconciles": false,
+      "source": "src/routes/invoices.tsx L1450-1465 insertRows shape"
+    },
+    {
+      "stage": "Persisted invoice_items (DB)",
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "unit_price": 10.88,
+      "line_total": 13.44,
+      "qty_x_price": 11.42,
+      "reconciles": false,
+      "source": "VL invoice_items bece238e-fd6d-493c-8555-6921b164f97c"
+    }
+  ],
+  "task6_firstInconsistentStage": {
+    "stage": "OCR / extract-invoice API (pass-c-raw)",
+    "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castagna 1/8 ~1.5Kg",
+    "quantity": 1.35,
+    "unit": "kg",
+    "unit_price": 9.82,
+    "line_total": 13.44,
+    "qty_x_price": 13.26,
+    "reconciles": false,
+    "source": ".tmp/persistence-audit/pass-c-raw/17aa3591-extract-invoice.json (2026-06-11)"
+  },
+  "task6_firstPersistedTrioStage": {
+    "stage": "Structured / API output (v28 deploy replay)",
+    "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrotti 1/8 - 1,8-1,9kg",
+    "quantity": 1.05,
+    "unit": null,
+    "unit_price": 10.88,
+    "line_total": 13.44,
+    "qty_x_price": 11.42,
+    "reconciles": false,
+    "source": ".tmp/final-validation-lab-rerun-v28/extracts/17aa3591.json deploy v28"
+  },
+  "persistedTrio": {
+    "quantity": 1.05,
+    "unit_price": 10.88,
+    "total": 13.44
+  },
+  "task7_discountHandling": {
+    "deliControlsReconcile": false,
+    "deliRows": [
+      {
+        "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+        "quantity": 1.05,
+        "unit_price": 10.88,
+        "total": 13.44,
+        "total_div_qty": 12.8,
+        "qty_x_unit_price": 11.42,
+        "reconciles": false
+      },
+      {
+        "product": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+        "quantity": 4.3,
+        "unit_price": 8.5,
+        "total": 36.54,
+        "total_div_qty": 8.5,
+        "qty_x_unit_price": 36.55,
+        "reconciles": true
+      },
+      {
+        "product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+        "quantity": 3.11,
+        "unit_price": 9.99,
+        "total": 31.07,
+        "total_div_qty": 9.99,
+        "qty_x_unit_price": 31.07,
+        "reconciles": true
+      },
+      {
+        "product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+        "quantity": 1.83,
+        "unit_price": 27.04,
+        "total": 49.48,
+        "total_div_qty": 27.04,
+        "qty_x_unit_price": 49.48,
+        "reconciles": true
+      }
+    ],
+    "bindMonetaryReplays": [
+      {
+        "scenario": "pdf_gross_discount_qty_1_35",
+        "input": {
+          "quantity": 1.35,
+          "gross": 12.9,
+          "discount": 22.85,
+          "total": 13.44
+        },
+        "bound": {
+          "quantity": 1.35,
+          "unit_price": 9.95,
+          "total": 13.44,
+          "reconciles": true
+        }
+      },
+      {
+        "scenario": "pdf_gross_discount_db_qty_1_05",
+        "input": {
+          "quantity": 1.05,
+          "gross": 12.9,
+          "discount": 22.85,
+          "total": 13.44
+        },
+        "bound": {
+          "quantity": 1.05,
+          "unit_price": 9.95,
+          "total": 13.44,
+          "reconciles": false
+        }
+      },
+      {
+        "scenario": "legacy_db_no_discount_cols",
+        "input": {
+          "quantity": 1.05,
+          "unit_price": 10.88,
+          "total": 13.44
+        },
+        "bound": {
+          "quantity": 1.05,
+          "unit_price": 10.88,
+          "total": 13.44,
+          "reconciles": false
+        }
+      }
+    ],
+    "prosciuttoMortadellaBresaolaReconcile": true
+  },
+  "task8_rootCause": {
+    "letter": "C",
+    "requiredQuestionAF": "C",
+    "rationale": "PDF is consistent (1.35×12.90×0.7715=13.44). Persisted trio qty=1.05, unit_price=10.88, total=13.44 (1.05×10.88=11.42≠13.44) first appears at extract-invoice API output (v28 deploy replay ≡ DB bece238e). normalizeInvoiceItemFields and insert payload are lossless. bindMonetaryColumns pass-through when discount cols null and total>qty×unit_price; applyEffectivePaidPrice does not fire."
+  },
+  "requiredTable": {
+    "description": {
+      "PDF": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelregio 1/8 ~1,5kg (GD87813)",
+      "OCR": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castagna 1/8 ~1.5Kg",
+      "Structured": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrotti 1/8 - 1,8-1,9kg",
+      "Persisted": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg"
+    },
+    "quantity": {
+      "PDF": 1.35,
+      "OCR": 1.35,
+      "Structured": 1.05,
+      "Persisted": 1.05
+    },
+    "unit": {
+      "PDF": "kg",
+      "OCR": "kg",
+      "Structured": "—",
+      "Persisted": "kg"
+    },
+    "unit_price": {
+      "PDF": "gross €12.90 / net €9.95",
+      "OCR": 9.82,
+      "Structured": 10.88,
+      "Persisted": 10.88
+    },
+    "discount": {
+      "PDF": "22.85%",
+      "OCR": "not in API response",
+      "Structured": "stripped at API",
+      "Persisted": "not stored (schema)"
+    },
+    "line_total": {
+      "PDF": 13.44,
+      "OCR": 13.44,
+      "Structured": 13.44,
+      "Persisted": 13.44
+    }
+  },
+  "ingredientDetail": {
+    "persistFields": {
+      "current_price": 10.88,
+      "purchase_quantity": 1000,
+      "cost_base_unit": "g"
+    },
+    "presentation": {
+      "priceDisplay": "€10.88 / kg",
+      "effectiveUsableCostLabel": "€10.88 / kg"
+    },
+    "buildLastPurchaseCostPresentation": {
+      "lastPurchase": "1.05 kg",
+      "procurementCost": "€10.88 / kg",
+      "operationalCost": "€10.88 / kg",
+      "totalPaid": "€13.44",
+      "supplier": null,
+      "purchaseDate": null,
+      "lines": [
+        {
+          "label": "Last Purchase",
+          "value": "1.05 kg"
+        },
+        {
+          "label": "Procurement Cost",
+          "value": "€10.88 / kg"
+        },
+        {
+          "label": "Operational Cost",
+          "value": "€10.88 / kg"
+        },
+        {
+          "label": "Total Paid",
+          "value": "€13.44"
+        }
+      ]
+    }
+  },
+  "final": {
+    "firstInconsistentStage": "Structured / API output (v28 deploy replay)",
+    "firstAnyArithmeticFailure": "OCR / extract-invoice API (pass-c-raw)",
+    "mostLikelyWrongValue": "unit_price",
+    "effectivePaidEurPerKg": 12.799999999999999,
+    "pdfNetEurPerKg": 9.95,
+    "persistedUnitPrice": 10.88
+  }
+}

@@ -1,0 +1,328 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "implementedAt": "2026-06-24T11:46:08.586Z",
+  "verdict": "A",
+  "designVerdict": "D — OCR anchoring + validation",
+  "changedFiles": [
+    "supabase/functions/extract-invoice/invoice-qty-prepass.ts",
+    "supabase/functions/extract-invoice/invoice-qty-prepass.test.ts",
+    "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+    "supabase/functions/extract-invoice/invoice-monetary-binding.ts",
+    "src/lib/invoice-extraction-review.ts",
+    "src/lib/invoice-extraction-review.test.ts",
+    "src/routes/invoices.tsx"
+  ],
+  "anchoringRule": {
+    "agreementThresholdPct": 2,
+    "scoreMarginEur": 0.1,
+    "mathFallbackMaxScoreEur": 0.5,
+    "ocrMismatchThresholdPct": 10,
+    "scope": "fractional kg + Emporio discount-table semantics"
+  },
+  "reviewIntegration": {
+    "mathReason": "MATHEMATICAL_RECONCILIATION_FAILURE",
+    "ocrReason": "OCR_QUANTITY_MISMATCH",
+    "ocrMessage": "Extracted quantity differs materially from OCR quantity",
+    "wiredIn": "needsExtractionConfirmation in src/routes/invoices.tsx"
+  },
+  "gorgonzolaScenarios": {
+    "A_v28": {
+      "id": "A",
+      "passCQty": 1.05,
+      "anchoredQty": 1.35,
+      "quantityAnchored": true,
+      "ocrMismatch": false,
+      "mathReview": false,
+      "ocrReview": false,
+      "needsReview": false,
+      "persisted": {
+        "quantity": 1.35,
+        "unit_price": 9.95,
+        "total": 13.44
+      }
+    },
+    "B_qty2_correctTotal": {
+      "id": "B",
+      "passCQty": 2,
+      "anchoredQty": 1.35,
+      "quantityAnchored": true,
+      "ocrMismatch": false,
+      "mathReview": false,
+      "ocrReview": false,
+      "needsReview": false,
+      "persisted": {
+        "quantity": 1.35,
+        "unit_price": 9.95,
+        "total": 13.44
+      }
+    },
+    "C_agreement": {
+      "id": "C",
+      "passCQty": 1.35,
+      "anchoredQty": 1.35,
+      "quantityAnchored": false,
+      "ocrMismatch": false,
+      "mathReview": false,
+      "ocrReview": false,
+      "needsReview": false,
+      "persisted": {
+        "quantity": 1.35,
+        "unit_price": 9.95,
+        "total": 13.44
+      }
+    },
+    "S3_v38": {
+      "id": "S3",
+      "passCQty": 2,
+      "anchoredQty": 2,
+      "quantityAnchored": false,
+      "ocrMismatch": true,
+      "mathReview": false,
+      "ocrReview": true,
+      "needsReview": true,
+      "persisted": {
+        "quantity": 2,
+        "unit_price": 9.35,
+        "total": 18.72
+      }
+    }
+  },
+  "gorgonzolaPass": true,
+  "validationMatrix": {
+    "A_1_05": {
+      "id": "A",
+      "passCQty": 1.05,
+      "anchoredQty": 1.35,
+      "quantityAnchored": true,
+      "ocrMismatch": false,
+      "mathReview": false,
+      "ocrReview": false,
+      "needsReview": false,
+      "persisted": {
+        "quantity": 1.35,
+        "unit_price": 9.95,
+        "total": 13.44
+      }
+    },
+    "B_2_00_total_13_44": {
+      "id": "B",
+      "passCQty": 2,
+      "anchoredQty": 1.35,
+      "quantityAnchored": true,
+      "ocrMismatch": false,
+      "mathReview": false,
+      "ocrReview": false,
+      "needsReview": false,
+      "persisted": {
+        "quantity": 1.35,
+        "unit_price": 9.95,
+        "total": 13.44
+      }
+    },
+    "C_1_35_agreement": {
+      "id": "C",
+      "passCQty": 1.35,
+      "anchoredQty": 1.35,
+      "quantityAnchored": false,
+      "ocrMismatch": false,
+      "mathReview": false,
+      "ocrReview": false,
+      "needsReview": false,
+      "persisted": {
+        "quantity": 1.35,
+        "unit_price": 9.95,
+        "total": 13.44
+      }
+    },
+    "S3_2_00_total_18_72": {
+      "id": "S3",
+      "passCQty": 2,
+      "anchoredQty": 2,
+      "quantityAnchored": false,
+      "ocrMismatch": true,
+      "mathReview": false,
+      "ocrReview": true,
+      "needsReview": true,
+      "persisted": {
+        "quantity": 2,
+        "unit_price": 9.35,
+        "total": 18.72
+      }
+    }
+  },
+  "regressionResults": [
+    {
+      "product": "Gorgonzola",
+      "found": true,
+      "matchedName": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "qty": 2,
+      "unit_price": 9.35,
+      "total": 18.72,
+      "mathReview": false,
+      "ocrReview": false,
+      "expectMathReview": true,
+      "expectOcrReview": false,
+      "pass": false
+    },
+    {
+      "product": "Prosciutto",
+      "found": true,
+      "matchedName": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+      "qty": 4.3,
+      "unit_price": 8.5,
+      "total": 36.54,
+      "mathReview": false,
+      "ocrReview": false,
+      "expectMathReview": false,
+      "expectOcrReview": false,
+      "pass": true
+    },
+    {
+      "product": "Mortadella",
+      "found": true,
+      "matchedName": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+      "qty": 3.11,
+      "unit_price": 9.99,
+      "total": 31.07,
+      "mathReview": false,
+      "ocrReview": false,
+      "expectMathReview": false,
+      "expectOcrReview": false,
+      "pass": true
+    },
+    {
+      "product": "Bresaola",
+      "found": true,
+      "matchedName": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+      "qty": 1.83,
+      "unit_price": 27.04,
+      "total": 49.48,
+      "mathReview": false,
+      "ocrReview": false,
+      "expectMathReview": false,
+      "expectOcrReview": false,
+      "pass": true
+    },
+    {
+      "product": "Pellegrino",
+      "found": true,
+      "matchedName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "qty": 2,
+      "unit_price": 20.97,
+      "total": 42.07,
+      "mathReview": false,
+      "ocrReview": false,
+      "expectMathReview": false,
+      "expectOcrReview": false,
+      "pass": true
+    },
+    {
+      "product": "Ovo",
+      "found": true,
+      "matchedName": "Ovo Líquido Past.Gema Dovo 1 Kg",
+      "qty": 6,
+      "unit_price": 10.49,
+      "total": 62.94,
+      "mathReview": false,
+      "ocrReview": false,
+      "expectMathReview": false,
+      "expectOcrReview": false,
+      "pass": true
+    },
+    {
+      "product": "Tomilho",
+      "found": true,
+      "matchedName": "Tomilho",
+      "qty": 1,
+      "unit_price": 2.06,
+      "total": 2.06,
+      "mathReview": false,
+      "ocrReview": false,
+      "expectMathReview": false,
+      "expectOcrReview": false,
+      "pass": true
+    },
+    {
+      "product": "Manjericão",
+      "found": true,
+      "matchedName": "Manjericão",
+      "qty": 5,
+      "unit_price": 2.06,
+      "total": 10.28,
+      "mathReview": false,
+      "ocrReview": false,
+      "expectMathReview": false,
+      "expectOcrReview": false,
+      "pass": true
+    },
+    {
+      "product": "Salada",
+      "found": true,
+      "matchedName": "Salada Ibérica FSTK EMB. 250g",
+      "qty": 4,
+      "unit_price": 2.19,
+      "total": 8.76,
+      "mathReview": false,
+      "ocrReview": false,
+      "expectMathReview": false,
+      "expectOcrReview": false,
+      "pass": true
+    },
+    {
+      "product": "Peroni",
+      "found": true,
+      "matchedName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "qty": 24,
+      "unit_price": 1.07,
+      "total": 25.69,
+      "mathReview": false,
+      "ocrReview": false,
+      "expectMathReview": false,
+      "expectOcrReview": false,
+      "pass": true
+    },
+    {
+      "product": "Paccheri",
+      "found": true,
+      "matchedName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "qty": 1,
+      "unit_price": 22.05,
+      "total": 22.05,
+      "mathReview": false,
+      "ocrReview": false,
+      "expectMathReview": false,
+      "expectOcrReview": false,
+      "pass": true
+    }
+  ],
+  "regressionPass": true,
+  "gorgonzolaVlRow": {
+    "product": "Gorgonzola",
+    "found": true,
+    "matchedName": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+    "qty": 2,
+    "unit_price": 9.35,
+    "total": 18.72,
+    "mathReview": false,
+    "ocrReview": false,
+    "expectMathReview": true,
+    "expectOcrReview": false,
+    "pass": false
+  },
+  "vlGorgonzolaIsV38SelfConsistent": true,
+  "vlGorgonzolaProtection": "Historical v38 row (2/9.35/18.72) math-consistent — OCR_QTY_MISMATCH on re-extract",
+  "vlReplay": {
+    "corpusSize": 52,
+    "mathFlaggedCount": 0,
+    "ocrFlaggedCount": 0,
+    "note": "VL DB rows lack extraction_meta; OCR flags apply post re-extract only",
+    "gorgonzolaMathStillFlagsHistoricalBadRow": false,
+    "gorgonzolaV38RowAwaitingReExtract": true
+  },
+  "blastRadius": {
+    "additionalGptCalls": 1,
+    "schemaMigration": false,
+    "recipeCosting": "unchanged",
+    "scopedFamilyOnly": true
+  }
+}

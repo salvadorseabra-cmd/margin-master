@@ -1,0 +1,299 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T15:19:44.781Z",
+  "auditType": "STRICT_READ_ONLY_OCR_ANCHORING_DECISION",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "gorgonzolaItemId": "35bdf942-712b-46af-9f2e-666cb4744a88",
+  "rereadTimestamp": "2026-06-24T12:19:51.42294+00:00",
+  "finalFiveQuestions": {
+    "executed": true,
+    "saw135InPrepass": false,
+    "whyRejected": "isQtyAnchorScopeRow requires fractional OCR qty; live prepass ocr_quantity=2 fails isFractionalQty → L221-224. Re-read persisted 1.05 proves prepass≠1.35.",
+    "whyNoOcrQtyMismatch": "defaultMeta.ocr_qty_mismatch=false on scope-fail; flag only when scoped+declined and delta>10%",
+    "issueClassification": "B"
+  },
+  "task1_pipelineTrace": {
+    "deployVersion": 39,
+    "deployUpdatedAt": "2026-06-24T12:17:35.325Z",
+    "rereadAfterV39Deploy": true
+  },
+  "task2_runQuantityPrePass": {
+    "executedAtReread": true,
+    "returned135": false,
+    "liveProbeOcrQty": 2,
+    "evidence": [
+      "extract-invoice v39 deployed 2026-06-24T12:17:35.325Z",
+      "Re-read 2026-06-24T12:19:51.42294+00:00 after v39 deploy",
+      "extraction_meta.ocr_quantity=2"
+    ]
+  },
+  "task3_anchorQuantities": {
+    "executed": true,
+    "liveProbeMeta": {
+      "ocr_quantity": 2,
+      "pass_c_quantity": 1.05,
+      "quantity_anchored": false,
+      "ocr_qty_mismatch": false
+    },
+    "scoringTable": {
+      "scoreOcr": 6.46,
+      "scorePassC": 2.99,
+      "mathFails": true,
+      "netUnit": 9.95
+    },
+    "scopeIn": false,
+    "branch": "isQtyAnchorScopeRow false → early return (invoice-qty-prepass.ts:221-224)",
+    "counterfactual135": {
+      "id": "counterfactual_135_vs_105",
+      "scopeIn": true,
+      "deltaPct": 22.22,
+      "scoring": {
+        "scoreOcr": 0.01,
+        "scorePassC": 2.99,
+        "mathFails": true,
+        "netUnit": 9.95
+      },
+      "meta": {
+        "ocr_quantity": 1.35,
+        "pass_c_quantity": 1.05,
+        "quantity_anchored": true,
+        "ocr_qty_mismatch": false
+      },
+      "outputQty": 1.35,
+      "persisted": {
+        "quantity": 1.35,
+        "unit_price": 9.95,
+        "total": 13.44
+      },
+      "mathReview": false,
+      "ocrReview": false,
+      "branch": "shouldAnchor true → replace with OCR (L257-264)"
+    }
+  },
+  "task4_exactBranch": {
+    "file": "invoice-qty-prepass.ts",
+    "lines": "221-224",
+    "failingGate": "isFractionalQty(ocrQty)",
+    "liveOcrQty": 2,
+    "alternativeIfPrepass105": "deltaPct 0% ≤ 2% → agreement skip (L234-237)"
+  },
+  "task5_ocrQtyMismatch": {
+    "generated": false,
+    "liveFlag": false,
+    "whyNot": "scope-fail defaultMeta forces false"
+  },
+  "task6_reviewFramework": {
+    "extractionMetaInApi": true,
+    "originMainOcrReview": "absent",
+    "mathReviewOnPersisted": {
+      "code": "MATHEMATICAL_RECONCILIATION_FAILURE",
+      "message": "Quantity × Unit Price does not reconcile with Line Total",
+      "metadata": {
+        "expected_total": 10.45,
+        "actual_total": 13.44,
+        "variance_abs": 2.99,
+        "variance_pct": 22.25
+      }
+    },
+    "ocrReviewOnLiveMeta": null
+  },
+  "task7_replay": {
+    "scenarios": [
+      {
+        "id": "counterfactual_135_vs_105",
+        "scopeIn": true,
+        "deltaPct": 22.22,
+        "scoring": {
+          "scoreOcr": 0.01,
+          "scorePassC": 2.99,
+          "mathFails": true,
+          "netUnit": 9.95
+        },
+        "meta": {
+          "ocr_quantity": 1.35,
+          "pass_c_quantity": 1.05,
+          "quantity_anchored": true,
+          "ocr_qty_mismatch": false
+        },
+        "outputQty": 1.35,
+        "persisted": {
+          "quantity": 1.35,
+          "unit_price": 9.95,
+          "total": 13.44
+        },
+        "mathReview": false,
+        "ocrReview": false,
+        "branch": "shouldAnchor true → replace with OCR (L257-264)"
+      },
+      {
+        "id": "agreement_105",
+        "scopeIn": true,
+        "deltaPct": 0,
+        "scoring": {
+          "scoreOcr": 2.99,
+          "scorePassC": 2.99,
+          "mathFails": true,
+          "netUnit": 9.95
+        },
+        "meta": {
+          "ocr_quantity": 1.05,
+          "pass_c_quantity": 1.05,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        },
+        "outputQty": 1.05,
+        "persisted": {
+          "quantity": 1.05,
+          "unit_price": 9.95,
+          "total": 13.44
+        },
+        "mathReview": true,
+        "ocrReview": false,
+        "branch": "deltaPct 0% ≤ 2% → agreement skip (L234-237)"
+      },
+      {
+        "id": "live_probe_replay",
+        "scopeIn": false,
+        "deltaPct": 47.5,
+        "scoring": {
+          "scoreOcr": 6.46,
+          "scorePassC": 2.99,
+          "mathFails": true,
+          "netUnit": 9.95
+        },
+        "meta": {
+          "ocr_quantity": 2,
+          "pass_c_quantity": 1.05,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        },
+        "outputQty": 1.05,
+        "persisted": {
+          "quantity": 1.05,
+          "unit_price": 9.95,
+          "total": 13.44
+        },
+        "mathReview": true,
+        "ocrReview": false,
+        "branch": "isQtyAnchorScopeRow false → early return (invoice-qty-prepass.ts:221-224)"
+      },
+      {
+        "id": "S3_scoring_decline",
+        "scopeIn": true,
+        "deltaPct": 48.15,
+        "scoring": {
+          "scoreOcr": 5.29,
+          "scorePassC": 1.18,
+          "mathFails": true,
+          "netUnit": 9.95
+        },
+        "meta": {
+          "ocr_quantity": 1.35,
+          "pass_c_quantity": 2,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": true
+        },
+        "outputQty": 2,
+        "persisted": {
+          "quantity": 2,
+          "unit_price": 9.95,
+          "total": 18.72
+        },
+        "mathReview": true,
+        "ocrReview": true,
+        "branch": "shouldAnchor false → keep Pass C; ocr_qty_mismatch=true (L267-273)"
+      }
+    ],
+    "expected135": {
+      "id": "counterfactual_135_vs_105",
+      "scopeIn": true,
+      "deltaPct": 22.22,
+      "scoring": {
+        "scoreOcr": 0.01,
+        "scorePassC": 2.99,
+        "mathFails": true,
+        "netUnit": 9.95
+      },
+      "meta": {
+        "ocr_quantity": 1.35,
+        "pass_c_quantity": 1.05,
+        "quantity_anchored": true,
+        "ocr_qty_mismatch": false
+      },
+      "outputQty": 1.35,
+      "persisted": {
+        "quantity": 1.35,
+        "unit_price": 9.95,
+        "total": 13.44
+      },
+      "mathReview": false,
+      "ocrReview": false,
+      "branch": "shouldAnchor true → replace with OCR (L257-264)"
+    },
+    "actualPersisted": {
+      "quantity": 1.05,
+      "unit_price": 9.95,
+      "total": 13.44
+    }
+  },
+  "task8_stageTable": [
+    {
+      "stage": "PDF Qtd",
+      "qty": 1.35,
+      "source": "OCR/PDF"
+    },
+    {
+      "stage": "Qty pre-pass (live v39)",
+      "qty": 2,
+      "source": "OCR prepass"
+    },
+    {
+      "stage": "Pass C (live)",
+      "qty": 1.05,
+      "source": "Pass C"
+    },
+    {
+      "stage": "anchorQuantities out",
+      "qty": 1.05,
+      "source": "Anchored"
+    },
+    {
+      "stage": "Persisted re-read",
+      "qty": 1.05,
+      "source": "Persisted"
+    }
+  ],
+  "gorgonzolaHistory": [
+    {
+      "id": "35bdf942-712b-46af-9f2e-666cb4744a88",
+      "quantity": 1.05,
+      "unit_price": 9.95,
+      "total": 13.44,
+      "created_at": "2026-06-24T12:19:51.42294+00:00"
+    }
+  ],
+  "liveProbe": {
+    "status": 200,
+    "gorgonzola": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg Produto de Stock",
+      "quantity": 1.05,
+      "unit": null,
+      "unit_price": 9.95,
+      "total": 13.44,
+      "extraction_meta": {
+        "ocr_quantity": 2,
+        "pass_c_quantity": 1.05,
+        "quantity_anchored": false,
+        "ocr_qty_mismatch": false
+      }
+    },
+    "probedAt": "2026-06-24T15:19:44.717Z"
+  },
+  "issueClassification": {
+    "A": "Scoring declined anchor — OCR 1.35 loses vs Pass C on line-total score",
+    "B": "Scope gate excluded row — isQtyAnchorScopeRow false (OCR prepass qty not fractional)",
+    "C": "runQuantityPrePass / anchorQuantities never executed",
+    "D": "ocr_qty_mismatch true but client review not visible",
+    "selected": "B"
+  }
+}

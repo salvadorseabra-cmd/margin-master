@@ -1,0 +1,390 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T03:07:40.472Z",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "invoiceItemId": "bece238e-fd6d-493c-8555-6921b164f97c",
+  "gorgItem": {
+    "id": "bece238e-fd6d-493c-8555-6921b164f97c",
+    "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+    "quantity": 1.05,
+    "unit": "kg",
+    "unit_price": 10.88,
+    "total": 13.44,
+    "created_at": "2026-06-23T10:41:31.22202+00:00",
+    "updated_at": "2026-06-23T10:41:31.22202+00:00"
+  },
+  "task1_pdf": {
+    "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelregio 1/8 ~1,5kg (GD87813)",
+    "quantity": 1.35,
+    "unit": "kg",
+    "gross_unit_price": 12.9,
+    "discount_pct": 22.85,
+    "net_unit_price": 9.95,
+    "line_total": 13.44,
+    "arithmetic": "1.35 × 12.90 × (1 − 0.2285) = 13.44",
+    "source": ".tmp/gorgonzola-root-cause/stage-trace.json + invoice-table-extraction.ts L107-108"
+  },
+  "task2_ocr": {
+    "ocrContains1088": false,
+    "answer": "NO",
+    "artifacts": [
+      {
+        "label": "pass-c-raw extract-invoice API",
+        "gorg": {
+          "qty": 1.35,
+          "unit_price": 9.82,
+          "total": 13.44
+        },
+        "path": ".tmp/persistence-audit/pass-c-raw/17aa3591-extract-invoice.json"
+      },
+      {
+        "label": "passc-refinement reextract",
+        "gorg": {
+          "qty": 1.35,
+          "unit_price": 9.82,
+          "total": 13.44
+        },
+        "path": ".tmp/passc-refinement-validation/reextract/17aa3591.json"
+      },
+      {
+        "label": "emporio-footer extract-invoice",
+        "gorg": {
+          "qty": 1.35,
+          "unit_price": 9.92,
+          "total": 13.44
+        },
+        "path": ".tmp/emporio-footer-audit/emporio/extract-invoice-response.json"
+      }
+    ],
+    "note": "OCR-era API responses for Gorgonzola show 9.82 / 9.92 — never 10.88"
+  },
+  "task3_structuredBeforeNormalization": {
+    "structuredContains1088": true,
+    "answer": "YES",
+    "v28ApiOutput": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrotti 1/8 - 1,8-1,9kg",
+      "quantity": 1.05,
+      "unit": null,
+      "unit_price": 10.88,
+      "total": 13.44
+    },
+    "inferredPreBindHandoff": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "gross_unit_price": null,
+      "discount_pct": null,
+      "line_total_net": 13.44,
+      "unit_price": 10.88,
+      "total": 13.44
+    },
+    "firstArtifactWith1088": {
+      "path": ".tmp/final-validation-lab-rerun-v28/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+      "field": "gorgonzola.unit_price",
+      "value": 10.88
+    }
+  },
+  "task4_monetaryBinding": {
+    "stageTable": [
+      {
+        "stage": "PDF (net implied)",
+        "quantity": 1.35,
+        "unit_price": 9.95,
+        "total": 13.44,
+        "qty_x_price": 13.43,
+        "unit_price_is_1088": false,
+        "source": "stage-trace.json"
+      },
+      {
+        "stage": "OCR API pass-c-raw",
+        "quantity": 1.35,
+        "unit_price": 9.82,
+        "total": 13.44,
+        "qty_x_price": 13.26,
+        "unit_price_is_1088": false,
+        "source": "pass-c-raw"
+      },
+      {
+        "stage": "Structured pre-bind (inferred Pass C → parseMonetaryLineItems)",
+        "quantity": 1.05,
+        "unit_price": 10.88,
+        "total": 13.44,
+        "qty_x_price": 11.42,
+        "unit_price_is_1088": true,
+        "source": "discount cols null; unit_price pre-filled — matches v28≡DB shape"
+      },
+      {
+        "stage": "After bindMonetaryColumns",
+        "quantity": 1.05,
+        "unit_price": 10.88,
+        "total": 13.44,
+        "qty_x_price": 11.42,
+        "unit_price_is_1088": true,
+        "source": "invoice-monetary-binding.ts L214-217 pass-through; applyEffectivePaidPrice skipped (total>qty×unit)"
+      },
+      {
+        "stage": "After applyEffectivePaidPrice (same row)",
+        "quantity": 1.05,
+        "unit_price": 10.88,
+        "total": 13.44,
+        "qty_x_price": 11.42,
+        "unit_price_is_1088": true,
+        "source": "hasInconsistentGrossLineTotal=false when total>qty×unit_price (L117)"
+      },
+      {
+        "stage": "API output v28 deploy replay",
+        "quantity": 1.05,
+        "unit_price": 10.88,
+        "total": 13.44,
+        "qty_x_price": 11.42,
+        "unit_price_is_1088": true,
+        "source": ".tmp/final-validation-lab-rerun-v28/extracts/17aa3591.json"
+      },
+      {
+        "stage": "PDF structured after bindMonetaryColumns (control)",
+        "quantity": 1.35,
+        "unit_price": 9.95,
+        "total": 13.44,
+        "qty_x_price": 13.43,
+        "unit_price_is_1088": false,
+        "source": "gross+discount cols → deriveNetUnitPrice=9.95"
+      }
+    ],
+    "firstStageWith1088": {
+      "stage": "Structured pre-bind (inferred Pass C → parseMonetaryLineItems)",
+      "quantity": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "qty_x_price": 11.42,
+      "unit_price_is_1088": true,
+      "source": "discount cols null; unit_price pre-filled — matches v28≡DB shape"
+    },
+    "bindChangedUnitPrice": false,
+    "applyEffectivePaidWouldFire": false
+  },
+  "task5_normalizeInvoiceItemFields": {
+    "input": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "unit_price": 10.88,
+      "total": 13.44
+    },
+    "output": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "unit_price": 10.88,
+      "total": 13.44,
+      "id": "bece238e-fd6d-493c-8555-6921b164f97c"
+    },
+    "unit_priceChanged": false,
+    "answer": "NO"
+  },
+  "task6_persistence": {
+    "structuredApi": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrotti 1/8 - 1,8-1,9kg",
+      "quantity": 1.05,
+      "unit": null,
+      "unit_price": 10.88,
+      "total": 13.44
+    },
+    "insertPayload": {
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "unit_price": 10.88,
+      "total": 13.44
+    },
+    "dbRow": {
+      "id": "bece238e-fd6d-493c-8555-6921b164f97c",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "unit_price": 10.88,
+      "total": 13.44,
+      "created_at": "2026-06-23T10:41:31.22202+00:00",
+      "updated_at": "2026-06-23T10:41:31.22202+00:00"
+    },
+    "structuredMatchesDb": true,
+    "insertMatchesDb": true
+  },
+  "task7_controls": {
+    "controls": [
+      {
+        "product": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+        "quantity": 4.3,
+        "unit_price": 8.5,
+        "total": 36.54,
+        "qty_x_price": 36.55,
+        "reconciles": true,
+        "isGorgonzola": false,
+        "divergesFromControls": false
+      },
+      {
+        "product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+        "quantity": 3.11,
+        "unit_price": 9.99,
+        "total": 31.07,
+        "qty_x_price": 31.07,
+        "reconciles": true,
+        "isGorgonzola": false,
+        "divergesFromControls": false
+      },
+      {
+        "product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+        "quantity": 1.83,
+        "unit_price": 27.04,
+        "total": 49.48,
+        "qty_x_price": 49.48,
+        "reconciles": true,
+        "isGorgonzola": false,
+        "divergesFromControls": false
+      }
+    ],
+    "gorgonzola": {
+      "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "qty_x_price": 11.42,
+      "reconciles": false,
+      "isGorgonzola": true,
+      "divergesFromControls": true
+    },
+    "controlsReconcile": true,
+    "gorgonzolaDivergence": "qty=1.05 (not PDF 1.35) + unit_price=10.88 (not PDF net 9.95 / OCR 9.82) while total=13.44 correct"
+  },
+  "task8_rootCause": {
+    "stage": "Structured pre-bind (inferred Pass C → parseMonetaryLineItems)",
+    "wrongValue": "unit_price",
+    "defectCategory": "B",
+    "rationale": "€10.88 first appears in structured Pass C handoff (v28 API replay ≡ DB). OCR artifacts show 9.82/9.92. bindMonetaryColumns and normalizeInvoiceItemFields pass through unchanged. Persistence is lossless.",
+    "codePaths": [
+      "supabase/functions/extract-invoice/invoice-table-extraction.ts L415-417 bindMonetaryColumns",
+      "supabase/functions/extract-invoice/invoice-monetary-binding.ts L120-130 applyEffectivePaidPrice (not triggered)",
+      "src/lib/invoice-item-fields.ts L157-174 normalizeInvoiceItemFields (no-op)",
+      "src/routes/invoices.tsx insertRows (lossless)"
+    ]
+  },
+  "requiredQuestionAF": "B",
+  "requiredTable": [
+    {
+      "stage": "PDF (net implied)",
+      "quantity": 1.35,
+      "unit_price": 9.95,
+      "total": 13.44,
+      "qty_x_price": 13.43,
+      "unit_price_is_1088": false,
+      "source": "stage-trace.json"
+    },
+    {
+      "stage": "OCR API pass-c-raw",
+      "quantity": 1.35,
+      "unit_price": 9.82,
+      "total": 13.44,
+      "qty_x_price": 13.26,
+      "unit_price_is_1088": false,
+      "source": "pass-c-raw"
+    },
+    {
+      "stage": "Structured pre-bind (inferred Pass C → parseMonetaryLineItems)",
+      "quantity": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "qty_x_price": 11.42,
+      "unit_price_is_1088": true,
+      "source": "discount cols null; unit_price pre-filled — matches v28≡DB shape"
+    },
+    {
+      "stage": "After bindMonetaryColumns",
+      "quantity": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "qty_x_price": 11.42,
+      "unit_price_is_1088": true,
+      "source": "invoice-monetary-binding.ts L214-217 pass-through; applyEffectivePaidPrice skipped (total>qty×unit)"
+    },
+    {
+      "stage": "After applyEffectivePaidPrice (same row)",
+      "quantity": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "qty_x_price": 11.42,
+      "unit_price_is_1088": true,
+      "source": "hasInconsistentGrossLineTotal=false when total>qty×unit_price (L117)"
+    },
+    {
+      "stage": "API output v28 deploy replay",
+      "quantity": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "qty_x_price": 11.42,
+      "unit_price_is_1088": true,
+      "source": ".tmp/final-validation-lab-rerun-v28/extracts/17aa3591.json"
+    },
+    {
+      "stage": "PDF structured after bindMonetaryColumns (control)",
+      "quantity": 1.35,
+      "unit_price": 9.95,
+      "total": 13.44,
+      "qty_x_price": 13.43,
+      "unit_price_is_1088": false,
+      "source": "gross+discount cols → deriveNetUnitPrice=9.95"
+    },
+    {
+      "stage": "After normalizeInvoiceItemFields",
+      "quantity": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "qty_x_price": 11.42,
+      "unit_price_is_1088": true,
+      "source": "src/lib/invoice-item-fields.ts"
+    },
+    {
+      "stage": "Persistence insert payload",
+      "quantity": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "qty_x_price": 11.42,
+      "unit_price_is_1088": true,
+      "source": "src/routes/invoices.tsx"
+    },
+    {
+      "stage": "Persisted DB invoice_items",
+      "quantity": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "qty_x_price": 11.42,
+      "unit_price_is_1088": true,
+      "source": "VL bece238e-fd6d-493c-8555-6921b164f97c"
+    }
+  ],
+  "artifact1088Scan": [
+    {
+      "path": ".tmp/final-validation-lab-rerun-v28/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+      "field": "gorgonzola.unit_price",
+      "value": 10.88
+    }
+  ],
+  "final": {
+    "where1088FirstAppeared": "Structured pre-bind (inferred Pass C → parseMonetaryLineItems)",
+    "defectIn": {
+      "extraction": true,
+      "monetaryBinding": false,
+      "normalization": false,
+      "persistence": false
+    },
+    "persistedTrio": {
+      "quantity": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44
+    },
+    "qtyTimesPrice": 11.42,
+    "effectivePaidPerKg": 12.8,
+    "pdfNetPerKg": 9.95
+  }
+}

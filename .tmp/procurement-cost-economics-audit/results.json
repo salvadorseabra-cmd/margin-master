@@ -1,0 +1,683 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T02:59:29.535Z",
+  "emporioInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "invoice": {
+    "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "supplier_name": "Emporio Italia",
+    "invoice_date": "2026-05-19",
+    "created_at": "2026-06-11T22:53:16.723511+00:00",
+    "total": 327.46
+  },
+  "task1_gorgonzolaFullTrace": {
+    "invoice": {
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoice_item_id": "bece238e-fd6d-493c-8555-6921b164f97c",
+      "raw_description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "raw_quantity": 1.05,
+      "raw_unit": "kg",
+      "unit_price": 10.88,
+      "line_total": 13.44,
+      "created_at": "2026-06-23T10:41:31.22202+00:00",
+      "updated_at": "2026-06-23T10:41:31.22202+00:00"
+    },
+    "bindingReplays": [
+      {
+        "label": "live_db_as_bound_input",
+        "input": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": 13.44,
+          "unit_price": 10.88,
+          "total": 13.44
+        },
+        "bound": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": 13.44,
+          "unit_price": 10.88,
+          "total": 13.44
+        }
+      },
+      {
+        "label": "pdf_gross_discount_qty_1_35",
+        "input": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 1.35,
+          "unit": "kg",
+          "gross_unit_price": 12.9,
+          "discount_pct": 22.85,
+          "line_total_net": 13.44,
+          "unit_price": null,
+          "total": null
+        },
+        "bound": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 1.35,
+          "unit": "kg",
+          "gross_unit_price": 12.9,
+          "discount_pct": 22.85,
+          "line_total_net": 13.44,
+          "unit_price": 9.95,
+          "total": 13.44
+        }
+      },
+      {
+        "label": "pdf_gross_discount_db_qty_1_05",
+        "input": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": 12.9,
+          "discount_pct": 22.85,
+          "line_total_net": 13.44,
+          "unit_price": null,
+          "total": null
+        },
+        "bound": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": 12.9,
+          "discount_pct": 22.85,
+          "line_total_net": 13.44,
+          "unit_price": 9.95,
+          "total": 13.44
+        }
+      },
+      {
+        "label": "effective_paid_rebind_candidate",
+        "input": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 10.88,
+          "total": 13.44
+        },
+        "bound": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 10.88,
+          "total": 13.44
+        }
+      }
+    ],
+    "parseAndPersistChain": {
+      "operationalCostFieldsFromInvoiceLine": {
+        "current_price": 10.88,
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g"
+      },
+      "recipeOperationalCostFieldsFromInvoiceLine": {
+        "current_price": 10.88,
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g"
+      },
+      "storedIngredient": {
+        "id": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+        "name": "Gorgonzola DOP dolce",
+        "current_price": 10.88,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g",
+        "normalized_name": "gorgonzola dop dolce",
+        "supplier": null,
+        "created_at": "2026-06-15T17:49:59.870301+00:00",
+        "updated_at": "2026-06-23T10:41:32.81021+00:00"
+      },
+      "resolveUsablePerPricedUnit": {
+        "amount": 1000,
+        "unit": "g"
+      },
+      "computeEffectiveUsableCost": {
+        "cost": 10.88,
+        "unit": "kg"
+      },
+      "resolveInvoiceLinePricingPresentation": {
+        "card": {
+          "purchaseQuantityLine": "1.05 kg",
+          "purchasePriceLine": "€10.88 / kg · €13.44 total",
+          "normalizedLine": "1.5 kg usable",
+          "usableCostLine": "€10.88 / kg"
+        },
+        "blocks": [
+          {
+            "id": "purchase",
+            "title": "Purchase",
+            "lines": [
+              {
+                "text": "1.05 kg",
+                "variant": "default"
+              },
+              {
+                "text": "€10.88 / kg · €13.44 total",
+                "variant": "secondary"
+              }
+            ]
+          },
+          {
+            "id": "normalized",
+            "title": "Normalized",
+            "lines": [
+              {
+                "text": "1.5 kg usable",
+                "variant": "default"
+              }
+            ]
+          },
+          {
+            "id": "recipe-cost",
+            "title": "Normalized",
+            "lines": [
+              {
+                "text": "€10.88 / kg",
+                "variant": "emphasis"
+              }
+            ]
+          }
+        ],
+        "badges": [],
+        "insights": [],
+        "priceLabel": "Purchase price",
+        "priceDisplay": "€10.88 / kg",
+        "purchasedPackDetail": null,
+        "usableStockLabel": "1.5 kg usable",
+        "effectiveUsableCostLabel": "€10.88 / kg"
+      },
+      "buildLastPurchaseCostPresentation": {
+        "lastPurchase": "1.05 kg",
+        "procurementCost": "€10.88 / kg",
+        "operationalCost": "€10.88 / kg",
+        "totalPaid": "€13.44",
+        "supplier": "Emporio Italia",
+        "purchaseDate": "19/05/2026",
+        "lines": [
+          {
+            "label": "Last Purchase",
+            "value": "1.05 kg"
+          },
+          {
+            "label": "Procurement Cost",
+            "value": "€10.88 / kg"
+          },
+          {
+            "label": "Operational Cost",
+            "value": "€10.88 / kg"
+          },
+          {
+            "label": "Total Paid",
+            "value": "€13.44"
+          },
+          {
+            "label": "Supplier",
+            "value": "Emporio Italia"
+          },
+          {
+            "label": "Purchase Date",
+            "value": "19/05/2026"
+          }
+        ]
+      }
+    },
+    "fieldSources": [
+      {
+        "field": "Last Purchase qty",
+        "value": "1.05 kg",
+        "source": "formatRowPurchaseQuantityLabel(metadata) → invoice_items.quantity+unit"
+      },
+      {
+        "field": "Procurement Cost",
+        "value": "€10.88 / kg",
+        "source": "resolvePurchaseCostLabels → presentation.priceDisplay → unit_price"
+      },
+      {
+        "field": "Operational Cost",
+        "value": "€10.88 / kg",
+        "source": "computeEffectiveUsableCost(unit_price)"
+      },
+      {
+        "field": "Total Paid",
+        "value": "€13.44",
+        "source": "invoice_items.total"
+      },
+      {
+        "field": "current_price",
+        "value": 10.88,
+        "source": "ingredients.current_price ← operationalCostFieldsFromInvoiceLine"
+      },
+      {
+        "field": "purchase_quantity",
+        "value": 1000,
+        "source": "recipeOperationalCostFieldsFromInvoiceLine kg short-circuit → 1000g"
+      }
+    ]
+  },
+  "task2_procurementOrigin": {
+    "resolvePurchaseCostLabels": {
+      "source": "src/lib/ingredient-purchase-memory.ts L94-103",
+      "procurementCostLabel": "presentation.priceDisplay",
+      "operationalCostLabel": "presentation.effectiveUsableCostLabel",
+      "priceDisplaySource": "resolveInvoiceLinePricingPresentation L1239-1243 uses metadata.unit_price",
+      "effectiveSource": "computeEffectiveUsableCost(unitPrice, ...) — same unitPrice numerator for kg rows",
+      "classification": "A",
+      "classificationMeaning": "Procurement Cost label = Invoice Unit Price (not line_total÷qty)"
+    },
+    "buildLastPurchaseCostPresentation": {
+      "source": "src/lib/ingredient-detail-panel.ts L299-334",
+      "procurementCost": "purchase.procurementCostLabel (passthrough from resolvePurchaseCostLabels)",
+      "operationalCost": "purchase.operationalCostLabel",
+      "totalPaid": "purchase.priceLabel = formatCurrency(lineTotal) when present",
+      "gorgonzolaReplay": {
+        "lastPurchase": "1.05 kg",
+        "procurementCost": "€10.88 / kg",
+        "operationalCost": "€10.88 / kg",
+        "totalPaid": "€13.44",
+        "supplier": "Emporio Italia",
+        "purchaseDate": "19/05/2026",
+        "lines": [
+          {
+            "label": "Last Purchase",
+            "value": "1.05 kg"
+          },
+          {
+            "label": "Procurement Cost",
+            "value": "€10.88 / kg"
+          },
+          {
+            "label": "Operational Cost",
+            "value": "€10.88 / kg"
+          },
+          {
+            "label": "Total Paid",
+            "value": "€13.44"
+          },
+          {
+            "label": "Supplier",
+            "value": "Emporio Italia"
+          },
+          {
+            "label": "Purchase Date",
+            "value": "19/05/2026"
+          }
+        ]
+      },
+      "classification": "A"
+    }
+  },
+  "task3_effectiveVsDisplayed": [
+    {
+      "product": "Gorgonzola DOP dolce",
+      "unitPrice": 10.88,
+      "effectivePaidPerKg": 12.799999999999999,
+      "displayedProcurement": "€10.88 / kg",
+      "displayedOperational": "€10.88 / kg",
+      "procurementEqualsUnitPrice": true,
+      "procurementEqualsEffectivePaid": false,
+      "qtyTimesUnitEqualsTotal": false
+    },
+    {
+      "product": "Prosciutto cotto scelto",
+      "unitPrice": 8.5,
+      "effectivePaidPerKg": 8.497674418604651,
+      "displayedProcurement": "€8.50 / kg",
+      "displayedOperational": "€8.50 / kg",
+      "procurementEqualsUnitPrice": true,
+      "procurementEqualsEffectivePaid": true,
+      "qtyTimesUnitEqualsTotal": true
+    },
+    {
+      "product": "Mortadella IGP massima con pistacchio",
+      "unitPrice": 9.99,
+      "effectivePaidPerKg": 9.990353697749196,
+      "displayedProcurement": "€9.99 / kg",
+      "displayedOperational": "€9.99 / kg",
+      "procurementEqualsUnitPrice": true,
+      "procurementEqualsEffectivePaid": true,
+      "qtyTimesUnitEqualsTotal": true
+    },
+    {
+      "product": "Bresaola punta d'anca oro",
+      "unitPrice": 27.04,
+      "effectivePaidPerKg": 27.038251366120218,
+      "displayedProcurement": "€27.04 / kg",
+      "displayedOperational": "€27.04 / kg",
+      "procurementEqualsUnitPrice": true,
+      "procurementEqualsEffectivePaid": true,
+      "qtyTimesUnitEqualsTotal": true
+    }
+  ],
+  "task4_deliFamilyUnitPriceVsEffective": [
+    {
+      "product": "Gorgonzola DOP dolce",
+      "quantity": 1.05,
+      "unit_price": 10.88,
+      "line_total": 13.44,
+      "line_total_div_qty": 12.799999999999999,
+      "unit_price_eq_line_total_div_qty": false,
+      "qty_times_unit_price": 11.424000000000001
+    },
+    {
+      "product": "Prosciutto cotto scelto",
+      "quantity": 4.3,
+      "unit_price": 8.5,
+      "line_total": 36.54,
+      "line_total_div_qty": 8.497674418604651,
+      "unit_price_eq_line_total_div_qty": true,
+      "qty_times_unit_price": 36.55
+    },
+    {
+      "product": "Mortadella IGP massima con pistacchio",
+      "quantity": 3.11,
+      "unit_price": 9.99,
+      "line_total": 31.07,
+      "line_total_div_qty": 9.990353697749196,
+      "unit_price_eq_line_total_div_qty": true,
+      "qty_times_unit_price": 31.0689
+    },
+    {
+      "product": "Bresaola punta d'anca oro",
+      "quantity": 1.83,
+      "unit_price": 27.04,
+      "line_total": 49.48,
+      "line_total_div_qty": 27.038251366120218,
+      "unit_price_eq_line_total_div_qty": true,
+      "qty_times_unit_price": 49.483200000000004
+    }
+  ],
+  "task5_discountHandling": {
+    "bindMonetaryColumnsSource": "supabase/functions/extract-invoice/invoice-monetary-binding.ts",
+    "rules": {
+      "applyStructuredBinding": "deriveNetUnitPrice(gross × (1−discount%)); prefer line_total_net",
+      "applyEffectivePaidPrice": "total÷qty when total < qty×unit_price AND discount_pct is null",
+      "note": "Gorgonzola DB row has no discount columns; total (13.44) > qty×unit_price (11.42) so effective-paid rebind does NOT fire"
+    },
+    "scenarios": [
+      {
+        "scenario": "pre_discount_gross_only",
+        "input": {
+          "name": "Test — gross only",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": 12.9,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": null,
+          "total": null
+        },
+        "bound": {
+          "name": "Test — gross only",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": 12.9,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 12.9,
+          "total": 13.55
+        },
+        "effectivePaidPerKg": 12.904761904761905,
+        "bindingUsesEffectivePaid": true,
+        "bindingUsesDerivedNet": false
+      },
+      {
+        "scenario": "post_discount_gross_and_pct",
+        "input": {
+          "name": "Test — gross + discount",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": 12.9,
+          "discount_pct": 22.85,
+          "line_total_net": 13.44,
+          "unit_price": null,
+          "total": null
+        },
+        "bound": {
+          "name": "Test — gross + discount",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": 12.9,
+          "discount_pct": 22.85,
+          "line_total_net": 13.44,
+          "unit_price": 9.95,
+          "total": 13.44
+        },
+        "effectivePaidPerKg": 12.799999999999999,
+        "bindingUsesEffectivePaid": false,
+        "bindingUsesDerivedNet": true
+      },
+      {
+        "scenario": "mixed_db_gorgonzola_no_discount_cols",
+        "input": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": 13.44,
+          "unit_price": 10.88,
+          "total": 13.44
+        },
+        "bound": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": 13.44,
+          "unit_price": 10.88,
+          "total": 13.44
+        },
+        "effectivePaidPerKg": 12.799999999999999,
+        "bindingUsesEffectivePaid": false,
+        "bindingUsesDerivedNet": false
+      },
+      {
+        "scenario": "effective_paid_when_total_lt_qty_x_unit",
+        "input": {
+          "name": "Test — gross unit exceeds net total",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 12.9,
+          "total": 13.44
+        },
+        "bound": {
+          "name": "Test — gross unit exceeds net total",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 12.8,
+          "total": 13.44
+        },
+        "effectivePaidPerKg": 12.799999999999999,
+        "bindingUsesEffectivePaid": true,
+        "bindingUsesDerivedNet": false
+      },
+      {
+        "scenario": "effective_paid_when_total_gt_qty_x_unit_gorgonzola_shape",
+        "input": {
+          "name": "Gorgonzola shape — total > qty×unit",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 10.88,
+          "total": 13.44
+        },
+        "bound": {
+          "name": "Gorgonzola shape — total > qty×unit",
+          "quantity": 1.05,
+          "unit": "kg",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 10.88,
+          "total": 13.44
+        },
+        "effectivePaidPerKg": 12.799999999999999,
+        "bindingUsesEffectivePaid": false,
+        "bindingUsesDerivedNet": false
+      }
+    ]
+  },
+  "task6_gorgonzolaRecipeCosting": {
+    "cost100g": 1.088,
+    "cost250g": 2.72,
+    "cost500g": 5.44,
+    "cost1000g": 10.88,
+    "recipeEurPerKg": 10.88,
+    "effectivePaidEurPerKg": 12.799999999999999,
+    "varianceEurPerKg": -1.9199999999999982,
+    "variancePct": -14.999999999999986
+  },
+  "task7_historicalPricing": [
+    {
+      "product": "Gorgonzola DOP dolce",
+      "ingredientId": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+      "currentPricePack": 10.88,
+      "purchaseQuantity": 1000,
+      "currentOperationalEurPerG": 0.01088,
+      "historyRows": [
+        {
+          "created_at": "2026-05-19T12:00:00+00:00",
+          "new_price_eur_per_g": 0.01088,
+          "new_price_eur_per_kg": 10.88,
+          "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "matchesUnitPriceBasis": true,
+          "matchesEffectivePaidBasis": false
+        }
+      ],
+      "alertsNote": "margin-alerts.ts uses ingredient_price_history.new_price (operational €/g), same unit_price÷purchase_quantity basis — not line_total÷qty"
+    },
+    {
+      "product": "Prosciutto cotto scelto",
+      "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+      "currentPricePack": 8.5,
+      "purchaseQuantity": 1000,
+      "currentOperationalEurPerG": 0.0085,
+      "historyRows": [
+        {
+          "created_at": "2026-05-19T12:00:00+00:00",
+          "new_price_eur_per_g": 0.0085,
+          "new_price_eur_per_kg": 8.5,
+          "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "matchesUnitPriceBasis": true,
+          "matchesEffectivePaidBasis": true
+        }
+      ],
+      "alertsNote": "margin-alerts.ts uses ingredient_price_history.new_price (operational €/g), same unit_price÷purchase_quantity basis — not line_total÷qty"
+    },
+    {
+      "product": "Mortadella IGP massima con pistacchio",
+      "ingredientId": "9c853a47-82fe-4d6d-88bc-f0aa007e0a59",
+      "currentPricePack": 9.99,
+      "purchaseQuantity": 1000,
+      "currentOperationalEurPerG": 0.00999,
+      "historyRows": [
+        {
+          "created_at": "2026-05-19T12:00:00+00:00",
+          "new_price_eur_per_g": 0.00999,
+          "new_price_eur_per_kg": 9.99,
+          "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "matchesUnitPriceBasis": true,
+          "matchesEffectivePaidBasis": true
+        }
+      ],
+      "alertsNote": "margin-alerts.ts uses ingredient_price_history.new_price (operational €/g), same unit_price÷purchase_quantity basis — not line_total÷qty"
+    },
+    {
+      "product": "Bresaola punta d'anca oro",
+      "ingredientId": "31d6da3f-d812-4836-9086-92a5616250d1",
+      "currentPricePack": 27.04,
+      "purchaseQuantity": 1000,
+      "currentOperationalEurPerG": 0.027039999999999998,
+      "historyRows": [
+        {
+          "created_at": "2026-05-19T12:00:00+00:00",
+          "new_price_eur_per_g": 0.027039999999999998,
+          "new_price_eur_per_kg": 27.04,
+          "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "matchesUnitPriceBasis": true,
+          "matchesEffectivePaidBasis": true
+        }
+      ],
+      "alertsNote": "margin-alerts.ts uses ingredient_price_history.new_price (operational €/g), same unit_price÷purchase_quantity basis — not line_total÷qty"
+    }
+  ],
+  "requiredTable": [
+    {
+      "product": "Gorgonzola DOP dolce",
+      "unitPrice": 10.88,
+      "effectivePaidCost": 12.8,
+      "displayedProcurement": "€10.88 / kg",
+      "match": "UNIT_PRICE"
+    },
+    {
+      "product": "Prosciutto cotto scelto",
+      "unitPrice": 8.5,
+      "effectivePaidCost": 8.4977,
+      "displayedProcurement": "€8.50 / kg",
+      "match": "BOTH"
+    },
+    {
+      "product": "Mortadella IGP massima con pistacchio",
+      "unitPrice": 9.99,
+      "effectivePaidCost": 9.9904,
+      "displayedProcurement": "€9.99 / kg",
+      "match": "BOTH"
+    },
+    {
+      "product": "Bresaola punta d'anca oro",
+      "unitPrice": 27.04,
+      "effectivePaidCost": 27.0383,
+      "displayedProcurement": "€27.04 / kg",
+      "match": "BOTH"
+    }
+  ],
+  "finalVerdict": {
+    "letter": "D",
+    "options": {
+      "A": "Procurement Cost = Invoice Unit Price (architectural/display)",
+      "B": "Procurement Cost = Effective Cost Paid (line_total ÷ qty)",
+      "C": "Mixed — extraction may rebind pre-persist; display always uses persisted unit_price",
+      "D": "Data defect — Gorgonzola unit_price inconsistent with line arithmetic and PDF binding"
+    },
+    "rationale": "Architectural basis is A (unit_price), but Gorgonzola invoice_items violate qty×unit_price=total. Displayed €10.88/kg mirrors unit_price; economically paid €12.80/kg (=13.44÷1.05) is not represented. bindMonetaryColumns applyEffectivePaidPrice only fires when total < qty×unit_price (gross-over-net); Gorgonzola has total > qty×unit_price so no rebind. Verdict D: data extraction defect, not intentional effective-paid semantics.",
+    "gorgonzolaAnswer": {
+      "displayedEurPerKg": 10.88,
+      "effectivePaidEurPerKg": 12.799999999999999,
+      "unitPriceDb": 10.88,
+      "intendedByCode": "€10.88/kg — persisted invoice_items.unit_price passed through kg-row short-circuit",
+      "economicallyPaid": "€12.80/kg — line_total (13.44) ÷ quantity (1.05 kg)",
+      "pdfBindingWouldBe": "€9.95/kg from gross 12.90 × (1−22.85%)",
+      "conclusion": "€10.88/kg is what Marginly displays because the pipeline treats unit_price as net €/kg; it is NOT the effective cost paid (€12.80/kg). The persisted unit_price itself is inconsistent with both PDF discount math and line arithmetic."
+    }
+  },
+  "codeEvidence": {
+    "resolvePurchaseCostLabels": "ingredient-purchase-memory.ts:94-103 — procurementCostLabel = presentation.priceDisplay from unit_price",
+    "resolveInvoiceLinePricingPresentation": "invoice-purchase-price-semantics.ts:1239-1248 — priceDisplay from unitPrice; effective from computeEffectiveUsableCost(same unitPrice)",
+    "recipeOperationalCostFieldsFromInvoiceLine": "invoice-purchase-price-semantics.ts:665-666 — kg row: current_price=unit_price, purchase_quantity=1000",
+    "operationalCostFieldsFromInvoiceLine": "ingredient-auto-persist.ts:73-103 — delegates to recipeOperationalCostFieldsFromInvoiceLine",
+    "buildLastPurchaseCostPresentation": "ingredient-detail-panel.ts:299-334 — passthrough procurementCostLabel",
+    "bindMonetaryColumns": "invoice-monetary-binding.ts:120-129 — applyEffectivePaidPrice only when total < qty×unit_price",
+    "operationalUnitPriceForPriceHistory": "ingredient-price-history.ts:149-159 — packPrice/purchase_quantity, not line_total÷qty"
+  }
+}

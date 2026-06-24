@@ -1,0 +1,1857 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T11:12:10.654Z",
+  "auditType": "STRICT_READ_ONLY_EMPORIO_DELI_STABILITY",
+  "invoices": {
+    "geometryFixture": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+    "persistedDb": "ab52796d-de1d-418d-86e7-230c8f056f09"
+  },
+  "artifactInventory": [
+    {
+      "path": ".tmp/final-stability-audit/",
+      "kind": "stability-runs",
+      "deploy": "v30",
+      "runs": 10,
+      "invoice": "17aa3591"
+    },
+    {
+      "path": ".tmp/final-validation-lab-rerun-v28/",
+      "kind": "v28-rerun",
+      "deploy": "v28",
+      "runs": 1,
+      "invoice": "17aa3591"
+    },
+    {
+      "path": ".tmp/emporio-variance-cluster/v28-validation.json",
+      "kind": "v28-cluster",
+      "deploy": "v28",
+      "runs": 5
+    },
+    {
+      "path": ".tmp/gorgonzola-root-cause/v27-stability.json",
+      "kind": "stability",
+      "deploy": "v27",
+      "product": "gorgonzola"
+    },
+    {
+      "path": ".tmp/bresaola-root-cause/stability.json",
+      "kind": "stability",
+      "deploy": "v27",
+      "product": "bresaola"
+    },
+    {
+      "path": ".tmp/mortadella-root-cause/stability.json",
+      "kind": "stability",
+      "deploy": "v28",
+      "product": "mortadella"
+    },
+    {
+      "path": ".tmp/prosciutto-v23-audit/",
+      "kind": "audit",
+      "deploy": "v23",
+      "product": "prosciutto"
+    },
+    {
+      "path": ".tmp/persistence-audit/pass-c-raw/",
+      "kind": "pass-c",
+      "deploy": "ocr-era"
+    },
+    {
+      "path": ".tmp/gorgonzola-reread-validation-audit/",
+      "kind": "v38-reread",
+      "deploy": "v38",
+      "invoice": "ab52796d"
+    },
+    {
+      "path": ".tmp/reread-pipeline-forensics-audit/",
+      "kind": "v38-reread-forensics",
+      "deploy": "v38"
+    },
+    {
+      "path": ".tmp/gorgonzola-* audits (8 dirs)",
+      "kind": "forensics",
+      "products": [
+        "gorgonzola"
+      ]
+    },
+    {
+      "path": ".tmp/emporio-discount-column-audit/",
+      "kind": "pass-c-discount",
+      "products": [
+        "prosciutto",
+        "mortadella"
+      ]
+    },
+    {
+      "path": ".tmp/emporio-deli-family-audit/",
+      "kind": "math-audit",
+      "invoice": "ab52796d"
+    }
+  ],
+  "products": {
+    "gorgonzola": {
+      "displayName": "Gorgonzola DOP dolce",
+      "pdfGroundTruth": {
+        "qty": 1.35,
+        "unit_price": 9.95,
+        "total": 13.44,
+        "note": "net after 22.85% disc; gross 12.90"
+      },
+      "vlCatalogGt": {
+        "qty": 1.35,
+        "unit_price": 9.92,
+        "total": 13.44
+      },
+      "v30TenRun": [
+        {
+          "run": 1,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.05,
+          "unit_price": 9.88,
+          "total": 13.44,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8*1,8...1,9kg"
+        },
+        {
+          "run": 2,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 9.35,
+          "total": 18.68,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8* 1,5-1,9kg Produto de Stock"
+        },
+        {
+          "run": 3,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 10.22,
+          "total": 13.44,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Casaleggio 1/8* 1.5kg Produto de Stock"
+        },
+        {
+          "run": 4,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 8.43,
+          "total": 13.44,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello 1/8* 1,8-1,9kg Produto de Stock"
+        },
+        {
+          "run": 5,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 10.2,
+          "total": 13.44,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg Produto de Stock"
+        },
+        {
+          "run": 6,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 13.43,
+          "total": 26.85,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelformaggi 1/8 - 1,8-1,9kg Produto de Stock"
+        },
+        {
+          "run": 7,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 10.22,
+          "total": 13.44,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castiglione 1/8* 1,8-1,9kg Produto de Stock"
+        },
+        {
+          "run": 8,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 22.85,
+          "total": 45.7,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1.5kg"
+        },
+        {
+          "run": 9,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 13.22,
+          "total": 13.44,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello \"1/8\" - 1,5kg Produto de Stock"
+        },
+        {
+          "run": 10,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 8.69,
+          "total": 17.38,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8*1,5kg Produto de Stock"
+        }
+      ],
+      "allVersions": [
+        {
+          "run": 1,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.05,
+          "unit_price": 9.88,
+          "total": 13.44,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8*1,8...1,9kg"
+        },
+        {
+          "run": 2,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 9.35,
+          "total": 18.68,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8* 1,5-1,9kg Produto de Stock"
+        },
+        {
+          "run": 3,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 10.22,
+          "total": 13.44,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Casaleggio 1/8* 1.5kg Produto de Stock"
+        },
+        {
+          "run": 4,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 8.43,
+          "total": 13.44,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello 1/8* 1,8-1,9kg Produto de Stock"
+        },
+        {
+          "run": 5,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 10.2,
+          "total": 13.44,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg Produto de Stock"
+        },
+        {
+          "run": 6,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 13.43,
+          "total": 26.85,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelformaggi 1/8 - 1,8-1,9kg Produto de Stock"
+        },
+        {
+          "run": 7,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 10.22,
+          "total": 13.44,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castiglione 1/8* 1,8-1,9kg Produto de Stock"
+        },
+        {
+          "run": 8,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 22.85,
+          "total": 45.7,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1.5kg"
+        },
+        {
+          "run": 9,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 13.22,
+          "total": 13.44,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castello \"1/8\" - 1,5kg Produto de Stock"
+        },
+        {
+          "run": 10,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 2,
+          "unit_price": 8.69,
+          "total": 17.38,
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8*1,5kg Produto de Stock"
+        },
+        {
+          "run": "v28-single",
+          "source": "final-validation-lab-rerun-v28",
+          "deployVersion": 28,
+          "qty": 1.05,
+          "unit_price": 10.88,
+          "total": 13.44
+        },
+        {
+          "run": "v28-cluster-1",
+          "source": "emporio-variance-cluster-v28",
+          "deployVersion": 28,
+          "qty": 1.05,
+          "unit_price": 9.88,
+          "total": 13.44
+        },
+        {
+          "run": "v28-cluster-2",
+          "source": "emporio-variance-cluster-v28",
+          "deployVersion": 28,
+          "qty": 2,
+          "unit_price": 12.87,
+          "total": 25.73
+        },
+        {
+          "run": "v27-stab-1",
+          "source": "gorgonzola-root-cause-v27",
+          "deployVersion": 27,
+          "qty": 2.6,
+          "unit_price": 10.22,
+          "total": 13.44
+        },
+        {
+          "run": "v27-stab-5",
+          "source": "gorgonzola-root-cause-v27",
+          "deployVersion": 27,
+          "qty": 2,
+          "unit_price": 16.55,
+          "total": 33.14
+        },
+        {
+          "run": "pass-c-raw",
+          "source": "persistence-audit-pass-c-raw",
+          "deployVersion": "ocr-era",
+          "qty": 1.35,
+          "unit_price": 9.82,
+          "total": 13.44
+        },
+        {
+          "run": "ab52796d-persisted",
+          "source": "gorgonzola-persistence-reconciliation",
+          "deployVersion": "v38-db",
+          "qty": 1.05,
+          "unit_price": 10.88,
+          "total": 13.44
+        },
+        {
+          "run": "v38-reread",
+          "source": "reread-pipeline-forensics-v38",
+          "deployVersion": 38,
+          "qty": 2,
+          "unit_price": 9.35,
+          "total": 18.72
+        }
+      ],
+      "variance": {
+        "v30": {
+          "qty": {
+            "unique": [
+              1.05,
+              2
+            ],
+            "min": 1.05,
+            "max": 2,
+            "range": 0.95,
+            "mean": 1.905,
+            "variancePct": 49.87
+          },
+          "unit_price": {
+            "unique": [
+              9.88,
+              9.35,
+              10.22,
+              8.43,
+              10.2,
+              13.43,
+              22.85,
+              13.22,
+              8.69
+            ],
+            "min": 8.43,
+            "max": 22.85,
+            "range": 14.420000000000002,
+            "mean": 11.649000000000001,
+            "variancePct": 123.79
+          },
+          "total": {
+            "unique": [
+              13.44,
+              18.68,
+              26.85,
+              45.7,
+              17.38
+            ],
+            "min": 13.44,
+            "max": 45.7,
+            "range": 32.260000000000005,
+            "mean": 18.925,
+            "variancePct": 170.46
+          }
+        },
+        "allArtifacts": {
+          "qty": {
+            "unique": [
+              1.05,
+              2,
+              2.6,
+              1.35
+            ],
+            "min": 1.05,
+            "max": 2.6,
+            "range": 1.55,
+            "mean": 1.7861111111111114,
+            "variancePct": 86.78
+          },
+          "unit_price": {
+            "unique": [
+              9.88,
+              9.35,
+              10.22,
+              8.43,
+              10.2,
+              13.43,
+              22.85,
+              13.22,
+              8.69,
+              10.88,
+              12.87,
+              16.55,
+              9.82
+            ],
+            "min": 8.43,
+            "max": 22.85,
+            "range": 14.420000000000002,
+            "mean": 11.496666666666666,
+            "variancePct": 125.43
+          },
+          "total": {
+            "unique": [
+              13.44,
+              18.68,
+              26.85,
+              45.7,
+              17.38,
+              25.73,
+              33.14,
+              18.72
+            ],
+            "min": 13.44,
+            "max": 45.7,
+            "range": 32.260000000000005,
+            "mean": 18.557777777777776,
+            "variancePct": 173.84
+          }
+        }
+      },
+      "pdfComparison": {
+        "qty": {
+          "pdf": 1.35,
+          "min": 1.05,
+          "max": 2.6
+        },
+        "unit_price": {
+          "pdf": 9.95,
+          "min": 8.43,
+          "max": 22.85
+        },
+        "total": {
+          "pdf": 13.44,
+          "min": 13.44,
+          "max": 45.7
+        }
+      },
+      "stabilityScoreV30": {
+        "letter": "B",
+        "totalCorrectPct": 60,
+        "qtyCorrectPct": 0,
+        "unitPriceCorrectPct": 0,
+        "qty": {
+          "unique": [
+            1.05,
+            2
+          ],
+          "min": 1.05,
+          "max": 2,
+          "range": 0.95,
+          "mean": 1.905,
+          "variancePct": 49.87
+        },
+        "unit_price": {
+          "unique": [
+            9.88,
+            9.35,
+            10.22,
+            8.43,
+            10.2,
+            13.43,
+            22.85,
+            13.22,
+            8.69
+          ],
+          "min": 8.43,
+          "max": 22.85,
+          "range": 14.420000000000002,
+          "mean": 11.649000000000001,
+          "variancePct": 123.79
+        },
+        "total": {
+          "unique": [
+            13.44,
+            18.68,
+            26.85,
+            45.7,
+            17.38
+          ],
+          "min": 13.44,
+          "max": 45.7,
+          "range": 32.260000000000005,
+          "mean": 18.925,
+          "variancePct": 170.46
+        }
+      },
+      "stabilityScoreAllArtifacts": {
+        "letter": "B",
+        "totalCorrectPct": 61,
+        "qtyCorrectPct": 6,
+        "unitPriceCorrectPct": 0,
+        "qty": {
+          "unique": [
+            1.05,
+            2,
+            2.6,
+            1.35
+          ],
+          "min": 1.05,
+          "max": 2.6,
+          "range": 1.55,
+          "mean": 1.7861111111111114,
+          "variancePct": 86.78
+        },
+        "unit_price": {
+          "unique": [
+            9.88,
+            9.35,
+            10.22,
+            8.43,
+            10.2,
+            13.43,
+            22.85,
+            13.22,
+            8.69,
+            10.88,
+            12.87,
+            16.55,
+            9.82
+          ],
+          "min": 8.43,
+          "max": 22.85,
+          "range": 14.420000000000002,
+          "mean": 11.496666666666666,
+          "variancePct": 125.43
+        },
+        "total": {
+          "unique": [
+            13.44,
+            18.68,
+            26.85,
+            45.7,
+            17.38,
+            25.73,
+            33.14,
+            18.72
+          ],
+          "min": 13.44,
+          "max": 45.7,
+          "range": 32.260000000000005,
+          "mean": 18.557777777777776,
+          "variancePct": 173.84
+        }
+      }
+    },
+    "prosciutto": {
+      "displayName": "Prosciutto cotto scelto",
+      "pdfGroundTruth": {
+        "qty": 4.3,
+        "unit_price": 8.5,
+        "total": 36.54,
+        "note": "net after 17.50% disc; gross 10.30"
+      },
+      "vlCatalogGt": {
+        "qty": 4.3,
+        "unit_price": 8.17,
+        "total": 35.14
+      },
+      "v30TenRun": [
+        {
+          "run": 1,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4...4,25kg"
+        },
+        {
+          "run": 2,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4-4,25Kg Produto de Stock"
+        },
+        {
+          "run": 3,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4.3-4.5KG Produto de Stock"
+        },
+        {
+          "run": 4,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4–4,25Kg Produto de Stock"
+        },
+        {
+          "run": 5,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,25KG Produto de Stock"
+        },
+        {
+          "run": 6,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Rovagnati Assaporami Prosciutto Cotto Scelto HC 4 - 4,25Kg Produto de Stock"
+        },
+        {
+          "run": 7,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,25Kg Produto de Stock"
+        },
+        {
+          "run": 8,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4-4,25Kg"
+        },
+        {
+          "run": 9,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,25Kg Produto de Stock"
+        },
+        {
+          "run": 10,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG Produto de Stock"
+        }
+      ],
+      "allVersions": [
+        {
+          "run": 1,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4...4,25kg"
+        },
+        {
+          "run": 2,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4-4,25Kg Produto de Stock"
+        },
+        {
+          "run": 3,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4.3-4.5KG Produto de Stock"
+        },
+        {
+          "run": 4,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4–4,25Kg Produto de Stock"
+        },
+        {
+          "run": 5,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,25KG Produto de Stock"
+        },
+        {
+          "run": 6,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Rovagnati Assaporami Prosciutto Cotto Scelto HC 4 - 4,25Kg Produto de Stock"
+        },
+        {
+          "run": 7,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,25Kg Produto de Stock"
+        },
+        {
+          "run": 8,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4-4,25Kg"
+        },
+        {
+          "run": 9,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,25Kg Produto de Stock"
+        },
+        {
+          "run": 10,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54,
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG Produto de Stock"
+        },
+        {
+          "run": "v28-single",
+          "source": "final-validation-lab-rerun-v28",
+          "deployVersion": 28,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54
+        },
+        {
+          "run": "v23-run1",
+          "source": "prosciutto-v23-audit",
+          "deployVersion": 23,
+          "qty": 4.3,
+          "unit_price": 10.56,
+          "total": 36.44
+        },
+        {
+          "run": "v23-run2",
+          "source": "prosciutto-v23-audit",
+          "deployVersion": 23,
+          "qty": 4.3,
+          "unit_price": 10.7,
+          "total": 46.01
+        },
+        {
+          "run": "v23-run3",
+          "source": "prosciutto-v23-audit",
+          "deployVersion": 23,
+          "qty": 4.3,
+          "unit_price": 10.22,
+          "total": 43.95
+        },
+        {
+          "run": "v38-reread",
+          "source": "reread-pipeline-forensics-v38",
+          "deployVersion": 38,
+          "qty": 4.3,
+          "unit_price": 8.5,
+          "total": 36.54
+        }
+      ],
+      "variance": {
+        "v30": {
+          "qty": {
+            "unique": [
+              4.3
+            ],
+            "min": 4.3,
+            "max": 4.3,
+            "range": 0,
+            "mean": 4.299999999999999,
+            "variancePct": 0
+          },
+          "unit_price": {
+            "unique": [
+              8.5
+            ],
+            "min": 8.5,
+            "max": 8.5,
+            "range": 0,
+            "mean": 8.5,
+            "variancePct": 0
+          },
+          "total": {
+            "unique": [
+              36.54
+            ],
+            "min": 36.54,
+            "max": 36.54,
+            "range": 0,
+            "mean": 36.540000000000006,
+            "variancePct": 0
+          }
+        },
+        "allArtifacts": {
+          "qty": {
+            "unique": [
+              4.3
+            ],
+            "min": 4.3,
+            "max": 4.3,
+            "range": 0,
+            "mean": 4.299999999999999,
+            "variancePct": 0
+          },
+          "unit_price": {
+            "unique": [
+              8.5,
+              10.56,
+              10.7,
+              10.22
+            ],
+            "min": 8.5,
+            "max": 10.7,
+            "range": 2.1999999999999993,
+            "mean": 8.898666666666667,
+            "variancePct": 24.72
+          },
+          "total": {
+            "unique": [
+              36.54,
+              36.44,
+              46.01,
+              43.95
+            ],
+            "min": 36.44,
+            "max": 46.01,
+            "range": 9.57,
+            "mean": 37.65866666666667,
+            "variancePct": 25.41
+          }
+        }
+      },
+      "pdfComparison": {
+        "qty": {
+          "pdf": 4.3,
+          "min": 4.3,
+          "max": 4.3
+        },
+        "unit_price": {
+          "pdf": 8.5,
+          "min": 8.5,
+          "max": 10.7
+        },
+        "total": {
+          "pdf": 36.54,
+          "min": 36.44,
+          "max": 46.01
+        }
+      },
+      "stabilityScoreV30": {
+        "letter": "D",
+        "totalCorrectPct": 100,
+        "qtyCorrectPct": 100,
+        "unitPriceCorrectPct": 100,
+        "qty": {
+          "unique": [
+            4.3
+          ],
+          "min": 4.3,
+          "max": 4.3,
+          "range": 0,
+          "mean": 4.299999999999999,
+          "variancePct": 0
+        },
+        "unit_price": {
+          "unique": [
+            8.5
+          ],
+          "min": 8.5,
+          "max": 8.5,
+          "range": 0,
+          "mean": 8.5,
+          "variancePct": 0
+        },
+        "total": {
+          "unique": [
+            36.54
+          ],
+          "min": 36.54,
+          "max": 36.54,
+          "range": 0,
+          "mean": 36.540000000000006,
+          "variancePct": 0
+        }
+      },
+      "stabilityScoreAllArtifacts": {
+        "letter": "B",
+        "totalCorrectPct": 80,
+        "qtyCorrectPct": 100,
+        "unitPriceCorrectPct": 80,
+        "qty": {
+          "unique": [
+            4.3
+          ],
+          "min": 4.3,
+          "max": 4.3,
+          "range": 0,
+          "mean": 4.299999999999999,
+          "variancePct": 0
+        },
+        "unit_price": {
+          "unique": [
+            8.5,
+            10.56,
+            10.7,
+            10.22
+          ],
+          "min": 8.5,
+          "max": 10.7,
+          "range": 2.1999999999999993,
+          "mean": 8.898666666666667,
+          "variancePct": 24.72
+        },
+        "total": {
+          "unique": [
+            36.54,
+            36.44,
+            46.01,
+            43.95
+          ],
+          "min": 36.44,
+          "max": 46.01,
+          "range": 9.57,
+          "mean": 37.65866666666667,
+          "variancePct": 25.41
+        }
+      }
+    },
+    "mortadella": {
+      "displayName": "Mortadella IGP massima con pistacchio",
+      "pdfGroundTruth": {
+        "qty": 3.11,
+        "unit_price": 9.99,
+        "total": 31.07,
+        "note": "net after 10% disc; gross 11.10 (VL GT net 10.10)"
+      },
+      "vlCatalogGt": {
+        "qty": 3.11,
+        "unit_price": 10.1,
+        "total": 31.07
+      },
+      "v30TenRun": [
+        {
+          "run": 1,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg"
+        },
+        {
+          "run": 2,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 – 3,5Kg Produto de Stock"
+        },
+        {
+          "run": 3,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 ~3.5Kg Produto de Stock"
+        },
+        {
+          "run": 4,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 – 3,5kg Produto de Stock"
+        },
+        {
+          "run": 5,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5kg Produto de Stock"
+        },
+        {
+          "run": 6,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5Kg Produto de Stock"
+        },
+        {
+          "run": 7,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 7.94,
+          "total": 24.7,
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5Kg Produto de Stock"
+        },
+        {
+          "run": 8,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3.5Kg"
+        },
+        {
+          "run": 9,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5Kg Produto de Stock"
+        },
+        {
+          "run": 10,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP “Massima” con Pistacchio 1/2 - 3,5kg Produto de Stock"
+        }
+      ],
+      "allVersions": [
+        {
+          "run": 1,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg"
+        },
+        {
+          "run": 2,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 – 3,5Kg Produto de Stock"
+        },
+        {
+          "run": 3,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 ~3.5Kg Produto de Stock"
+        },
+        {
+          "run": 4,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 – 3,5kg Produto de Stock"
+        },
+        {
+          "run": 5,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5kg Produto de Stock"
+        },
+        {
+          "run": 6,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5Kg Produto de Stock"
+        },
+        {
+          "run": 7,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 7.94,
+          "total": 24.7,
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5Kg Produto de Stock"
+        },
+        {
+          "run": 8,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3.5Kg"
+        },
+        {
+          "run": 9,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 - 3,5Kg Produto de Stock"
+        },
+        {
+          "run": 10,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07,
+          "name": "Rovagnati - Mortadella IGP “Massima” con Pistacchio 1/2 - 3,5kg Produto de Stock"
+        },
+        {
+          "run": "v28-single",
+          "source": "final-validation-lab-rerun-v28",
+          "deployVersion": 28,
+          "qty": 3.11,
+          "unit_price": 8.88,
+          "total": 27.57
+        },
+        {
+          "run": "v28-stab-1",
+          "source": "mortadella-root-cause-v28",
+          "deployVersion": 28,
+          "qty": 3.11,
+          "unit_price": 8.56,
+          "total": 26.66
+        },
+        {
+          "run": "v28-stab-2",
+          "source": "mortadella-root-cause-v28",
+          "deployVersion": 28,
+          "qty": 3.11,
+          "unit_price": 8.56,
+          "total": 26.65
+        },
+        {
+          "run": "v28-stab-3",
+          "source": "mortadella-root-cause-v28",
+          "deployVersion": 28,
+          "qty": 3.11,
+          "unit_price": 8.88,
+          "total": 27.62
+        },
+        {
+          "run": "v38-reread",
+          "source": "reread-pipeline-forensics-v38",
+          "deployVersion": 38,
+          "qty": 3.11,
+          "unit_price": 9.99,
+          "total": 31.07
+        }
+      ],
+      "variance": {
+        "v30": {
+          "qty": {
+            "unique": [
+              3.11
+            ],
+            "min": 3.11,
+            "max": 3.11,
+            "range": 0,
+            "mean": 3.11,
+            "variancePct": 0
+          },
+          "unit_price": {
+            "unique": [
+              9.99,
+              7.94
+            ],
+            "min": 7.94,
+            "max": 9.99,
+            "range": 2.05,
+            "mean": 9.785,
+            "variancePct": 20.95
+          },
+          "total": {
+            "unique": [
+              31.07,
+              24.7
+            ],
+            "min": 24.7,
+            "max": 31.07,
+            "range": 6.370000000000001,
+            "mean": 30.433,
+            "variancePct": 20.93
+          }
+        },
+        "allArtifacts": {
+          "qty": {
+            "unique": [
+              3.11
+            ],
+            "min": 3.11,
+            "max": 3.11,
+            "range": 0,
+            "mean": 3.11,
+            "variancePct": 0
+          },
+          "unit_price": {
+            "unique": [
+              9.99,
+              7.94,
+              8.88,
+              8.56
+            ],
+            "min": 7.94,
+            "max": 9.99,
+            "range": 2.05,
+            "mean": 9.514666666666667,
+            "variancePct": 21.55
+          },
+          "total": {
+            "unique": [
+              31.07,
+              24.7,
+              27.57,
+              26.66,
+              26.65,
+              27.62
+            ],
+            "min": 24.7,
+            "max": 31.07,
+            "range": 6.370000000000001,
+            "mean": 29.59333333333333,
+            "variancePct": 21.53
+          }
+        }
+      },
+      "pdfComparison": {
+        "qty": {
+          "pdf": 3.11,
+          "min": 3.11,
+          "max": 3.11
+        },
+        "unit_price": {
+          "pdf": 9.99,
+          "min": 7.94,
+          "max": 9.99
+        },
+        "total": {
+          "pdf": 31.07,
+          "min": 24.7,
+          "max": 31.07
+        }
+      },
+      "stabilityScoreV30": {
+        "letter": "D",
+        "totalCorrectPct": 90,
+        "qtyCorrectPct": 100,
+        "unitPriceCorrectPct": 90,
+        "qty": {
+          "unique": [
+            3.11
+          ],
+          "min": 3.11,
+          "max": 3.11,
+          "range": 0,
+          "mean": 3.11,
+          "variancePct": 0
+        },
+        "unit_price": {
+          "unique": [
+            9.99,
+            7.94
+          ],
+          "min": 7.94,
+          "max": 9.99,
+          "range": 2.05,
+          "mean": 9.785,
+          "variancePct": 20.95
+        },
+        "total": {
+          "unique": [
+            31.07,
+            24.7
+          ],
+          "min": 24.7,
+          "max": 31.07,
+          "range": 6.370000000000001,
+          "mean": 30.433,
+          "variancePct": 20.93
+        }
+      },
+      "stabilityScoreAllArtifacts": {
+        "letter": "B",
+        "totalCorrectPct": 67,
+        "qtyCorrectPct": 100,
+        "unitPriceCorrectPct": 67,
+        "qty": {
+          "unique": [
+            3.11
+          ],
+          "min": 3.11,
+          "max": 3.11,
+          "range": 0,
+          "mean": 3.11,
+          "variancePct": 0
+        },
+        "unit_price": {
+          "unique": [
+            9.99,
+            7.94,
+            8.88,
+            8.56
+          ],
+          "min": 7.94,
+          "max": 9.99,
+          "range": 2.05,
+          "mean": 9.514666666666667,
+          "variancePct": 21.55
+        },
+        "total": {
+          "unique": [
+            31.07,
+            24.7,
+            27.57,
+            26.66,
+            26.65,
+            27.62
+          ],
+          "min": 24.7,
+          "max": 31.07,
+          "range": 6.370000000000001,
+          "mean": 29.59333333333333,
+          "variancePct": 21.53
+        }
+      }
+    },
+    "bresaola": {
+      "displayName": "Bresaola punta d'anca oro",
+      "pdfGroundTruth": {
+        "qty": 1.83,
+        "unit_price": 27.04,
+        "total": 49.48,
+        "note": "net after 20% disc; gross 33.80"
+      },
+      "vlCatalogGt": {
+        "qty": 2.8,
+        "unit_price": 17.68,
+        "total": 49.48
+      },
+      "v30TenRun": [
+        {
+          "run": 1,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg"
+        },
+        {
+          "run": 2,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2, 1,5Kg Produto de Stock"
+        },
+        {
+          "run": 3,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d’Anca Oro 1/2 - 1.5Kg Produto de Stock"
+        },
+        {
+          "run": 4,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rugamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock"
+        },
+        {
+          "run": 5,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock"
+        },
+        {
+          "run": 6,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Riganatti - Bresaola Punta d’Anca Oro 1/2 - 1,5Kg Produto de Stock"
+        },
+        {
+          "run": 7,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg Produto de Stock"
+        },
+        {
+          "run": 8,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg"
+        },
+        {
+          "run": 9,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg Produto de Stock"
+        },
+        {
+          "run": 10,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d’Anca Oro 1/2 - 1,5kg Produto de Stock"
+        }
+      ],
+      "allVersions": [
+        {
+          "run": 1,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg"
+        },
+        {
+          "run": 2,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2, 1,5Kg Produto de Stock"
+        },
+        {
+          "run": 3,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d’Anca Oro 1/2 - 1.5Kg Produto de Stock"
+        },
+        {
+          "run": 4,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rugamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock"
+        },
+        {
+          "run": 5,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock"
+        },
+        {
+          "run": 6,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Riganatti - Bresaola Punta d’Anca Oro 1/2 - 1,5Kg Produto de Stock"
+        },
+        {
+          "run": 7,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg Produto de Stock"
+        },
+        {
+          "run": 8,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg"
+        },
+        {
+          "run": 9,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg Produto de Stock"
+        },
+        {
+          "run": 10,
+          "source": "final-stability-audit-v30",
+          "deployVersion": 30,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48,
+          "name": "Rigamonti - Bresaola Punta d’Anca Oro 1/2 - 1,5kg Produto de Stock"
+        },
+        {
+          "run": "v27-stab-1",
+          "source": "bresaola-root-cause-v27",
+          "deployVersion": 27,
+          "qty": 2.5,
+          "unit_price": 19.79,
+          "total": 49.48
+        },
+        {
+          "run": "v27-stab-3",
+          "source": "bresaola-root-cause-v27",
+          "deployVersion": 27,
+          "qty": 2.3,
+          "unit_price": 19.49,
+          "total": 44.83
+        },
+        {
+          "run": "v27-stab-4",
+          "source": "bresaola-root-cause-v27",
+          "deployVersion": 27,
+          "qty": 3.3,
+          "unit_price": 12,
+          "total": 39.48
+        },
+        {
+          "run": "v28-cluster-all",
+          "source": "emporio-variance-cluster-v28",
+          "deployVersion": 28,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48
+        },
+        {
+          "run": "v38-reread",
+          "source": "reread-pipeline-forensics-v38",
+          "deployVersion": 38,
+          "qty": 1.83,
+          "unit_price": 27.04,
+          "total": 49.48
+        }
+      ],
+      "variance": {
+        "v30": {
+          "qty": {
+            "unique": [
+              1.83
+            ],
+            "min": 1.83,
+            "max": 1.83,
+            "range": 0,
+            "mean": 1.8299999999999996,
+            "variancePct": 0
+          },
+          "unit_price": {
+            "unique": [
+              27.04
+            ],
+            "min": 27.04,
+            "max": 27.04,
+            "range": 0,
+            "mean": 27.04,
+            "variancePct": 0
+          },
+          "total": {
+            "unique": [
+              49.48
+            ],
+            "min": 49.48,
+            "max": 49.48,
+            "range": 0,
+            "mean": 49.480000000000004,
+            "variancePct": 0
+          }
+        },
+        "allArtifacts": {
+          "qty": {
+            "unique": [
+              1.83,
+              2.5,
+              2.3,
+              3.3
+            ],
+            "min": 1.83,
+            "max": 3.3,
+            "range": 1.4699999999999998,
+            "mean": 2.0039999999999996,
+            "variancePct": 73.35
+          },
+          "unit_price": {
+            "unique": [
+              27.04,
+              19.79,
+              19.49,
+              12
+            ],
+            "min": 12,
+            "max": 27.04,
+            "range": 15.04,
+            "mean": 25.050666666666668,
+            "variancePct": 60.04
+          },
+          "total": {
+            "unique": [
+              49.48,
+              44.83,
+              39.48
+            ],
+            "min": 39.48,
+            "max": 49.48,
+            "range": 10,
+            "mean": 48.503333333333345,
+            "variancePct": 20.62
+          }
+        }
+      },
+      "pdfComparison": {
+        "qty": {
+          "pdf": 1.83,
+          "min": 1.83,
+          "max": 3.3
+        },
+        "unit_price": {
+          "pdf": 27.04,
+          "min": 12,
+          "max": 27.04
+        },
+        "total": {
+          "pdf": 49.48,
+          "min": 39.48,
+          "max": 49.48
+        }
+      },
+      "stabilityScoreV30": {
+        "letter": "D",
+        "totalCorrectPct": 100,
+        "qtyCorrectPct": 100,
+        "unitPriceCorrectPct": 100,
+        "qty": {
+          "unique": [
+            1.83
+          ],
+          "min": 1.83,
+          "max": 1.83,
+          "range": 0,
+          "mean": 1.8299999999999996,
+          "variancePct": 0
+        },
+        "unit_price": {
+          "unique": [
+            27.04
+          ],
+          "min": 27.04,
+          "max": 27.04,
+          "range": 0,
+          "mean": 27.04,
+          "variancePct": 0
+        },
+        "total": {
+          "unique": [
+            49.48
+          ],
+          "min": 49.48,
+          "max": 49.48,
+          "range": 0,
+          "mean": 49.480000000000004,
+          "variancePct": 0
+        }
+      },
+      "stabilityScoreAllArtifacts": {
+        "letter": "B",
+        "totalCorrectPct": 87,
+        "qtyCorrectPct": 80,
+        "unitPriceCorrectPct": 80,
+        "qty": {
+          "unique": [
+            1.83,
+            2.5,
+            2.3,
+            3.3
+          ],
+          "min": 1.83,
+          "max": 3.3,
+          "range": 1.4699999999999998,
+          "mean": 2.0039999999999996,
+          "variancePct": 73.35
+        },
+        "unit_price": {
+          "unique": [
+            27.04,
+            19.79,
+            19.49,
+            12
+          ],
+          "min": 12,
+          "max": 27.04,
+          "range": 15.04,
+          "mean": 25.050666666666668,
+          "variancePct": 60.04
+        },
+        "total": {
+          "unique": [
+            49.48,
+            44.83,
+            39.48
+          ],
+          "min": 39.48,
+          "max": 49.48,
+          "range": 10,
+          "mean": 48.503333333333345,
+          "variancePct": 20.62
+        }
+      }
+    }
+  },
+  "commonPattern": {
+    "invoiceType": "Emporio Italia dense 4-column monetary table (Qtd | Preço Unit | Desc.(%) | Preço Total)",
+    "rowType": "Weighted deli/cheese rows — fractional kg quantities, gross/net discount columns without % symbol",
+    "failureFamily": "Emporio variance cluster A — Pass C GPT non-determinism on qty, unit_price, and/or line_total_net",
+    "mechanisms": [
+      "qty misread (Gorgonzola 1,35→1,05 or 2)",
+      "discount_pct omission → gross used as unit_price (Prosciutto v23, Mortadella v28)",
+      "line_total_net synthesized as qty×unit instead of copying Preço Total VALOR",
+      "adjacent-row bleed (Bresaola 39.48 ≈ Ventricina 39.49)",
+      "pack-metadata confusion from description (Gorgonzola 1/8 ~1,5kg → qty 2)"
+    ],
+    "weighted": true,
+    "discounted": true,
+    "deli": true,
+    "grossNet": true
+  },
+  "task7_instabilityOutsideGorgonzola": {
+    "answer": "YES",
+    "rationale": "Historical instability on Bresaola (v27 40%), Mortadella (v28 0/3), Prosciutto (v23 non-deterministic €7–11). At v30 10-run: Prosciutto/Bresaola 100% stable vs PDF; Mortadella 90%; Gorgonzola 60%. Family shares same Pass C failure mode; Gorgonzola is worst but not unique."
+  },
+  "stabilityScores": {
+    "gorgonzola": {
+      "v30": "B",
+      "allArtifacts": "B"
+    },
+    "prosciutto": {
+      "v30": "D",
+      "allArtifacts": "B"
+    },
+    "mortadella": {
+      "v30": "D",
+      "allArtifacts": "B"
+    },
+    "bresaola": {
+      "v30": "D",
+      "allArtifacts": "B"
+    }
+  },
+  "finalVerdict": {
+    "letter": "B",
+    "question": "Should VL continue to Prosciutto or address extraction stability first?",
+    "answer": "Address extraction stability first — primarily Gorgonzola (v30 60% correct, v38 reread regressed to 2/9.35/18.72). Prosciutto/Bresaola/Mortadella are stable at v30 against visible PDF, but family-wide Pass C variance and fresh v38 Gorgonzola hallucination block confident VL progression.",
+    "evidence": [
+      "Gorgonzola: only product with >1 distinct total on 4/10 v30 runs; totals range €13.44–€45.70",
+      "v38 live re-read worsened Gorgonzola from 1.05/10.88/13.44 to 2/9.35/18.72",
+      "Prosciutto v30: 10/10 identical 4.3/8.5/36.54 — safe to continue IF Gorgonzola fixed",
+      "Mortadella v30: 9/10 at 31.07; v28 had 0/3 correct",
+      "Bresaola v30: 10/10 at 49.48; v27 had 2/5"
+    ]
+  }
+}

@@ -1,0 +1,414 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T15:35:43.414Z",
+  "auditType": "STRICT_READ_ONLY_OCR_QTY_PREPAS_FORENSICS",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "gorgonzolaItemId": "35bdf942-712b-46af-9f2e-666cb4744a88",
+  "geometryFixture": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "rereadTimestamp": "2026-06-24T12:19:51.42294+00:00",
+  "task1_architecture": {
+    "chain": [
+      "extractTableItemsFromImage (invoice-table-extraction.ts:337)",
+      "runTableExtractionPass (L378)",
+      "cropTableRegionForLineItems (invoice-image-crop.ts:393)",
+      "runQuantityPrePass (invoice-qty-prepass.ts:165)",
+      "callOpenAiJson gpt-4.1 seed=42 (invoice-date-extraction.ts:54)",
+      "JSON parse items[].quantity (L190-198)",
+      "anchorQuantities (L447-448)",
+      "Pass C callOpenAiJson (L428-444)",
+      "bindMonetaryColumns → reconcile → extraction_meta"
+    ],
+    "model": "gpt-4.1",
+    "temperature": 0,
+    "seed": 42,
+    "prepassSchema": "invoice_qty_prepass strict JSON {name, quantity, unit}",
+    "logging": {
+      "edgeLogTag": "[invoice-ocr] qty-prepass-result",
+      "logsParsedPreviewOnly": true,
+      "rawGptResponsePersisted": false
+    }
+  },
+  "task2_liveArtifactRecovery": {
+    "rawGptResponse": {
+      "available": false,
+      "reason": "runQuantityPrePass discards OpenAI content after JSON.parse; no edge log cache queried"
+    },
+    "systemPrompt": "\nYou extract ONLY quantity and unit from invoice table line items.\n\nReturn ONLY valid JSON:\n{ \"items\": [{ \"name\": string, \"quantity\": number | null, \"unit\": string | null }] }\n\nRULES:\n- Copy quantity ONLY from the Qtd / QUANT / quantity column for each row.\n- Copy unit from the unit column when visible; otherwise null.\n- Ignore description tokens: 1/8, ~1,5kg, pack *N, CX6, x15, 33cl*24 — these are NOT purchased quantity.\n- When quantity column and description disagree, ALWAYS trust the quantity column.\n- Read fractional decimals exactly: 1,35 → 1.35, 0,5 → 0.5 — never round.\n- One output row per visible product line in table order.\n- Do not extract prices, discounts, or totals.\n",
+    "userPrompt": "Copy quantity and unit from the Qtd column for each visible invoice line item.",
+    "parsedPrepassQtyGorgonzola": 2,
+    "recoverySource": "VL live probe extraction_meta.ocr_quantity (v39)",
+    "reReadArtifact": {
+      "available": false,
+      "reason": "Re-read at 12:19 UTC left no prepass log artifact; inference from extraction_meta pattern + persisted 1.05"
+    }
+  },
+  "task3_firstAppearanceOf200": {
+    "firstStage": "Qty pre-pass GPT vision call",
+    "stageTable": [
+      {
+        "stage": "PDF Qtd column",
+        "qty": 1.35,
+        "source": "Visible invoice / stage-trace.json"
+      },
+      {
+        "stage": "Geometry crop bounds",
+        "qty": null,
+        "source": "top 456 bottom 851 — row visible"
+      },
+      {
+        "stage": "Qty pre-pass GPT (first divergence)",
+        "qty": 2,
+        "source": "extraction_meta.ocr_quantity live v39"
+      },
+      {
+        "stage": "prepass parseMonetaryLineItems N/A",
+        "qty": 2,
+        "source": "invoice-qty-prepass.ts L190-198 pass-through"
+      },
+      {
+        "stage": "Pass C structured",
+        "qty": 1.05,
+        "source": "extraction_meta.pass_c_quantity"
+      },
+      {
+        "stage": "anchorQuantities out",
+        "qty": 1.05,
+        "source": "scope gate skip — integer OCR"
+      },
+      {
+        "stage": "Persisted re-read",
+        "qty": 1.05,
+        "source": "invoice_items DB"
+      }
+    ],
+    "note": "2.00 first appears at prepass model output — before Pass C anchorQuantities; Pass C on same run returned 1.05"
+  },
+  "task4_promptInspection": {
+    "ignoresDescriptionTokens": [
+      "1/8",
+      "~1,5kg",
+      "pack *N",
+      "CX6",
+      "x15",
+      "33cl*24"
+    ],
+    "trustsQtdColumn": true,
+    "could18Become200": {
+      "answer": false,
+      "rationale": "1/8 is one-eighth pack notation → would be 0.125 or 1, not 2; ~1,5kg → 1.5. Integer 2 matches historical description-confusion class (qty=2 on Gorgonzola) not arithmetic of 1/8×1.5kg"
+    },
+    "promptGap": "Rule lists tokens to ignore but lacks Emporio Gorgonzola positive example with Qtd 1,35 adjacent to 1/8 ~1,5kg"
+  },
+  "task5_visualAmbiguity": {
+    "imageSource": ".tmp/emporio-italia-investigation/invoice-full.png",
+    "geometry": {
+      "imageWidth": 724,
+      "imageHeight": 1124,
+      "bounds": {
+        "top": 456,
+        "bottom": 851,
+        "headerTop": 466,
+        "headerBottom": 502,
+        "totalsStart": 827,
+        "detected": true
+      },
+      "fractionStartY": 506,
+      "summaryBandTop": 710,
+      "footerCropStartY": 506,
+      "footerCropHeight": 618,
+      "scanStart": 134,
+      "scanEnd": 618,
+      "greyHeaderThreshold": 163,
+      "imageSource": "cached",
+      "isPdf": false
+    },
+    "gorgonzolaRowVisible": true,
+    "qtdColumnPrinted": "1,35",
+    "tokenTable": [
+      {
+        "token": "1,35",
+        "meaning": "Printed Qtd column (purchased weight kg)",
+        "couldBecome200": false,
+        "why": "Correct ground truth; prepass should emit 1.35 not 2"
+      },
+      {
+        "token": "1/8",
+        "meaning": "Pack fraction in description (one-eighth wheel)",
+        "couldBecome200": true,
+        "why": "Historical Gorgonzola failure mode: models infer integer case/piece count from fraction notation; prepass returned integer 2"
+      },
+      {
+        "token": "~1,5kg",
+        "meaning": "Nominal pack weight metadata in description",
+        "couldBecome200": false,
+        "why": "Would yield 1.5 if misused, not 2; listed in prepass ignore rule L44"
+      },
+      {
+        "token": "22,85",
+        "meaning": "Desc.(%) discount column value",
+        "couldBecome200": false,
+        "why": "Discount percentage, not quantity; no path to integer 2"
+      },
+      {
+        "token": "12,90",
+        "meaning": "Preço Unit gross €/kg",
+        "couldBecome200": false,
+        "why": "Monetary column; prepass prompt excludes prices"
+      },
+      {
+        "token": "13,44",
+        "meaning": "Preço Total line VALOR",
+        "couldBecome200": false,
+        "why": "Line total EUR; prepass excludes totals"
+      },
+      {
+        "token": "2 (integer)",
+        "meaning": "No visible token on Gorgonzola row Qtd column",
+        "couldBecome200": true,
+        "why": "Prepass output 2.00 is hallucinated/inferred — not copied from Qtd cell per visible invoice"
+      },
+      {
+        "token": "GD87813",
+        "meaning": "Product code in description area",
+        "couldBecome200": false,
+        "why": "Alphanumeric SKU; no qty semantics"
+      }
+    ]
+  },
+  "task6_prepassVsPassC": {
+    "liveV39": {
+      "prepassOcr": 2,
+      "passC": 1.05,
+      "final": 1.05,
+      "disagree": true
+    },
+    "passCRawOcrEra": {
+      "qty": 1.35,
+      "note": "Pre-prepass full extract API read 1.35 correctly (2026-06-11)"
+    },
+    "historicalGorgonzolaQtyValues": [
+      1.35,
+      1.05,
+      2,
+      2.6
+    ],
+    "contrast": "Prepass on v39 returned integer 2 (wrong); Pass C on same invoke returned 1.05 (also wrong vs PDF 1.35). Neither pass read PDF faithfully on live probe."
+  },
+  "task7_controls": {
+    "liveProbe": [
+      {
+        "product": "gorgonzola",
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg Produto de Stock",
+        "pdfQty": 1.35,
+        "prepassOcrQty": 2,
+        "passCQty": 1.05,
+        "finalQty": 1.05,
+        "prepassMatchesPdf": false,
+        "passCMatchesPdf": false,
+        "prepassPassCAgree": false
+      },
+      {
+        "product": "prosciutto",
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg Produto de Stock",
+        "pdfQty": 4.3,
+        "prepassOcrQty": 4.3,
+        "passCQty": 4.3,
+        "finalQty": 4.3,
+        "prepassMatchesPdf": true,
+        "passCMatchesPdf": true,
+        "prepassPassCAgree": true
+      },
+      {
+        "product": "mortadella",
+        "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg Produto de Stock",
+        "pdfQty": 3.11,
+        "prepassOcrQty": 3.1,
+        "passCQty": 3.11,
+        "finalQty": 3.11,
+        "prepassMatchesPdf": false,
+        "passCMatchesPdf": true,
+        "prepassPassCAgree": false
+      },
+      {
+        "product": "bresaola",
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock",
+        "pdfQty": 1.83,
+        "prepassOcrQty": 2,
+        "passCQty": 1.83,
+        "finalQty": 1.83,
+        "prepassMatchesPdf": false,
+        "passCMatchesPdf": true,
+        "prepassPassCAgree": false
+      }
+    ],
+    "gorgonzolaUniqueAmongFractionRows": true,
+    "fractionNotationRowsReturning2": ["gorgonzola (1/8)", "bresaola (1/2)"],
+    "note": "Integer prepass=2 clusters on rows whose descriptions contain pack fractions (1/8, 1/2); Prosciutto (no fraction) correct at 4.3",
+    "summary": [
+      "gorgonzola: prepass=2 pdf=1.35 match=false (description 1/8 ~1,5kg)",
+      "prosciutto: prepass=4.3 pdf=4.3 match=true",
+      "mortadella: prepass=3.1 pdf=3.11 match=false (rounding slip)",
+      "bresaola: prepass=2 pdf=1.83 match=false (description 1/2 - 1,5kg)"
+    ]
+  },
+  "task8_rootCause": {
+    "A": "Vision misread Qtd column cell — digit OCR error on printed 1,35",
+    "B": "Description/pack-metadata override — 1/8 ~1,5kg inferred as purchased qty 2 despite prompt ignore rule",
+    "C": "Wrong column bleed — integer read from non-Qtd column on Gorgonzola row",
+    "D": "Parsing/code bug — GPT returned correct qty, TypeScript parser corrupted to 2",
+    "E": "Crop/geometry failure — Qtd column illegible in prepass crop, model guessed 2",
+    "selected": "B"
+  },
+  "finalFiveQuestions": {
+    "q1_whatReturned200": "runQuantityPrePass GPT vision on cropped table image returned parsed quantity=2 for Gorgonzola row",
+    "q2_rawResponseAvailable": "NO — only extraction_meta.ocr_quantity=2 on API; edge logs preview first 3 rows unparsed raw",
+    "q3_firstStage": "Qty pre-pass model output (before anchorQuantities)",
+    "q4_promptCause": "Model violated ignore-1/8 rule; integer 2 aligns with historical description-confusion class not Qtd 1,35 OCR",
+    "q5_controls": "Prosciutto prepass correct (4.3); Gorgonzola and Bresaola both prepass=2 (fraction-description rows); Mortadella minor slip 3.1 vs 3.11",
+    "rootCause": "B"
+  },
+  "liveProbe": {
+    "status": 200,
+    "probedAt": "2026-06-24T15:35:43.412Z",
+    "deployVersion": 39,
+    "items": [
+      {
+        "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+        "quantity": 24,
+        "unit": null,
+        "unit_price": 2.1,
+        "total": 50.4,
+        "extraction_meta": {
+          "ocr_quantity": 24,
+          "pass_c_quantity": 24,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      },
+      {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg Produto de Stock",
+        "quantity": 1.05,
+        "unit": null,
+        "unit_price": 9.88,
+        "total": 13.44,
+        "extraction_meta": {
+          "ocr_quantity": 2,
+          "pass_c_quantity": 1.05,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      },
+      {
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg Produto de Stock",
+        "quantity": 4.3,
+        "unit": null,
+        "unit_price": 8.5,
+        "total": 36.54,
+        "extraction_meta": {
+          "ocr_quantity": 4.3,
+          "pass_c_quantity": 4.3,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      },
+      {
+        "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg Produto de Stock",
+        "quantity": 3.11,
+        "unit": null,
+        "unit_price": 9.99,
+        "total": 31.07,
+        "extraction_meta": {
+          "ocr_quantity": 3.1,
+          "pass_c_quantity": 3.11,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      },
+      {
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+        "quantity": 2,
+        "unit": null,
+        "unit_price": 19.28,
+        "total": 38.56,
+        "extraction_meta": {
+          "ocr_quantity": 11,
+          "pass_c_quantity": 2,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      },
+      {
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock",
+        "quantity": 1.83,
+        "unit": null,
+        "unit_price": 27.04,
+        "total": 49.48,
+        "extraction_meta": {
+          "ocr_quantity": 2,
+          "pass_c_quantity": 1.83,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      },
+      {
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 24,
+        "unit": null,
+        "unit_price": 0.85,
+        "total": 20.4,
+        "extraction_meta": {
+          "ocr_quantity": 24,
+          "pass_c_quantity": 24,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      },
+      {
+        "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+        "quantity": 2.6,
+        "unit": null,
+        "unit_price": 15.19,
+        "total": 39.49,
+        "extraction_meta": {
+          "ocr_quantity": 2.6,
+          "pass_c_quantity": 2.6,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      }
+    ],
+    "gorgonzola": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg Produto de Stock",
+      "quantity": 1.05,
+      "unit": null,
+      "unit_price": 9.88,
+      "total": 13.44,
+      "extraction_meta": {
+        "ocr_quantity": 2,
+        "pass_c_quantity": 1.05,
+        "quantity_anchored": false,
+        "ocr_qty_mismatch": false
+      }
+    }
+  },
+  "persistedGorgonzola": {
+    "id": "35bdf942-712b-46af-9f2e-666cb4744a88",
+    "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+    "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+    "quantity": 1.05,
+    "unit": "kg",
+    "unit_price": 9.95,
+    "total": 13.44,
+    "created_at": "2026-06-24T12:19:51.42294+00:00",
+    "updated_at": "2026-06-24T12:19:51.42294+00:00"
+  },
+  "deploy": {
+    "version": 39,
+    "updatedAt": "2026-06-24T12:17:35.325Z"
+  },
+  "localPrepassReplay": {
+    "attempted": false,
+    "reason": "OPENAI_API_KEY unset in audit environment"
+  }
+}

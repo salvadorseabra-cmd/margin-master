@@ -13,6 +13,11 @@ import {
   reconcileLineItemsToNetSubtotal,
   type InvoiceLineItem as ReconciledLineItem,
 } from "./invoice-line-reconcile.ts";
+import {
+  anchorQuantities,
+  runQuantityPrePass,
+  type QtyAnchorMetadata,
+} from "./invoice-qty-prepass.ts";
 import type { TableBounds } from "./invoice-image-crop.ts";
 
 const TABLE_EXTRACTION_SYSTEM_PROMPT = `
@@ -124,6 +129,17 @@ FRACTIONAL QUANTITIES (copy decimals exactly — never round):
 "Hortelã" with quantity column "0,5" and unit "KG"
 → quantity: 0.5, unit: "kg" (NOT 1 — do not round; NOT "mo" unless unit column says MO)
 → unit_price: from PREÇO UNITÁRIO (€/kg), total: from VALOR
+
+FRACTIONAL DIGIT GUARD (Emporio Qtd):
+- 1,35 is 1.35 kg — NOT 1,05 (digit 3 vs 5) and NOT 2 (do not round 1,35 up).
+- Read BOTH digits after the decimal separator before emitting quantity.
+
+EMPORIO DISCOUNT MANDATORY:
+- When Preço Total < Qtd × Preço Unit, Desc.(%) MUST be populated — never null on discounted rows.
+
+NEGATIVE — Gorgonzola BAD:
+- Qtd 1,05 + unit 10,88 + total 13,44 → WRONG (1,05×10,88≠13,44).
+- Qtd 2,00 + total 13,44 → WRONG (visible Preço Total is 13,44; do not synthesize 2×unit).
 
 ═══════════════════════════════════════════════════════════════
 NEGATIVE EXAMPLES (common failures — do NOT repeat)
@@ -306,7 +322,9 @@ const TABLE_EXTRACTION_RESPONSE_FORMAT: OpenAiResponseFormat = {
   },
 };
 
-export type InvoiceLineItem = ReconciledLineItem;
+export type InvoiceLineItem = ReconciledLineItem & {
+  extraction_meta?: QtyAnchorMetadata | null;
+};
 
 export type TableExtractionResult = {
   items: InvoiceLineItem[];
@@ -394,6 +412,23 @@ async function runTableExtractionPass(
     });
   }
 
+  let prepassRows: Awaited<ReturnType<typeof runQuantityPrePass>>["rows"] = [];
+  let usedQtdStrip = false;
+  try {
+    const prepassResult = await runQuantityPrePass(croppedDataUrl, apiKey);
+    prepassRows = prepassResult.rows;
+    usedQtdStrip = prepassResult.usedQtdStrip;
+    console.log("[invoice-ocr] qty-prepass-result", {
+      rowCount: prepassRows.length,
+      usedQtdStrip,
+      preview: prepassRows.slice(0, 3),
+    });
+  } catch (prepassError) {
+    console.error("[invoice-ocr] qty-prepass-failed", {
+      error: prepassError instanceof Error ? prepassError.message : String(prepassError),
+    });
+  }
+
   const parsed = await callOpenAiJson(
     apiKey,
     [
@@ -412,10 +447,24 @@ async function runTableExtractionPass(
     TABLE_EXTRACTION_RESPONSE_FORMAT,
   );
 
-  const boundItems = bindMonetaryColumns(parseMonetaryLineItems(parsed.items));
-  const items = reconcileLineItemAmounts(
+  const parsedItems = parseMonetaryLineItems(parsed.items);
+  const anchored = prepassRows.length > 0
+    ? anchorQuantities(prepassRows, parsedItems)
+    : { items: parsedItems, metadata: parsedItems.map(() => ({
+      ocr_quantity: null,
+      pass_c_quantity: null,
+      quantity_anchored: false,
+      ocr_qty_mismatch: false,
+    })) };
+
+  const boundItems = bindMonetaryColumns(anchored.items);
+  const reconciled = reconcileLineItemAmounts(
     boundItems.map(monetaryToInvoiceLineItem),
   );
+  const items = reconciled.map((item, index) => ({
+    ...item,
+    extraction_meta: anchored.metadata[index] ?? null,
+  }));
 
   return {
     items,

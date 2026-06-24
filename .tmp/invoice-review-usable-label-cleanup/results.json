@@ -1,0 +1,187 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T02:26:38.642Z",
+  "verdict": "A) Safe to merge",
+  "goal": "Remove redundant \"usable\" suffix from operational cost label only; keep \"usable\" on quantity label.",
+  "filesChanged": [
+    "src/lib/invoice-purchase-price-semantics.ts",
+    "src/lib/invoice-purchase-price-semantics.test.ts"
+  ],
+  "blastRadius": {
+    "scope": "Invoice Review presentation only (buildNormalizationCard → InvoiceNormalizationCardCell)",
+    "unchanged": [
+      "computeEffectiveUsableCost",
+      "effectiveUsableCostLabel computation",
+      "recipeOperationalCostFieldsFromInvoiceLine",
+      "persistence",
+      "recipe costing",
+      "ingredient detail modal",
+      "ingredient-purchase-memory operationalCostLabel (uses effectiveUsableCostLabel directly)"
+    ]
+  },
+  "validationMatrix": [
+    {
+      "id": "A-pera",
+      "product": "Pêra Abacate Hasse",
+      "designCase": "A",
+      "before": {
+        "normalizedLine": "3.28 kg usable",
+        "usableCostLine": "€4.26 / kg"
+      },
+      "after": {
+        "normalizedLine": null,
+        "usableCostLine": null,
+        "effectiveUsableCostLabel": "€4.26 / kg",
+        "collapsed": true
+      },
+      "pass": true,
+      "checks": {
+        "quantityPass": true,
+        "costPass": true,
+        "costSuffixPass": true,
+        "collapsePass": true
+      }
+    },
+    {
+      "id": "B-salada",
+      "product": "Salada Ibérica",
+      "designCase": "B",
+      "before": {
+        "normalizedLine": "250 g usable",
+        "usableCostLine": "€8.76 / kg usable"
+      },
+      "after": {
+        "normalizedLine": "250 g usable",
+        "usableCostLine": "€8.76 / kg",
+        "effectiveUsableCostLabel": "€8.76 / kg",
+        "collapsed": false
+      },
+      "pass": true,
+      "checks": {
+        "quantityPass": true,
+        "costPass": true,
+        "costSuffixPass": true,
+        "collapsePass": true
+      }
+    },
+    {
+      "id": "C-ovo",
+      "product": "Ovo classe M",
+      "designCase": "C",
+      "before": {
+        "normalizedLine": "180 un usable",
+        "usableCostLine": "€0.2136 / egg usable"
+      },
+      "after": {
+        "normalizedLine": "180 un usable",
+        "usableCostLine": "€0.2136 / egg",
+        "effectiveUsableCostLabel": "€0.2136 / egg",
+        "collapsed": false
+      },
+      "pass": true,
+      "checks": {
+        "quantityPass": true,
+        "costPass": true,
+        "costSuffixPass": true,
+        "collapsePass": true
+      }
+    },
+    {
+      "id": "D-tomilho",
+      "product": "Tomilho",
+      "designCase": "D",
+      "before": {
+        "normalizedLine": "100 g usable",
+        "usableCostLine": "€20.60 / kg usable"
+      },
+      "after": {
+        "normalizedLine": "100 g usable",
+        "usableCostLine": "€20.60 / kg",
+        "effectiveUsableCostLabel": "€20.60 / kg",
+        "collapsed": false
+      },
+      "pass": true,
+      "checks": {
+        "quantityPass": true,
+        "costPass": true,
+        "costSuffixPass": true,
+        "collapsePass": true
+      }
+    },
+    {
+      "id": "E-manjericao",
+      "product": "Manjericão",
+      "designCase": "E",
+      "before": {
+        "normalizedLine": "500 g usable",
+        "usableCostLine": "€20.60 / kg usable"
+      },
+      "after": {
+        "normalizedLine": "500 g usable",
+        "usableCostLine": "€20.60 / kg",
+        "effectiveUsableCostLabel": "€20.60 / kg",
+        "collapsed": false
+      },
+      "pass": true,
+      "checks": {
+        "quantityPass": true,
+        "costPass": true,
+        "costSuffixPass": true,
+        "collapsePass": true
+      }
+    },
+    {
+      "id": "angus-case",
+      "product": "Angus burger case",
+      "designCase": null,
+      "before": {
+        "normalizedLine": "7.2 kg usable",
+        "usableCostLine": "€6.39 / kg usable"
+      },
+      "after": {
+        "normalizedLine": "7.2 kg usable",
+        "usableCostLine": "€6.39 / kg",
+        "effectiveUsableCostLabel": "€6.39 / kg",
+        "collapsed": false
+      },
+      "pass": true,
+      "checks": {
+        "quantityPass": true,
+        "costPass": true,
+        "costSuffixPass": true,
+        "collapsePass": true
+      }
+    },
+    {
+      "id": "batata-name-2kg",
+      "product": "BATATA PALHA 2KG",
+      "designCase": null,
+      "before": {
+        "normalizedLine": "2 kg usable",
+        "usableCostLine": "€14.50 / kg usable"
+      },
+      "after": {
+        "normalizedLine": "2 kg usable",
+        "usableCostLine": "€14.50 / kg",
+        "effectiveUsableCostLabel": "€14.50 / kg",
+        "collapsed": false
+      },
+      "pass": true,
+      "checks": {
+        "quantityPass": true,
+        "costPass": true,
+        "costSuffixPass": true,
+        "collapsePass": true
+      }
+    }
+  ],
+  "matrixSummary": {
+    "total": 7,
+    "passed": 7,
+    "failed": 0
+  },
+  "tests": {
+    "pass": true,
+    "outputTail": " ✓ src/lib/invoice-purchase-price-semantics.test.ts (64 tests) 79ms\n\n Test Files  1 passed (1)\n      Tests  64 passed (64)\n   Start at  03:26:37\n   Duration  849ms (transform 395ms, setup 0ms, collect 473ms, tests 79ms, environment 0ms, prepare 68ms)\n\n"
+  }
+}

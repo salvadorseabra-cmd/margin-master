@@ -338,7 +338,7 @@ describe("resolveInvoiceLinePricingPresentation", () => {
           "normalizedLine": "7.2 kg usable",
           "purchasePriceLine": "€46.00 / case · €92.00 total",
           "purchaseQuantityLine": "2 cases · 40 × 180 g",
-          "usableCostLine": "€6.39 / kg usable",
+          "usableCostLine": "€6.39 / kg",
         },
         "purchasedPackDetail": "40 × 180 g",
         "rowQuantity": "2 cases",
@@ -358,7 +358,7 @@ describe("resolveInvoiceLinePricingPresentation", () => {
     expect(presentation.priceDisplay).toBe("€14.50 / kg");
     expect(presentation.effectiveUsableCostLabel).toBe("€14.50 / kg");
     expect(presentation.card.normalizedLine).toBe("2 kg usable");
-    expect(presentation.card.usableCostLine).toBe("€14.50 / kg usable");
+    expect(presentation.card.usableCostLine).toBe("€14.50 / kg");
   });
 
   it.each([
@@ -408,7 +408,7 @@ describe("resolveInvoiceLinePricingPresentation", () => {
 
     expect(presentation.priceDisplay).toBe("€2.19 / pack");
     expect(presentation.effectiveUsableCostLabel).toBe("€8.76 / kg");
-    expect(presentation.card.usableCostLine).toBe("€8.76 / kg usable");
+    expect(presentation.card.usableCostLine).toBe("€8.76 / kg");
     expect(presentation.usableStockLabel).toMatch(/250\s*g\s+usable/i);
     expect(effective).toEqual({ cost: 8.76, unit: "kg" });
     expect(recipeFields).toMatchObject({
@@ -507,7 +507,7 @@ describe("resolveInvoiceLinePricingPresentation", () => {
       line_total: 8.76,
     });
     expect(salada.card.normalizedLine).toMatch(/250\s*g\s+usable/i);
-    expect(salada.card.usableCostLine).toBe("€8.76 / kg usable");
+    expect(salada.card.usableCostLine).toBe("€8.76 / kg");
 
     const ovo = resolveInvoiceLinePricingPresentation({
       name: "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
@@ -516,7 +516,7 @@ describe("resolveInvoiceLinePricingPresentation", () => {
       unit_price: 38.44,
     });
     expect(ovo.card.normalizedLine).toMatch(/180\s+un\s+usable/i);
-    expect(ovo.card.usableCostLine).toBe("€0.2136 / egg usable");
+    expect(ovo.card.usableCostLine).toBe("€0.2136 / egg");
 
     const tomilho = resolveInvoiceLinePricingPresentation({
       name: "Tomilho",
@@ -525,7 +525,7 @@ describe("resolveInvoiceLinePricingPresentation", () => {
       unit_price: 2.06,
     });
     expect(tomilho.card.normalizedLine).toMatch(/100\s*g\s+usable/i);
-    expect(tomilho.card.usableCostLine).toBe("€20.60 / kg usable");
+    expect(tomilho.card.usableCostLine).toBe("€20.60 / kg");
 
     const manjericao = resolveInvoiceLinePricingPresentation({
       name: "Manjericão",
@@ -535,7 +535,21 @@ describe("resolveInvoiceLinePricingPresentation", () => {
       line_total: 10.28,
     });
     expect(manjericao.card.normalizedLine).toMatch(/500\s*g\s+usable/i);
-    expect(manjericao.card.usableCostLine).toBe("€20.60 / kg usable");
+    expect(manjericao.card.usableCostLine).toBe("€20.60 / kg");
+  });
+
+  it("omits redundant usable suffix on operational cost label (quantity label keeps usable)", () => {
+    const salada = resolveInvoiceLinePricingPresentation({
+      name: "Salada Ibérica FSTK EMB. 250g",
+      quantity: 4,
+      unit: "em",
+      unit_price: 2.19,
+      line_total: 8.76,
+    });
+    expect(salada.card.normalizedLine).toMatch(/250\s*g\s+usable/i);
+    expect(salada.card.usableCostLine).toBe("€8.76 / kg");
+    expect(salada.card.usableCostLine).not.toMatch(/usable/i);
+    expect(salada.effectiveUsableCostLabel).toBe("€8.76 / kg");
   });
 });
 

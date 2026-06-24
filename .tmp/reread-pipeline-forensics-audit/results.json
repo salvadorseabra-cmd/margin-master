@@ -1,0 +1,650 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T11:07:46.102Z",
+  "auditType": "STRICT_READ_ONLY_REREAD_PIPELINE_FORENSICS",
+  "requiredQuestionAF": "A",
+  "requiredQuestionLabel": "Fresh hallucination",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "originalInvoiceItemId": "bece238e-fd6d-493c-8555-6921b164f97c",
+  "currentInvoiceItemId": "091d5bc2-b041-4a65-b652-d9be15b5fd3f",
+  "geometryFixture": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "rereadTimestamp": "2026-06-24T10:45:37.333848+00:00",
+  "task1_executionTrace": {
+    "ui": "Invoice Review → reExtract(row) — src/routes/invoices.tsx:2411",
+    "api": "supabase.functions.invoke('extract-invoice', { imageDataUrl }) — invoices.tsx:1378",
+    "edgeFunction": {
+      "name": "extract-invoice",
+      "version": 38,
+      "updatedAtUtc": "2026-06-23 10:13:38",
+      "model": "gpt-4.1",
+      "temperature": 0,
+      "seed": 42,
+      "passes": [
+        "date-specialist",
+        "supplier-specialist",
+        "footer-totals-specialist",
+        "table-specialist (Pass C)"
+      ],
+      "cachingInProductionCode": false,
+      "cacheKeyMechanism": "none — no gpt-raw-cache or response cache in supabase/functions/extract-invoice/"
+    },
+    "clientPersistence": {
+      "normalize": "normalizeInvoiceItemFields per item",
+      "filter": "shouldRejectInvoiceIngredientRow",
+      "delete": "invoice_items DELETE WHERE invoice_id",
+      "insert": "invoice_items INSERT from API-normalized rows",
+      "postInsertMutation": false
+    },
+    "invoice": {
+      "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier_name": "Emporio Italia",
+      "invoice_date": "2026-05-19",
+      "total": 327.46,
+      "file_url": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781218392988-Screenshot_2026-06-07_at_21.05.07.png",
+      "created_at": "2026-06-11T22:53:16.723511+00:00"
+    },
+    "artifactFile": "acfb54e5-785f-4bc8-b47b-3914452e18a5/1781218392988-Screenshot_2026-06-07_at_21.05.07.png",
+    "note": "Re-read fetches signed URL from storage invoices bucket, converts via fileToExtractionDataUrl, invokes edge function fresh each time"
+  },
+  "task2_timeline": [
+    {
+      "when": "2026-06-11T22:53:16Z",
+      "event": "Invoice ab52796d uploaded (Emporio screenshot PNG)",
+      "evidence": "invoices.created_at"
+    },
+    {
+      "when": "2026-06-12T23:59:04Z",
+      "event": "v28 geometry replay: Gorgonzola 1.05/10.88/13.44",
+      "evidence": "final-validation-lab-rerun-v28/extracts/17aa3591.json"
+    },
+    {
+      "when": "2026-06-13T16:35:39Z",
+      "event": "Stability run2 lab extract: Gorgonzola 2/9.35/18.68",
+      "evidence": "final-stability-audit/run2.json"
+    },
+    {
+      "when": "2026-06-23T10:28:12Z",
+      "event": "Prior re-read batch: Gorgonzola 2/8.69/13.44 (total preserved)",
+      "evidence": "reread-persistence-path-audit/results.json"
+    },
+    {
+      "when": "2026-06-23T10:41:31Z",
+      "event": "Original item bece238e persisted: 1.05/10.88/13.44",
+      "evidence": "gorgonzola-persistence-reconciliation-audit"
+    },
+    {
+      "when": "2026-06-24T10:45:37.333848+00:00",
+      "event": "Live re-read: all 8 lines replaced; Gorgonzola 091d5bc2 → 2/9.35/18.72",
+      "evidence": "VL invoice_items.created_at batch"
+    },
+    {
+      "when": "2026-06-24T10:45:39Z",
+      "event": "Ingredient current_price updated to 9.35",
+      "evidence": "ingredients.updated_at"
+    }
+  ],
+  "task3_artifacts": {
+    "ocr": {
+      "path": ".tmp/persistence-audit/pass-c-raw/17aa3591-extract-invoice.json",
+      "gorgonzola": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castagna 1/8 ~1.5Kg",
+        "quantity": 1.35,
+        "unit_price": 9.82,
+        "total": 13.44,
+        "reconciles": false
+      }
+    },
+    "passes": {
+      "note": "No live 2026-06-24 Pass A/B/C/D raw logs captured in workspace; edge function logs not queried",
+      "passC_promptExample": "invoice-table-extraction.ts L107-108 Gorgonzola qty 1.35 gross 12.90 discount 22.85 total 13.44",
+      "gptRawCachedForFixture": false,
+      "gptRawPathsChecked": [
+        ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-gpt-raw.json",
+        ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-gpt-raw-cache.json"
+      ]
+    },
+    "finalApiArtifacts": [
+      {
+        "id": "v28-deploy-replay",
+        "path": ".tmp/final-validation-lab-rerun-v28/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+        "kind": "api-final",
+        "exists": true,
+        "gorgonzola": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrotti 1/8 - 1,8-1,9kg",
+          "quantity": 1.05,
+          "unit_price": 10.88,
+          "total": 13.44,
+          "reconciles": false
+        },
+        "allItems": [
+          {
+            "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+            "quantity": 24,
+            "unit_price": 2.35,
+            "total": 50.4
+          },
+          {
+            "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrotti 1/8 - 1,8-1,9kg",
+            "quantity": 1.05,
+            "unit_price": 10.88,
+            "total": 13.44
+          },
+          {
+            "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+            "quantity": 4.3,
+            "unit_price": 8.5,
+            "total": 36.54
+          },
+          {
+            "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3.5Kg",
+            "quantity": 3.11,
+            "unit_price": 8.88,
+            "total": 27.57
+          },
+          {
+            "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+            "quantity": 2,
+            "unit_price": 19.28,
+            "total": 38.56
+          },
+          {
+            "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5KG",
+            "quantity": 1.83,
+            "unit_price": 27.04,
+            "total": 49.48
+          },
+          {
+            "name": "Baladin - Ginger Beer 0.20cl",
+            "quantity": 24,
+            "unit_price": 0.85,
+            "total": 19.38
+          },
+          {
+            "name": "Rovagnati - Salame Ventricina 2,5 Kg",
+            "quantity": 2.6,
+            "unit_price": 15.19,
+            "total": 39.49
+          }
+        ]
+      },
+      {
+        "id": "stability-run2",
+        "path": ".tmp/final-stability-audit/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb-run2.json",
+        "kind": "api-final",
+        "exists": true,
+        "gorgonzola": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8* 1,5-1,9kg Produto de Stock",
+          "quantity": 2,
+          "unit_price": 9.35,
+          "total": 18.68,
+          "reconciles": true
+        },
+        "allItems": [
+          {
+            "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+            "quantity": 24,
+            "unit_price": 2.09,
+            "total": 50.2
+          },
+          {
+            "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8* 1,5-1,9kg Produto de Stock",
+            "quantity": 2,
+            "unit_price": 9.35,
+            "total": 18.68
+          },
+          {
+            "name": "Assaporami Prosciutto Cotto Scelto HC 4-4,25Kg Produto de Stock",
+            "quantity": 4.3,
+            "unit_price": 8.5,
+            "total": 36.54
+          },
+          {
+            "name": "Rovagnati - Mortadella IGP \"Massima\" con Pistacchio 1/2 – 3,5Kg Produto de Stock",
+            "quantity": 3.11,
+            "unit_price": 9.99,
+            "total": 31.07
+          },
+          {
+            "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+            "quantity": 2,
+            "unit_price": 19.28,
+            "total": 38.56
+          },
+          {
+            "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2, 1,5Kg Produto de Stock",
+            "quantity": 1.83,
+            "unit_price": 27.04,
+            "total": 49.48
+          },
+          {
+            "name": "Baladin - Ginger Beer 0.20cl",
+            "quantity": 2,
+            "unit_price": 9.77,
+            "total": 19.53
+          },
+          {
+            "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+            "quantity": 2.6,
+            "unit_price": 15.19,
+            "total": 39.49
+          }
+        ]
+      },
+      {
+        "id": "pass-c-raw-ocr-era",
+        "path": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json",
+        "kind": "api-final",
+        "exists": true,
+        "gorgonzola": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castagna 1/8 ~1.5Kg",
+          "quantity": 1.35,
+          "unit_price": 9.82,
+          "total": 13.44,
+          "reconciles": false
+        },
+        "allItems": [
+          {
+            "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+            "quantity": 24,
+            "unit_price": 2.35,
+            "total": 50.2
+          },
+          {
+            "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castagna 1/8 ~1.5Kg",
+            "quantity": 1.35,
+            "unit_price": 9.82,
+            "total": 13.44
+          },
+          {
+            "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4.4~4.25Kg",
+            "quantity": 4.3,
+            "unit_price": 17.06,
+            "total": 36.54
+          },
+          {
+            "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 ~2,5Kg",
+            "quantity": 3.11,
+            "unit_price": 10.1,
+            "total": 31.07
+          },
+          {
+            "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+            "quantity": 2,
+            "unit_price": 19.32,
+            "total": 38.65
+          },
+          {
+            "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2",
+            "quantity": 1.8,
+            "unit_price": 28,
+            "total": 49.48
+          },
+          {
+            "name": "Baladin - Ginger Beer 0.20cl",
+            "quantity": 24,
+            "unit_price": 0.85,
+            "total": 19.38
+          },
+          {
+            "name": "Rovagnati - Salame Ventricina 2.5 Kg",
+            "quantity": 2.6,
+            "unit_price": 16.6,
+            "total": 39.49
+          }
+        ]
+      },
+      {
+        "id": "pass-c-refinement",
+        "path": ".tmp/passc-refinement-validation/reextract/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+        "kind": "api-final",
+        "exists": true,
+        "gorgonzola": {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Casaleggio 1/8 - 1,5Kg Produto de Stock",
+          "quantity": 1.35,
+          "unit_price": 9.82,
+          "total": 13.44,
+          "reconciles": false
+        },
+        "allItems": [
+          {
+            "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+            "quantity": 24,
+            "unit_price": 2.35,
+            "total": 50.2
+          },
+          {
+            "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Casaleggio 1/8 - 1,5Kg Produto de Stock",
+            "quantity": 1.35,
+            "unit_price": 9.82,
+            "total": 13.44
+          },
+          {
+            "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4+, 4-4,25Kg Produto de Stock",
+            "quantity": 4,
+            "unit_price": 9.17,
+            "total": 36.54
+          },
+          {
+            "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio in 1/2 - 2,5Kg Produto de Stock",
+            "quantity": 3.11,
+            "unit_price": 10,
+            "total": 31.07
+          },
+          {
+            "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+            "quantity": 2,
+            "unit_price": 19.3,
+            "total": 38.56
+          },
+          {
+            "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - Produto de Stock",
+            "quantity": 2.28,
+            "unit_price": 21.8,
+            "total": 49.64
+          },
+          {
+            "name": "Baladin - Ginger Beer 0.20cl",
+            "quantity": 2,
+            "unit_price": 9.69,
+            "total": 19.38
+          },
+          {
+            "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+            "quantity": 2.6,
+            "unit_price": 16.6,
+            "total": 39.49
+          }
+        ]
+      }
+    ],
+    "persistence": {
+      "originalItemExists": false,
+      "currentBatchItemCount": 8,
+      "allShareRereadTimestamp": true,
+      "allItems": [
+        {
+          "id": "091d5bc2-b041-4a65-b652-d9be15b5fd3f",
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 2,
+          "unit": "kg",
+          "unit_price": 9.35,
+          "total": 18.72,
+          "created_at": "2026-06-24T10:45:37.333848+00:00",
+          "updated_at": "2026-06-24T10:45:37.333848+00:00"
+        },
+        {
+          "id": "84c4744b-9e04-44f0-bcc5-0d80bdac8bc0",
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 8.5,
+          "total": 36.54,
+          "created_at": "2026-06-24T10:45:37.333848+00:00",
+          "updated_at": "2026-06-24T10:45:37.333848+00:00"
+        },
+        {
+          "id": "297f0e70-7a91-47f8-b3fe-5807b1f7acf5",
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 0.85,
+          "total": 19.38,
+          "created_at": "2026-06-24T10:45:37.333848+00:00",
+          "updated_at": "2026-06-24T10:45:37.333848+00:00"
+        },
+        {
+          "id": "f30b8dc6-529d-42ef-a3b6-b9d8774c4c19",
+          "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 2.09,
+          "total": 50.2,
+          "created_at": "2026-06-24T10:45:37.333848+00:00",
+          "updated_at": "2026-06-24T10:45:37.333848+00:00"
+        },
+        {
+          "id": "62669353-e9be-4cf0-ad9f-418776215c36",
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+          "quantity": 1.83,
+          "unit": "kg",
+          "unit_price": 27.04,
+          "total": 49.48,
+          "created_at": "2026-06-24T10:45:37.333848+00:00",
+          "updated_at": "2026-06-24T10:45:37.333848+00:00"
+        },
+        {
+          "id": "43d7855c-4dee-45bc-a036-e0afc5b23179",
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+          "quantity": 3.11,
+          "unit": "kg",
+          "unit_price": 9.99,
+          "total": 31.07,
+          "created_at": "2026-06-24T10:45:37.333848+00:00",
+          "updated_at": "2026-06-24T10:45:37.333848+00:00"
+        },
+        {
+          "id": "dc468add-cee9-4326-a521-7f97a259746a",
+          "name": "Rovagnati - Salame Ventricina 2,5 Kg",
+          "quantity": 2.6,
+          "unit": "kg",
+          "unit_price": 15.19,
+          "total": 39.49,
+          "created_at": "2026-06-24T10:45:37.333848+00:00",
+          "updated_at": "2026-06-24T10:45:37.333848+00:00"
+        },
+        {
+          "id": "978e1a0e-a6e9-45d1-99e0-44419a899485",
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 19.28,
+          "total": 38.56,
+          "created_at": "2026-06-24T10:45:37.333848+00:00",
+          "updated_at": "2026-06-24T10:45:37.333848+00:00"
+        }
+      ]
+    },
+    "liveRereadResponseArtifact": null,
+    "liveRereadResponseNote": "No workspace artifact captures the exact 2026-06-24T10:45:37Z extract-invoice HTTP response"
+  },
+  "task4_firstAppearance": {
+    "value200": {
+      "first": ".tmp/final-stability-audit/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb-run2.json",
+      "note": "qty=2 first in stability-run2 (2026-06-13 lab), not PDF (1.35)"
+    },
+    "value935": {
+      "first": ".tmp/final-stability-audit/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb-run2.json",
+      "note": "unit_price=9.35 first in stability-run2; PDF net is 9.95"
+    },
+    "value1872": {
+      "first": "091d5bc2-b041-4a65-b652-d9be15b5fd3f",
+      "note": "total=18.72 first at reread-persisted; closest lab artifact 18.68 (run2, Δ€0.04)"
+    },
+    "pdf135": {
+      "first": ".tmp/gorgonzola-root-cause/stage-trace.json"
+    },
+    "pdf995": {
+      "first": ".tmp/gorgonzola-root-cause/stage-trace.json"
+    },
+    "pdf1344": {
+      "first": ".tmp/gorgonzola-root-cause/stage-trace.json",
+      "note": "total 13.44 stable across OCR-era and original; lost on re-read"
+    },
+    "fullTimeline": [
+      {
+        "stage": "PDF visible",
+        "source": ".tmp/gorgonzola-root-cause/stage-trace.json",
+        "quantity": 1.35,
+        "unit_price": 9.95,
+        "total": 13.44
+      },
+      {
+        "stage": "v28-deploy-replay",
+        "source": ".tmp/final-validation-lab-rerun-v28/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrotti 1/8 - 1,8-1,9kg",
+        "quantity": 1.05,
+        "unit_price": 10.88,
+        "total": 13.44,
+        "reconciles": false
+      },
+      {
+        "stage": "stability-run2",
+        "source": ".tmp/final-stability-audit/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb-run2.json",
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfiorito 1/8* 1,5-1,9kg Produto de Stock",
+        "quantity": 2,
+        "unit_price": 9.35,
+        "total": 18.68,
+        "reconciles": true
+      },
+      {
+        "stage": "pass-c-raw-ocr-era",
+        "source": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json",
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castagna 1/8 ~1.5Kg",
+        "quantity": 1.35,
+        "unit_price": 9.82,
+        "total": 13.44,
+        "reconciles": false
+      },
+      {
+        "stage": "pass-c-refinement",
+        "source": ".tmp/passc-refinement-validation/reextract/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Casaleggio 1/8 - 1,5Kg Produto de Stock",
+        "quantity": 1.35,
+        "unit_price": 9.82,
+        "total": 13.44,
+        "reconciles": false
+      },
+      {
+        "stage": "original-persisted",
+        "source": "bece238e-fd6d-493c-8555-6921b164f97c",
+        "quantity": 1.05,
+        "unit_price": 10.88,
+        "total": 13.44
+      },
+      {
+        "stage": "reread-persisted",
+        "source": "091d5bc2-b041-4a65-b652-d9be15b5fd3f",
+        "quantity": 2,
+        "unit_price": 9.35,
+        "total": 18.72
+      }
+    ]
+  },
+  "task5_cacheInvestigation": {
+    "reExtractAlwaysReExtracts": true,
+    "evidence": [
+      "reExtract: signed URL fetch → blob → fileToExtractionDataUrl → runExtraction — no local cache (invoices.tsx:2411-2421)",
+      "runExtraction: supabase.functions.invoke('extract-invoice') with fresh imageDataUrl — no cache key param (invoices.tsx:1378)",
+      "extract-invoice/index.ts: no cache read/write; each request runs 4 GPT vision passes",
+      "gpt-raw-cache files under .tmp/persistence-audit/ are audit scripts only, not production runtime",
+      "Persisted batch ≠ exact replay of stability-run2 (Gorgonzola total 18.72 vs 18.68; Ginger Beer 24×0.85 vs 2×9.77) — rules out serving stale lab JSON"
+    ],
+    "batchComparisonWithStabilityRun2": {
+      "exact": 6,
+      "total": 8,
+      "diffs": [
+        "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg: A(2,9.35,18.72) vs B(2,9.35,18.68)",
+        "Baladin - Ginger Beer 0.20cl: A(24,0.85,19.38) vs B(2,9.77,19.53)"
+      ]
+    }
+  },
+  "task6_lineMixup": {
+    "answer": "NO",
+    "otherLinesWithUnitPrice935": [],
+    "otherLinesWithTotal1872": [],
+    "otherLinesWithQty2And935": [],
+    "note": "Only Gorgonzola row carries 9.35 unit_price; SanPellegrino also qty=2 but 19.28/38.56"
+  },
+  "task7_comparisonTable": {
+    "pdf": {
+      "description": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelregio* 1/8\" ~1,5kg (Produto de Stock)",
+      "quantity": 1.35,
+      "gross_unit_price": 12.9,
+      "discount_pct": 22.85,
+      "net_unit_price": 9.95,
+      "line_total": 13.44,
+      "source": ".tmp/gorgonzola-root-cause/stage-trace.json"
+    },
+    "original": {
+      "id": "bece238e-fd6d-493c-8555-6921b164f97c",
+      "quantity": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "created_at": "2026-06-23T10:41:31.22202+00:00",
+      "source": "bece238e VL snapshot (gorgonzola-persistence-reconciliation-audit)"
+    },
+    "reread": {
+      "id": "091d5bc2-b041-4a65-b652-d9be15b5fd3f",
+      "quantity": 2,
+      "unit_price": 9.35,
+      "total": 18.72,
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "created_at": "2026-06-24T10:45:37.333848+00:00",
+      "updated_at": "2026-06-24T10:45:37.333848+00:00"
+    },
+    "reconciles": {
+      "pdf": true,
+      "original": false,
+      "reread": true
+    }
+  },
+  "task8_persistenceMutate": {
+    "answer": "NO",
+    "extractionVsInsert": "lossless — postBind/postReconcile/postNormalize replay on re-read trio unchanged",
+    "postProcessingReplay": {
+      "bindMonetaryColumns": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+        "quantity": 2,
+        "unit": "kg",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": 18.72,
+        "unit_price": 9.35,
+        "total": 18.72
+      },
+      "reconcileLineItemAmounts": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+        "quantity": 2,
+        "unit": "kg",
+        "unit_price": 9.35,
+        "total": 18.72
+      },
+      "normalizeInvoiceItemFields": {
+        "quantity": 2,
+        "unit_price": 9.35,
+        "total": 18.72
+      }
+    },
+    "dbPostInsertUpdate": true,
+    "note": "DELETE+INSERT batch at re-read; no UPDATE mutation of monetary fields after insert"
+  },
+  "task9_rootCauseComparison": {
+    "sameUnderlyingCause": true,
+    "label": "GPT Pass C structured extraction variance on Emporio Gorgonzola row",
+    "original": {
+      "mechanism": "GPT misread qty 1.35→1.05, invented unit_price 10.88, copied correct line_total_net 13.44",
+      "failureMode": "math fail (1.05×10.88≠13.44)",
+      "verdict": "structured-extraction-failure-audit → C (LLM hallucinated qty+unit_price)"
+    },
+    "reread": {
+      "mechanism": "GPT misread qty as 2, synthesized unit_price 9.35 and line_total 18.72 (=2×9.36) instead of copying PDF Preço Total 13.44",
+      "failureMode": "math pass (2×9.35≈18.72) but PDF wrong",
+      "documentedPrecedent": "gorgonzola-root-cause + final-stability-audit: 6/10 runs qty=2; run2 exact pattern 2/9.35/18.68"
+    },
+    "differentManifestSameStage": "Both failures originate at Pass C GPT; post-processing pass-through in both cases"
+  },
+  "task10_finalAnswers": {
+    "q1_why200": "Pass C GPT misread Qtd 1,35 as integer 2 — documented intermittent Gorgonzola failure (60% stability runs qty=2)",
+    "q2_why935": "GPT synthesized net unit ≈9.35 (not PDF 9.95 gross-derived net); matches stability-run2 draw, not any PDF column",
+    "q3_why1872": "GPT synthesized Preço Total as qty×unit (2×9.36≈18.72) instead of copying visible 13,44 — 'fully consistent wrong triple' mode",
+    "q4_sameOrDifferentRootCause": "Same root cause (Pass C GPT variance), different error manifestation: original kept correct total; re-read kept internal math consistency",
+    "q5_verdict": "A) Fresh hallucination"
+  },
+  "verdictOptionsRuledOut": {
+    "B_cachedExtraction": "No production cache layer; persisted batch differs from closest cached lab artifact (run2) on Gorgonzola total and Ginger line",
+    "C_wrongInvoiceArtifact": "Same invoice ab52796d, same Emporio May-19 screenshot file_url; geometry fixture 17aa3591 is same table image",
+    "D_lineMixUp": "No other line on invoice has 9.35 or 18.72",
+    "E_pipelineBug": "bindMonetaryColumns/reconcileLineItemAmounts/normalizeInvoiceItemFields replay pass-through; wrong values present at extraction handoff",
+    "F_unknown": "Ruled out — mechanism matches documented GPT variance with lab precedent"
+  }
+}

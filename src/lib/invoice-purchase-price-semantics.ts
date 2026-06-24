@@ -912,9 +912,8 @@ function buildNormalizationCard(args: {
   const purchasePriceLine = joinPresentationParts([args.priceDisplay, totalLine?.text ?? null]);
 
   let usableCostLine: string | null = null;
-  if (!args.collapseOperational && args.effectiveUsableCostLabel && args.effectiveUnit) {
-    const costOnly = args.effectiveUsableCostLabel.replace(/\s*\/\s*\S+$/, "").trim();
-    usableCostLine = `${costOnly} / ${args.effectiveUnit} usable`;
+  if (!args.collapseOperational && args.effectiveUsableCostLabel) {
+    usableCostLine = args.effectiveUsableCostLabel;
   }
 
   return {

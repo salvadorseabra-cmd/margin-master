@@ -181,13 +181,35 @@ function rebindFromStructured(item: MonetaryLineItem): MonetaryLineItem {
   return item;
 }
 
+function triggersRuleF(item: MonetaryLineItem): boolean {
+  const { gross_unit_price, discount_pct, line_total_net, quantity } = item;
+  if (gross_unit_price == null || discount_pct == null || line_total_net == null) {
+    return false;
+  }
+  if (quantity == null || quantity <= 0) return false;
+  const expected = round2(quantity * gross_unit_price * (1 - discount_pct / 100));
+  return Math.abs(expected - line_total_net) > 0.05;
+}
+
+function applyRuleF(item: MonetaryLineItem): MonetaryLineItem {
+  const derivedNet = deriveNetUnitPrice(item.gross_unit_price, item.discount_pct);
+  if (derivedNet == null || item.line_total_net == null) return item;
+  return {
+    ...item,
+    unit_price: derivedNet,
+    total: item.line_total_net,
+  };
+}
+
 function bindRow(
   items: MonetaryLineItem[],
   index: number,
 ): MonetaryLineItem {
   let item = applyStructuredBinding(items[index]);
 
-  if (triggersRuleB(item)) {
+  if (triggersRuleF(item)) {
+    item = applyRuleF(item);
+  } else if (triggersRuleB(item)) {
     item = rebindFromStructured(item);
   } else if (triggersRuleE(items, index)) {
     item = rebindFromStructured(item);

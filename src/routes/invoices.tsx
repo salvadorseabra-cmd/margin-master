@@ -45,6 +45,15 @@ import {
   resolveInvoicePurchaseDisplayLabel,
 } from "@/lib/invoice-purchase-format";
 import {
+  deriveMathematicalReconciliationReviewReason,
+  deriveOcrQtyMismatchReviewReason,
+  MATHEMATICAL_RECONCILIATION_FAILURE_MESSAGE,
+  needsMathematicalReconciliationReview,
+  needsOcrQtyMismatchReview,
+  OCR_QUANTITY_MISMATCH_MESSAGE,
+  type InvoiceOcrQtyExtractionMeta,
+} from "@/lib/invoice-extraction-review";
+import {
   deriveInvoiceRowInlineChips,
   resolveInvoiceLinePricingPresentation,
   type InvoiceLineNormalizationCard,
@@ -515,10 +524,15 @@ const needsQuantityUnitConfirmation = (item: ItemRow) => {
 
 const needsAmountConfirmation = (item: ItemRow) => item.unit_price == null || item.total == null;
 
-const needsExtractionConfirmation = (item: ItemRow) =>
+const needsExtractionConfirmation = (
+  item: ItemRow,
+  ocrMeta?: InvoiceOcrQtyExtractionMeta | null,
+) =>
   isPlaceholderItemName(item.name) ||
   needsQuantityUnitConfirmation(item) ||
-  needsAmountConfirmation(item);
+  needsAmountConfirmation(item) ||
+  needsMathematicalReconciliationReview(item) ||
+  needsOcrQtyMismatchReview(ocrMeta);
 
 const GENERIC_UNIT_TOKENS = new Set(["un", "unit", "units", "und", "unds", "unid", "unids"]);
 const RECIPE_COMPATIBLE_DISPLAY_UNITS = new Set(["kg", "g", "ml", "l"]);
@@ -862,6 +876,9 @@ function InvoicesPage() {
   const [canonicalCreateSaving, setCanonicalCreateSaving] = useState(false);
   const [rejectedMatchItemIds, setRejectedMatchItemIds] = useState<Set<string>>(() => new Set());
   const [extracting, setExtracting] = useState<Record<string, boolean>>({});
+  const [extractionMetaByItemId, setExtractionMetaByItemId] = useState<
+    Record<string, InvoiceOcrQtyExtractionMeta>
+  >({});
   const extractionInFlightRef = useRef<Record<string, boolean>>({});
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [selectedKpiMonth, setSelectedKpiMonth] = useState<string | null>(null);
@@ -1380,7 +1397,15 @@ function InvoicesPage() {
         dataKeys: data && typeof data === "object" ? Object.keys(data) : [],
       });
       if (error) throw error;
-      const items = Array.isArray(data?.items) ? data.items : [];
+      const rawItems = Array.isArray(data?.items) ? data.items : [];
+      const extractionMetaByName = new Map<string, InvoiceOcrQtyExtractionMeta>();
+      const items = rawItems.map((raw: ItemRow & { extraction_meta?: InvoiceOcrQtyExtractionMeta }) => {
+        if (raw.extraction_meta) {
+          extractionMetaByName.set(String(raw.name ?? ""), raw.extraction_meta);
+        }
+        const { extraction_meta: _meta, ...line } = raw;
+        return line as ItemRow;
+      });
       console.log("[invoice-ocr] stage=5 raw-extraction-received", {
         invoiceId,
         rawItemsCount: items.length,
@@ -1532,6 +1557,14 @@ function InvoicesPage() {
           error: persistedItemsLoadError.message,
         });
       } else {
+        const nextExtractionMeta: Record<string, InvoiceOcrQtyExtractionMeta> = {};
+        for (const row of persistedItemRows ?? []) {
+          const meta = extractionMetaByName.get(String(row.name ?? ""));
+          if (meta) nextExtractionMeta[row.id] = meta;
+        }
+        if (Object.keys(nextExtractionMeta).length > 0) {
+          setExtractionMetaByItemId((current) => ({ ...current, ...nextExtractionMeta }));
+        }
         await shadowSeedInvoiceItemMatchesAfterExtract(supabase, {
           invoiceId,
           userId: user.id,
@@ -2805,6 +2838,7 @@ function InvoicesPage() {
                             <ItemsTable
                               invoiceId={r.id}
                               items={items}
+                              extractionMetaByItemId={extractionMetaByItemId}
                               priceComparisons={priceComparisonsByInvoice[r.id] ?? {}}
                               ingredientCatalog={ingredientCatalog}
                               operationalMetadata={invoiceOperationalMetadata}
@@ -3139,6 +3173,7 @@ function InvoiceNormalizationCardCell({ card }: { card: InvoiceLineNormalization
 function ItemsTable({
   invoiceId,
   items,
+  extractionMetaByItemId,
   priceComparisons,
   ingredientCatalog,
   operationalMetadata,
@@ -3162,6 +3197,7 @@ function ItemsTable({
 }: {
   invoiceId: string;
   items: ItemRow[];
+  extractionMetaByItemId: Record<string, InvoiceOcrQtyExtractionMeta>;
   priceComparisons: PriceComparisonMap;
   ingredientCatalog: IngredientMatchRow[];
   operationalMetadata: InvoiceOperationalMetadata;
@@ -3375,7 +3411,9 @@ function ItemsTable({
         summary.unmatchedIngredients += 1;
       }
 
-      if (needsExtractionConfirmation(item)) summary.extractionReview += 1;
+      if (needsExtractionConfirmation(item, extractionMetaByItemId[rowItem.id])) {
+        summary.extractionReview += 1;
+      }
       if (needsQuantityUnitConfirmation(item)) summary.quantityReview += 1;
 
       const delta = getPriceDeltaDetails(item.unit_price, priceComparisons[item.id]);
@@ -3607,9 +3645,17 @@ function ItemsTable({
                   unmatched: unmatchedIngredient,
                   badgeLabel: suggestedMatchBadgeLabel,
                 } = ingredientMatchState;
-                const extractionReview = needsExtractionConfirmation(renderItem);
+                const extractionReview = needsExtractionConfirmation(
+                  renderItem,
+                  extractionMetaByItemId[renderItem.id],
+                );
                 const quantityReview = needsQuantityUnitConfirmation(renderItem);
                 const amountReview = needsAmountConfirmation(renderItem);
+                const mathematicalReconciliationReviewReason =
+                  deriveMathematicalReconciliationReviewReason(renderItem);
+                const ocrQtyMismatchReviewReason = deriveOcrQtyMismatchReviewReason(
+                  extractionMetaByItemId[renderItem.id],
+                );
                 const canCreateIngredient = !isPlaceholderItemName(renderItem.name);
                 const creatingIngredient = !!creatingIngredientByItem[renderItem.id];
                 const creationError = ingredientCreationErrors[renderItem.id];
@@ -3772,7 +3818,9 @@ function ItemsTable({
                             disabled={correctionBusy}
                           />
                         )}
-                        {inlineChips.length > 0 && (
+                        {(inlineChips.length > 0 ||
+                          mathematicalReconciliationReviewReason ||
+                          ocrQtyMismatchReviewReason) && (
                           <div className="flex flex-wrap items-center gap-1 pt-0.5">
                             {inlineChips.map((chip) => (
                               <OperationalBadge
@@ -3782,6 +3830,22 @@ function ItemsTable({
                                 title={chip.title}
                               />
                             ))}
+                            {mathematicalReconciliationReviewReason && (
+                              <OperationalBadge
+                                key="mathematical-reconciliation"
+                                label="Math mismatch"
+                                tone="review"
+                                title={MATHEMATICAL_RECONCILIATION_FAILURE_MESSAGE}
+                              />
+                            )}
+                            {ocrQtyMismatchReviewReason && (
+                              <OperationalBadge
+                                key="ocr-quantity-mismatch"
+                                label="OCR qty mismatch"
+                                tone="review"
+                                title={OCR_QUANTITY_MISMATCH_MESSAGE}
+                              />
+                            )}
                           </div>
                         )}
                         {correctionUi.showConfirm && possibleIngredientMatch && (

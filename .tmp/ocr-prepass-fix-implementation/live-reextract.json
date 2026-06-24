@@ -1,0 +1,103 @@
+{
+  "capturedAt": "2026-06-24T17:27:35.168Z",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "deployVersion": 40,
+  "status": 200,
+  "checks": {
+    "gorgonzola": {
+      "expected": 1.35,
+      "actual": 1.3,
+      "ok": false,
+      "row": {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg Produto de Stock",
+        "quantity": 1.3,
+        "unit": null,
+        "unit_price": 9.95,
+        "total": 13.44,
+        "extraction_meta": {
+          "ocr_quantity": 1.3,
+          "pass_c_quantity": 1.05,
+          "quantity_anchored": true,
+          "ocr_qty_mismatch": false
+        }
+      }
+    },
+    "bresaola": {
+      "expected": 1.83,
+      "actual": 1.83,
+      "ok": true,
+      "row": {
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock",
+        "quantity": 1.83,
+        "unit": null,
+        "unit_price": 27.04,
+        "total": 49.48,
+        "extraction_meta": {
+          "ocr_quantity": 1.8,
+          "pass_c_quantity": 1.83,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      }
+    },
+    "prosciutto": {
+      "expected": 4.3,
+      "actual": 4.3,
+      "ok": true,
+      "row": {
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg Produto de Stock",
+        "quantity": 4.3,
+        "unit": null,
+        "unit_price": 8.5,
+        "total": 36.54,
+        "extraction_meta": {
+          "ocr_quantity": 4.3,
+          "pass_c_quantity": 4.3,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      }
+    },
+    "mortadella": {
+      "expected": 3.11,
+      "actual": 3.11,
+      "ok": true,
+      "row": {
+        "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg Produto de Stock",
+        "quantity": 3.11,
+        "unit": null,
+        "unit_price": 9.99,
+        "total": 31.07,
+        "extraction_meta": {
+          "ocr_quantity": 3.1,
+          "pass_c_quantity": 3.11,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      }
+    },
+    "paccheri": {
+      "expected": 24,
+      "actual": 24,
+      "ok": true,
+      "row": {
+        "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+        "quantity": 24,
+        "unit": null,
+        "unit_price": 2.1,
+        "total": 50.4,
+        "extraction_meta": {
+          "ocr_quantity": 24,
+          "pass_c_quantity": 24,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      }
+    }
+  },
+  "allFractionFamilyOk": false,
+  "allControlsOk": true,
+  "allOk": false,
+  "extraction_meta": null,
+  "itemCount": 8
+}

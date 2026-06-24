@@ -1,0 +1,249 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T12:00:00.000Z",
+  "auditType": "STRICT_READ_ONLY",
+  "invoiceIds": {
+    "geometryFixture": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+    "persistedDb": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "invoiceItem": "bece238e-fd6d-493c-8555-6921b164f97c"
+  },
+  "requiredQuestionAE": "C",
+  "requiredQuestionLabel": "LLM hallucinated both qty and unit_price",
+  "task1_v28GorgonzolaRow": {
+    "source": ".tmp/final-validation-lab-rerun-v28/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+    "deployVersion": 28,
+    "extractedAt": "2026-06-12T23:59:04.647Z",
+    "raw": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelgrotti 1/8 - 1,8-1,9kg",
+      "quantity": 1.05,
+      "unit": null,
+      "unit_price": 10.88,
+      "total": 13.44
+    },
+    "qty_x_price": 11.42,
+    "reconciles": false
+  },
+  "task2_pipelineStages": [
+    {
+      "stage": "PDF (visible row)",
+      "qty": 1.35,
+      "unit_price": 9.95,
+      "unit_price_note": "net implied: gross €12.90 × (1 − 22.85%)",
+      "total": 13.44,
+      "qty_x_price": 13.43,
+      "reconciles": true,
+      "source": ".tmp/gorgonzola-root-cause/stage-trace.json visibleInvoice"
+    },
+    {
+      "stage": "Geometry crop (Pass C input)",
+      "qty": null,
+      "unit_price": null,
+      "total": null,
+      "note": "Gorgonzola row visible; discount values in crop pixels",
+      "source": ".tmp/geometry-audit/17aa3591-ec98-4c21-89c9-5ae946bc97bb-geometry.json"
+    },
+    {
+      "stage": "Prompt (Pass C system)",
+      "qty": 1.35,
+      "unit_price": 12.9,
+      "total": 13.44,
+      "note": "Emporio Gorgonzola example at invoice-table-extraction.ts L107-108",
+      "source": "supabase/functions/extract-invoice/invoice-table-extraction.ts"
+    },
+    {
+      "stage": "GPT raw JSON (Pass C, pre-parseMonetaryLineItems)",
+      "qty": null,
+      "unit_price": null,
+      "total": null,
+      "note": "NO gpt-raw.json cached for 17aa3591; persistence-audit stage-trace gptPassCRaw=null",
+      "source": ".tmp/persistence-audit/stage-trace.json"
+    },
+    {
+      "stage": "Inferred Pass C handoff (pre-bind)",
+      "qty": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "gross_unit_price": null,
+      "discount_pct": null,
+      "line_total_net": 13.44,
+      "qty_x_price": 11.42,
+      "reconciles": false,
+      "source": "Reverse-engineered from v28 API ≡ DB; bindMonetaryColumns pass-through proof"
+    },
+    {
+      "stage": "parseMonetaryLineItems → bindMonetaryColumns",
+      "qty": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "changed": false,
+      "source": "supabase/functions/extract-invoice/invoice-monetary-binding.ts L214-217"
+    },
+    {
+      "stage": "reconcileLineItemAmounts (API response)",
+      "qty": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "source": ".tmp/final-validation-lab-rerun-v28/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json"
+    },
+    {
+      "stage": "normalizeInvoiceItemFields",
+      "qty": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "changed": false,
+      "source": "src/lib/invoice-item-fields.ts"
+    },
+    {
+      "stage": "Persisted invoice_items (DB)",
+      "qty": 1.05,
+      "unit_price": 10.88,
+      "total": 13.44,
+      "source": "VL bece238e-fd6d-493c-8555-6921b164f97c"
+    }
+  ],
+  "task3_rawModelOutput": {
+    "gptRawArtifactExists": false,
+    "pathsChecked": [
+      ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-gpt-raw.json",
+      ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-gpt-raw-cache.json"
+    ],
+    "answer": "INFERRED_YES",
+    "directSnippetAvailable": false,
+    "inferenceEvidence": [
+      "v28 API output (post-bind) ≡ DB row exactly on qty/unit_price/total",
+      "bindMonetaryColumns replay on legacy handoff {qty:1.05, unit_price:10.88, line_total_net:13.44, gross:null, discount:null} is pass-through",
+      "Post-bind cannot derive 10.88 from 13.44÷1.05 (=12.80) or PDF binding (9.95)",
+      "OCR-era pass-c-raw API had qty 1.35, unit_price 9.82 — neither wrong value present pre-v28"
+    ],
+    "inferredPreBindSnippet": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.05,
+      "unit": "kg",
+      "gross_unit_price": null,
+      "discount_pct": null,
+      "line_total_net": 13.44,
+      "unit_price": 10.88,
+      "total": 13.44
+    },
+    "ocrEraContrastSnippet": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castagna 1/8 ~1.5Kg",
+      "quantity": 1.35,
+      "unit": "kg",
+      "unit_price": 9.82,
+      "total": 13.44,
+      "source": ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json"
+    }
+  },
+  "task4_quantityTrace": {
+    "pdfValue": 1.35,
+    "persistedValue": 1.05,
+    "firstWrongValue": 1.05,
+    "firstStage": "Pass C structured extraction (v28 API output)",
+    "priorStagesCorrect": [
+      "PDF Qtd column 1,35",
+      "pass-c-raw extract-invoice qty 1.35",
+      "passc-refinement reextract qty 1.35"
+    ],
+    "mechanism": "GPT misread Qtd 1,35 as 1,05 (digit substitution); not from description 1,5kg pack metadata"
+  },
+  "task5_unitPriceTrace": {
+    "pdfNetValue": 9.95,
+    "pdfGrossValue": 12.9,
+    "ocrValue": 9.82,
+    "persistedValue": 10.88,
+    "firstWrongValue": 10.88,
+    "firstStage": "Pass C structured extraction (v28 API output)",
+    "ocrContained1088": false,
+    "mechanism": "GPT emitted legacy unit_price 10.88 with gross_unit_price/discount_pct null; value matches no PDF column (not gross 12.90, not net 9.95, not OCR 9.82)"
+  },
+  "task6_promptAudit": {
+    "columnConfusion": true,
+    "grossVsNet": true,
+    "details": [
+      "Prompt mandates gross_unit_price from Preço Unit and discount_pct from Desc.(%) — Gorgonzola example shows qty 1.35, gross 12.90, discount 22.85, line_total_net 13.44",
+      "Model returned pre-filled unit_price 10.88 with discount columns null/stripped — bypasses deriveNetUnitPrice",
+      "10.88 ≠ 12.90 (gross), ≠ 9.95 (net), ≠ 9.82 (OCR); 1.05×10.88=11.42 ≠ 13.44",
+      "line_total_net 13.44 likely copied correctly from Preço Total (VALOR isolation worked for total only)"
+    ],
+    "promptExampleLine": "Emporio — Gorgonzola DOP Dolce with Qtd 1,35, Preço Unit 12,90 €, Desc.(%) 22,85, Preço Total 13,44 €",
+    "promptSource": "invoice-table-extraction.ts L107-108"
+  },
+  "task7_controls": {
+    "source": ".tmp/final-validation-lab-rerun-v28/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+    "rows": [
+      {
+        "product": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+        "quantity": 4.3,
+        "unit_price": 8.5,
+        "total": 36.54,
+        "qty_x_price": 36.55,
+        "reconciles": true
+      },
+      {
+        "product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3.5Kg",
+        "quantity": 3.11,
+        "unit_price": 8.88,
+        "total": 27.57,
+        "qty_x_price": 27.62,
+        "reconciles": true
+      },
+      {
+        "product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5KG",
+        "quantity": 1.83,
+        "unit_price": 27.04,
+        "total": 49.48,
+        "qty_x_price": 49.48,
+        "reconciles": true
+      },
+      {
+        "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce (FOCUS)",
+        "quantity": 1.05,
+        "unit_price": 10.88,
+        "total": 13.44,
+        "qty_x_price": 11.42,
+        "reconciles": false,
+        "divergesFromControls": true
+      }
+    ],
+    "controlsReconcile": true,
+    "gorgonzolaOnlyNonReconciling": true
+  },
+  "task8_failureMechanism": {
+    "category": "Pass C GPT structured extraction — dual field hallucination",
+    "steps": [
+      "1. PDF row arithmetically consistent: 1.35 kg × €12.90 gross × (1−22.85%) = €13.44",
+      "2. Pass C crop + prompt delivered correct column semantics; total isolation succeeded (line_total_net=13.44)",
+      "3. GPT misread quantity 1,35 → 1.05 and invented unit_price 10.88 instead of populating gross_unit_price=12.90 + discount_pct=22.85",
+      "4. parseMonetaryLineItems accepted legacy unit_price; bindMonetaryColumns pass-through (discount cols null; total > qty×unit_price so applyEffectivePaidPrice skipped)",
+      "5. normalizeInvoiceItemFields and persistence insert copied API output losslessly to DB"
+    ],
+    "postProcessingModified": false,
+    "modelOrPostProcessing": "model"
+  },
+  "requiredTable": [
+    { "stage": "PDF (net implied)", "qty": 1.35, "unit_price": 9.95, "total": 13.44 },
+    { "stage": "OCR / pass-c-raw API (2026-06-11)", "qty": 1.35, "unit_price": 9.82, "total": 13.44 },
+    { "stage": "Pass C inferred pre-bind", "qty": 1.05, "unit_price": 10.88, "total": 13.44 },
+    { "stage": "bindMonetaryColumns", "qty": 1.05, "unit_price": 10.88, "total": 13.44 },
+    { "stage": "v28 API output", "qty": 1.05, "unit_price": 10.88, "total": 13.44 },
+    { "stage": "normalizeInvoiceItemFields", "qty": 1.05, "unit_price": 10.88, "total": 13.44 },
+    { "stage": "Persisted DB", "qty": 1.05, "unit_price": 10.88, "total": 13.44 }
+  ],
+  "final": {
+    "where105FirstAppears": "Pass C structured extraction — first full artifact: .tmp/final-stability-audit/extracts/17aa3591-run1.json (qty 1.05, unit_price 9.88); persisted trio qty 1.05 + unit_price 10.88 first together at v28 deploy replay ≡ DB",
+    "where1088FirstAppears": "Pass C structured extraction — .tmp/final-validation-lab-rerun-v28/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json (no prior artifact contains 10.88 for Gorgonzola)",
+    "modelOrPostProcessing": "model",
+    "exactExtractionFailure": "GPT Pass C returned quantity=1.05 and unit_price=10.88 with discount columns absent while line_total_net=13.44 correct; downstream binding/normalization/persistence pass through unchanged"
+  },
+  "artifactIndex": [
+    ".tmp/final-validation-lab-rerun-v28/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+    ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json",
+    ".tmp/passc-refinement-validation/reextract/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+    ".tmp/gorgonzola-root-cause/stage-trace.json",
+    ".tmp/final-stability-audit/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb-run1.json",
+    ".tmp/gorgonzola-unit-price-origin-audit/results.json",
+    ".tmp/gorgonzola-persistence-reconciliation-audit/results.json",
+    "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+    "supabase/functions/extract-invoice/invoice-monetary-binding.ts"
+  ]
+}

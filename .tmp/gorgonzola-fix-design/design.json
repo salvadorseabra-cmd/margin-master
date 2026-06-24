@@ -1,0 +1,204 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T12:00:00.000Z",
+  "mode": "STRICT_DESIGN_ONLY",
+  "noCodeChanges": true,
+  "noDbWrites": true,
+  "noDeployments": true,
+  "fixture": {
+    "geometryInvoiceId": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+    "persistedInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "invoiceItemId": "bece238e-fd6d-493c-8555-6921b164f97c",
+    "deployVersion": 28
+  },
+  "groundTruth": {
+    "pdf": { "quantity": 1.35, "unit": "kg", "grossUnitPrice": 12.9, "discountPct": 22.85, "netUnitPrice": 9.95, "total": 13.44, "reconciles": true },
+    "ocr": { "quantity": 1.35, "unitPrice": 9.82, "total": 13.44 },
+    "structuredV28": { "quantity": 1.05, "unitPrice": 10.88, "total": 13.44, "qtyXPrice": 11.42, "reconciles": false },
+    "corpus": { "totalRows": 52, "confirmedBugs": 1, "isolated": true }
+  },
+  "task1_extractionTrace": {
+    "passC": {
+      "location": ".tmp/passc-prompt-audit/passc-prompt.txt",
+      "schema": { "name": "string", "quantity": "number|null", "unit": "string|null", "unit_price": "number|null", "total": "number|null" },
+      "qtySemantics": "infer from description allowed",
+      "monetarySemantics": "unit_price + total authoritative"
+    },
+    "hybridH": {
+      "location": "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+      "systemPrompt": "TABLE_EXTRACTION_SYSTEM_PROMPT L18-268",
+      "userMessage": "Extract each visible invoice line item. Copy quantity, gross_unit_price, discount_pct, and line_total_net from their labeled table columns.",
+      "responseFormat": "TABLE_EXTRACTION_RESPONSE_FORMAT L271-307",
+      "schema": {
+        "name": "string",
+        "quantity": "number|null",
+        "unit": "string|null",
+        "gross_unit_price": "number|null",
+        "discount_pct": "number|null",
+        "line_total_net": "number|null"
+      },
+      "strictJsonSchema": true,
+      "qtySemantics": "column-only; pack metadata NOT purchased quantity",
+      "monetarySemantics": "gross_unit_price + discount_pct + line_total_net from columns; downstream bindMonetaryColumns derives unit_price"
+    },
+    "pipeline": [
+      "cropTableRegionForLineItems",
+      "callOpenAiJson(TABLE_EXTRACTION_SYSTEM_PROMPT, TABLE_EXTRACTION_RESPONSE_FORMAT)",
+      "parseMonetaryLineItems",
+      "bindMonetaryColumns",
+      "reconcileLineItemAmounts",
+      "monetaryToInvoiceLineItem → API",
+      "invoices.tsx normalizeInvoiceItemFields → insert invoice_items"
+    ]
+  },
+  "task2_failureHypothesis": {
+    "quantity105": {
+      "hypothesis": "Digit misread 1,35 → 1,05 (3↔5 in fractional Emporio Qtd column)",
+      "confidence": "HIGH",
+      "evidence": [
+        "PDF and OCR both 1.35; first wrong at v28 Pass C",
+        "Description ~1,5kg did not become 1.5",
+        "Prompt L119-125 fractional copy rule already present but insufficient"
+      ],
+      "rejected": ["pack metadata override", "description weight 1,8-1,9kg bleed"]
+    },
+    "unitPrice1088": {
+      "hypothesis": "Structured columns skipped; invented unit_price or wrong gross_unit_price=10.88 with discount_pct null",
+      "confidence": "HIGH",
+      "evidence": [
+        "10.88 matches no PDF column (gross 12.90, net 9.95, OCR 9.82)",
+        "Inferred pre-bind: gross_unit_price=null, discount_pct=null, line_total_net=13.44",
+        "applyStructuredBinding sets unit_price=gross when discount null (L69-70)",
+        "applyEffectivePaidPrice skipped: total 13.44 > qty×unit_price 11.42 (inverse failure mode)",
+        "line_total_net 13.44 correct — VALOR isolation worked; asymmetric column failure"
+      ],
+      "rejected": ["OCR contained 10.88", "bindMonetaryColumns derivation", "normalizeInvoiceItemFields mutation"]
+    },
+    "promptAudit": {
+      "columnConfusion": true,
+      "grossVsNet": true,
+      "existingGorgonzolaExample": "L107-108 qty 1.35, gross 12.90, discount 22.85, total 13.44",
+      "examplePreventedFailure": false
+    }
+  },
+  "task3_designOptions": {
+    "A_promptOnly": {
+      "description": "Fractional digit guard + mandatory Emporio Desc.(%) + negative 1.05/10.88 example",
+      "effectiveness": "LOW",
+      "blastRadius": "minimal",
+      "risk": "high residual — no safety net; proven insufficient alone",
+      "vlImpact": { "rowsProtected": 0, "rowsChangedIfCompliant": 0 }
+    },
+    "B_validationOnly": {
+      "B1_bidirectionalApplyEffectivePaidPrice": {
+        "description": "When total > qty×unit_price beyond tolerance, unit_price = total/qty",
+        "effectivenessOnGorgonzola": "PARTIAL — yields 12.80/kg, qty still 1.05",
+        "risk": "may mask gross-as-net errors on reconciling rows"
+      },
+      "B2_needsMathConfirmation": {
+        "description": "Flag when |qty×unit_price - total| > max(€0.50, 5%)",
+        "effectivenessOnGorgonzola": "CATCHES — 15.03% variance",
+        "blastRadius": "1 VL row at 5% threshold",
+        "falsePositivesAt5Pct": 0
+      },
+      "B3_structuredFormulaRuleF": {
+        "description": "Verify qty×gross×(1-disc/100)≈line_total_net; rebind on fail",
+        "effectivenessOnGorgonzola": "NO when discount cols null (actual failure)",
+        "effectivenessOnControls": "HIGH when structured cols present"
+      },
+      "overall": {
+        "effectiveness": "INCOMPLETE — catches but cannot auto-correct dual field error",
+        "risk": "silent wrong cost without UI gate"
+      }
+    },
+    "C_promptPlusValidation": {
+      "description": "Minimal prompt delta + Rule F structured rebind + needsMathConfirmation at 5%",
+      "effectiveness": "HIGH",
+      "blastRadius": "1 flagged row in VL corpus",
+      "risk": "LOW",
+      "preservesControls": true
+    },
+    "D_other": {
+      "rowReextractOnMathFail": "defer — higher cost, non-deterministic",
+      "ocrCrossCheckQty": "defer — larger scope",
+      "stripLegacyUnitPriceInParser": "good hardening adjunct; does not fix qty"
+    }
+  },
+  "task5_mathValidation": {
+    "proposedGate": {
+      "formula": "variance_abs = |qty × unit_price - total|",
+      "threshold": "variance_abs > max(€0.50, 5% of total)",
+      "location": "src/routes/invoices.tsx needsExtractionConfirmation"
+    },
+    "wouldCatchGorgonzola": true,
+    "gorgonzolaVariance": { "abs": 2.02, "pct": 15.03 },
+    "falsePositiveAudit": [
+      { "product": "Aceto balsamico pet 5l*2", "variancePct": 3.36, "caughtAt5Pct": false, "note": "legitimate discount semantics" },
+      { "product": "ACQUA S.PELLEGRINO Bocconcino", "variancePct": 0.31, "caughtAt5Pct": false, "note": "legitimate discount" },
+      { "product": "SanPellegrino Emporio v28", "variancePct": 0, "caughtAt5Pct": false, "note": "control reconciles" },
+      { "product": "Prosciutto", "varianceAbs": 0.01, "caughtAt5Pct": false },
+      { "product": "Mortadella", "varianceAbs": 0.05, "caughtAt5Pct": false },
+      { "product": "Bresaola", "varianceAbs": 0, "caughtAt5Pct": false }
+    ],
+    "structuredRuleF": {
+      "condition": "gross_unit_price && discount_pct && line_total_net all non-null",
+      "verify": "round2(qty × gross × (1 - discount/100)) ≈ line_total_net within €0.05",
+      "onFail": "unit_price = deriveNetUnitPrice(gross, discount); total = line_total_net",
+      "gorgonzolaWithCorrectStructured": { "qty": 1.35, "gross": 12.9, "discount": 22.85, "total": 13.44, "derivedUnitPrice": 9.95, "reconciles": true },
+      "gorgonzolaActualFailure": { "discountColsNull": true, "ruleFFires": false }
+    }
+  },
+  "task6_recommendation": {
+    "preferred": "C",
+    "rationale": [
+      "Prompt already contains correct Gorgonzola example — A alone proven insufficient",
+      "Validation alone cannot recover qty 1.35 without structured cols or re-extract",
+      "Combined: prompt reduces recurrence; 5% gate prevents silent cost propagation",
+      "0 control regressions at designed thresholds on 52-row VL corpus"
+    ],
+    "implementation": {
+      "estimatedLines": "60-80",
+      "files": [
+        { "path": "supabase/functions/extract-invoice/invoice-table-extraction.ts", "change": "prompt delta ~12 lines after L125" },
+        { "path": "supabase/functions/extract-invoice/invoice-monetary-binding.ts", "change": "Rule F structured formula rebind" },
+        { "path": "src/routes/invoices.tsx", "change": "needsMathConfirmation in needsExtractionConfirmation" }
+      ],
+      "noSchemaMigration": true,
+      "noDbBackfill": true
+    },
+    "controlPreservation": {
+      "prosciutto": { "qty": 4.3, "unitPrice": 8.5, "total": 36.54, "varianceAbs": 0.01, "pass": true },
+      "mortadella": { "qty": 3.11, "unitPrice": 8.88, "total": 27.57, "varianceAbs": 0.05, "pass": true },
+      "bresaola": { "qty": 1.83, "unitPrice": 27.04, "total": 49.48, "varianceAbs": 0, "pass": true },
+      "sanPellegrinoEmporio": { "qty": 2, "unitPrice": 19.28, "total": 38.56, "varianceAbs": 0, "pass": true },
+      "otherVlRows": { "count": 51, "passAt5Pct": true }
+    }
+  },
+  "finalVerdict": {
+    "selected": "C",
+    "label": "Prompt + validation",
+    "rejected": {
+      "A": "Prompt-only — insufficient (v28 failed despite L107-108 example)",
+      "B": "Validation-only — catches Gorgonzola but cannot correct dual field error",
+      "D": "Other — defer row re-extract / OCR cross-check unless C fails VL replay"
+    }
+  },
+  "currentGuardrails": {
+    "applyEffectivePaidPrice": { "active": true, "catchesGorgonzola": false, "reason": "requires total < qty×unit_price" },
+    "bindMonetaryColumns": { "active": true, "catchesGorgonzola": false, "reason": "discount cols null; pass-through" },
+    "reconcileLineItemAmounts": { "active": true, "catchesGorgonzola": false, "reason": "preserves both columns when present" },
+    "needsExtractionConfirmation": { "active": true, "catchesGorgonzola": false, "reason": "null fields only" },
+    "persistTimeMathValidation": { "active": false, "catchesGorgonzola": true }
+  },
+  "artifactIndex": [
+    ".tmp/gorgonzola-structured-extraction-failure-audit/",
+    ".tmp/gorgonzola-unit-price-origin-audit/",
+    ".tmp/gorgonzola-persistence-reconciliation-audit/",
+    ".tmp/mathematical-consistency-coverage-audit/",
+    ".tmp/final-validation-lab-rerun-v28/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json",
+    "supabase/functions/extract-invoice/invoice-table-extraction.ts",
+    "supabase/functions/extract-invoice/invoice-monetary-binding.ts",
+    "supabase/functions/extract-invoice/invoice-line-reconcile.ts",
+    "src/routes/invoices.tsx"
+  ]
+}

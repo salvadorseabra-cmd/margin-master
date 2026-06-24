@@ -1,0 +1,238 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T17:00:00.000Z",
+  "mode": "STRICT_DESIGN_ONLY",
+  "noCodeChanges": true,
+  "noDbWrites": true,
+  "noDeployments": true,
+  "fixture": {
+    "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "gorgonzolaItemId": "35bdf942-712b-46af-9f2e-666cb4744a88",
+    "geometryFixture": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+    "deployVersion": 39,
+    "imageDimensions": { "width": 724, "height": 1124 }
+  },
+  "rootCause": {
+    "selected": "B",
+    "label": "GPT prepass prefers fraction metadata (1/8, 1/2) over visible Qtd decimals",
+    "rejects": {
+      "A_cropLacksQtd": "Qtd strips show 1,35 / 1,83 / 4,30; Prosciutto correct on same crop",
+      "C_both": "Crop legible — not combined failure",
+      "D_parsingBug": "2.00 first appears at GPT JSON output",
+      "E_geometryFailure": "gorgonzola-qtd-strip.png legible"
+    },
+    "downstreamImpact": "Integer prepass fails isFractionalQty → anchorQuantities scope gate skip → Gorgonzola stays Pass C 1.05"
+  },
+  "requiredQuestion": {
+    "options": {
+      "A": "Gorgonzola only",
+      "B": "Fraction-description family",
+      "C": "General robustness"
+    },
+    "selected": "B",
+    "rationale": "Integer prepass=2 clusters on Gorgonzola (1/8) and Bresaola (1/2); Prosciutto without fraction reads correctly; Mortadella has fraction but prepass≈PDF; Pellegrino x15 is separate metadata class"
+  },
+  "finalVerdict": {
+    "options": {
+      "A": "Prompt only",
+      "B": "Deterministic Qtd only",
+      "C": "Prompt+validation",
+      "D": "Deterministic Qtd+validation",
+      "E": "Other"
+    },
+    "selected": "D",
+    "rationale": "Column strip removes description from vision input (fixes root cause); fraction-conflict heuristic widens ocr_qty_mismatch when scope gate would miss bad integer OCR"
+  },
+  "task1_architectureTrace": {
+    "chain": [
+      "extractTableItemsFromImage (invoice-table-extraction.ts:337)",
+      "runTableExtractionPass (L378)",
+      "cropTableRegionForLineItems (invoice-image-crop.ts:393)",
+      "runQuantityPrePass (invoice-qty-prepass.ts:165)",
+      "callOpenAiJson — gpt-4.1, temp=0, seed=42 (invoice-date-extraction.ts:54)",
+      "JSON parse items[].quantity (L190-198)",
+      "callOpenAiJson Pass C (L428-444)",
+      "anchorQuantities (L447-448)",
+      "bindMonetaryColumns → reconcile → extraction_meta"
+    ],
+    "prepass": {
+      "model": "gpt-4.1",
+      "temperature": 0,
+      "seed": 42,
+      "responseFormat": "invoice_qty_prepass strict JSON schema",
+      "systemPromptFile": "invoice-qty-prepass.ts QTY_PREPAS_SYSTEM_PROMPT L35-48",
+      "userContent": "text + full table crop image_url",
+      "parseBehavior": "pass-through number | null; no post-validation",
+      "rawJsonRetained": false
+    },
+    "anchorQuantitiesInput": {
+      "prepassRows": "QtyPrepassRow[] from runQuantityPrePass",
+      "structuredRows": "MonetaryLineItem[] from Pass C parseMonetaryLineItems",
+      "matching": "index-first then normalizeNameKey",
+      "scopeGate": "isQtyAnchorScopeRow — fractional kg + Emporio discount semantics",
+      "blindSpot": "integer ocr_quantity skips scope → ocr_qty_mismatch hardcoded false"
+    }
+  },
+  "task2_designOptions": {
+    "A_promptOnly": {
+      "effectiveness": "LOW",
+      "complexity": "~8 prompt lines",
+      "blastRadius": "minimal",
+      "risk": "HIGH residual",
+      "verdict": "reject",
+      "evidence": "v39 prompt already lists 1/8 as NOT purchased qty; live prepass returns 2"
+    },
+    "B_deterministicQtdOnly": {
+      "effectiveness": "HIGH on fraction rows",
+      "complexity": "~60-80 lines",
+      "blastRadius": "Emporio prepass input image",
+      "risk": "LOW on deli controls",
+      "verdict": "partial alone",
+      "gap": "scope gate still blind to residual bad integer if strip fails"
+    },
+    "C_promptPlusValidation": {
+      "effectiveness": "LOW fix / PARTIAL detect",
+      "complexity": "~25 lines",
+      "blastRadius": "review flags",
+      "risk": "does not supply correct ocr_quantity for anchoring",
+      "verdict": "reject as primary"
+    },
+    "D_deterministicQtdPlusValidation": {
+      "effectiveness": "HIGH",
+      "complexity": "~90-110 lines",
+      "blastRadius": "Emporio prepass + extraction_meta heuristic",
+      "risk": "LOW",
+      "verdict": "recommended"
+    },
+    "E_other": {
+      "rowReextractOnMathFail": "defer — cost + latency",
+      "dualFullSchemaParallelPass": "defer — 2x vision cost",
+      "tesseractOnQtdStrip": "defer — tuning burden; GPT on strip sufficient for v1"
+    }
+  },
+  "task3_deterministicQtdDesign": {
+    "principle": "Read ONLY Qtd column pixels; ignore Designação; return null if unreadable",
+    "approach": "vertical Qtd strip crop after table crop, before runQuantityPrePass",
+    "emporioColumnGeometry": {
+      "source": ".tmp/fraction-row-crop-audit/audit.mts COLUMNS",
+      "fullImageWidth": 724,
+      "qtd": { "x0": 438, "x1": 478, "widthPx": 40 },
+      "normalizedFraction": { "x0": 0.605, "x1": 0.661 },
+      "tableCropBounds": { "top": 430, "bottom": 851, "height": 421 }
+    },
+    "rowAlignment": "index-order matching; name optional in strip mode (row-0, row-1, …)",
+    "failOpen": [
+      "strip crop fails → full table crop + hardened prompt (T4)",
+      "prepass null per row → skip anchor for that row; retain Pass C qty"
+    ],
+    "pseudocode": {
+      "cropQtdColumnStrip": "async function cropQtdColumnStrip(tableCropDataUrl, imageWidth?) {\n  const image = await decodeImage(tableCropDataUrl);\n  const w = image.width;\n  const x0 = Math.floor(w * EMPORIO_QTD_X_FRAC.x0); // 438/724\n  const x1 = Math.ceil(w * EMPORIO_QTD_X_FRAC.x1);   // 478/724\n  if (x1 - x0 < 24) return null; // strip too narrow\n  const strip = image.crop(x0, 0, x1 - x0, image.height);\n  if (isMostlyBlank(strip)) return null;\n  return await encodeDataUrl(strip);\n}",
+      "runQuantityPrePass": "async function runQuantityPrePass(tableCropDataUrl, apiKey, opts?) {\n  const qtdStripUrl = await cropQtdColumnStrip(tableCropDataUrl);\n  const useStrip = qtdStripUrl != null;\n  const imageUrl = useStrip ? qtdStripUrl : tableCropDataUrl;\n  const systemPrompt = useStrip ? QTD_STRIP_SYSTEM_PROMPT : QTY_PREPAS_SYSTEM_PROMPT;\n  const userText = useStrip\n    ? 'Read decimal quantity from each horizontal row band. Top-to-bottom order. Qtd column only.'\n    : 'Copy quantity and unit from the Qtd column for each visible invoice line item.';\n  const parsed = await callOpenAiJson(apiKey, [{ role: 'system', content: systemPrompt }, { role: 'user', content: [{ type: 'text', text: userText }, { type: 'image_url', image_url: { url: imageUrl } }] }], QTY_PREPAS_RESPONSE_FORMAT);\n  return normalizePrepassRows(parsed.items, { stripMode: useStrip });\n}",
+      "normalizePrepassRows": "function normalizePrepassRows(raw, { stripMode }) {\n  return raw.map((item, i) => ({\n    name: stripMode ? `row-${i}` : (item.name ?? 'Unknown item'),\n    quantity: typeof item.quantity === 'number' ? item.quantity : null,\n    unit: stripMode ? 'kg' : (item.unit ?? null), // Emporio deli default; Pass C overrides\n  }));\n}",
+      "integrationHook": "// invoice-table-extraction.ts runTableExtractionPass\nconst cropResult = await cropTableRegionForLineItems(imageDataUrl);\nprepassRows = await runQuantityPrePass(cropResult.croppedDataUrl, apiKey, { tableBounds: cropResult.bounds });"
+    },
+    "constantsToAdd": {
+      "file": "invoice-crop-geometry.ts",
+      "EMPORIO_QTD_COLUMN_X_FRAC": { "x0": 0.605, "x1": 0.661 },
+      "QTD_STRIP_MIN_WIDTH_PX": 24
+    }
+  },
+  "task4_promptHardening": {
+    "when": "fallback only — full table crop when strip crop unavailable",
+    "minimalAdditions": [
+      "The image may show ONLY the quantity column — no product names are visible.",
+      "Each horizontal band is one row's Qtd cell. Read top-to-bottom in table order.",
+      "Pack fractions in product names (1/8, 1/2, 1/4) are NEVER purchased quantity.",
+      "If a cell is blank or illegible → quantity: null (never infer 1, 2, or pack count).",
+      "Integer 2 is almost never a valid Emporio kg Qtd when the cell shows a decimal like 1,35."
+    ],
+    "stripModeUserMessage": "Read the decimal quantity from each row band in this Qtd column image only. Return one item per visible row band, in order. Name may be row-N.",
+    "note": "Do not deploy prompt-only; existing v39 rules already violated"
+  },
+  "task5_validationOcrQtyReview": {
+    "currentBehavior": {
+      "flag": "ocr_qty_mismatch in extraction_meta",
+      "reviewFn": "needsOcrQtyMismatchReview — trusts meta.ocr_qty_mismatch",
+      "scopeLimit": "flag only set inside isQtyAnchorScopeRow branches",
+      "gorgonzolaGap": "prepass=2 → scope false → ocr_qty_mismatch false at 47.5% delta"
+    },
+    "proposedAdjunct": {
+      "name": "fractionDescriptionConflict",
+      "condition": "name matches /\\d+\\s*\\/\\s*\\d+/ AND prepass.quantity is integer AND passC.quantity is fractional kg AND deltaPct > 10%",
+      "action": "set ocr_qty_mismatch true in metadata (detection only)",
+      "safe": true,
+      "reason": "flags for review; never auto-overwrites qty"
+    },
+    "validationAlone": {
+      "safeAsPrimaryFix": false,
+      "reason": "cannot supply correct ocr_quantity for anchorQuantities; user still gets wrong persisted qty"
+    },
+    "afterDeterministicQtd": {
+      "existingOcrQtyMismatch": "retained as safety net for S3-style disagreements",
+      "newReasonCodeRequired": false
+    }
+  },
+  "task6_regressionTable": [
+    { "product": "Gorgonzola", "pdfQty": 1.35, "prepassV39": 2, "passC": 1.05, "fractionToken": "1/8", "prepassOk": false, "expectedAfter": { "prepass": 1.35, "final": 1.35, "anchored": true } },
+    { "product": "Bresaola", "pdfQty": 1.83, "prepassV39": 2, "passC": 1.83, "fractionToken": "1/2", "prepassOk": false, "expectedAfter": { "prepass": 1.83, "final": 1.83, "anchored": false } },
+    { "product": "Prosciutto", "pdfQty": 4.3, "prepassV39": 4.3, "passC": 4.3, "fractionToken": null, "prepassOk": true, "expectedAfter": { "prepass": 4.3, "final": 4.3, "anchored": false } },
+    { "product": "Mortadella", "pdfQty": 3.11, "prepassV39": 3.1, "passC": 3.11, "fractionToken": "1/2", "prepassOk": true, "expectedAfter": { "prepass": 3.11, "final": 3.11, "anchored": false } },
+    { "product": "Pellegrino", "pdfQty": 2, "prepassV39": 11, "passC": 2, "fractionToken": "x15", "prepassOk": false, "expectedAfter": { "prepass": 2, "final": 2, "note": "strip may fix; else heuristic flag" } },
+    { "product": "Paccheri", "pdfQty": 24, "prepassV39": 24, "passC": 24, "fractionToken": null, "prepassOk": true, "expectedAfter": { "prepass": 24, "final": 24, "anchored": false } },
+    { "product": "Ovo", "pdfQty": 6, "invoice": "Bidfood VL", "prepassV39": "n/a", "prepassOk": true, "expectedAfter": { "note": "control — different supplier layout; no change" } },
+    { "product": "Tomilho", "pdfQty": 1, "invoice": "Bidfood VL", "unit": "MO", "prepassV39": "n/a", "prepassOk": true, "expectedAfter": { "note": "control — no change" } },
+    { "product": "Salada", "pdfQty": 1, "invoice": "Bidfood VL", "unit": "EM", "prepassV39": "n/a", "prepassOk": true, "expectedAfter": { "note": "control — no change" } }
+  ],
+  "task7_beforeAfterMatrix": {
+    "assumptions": "Deterministic Qtd strip + existing v39 anchoring on Emporio May 2026 re-extract",
+    "rows": [
+      {
+        "product": "Gorgonzola",
+        "pdfQty": 1.35,
+        "before": { "prepass": 2, "passC": 1.05, "final": 1.05, "anchored": false, "mathReview": "FLAG" },
+        "after": { "prepass": 1.35, "passC": 1.05, "final": 1.35, "anchored": true, "mathReview": "PASS" }
+      },
+      {
+        "product": "Bresaola",
+        "pdfQty": 1.83,
+        "before": { "prepass": 2, "passC": 1.83, "final": 1.83, "anchored": false, "mathReview": "PASS" },
+        "after": { "prepass": 1.83, "passC": 1.83, "final": 1.83, "anchored": false, "mathReview": "PASS" }
+      },
+      {
+        "product": "Prosciutto",
+        "pdfQty": 4.3,
+        "before": { "prepass": 4.3, "passC": 4.3, "final": 4.3, "anchored": false, "mathReview": "PASS" },
+        "after": { "prepass": 4.3, "passC": 4.3, "final": 4.3, "anchored": false, "mathReview": "PASS" }
+      },
+      {
+        "product": "Mortadella",
+        "pdfQty": 3.11,
+        "before": { "prepass": 3.1, "passC": 3.11, "final": 3.11, "anchored": false, "mathReview": "PASS" },
+        "after": { "prepass": 3.11, "passC": 3.11, "final": 3.11, "anchored": false, "mathReview": "PASS" }
+      }
+    ]
+  },
+  "implementationPlan": {
+    "files": [
+      { "path": "supabase/functions/extract-invoice/invoice-qty-column-crop.ts", "change": "NEW — cropQtdColumnStrip" },
+      { "path": "supabase/functions/extract-invoice/invoice-crop-geometry.ts", "change": "EMPORIO_QTD_COLUMN_X_FRAC constants" },
+      { "path": "supabase/functions/extract-invoice/invoice-qty-prepass.ts", "change": "strip mode prompt; fraction-conflict meta helper" },
+      { "path": "supabase/functions/extract-invoice/invoice-table-extraction.ts", "change": "pass bounds to prepass; log strip vs fallback" },
+      { "path": "supabase/functions/extract-invoice/invoice-qty-prepass.test.ts", "change": "strip fixture + Gorgonzola 1.35 path" }
+    ],
+    "gptCallsDelta": 0,
+    "schemaMigration": false,
+    "testPlan": [
+      "Unit: cropQtdColumnStrip on fraction-row-crop table-crop.png → 40px strip",
+      "Unit: Gorgonzola anchor with prepass 1.35 (existing tests pass)",
+      "Integration: VL re-extract ab52796d — Gorgonzola qty 1.35 persisted",
+      "Regression: Prosciutto/Mortadella/Paccheri unchanged"
+    ]
+  },
+  "priorAudits": [
+    ".tmp/fraction-row-crop-audit/",
+    ".tmp/ocr-prepass-forensics-audit/",
+    ".tmp/ocr-anchoring-decision-audit/",
+    ".tmp/gorgonzola-hardening-implementation/"
+  ]
+}

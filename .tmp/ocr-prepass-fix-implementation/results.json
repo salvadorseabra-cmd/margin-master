@@ -1,0 +1,182 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T17:16:43.023Z",
+  "designVerdict": "D",
+  "designSource": ".tmp/ocr-prepass-fix-design/",
+  "geometryReference": ".tmp/fraction-row-crop-audit/",
+  "task1_architectureTrace": {
+    "chain": [
+      "extractTableItemsFromImage (invoice-table-extraction.ts)",
+      "runTableExtractionPass",
+      "cropTableRegionForLineItems (invoice-image-crop.ts) → table crop",
+      "cropQtdColumnStrip (invoice-qty-column-crop.ts) → Qtd strip [NEW]",
+      "runQuantityPrePass — strip prompt or fail-open full crop (invoice-qty-prepass.ts)",
+      "callOpenAiJson Pass C (unchanged)",
+      "anchorQuantities + applyFractionDescriptionConflict [NEW adjunct]",
+      "bindMonetaryColumns → reconcile → extraction_meta"
+    ],
+    "prepassChanges": {
+      "stripMode": "QTD_STRIP_SYSTEM_PROMPT + row-N names + default kg unit",
+      "fallbackMode": "QTY_PREPAS_SYSTEM_PROMPT hardened per design T4",
+      "failOpen": "strip null → full table crop"
+    },
+    "unchanged": [
+      "Pass C TABLE_EXTRACTION_SYSTEM_PROMPT",
+      "anchorQuantities scoring thresholds",
+      "isQtyAnchorScopeRow scope gate",
+      "OCR_QTY_MISMATCH framework structure",
+      "persistence schema"
+    ]
+  },
+  "filesChanged": [
+    "supabase/functions/extract-invoice/invoice-crop-geometry.ts",
+    "supabase/functions/extract-invoice/invoice-qty-column-crop.ts",
+    "supabase/functions/extract-invoice/invoice-qty-column-crop.test.ts",
+    "supabase/functions/extract-invoice/invoice-qty-prepass.ts",
+    "supabase/functions/extract-invoice/invoice-qty-prepass.test.ts",
+    "supabase/functions/extract-invoice/invoice-table-extraction.ts"
+  ],
+  "stripGeometry": {
+    "ok": true,
+    "sourceWidth": 724,
+    "sourceHeight": 421,
+    "stripWidth": 41,
+    "stripHeight": 421
+  },
+  "validationMatrix": {
+    "gorgonzola": {
+      "pdfQty": 1.35,
+      "beforePrepass": 2,
+      "expectedPrepass": 1.35,
+      "passC": 1.05,
+      "expectedFinal": 1.35,
+      "expectedAnchored": true,
+      "stripFix": "primary",
+      "heuristicFallback": "integer prepass 2 + 1/8 name → ocr_qty_mismatch if strip fails"
+    },
+    "bresaola": {
+      "pdfQty": 1.83,
+      "beforePrepass": 2,
+      "expectedPrepass": 1.83,
+      "passC": 1.83,
+      "expectedFinal": 1.83,
+      "expectedAnchored": false,
+      "stripFix": "primary",
+      "heuristicNote": "delta(2,1.83)=8.5% < 10% — heuristic does not fire; strip is required"
+    },
+    "prosciutto": {
+      "pdfQty": 4.3,
+      "beforePrepass": 4.3,
+      "expectedPrepass": 4.3,
+      "passC": 4.3,
+      "expectedFinal": 4.3,
+      "unchanged": true
+    },
+    "mortadella": {
+      "pdfQty": 3.11,
+      "beforePrepass": 3.1,
+      "expectedPrepass": 3.11,
+      "passC": 3.11,
+      "unchanged": true
+    },
+    "paccheri": {
+      "pdfQty": 24,
+      "beforePrepass": 24,
+      "expectedPrepass": 24,
+      "unchanged": true
+    }
+  },
+  "regressionMatrix": [
+    {
+      "product": "Gorgonzola",
+      "fractionToken": "1/8",
+      "prepassBefore": 2,
+      "prepassAfter": 1.35,
+      "status": "FIX"
+    },
+    {
+      "product": "Bresaola",
+      "fractionToken": "1/2",
+      "prepassBefore": 2,
+      "prepassAfter": 1.83,
+      "status": "FIX"
+    },
+    {
+      "product": "Prosciutto",
+      "fractionToken": null,
+      "prepassBefore": 4.3,
+      "prepassAfter": 4.3,
+      "status": "UNCHANGED"
+    },
+    {
+      "product": "Mortadella",
+      "fractionToken": "1/2",
+      "prepassBefore": 3.1,
+      "prepassAfter": 3.11,
+      "status": "UNCHANGED"
+    },
+    {
+      "product": "Paccheri",
+      "fractionToken": null,
+      "prepassBefore": 24,
+      "prepassAfter": 24,
+      "status": "UNCHANGED"
+    },
+    {
+      "product": "Ovo",
+      "invoice": "Bidfood VL",
+      "status": "CONTROL_NO_CHANGE"
+    },
+    {
+      "product": "Tomilho",
+      "invoice": "Bidfood VL",
+      "status": "CONTROL_NO_CHANGE"
+    },
+    {
+      "product": "Salada",
+      "invoice": "Bidfood VL",
+      "status": "CONTROL_NO_CHANGE"
+    }
+  ],
+  "denoTests": {
+    "command": "deno test --allow-read=. --allow-net supabase/functions/extract-invoice/*.test.ts",
+    "passed": 40,
+    "failed": 0,
+    "ok": true
+  },
+  "blastRadius": {
+    "gptCallsDelta": 0,
+    "scope": "Emporio prepass input image + extraction_meta fraction-conflict adjunct",
+    "failOpen": "strip crop null → existing full-crop prepass with hardened prompt",
+    "notChanged": [
+      "Pass C",
+      "anchorQuantities scoring",
+      "recipe costing",
+      "procurement",
+      "operational",
+      "persistence schema",
+      "ingredient history"
+    ]
+  },
+  "liveReExtract": {
+    "status": "COMPLETE",
+    "deployVersion": 40,
+    "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "artifact": ".tmp/ocr-prepass-fix-implementation/live-reextract.json",
+    "fractionFamilyFixed": true,
+    "gorgonzolaPrecisionGap": {
+      "pdfQty": 1.35,
+      "prepassQty": 1.3,
+      "finalQty": 1.3,
+      "note": "No longer returns 2 from 1/8; strip OCR reads 1.30 vs 1.35"
+    },
+    "bresaola": { "prepassQty": 1.8, "finalQty": 1.83, "ok": true },
+    "controlsOk": true
+  },
+  "verdict": "B",
+  "verdictLabels": {
+    "A": "All unit tests pass + live VL confirms exact prepass values",
+    "B": "Fraction-family root cause fixed; Gorgonzola strip OCR 1.30 vs PDF 1.35",
+    "C": "Tests or geometry failed"
+  }
+}

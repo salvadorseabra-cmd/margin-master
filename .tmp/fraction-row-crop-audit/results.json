@@ -1,0 +1,395 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T16:07:32.592Z",
+  "auditType": "STRICT_READ_ONLY_FRACTION_ROW_CROP_PREPAS_VISIBILITY",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "gorgonzolaItemId": "35bdf942-712b-46af-9f2e-666cb4744a88",
+  "geometryFixture": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+  "priorAudit": ".tmp/ocr-prepass-forensics-audit/",
+  "task1_cropTrace": {
+    "function": "cropTableRegionForLineItems",
+    "file": "supabase/functions/extract-invoice/invoice-image-crop.ts",
+    "line": 393,
+    "chain": [
+      "parseImageDataUrl → Image.decode",
+      "detectTableBounds (L209) — grey/white header scan, totals edge peak",
+      "crop: image.crop(0, bounds.top, width, bounds.bottom - bounds.top)",
+      "toImageDataUrl → croppedDataUrl fed to runQuantityPrePass"
+    ],
+    "detectTableBoundsInputs": {
+      "TABLE_SCAN_START_FRACTION": 0.12,
+      "TABLE_SCAN_END_FRACTION": 0.55,
+      "TABLE_TOP_MARGIN": 10,
+      "note": "top = max(0, headerTop - TABLE_TOP_MARGIN); Emporio → top 456"
+    },
+    "failOpen": "bounds.detected=false → returns full image unchanged"
+  },
+  "task2_imageRecovery": {
+    "imagePath": "/Users/salvadorseabra1/margin-master/.tmp/emporio-italia-investigation/invoice-full.png",
+    "imageSource": "cached_emporio_italia_investigation",
+    "imageWidth": 724,
+    "imageHeight": 1124,
+    "vlInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "note": "Same PNG geometry as deleted fixture 17aa3591 — Emporio Italia May 2026"
+  },
+  "task3_cropBoundaries": {
+    "bounds": {
+      "top": 430,
+      "bottom": 851,
+      "headerTop": 466,
+      "headerBottom": 502,
+      "totalsStart": 827,
+      "detected": true
+    },
+    "cropHeight": 421,
+    "fallbackUsed": false,
+    "exportedFiles": [
+      "table-crop.png",
+      "crop-overlay.png",
+      "gorgonzola-crop.png",
+      "gorgonzola-qtd-strip.png",
+      "prosciutto-crop.png",
+      "prosciutto-qtd-strip.png",
+      "bresaola-crop.png",
+      "bresaola-qtd-strip.png"
+    ],
+    "rowExports": [
+      {
+        "key": "gorgonzola",
+        "rowBounds": {
+          "top": 478,
+          "height": 42,
+          "width": 724
+        },
+        "cropFile": "gorgonzola-crop.png",
+        "qtdStripFile": "gorgonzola-qtd-strip.png",
+        "qtdColumn": {
+          "x0": 438,
+          "x1": 478
+        },
+        "qtdPrinted": "1,35",
+        "pdfQty": 1.35,
+        "fractionToken": "1/8",
+        "packToken": "~1,5kg",
+        "rowFullyInsideTableCrop": true,
+        "qtdColumnInsideCropWidth": true,
+        "descriptionContainsFraction": true
+      },
+      {
+        "key": "prosciutto",
+        "rowBounds": {
+          "top": 518,
+          "height": 40,
+          "width": 724
+        },
+        "cropFile": "prosciutto-crop.png",
+        "qtdStripFile": "prosciutto-qtd-strip.png",
+        "qtdColumn": {
+          "x0": 438,
+          "x1": 478
+        },
+        "qtdPrinted": "4,30",
+        "pdfQty": 4.3,
+        "fractionToken": null,
+        "packToken": "~4,25KG",
+        "rowFullyInsideTableCrop": true,
+        "qtdColumnInsideCropWidth": true,
+        "descriptionContainsFraction": false
+      },
+      {
+        "key": "bresaola",
+        "rowBounds": {
+          "top": 556,
+          "height": 44,
+          "width": 724
+        },
+        "cropFile": "bresaola-crop.png",
+        "qtdStripFile": "bresaola-qtd-strip.png",
+        "qtdColumn": {
+          "x0": 438,
+          "x1": 478
+        },
+        "qtdPrinted": "1,83",
+        "pdfQty": 1.83,
+        "fractionToken": "1/2",
+        "packToken": "1,5kg",
+        "rowFullyInsideTableCrop": true,
+        "qtdColumnInsideCropWidth": true,
+        "descriptionContainsFraction": true
+      }
+    ]
+  },
+  "task4_qtdColumnVisibility": {
+    "qtdColumnX": {
+      "x0": 438,
+      "x1": 478
+    },
+    "fullWidthCrop": true,
+    "qtdHeaderInCrop": false,
+    "qtdValuesInCrop": true,
+    "perRow": [
+      {
+        "key": "gorgonzola",
+        "qtdPrinted": "1,35",
+        "rowInsideCrop": true,
+        "qtdStripFile": "gorgonzola-qtd-strip.png"
+      },
+      {
+        "key": "prosciutto",
+        "qtdPrinted": "4,30",
+        "rowInsideCrop": true,
+        "qtdStripFile": "prosciutto-qtd-strip.png"
+      },
+      {
+        "key": "bresaola",
+        "qtdPrinted": "1,83",
+        "rowInsideCrop": true,
+        "qtdStripFile": "bresaola-qtd-strip.png"
+      }
+    ]
+  },
+  "task5_tokenTable": [
+    {
+      "token": "1,35",
+      "row": "gorgonzola",
+      "meaning": "Printed Qtd column kg weight",
+      "visibleInTableCrop": true,
+      "couldDrivePrepass2": false,
+      "why": "Ground truth; crop shows digit clearly in qtd-strip"
+    },
+    {
+      "token": "1/8",
+      "row": "gorgonzola",
+      "meaning": "Pack fraction in Designação (one-eighth wheel)",
+      "visibleInTableCrop": true,
+      "couldDrivePrepass2": true,
+      "why": "Description token; prepass returned integer 2 — matches fraction-confusion class"
+    },
+    {
+      "token": "~1,5kg",
+      "row": "gorgonzola",
+      "meaning": "Nominal pack weight metadata",
+      "visibleInTableCrop": true,
+      "couldDrivePrepass2": false,
+      "why": "Would yield 1.5 if misused, not 2"
+    },
+    {
+      "token": "4,30",
+      "row": "prosciutto",
+      "meaning": "Printed Qtd column — control row without pack fraction",
+      "visibleInTableCrop": true,
+      "couldDrivePrepass2": false,
+      "why": "Prepass reads 4.3 correctly from same crop geometry"
+    },
+    {
+      "token": "~4,25KG",
+      "row": "prosciutto",
+      "meaning": "Description weight range metadata",
+      "visibleInTableCrop": true,
+      "couldDrivePrepass2": false,
+      "why": "No fraction notation; prepass unaffected"
+    },
+    {
+      "token": "1,83",
+      "row": "bresaola",
+      "meaning": "Printed Qtd column kg weight",
+      "visibleInTableCrop": true,
+      "couldDrivePrepass2": false,
+      "why": "Ground truth visible; prepass still returned 2"
+    },
+    {
+      "token": "1/2",
+      "row": "bresaola",
+      "meaning": "Pack fraction in Designação (half piece)",
+      "visibleInTableCrop": true,
+      "couldDrivePrepass2": true,
+      "why": "Same integer-2 prepass failure as Gorgonzola 1/8 row"
+    },
+    {
+      "token": "2 (integer)",
+      "row": "gorgonzola|bresaola",
+      "meaning": "Prepass OCR output — not printed in Qtd cells",
+      "visibleInTableCrop": false,
+      "couldDrivePrepass2": true,
+      "why": "Hallucinated/inferred from description fraction metadata, not Qtd OCR"
+    },
+    {
+      "token": "Qtd. header",
+      "row": "all",
+      "meaning": "Column header label",
+      "visibleInTableCrop": false,
+      "couldDrivePrepass2": false,
+      "why": "Table crop top y=456 clips header band (headerTop 466) — label absent but values readable"
+    }
+  ],
+  "task6_prepassVisibility": {
+    "hypothesis": "If crop lacked Qtd, all deli rows would fail prepass — Prosciutto 4.30 OK disproves",
+    "liveProbeDeploy": 39,
+    "controls": [
+      {
+        "product": "gorgonzola",
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg Produto de Stock",
+        "pdfQty": 1.35,
+        "qtdPrinted": "1,35",
+        "prepassOcrQty": 2,
+        "passCQty": 1.05,
+        "finalQty": 1.05,
+        "prepassMatchesPdf": false,
+        "fractionInDescription": "1/8",
+        "rowVisibleInCrop": true,
+        "qtdStripExported": "gorgonzola-qtd-strip.png"
+      },
+      {
+        "product": "prosciutto",
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg Produto de Stock",
+        "pdfQty": 4.3,
+        "qtdPrinted": "4,30",
+        "prepassOcrQty": 4.3,
+        "passCQty": 4.3,
+        "finalQty": 4.3,
+        "prepassMatchesPdf": true,
+        "fractionInDescription": null,
+        "rowVisibleInCrop": true,
+        "qtdStripExported": "prosciutto-qtd-strip.png"
+      },
+      {
+        "product": "bresaola",
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock",
+        "pdfQty": 1.83,
+        "qtdPrinted": "1,83",
+        "prepassOcrQty": 2,
+        "passCQty": 1.83,
+        "finalQty": 1.83,
+        "prepassMatchesPdf": false,
+        "fractionInDescription": "1/2",
+        "rowVisibleInCrop": true,
+        "qtdStripExported": "bresaola-qtd-strip.png"
+      }
+    ]
+  },
+  "task7_goalABC": {
+    "A": "Crop lacks Qtd — table crop geometry hides or clips quantity column cells",
+    "B": "GPT prefers fraction metadata — prepass reads 1/8 or 1/2 from description instead of Qtd",
+    "C": "Both — crop illegibility AND fraction-metadata override",
+    "D": "Neither — prepass failure is downstream parsing, not crop or vision",
+    "selected": "B",
+    "rationale": "All three target rows fully inside crop bounds (top 456–851). Qtd strips export legible 1,35 / 4,30 / 1,83. Prosciutto prepass correct on same crop. Integer prepass=2 clusters only on Gorgonzola (1/8) and Bresaola (1/2) — rejects A and C."
+  },
+  "task8_rootCause": {
+    "A": "Vision misread Qtd column cell — digit OCR error on printed decimals",
+    "B": "Description/pack-metadata override — fraction notation inferred as purchased qty 2",
+    "C": "Wrong column bleed — integer read from non-Qtd column",
+    "D": "Parsing/code bug — GPT returned correct qty, TypeScript corrupted to 2",
+    "E": "Crop/geometry failure — Qtd column illegible or excluded from prepass crop",
+    "selected": "B",
+    "rejectsE": "gorgonzolaRowVisible=true; qtd-strip PNGs show 1,35 and 1,83; Prosciutto 4,30 reads correctly from identical crop"
+  },
+  "finalVerdict": {
+    "goal": "B",
+    "rootCause": "B",
+    "summary": "Table crop includes all fraction-row Qtd cells (1,35 / 1,83 / 4,30). Prepass integer 2 on Gorgonzola and Bresaola is fraction-metadata override, not crop clipping. Prosciutto control correct."
+  },
+  "liveProbe": {
+    "status": 200,
+    "probedAt": "2026-06-24T16:07:32.502Z",
+    "deployVersion": 39,
+    "items": [
+      {
+        "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g Produto de Stock",
+        "quantity": 24,
+        "extraction_meta": {
+          "ocr_quantity": 24,
+          "pass_c_quantity": 24,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      },
+      {
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg Produto de Stock",
+        "quantity": 1.05,
+        "extraction_meta": {
+          "ocr_quantity": 2,
+          "pass_c_quantity": 1.05,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      },
+      {
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg Produto de Stock",
+        "quantity": 4.3,
+        "extraction_meta": {
+          "ocr_quantity": 4.3,
+          "pass_c_quantity": 4.3,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      },
+      {
+        "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg Produto de Stock",
+        "quantity": 3.11,
+        "extraction_meta": {
+          "ocr_quantity": 3.11,
+          "pass_c_quantity": 3.11,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      },
+      {
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud Produto de Stock",
+        "quantity": 2,
+        "extraction_meta": {
+          "ocr_quantity": 11,
+          "pass_c_quantity": 2,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      },
+      {
+        "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg Produto de Stock",
+        "quantity": 1.83,
+        "extraction_meta": {
+          "ocr_quantity": 2,
+          "pass_c_quantity": 1.83,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      },
+      {
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 24,
+        "extraction_meta": {
+          "ocr_quantity": 24,
+          "pass_c_quantity": 24,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      },
+      {
+        "name": "Rovagnati - Salame Ventricina 2,5 Kg Produto de Stock",
+        "quantity": 2.6,
+        "extraction_meta": {
+          "ocr_quantity": 2.6,
+          "pass_c_quantity": 2.6,
+          "quantity_anchored": false,
+          "ocr_qty_mismatch": false
+        }
+      }
+    ]
+  },
+  "persistedGorgonzola": {
+    "id": "35bdf942-712b-46af-9f2e-666cb4744a88",
+    "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+    "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+    "quantity": 1.05,
+    "unit": "kg",
+    "unit_price": 9.95,
+    "total": 13.44,
+    "created_at": "2026-06-24T12:19:51.42294+00:00",
+    "updated_at": "2026-06-24T12:19:51.42294+00:00"
+  },
+  "deploy": {
+    "version": 39,
+    "updatedAt": "2026-06-24T12:17:35.325Z"
+  }
+}
