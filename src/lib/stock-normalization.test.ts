@@ -258,6 +258,58 @@ describe("parsePurchaseStructureFromText", () => {
   );
 });
 
+describe("parsePurchaseStructureFromText — caixa dozen count (Ovo Classe M)", () => {
+  it.each([
+    {
+      name: "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      innerUnitCount: 15,
+      totalUsableAmount: 180,
+    },
+    {
+      name: "Ovo Classe M Cx 12 dúzias",
+      innerUnitCount: 12,
+      totalUsableAmount: 144,
+    },
+    {
+      name: "Ovo Classe M Caixa 30 dz",
+      innerUnitCount: 30,
+      totalUsableAmount: 360,
+    },
+    {
+      name: "Ovo Classe M Cx.15 duzias",
+      innerUnitCount: 15,
+      totalUsableAmount: 180,
+    },
+    {
+      name: "Eggs Class M cx 2 dozen",
+      innerUnitCount: 2,
+      totalUsableAmount: 24,
+    },
+  ])("parses $name", ({ name, innerUnitCount, totalUsableAmount }) => {
+    const structure = parsePurchaseStructureFromText(name);
+    expect(structure).not.toBeNull();
+    expect(structure?.tier).toBe("caixa_dozen_count");
+    expect(structure?.purchaseQuantity).toBe(1);
+    expect(structure?.innerUnitCount).toBe(innerUnitCount);
+    expect(structure?.innerUnitType).toBe("dozen");
+    expect(structure?.unitSize).toBe(12);
+    expect(structure?.unitMeasurement).toBe("un");
+    expect(structure?.totalUsableAmount).toBe(totalUsableAmount);
+    expect(structure?.usableUnit).toBe("un");
+    expect(purchaseStructureMultiplierChain(structure!).expression).toBe(
+      `1 × ${innerUnitCount} × 12 un`,
+    );
+  });
+
+  it.each([
+    { name: "Chocolate Pantagruel 10x200g", tier: "count_size" },
+    { name: "Caixa 40 un x 180g", tier: "caixa_units_size" },
+  ])("does not steal $name from $tier", ({ name, tier }) => {
+    const structure = parsePurchaseStructureFromText(name);
+    expect(structure?.tier).toBe(tier);
+  });
+});
+
 describe("parsePurchaseStructureFromText — beverage cl pack patterns", () => {
   function expectClPackStructure(
     input: string,
@@ -830,17 +882,17 @@ describe("size_count outer-pack scaling — Mozzarella fix", () => {
       name: "ACQUA S.PELLEGRINO (CX 75CL*15)",
       rowQuantity: 2,
       rowUnit: "un",
-      usable: 11250,
-      usableSource: "structure_total" as const,
-      purchaseContainerCount: 1,
+      usable: 22500,
+      usableSource: "structure_scaled_outer" as const,
+      purchaseContainerCount: 2,
     },
     {
       name: "SanPellegrino - Acqua in vitro 75cl x 15ud",
       rowQuantity: 2,
       rowUnit: "un",
-      usable: 11250,
-      usableSource: "structure_total" as const,
-      purchaseContainerCount: 1,
+      usable: 22500,
+      usableSource: "structure_scaled_outer" as const,
+      purchaseContainerCount: 2,
     },
   ] as const)(
     "$name (row $rowQuantity $rowUnit) → $usable g/ml",
@@ -875,6 +927,76 @@ describe("size_count outer-pack scaling — Mozzarella fix", () => {
     // Structured purchaseContainerCount reflects inner pack count (8), not outer invoice qty.
     expect(resolved.purchaseContainerCount).toBe(8);
   });
+});
+
+describe("count_size outer-case scaling — Nata / Chocolate fix", () => {
+  it.each([
+    {
+      name: "Nata Culinaria 22% Reny Picot 6x1 Lt",
+      rowQuantity: 5,
+      rowUnit: "cx",
+      usable: 30000,
+      usableSource: "structure_scaled_outer" as const,
+      purchaseContainerCount: 5,
+    },
+    {
+      name: "Nata Reny Picot 22% 6x1L",
+      rowQuantity: 5,
+      rowUnit: "cx",
+      usable: 30000,
+      usableSource: "structure_scaled_outer" as const,
+      purchaseContainerCount: 5,
+    },
+    {
+      name: "Chocolate Culinaria Pantagruel 10x200 g",
+      rowQuantity: 2,
+      rowUnit: "cx",
+      usable: 4000,
+      usableSource: "structure_scaled_outer" as const,
+      purchaseContainerCount: 2,
+    },
+    {
+      name: "Chocolate Pantagruel 10x200g",
+      rowQuantity: 2,
+      rowUnit: "cx",
+      usable: 4000,
+      usableSource: "structure_scaled_outer" as const,
+      purchaseContainerCount: 2,
+    },
+    {
+      name: "Açucar Branco METRO Chef 10x1 Kg",
+      rowQuantity: 1,
+      rowUnit: "cx",
+      usable: 10000,
+      usableSource: "structure_total" as const,
+      purchaseContainerCount: 1,
+    },
+    {
+      name: "24x80g",
+      rowQuantity: 2,
+      rowUnit: "un",
+      usable: 1920,
+      usableSource: "structure_total" as const,
+      purchaseContainerCount: 1,
+    },
+  ] as const)(
+    "$name (row $rowQuantity $rowUnit) → $usable g/ml",
+    ({ name, rowQuantity, rowUnit, usable, usableSource, purchaseContainerCount }) => {
+      const structure = parsePurchaseStructureFromText(name);
+      expect(structure).not.toBeNull();
+      const derived = computeUsableFromPurchaseStructure(structure!, rowQuantity, rowUnit);
+      expect(derived.usableQuantity).toBe(usable);
+      expect(derived.usableSource).toBe(usableSource);
+      expect(derived.purchaseContainerCount).toBe(purchaseContainerCount);
+
+      const resolved = resolveInvoiceLinePurchaseFormat({
+        name,
+        quantity: rowQuantity,
+        unit: rowUnit,
+      });
+      expect(resolved.normalizedUsableQuantity).toBe(usable);
+    },
+  );
 });
 
 describe("size_count weight-billed row — Guanciale fix", () => {

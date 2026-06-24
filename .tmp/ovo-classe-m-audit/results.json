@@ -1,0 +1,491 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "auditedAt": "2026-06-24T00:26:56.958Z",
+  "mode": "STRICT_READ_ONLY",
+  "product": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+  "canonicalName": "Ovo classe M",
+  "bidfoodInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+  "verdict": "C",
+  "verdictOptions": {
+    "A": "Correct",
+    "B": "Display bug",
+    "C": "Missing operational conversion",
+    "D": "Architecture ambiguity",
+    "E": "Data inconsistency"
+  },
+  "verdictQuestion": "How does Marginly intend to cost 1 egg in a recipe when purchase is 1 case of 15 dozen eggs for €38.44?",
+  "verdictAnswer": "Current code persists purchase_quantity=1, cost_base_unit=un → ingredientLineCostEur(N, fields, { recipeUnit: 'un' }) = N × €38.44 (treats one recipe 'un' as one priced purchase unit = whole case). No pipeline stage parses '15 dúzias' into 180 eggs; computeEffectiveUsableCost returns null so Operational Cost is suppressed. Architecture intent for countable eggs (inferCountableCostUnit → 'egg') is unreachable without a usable per-unit denominator.",
+  "q1_dbState": {
+    "ingredient_id": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+    "name": "Ovo classe M",
+    "current_price": 38.44,
+    "purchase_quantity": 1,
+    "purchase_unit": "un",
+    "cost_base_unit": "un",
+    "usable_quantity": null,
+    "usable_unit": null,
+    "purchase_structure_kind": "row_only"
+  },
+  "q1_dbStateTable": [
+    {
+      "field": "ingredient_id",
+      "currentValue": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+      "source": "ingredients.id"
+    },
+    {
+      "field": "name",
+      "currentValue": "Ovo classe M",
+      "source": "ingredients.name"
+    },
+    {
+      "field": "current_price",
+      "currentValue": 38.44,
+      "source": "ingredients.current_price (pack/case price)"
+    },
+    {
+      "field": "purchase_quantity",
+      "currentValue": 1,
+      "source": "ingredients.purchase_quantity"
+    },
+    {
+      "field": "purchase_unit",
+      "currentValue": "un",
+      "source": "ingredients.purchase_unit"
+    },
+    {
+      "field": "cost_base_unit",
+      "currentValue": "un",
+      "source": "ingredients.base_unit"
+    },
+    {
+      "field": "usable_quantity",
+      "currentValue": null,
+      "source": "resolveInvoiceLinePurchaseFormat.normalizedUsableQuantity (trace)"
+    },
+    {
+      "field": "usable_unit",
+      "currentValue": null,
+      "source": "resolveInvoiceLinePurchaseFormat.usableQuantityUnit (trace)"
+    },
+    {
+      "field": "purchase_structure_kind",
+      "currentValue": "row_only",
+      "source": "parsePurchaseStructureFromText.tier / structured.kind"
+    }
+  ],
+  "q2_latestPurchase": {
+    "invoice_item_id": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+    "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "quantity": 1,
+    "unit": "cx",
+    "unit_price": 38.44,
+    "total": 38.44,
+    "purchase_structure_kind": "row_only",
+    "parsedStructure": {
+      "tier": null,
+      "matchedText": null,
+      "structuredKind": "row_only",
+      "unitsPerPack": null
+    },
+    "persistedAs": "1 case",
+    "persistedInterpretation": "case (cx → 1 case via formatRowPurchaseQuantityLabel)",
+    "supplier": "Bidfood Portugal, SA",
+    "invoice_date": "2026-05-25"
+  },
+  "q3_fullTrace": [
+    {
+      "stage": "invoice_item (DB)",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 38.44,
+      "total": 38.44
+    },
+    {
+      "stage": "normalizeInvoiceItemFields",
+      "quantity": 1,
+      "unit": "cx"
+    },
+    {
+      "stage": "parsePurchaseStructureFromText",
+      "tier": null,
+      "matchedText": null,
+      "unitSize": null,
+      "unitMeasurement": null
+    },
+    {
+      "stage": "computeUsableFromPurchaseStructure",
+      "usableQuantity": null,
+      "usableUnit": null,
+      "usableSource": null
+    },
+    {
+      "stage": "resolveInvoiceLinePurchaseFormat",
+      "kind": "row_only",
+      "normalizedUsableQuantity": null,
+      "usableQuantityUnit": null,
+      "purchaseContainerCount": 1,
+      "purchaseContainerUnit": "cx",
+      "inferred": {
+        "purchase_quantity": 1,
+        "purchase_unit": null,
+        "base_unit": null,
+        "package_type": "caixa",
+        "package_count": null,
+        "confidence": 0,
+        "reason": "no unit tokens matched",
+        "purchase_unit_count": 1,
+        "pack_size": null,
+        "pack_size_unit": null,
+        "size_is_metadata_only": false,
+        "normalized_stock_quantity": null,
+        "stock_unit": null,
+        "recipe_usage_unit": null,
+        "conversion_hint": null
+      }
+    },
+    {
+      "stage": "resolveUnitsPerPack",
+      "unitsPerPack": null
+    },
+    {
+      "stage": "resolveUsablePerPricedUnit",
+      "perUnit": null
+    },
+    {
+      "stage": "computeEffectiveUsableCost",
+      "effective": null
+    },
+    {
+      "stage": "resolveInvoiceLinePricingPresentation",
+      "priceDisplay": "€38.44 / case",
+      "effectiveUsableCostLabel": null
+    },
+    {
+      "stage": "procurementPackFieldsFromInvoiceLine",
+      "fields": {
+        "current_price": 38.44,
+        "purchase_quantity": 1,
+        "purchase_unit": "un",
+        "base_unit": "un",
+        "unit": "un",
+        "includeCatalogUnitFields": true
+      }
+    },
+    {
+      "stage": "operationalCostFieldsFromInvoiceLine (persistence)",
+      "fields": {
+        "current_price": 38.44,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un"
+      }
+    },
+    {
+      "stage": "recipeOperationalCostFieldsFromInvoiceLine",
+      "fields": {
+        "current_price": 38.44,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un"
+      }
+    },
+    {
+      "stage": "buildLastPurchaseCostPresentation (detail UI)",
+      "lastPurchase": "1 case",
+      "procurementCost": "€38.44 / case",
+      "operationalCost": null
+    },
+    {
+      "stage": "inferUnitFamily",
+      "unitFamily": "countable"
+    }
+  ],
+  "q4_intendedOperationalUnit": {
+    "selected": "D",
+    "options": {
+      "A": "case",
+      "B": "dozen",
+      "C": "egg",
+      "D": "unclear"
+    },
+    "evidence": [
+      "inferCountableCostUnit(name) returns 'egg' when computeEffectiveUsableCost reaches countable branch — but only if resolveUsablePerPricedUnit yields un with amount>0",
+      "resolveUsablePerPricedUnit returns null for row_only (no normalizedUsableQuantity)",
+      "resolveCountablePurchaseQuantityForCost(cx, row_only) → purchase_quantity=1 (resolveUnitsPerPack null)",
+      "No dozen/dúzia parser in stock-normalization.ts or invoice-purchase-format.ts",
+      "Product name embeds 'Cx.15 dúzias' but structured.kind=row_only — nested count not extracted"
+    ]
+  },
+  "q5_recipeCosting": {
+    "formula": "effectiveIngredientUnitCostEur = current_price / max(purchase_quantity, 1); ingredientLineCostEur(qty, fields, { recipeUnit: 'un' }) via directCountableLineCostEur when recipe unit is un",
+    "sourceFields": {
+      "current_price": 38.44,
+      "purchase_quantity": 1,
+      "cost_base_unit": "un"
+    },
+    "dbPersistedFields": {
+      "current_price": 38.44,
+      "purchase_quantity": 1,
+      "cost_base_unit": "un"
+    },
+    "scenarios": [
+      {
+        "fromInvoiceTrace": {
+          "eggCount": 1,
+          "formula": "ingredientLineCostEur(qty, { current_price, purchase_quantity, cost_base_unit }, { recipeUnit: 'un' })",
+          "unitCostEur": 38.44,
+          "effectiveIngredientUnitCostEur": 38.44,
+          "lineCostRecipeUn": 38.44,
+          "lineCostRecipeG60gPerEgg": null,
+          "impliedPerEggIf180InCase": 0.21355555555555555,
+          "impliedPerEggIf1UnIsCase": 38.44
+        },
+        "fromDbIngredient": {
+          "eggCount": 1,
+          "formula": "ingredientLineCostEur(qty, { current_price, purchase_quantity, cost_base_unit }, { recipeUnit: 'un' })",
+          "unitCostEur": 38.44,
+          "effectiveIngredientUnitCostEur": 38.44,
+          "lineCostRecipeUn": 38.44,
+          "lineCostRecipeG60gPerEgg": null,
+          "impliedPerEggIf180InCase": 0.21355555555555555,
+          "impliedPerEggIf1UnIsCase": 38.44
+        }
+      },
+      {
+        "fromInvoiceTrace": {
+          "eggCount": 2,
+          "formula": "ingredientLineCostEur(qty, { current_price, purchase_quantity, cost_base_unit }, { recipeUnit: 'un' })",
+          "unitCostEur": 38.44,
+          "effectiveIngredientUnitCostEur": 38.44,
+          "lineCostRecipeUn": 76.88,
+          "lineCostRecipeG60gPerEgg": null,
+          "impliedPerEggIf180InCase": 0.21355555555555555,
+          "impliedPerEggIf1UnIsCase": 38.44
+        },
+        "fromDbIngredient": {
+          "eggCount": 2,
+          "formula": "ingredientLineCostEur(qty, { current_price, purchase_quantity, cost_base_unit }, { recipeUnit: 'un' })",
+          "unitCostEur": 38.44,
+          "effectiveIngredientUnitCostEur": 38.44,
+          "lineCostRecipeUn": 76.88,
+          "lineCostRecipeG60gPerEgg": null,
+          "impliedPerEggIf180InCase": 0.21355555555555555,
+          "impliedPerEggIf1UnIsCase": 38.44
+        }
+      },
+      {
+        "fromInvoiceTrace": {
+          "eggCount": 6,
+          "formula": "ingredientLineCostEur(qty, { current_price, purchase_quantity, cost_base_unit }, { recipeUnit: 'un' })",
+          "unitCostEur": 38.44,
+          "effectiveIngredientUnitCostEur": 38.44,
+          "lineCostRecipeUn": 230.64,
+          "lineCostRecipeG60gPerEgg": null,
+          "impliedPerEggIf180InCase": 0.21355555555555555,
+          "impliedPerEggIf1UnIsCase": 38.44
+        },
+        "fromDbIngredient": {
+          "eggCount": 6,
+          "formula": "ingredientLineCostEur(qty, { current_price, purchase_quantity, cost_base_unit }, { recipeUnit: 'un' })",
+          "unitCostEur": 38.44,
+          "effectiveIngredientUnitCostEur": 38.44,
+          "lineCostRecipeUn": 230.64,
+          "lineCostRecipeG60gPerEgg": null,
+          "impliedPerEggIf180InCase": 0.21355555555555555,
+          "impliedPerEggIf1UnIsCase": 38.44
+        }
+      },
+      {
+        "fromInvoiceTrace": {
+          "eggCount": 12,
+          "formula": "ingredientLineCostEur(qty, { current_price, purchase_quantity, cost_base_unit }, { recipeUnit: 'un' })",
+          "unitCostEur": 38.44,
+          "effectiveIngredientUnitCostEur": 38.44,
+          "lineCostRecipeUn": 461.28,
+          "lineCostRecipeG60gPerEgg": null,
+          "impliedPerEggIf180InCase": 0.21355555555555555,
+          "impliedPerEggIf1UnIsCase": 38.44
+        },
+        "fromDbIngredient": {
+          "eggCount": 12,
+          "formula": "ingredientLineCostEur(qty, { current_price, purchase_quantity, cost_base_unit }, { recipeUnit: 'un' })",
+          "unitCostEur": 38.44,
+          "effectiveIngredientUnitCostEur": 38.44,
+          "lineCostRecipeUn": 461.28,
+          "lineCostRecipeG60gPerEgg": null,
+          "impliedPerEggIf180InCase": 0.21355555555555555,
+          "impliedPerEggIf1UnIsCase": 38.44
+        }
+      }
+    ],
+    "hypotheticalIf180Eggs": {
+      "purchase_quantity": 180,
+      "unitCostPerEgg": 0.21355555555555555,
+      "lineCosts": [
+        {
+          "eggs": 1,
+          "cost": 0.21355555555555555
+        },
+        {
+          "eggs": 2,
+          "cost": 0.4271111111111111
+        },
+        {
+          "eggs": 6,
+          "cost": 1.2813333333333334
+        },
+        {
+          "eggs": 12,
+          "cost": 2.562666666666667
+        }
+      ]
+    }
+  },
+  "q6_compare": {
+    "ovo": {
+      "ingredient": "Ovo classe M",
+      "procurement": "€38.44 / case",
+      "operational": null,
+      "recipeUnit": "un",
+      "purchase_quantity": 1
+    },
+    "tomilho": {
+      "ingredient": "Tomilho",
+      "procurement": "€2.06 / bunch",
+      "operational": null,
+      "recipeUnit": "un",
+      "purchase_quantity": 1
+    },
+    "manjericao": {
+      "ingredient": "Manjericão",
+      "procurement": "€2.06 / bunch",
+      "operational": "€20.60 / kg",
+      "recipeUnit": "g",
+      "purchase_quantity": 100
+    },
+    "salada": {
+      "ingredient": "Salada ibérica",
+      "procurement": "€2.19 / pack",
+      "operational": "€8.76 / kg",
+      "recipeUnit": "g",
+      "purchase_quantity": 250
+    }
+  },
+  "q7_shouldOperationalDisplay": {
+    "selected": [
+      "A",
+      "B",
+      "C"
+    ],
+    "options": {
+      "A": "no usable conversion — resolveUsablePerPricedUnit returns null (row_only, no parsed dozen count)",
+      "B": "countable architecture — inferUnitFamily(cx)→countable; operational display suppressed when no per-unit usable",
+      "C": "display suppression — effectiveUsableCostLabel omitted when computeEffectiveUsableCost returns null",
+      "D": "bug — should show €/egg but pipeline fails to parse Cx.15 dúzias"
+    },
+    "evidence": {
+      "resolveUsablePerPricedUnit": null,
+      "computeEffectiveUsableCost": null,
+      "effectiveUsableCostLabel": null,
+      "structuredKind": "row_only",
+      "isCasePieceWeight": false,
+      "unitFamily": "countable"
+    },
+    "operationalShown": false
+  },
+  "requiredTable": [
+    {
+      "concept": "Purchase Unit",
+      "current": "1 case",
+      "intendedByArchitecture": "case — invoice row cx priced as one procurement container; formatRowPurchaseQuantityLabel maps cx → case"
+    },
+    {
+      "concept": "Procurement Unit",
+      "current": "€38.44 / case",
+      "intendedByArchitecture": "case — resolvePriceSuffix maps cx → case; unit_price is €/case on invoice"
+    },
+    {
+      "concept": "Operational Unit",
+      "current": "null / not shown",
+      "intendedByArchitecture": "egg (countable) — inferCountableCostUnit returns 'egg' when usable per-unit count is derivable; requires parsing nested 15×dozen structure"
+    },
+    {
+      "concept": "Recipe Consumption Unit",
+      "current": "un (persisted base_unit=un, purchase_quantity=1)",
+      "intendedByArchitecture": "un (egg) — recipeOperationalCostFieldsFromInvoiceLine uses cost_base_unit=un; denominator should be total eggs per case (15 dozen = 180) not 1"
+    }
+  ],
+  "ovoTrace": {
+    "invoiceItemId": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+    "isCasePieceWeight": false,
+    "procurement": {
+      "current_price": 38.44,
+      "purchase_quantity": 1,
+      "purchase_unit": "un",
+      "base_unit": "un",
+      "unit": "un",
+      "includeCatalogUnitFields": true
+    },
+    "persistFields": {
+      "current_price": 38.44,
+      "purchase_quantity": 1,
+      "cost_base_unit": "un"
+    },
+    "recipeFields": {
+      "current_price": 38.44,
+      "purchase_quantity": 1,
+      "cost_base_unit": "un"
+    },
+    "structuredFields": {
+      "purchase_quantity": 1,
+      "purchase_unit": "un",
+      "base_unit": "un"
+    }
+  },
+  "ovoIngredient": {
+    "id": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+    "name": "Ovo classe M",
+    "current_price": 38.44,
+    "purchase_quantity": 1,
+    "purchase_unit": "un",
+    "base_unit": "un",
+    "unit": "un",
+    "normalized_name": "ovo classe m",
+    "supplier": null
+  },
+  "ovoMatch": {
+    "ingredient_id": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+    "status": "confirmed",
+    "match_kind": "confirmed-alias"
+  },
+  "priceHistory": [
+    {
+      "id": "0e70f19d-fdf2-4201-8a0c-0fa65712afd7",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "new_price": 38.44,
+      "created_at": "2026-05-25T12:00:00+00:00"
+    }
+  ],
+  "aliases": [
+    {
+      "alias_name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "confirmed_by_user": true,
+      "supplier_name": "Bidfood Portugal"
+    }
+  ],
+  "ovoItems": [
+    {
+      "id": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 38.44,
+      "total": 38.44,
+      "created_at": "2026-06-20T01:24:45.305604+00:00",
+      "invoices": {
+        "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice_date": "2026-05-25",
+        "supplier_name": "Bidfood Portugal, SA"
+      }
+    }
+  ]
+}

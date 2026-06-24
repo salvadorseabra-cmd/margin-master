@@ -6,6 +6,7 @@ import {
   formatUsableStockQuantityLabel,
   hasRichPackageSemantics,
   isCaseRowWithEmbeddedPieceWeightOnly,
+  shouldApplyCasePieceWeightOperationalShortcut,
   isCollapsedMeaninglessPurchaseLabel,
   isCollapsedMeaninglessUsable,
   isMeaninglessUsableStockLabel,
@@ -565,6 +566,26 @@ describe("isCaseRowWithEmbeddedPieceWeightOnly", () => {
   it("does not flag explicit multi-unit case structures", () => {
     expect(
       isCaseRowWithEmbeddedPieceWeightOnly("Burger Angus 180gr (Caixa 40 un)", "cx"),
+    ).toBe(false);
+  });
+
+  it("detects em pack row with embedded weight (Salada Ibérica)", () => {
+    expect(
+      isCaseRowWithEmbeddedPieceWeightOnly("Salada Ibérica FSTK EMB. 250g", "em"),
+    ).toBe(true);
+  });
+});
+
+describe("shouldApplyCasePieceWeightOperationalShortcut", () => {
+  it("applies wholesale case shortcut for cx rows only", () => {
+    expect(
+      shouldApplyCasePieceWeightOperationalShortcut("CARNE HAMBURGUER ANGUS 180G", "cx"),
+    ).toBe(true);
+  });
+
+  it("does not apply shortcut for em/pack rows with embedded weight", () => {
+    expect(
+      shouldApplyCasePieceWeightOperationalShortcut("Salada Ibérica FSTK EMB. 250g", "em"),
     ).toBe(false);
   });
 });

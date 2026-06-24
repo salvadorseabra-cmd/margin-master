@@ -1,0 +1,332 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "auditedAt": "2026-06-24T00:05:06.368Z",
+  "mode": "STRICT_READ_ONLY",
+  "product": "Salada Ibérica FSTK EMB. 250g",
+  "verdict": "C",
+  "verdictQuestion": "Why is Salada Ibérica showing €2.19 / case as Operational Cost?",
+  "verdictAnswer": "isCaseRowWithEmbeddedPieceWeightOnly(name, em)=true for bare_measure 250g embed; computeEffectiveUsableCost short-circuits to {cost: unitPrice, unit: 'case'}",
+  "q1_dbState": {
+    "ingredient_id": "47cd8362-79f4-4285-8491-f016229eaa21",
+    "name": "Salada ibérica",
+    "current_price": 2.19,
+    "purchase_quantity": 250,
+    "purchase_unit": "g",
+    "procurement_unit": "pack",
+    "operational_unit": "case",
+    "usable_quantity": 250,
+    "usable_unit": "g",
+    "purchase_structure_kind": "bare_measure",
+    "catalog": {
+      "base_unit": "g",
+      "unit": "g"
+    },
+    "match": {
+      "ingredient_id": "47cd8362-79f4-4285-8491-f016229eaa21",
+      "status": "confirmed",
+      "match_kind": "confirmed-alias"
+    }
+  },
+  "q2_latestPurchase": {
+    "invoice_item_id": "593e7560-ba2a-4c60-8300-ff34a26335b9",
+    "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "quantity": 4,
+    "unit": "em",
+    "unit_price": 2.19,
+    "line_total": 8.76,
+    "purchase_structure_kind": "bare_measure",
+    "persisted_as": "4 packs",
+    "supplier": "Bidfood Portugal, SA",
+    "invoice_date": "2026-05-25"
+  },
+  "q3_operationalTrace": {
+    "pipeline": [
+      {
+        "stage": "invoice_item (DB)",
+        "quantity": 4,
+        "unit": "em",
+        "unit_price": 2.19,
+        "total": 8.76
+      },
+      {
+        "stage": "normalizeInvoiceItemFields",
+        "quantity": 4,
+        "unit": "em"
+      },
+      {
+        "stage": "parsePurchaseStructureFromText",
+        "tier": "bare_measure",
+        "matchedText": "250g",
+        "unitSize": 250,
+        "unitMeasurement": "g"
+      },
+      {
+        "stage": "computeUsableFromPurchaseStructure",
+        "usableQuantity": 250,
+        "usableUnit": "g",
+        "usableSource": "structure_total",
+        "purchaseContainerCount": 1
+      },
+      {
+        "stage": "resolveInvoiceLinePurchaseFormat",
+        "kind": "weight_or_volume",
+        "purchaseContainerCount": 1,
+        "purchaseContainerUnit": "g",
+        "normalizedUsableQuantity": 250,
+        "usableQuantityUnit": "g",
+        "packageQuantity": 250,
+        "packageMeasurementUnit": "g"
+      },
+      {
+        "stage": "isCaseRowWithEmbeddedPieceWeightOnly",
+        "result": true
+      },
+      {
+        "stage": "resolveUsablePerPricedUnit",
+        "perUnit": {
+          "amount": 250,
+          "unit": "g"
+        }
+      },
+      {
+        "stage": "computeEffectiveUsableCost",
+        "effective": {
+          "cost": 2.19,
+          "unit": "case"
+        }
+      },
+      {
+        "stage": "resolveInvoiceLinePricingPresentation",
+        "priceDisplay": "€2.19 / pack",
+        "effectiveUsableCostLabel": "€2.19 / case",
+        "usableStockLabel": null,
+        "purchaseQuantityLine": "4 packs"
+      },
+      {
+        "stage": "buildLastPurchaseCostPresentation (detail UI)",
+        "lastPurchase": "4 packs",
+        "procurementCost": "€2.19 / pack",
+        "operationalCost": "€2.19 / case"
+      },
+      {
+        "stage": "operationalCostFieldsFromInvoiceLine (persistence)",
+        "fields": {
+          "current_price": 2.19,
+          "purchase_quantity": 250,
+          "cost_base_unit": "g"
+        }
+      },
+      {
+        "stage": "recipeOperationalCostFieldsFromInvoiceLine",
+        "fields": {
+          "current_price": 2.19,
+          "purchase_quantity": 250,
+          "cost_base_unit": "g"
+        }
+      }
+    ]
+  },
+  "q4_caseOrigin": {
+    "selected": "C",
+    "evidence": {
+      "isCaseRowWithEmbeddedPieceWeightOnly": true,
+      "rowUnit": "em",
+      "procurementSuffix": "pack",
+      "operationalUnit": "case",
+      "computeEffectiveUsableCost": {
+        "cost": 2.19,
+        "unit": "case"
+      },
+      "normalizedUsableQuantityNulledByCasePath": true,
+      "note": "isCaseRowWithEmbeddedPieceWeightOnly(name, em)=true for bare_measure 250g embed; computeEffectiveUsableCost short-circuits to {cost: unitPrice, unit: 'case'}"
+    }
+  },
+  "q4Options": {
+    "A": "Data corruption — wrong values stored in DB",
+    "B": "Purchase-unit mapping — procurement suffix wrong",
+    "C": "Operational-unit derivation — computeEffectiveUsableCost / isCaseRowWithEmbeddedPieceWeightOnly",
+    "D": "UI rendering bug — detail panel mislabels stored values",
+    "E": "Mixed — multiple stages contribute"
+  },
+  "q5_controls": {
+    "ovo": {
+      "label": "Ovo classe M",
+      "invoiceQuantity": 1,
+      "invoiceUnit": "cx",
+      "rowQtyLabel": "1 case",
+      "procurementCost": "€38.44 / case",
+      "operationalCost": null,
+      "isCasePieceWeight": false,
+      "effectiveUnit": null,
+      "purchaseStructureKind": "row_only"
+    },
+    "tomilho": {
+      "label": "Tomilho",
+      "invoiceQuantity": 1,
+      "invoiceUnit": "mo",
+      "rowQtyLabel": "1 bunch",
+      "procurementCost": "€2.06 / bunch",
+      "operationalCost": null,
+      "isCasePieceWeight": false,
+      "effectiveUnit": null,
+      "purchaseStructureKind": "row_only"
+    },
+    "manjericao": {
+      "label": "Manjericão",
+      "invoiceQuantity": 5,
+      "invoiceUnit": "mo",
+      "rowQtyLabel": "5 bunches",
+      "procurementCost": "€2.06 / bunch",
+      "operationalCost": "€20.60 / kg",
+      "isCasePieceWeight": false,
+      "effectiveUnit": "kg",
+      "purchaseStructureKind": "inferred"
+    }
+  },
+  "q6_consistency": {
+    "procurementDisplayRule": "resolvePriceSuffix maps row unit em → ROW_UNIT_PRICE_SUFFIX['em'] = 'pack'; priceDisplay = €{unit_price} / pack",
+    "operationalDisplayRule": "isCaseRowWithEmbeddedPieceWeightOnly triggers computeEffectiveUsableCost early return { cost: unitPrice, unit: 'case' } — skips kg/L derivation",
+    "dataModelImplication": "Procurement and operational use different code paths: procurement via resolvePriceSuffix (em→pack); operational via isCaseRowWithEmbeddedPieceWeightOnly (em in PACK_CONTAINER_ROW_UNITS + bare_measure → hardcoded 'case')",
+    "samePriceDifferentSuffix": true
+  },
+  "requiredTable": [
+    {
+      "field": "Invoice quantity",
+      "currentValue": "4",
+      "source": "invoice_items.quantity"
+    },
+    {
+      "field": "Invoice unit (DB)",
+      "currentValue": "em",
+      "source": "invoice_items.unit"
+    },
+    {
+      "field": "Unit price (effective)",
+      "currentValue": "€2.19",
+      "source": "invoice_items.unit_price (post discount binding)"
+    },
+    {
+      "field": "Line total",
+      "currentValue": "€8.76",
+      "source": "invoice_items.total"
+    },
+    {
+      "field": "Last Purchase label",
+      "currentValue": "4 packs",
+      "source": "formatRowPurchaseQuantityLabel"
+    },
+    {
+      "field": "Procurement Cost",
+      "currentValue": "€2.19 / pack",
+      "source": "resolveInvoiceLinePricingPresentation.priceDisplay"
+    },
+    {
+      "field": "Operational Cost",
+      "currentValue": "€2.19 / case",
+      "source": "resolveInvoiceLinePricingPresentation.effectiveUsableCostLabel"
+    },
+    {
+      "field": "Purchase structure tier",
+      "currentValue": "bare_measure",
+      "source": "parsePurchaseStructureFromText"
+    },
+    {
+      "field": "isCaseRowWithEmbeddedPieceWeightOnly",
+      "currentValue": "true",
+      "source": "invoice-purchase-format.ts"
+    },
+    {
+      "field": "normalizedUsableQuantity",
+      "currentValue": "250 g",
+      "source": "resolveInvoiceLinePurchaseFormat"
+    },
+    {
+      "field": "ingredients.purchase_unit",
+      "currentValue": "g",
+      "source": "ingredients table"
+    },
+    {
+      "field": "ingredients.current_price",
+      "currentValue": "€2.19",
+      "source": "ingredients table"
+    }
+  ],
+  "saladaTrace": {
+    "invoiceItemId": "593e7560-ba2a-4c60-8300-ff34a26335b9",
+    "isCasePieceWeight": true,
+    "procurement": {
+      "current_price": 2.19,
+      "purchase_quantity": 250,
+      "purchase_unit": "g",
+      "base_unit": "g",
+      "unit": "g",
+      "includeCatalogUnitFields": false
+    },
+    "persistFields": {
+      "current_price": 2.19,
+      "purchase_quantity": 250,
+      "cost_base_unit": "g"
+    },
+    "recipeFields": {
+      "current_price": 2.19,
+      "purchase_quantity": 250,
+      "cost_base_unit": "g"
+    },
+    "purchaseUnitResolution": {
+      "unit": "em",
+      "source": "ocr_explicit"
+    },
+    "structuredFields": {
+      "purchase_quantity": 250,
+      "purchase_unit": "g",
+      "base_unit": "g"
+    }
+  },
+  "saladaItems": [
+    {
+      "id": "593e7560-ba2a-4c60-8300-ff34a26335b9",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "name": "Salada Ibérica FSTK EMB. 250g",
+      "quantity": 4,
+      "unit": "em",
+      "unit_price": 2.19,
+      "total": 8.76,
+      "created_at": "2026-06-20T01:24:45.305604+00:00",
+      "invoices": {
+        "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice_date": "2026-05-25",
+        "supplier_name": "Bidfood Portugal, SA"
+      }
+    }
+  ],
+  "saladaIngredient": {
+    "id": "47cd8362-79f4-4285-8491-f016229eaa21",
+    "name": "Salada ibérica",
+    "current_price": 2.19,
+    "purchase_quantity": 250,
+    "purchase_unit": "g",
+    "base_unit": "g",
+    "unit": "g",
+    "normalized_name": "salada iberica",
+    "supplier": null
+  },
+  "saladaMatch": {
+    "ingredient_id": "47cd8362-79f4-4285-8491-f016229eaa21",
+    "status": "confirmed",
+    "match_kind": "confirmed-alias"
+  },
+  "priceHistory": [
+    {
+      "id": "66339369-9df8-4f43-bc17-189bd39ab38e",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "new_price": 0.00876,
+      "created_at": "2026-05-25T12:00:00+00:00"
+    }
+  ],
+  "aliases": [
+    {
+      "alias_name": "Salada Ibérica FSTK EMB. 250g",
+      "confirmed_by_user": true
+    }
+  ]
+}

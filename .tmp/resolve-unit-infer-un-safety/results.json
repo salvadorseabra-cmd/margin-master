@@ -1,0 +1,3264 @@
+{
+  "generatedAt": "2026-06-23T09:54:40.640Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "mode": "STRICT_READ_ONLY_INFER_UN_SAFETY",
+  "proposedRule": "OCR unit null AND structured.kind === weight_or_volume AND quantity > 1 → infer un",
+  "corpus": {
+    "totalItems": 52,
+    "weightOrVolumeNullOcrQtyGt1": 16,
+    "proposedWouldInferUn": 16,
+    "dbRowsMatchingGate": 2,
+    "calcRiskIfProposed": 30,
+    "displayOnlyChanges": 6
+  },
+  "needsFixMatrix": [
+    {
+      "product": "Paccheri 500g",
+      "key": "paccheri",
+      "found": true,
+      "dbUnit": null,
+      "currentResolvedUnit": null,
+      "proposedInferUnUnit": "un",
+      "fixesGap": true
+    },
+    {
+      "product": "Ginger Beer 0.20cl",
+      "key": "ginger",
+      "found": true,
+      "dbUnit": null,
+      "currentResolvedUnit": null,
+      "proposedInferUnUnit": "un",
+      "fixesGap": true
+    }
+  ],
+  "regressionMatrix": [
+    {
+      "product": "Peroni 33cl*24",
+      "key": "peroni",
+      "found": true,
+      "dbUnit": "un",
+      "dbQuantity": 24,
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "un",
+      "nullOcrResolvedUnit": "un",
+      "proposedInferUnUnit": "un",
+      "wouldChangeVsCurrent": false,
+      "wouldChangeUnderNullOcr": false,
+      "impactIfProposed": "NONE",
+      "isCounterWeightPriced": false
+    },
+    {
+      "product": "Pellegrino 75cl×15",
+      "key": "pellegrino",
+      "found": true,
+      "dbUnit": "un",
+      "dbQuantity": 2,
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "un",
+      "nullOcrResolvedUnit": "un",
+      "proposedInferUnUnit": "un",
+      "wouldChangeVsCurrent": false,
+      "wouldChangeUnderNullOcr": false,
+      "impactIfProposed": "NONE",
+      "isCounterWeightPriced": false
+    },
+    {
+      "product": "Açúcar 10x1kg",
+      "key": "acucar",
+      "found": true,
+      "dbUnit": "cx",
+      "dbQuantity": 1,
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "cx",
+      "nullOcrResolvedUnit": "un",
+      "proposedInferUnUnit": "un",
+      "wouldChangeVsCurrent": true,
+      "wouldChangeUnderNullOcr": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "isCounterWeightPriced": false
+    },
+    {
+      "product": "Pomodori 2.5kg×6",
+      "key": "pomodori",
+      "found": true,
+      "dbUnit": "un",
+      "dbQuantity": 1,
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "un",
+      "nullOcrResolvedUnit": "un",
+      "proposedInferUnUnit": "un",
+      "wouldChangeVsCurrent": false,
+      "wouldChangeUnderNullOcr": false,
+      "impactIfProposed": "NONE",
+      "isCounterWeightPriced": false
+    },
+    {
+      "product": "Mozzarella 125g×8",
+      "key": "mozzarella",
+      "found": true,
+      "dbUnit": "un",
+      "dbQuantity": 10,
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "un",
+      "nullOcrResolvedUnit": "un",
+      "proposedInferUnUnit": "un",
+      "wouldChangeVsCurrent": false,
+      "wouldChangeUnderNullOcr": false,
+      "impactIfProposed": "NONE",
+      "isCounterWeightPriced": false
+    },
+    {
+      "product": "Guanciale",
+      "key": "guanciale",
+      "found": true,
+      "dbUnit": "un",
+      "dbQuantity": 5.996,
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "un",
+      "nullOcrResolvedUnit": "un",
+      "proposedInferUnUnit": "un",
+      "wouldChangeVsCurrent": false,
+      "wouldChangeUnderNullOcr": false,
+      "impactIfProposed": "NONE",
+      "isCounterWeightPriced": true
+    }
+  ],
+  "guancialeDeepDive": {
+    "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+    "dbQuantity": 5.996,
+    "dbUnit": "un",
+    "isCounterWeightPriced": true,
+    "structuredKindDb": "multi_unit_pack",
+    "structuredKindNullOcr": "multi_unit_pack",
+    "currentResolvedUnit": "un",
+    "nullOcrResolvedUnit": "un",
+    "proposedInferUnUnit": "un",
+    "gateWouldFireUnderNullOcr": false,
+    "impactIfProposed": "NONE",
+    "impactDetails": {
+      "impact": "NONE",
+      "labelCurrent": "6.00 un",
+      "labelProposed": "6.00 un",
+      "usableCurrent": 5996,
+      "usableProposed": 5996,
+      "usableUnitCurrent": "g",
+      "usableUnitProposed": "g",
+      "costCurrent": {
+        "cost": 10.830000000000002,
+        "unit": "kg"
+      },
+      "costProposed": {
+        "cost": 10.830000000000002,
+        "unit": "kg"
+      },
+      "procCurrent": {
+        "current_price": 10.83,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 999.9999999999999
+      },
+      "procProposed": {
+        "current_price": 10.83,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 999.9999999999999
+      },
+      "purchaseQtyCurrent": 1,
+      "purchaseQtyProposed": 1,
+      "displayDiffers": false,
+      "usableDiffers": false,
+      "costDiffers": false,
+      "procDiffers": false,
+      "purchaseQtyDiffers": false
+    },
+    "note": "Billed-weight path: non-integer qty 5.996 kg; name embeds 1,5kg*7 multipack marker"
+  },
+  "falsePositiveCandidates": [
+    {
+      "product": "Manteiga Coimbra s/Sal EMB 1 Kg",
+      "supplier": "Bidfood Portugal, SA",
+      "dbQuantity": 8,
+      "dbUnit": "kg",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "kg",
+      "proposedInferUnUnit": "un",
+      "isCounterWeightPriced": false,
+      "impactIfProposed": "CALCULATION_RISK"
+    },
+    {
+      "product": "Salada Ibérica FSTK EMB. 250g",
+      "supplier": "Bidfood Portugal, SA",
+      "dbQuantity": 4,
+      "dbUnit": "em",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "em",
+      "proposedInferUnUnit": "un",
+      "isCounterWeightPriced": false,
+      "impactIfProposed": "CALCULATION_RISK"
+    },
+    {
+      "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "supplier": "Emporio Italia, Lda.",
+      "dbQuantity": 2,
+      "dbUnit": "kg",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "kg",
+      "proposedInferUnUnit": "un",
+      "isCounterWeightPriced": false,
+      "impactIfProposed": "CALCULATION_RISK"
+    },
+    {
+      "product": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+      "supplier": "Emporio Italia, Lda.",
+      "dbQuantity": 4.3,
+      "dbUnit": "kg",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "kg",
+      "proposedInferUnUnit": "un",
+      "isCounterWeightPriced": true,
+      "impactIfProposed": "CALCULATION_RISK"
+    },
+    {
+      "product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+      "supplier": "Emporio Italia, Lda.",
+      "dbQuantity": 3.11,
+      "dbUnit": "kg",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "kg",
+      "proposedInferUnUnit": "un",
+      "isCounterWeightPriced": true,
+      "impactIfProposed": "CALCULATION_RISK"
+    },
+    {
+      "product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+      "supplier": "Emporio Italia, Lda.",
+      "dbQuantity": 1.83,
+      "dbUnit": "kg",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "kg",
+      "proposedInferUnUnit": "un",
+      "isCounterWeightPriced": true,
+      "impactIfProposed": "CALCULATION_RISK"
+    },
+    {
+      "product": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "supplier": "Emporio Italia, Lda.",
+      "dbQuantity": 2.6,
+      "dbUnit": "kg",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "kg",
+      "proposedInferUnUnit": "un",
+      "isCounterWeightPriced": true,
+      "impactIfProposed": "CALCULATION_RISK"
+    }
+  ],
+  "allRows": [
+    {
+      "invoiceItemId": "dd8e55d7-de5c-4520-bb6c-fa0d403b2619",
+      "invoiceId": "342d930b-7784-45d9-8db9-43e2a29baf61",
+      "supplier": "Mais Lenhas & Carvão",
+      "product": "Lenha para pizzaria",
+      "dbQuantity": 1,
+      "dbUnit": "m3",
+      "structuredKind": "row_only",
+      "structuredKindNullOcr": "inferred",
+      "currentResolvedUnit": "m3",
+      "currentResolutionSource": "fallback_null",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": null,
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "DISPLAY_ONLY",
+      "impactDetails": {
+        "impact": "DISPLAY_ONLY",
+        "labelCurrent": "1 m3",
+        "labelProposed": "1",
+        "usableCurrent": null,
+        "usableProposed": null,
+        "usableUnitCurrent": null,
+        "usableUnitProposed": null,
+        "costCurrent": null,
+        "costProposed": null,
+        "procCurrent": {
+          "current_price": 75,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "procProposed": {
+          "current_price": 75,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": null,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "7e6f6f69-81ed-42be-a062-e28ffc015f0c",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "product": "Filete de Anchoas Alconfirosa LI 495 g",
+      "dbQuantity": 2,
+      "dbUnit": "un",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "2 un",
+        "labelProposed": "2 un",
+        "usableCurrent": 990,
+        "usableProposed": 990,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 20.181818181818183,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 20.181818181818183,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 9.99,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 495
+        },
+        "procProposed": {
+          "current_price": 9.99,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 495
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "77d804e3-b2ff-4a06-b4df-a78d3ff405a5",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "product": "Ovo Líquido Past.Gema Dovo 1 Kg",
+      "dbQuantity": 6,
+      "dbUnit": "un",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": true,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "6 un",
+        "labelProposed": "6 un",
+        "usableCurrent": 6000,
+        "usableProposed": 6000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 10.49,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 10.49,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 10.49,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1000
+        },
+        "procProposed": {
+          "current_price": 10.49,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1000
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "86d75d64-4a8a-4fc5-95d5-cd352ba29b5f",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "product": "Pepinos Extra Uli Frasco 6x720 g",
+      "dbQuantity": 1,
+      "dbUnit": "cx",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "cx",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "multi_unit_pack",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "1 case",
+        "labelProposed": "1 un",
+        "usableCurrent": 4320,
+        "usableProposed": 4320,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 5.206018518518518,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 5.206018518518518,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 22.49,
+          "purchase_quantity": 6,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 4320
+        },
+        "procProposed": {
+          "current_price": 22.49,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 4320
+        },
+        "purchaseQtyCurrent": 6,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "c7c7f16b-917f-4ce6-80ad-e8484bda1bbe",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "product": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+      "dbQuantity": 1,
+      "dbUnit": "un",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "kg",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "1 un",
+        "labelProposed": "1 kg",
+        "usableCurrent": 1000,
+        "usableProposed": 1000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 13.1,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 13.1,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 13.1,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1000
+        },
+        "procProposed": {
+          "current_price": 13.1,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": true,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "8e36bac6-c3b6-4bc3-885c-e81514feba61",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "product": "Arroz Agulha Metro Chef 12x1 kg",
+      "dbQuantity": 1,
+      "dbUnit": "cx",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "cx",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "multi_unit_pack",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "1 case",
+        "labelProposed": "1 un",
+        "usableCurrent": 12000,
+        "usableProposed": 12000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 1.1624999999999999,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 1.1624999999999999,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 13.95,
+          "purchase_quantity": 12,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 12000
+        },
+        "procProposed": {
+          "current_price": 13.95,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 12000
+        },
+        "purchaseQtyCurrent": 12,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "fa0d0138-577e-42fe-9212-fe5f53c7ead8",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "product": "Chocolate Culinaria Pantagruel 10x200 g",
+      "dbQuantity": 2,
+      "dbUnit": "cx",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "cx",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "multi_unit_pack",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "2 cases",
+        "labelProposed": "2 un",
+        "usableCurrent": 4000,
+        "usableProposed": 2000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 14.995,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 29.99,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 29.99,
+          "purchase_quantity": 10,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 2000
+        },
+        "procProposed": {
+          "current_price": 29.99,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 2000
+        },
+        "purchaseQtyCurrent": 10,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "478442d5-cf8f-4e21-a905-01b7cc327fab",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "product": "Açucar Branco METRO Chef 10x1 Kg",
+      "dbQuantity": 1,
+      "dbUnit": "cx",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "cx",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "multi_unit_pack",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "1 case",
+        "labelProposed": "1 un",
+        "usableCurrent": 10000,
+        "usableProposed": 10000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 0.999,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 0.999,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 9.99,
+          "purchase_quantity": 10,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 10000
+        },
+        "procProposed": {
+          "current_price": 9.99,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 10000
+        },
+        "purchaseQtyCurrent": 10,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "2b5cea32-ec1f-4454-a4d9-cb4bb2612866",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "product": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+      "dbQuantity": 5,
+      "dbUnit": "cx",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "cx",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "multi_unit_pack",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "5 cases",
+        "labelProposed": "5 un",
+        "usableCurrent": 30000,
+        "usableProposed": 6000,
+        "usableUnitCurrent": "ml",
+        "usableUnitProposed": "ml",
+        "costCurrent": {
+          "cost": 3.1483333333333334,
+          "unit": "L"
+        },
+        "costProposed": {
+          "cost": 15.741666666666667,
+          "unit": "L"
+        },
+        "procCurrent": {
+          "current_price": 18.89,
+          "purchase_quantity": 6,
+          "cost_base_unit": "un",
+          "usable_volume_ml": 6000
+        },
+        "procProposed": {
+          "current_price": 18.89,
+          "purchase_quantity": 6000,
+          "cost_base_unit": "ml"
+        },
+        "purchaseQtyCurrent": 6,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "8476c916-26a1-4d2a-b6e7-f211560f6e95",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "product": "Filete de Anchovas Alconfrista Lt 495 g",
+      "dbQuantity": 2,
+      "dbUnit": "un",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "2 un",
+        "labelProposed": "2 un",
+        "usableCurrent": 990,
+        "usableProposed": 990,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 19.171717171717173,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 19.171717171717173,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 9.49,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 495
+        },
+        "procProposed": {
+          "current_price": 9.49,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 495
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "c3533ceb-8784-49de-a0a9-ecf168d68c40",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "product": "Ovo Líquido Past.Gema Dovo 1kg",
+      "dbQuantity": 6,
+      "dbUnit": "un",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": true,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "6 un",
+        "labelProposed": "6 un",
+        "usableCurrent": 6000,
+        "usableProposed": 6000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 10.19,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 10.19,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 10.19,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1000
+        },
+        "procProposed": {
+          "current_price": 10.19,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1000
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "a352ec6f-8e78-4752-9eee-47f900e4a916",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "product": "Pepinos Extra II Frasco 6X720g",
+      "dbQuantity": 1,
+      "dbUnit": "cx",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "cx",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "multi_unit_pack",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "1 case",
+        "labelProposed": "1 un",
+        "usableCurrent": 4320,
+        "usableProposed": 4320,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 5.090277777777777,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 5.090277777777777,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 21.99,
+          "purchase_quantity": 6,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 4320
+        },
+        "procProposed": {
+          "current_price": 21.99,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 4320
+        },
+        "purchaseQtyCurrent": 6,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "9af131b9-159f-48d6-807b-47b6124a9045",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "product": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+      "dbQuantity": 2,
+      "dbUnit": "un",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": true,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "2 un",
+        "labelProposed": "2 un",
+        "usableCurrent": 2000,
+        "usableProposed": 2000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 6.29,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 6.29,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 6.29,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1000
+        },
+        "procProposed": {
+          "current_price": 6.29,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1000
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "a5771209-414e-4fd4-81eb-2b1ba7cc52a6",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "product": "Arroz Agulha Metro Chef 12x1kg",
+      "dbQuantity": 1,
+      "dbUnit": "cx",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "cx",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "multi_unit_pack",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "1 case",
+        "labelProposed": "1 un",
+        "usableCurrent": 12000,
+        "usableProposed": 12000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 1.1208333333333333,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 1.1208333333333333,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 13.45,
+          "purchase_quantity": 12,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 12000
+        },
+        "procProposed": {
+          "current_price": 13.45,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 12000
+        },
+        "purchaseQtyCurrent": 12,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "11024922-0c2b-4daf-b178-06d622899b18",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "product": "Chocolate Pantagruel 10x200g",
+      "dbQuantity": 2,
+      "dbUnit": "cx",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "cx",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "multi_unit_pack",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "2 cases",
+        "labelProposed": "2 un",
+        "usableCurrent": 4000,
+        "usableProposed": 2000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 14.595,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 29.19,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 29.19,
+          "purchase_quantity": 10,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 2000
+        },
+        "procProposed": {
+          "current_price": 29.19,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 2000
+        },
+        "purchaseQtyCurrent": 10,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "693004ee-b902-4e18-8442-5d488e175e42",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "product": "Açúcar Branco Metro Chef 10x1Kg",
+      "dbQuantity": 1,
+      "dbUnit": "cx",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "cx",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "multi_unit_pack",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "1 case",
+        "labelProposed": "1 un",
+        "usableCurrent": 10000,
+        "usableProposed": 10000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 0.9289999999999999,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 0.9289999999999999,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 9.29,
+          "purchase_quantity": 10,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 10000
+        },
+        "procProposed": {
+          "current_price": 9.29,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 10000
+        },
+        "purchaseQtyCurrent": 10,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "fead3fbb-df70-439c-b9e0-1ceb58cecc0e",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "product": "Nata Reny Picot 22% 6x1L",
+      "dbQuantity": 5,
+      "dbUnit": "cx",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "cx",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "multi_unit_pack",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "5 cases",
+        "labelProposed": "5 un",
+        "usableCurrent": 30000,
+        "usableProposed": 6000,
+        "usableUnitCurrent": "ml",
+        "usableUnitProposed": "ml",
+        "costCurrent": {
+          "cost": 3.0483333333333333,
+          "unit": "L"
+        },
+        "costProposed": {
+          "cost": 15.241666666666667,
+          "unit": "L"
+        },
+        "procCurrent": {
+          "current_price": 18.29,
+          "purchase_quantity": 6,
+          "cost_base_unit": "un",
+          "usable_volume_ml": 6000
+        },
+        "procProposed": {
+          "current_price": 18.29,
+          "purchase_quantity": 6000,
+          "cost_base_unit": "ml"
+        },
+        "purchaseQtyCurrent": 6,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "27144491-6c66-4f0a-a6d4-659623a785b5",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "product": "Mozzarella Flor di Latte 2Kg",
+      "dbQuantity": 1,
+      "dbUnit": "un",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "kg",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "1 un",
+        "labelProposed": "1 kg",
+        "usableCurrent": 2000,
+        "usableProposed": 2000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 6.845,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 13.69,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 13.69,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 2000
+        },
+        "procProposed": {
+          "current_price": 13.69,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "e1fcc019-499b-46a9-a99e-e5b51a7578db",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "product": "Manteiga Coimbra s/Sal EMB 1 Kg",
+      "dbQuantity": 8,
+      "dbUnit": "kg",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "kg",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": true,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "8 kg",
+        "labelProposed": "8 un",
+        "usableCurrent": 1000,
+        "usableProposed": 8000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 8.9,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 8.9,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 8.9,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "procProposed": {
+          "current_price": 8.9,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1000
+        },
+        "purchaseQtyCurrent": 8,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": false,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "product": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "dbQuantity": 1,
+      "dbUnit": "cx",
+      "structuredKind": "row_only",
+      "structuredKindNullOcr": "inferred",
+      "currentResolvedUnit": "cx",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": null,
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "DISPLAY_ONLY",
+      "impactDetails": {
+        "impact": "DISPLAY_ONLY",
+        "labelCurrent": "1 case",
+        "labelProposed": "1",
+        "usableCurrent": null,
+        "usableProposed": null,
+        "usableUnitCurrent": null,
+        "usableUnitProposed": null,
+        "costCurrent": null,
+        "costProposed": null,
+        "procCurrent": {
+          "current_price": 38.44,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "procProposed": {
+          "current_price": 38.44,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": null,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "f2d094ab-f50a-483d-b6cb-76554d5bf195",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "product": "Tomilho",
+      "dbQuantity": 1,
+      "dbUnit": "mo",
+      "structuredKind": "row_only",
+      "structuredKindNullOcr": "inferred",
+      "currentResolvedUnit": "mo",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": null,
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "DISPLAY_ONLY",
+      "impactDetails": {
+        "impact": "DISPLAY_ONLY",
+        "labelCurrent": "1 bunch",
+        "labelProposed": "1",
+        "usableCurrent": null,
+        "usableProposed": null,
+        "usableUnitCurrent": null,
+        "usableUnitProposed": null,
+        "costCurrent": null,
+        "costProposed": null,
+        "procCurrent": {
+          "current_price": 2.06,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "procProposed": {
+          "current_price": 2.06,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": null,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "593e7560-ba2a-4c60-8300-ff34a26335b9",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "product": "Salada Ibérica FSTK EMB. 250g",
+      "dbQuantity": 4,
+      "dbUnit": "em",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "em",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "4 packs",
+        "labelProposed": "4 un",
+        "usableCurrent": 250,
+        "usableProposed": 1000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 2.19,
+          "unit": "case"
+        },
+        "costProposed": {
+          "cost": 8.76,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 2.19,
+          "purchase_quantity": 250,
+          "cost_base_unit": "g"
+        },
+        "procProposed": {
+          "current_price": 2.19,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 250
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "b47828a9-e042-4437-b0b7-8944c812509a",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "product": "Manjericão",
+      "dbQuantity": 5,
+      "dbUnit": "mo",
+      "structuredKind": "inferred",
+      "structuredKindNullOcr": "inferred",
+      "currentResolvedUnit": "mo",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "conversion_hint",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "5 bunches",
+        "labelProposed": "5 un",
+        "usableCurrent": 500,
+        "usableProposed": 500,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 20.599999999999998,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 20.599999999999998,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 2.06,
+          "purchase_quantity": 100,
+          "cost_base_unit": "g"
+        },
+        "procProposed": {
+          "current_price": 2.06,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 100
+        },
+        "purchaseQtyCurrent": 5,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": null,
+        "costDiffers": false,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "90823d87-6da6-414b-8a5e-1f8787db4aa9",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "product": "Hortelã",
+      "dbQuantity": 0.5,
+      "dbUnit": "kg",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "inferred",
+      "currentResolvedUnit": "kg",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "conversion_hint",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": true,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "0.50 kg",
+        "labelProposed": "0.50 un",
+        "usableCurrent": 500,
+        "usableProposed": 50,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 5.4,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 108,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 5.4,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "procProposed": {
+          "current_price": 5.4,
+          "purchase_quantity": 0.5,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 50
+        },
+        "purchaseQtyCurrent": 0.5,
+        "purchaseQtyProposed": 0.5,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "0b373627-9e78-4387-9945-35a504174b93",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "product": "Pepino",
+      "dbQuantity": 3.36,
+      "dbUnit": "kg",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "inferred",
+      "currentResolvedUnit": "kg",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": null,
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": true,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "3.36 kg",
+        "labelProposed": "3.36",
+        "usableCurrent": 3360,
+        "usableProposed": null,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": null,
+        "costCurrent": {
+          "cost": 1.42,
+          "unit": "kg"
+        },
+        "costProposed": null,
+        "procCurrent": {
+          "current_price": 1.42,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "procProposed": {
+          "current_price": 1.42,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "purchaseQtyCurrent": 3.36,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "dd6efa1e-60a0-471a-87b8-0c8df1bafcf0",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "product": "Pêra Abacate Hasse",
+      "dbQuantity": 3.28,
+      "dbUnit": "kg",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "inferred",
+      "currentResolvedUnit": "kg",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": null,
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": true,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "3.28 kg",
+        "labelProposed": "3.28",
+        "usableCurrent": 3280,
+        "usableProposed": null,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": null,
+        "costCurrent": {
+          "cost": 4.26,
+          "unit": "kg"
+        },
+        "costProposed": null,
+        "procCurrent": {
+          "current_price": 4.26,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "procProposed": {
+          "current_price": 4.26,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "purchaseQtyCurrent": 3.28,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "b64d5a44-d15b-4c1e-8f25-5809fa3f5541",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "product": "Courgettes",
+      "dbQuantity": 3.3,
+      "dbUnit": "kg",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "inferred",
+      "currentResolvedUnit": "kg",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": null,
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": true,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "3.30 kg",
+        "labelProposed": "3.30",
+        "usableCurrent": 3300,
+        "usableProposed": null,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": null,
+        "costCurrent": {
+          "cost": 1.56,
+          "unit": "kg"
+        },
+        "costProposed": null,
+        "procCurrent": {
+          "current_price": 1.56,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "procProposed": {
+          "current_price": 1.56,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "purchaseQtyCurrent": 3.3,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "5700a733-3cd9-4147-8d21-cb524976a3d7",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "product": "Alho Francês",
+      "dbQuantity": 5.42,
+      "dbUnit": "kg",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "inferred",
+      "currentResolvedUnit": "kg",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": null,
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": true,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "5.42 kg",
+        "labelProposed": "5.42",
+        "usableCurrent": 5420,
+        "usableProposed": null,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": null,
+        "costCurrent": {
+          "cost": 1.42,
+          "unit": "kg"
+        },
+        "costProposed": null,
+        "procCurrent": {
+          "current_price": 1.42,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "procProposed": {
+          "current_price": 1.42,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "purchaseQtyCurrent": 5.42,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "dee41356-7df1-430e-a288-7de2a40ff979",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "product": "Abóbora Butternut",
+      "dbQuantity": 5.64,
+      "dbUnit": "kg",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "inferred",
+      "currentResolvedUnit": "kg",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": null,
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": true,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "5.64 kg",
+        "labelProposed": "5.64",
+        "usableCurrent": 5640,
+        "usableProposed": null,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": null,
+        "costCurrent": {
+          "cost": 0.99,
+          "unit": "kg"
+        },
+        "costProposed": null,
+        "procCurrent": {
+          "current_price": 0.99,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "procProposed": {
+          "current_price": 0.99,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "purchaseQtyCurrent": 5.64,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "728517aa-8578-4f6f-a415-aae06f05f5c4",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "dbQuantity": 24,
+      "dbUnit": null,
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": null,
+      "currentResolutionSource": "fallback_null",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": true,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "DISPLAY_ONLY",
+      "impactDetails": {
+        "impact": "DISPLAY_ONLY",
+        "labelCurrent": "24",
+        "labelProposed": "24 un",
+        "usableCurrent": 12000,
+        "usableProposed": 12000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 4.2,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 4.2,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 2.1,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 500
+        },
+        "procProposed": {
+          "current_price": 2.1,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 500
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "4251c737-1554-4ef3-9424-0707d4889292",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "dbQuantity": 2,
+      "dbUnit": "kg",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "kg",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": true,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "2 kg",
+        "labelProposed": "2 un",
+        "usableCurrent": 1500,
+        "usableProposed": 3000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 6.72,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 4.4799999999999995,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 6.72,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "procProposed": {
+          "current_price": 6.72,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1500
+        },
+        "purchaseQtyCurrent": 2,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "388d8654-69f2-46e5-999c-9a87d0efe26c",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "product": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+      "dbQuantity": 4.3,
+      "dbUnit": "kg",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "kg",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": true,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": true,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "4.30 kg",
+        "labelProposed": "4.30 un",
+        "usableCurrent": 4500,
+        "usableProposed": 18000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 8.5,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 2.0305555555555554,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 8.5,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "procProposed": {
+          "current_price": 8.5,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 4186.046511627907
+        },
+        "purchaseQtyCurrent": 4.3,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "663013ff-dcf1-4741-894e-e9c453c90b80",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "product": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+      "dbQuantity": 3.11,
+      "dbUnit": "kg",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "kg",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": true,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": true,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "3.11 kg",
+        "labelProposed": "3.11 un",
+        "usableCurrent": 3500,
+        "usableProposed": 10500,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 9.99,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 2.958942857142857,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 9.99,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "procProposed": {
+          "current_price": 9.99,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 3376.2057877813504
+        },
+        "purchaseQtyCurrent": 3.11,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "9cdd22ba-051b-4422-a122-3e6a39e9ef8c",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "product": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "dbQuantity": 2,
+      "dbUnit": "un",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "structured_container",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "2 un",
+        "labelProposed": "2 un",
+        "usableCurrent": 22500,
+        "usableProposed": 22500,
+        "usableUnitCurrent": "ml",
+        "usableUnitProposed": "ml",
+        "costCurrent": {
+          "cost": 1.7137777777777778,
+          "unit": "L"
+        },
+        "costProposed": {
+          "cost": 1.7137777777777778,
+          "unit": "L"
+        },
+        "procCurrent": {
+          "current_price": 19.28,
+          "purchase_quantity": 11250,
+          "cost_base_unit": "ml"
+        },
+        "procProposed": {
+          "current_price": 19.28,
+          "purchase_quantity": 11250,
+          "cost_base_unit": "ml"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "d45b4c8b-c47d-4e4c-ad97-d2073f1287b2",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "product": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+      "dbQuantity": 1.83,
+      "dbUnit": "kg",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "kg",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": true,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": true,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "1.83 kg",
+        "labelProposed": "1.83 un",
+        "usableCurrent": 1500,
+        "usableProposed": 3000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 27.04,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 16.4944,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 27.04,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "procProposed": {
+          "current_price": 27.04,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1639.344262295082
+        },
+        "purchaseQtyCurrent": 1.83,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "634a418b-1509-42a9-bf01-563705967b6f",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "product": "Baladin - Ginger Beer 0.20cl",
+      "dbQuantity": 24,
+      "dbUnit": null,
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": null,
+      "currentResolutionSource": "fallback_null",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": true,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "DISPLAY_ONLY",
+      "impactDetails": {
+        "impact": "DISPLAY_ONLY",
+        "labelCurrent": "24",
+        "labelProposed": "24 un",
+        "usableCurrent": 4800,
+        "usableProposed": 4800,
+        "usableUnitCurrent": "ml",
+        "usableUnitProposed": "ml",
+        "costCurrent": {
+          "cost": 4.05,
+          "unit": "L"
+        },
+        "costProposed": {
+          "cost": 4.05,
+          "unit": "L"
+        },
+        "procCurrent": {
+          "current_price": 0.81,
+          "purchase_quantity": 200,
+          "cost_base_unit": "ml"
+        },
+        "procProposed": {
+          "current_price": 0.81,
+          "purchase_quantity": 200,
+          "cost_base_unit": "ml"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "a3713087-1d87-40b2-b05a-8e4bea2976f3",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "product": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "dbQuantity": 2.6,
+      "dbUnit": "kg",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "kg",
+      "currentResolutionSource": "ocr_explicit",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": true,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": true,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "2.60 kg",
+        "labelProposed": "2.60 un",
+        "usableCurrent": 2500,
+        "usableProposed": 7500,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 15.19,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 5.265866666666668,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 15.19,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "procProposed": {
+          "current_price": 15.19,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 2884.6153846153843
+        },
+        "purchaseQtyCurrent": 2.6,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": true
+      }
+    },
+    {
+      "invoiceItemId": "f2a672e0-016c-43d7-a53f-1ee8b8976f4b",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "product": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "dbQuantity": 10,
+      "dbUnit": "un",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "structured_container",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "10 un",
+        "labelProposed": "10 un",
+        "usableCurrent": 10000,
+        "usableProposed": 10000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 8.12,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 8.12,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 8.12,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1000
+        },
+        "procProposed": {
+          "current_price": 8.12,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1000
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "793e9cd0-a7b5-4228-8ece-e6f16b047515",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "product": "STRACCIATELLA 250 GR",
+      "dbQuantity": 24,
+      "dbUnit": "un",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "24 un",
+        "labelProposed": "24 un",
+        "usableCurrent": 6000,
+        "usableProposed": 6000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 12.44,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 12.44,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 3.11,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 250
+        },
+        "procProposed": {
+          "current_price": 3.11,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 250
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "product": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "dbQuantity": 5.996,
+      "dbUnit": "un",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "structured_container",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": true,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "6.00 un",
+        "labelProposed": "6.00 un",
+        "usableCurrent": 5996,
+        "usableProposed": 5996,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 10.830000000000002,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 10.830000000000002,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 10.83,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 999.9999999999999
+        },
+        "procProposed": {
+          "current_price": 10.83,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 999.9999999999999
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "65ced122-bedd-4f87-bc23-3b85477ebe8b",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "product": "Farina Speciale pizza 25kg Amoruso",
+      "dbQuantity": 1,
+      "dbUnit": "un",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "kg",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "1 un",
+        "labelProposed": "1 kg",
+        "usableCurrent": 25000,
+        "usableProposed": 25000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 1.0608,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 26.52,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 26.52,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 25000
+        },
+        "procProposed": {
+          "current_price": 26.52,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "product": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "dbQuantity": 24,
+      "dbUnit": "un",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "structured_container",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "24 un",
+        "labelProposed": "24 un",
+        "usableCurrent": 7920,
+        "usableProposed": 7920,
+        "usableUnitCurrent": "ml",
+        "usableUnitProposed": "ml",
+        "costCurrent": {
+          "cost": 3.2424242424242427,
+          "unit": "L"
+        },
+        "costProposed": {
+          "cost": 3.2424242424242427,
+          "unit": "L"
+        },
+        "procCurrent": {
+          "current_price": 1.07,
+          "purchase_quantity": 7920,
+          "cost_base_unit": "ml"
+        },
+        "procProposed": {
+          "current_price": 1.07,
+          "purchase_quantity": 7920,
+          "cost_base_unit": "ml"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "product": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "dbQuantity": 1,
+      "dbUnit": "un",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "structured_container",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "1 un",
+        "labelProposed": "1 un",
+        "usableCurrent": 10000,
+        "usableProposed": 10000,
+        "usableUnitCurrent": "ml",
+        "usableUnitProposed": "ml",
+        "costCurrent": {
+          "cost": 1.5550000000000002,
+          "unit": "L"
+        },
+        "costProposed": {
+          "cost": 1.5550000000000002,
+          "unit": "L"
+        },
+        "procCurrent": {
+          "current_price": 15.55,
+          "purchase_quantity": 10000,
+          "cost_base_unit": "ml"
+        },
+        "procProposed": {
+          "current_price": 15.55,
+          "purchase_quantity": 10000,
+          "cost_base_unit": "ml"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "d13fce65-832c-4ca2-9c52-049579c99663",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "product": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "dbQuantity": 10,
+      "dbUnit": "un",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": true,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": true,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "10 un",
+        "labelProposed": "10 un",
+        "usableCurrent": 30000,
+        "usableProposed": 30000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 6.676666666666667,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 6.676666666666667,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 20.03,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 3000
+        },
+        "procProposed": {
+          "current_price": 20.03,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 3000
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "e418468e-cb13-44f3-93b2-1857ae6eaa4d",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "product": "Rulo Di Capra 1kg*2 Simonetta",
+      "dbQuantity": 1,
+      "dbUnit": "un",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "structured_container",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "1 un",
+        "labelProposed": "1 un",
+        "usableCurrent": 2000,
+        "usableProposed": 2000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 5.43,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 5.43,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 10.86,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 2000
+        },
+        "procProposed": {
+          "current_price": 10.86,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 2000
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "53167dd9-c734-412f-9679-10b022060980",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "product": "Recargo por combustivel",
+      "dbQuantity": 1,
+      "dbUnit": "un",
+      "structuredKind": "unit_count",
+      "structuredKindNullOcr": "inferred",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": null,
+      "nullOcrResolutionSource": "fallback_null",
+      "proposedInferUnUnit": null,
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "DISPLAY_ONLY",
+      "impactDetails": {
+        "impact": "DISPLAY_ONLY",
+        "labelCurrent": "1 un",
+        "labelProposed": "1",
+        "usableCurrent": null,
+        "usableProposed": null,
+        "usableUnitCurrent": null,
+        "usableUnitProposed": null,
+        "costCurrent": null,
+        "costProposed": null,
+        "procCurrent": {
+          "current_price": 2,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "procProposed": {
+          "current_price": 2,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": null,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "d69123d3-40af-4b9e-a566-bde7a8989e49",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "product": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "dbQuantity": 1,
+      "dbUnit": "un",
+      "structuredKind": "inferred",
+      "structuredKindNullOcr": "inferred",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "kg",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "1 un",
+        "labelProposed": "1 kg",
+        "usableCurrent": 25000,
+        "usableProposed": 1000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 1.2044,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 30.11,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 30.11,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 25000
+        },
+        "procProposed": {
+          "current_price": 30.11,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": true,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "bf43813b-6377-459d-9c8f-b342eb969452",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "product": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "dbQuantity": 1,
+      "dbUnit": "un",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "structured_container",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "1 un",
+        "labelProposed": "1 un",
+        "usableCurrent": 6000,
+        "usableProposed": 6000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 3.6750000000000003,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 3.6750000000000003,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 22.05,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 6000
+        },
+        "procProposed": {
+          "current_price": 22.05,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 6000
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "9a52cc46-1c5a-4798-9621-d06177e04208",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "product": "POMODORI PELATI (CX 2,5KG*6)",
+      "dbQuantity": 1,
+      "dbUnit": "un",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "structured_container",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "1 un",
+        "labelProposed": "1 un",
+        "usableCurrent": 15000,
+        "usableProposed": 15000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 1.47,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 1.47,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 22.05,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 15000
+        },
+        "procProposed": {
+          "current_price": 22.05,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 15000
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "ef25be0f-f153-40de-b377-25151d147637",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "product": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "dbQuantity": 2,
+      "dbUnit": "un",
+      "structuredKind": "multi_unit_pack",
+      "structuredKindNullOcr": "multi_unit_pack",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "un",
+      "nullOcrResolutionSource": "structured_container",
+      "proposedInferUnUnit": "un",
+      "unitWouldChangeVsCurrent": false,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": true,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "NONE",
+      "impactDetails": {
+        "impact": "NONE",
+        "labelCurrent": "2 un",
+        "labelProposed": "2 un",
+        "usableCurrent": 22500,
+        "usableProposed": 22500,
+        "usableUnitCurrent": "ml",
+        "usableUnitProposed": "ml",
+        "costCurrent": {
+          "cost": 1.8639999999999999,
+          "unit": "L"
+        },
+        "costProposed": {
+          "cost": 1.8639999999999999,
+          "unit": "L"
+        },
+        "procCurrent": {
+          "current_price": 20.97,
+          "purchase_quantity": 11250,
+          "cost_base_unit": "ml"
+        },
+        "procProposed": {
+          "current_price": 20.97,
+          "purchase_quantity": 11250,
+          "cost_base_unit": "ml"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": false,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "28777b03-2389-4759-bc48-c9bd1839d970",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "product": "RICOTTA TREVIGIANA 1,5KG",
+      "dbQuantity": 1,
+      "dbUnit": "un",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "kg",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "1 un",
+        "labelProposed": "1 kg",
+        "usableCurrent": 1500,
+        "usableProposed": 1500,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 5.311333333333333,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 7.967,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 7.967,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1500
+        },
+        "procProposed": {
+          "current_price": 7.967,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": true,
+        "procDiffers": true,
+        "purchaseQtyDiffers": false
+      }
+    },
+    {
+      "invoiceItemId": "655aa967-b1dc-48e2-ae46-fd0ca962e9e3",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "product": "ROLO DE CABRA E VACA 1KG",
+      "dbQuantity": 1,
+      "dbUnit": "un",
+      "structuredKind": "weight_or_volume",
+      "structuredKindNullOcr": "weight_or_volume",
+      "currentResolvedUnit": "un",
+      "currentResolutionSource": "preserved_countable",
+      "nullOcrResolvedUnit": "kg",
+      "nullOcrResolutionSource": "name_weight_denomination",
+      "proposedInferUnUnit": "kg",
+      "unitWouldChangeVsCurrent": true,
+      "unitWouldChangeVsNullOcrBaseline": false,
+      "isCounterWeightPriced": false,
+      "isIntegerQtyGt1": false,
+      "matchesProposedGate": false,
+      "incorrectlyGetsUn": false,
+      "impactIfProposed": "CALCULATION_RISK",
+      "impactDetails": {
+        "impact": "CALCULATION_RISK",
+        "labelCurrent": "1 un",
+        "labelProposed": "1 kg",
+        "usableCurrent": 1000,
+        "usableProposed": 1000,
+        "usableUnitCurrent": "g",
+        "usableUnitProposed": "g",
+        "costCurrent": {
+          "cost": 12.71,
+          "unit": "kg"
+        },
+        "costProposed": {
+          "cost": 12.71,
+          "unit": "kg"
+        },
+        "procCurrent": {
+          "current_price": 12.71,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 1000
+        },
+        "procProposed": {
+          "current_price": 12.71,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "purchaseQtyCurrent": 1,
+        "purchaseQtyProposed": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": true,
+        "purchaseQtyDiffers": false
+      }
+    }
+  ],
+  "verdict": {
+    "naiveRule": {
+      "answer": "NO",
+      "riskLevel": "HIGH",
+      "rationale": "Null-OCR stress hits 16 weight_or_volume rows with qty>1; 7 VL rows would incorrectly get un (kg bulk, counter-weight deli, em packs) with CALCULATION_RISK. Current DB only has 2 null-unit rows (Paccheri/Ginger) but rule is unsafe as general policy.",
+      "dbStateHits": 2,
+      "nullOcrStressHits": 16,
+      "calculationRiskFalsePositives": 7,
+      "displayOnlyFixes": 2
+    },
+    "conditionalSafeGate": {
+      "answer": "CONDITIONAL YES",
+      "riskLevel": "LOW",
+      "nullOcrStressRiskLevel": "LOW_MEDIUM",
+      "gateConditions": [
+        "OCR unit is null",
+        "resolveInvoiceLinePurchaseFormat().kind === weight_or_volume",
+        "quantity is integer and > 1",
+        "name embeds retail g/ml/cl measure (not kg/L purchase denomination)",
+        "name lacks pack-denomination markers (EMB, CX, CAIXA, PACK)",
+        "resolveInvoiceLinePurchaseUnit() returns fallback_null (no kg/L/name/hint resolution)",
+        "then infer un"
+      ],
+      "dbStateHits": 2,
+      "nullOcrStressHits": 5,
+      "nullOcrStressIdempotent": 3,
+      "nullOcrStressWouldChangeEmToUn": 0,
+      "impactOnHits": "DISPLAY_ONLY"
+    }
+  },
+  "safeGateV2Hits": [
+    {
+      "product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "dbUnit": null,
+      "current": null
+    },
+    {
+      "product": "Baladin - Ginger Beer 0.20cl",
+      "dbUnit": null,
+      "current": null
+    }
+  ],
+  "safeGateV2Stress": [
+    {
+      "product": "Filete de Anchoas Alconfirosa LI 495 g",
+      "dbUnit": "un",
+      "current": "un"
+    },
+    {
+      "product": "Filete de Anchovas Alconfrista Lt 495 g",
+      "dbUnit": "un",
+      "current": "un"
+    },
+    {
+      "product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "dbUnit": null,
+      "current": null
+    },
+    {
+      "product": "Baladin - Ginger Beer 0.20cl",
+      "dbUnit": null,
+      "current": null
+    },
+    {
+      "product": "STRACCIATELLA 250 GR",
+      "dbUnit": "un",
+      "current": "un"
+    }
+  ]
+}

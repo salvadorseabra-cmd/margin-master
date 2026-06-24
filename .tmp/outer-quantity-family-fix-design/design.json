@@ -1,0 +1,450 @@
+{
+  "generatedAt": "2026-06-23T12:00:00.000Z",
+  "mode": "STRICT_DESIGN_ONLY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "family": {
+    "name": "Outer Quantity Scaling",
+    "hypothesis": "rowQty>1 + structured pack + structureTotalIsFinalForGenericRow → one-pack usable instead of rowQty×pack",
+    "scope": {
+      "invoiceItemsScanned": 51,
+      "qtyGt1StructuredLines": 25,
+      "broken": 6,
+      "safe": 11,
+      "suspicious": 8
+    },
+    "brokenTiers": ["size_count", "count_size"],
+    "fixedSubset": ["mozzarella_size_count_g"]
+  },
+  "task1_familyMap": [
+    {
+      "product": "Pellegrino",
+      "examples": [
+        "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "SanPellegrino - Acqua in vitro 75cl x 15ud"
+      ],
+      "tier": "size_count",
+      "measurement": "cl",
+      "rowQty": 2,
+      "rowUnit": "un",
+      "structureOneCase": "15×75cl = 11250 ml",
+      "currentBehaviour": "structure_total 11.25 L; rowQty discarded",
+      "status": "BROKEN"
+    },
+    {
+      "product": "Nata",
+      "examples": [
+        "Nata Culinaria 22% Reny Picot 6x1 Lt",
+        "Nata Reny Picot 22% 6x1L"
+      ],
+      "tier": "count_size",
+      "measurement": "L",
+      "rowQty": 5,
+      "rowUnit": "cx",
+      "structureOneCase": "6×1L = 6000 ml",
+      "currentBehaviour": "structure_total 6 L; rowQty discarded",
+      "status": "BROKEN"
+    },
+    {
+      "product": "Chocolate",
+      "examples": [
+        "Chocolate Culinaria Pantagruel 10x200 g",
+        "Chocolate Pantagruel 10x200g"
+      ],
+      "tier": "count_size",
+      "measurement": "g",
+      "rowQty": 2,
+      "rowUnit": "cx",
+      "structureOneCase": "10×200g = 2000 g",
+      "currentBehaviour": "structure_total 2 kg; rowQty discarded",
+      "status": "BROKEN"
+    },
+    {
+      "product": "Peroni",
+      "examples": ["Birra Peroni Nastro Azzurro PNA 33cl*24"],
+      "tier": "size_count",
+      "measurement": "cl",
+      "rowQty": 24,
+      "rowUnit": "un",
+      "structureOneCase": "24×33cl = 7920 ml",
+      "currentBehaviour": "structure_total 7.92 L; rowQty equals inner bottle count",
+      "status": "SAFE"
+    },
+    {
+      "product": "Mozzarella",
+      "examples": ["MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8"],
+      "tier": "size_count",
+      "measurement": "g",
+      "rowQty": 10,
+      "rowUnit": "un",
+      "structureOneCase": "8×125g = 1000 g",
+      "currentBehaviour": "structure_scaled_outer 10 kg via shouldScaleOuterPackForSizeCountGenericRow",
+      "status": "SAFE"
+    },
+    {
+      "product": "Açúcar",
+      "examples": [
+        "Açucar Branco METRO Chef 10x1 Kg",
+        "Açúcar Branco Metro Chef 10x1Kg"
+      ],
+      "tier": "count_size",
+      "measurement": "kg",
+      "rowQty": 1,
+      "rowUnit": "cx",
+      "structureOneCase": "10×1kg = 10000 g",
+      "currentBehaviour": "structure_total 10 kg; rowQty=1 no scaling needed",
+      "status": "SAFE"
+    },
+    {
+      "product": "Pomodori",
+      "examples": ["POMODORI PELATI (CX 2,5KG*6)"],
+      "tier": "size_count",
+      "measurement": "kg",
+      "rowQty": 1,
+      "rowUnit": "un",
+      "structureOneCase": "6×2.5kg = 15000 g",
+      "currentBehaviour": "structure_total 15 kg; rowQty=1",
+      "status": "SAFE"
+    }
+  ],
+  "task2_safeDiscriminators": [
+    {
+      "product": "Peroni",
+      "discriminator": "rowQty === innerUnitCount (24 === 24)",
+      "function": "shouldScaleOuterPackForSizeCountGenericRow returns false",
+      "usableSource": "structure_total"
+    },
+    {
+      "product": "Mozzarella",
+      "discriminator": "size_count g; rowQty !== innerCount; rowQty > 1",
+      "function": "shouldScaleOuterPackForSizeCountGenericRow",
+      "usableSource": "structure_scaled_outer"
+    },
+    {
+      "product": "Açúcar",
+      "discriminator": "rowQty <= 1",
+      "function": "outer scaling gates never fire",
+      "usableSource": "structure_total"
+    },
+    {
+      "product": "Pomodori",
+      "discriminator": "rowQty <= 1",
+      "function": "structureTotalIsFinalForGenericRow",
+      "usableSource": "structure_total"
+    }
+  ],
+  "task3_brokenAnalysis": [
+    {
+      "product": "Pellegrino",
+      "invoiceItemIds": [
+        "ef25be0f-f153-40de-b377-25151d147637",
+        "9cdd22ba-051b-4422-a122-3e6a39e9ef8c"
+      ],
+      "rowQtyDiscardedAt": "resolveStructurePurchaseQuantity → 1",
+      "gate": "structureTotalIsFinalForGenericRow true; shouldScaleOuterPack false (cl not g)",
+      "transformation": "11250 ml = 1×15×75cl; expected 2×11250 = 22500 ml",
+      "usableSource": "structure_total"
+    },
+    {
+      "product": "Nata",
+      "invoiceItemIds": [
+        "2b5cea32-ec1f-4454-a4d9-cb4bb2612866",
+        "fead3fbb-df70-439c-b9e0-1ceb58cecc0e"
+      ],
+      "rowQtyDiscardedAt": "resolveStructurePurchaseQuantity count_size generic → 1",
+      "gate": "structureTotalIsFinalForGenericRow true for count_size tier",
+      "transformation": "6000 ml = 1 case; expected 5×6000 = 30000 ml",
+      "usableSource": "structure_total"
+    },
+    {
+      "product": "Chocolate",
+      "invoiceItemIds": [
+        "fa0d0138-577e-42fe-9212-fe5f53c7ead8",
+        "11024922-0c2b-4daf-b178-06d622899b18"
+      ],
+      "rowQtyDiscardedAt": "resolveStructurePurchaseQuantity count_size generic → 1",
+      "gate": "structureTotalIsFinalForGenericRow true for count_size tier",
+      "transformation": "2000 g = 1 case; expected 2×2000 = 4000 g",
+      "usableSource": "structure_total"
+    }
+  ],
+  "task4_designOptions": [
+    {
+      "id": "A",
+      "name": "Minimal targeted helpers",
+      "scope": "Extend shouldScaleOuterPack to volume (cl/L/ml); add shouldScaleOuterCountForCountSizeGenericRow for cx + rowQty>1",
+      "risk": "low",
+      "files": [
+        "src/lib/stock-normalization.ts",
+        "src/lib/stock-normalization.test.ts"
+      ],
+      "recommended": true
+    },
+    {
+      "id": "B",
+      "name": "Family-level structureTotalIsFinal change",
+      "scope": "Add rowQuantity param; return false when rowQty>1 on count_size/size_count",
+      "risk": "low-medium",
+      "files": ["src/lib/stock-normalization.ts"],
+      "recommended": false
+    },
+    {
+      "id": "C",
+      "name": "Alternative discriminator (parse-time outer)",
+      "scope": "Triple-nested / name-embedded outer count",
+      "risk": "medium-high",
+      "files": [
+        "src/lib/stock-normalization.ts",
+        "supabase/functions/extract-invoice/*"
+      ],
+      "recommended": false
+    }
+  ],
+  "task5_regressionMatrix": [
+    {
+      "product": "Mozzarella 125GR*8",
+      "tier": "size_count",
+      "rowQty": 10,
+      "expectedUsable": "10 kg",
+      "preserve": true,
+      "guard": "existing g helper unchanged"
+    },
+    {
+      "product": "Peroni 33cl*24",
+      "tier": "size_count",
+      "rowQty": 24,
+      "expectedUsable": "7.92 L",
+      "preserve": true,
+      "guard": "rowQty === innerCount"
+    },
+    {
+      "product": "Açúcar 10x1kg",
+      "tier": "count_size",
+      "rowQty": 1,
+      "expectedUsable": "10 kg",
+      "preserve": true,
+      "guard": "rowQty <= 1"
+    },
+    {
+      "product": "Pomodori 2.5kg*6",
+      "tier": "size_count",
+      "rowQty": 1,
+      "expectedUsable": "15 kg",
+      "preserve": true,
+      "guard": "rowQty <= 1"
+    },
+    {
+      "product": "Ginger Beer 0.20cl",
+      "tier": "bare_measure",
+      "rowQty": 24,
+      "expectedUsable": "4.80 L",
+      "preserve": true,
+      "guard": "orthogonal tier"
+    },
+    {
+      "product": "Guanciale 1.5kg*7",
+      "tier": "size_count",
+      "rowQty": 5.996,
+      "expectedUsable": "~6 kg",
+      "preserve": true,
+      "guard": "shouldUseRowQtyAsBilledKgForSizeCountGenericRow"
+    },
+    {
+      "product": "Mezzi 1KG*6",
+      "tier": "size_count",
+      "rowQty": 2,
+      "expectedUsable": "6 kg",
+      "preserve": true,
+      "guard": "kg excluded from volume/g outer scaling"
+    },
+    {
+      "product": "Ricotta 1.5KG",
+      "tier": "bare_measure",
+      "rowQty": 2,
+      "expectedUsable": "3 kg",
+      "preserve": true,
+      "guard": "bare_measure tier"
+    },
+    {
+      "product": "24x80g row 2 un",
+      "tier": "count_size",
+      "rowQty": 2,
+      "expectedUsable": "1920 g",
+      "preserve": true,
+      "guard": "no case rowUnit — isCasePurchaseUnit false"
+    }
+  ],
+  "task6_expectedResults": [
+    {
+      "product": "Pellegrino 75cl×15",
+      "rowQty": 2,
+      "current": "11.25 L",
+      "currentRaw": 11250,
+      "expected": "22.50 L",
+      "expectedRaw": 22500,
+      "usableSource": "structure_scaled_outer"
+    },
+    {
+      "product": "Nata 6×1L",
+      "rowQty": 5,
+      "current": "6.00 L",
+      "currentRaw": 6000,
+      "expected": "30.00 L",
+      "expectedRaw": 30000,
+      "usableSource": "structure_scaled_outer"
+    },
+    {
+      "product": "Chocolate 10×200g",
+      "rowQty": 2,
+      "current": "2 kg",
+      "currentRaw": 2000,
+      "expected": "4 kg",
+      "expectedRaw": 4000,
+      "usableSource": "structure_scaled_outer"
+    }
+  ],
+  "task7_readiness": {
+    "verdict": "A",
+    "label": "Ready for implementation",
+    "rationale": "VL-proven 6-line family; root cause in stock-normalization gates; Mozzarella pattern reusable with tier-specific guards",
+    "blockingItems": [],
+    "investigationItems": [
+      "count_size with rowQty>1 and rowUnit=un (e.g. 24x80g) — preserve existing test; not in VL broken set",
+      "Mezzi Family A — kg guard required; extraction qty ambiguity remains SUSPICIOUS"
+    ]
+  },
+  "preferredOption": {
+    "id": "A",
+    "name": "Minimal targeted helpers",
+    "rationale": [
+      "Extends proven Mozzarella integration points",
+      "Partitioned guards: volume size_count, case count_size, kg billed-weight, Peroni inner-equality",
+      "count_size uses rowQty × structure.totalUsableAmount (not scaleStructureTotal)",
+      "Expected blast radius: 6 BROKEN lines only"
+    ],
+    "helpers": [
+      {
+        "name": "shouldScaleOuterPackForSizeCountGenericRow",
+        "change": "extend",
+        "location": "src/lib/stock-normalization.ts ~1112",
+        "newConditions": [
+          "unitMeasurement in g, cl, L, ml",
+          "unitMeasurement !== kg (Mezzi guard)",
+          "existing: tier size_count, generic row, rowQty>1, rowQty !== innerCount"
+        ]
+      },
+      {
+        "name": "shouldScaleOuterCountForCountSizeGenericRow",
+        "change": "new",
+        "location": "src/lib/stock-normalization.ts adjacent to shouldScaleOuterPack",
+        "signature": "(structure: PurchaseStructure, rowQuantity: number | null, rowUnit: string | null) => boolean",
+        "conditions": [
+          "structure.tier === 'count_size'",
+          "isCasePurchaseUnit(rowUnit)",
+          "rowQuantity > 1"
+        ]
+      },
+      {
+        "name": "isCasePurchaseUnit",
+        "change": "new",
+        "location": "src/lib/stock-normalization.ts",
+        "tokens": ["cx", "caixa", "caixas", "case", "cases", "emb", "embalagem", "embalagens"]
+      }
+    ],
+    "integrationPoints": [
+      {
+        "function": "resolveStructurePurchaseQuantity",
+        "count_sizeBranch": "when shouldScaleOuterCountForCountSizeGenericRow → return Math.round(rowQuantity)",
+        "size_countBranch": "existing shouldScaleOuterPack path (volume now included)"
+      },
+      {
+        "function": "computeUsableFromPurchaseStructure",
+        "count_sizeBranch": "when shouldScaleOuterCount → total = rowQty * structure.totalUsableAmount; source structure_scaled_outer",
+        "size_countBranch": "existing scaleStructureTotal path"
+      }
+    ],
+    "guardOrder": [
+      "rowConflatedPurchase",
+      "cartonPartialWeak",
+      "shouldUseRowQtyAsBilledKgForSizeCountGenericRow",
+      "shouldScaleOuterPackForSizeCountGenericRow",
+      "shouldScaleOuterCountForCountSizeGenericRow",
+      "structureTotalIsFinalForGenericRow"
+    ],
+    "explicitlyNotChanging": [
+      "SIZE_COUNT_RE",
+      "COUNT_SIZE_RE",
+      "parsePurchaseStructureFromText",
+      "buildStructure",
+      "shouldUseRowQtyAsBilledKgForSizeCountGenericRow",
+      "invoice-purchase-format.ts",
+      "extraction pipeline"
+    ],
+    "tests": [
+      {
+        "name": "Pellegrino Boc qty=2",
+        "input": {
+          "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+          "rowQuantity": 2,
+          "rowUnit": "un"
+        },
+        "expected": {
+          "usableQuantity": 22500,
+          "usableSource": "structure_scaled_outer",
+          "purchaseContainerCount": 2
+        }
+      },
+      {
+        "name": "Pellegrino Emp qty=2",
+        "input": {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "rowQuantity": 2,
+          "rowUnit": "un"
+        },
+        "expected": {
+          "usableQuantity": 22500,
+          "usableSource": "structure_scaled_outer"
+        }
+      },
+      {
+        "name": "Nata qty=5 cx",
+        "input": {
+          "name": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+          "rowQuantity": 5,
+          "rowUnit": "cx"
+        },
+        "expected": {
+          "usableQuantity": 30000,
+          "usableSource": "structure_scaled_outer"
+        }
+      },
+      {
+        "name": "Chocolate qty=2 cx",
+        "input": {
+          "name": "Chocolate Culinaria Pantagruel 10x200 g",
+          "rowQuantity": 2,
+          "rowUnit": "cx"
+        },
+        "expected": {
+          "usableQuantity": 4000,
+          "usableSource": "structure_scaled_outer"
+        }
+      }
+    ]
+  },
+  "confidence": {
+    "rootCause": 0.95,
+    "optionASafety": 0.88,
+    "vlCoverage": 0.94,
+    "countSizeUnEdge": 0.75,
+    "overall": 0.9
+  },
+  "sources": [
+    ".tmp/outer-quantity-population-audit/results.json",
+    ".tmp/pellegrino-root-cause-audit/results.json",
+    ".tmp/mozzarella-implementation-validation/results.json",
+    ".tmp/guanciale-fix-design/design.json",
+    ".tmp/size-count-discriminator-audit/discriminator.json",
+    "src/lib/stock-normalization.ts",
+    "src/lib/stock-normalization.test.ts"
+  ]
+}

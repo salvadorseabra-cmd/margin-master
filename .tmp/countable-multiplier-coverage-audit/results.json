@@ -1,0 +1,1085 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "auditedAt": "2026-06-24T00:37:32.091Z",
+  "mode": "STRICT_READ_ONLY",
+  "totalInvoiceItems": 52,
+  "candidateCount": 6,
+  "brokenCount": 1,
+  "workingCount": 0,
+  "architecturalGap": "C",
+  "architecturalGapOptions": {
+    "A": "OCR never extracts countable multiplier text",
+    "B": "Extraction OK but normalization strips multiplier",
+    "C": "Purchase structure parser fails — no tier for countable-only multipliers (dúzias, cx.N without g/ml)",
+    "D": "Structure parsed but persistence/costing drops denominator"
+  },
+  "finalVerdictABC": "A",
+  "finalVerdictQuestion": "If we fix Ovo, only eggs or entire missing parser family?",
+  "finalVerdictExplanation": "Only Ovo MORENO Classe M (egg/dozen) is broken; all other countable multiplier candidates parse or N/A. Fixing Ovo is an isolated egg/dozen parser addition.",
+  "familySummary": {
+    "none": {
+      "total": 2,
+      "WORKING": 0,
+      "BROKEN": 0,
+      "N_A_VOLUME": 0,
+      "N_A_OTHER": 2,
+      "examples": [
+        {
+          "name": "Ovo Líquido Past.Gema Dovo 1 Kg",
+          "status": "N_A_OTHER",
+          "parseTier": "bare_measure"
+        },
+        {
+          "name": "Ovo Líquido Past.Gema Dovo 1kg",
+          "status": "N_A_OTHER",
+          "parseTier": "bare_measure"
+        }
+      ]
+    },
+    "dozen_countable": {
+      "total": 1,
+      "WORKING": 0,
+      "BROKEN": 1,
+      "N_A_VOLUME": 0,
+      "N_A_OTHER": 0,
+      "examples": [
+        {
+          "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+          "status": "BROKEN",
+          "parseTier": null
+        }
+      ]
+    },
+    "container_bare_count": {
+      "total": 3,
+      "WORKING": 0,
+      "BROKEN": 0,
+      "N_A_VOLUME": 3,
+      "N_A_OTHER": 0,
+      "examples": [
+        {
+          "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+          "status": "N_A_VOLUME",
+          "parseTier": "size_count"
+        },
+        {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "status": "N_A_VOLUME",
+          "parseTier": "size_count"
+        },
+        {
+          "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+          "status": "N_A_VOLUME",
+          "parseTier": "size_count"
+        }
+      ]
+    }
+  },
+  "denominatorLossTable": [
+    {
+      "id": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+      "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "rowQty": 1,
+      "rowUnit": "cx",
+      "unitPrice": 38.44,
+      "expectedDenominator": 180,
+      "expectedFormula": "1 cx × 15 dozen × 12",
+      "actualPurchaseQty": 1,
+      "parseTier": null,
+      "structuredKind": "row_only",
+      "unitsPerPack": null,
+      "lossFactor": 180,
+      "unitCostActual": 38.44,
+      "unitCostHypothetical": 0.21355555555555555,
+      "primaryFamily": "dozen_countable",
+      "candidatePatterns": [
+        {
+          "id": "dozen_unit",
+          "family": "dozen_countable",
+          "match": "15 dúzias"
+        },
+        {
+          "id": "cx_dot_count",
+          "family": "container_dot_count",
+          "match": "Cx.15"
+        },
+        {
+          "id": "cx_count_no_measure",
+          "family": "container_countable_inner",
+          "match": "Cx.15 dúzias"
+        },
+        {
+          "id": "container_x_count_no_measure",
+          "family": "container_bare_count",
+          "match": "Cx.15 "
+        },
+        {
+          "id": "egg_product",
+          "family": "egg_countable",
+          "match": "Ovo MORENO Classe M Cx.15 dúzias"
+        }
+      ],
+      "tierProbes": [],
+      "statusReason": "expected denominator >1 but purchase_quantity collapsed to 1"
+    }
+  ],
+  "controls": {
+    "peroni": {
+      "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "quantity": 24,
+      "unit": "un",
+      "parseTier": "size_count",
+      "structuredKind": "multi_unit_pack",
+      "tierProbes": [
+        "size_count",
+        "embedded_bare_measure"
+      ],
+      "structureSummary": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 24,
+        "innerUnitType": null,
+        "unitSize": 33,
+        "unitMeasurement": "cl",
+        "totalUsableAmount": 7920,
+        "usableUnit": "ml",
+        "tier": "size_count",
+        "matchedText": "33cl*24 ",
+        "multiplierChain": {
+          "purchaseQuantity": 1,
+          "innerUnitCount": 24,
+          "unitSize": 33,
+          "unitMeasurement": "cl",
+          "perItemBase": 330,
+          "usableUnit": "ml",
+          "totalUsableAmount": 7920,
+          "expression": "1 × 24 × 33 cl"
+        }
+      },
+      "purchaseQty": 1,
+      "normalizedUsableQuantity": 7920,
+      "usableQuantityUnit": "ml",
+      "perUnit": {
+        "amount": 7920,
+        "unit": "ml"
+      },
+      "effective": {
+        "cost": 3.2424242424242427,
+        "unit": "L"
+      }
+    },
+    "pellegrino": {
+      "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "quantity": 2,
+      "unit": "un",
+      "parseTier": "size_count",
+      "structuredKind": "multi_unit_pack",
+      "tierProbes": [
+        "size_count",
+        "embedded_bare_measure"
+      ],
+      "structureSummary": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 15,
+        "innerUnitType": "unit",
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "totalUsableAmount": 11250,
+        "usableUnit": "ml",
+        "tier": "size_count",
+        "matchedText": "75cl x 15ud",
+        "multiplierChain": {
+          "purchaseQuantity": 1,
+          "innerUnitCount": 15,
+          "unitSize": 75,
+          "unitMeasurement": "cl",
+          "perItemBase": 750,
+          "usableUnit": "ml",
+          "totalUsableAmount": 11250,
+          "expression": "1 × 15 × 75 cl"
+        }
+      },
+      "purchaseQty": 1,
+      "normalizedUsableQuantity": 22500,
+      "usableQuantityUnit": "ml",
+      "perUnit": {
+        "amount": 11250,
+        "unit": "ml"
+      },
+      "effective": {
+        "cost": 1.7137777777777778,
+        "unit": "L"
+      }
+    },
+    "nata": {
+      "name": "Nata Reny Picot 22% 6x1L",
+      "quantity": 5,
+      "unit": "cx",
+      "parseTier": "count_size",
+      "structuredKind": "multi_unit_pack",
+      "tierProbes": [
+        "count_size"
+      ],
+      "structureSummary": {
+        "purchaseQuantity": 6,
+        "purchaseFormat": "unit",
+        "innerUnitCount": null,
+        "innerUnitType": null,
+        "unitSize": 1,
+        "unitMeasurement": "L",
+        "totalUsableAmount": 6000,
+        "usableUnit": "ml",
+        "tier": "count_size",
+        "matchedText": "6x1L",
+        "multiplierChain": {
+          "purchaseQuantity": 6,
+          "innerUnitCount": 1,
+          "unitSize": 1,
+          "unitMeasurement": "L",
+          "perItemBase": 1000,
+          "usableUnit": "ml",
+          "totalUsableAmount": 6000,
+          "expression": "6 × 1 × 1 L"
+        }
+      },
+      "purchaseQty": 6,
+      "normalizedUsableQuantity": 30000,
+      "usableQuantityUnit": "ml",
+      "perUnit": {
+        "amount": 6000,
+        "unit": "ml"
+      },
+      "effective": {
+        "cost": 3.0483333333333333,
+        "unit": "L"
+      }
+    },
+    "chocolate": {
+      "name": "Chocolate Pantagruel 10x200g",
+      "quantity": 2,
+      "unit": "cx",
+      "parseTier": "count_size",
+      "structuredKind": "multi_unit_pack",
+      "tierProbes": [
+        "count_size"
+      ],
+      "structureSummary": {
+        "purchaseQuantity": 10,
+        "purchaseFormat": "unit",
+        "innerUnitCount": null,
+        "innerUnitType": null,
+        "unitSize": 200,
+        "unitMeasurement": "g",
+        "totalUsableAmount": 2000,
+        "usableUnit": "g",
+        "tier": "count_size",
+        "matchedText": "10x200g",
+        "multiplierChain": {
+          "purchaseQuantity": 10,
+          "innerUnitCount": 1,
+          "unitSize": 200,
+          "unitMeasurement": "g",
+          "perItemBase": 200,
+          "usableUnit": "g",
+          "totalUsableAmount": 2000,
+          "expression": "10 × 1 × 200 g"
+        }
+      },
+      "purchaseQty": 10,
+      "normalizedUsableQuantity": 4000,
+      "usableQuantityUnit": "g",
+      "perUnit": {
+        "amount": 2000,
+        "unit": "g"
+      },
+      "effective": {
+        "cost": 14.595,
+        "unit": "kg"
+      }
+    }
+  },
+  "allCandidates": [
+    {
+      "id": "77d804e3-b2ff-4a06-b4df-a78d3ff405a5",
+      "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "name": "Ovo Líquido Past.Gema Dovo 1 Kg",
+      "quantity": 6,
+      "unit": "un",
+      "unit_price": 10.49,
+      "total": 62.94,
+      "candidatePatterns": [],
+      "primaryFamily": "none",
+      "tierProbes": [
+        "embedded_bare_measure"
+      ],
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "unitSize": 1,
+        "unitMeasurement": "kg",
+        "totalUsableAmount": 1000,
+        "usableUnit": "g",
+        "matchedText": "1 Kg",
+        "tier": "bare_measure"
+      },
+      "structureSummary": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": null,
+        "innerUnitType": null,
+        "unitSize": 1,
+        "unitMeasurement": "kg",
+        "totalUsableAmount": 1000,
+        "usableUnit": "g",
+        "tier": "bare_measure",
+        "matchedText": "1 Kg",
+        "multiplierChain": {
+          "purchaseQuantity": 1,
+          "innerUnitCount": 1,
+          "unitSize": 1,
+          "unitMeasurement": "kg",
+          "perItemBase": 1000,
+          "usableUnit": "g",
+          "totalUsableAmount": 1000,
+          "expression": "1 × 1 × 1 kg"
+        }
+      },
+      "parseTier": "bare_measure",
+      "structuredKind": "weight_or_volume",
+      "normalizedUsableQuantity": 6000,
+      "usableQuantityUnit": "g",
+      "usableChain": {
+        "purchaseContainerCount": 6,
+        "usableQuantity": 6000,
+        "usableUnit": "g",
+        "unitFamily": "mass",
+        "usableSource": "structure_recomputed",
+        "fallbackReason": "generic row unit × per-item (6 × 1 kg)",
+        "weak_scalar_activated": false
+      },
+      "purchaseQty": 1,
+      "unitsPerPack": null,
+      "perUnit": {
+        "amount": 1000,
+        "unit": "g"
+      },
+      "effective": {
+        "cost": 10.49,
+        "unit": "kg"
+      },
+      "recipeFields": {
+        "current_price": 10.49,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 1000
+      },
+      "presentation": {
+        "card": {
+          "purchaseQuantityLine": "6 un",
+          "purchasePriceLine": "€10.49 / unit · €62.94 total",
+          "normalizedLine": "6 kg usable",
+          "usableCostLine": "€10.49 / kg usable"
+        },
+        "blocks": [
+          {
+            "id": "purchase",
+            "title": "Purchase",
+            "lines": [
+              {
+                "text": "6 un",
+                "variant": "default"
+              },
+              {
+                "text": "€10.49 / unit · €62.94 total",
+                "variant": "secondary"
+              }
+            ]
+          },
+          {
+            "id": "normalized",
+            "title": "Normalized",
+            "lines": [
+              {
+                "text": "6 kg usable",
+                "variant": "default"
+              }
+            ]
+          },
+          {
+            "id": "recipe-cost",
+            "title": "Normalized",
+            "lines": [
+              {
+                "text": "€10.49 / kg usable",
+                "variant": "emphasis"
+              }
+            ]
+          }
+        ],
+        "badges": [],
+        "insights": [],
+        "priceLabel": "Purchase price",
+        "priceDisplay": "€10.49 / unit",
+        "purchasedPackDetail": null,
+        "usableStockLabel": "6 kg usable",
+        "effectiveUsableCostLabel": "€10.49 / kg"
+      },
+      "expectedDenominator": null,
+      "expectedFormula": null,
+      "status": "N_A_OTHER",
+      "statusReason": "no inferable countable denominator",
+      "unitCostEur": 10.49,
+      "effectiveUnitCostEur": 10.49,
+      "hypotheticalUnitCost": null
+    },
+    {
+      "id": "c3533ceb-8784-49de-a0a9-ecf168d68c40",
+      "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "name": "Ovo Líquido Past.Gema Dovo 1kg",
+      "quantity": 6,
+      "unit": "un",
+      "unit_price": 10.19,
+      "total": 61.14,
+      "candidatePatterns": [],
+      "primaryFamily": "none",
+      "tierProbes": [
+        "embedded_bare_measure"
+      ],
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "unitSize": 1,
+        "unitMeasurement": "kg",
+        "totalUsableAmount": 1000,
+        "usableUnit": "g",
+        "matchedText": "1kg",
+        "tier": "bare_measure"
+      },
+      "structureSummary": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": null,
+        "innerUnitType": null,
+        "unitSize": 1,
+        "unitMeasurement": "kg",
+        "totalUsableAmount": 1000,
+        "usableUnit": "g",
+        "tier": "bare_measure",
+        "matchedText": "1kg",
+        "multiplierChain": {
+          "purchaseQuantity": 1,
+          "innerUnitCount": 1,
+          "unitSize": 1,
+          "unitMeasurement": "kg",
+          "perItemBase": 1000,
+          "usableUnit": "g",
+          "totalUsableAmount": 1000,
+          "expression": "1 × 1 × 1 kg"
+        }
+      },
+      "parseTier": "bare_measure",
+      "structuredKind": "weight_or_volume",
+      "normalizedUsableQuantity": 6000,
+      "usableQuantityUnit": "g",
+      "usableChain": {
+        "purchaseContainerCount": 6,
+        "usableQuantity": 6000,
+        "usableUnit": "g",
+        "unitFamily": "mass",
+        "usableSource": "structure_recomputed",
+        "fallbackReason": "generic row unit × per-item (6 × 1 kg)",
+        "weak_scalar_activated": false
+      },
+      "purchaseQty": 1,
+      "unitsPerPack": null,
+      "perUnit": {
+        "amount": 1000,
+        "unit": "g"
+      },
+      "effective": {
+        "cost": 10.19,
+        "unit": "kg"
+      },
+      "recipeFields": {
+        "current_price": 10.19,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 1000
+      },
+      "presentation": {
+        "card": {
+          "purchaseQuantityLine": "6 un",
+          "purchasePriceLine": "€10.19 / unit · €61.14 total",
+          "normalizedLine": "6 kg usable",
+          "usableCostLine": "€10.19 / kg usable"
+        },
+        "blocks": [
+          {
+            "id": "purchase",
+            "title": "Purchase",
+            "lines": [
+              {
+                "text": "6 un",
+                "variant": "default"
+              },
+              {
+                "text": "€10.19 / unit · €61.14 total",
+                "variant": "secondary"
+              }
+            ]
+          },
+          {
+            "id": "normalized",
+            "title": "Normalized",
+            "lines": [
+              {
+                "text": "6 kg usable",
+                "variant": "default"
+              }
+            ]
+          },
+          {
+            "id": "recipe-cost",
+            "title": "Normalized",
+            "lines": [
+              {
+                "text": "€10.19 / kg usable",
+                "variant": "emphasis"
+              }
+            ]
+          }
+        ],
+        "badges": [],
+        "insights": [],
+        "priceLabel": "Purchase price",
+        "priceDisplay": "€10.19 / unit",
+        "purchasedPackDetail": null,
+        "usableStockLabel": "6 kg usable",
+        "effectiveUsableCostLabel": "€10.19 / kg"
+      },
+      "expectedDenominator": null,
+      "expectedFormula": null,
+      "status": "N_A_OTHER",
+      "statusReason": "no inferable countable denominator",
+      "unitCostEur": 10.19,
+      "effectiveUnitCostEur": 10.19,
+      "hypotheticalUnitCost": null
+    },
+    {
+      "id": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 38.44,
+      "total": 38.44,
+      "candidatePatterns": [
+        {
+          "id": "dozen_unit",
+          "family": "dozen_countable",
+          "match": "15 dúzias"
+        },
+        {
+          "id": "cx_dot_count",
+          "family": "container_dot_count",
+          "match": "Cx.15"
+        },
+        {
+          "id": "cx_count_no_measure",
+          "family": "container_countable_inner",
+          "match": "Cx.15 dúzias"
+        },
+        {
+          "id": "container_x_count_no_measure",
+          "family": "container_bare_count",
+          "match": "Cx.15 "
+        },
+        {
+          "id": "egg_product",
+          "family": "egg_countable",
+          "match": "Ovo MORENO Classe M Cx.15 dúzias"
+        }
+      ],
+      "primaryFamily": "dozen_countable",
+      "tierProbes": [],
+      "parsePurchaseStructureFromText": null,
+      "structureSummary": null,
+      "parseTier": null,
+      "structuredKind": "row_only",
+      "normalizedUsableQuantity": null,
+      "usableQuantityUnit": null,
+      "usableChain": null,
+      "purchaseQty": 1,
+      "unitsPerPack": null,
+      "perUnit": null,
+      "effective": null,
+      "recipeFields": {
+        "current_price": 38.44,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un"
+      },
+      "presentation": {
+        "card": {
+          "purchaseQuantityLine": "1 case",
+          "purchasePriceLine": "€38.44 / case",
+          "normalizedLine": null,
+          "usableCostLine": null
+        },
+        "blocks": [
+          {
+            "id": "purchase",
+            "title": "Purchase",
+            "lines": [
+              {
+                "text": "1 case",
+                "variant": "default"
+              },
+              {
+                "text": "€38.44 / case",
+                "variant": "secondary"
+              }
+            ]
+          }
+        ],
+        "badges": [],
+        "insights": [],
+        "priceLabel": "Pack price",
+        "priceDisplay": "€38.44 / case",
+        "purchasedPackDetail": null,
+        "usableStockLabel": null,
+        "effectiveUsableCostLabel": null
+      },
+      "expectedDenominator": 180,
+      "expectedFormula": "1 cx × 15 dozen × 12",
+      "status": "BROKEN",
+      "statusReason": "expected denominator >1 but purchase_quantity collapsed to 1",
+      "unitCostEur": 38.44,
+      "effectiveUnitCostEur": 38.44,
+      "hypotheticalUnitCost": 0.21355555555555555
+    },
+    {
+      "id": "bf43813b-6377-459d-9c8f-b342eb969452",
+      "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 22.05,
+      "total": 22.05,
+      "candidatePatterns": [
+        {
+          "id": "container_x_count_no_measure",
+          "family": "container_bare_count",
+          "match": "CX 1"
+        }
+      ],
+      "primaryFamily": "container_bare_count",
+      "tierProbes": [
+        "size_count",
+        "embedded_bare_measure"
+      ],
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 6,
+        "unitSize": 1,
+        "unitMeasurement": "kg",
+        "totalUsableAmount": 6000,
+        "usableUnit": "g",
+        "matchedText": "1KG*6",
+        "tier": "size_count"
+      },
+      "structureSummary": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 6,
+        "innerUnitType": null,
+        "unitSize": 1,
+        "unitMeasurement": "kg",
+        "totalUsableAmount": 6000,
+        "usableUnit": "g",
+        "tier": "size_count",
+        "matchedText": "1KG*6",
+        "multiplierChain": {
+          "purchaseQuantity": 1,
+          "innerUnitCount": 6,
+          "unitSize": 1,
+          "unitMeasurement": "kg",
+          "perItemBase": 1000,
+          "usableUnit": "g",
+          "totalUsableAmount": 6000,
+          "expression": "1 × 6 × 1 kg"
+        }
+      },
+      "parseTier": "size_count",
+      "structuredKind": "multi_unit_pack",
+      "normalizedUsableQuantity": 6000,
+      "usableQuantityUnit": "g",
+      "usableChain": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 6000,
+        "usableUnit": "g",
+        "unitFamily": "mass",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "purchaseQty": 1,
+      "unitsPerPack": 6,
+      "perUnit": {
+        "amount": 6000,
+        "unit": "g"
+      },
+      "effective": {
+        "cost": 3.6750000000000003,
+        "unit": "kg"
+      },
+      "recipeFields": {
+        "current_price": 22.05,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 6000
+      },
+      "presentation": {
+        "card": {
+          "purchaseQuantityLine": "1 un · 6 × 1 kg",
+          "purchasePriceLine": "€22.05 / case",
+          "normalizedLine": "6 kg usable",
+          "usableCostLine": "€3.68 / kg usable"
+        },
+        "blocks": [
+          {
+            "id": "purchase",
+            "title": "Purchase",
+            "lines": [
+              {
+                "text": "1 un · 6 × 1 kg",
+                "variant": "default"
+              },
+              {
+                "text": "€22.05 / case",
+                "variant": "secondary"
+              }
+            ]
+          },
+          {
+            "id": "normalized",
+            "title": "Normalized",
+            "lines": [
+              {
+                "text": "6 kg usable",
+                "variant": "default"
+              }
+            ]
+          },
+          {
+            "id": "recipe-cost",
+            "title": "Normalized",
+            "lines": [
+              {
+                "text": "€3.68 / kg usable",
+                "variant": "emphasis"
+              }
+            ]
+          }
+        ],
+        "badges": [],
+        "insights": [],
+        "priceLabel": "Pack price",
+        "priceDisplay": "€22.05 / case",
+        "purchasedPackDetail": "6 × 1 kg",
+        "usableStockLabel": "6 kg usable",
+        "effectiveUsableCostLabel": "€3.68 / kg"
+      },
+      "expectedDenominator": null,
+      "expectedFormula": null,
+      "status": "N_A_VOLUME",
+      "statusReason": "mass/volume multiplier — handled by measure tiers",
+      "unitCostEur": 22.05,
+      "effectiveUnitCostEur": 22.05,
+      "hypotheticalUnitCost": null
+    },
+    {
+      "id": "9a52cc46-1c5a-4798-9621-d06177e04208",
+      "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "name": "POMODORI PELATI (CX 2,5KG*6)",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 22.05,
+      "total": 22.05,
+      "candidatePatterns": [
+        {
+          "id": "container_x_count_no_measure",
+          "family": "container_bare_count",
+          "match": "CX 2,5"
+        }
+      ],
+      "primaryFamily": "container_bare_count",
+      "tierProbes": [
+        "size_count",
+        "caixa_count_only",
+        "embedded_bare_measure"
+      ],
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 6,
+        "unitSize": 2.5,
+        "unitMeasurement": "kg",
+        "totalUsableAmount": 15000,
+        "usableUnit": "g",
+        "matchedText": "2,5KG*6",
+        "tier": "size_count"
+      },
+      "structureSummary": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 6,
+        "innerUnitType": null,
+        "unitSize": 2.5,
+        "unitMeasurement": "kg",
+        "totalUsableAmount": 15000,
+        "usableUnit": "g",
+        "tier": "size_count",
+        "matchedText": "2,5KG*6",
+        "multiplierChain": {
+          "purchaseQuantity": 1,
+          "innerUnitCount": 6,
+          "unitSize": 2.5,
+          "unitMeasurement": "kg",
+          "perItemBase": 2500,
+          "usableUnit": "g",
+          "totalUsableAmount": 15000,
+          "expression": "1 × 6 × 2.5 kg"
+        }
+      },
+      "parseTier": "size_count",
+      "structuredKind": "multi_unit_pack",
+      "normalizedUsableQuantity": 15000,
+      "usableQuantityUnit": "g",
+      "usableChain": {
+        "purchaseContainerCount": 1,
+        "usableQuantity": 15000,
+        "usableUnit": "g",
+        "unitFamily": "mass",
+        "usableSource": "structure_total",
+        "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+        "weak_scalar_activated": false
+      },
+      "purchaseQty": 1,
+      "unitsPerPack": 6,
+      "perUnit": {
+        "amount": 15000,
+        "unit": "g"
+      },
+      "effective": {
+        "cost": 1.47,
+        "unit": "kg"
+      },
+      "recipeFields": {
+        "current_price": 22.05,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 15000
+      },
+      "presentation": {
+        "card": {
+          "purchaseQuantityLine": "1 un · 6 × 2.5 kg",
+          "purchasePriceLine": "€22.05 / case",
+          "normalizedLine": "15 kg usable",
+          "usableCostLine": "€1.47 / kg usable"
+        },
+        "blocks": [
+          {
+            "id": "purchase",
+            "title": "Purchase",
+            "lines": [
+              {
+                "text": "1 un · 6 × 2.5 kg",
+                "variant": "default"
+              },
+              {
+                "text": "€22.05 / case",
+                "variant": "secondary"
+              }
+            ]
+          },
+          {
+            "id": "normalized",
+            "title": "Normalized",
+            "lines": [
+              {
+                "text": "15 kg usable",
+                "variant": "default"
+              }
+            ]
+          },
+          {
+            "id": "recipe-cost",
+            "title": "Normalized",
+            "lines": [
+              {
+                "text": "€1.47 / kg usable",
+                "variant": "emphasis"
+              }
+            ]
+          }
+        ],
+        "badges": [],
+        "insights": [],
+        "priceLabel": "Pack price",
+        "priceDisplay": "€22.05 / case",
+        "purchasedPackDetail": "6 × 2.5 kg",
+        "usableStockLabel": "15 kg usable",
+        "effectiveUsableCostLabel": "€1.47 / kg"
+      },
+      "expectedDenominator": null,
+      "expectedFormula": null,
+      "status": "N_A_VOLUME",
+      "statusReason": "mass/volume multiplier — handled by measure tiers",
+      "unitCostEur": 22.05,
+      "effectiveUnitCostEur": 22.05,
+      "hypotheticalUnitCost": null
+    },
+    {
+      "id": "ef25be0f-f153-40de-b377-25151d147637",
+      "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 20.97,
+      "total": 42.07,
+      "candidatePatterns": [
+        {
+          "id": "container_x_count_no_measure",
+          "family": "container_bare_count",
+          "match": "CX 7"
+        }
+      ],
+      "primaryFamily": "container_bare_count",
+      "tierProbes": [
+        "size_count",
+        "embedded_bare_measure"
+      ],
+      "parsePurchaseStructureFromText": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 15,
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "totalUsableAmount": 11250,
+        "usableUnit": "ml",
+        "matchedText": "75CL*15",
+        "tier": "size_count"
+      },
+      "structureSummary": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 15,
+        "innerUnitType": null,
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "totalUsableAmount": 11250,
+        "usableUnit": "ml",
+        "tier": "size_count",
+        "matchedText": "75CL*15",
+        "multiplierChain": {
+          "purchaseQuantity": 1,
+          "innerUnitCount": 15,
+          "unitSize": 75,
+          "unitMeasurement": "cl",
+          "perItemBase": 750,
+          "usableUnit": "ml",
+          "totalUsableAmount": 11250,
+          "expression": "1 × 15 × 75 cl"
+        }
+      },
+      "parseTier": "size_count",
+      "structuredKind": "multi_unit_pack",
+      "normalizedUsableQuantity": 22500,
+      "usableQuantityUnit": "ml",
+      "usableChain": {
+        "purchaseContainerCount": 2,
+        "usableQuantity": 22500,
+        "usableUnit": "ml",
+        "unitFamily": "volume",
+        "usableSource": "structure_scaled_outer",
+        "fallbackReason": "outer count 2 (name 1)",
+        "weak_scalar_activated": false
+      },
+      "purchaseQty": 1,
+      "unitsPerPack": 15,
+      "perUnit": {
+        "amount": 11250,
+        "unit": "ml"
+      },
+      "effective": {
+        "cost": 1.8639999999999999,
+        "unit": "L"
+      },
+      "recipeFields": {
+        "current_price": 20.97,
+        "purchase_quantity": 11250,
+        "cost_base_unit": "ml"
+      },
+      "presentation": {
+        "card": {
+          "purchaseQuantityLine": "2 un · 15 × 75 cl",
+          "purchasePriceLine": "€20.97 / case · €42.07 total",
+          "normalizedLine": "22.5 L usable",
+          "usableCostLine": "€1.86 / L usable"
+        },
+        "blocks": [
+          {
+            "id": "purchase",
+            "title": "Purchase",
+            "lines": [
+              {
+                "text": "2 un · 15 × 75 cl",
+                "variant": "default"
+              },
+              {
+                "text": "€20.97 / case · €42.07 total",
+                "variant": "secondary"
+              }
+            ]
+          },
+          {
+            "id": "normalized",
+            "title": "Normalized",
+            "lines": [
+              {
+                "text": "22.5 L usable",
+                "variant": "default"
+              }
+            ]
+          },
+          {
+            "id": "recipe-cost",
+            "title": "Normalized",
+            "lines": [
+              {
+                "text": "€1.86 / L usable",
+                "variant": "emphasis"
+              }
+            ]
+          }
+        ],
+        "badges": [],
+        "insights": [],
+        "priceLabel": "Pack price",
+        "priceDisplay": "€20.97 / case",
+        "purchasedPackDetail": "15 × 75 cl",
+        "usableStockLabel": "22.5 L usable",
+        "effectiveUsableCostLabel": "€1.86 / L"
+      },
+      "expectedDenominator": null,
+      "expectedFormula": null,
+      "status": "N_A_VOLUME",
+      "statusReason": "mass/volume multiplier — handled by measure tiers",
+      "unitCostEur": 0.001864,
+      "effectiveUnitCostEur": 0.001864,
+      "hypotheticalUnitCost": null
+    }
+  ]
+}

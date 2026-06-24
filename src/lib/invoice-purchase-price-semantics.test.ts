@@ -5,7 +5,7 @@ import {
   MISSING_OPERATIONAL_PRICING_LABEL,
   resolvedOperationalUnitCostEur,
 } from "@/lib/ingredient-unit-cost";
-import { resolveInvoiceLinePurchaseFormat } from "./invoice-purchase-format";
+import { resolveInvoiceLinePurchaseFormat, resolveInvoiceLineStockPresentation } from "./invoice-purchase-format";
 import { ingredientLineCostEur } from "@/lib/recipe-prep-cost";
 import {
   computeEffectiveUsableCost,
@@ -20,6 +20,7 @@ import {
   recipeOperationalCostFieldsFromInvoiceLine,
   resolveInvoiceLinePricingPresentation,
   resolveUsablePerPricedUnit,
+  shouldCollapseInvoiceOperationalDisplay,
 } from "./invoice-purchase-price-semantics";
 
 describe("recipeOperationalCostFieldsFromInvoiceLine", () => {
@@ -356,6 +357,7 @@ describe("resolveInvoiceLinePricingPresentation", () => {
     expect(presentation.priceLabel).toBe("Purchase price");
     expect(presentation.priceDisplay).toBe("€14.50 / kg");
     expect(presentation.effectiveUsableCostLabel).toBe("€14.50 / kg");
+    expect(presentation.card.normalizedLine).toBe("2 kg usable");
     expect(presentation.card.usableCostLine).toBe("€14.50 / kg usable");
   });
 
@@ -374,7 +376,8 @@ describe("resolveInvoiceLinePricingPresentation", () => {
 
     const presentation = resolveInvoiceLinePricingPresentation(meta);
     expect(presentation.effectiveUsableCostLabel).toBe(`€${unit_price.toFixed(2)} / kg`);
-    expect(presentation.card.usableCostLine).toBe(`€${unit_price.toFixed(2)} / kg usable`);
+    expect(presentation.card.normalizedLine).toBeNull();
+    expect(presentation.card.usableCostLine).toBeNull();
   });
 
   it("formats Salada Ibérica EM pack without kg regression", () => {
@@ -388,6 +391,31 @@ describe("resolveInvoiceLinePricingPresentation", () => {
     expect(presentation.priceLabel).toBe("Pack price");
     expect(presentation.priceDisplay).toBe("€4.25 / pack");
     expect(presentation.card.purchaseQuantityLine).toBe("1 pack");
+  });
+
+  it("formats Salada Ibérica FSTK EMB 250g @ em as €8.76/kg operational, €2.19/pack procurement", () => {
+    const meta = {
+      name: "Salada Ibérica FSTK EMB. 250g",
+      quantity: 4,
+      unit: "em" as const,
+      unit_price: 2.19,
+      line_total: 8.76,
+    };
+    const structured = resolveInvoiceLinePurchaseFormat(meta);
+    const presentation = resolveInvoiceLinePricingPresentation(meta);
+    const effective = computeEffectiveUsableCost(2.19, meta, structured, meta.name);
+    const recipeFields = recipeOperationalCostFieldsFromInvoiceLine(meta);
+
+    expect(presentation.priceDisplay).toBe("€2.19 / pack");
+    expect(presentation.effectiveUsableCostLabel).toBe("€8.76 / kg");
+    expect(presentation.card.usableCostLine).toBe("€8.76 / kg usable");
+    expect(presentation.usableStockLabel).toMatch(/250\s*g\s+usable/i);
+    expect(effective).toEqual({ cost: 8.76, unit: "kg" });
+    expect(recipeFields).toMatchObject({
+      current_price: 2.19,
+      purchase_quantity: 250,
+      cost_base_unit: "g",
+    });
   });
 
   it("formats liquid bottle lines with per-L usable cost", () => {
@@ -447,8 +475,104 @@ describe("resolveInvoiceLinePricingPresentation", () => {
     expect(presentation.card.purchasePriceLine).toBe("€24.90 / case");
     expect(presentation.card.normalizedLine).toBeNull();
     expect(presentation.usableStockLabel).toBeNull();
-    expect(presentation.card.usableCostLine).toBe("€24.90 / case usable");
+    expect(presentation.card.usableCostLine).toBeNull();
     expect(presentation.effectiveUsableCostLabel).not.toMatch(/138/i);
+  });
+
+  it("collapses duplicate operational display for same-unit bulk weight (Pêra Abacate)", () => {
+    const meta = {
+      name: "Pêra Abacate Hasse",
+      quantity: 3.28,
+      unit: "kg" as const,
+      unit_price: 4.26,
+      line_total: 13.96,
+    };
+    const presentation = resolveInvoiceLinePricingPresentation(meta);
+
+    expect(presentation.card).toEqual({
+      purchaseQuantityLine: "3.28 kg",
+      purchasePriceLine: "€4.26 / kg · €13.96 total",
+      normalizedLine: null,
+      usableCostLine: null,
+    });
+    expect(presentation.effectiveUsableCostLabel).toBe("€4.26 / kg");
+  });
+
+  it("keeps operational display when pack content differs from procurement (Salada, Ovo, herbs)", () => {
+    const salada = resolveInvoiceLinePricingPresentation({
+      name: "Salada Ibérica FSTK EMB. 250g",
+      quantity: 4,
+      unit: "em",
+      unit_price: 2.19,
+      line_total: 8.76,
+    });
+    expect(salada.card.normalizedLine).toMatch(/250\s*g\s+usable/i);
+    expect(salada.card.usableCostLine).toBe("€8.76 / kg usable");
+
+    const ovo = resolveInvoiceLinePricingPresentation({
+      name: "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      quantity: 1,
+      unit: "cx",
+      unit_price: 38.44,
+    });
+    expect(ovo.card.normalizedLine).toMatch(/180\s+un\s+usable/i);
+    expect(ovo.card.usableCostLine).toBe("€0.2136 / egg usable");
+
+    const tomilho = resolveInvoiceLinePricingPresentation({
+      name: "Tomilho",
+      quantity: 1,
+      unit: "mo",
+      unit_price: 2.06,
+    });
+    expect(tomilho.card.normalizedLine).toMatch(/100\s*g\s+usable/i);
+    expect(tomilho.card.usableCostLine).toBe("€20.60 / kg usable");
+
+    const manjericao = resolveInvoiceLinePricingPresentation({
+      name: "Manjericão",
+      quantity: 5,
+      unit: "mo",
+      unit_price: 2.06,
+      line_total: 10.28,
+    });
+    expect(manjericao.card.normalizedLine).toMatch(/500\s*g\s+usable/i);
+    expect(manjericao.card.usableCostLine).toBe("€20.60 / kg usable");
+  });
+});
+
+describe("shouldCollapseInvoiceOperationalDisplay", () => {
+  it("documents the three-way comparison rule", () => {
+    const meta = {
+      name: "Pêra Abacate Hasse",
+      quantity: 3.28,
+      unit: "kg" as const,
+      unit_price: 4.26,
+      line_total: 13.96,
+    };
+    const structured = resolveInvoiceLinePurchaseFormat(meta);
+    const stock = resolveInvoiceLineStockPresentation(meta);
+    const effective = computeEffectiveUsableCost(4.26, meta, structured, meta.name);
+
+    expect(
+      shouldCollapseInvoiceOperationalDisplay({
+        metadata: meta,
+        stock,
+        unitPrice: 4.26,
+        priceSuffix: "kg",
+        effective,
+        usableStockLabel: "3.28 kg usable",
+      }),
+    ).toBe(true);
+
+    expect(
+      shouldCollapseInvoiceOperationalDisplay({
+        metadata: meta,
+        stock,
+        unitPrice: 4.26,
+        priceSuffix: "kg",
+        effective: { cost: 8.76, unit: "kg" },
+        usableStockLabel: "3.28 kg usable",
+      }),
+    ).toBe(false);
   });
 });
 

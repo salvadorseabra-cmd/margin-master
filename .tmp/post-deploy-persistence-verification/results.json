@@ -1,0 +1,274 @@
+{
+  "generatedAt": "2026-06-23T10:20:41.993Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "mode": "STRICT_READ_ONLY",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "invoice": {
+    "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "supplier_name": "Emporio Italia",
+    "created_at": "2026-06-11T22:53:16.723511+00:00",
+    "invoice_date": "2026-05-19",
+    "total": 327.46
+  },
+  "task1_liveDb": [
+    {
+      "invoice_item_id": "9751608b-a4b1-4469-b3bd-7e43e8298e50",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "product_name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 2,
+      "unit": "kg",
+      "updated_at": "2026-06-23T10:14:08.313145+00:00",
+      "created_at": "2026-06-23T10:14:08.313145+00:00"
+    },
+    {
+      "invoice_item_id": "d334024e-a2f5-4bbc-8880-d13e4cbee5ca",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "product_name": "Assaporami Prosciutto Cotto Scelto HC 4-4,25Kg",
+      "quantity": 4.3,
+      "unit": "kg",
+      "updated_at": "2026-06-23T10:14:08.313145+00:00",
+      "created_at": "2026-06-23T10:14:08.313145+00:00"
+    },
+    {
+      "invoice_item_id": "f187d028-9a8f-400a-aead-80b7f5f98de1",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "product_name": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 24,
+      "unit": null,
+      "updated_at": "2026-06-23T10:14:08.313145+00:00",
+      "created_at": "2026-06-23T10:14:08.313145+00:00"
+    },
+    {
+      "invoice_item_id": "8c4d16d6-89c6-4fd0-8d3a-d18a6e65666a",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "product_name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null,
+      "updated_at": "2026-06-23T10:14:08.313145+00:00",
+      "created_at": "2026-06-23T10:14:08.313145+00:00"
+    },
+    {
+      "invoice_item_id": "bf827fdf-f7f3-4f4c-b92a-1f9b17a3c368",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "product_name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5Kg",
+      "quantity": 1.83,
+      "unit": "kg",
+      "updated_at": "2026-06-23T10:14:08.313145+00:00",
+      "created_at": "2026-06-23T10:14:08.313145+00:00"
+    },
+    {
+      "invoice_item_id": "43394152-666e-44d3-a54d-2dbe86a1551e",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "product_name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5Kg",
+      "quantity": 3.11,
+      "unit": "kg",
+      "updated_at": "2026-06-23T10:14:08.313145+00:00",
+      "created_at": "2026-06-23T10:14:08.313145+00:00"
+    },
+    {
+      "invoice_item_id": "505f3f4d-c0b6-465d-8722-cc978add408b",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "product_name": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "quantity": 2.6,
+      "unit": "kg",
+      "updated_at": "2026-06-23T10:14:08.313145+00:00",
+      "created_at": "2026-06-23T10:14:08.313145+00:00"
+    },
+    {
+      "invoice_item_id": "3236684f-1c48-4ed9-ba4c-e7b83b774fba",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "product_name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "quantity": 2,
+      "unit": "un",
+      "updated_at": "2026-06-23T10:14:08.313145+00:00",
+      "created_at": "2026-06-23T10:14:08.313145+00:00"
+    }
+  ],
+  "task2_reReadEffect": {
+    "verdict": "B) delete/recreate",
+    "evidence": {
+      "reReadTimestamp": "2026-06-23T10:14:08.313145+00:00",
+      "priorAuditIds": {
+        "invoiceUnitPersistence_0924Z": {
+          "paccheri": "728517aa-8578-4f6f-a415-aae06f05f5c4",
+          "ginger": "634a418b-1509-42a9-bf01-563705967b6f",
+          "created_at": "2026-06-20T01:25:08.339203+00:00"
+        },
+        "paccheriGingerAudit_1200Z": {
+          "paccheri": "cdecef89-2881-4795-92ba-93c06bc7c8e8",
+          "ginger": "e41a41e6-dc12-403e-abe3-47872412435c"
+        }
+      },
+      "currentIds": {
+        "paccheri": "8c4d16d6-89c6-4fd0-8d3a-d18a6e65666a",
+        "ginger": "f187d028-9a8f-400a-aead-80b7f5f98de1"
+      },
+      "allEightItemsShareCreatedAt": "2026-06-23T10:14:08.313145+00:00",
+      "unitStillNullAfterReRead": true
+    }
+  },
+  "task3_executionTrace": [
+    {
+      "product": "Baladin - Ginger Beer 0.20cl",
+      "invoiceItemId": "f187d028-9a8f-400a-aead-80b7f5f98de1",
+      "db": {
+        "quantity": 24,
+        "unit": null,
+        "created_at": "2026-06-23T10:14:08.313145+00:00",
+        "updated_at": "2026-06-23T10:14:08.313145+00:00"
+      },
+      "trace": {
+        "extractionUnit": null,
+        "structuredKind": "weight_or_volume",
+        "resolverInput": {
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "quantity": 24,
+          "unit": null
+        },
+        "resolverOutput": {
+          "unit": null,
+          "source": "fallback_null"
+        },
+        "persistencePayloadUnit_deployedProxy": null,
+        "persistencePayloadUnit_currentLocalCode": "un",
+        "persistedDbUnit": null
+      },
+      "gates": {
+        "ocrNull": true,
+        "weightOrVolume": true,
+        "qtyOk": true,
+        "embeddedRetail": true,
+        "noPackMarkers": true,
+        "fallbackNull": true,
+        "allPass": true,
+        "structuredKind": "weight_or_volume",
+        "resolution": {
+          "unit": null,
+          "source": "fallback_null"
+        }
+      },
+      "wouldCurrentCodeInferUn": true,
+      "wouldDeployedCodeInferUn": false
+    },
+    {
+      "product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "invoiceItemId": "8c4d16d6-89c6-4fd0-8d3a-d18a6e65666a",
+      "db": {
+        "quantity": 24,
+        "unit": null,
+        "created_at": "2026-06-23T10:14:08.313145+00:00",
+        "updated_at": "2026-06-23T10:14:08.313145+00:00"
+      },
+      "trace": {
+        "extractionUnit": null,
+        "structuredKind": "weight_or_volume",
+        "resolverInput": {
+          "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+          "quantity": 24,
+          "unit": null
+        },
+        "resolverOutput": {
+          "unit": null,
+          "source": "fallback_null"
+        },
+        "persistencePayloadUnit_deployedProxy": null,
+        "persistencePayloadUnit_currentLocalCode": "un",
+        "persistedDbUnit": null
+      },
+      "gates": {
+        "ocrNull": true,
+        "weightOrVolume": true,
+        "qtyOk": true,
+        "embeddedRetail": true,
+        "noPackMarkers": true,
+        "fallbackNull": true,
+        "allPass": true,
+        "structuredKind": "weight_or_volume",
+        "resolution": {
+          "unit": null,
+          "source": "fallback_null"
+        }
+      },
+      "wouldCurrentCodeInferUn": true,
+      "wouldDeployedCodeInferUn": false
+    }
+  ],
+  "task4_deploymentValidation": {
+    "shouldInferUnForEmbeddedMeasureCountable": {
+      "localWorkspace": {
+        "present": true,
+        "file": "src/lib/invoice-purchase-format.ts:1423",
+        "commit": "be21f023653bd0252db147d22f6274fa79e9e014",
+        "commitDate": "2026-06-23 11:13:32 +0100",
+        "message": "Fix embedded-measure countable unit inference"
+      },
+      "originMain_proxyForDeployedFrontend": {
+        "present": false,
+        "commit": "c23dcda07e48558365dbfaeccad4c10ebda6454a",
+        "commitDate": "2026-06-10 01:21:11 +0100",
+        "message": "feat(invoices): support Bidfood MO/EM supplier units"
+      },
+      "localMainAheadOfOrigin": 19,
+      "runsOnReRead": "CLIENT — invoices.tsx runExtraction → resolveInvoiceItemUnit → resolveInvoicePersistedItemUnit (line 1448)",
+      "edgeFunction": {
+        "name": "extract-invoice",
+        "version": 38,
+        "updatedAtUtc": "2026-06-23 10:13:38",
+        "relevance": "Returns extraction unit only; does NOT run shouldInferUnForEmbeddedMeasureCountable"
+      }
+    }
+  },
+  "task5_gateValidation": [
+    {
+      "product": "Baladin - Ginger Beer 0.20cl",
+      "gates": {
+        "ocrUnitNull": "PASS",
+        "weightOrVolume": "PASS",
+        "integerQtyGt1": "PASS",
+        "embeddedRetailMeasure": "PASS",
+        "noPackMarkers": "PASS",
+        "fallbackNull": "PASS"
+      },
+      "allGatesPass": true,
+      "wouldCurrentCodeInferUn": "YES",
+      "wouldDeployedOriginMainInferUn": "NO"
+    },
+    {
+      "product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "gates": {
+        "ocrUnitNull": "PASS",
+        "weightOrVolume": "PASS",
+        "integerQtyGt1": "PASS",
+        "embeddedRetailMeasure": "PASS",
+        "noPackMarkers": "PASS",
+        "fallbackNull": "PASS"
+      },
+      "allGatesPass": true,
+      "wouldCurrentCodeInferUn": "YES",
+      "wouldDeployedOriginMainInferUn": "NO"
+    }
+  ],
+  "task6_rootCause": {
+    "verdict": "B) Deployed code not active",
+    "singleRootCause": "Client-side frontend bundle on VL does not include be21f02 gated un inference; re-read ran with pre-fix resolveInvoicePersistedItemUnit (origin/main proxy). Edge extract-invoice v38 deploy is irrelevant to unit persistence."
+  },
+  "task7_hypotheticalFreshUpload": {
+    "paccheri": {
+      "quantity": 24,
+      "extractionUnit": null,
+      "unitWithCurrentLocalCode": "un",
+      "unitWithDeployedOriginMain": null
+    },
+    "gingerBeer": {
+      "quantity": 24,
+      "extractionUnit": null,
+      "unitWithCurrentLocalCode": "un",
+      "unitWithDeployedOriginMain": null
+    }
+  },
+  "pellegrinoControl": {
+    "id": "3236684f-1c48-4ed9-ba4c-e7b83b774fba",
+    "unit": "un",
+    "created_at": "2026-06-23T10:14:08.313145+00:00"
+  }
+}

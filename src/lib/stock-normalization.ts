@@ -45,6 +45,7 @@ export type PurchaseStructure = {
     | "triple_nested"
     | "caixa_units_size"
     | "caixa_compact_size"
+    | "caixa_dozen_count"
     | "units_size"
     | "container_size"
     | "count_size"
@@ -209,6 +210,16 @@ const CAIXA_COMPACT_SIZE_RE = new RegExp(
   "iu",
 );
 
+const EGGS_PER_DOZEN = 12;
+
+const DOZEN_UNIT_TOKEN = String.raw`dúzia|dúzias|duzia|duzias|dozen|dozens|dz`;
+
+/** `Cx.15 dúzias` / `cx 15 dúzias` / `Caixa 30 dz` — case of dozens (countable eggs). */
+const CAIXA_DOZEN_RE = new RegExp(
+  String.raw`\b(?:caixa|caixas|cx)\s*\.?\s*(?<inner>\d+(?:[.,]\d+)?)\s*(?<dozenUnit>${DOZEN_UNIT_TOKEN})\b`,
+  "iu",
+);
+
 /** `caixa 24` beside a per-piece weight elsewhere in the title (`Pão Batata 80g caixa 24`). */
 const CAIXA_COUNT_ONLY_RE = new RegExp(
   String.raw`\b(?:caixa|caixas|cx)\s*(?<inner>\d+(?:[.,]\d+)?)\b`,
@@ -354,6 +365,11 @@ function scoreCaixaUnitsSizeMatch(match: RegExpMatchArray): number {
 
 function scoreCaixaCompactSizeMatch(match: RegExpMatchArray): number {
   return scoreInnerUnitsSizeMatch(match);
+}
+
+function scoreCaixaDozenMatch(match: RegExpMatchArray): number {
+  const dozenCount = parseQuantityToken(match.groups?.inner ?? "");
+  return dozenCount ?? -1;
 }
 
 function scoreUnitsSizeMatch(match: RegExpMatchArray): number {
@@ -699,6 +715,25 @@ export function parsePurchaseStructureFromText(text: string): PurchaseStructure 
     });
     logPurchaseStructureParse(trimmed, structure, "caixa_compact_size");
     return structure;
+  }
+
+  const caixaDozen = findBestRegexMatch(trimmed, CAIXA_DOZEN_RE, scoreCaixaDozenMatch);
+  if (caixaDozen?.groups) {
+    const dozenCount = parseQuantityToken(caixaDozen.groups.inner ?? "");
+    if (dozenCount != null) {
+      const structure = buildStructure({
+        purchaseQuantity: 1,
+        purchaseFormat: "case",
+        innerUnitCount: dozenCount,
+        innerUnitType: "dozen",
+        unitSize: EGGS_PER_DOZEN,
+        unitMeasurement: "un",
+        matchedText: caixaDozen[0] ?? trimmed,
+        tier: "caixa_dozen_count",
+      });
+      logPurchaseStructureParse(trimmed, structure, "caixa_dozen_count");
+      return structure;
+    }
   }
 
   const unitsSize = findBestRegexMatch(trimmed, UNITS_SIZE_RE, scoreUnitsSizeMatch);
@@ -1105,9 +1140,25 @@ function structureTotalIsFinalForGenericRow(
   );
 }
 
+const CASE_PURCHASE_UNITS = new Set([
+  "cx",
+  "caixa",
+  "caixas",
+  "case",
+  "cases",
+  "emb",
+  "embalagem",
+  "embalagens",
+]);
+
+function isCasePurchaseUnit(unit: string | null | undefined): boolean {
+  const normalized = unit?.trim().toLowerCase();
+  return normalized != null && CASE_PURCHASE_UNITS.has(normalized);
+}
+
 /**
- * size_count g packs (e.g. 125GR*8): invoice outer qty scales usable; cl/L volume packs keep
- * structure_total (Pellegrino, Peroni rowQty=innerCount).
+ * size_count g/cl/L/ml packs: invoice outer qty scales usable when rowQty ≠ innerCount.
+ * kg excluded (Mezzi); Peroni excluded when rowQty === innerCount.
  */
 function shouldScaleOuterPackForSizeCountGenericRow(
   structure: PurchaseStructure,
@@ -1119,7 +1170,25 @@ function shouldScaleOuterPackForSizeCountGenericRow(
   if (rowQuantity == null || !Number.isFinite(rowQuantity) || rowQuantity <= 1) return false;
   const inner = structure.innerUnitCount ?? 1;
   if (Math.abs(rowQuantity - inner) < 0.01) return false;
-  return structure.unitMeasurement === "g";
+  if (structure.unitMeasurement === "kg") return false;
+  return (
+    structure.unitMeasurement === "g" ||
+    structure.unitMeasurement === "cl" ||
+    structure.unitMeasurement === "L" ||
+    structure.unitMeasurement === "ml"
+  );
+}
+
+/** count_size case-unit rows (cx): invoice outer case count × one-case structure total. */
+function shouldScaleOuterCountForCountSizeGenericRow(
+  structure: PurchaseStructure,
+  rowQuantity: number | null,
+  rowUnit: string | null,
+): boolean {
+  if (structure.tier !== "count_size") return false;
+  if (!isCasePurchaseUnit(rowUnit)) return false;
+  if (rowQuantity == null || !Number.isFinite(rowQuantity) || rowQuantity <= 1) return false;
+  return true;
 }
 
 function hasFractionalQuantity(qty: number): boolean {
@@ -1208,6 +1277,9 @@ export function resolveStructurePurchaseQuantity(
   if (structure.tier === "count_size") {
     if (isRowQtyConflatedWithPurchaseCount(structure, rowQuantity, rowUnit)) {
       return fromName;
+    }
+    if (shouldScaleOuterCountForCountSizeGenericRow(structure, rowQuantity, rowUnit)) {
+      return Math.max(1, Math.round(rowQuantity));
     }
     if (isGenericPurchaseUnit(rowUnit)) {
       return 1;
@@ -1369,6 +1441,10 @@ export function computeUsableFromPurchaseStructure(
       total = rowBase.amount;
       usableSource = "structure_total";
       fallbackReason = "weak invoice row g/ml; row amount as partial usable";
+    } else if (shouldScaleOuterCountForCountSizeGenericRow(structure, rowQuantity, rowUnit)) {
+      total = Math.max(1, Math.round(rowQuantity!)) * structure.totalUsableAmount;
+      usableSource = "structure_scaled_outer";
+      fallbackReason = `outer case count ${rowQuantity} × pack total ${structure.totalUsableAmount}`;
     } else if (
       isGenericPurchaseUnit(rowUnit) &&
       rowQuantity != null &&

@@ -1,0 +1,615 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "auditedAt": "2026-06-24T01:32:08.142Z",
+  "mode": "STRICT_READ_ONLY",
+  "product": "Manjericão",
+  "canonicalName": "Manjericão",
+  "bidfoodInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+  "verdict": "A",
+  "verdictOptions": {
+    "A": "Correct — 100g/bunch conversion, €20.60/kg operational, recipe g-costing aligned end-to-end",
+    "B": "Display correct but recipe misaligned — operational shown but persistence/recipe fields diverge",
+    "C": "Conversion hint runtime-only gap — operational works on invoice trace but DB fields differ",
+    "D": "Math error — €20.60/kg or recipe denominator incorrect for 5×€2.06 / 100g/bunch",
+    "E": "Unsafe for recipe costing — null operational, wrong unit family, or g-recipe returns null"
+  },
+  "verdictQuestion": "Can Marginly safely use Manjericão for recipe costing today?",
+  "verdictAnswer": "Yes. Invoice 5 mo × €2.06/bunch → detectConversionHint MANJERICAO → 100g/bunch → operational €20.60/kg. Recipe fields: current_price=2.06, purchase_quantity=100, cost_base_unit=g → ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) = qty × (€2.06/100). DB persisted fields match trace.",
+  "q1_dbState": {
+    "ingredient_id": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+    "name": "Manjericão",
+    "current_price": 2.06,
+    "purchase_quantity": 100,
+    "purchase_unit": "g",
+    "cost_base_unit": "g",
+    "usable_quantity": 500,
+    "usable_unit": "g",
+    "purchase_structure_kind": "inferred",
+    "catalog": {
+      "base_unit": "g",
+      "unit": "g"
+    },
+    "match": {
+      "ingredient_id": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+      "status": "confirmed",
+      "match_kind": "confirmed-alias"
+    }
+  },
+  "q1_dbStateTable": [
+    {
+      "field": "ingredient_id",
+      "currentValue": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+      "source": "ingredients.id"
+    },
+    {
+      "field": "name",
+      "currentValue": "Manjericão",
+      "source": "ingredients.name"
+    },
+    {
+      "field": "current_price",
+      "currentValue": 2.06,
+      "source": "ingredients.current_price (€/bunch)"
+    },
+    {
+      "field": "purchase_quantity",
+      "currentValue": 100,
+      "source": "ingredients.purchase_quantity (grams per bunch for recipe denominator)"
+    },
+    {
+      "field": "purchase_unit",
+      "currentValue": "g",
+      "source": "ingredients.purchase_unit"
+    },
+    {
+      "field": "cost_base_unit",
+      "currentValue": "g",
+      "source": "ingredients.base_unit"
+    },
+    {
+      "field": "usable_quantity",
+      "currentValue": 500,
+      "source": "resolveInvoiceLinePurchaseFormat.normalizedUsableQuantity (trace: 5×100g=500g)"
+    },
+    {
+      "field": "usable_unit",
+      "currentValue": "g",
+      "source": "resolveInvoiceLinePurchaseFormat.usableQuantityUnit (trace)"
+    },
+    {
+      "field": "purchase_structure_kind",
+      "currentValue": "inferred",
+      "source": "structured.kind=inferred via conversion_hint"
+    }
+  ],
+  "q2_latestPurchase": {
+    "invoice_item_id": "b47828a9-e042-4437-b0b7-8944c812509a",
+    "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "quantity": 5,
+    "unit": "mo",
+    "unit_price": 2.06,
+    "line_total": 10.28,
+    "purchase_structure_kind": "inferred",
+    "parsedStructure": {
+      "tier": null,
+      "matchedText": null,
+      "structuredKind": "inferred",
+      "unitsPerPack": null,
+      "conversionHint": {
+        "purchase_unit": "un",
+        "estimated_quantity": 100,
+        "stock_unit": "g",
+        "recipe_usage_unit": "g",
+        "label": "fresh herbs",
+        "confidence": 0.58,
+        "reason": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+      }
+    },
+    "persistedAs": "5 bunches",
+    "persistedInterpretation": "operationalCostFieldsFromInvoiceLine → current_price=unit_price, purchase_quantity=100, cost_base_unit=g",
+    "supplier": "Bidfood Portugal, SA",
+    "invoice_date": "2026-05-25",
+    "match": {
+      "ingredient_id": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+      "status": "confirmed",
+      "match_kind": "confirmed-alias"
+    }
+  },
+  "q3_fullTrace": [
+    {
+      "stage": "invoice_item (DB)",
+      "quantity": 5,
+      "unit": "mo",
+      "unit_price": 2.06,
+      "total": 10.28
+    },
+    {
+      "stage": "normalizeInvoiceItemFields",
+      "quantity": 5,
+      "unit": "mo"
+    },
+    {
+      "stage": "parsePurchaseStructureFromText",
+      "tier": null,
+      "matchedText": null,
+      "unitSize": null,
+      "unitMeasurement": null
+    },
+    {
+      "stage": "detectConversionHint (ingredient-unit-inference)",
+      "hint": {
+        "purchase_unit": "un",
+        "estimated_quantity": 100,
+        "stock_unit": "g",
+        "recipe_usage_unit": "g",
+        "label": "fresh herbs",
+        "confidence": 0.58,
+        "reason": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+      }
+    },
+    {
+      "stage": "computeUsableFromPurchaseStructure",
+      "usableQuantity": null,
+      "usableUnit": null,
+      "usableSource": null
+    },
+    {
+      "stage": "resolveInvoiceLinePurchaseFormat",
+      "kind": "inferred",
+      "normalizedUsableQuantity": 500,
+      "usableQuantityUnit": "g",
+      "purchaseContainerCount": 5,
+      "purchaseContainerUnit": null,
+      "inferred": {
+        "purchase_quantity": 1,
+        "purchase_unit": null,
+        "base_unit": null,
+        "package_type": null,
+        "package_count": null,
+        "confidence": 0,
+        "reason": "no unit tokens matched",
+        "purchase_unit_count": 1,
+        "pack_size": null,
+        "pack_size_unit": null,
+        "size_is_metadata_only": false,
+        "normalized_stock_quantity": null,
+        "stock_unit": null,
+        "recipe_usage_unit": null,
+        "conversion_hint": {
+          "purchase_unit": "un",
+          "estimated_quantity": 100,
+          "stock_unit": "g",
+          "recipe_usage_unit": "g",
+          "label": "fresh herbs",
+          "confidence": 0.58,
+          "reason": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+        }
+      }
+    },
+    {
+      "stage": "resolveUnitsPerPack",
+      "unitsPerPack": null
+    },
+    {
+      "stage": "resolveUsablePerPricedUnit",
+      "perUnit": {
+        "amount": 100,
+        "unit": "g"
+      }
+    },
+    {
+      "stage": "computeEffectiveUsableCost",
+      "effective": {
+        "cost": 20.599999999999998,
+        "unit": "kg"
+      }
+    },
+    {
+      "stage": "resolveInvoiceLinePricingPresentation",
+      "priceDisplay": "€2.06 / bunch",
+      "effectiveUsableCostLabel": "€20.60 / kg"
+    },
+    {
+      "stage": "procurementPackFieldsFromInvoiceLine",
+      "fields": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "purchase_unit": "g",
+        "base_unit": "g",
+        "unit": "g",
+        "includeCatalogUnitFields": false
+      }
+    },
+    {
+      "stage": "operationalCostFieldsFromInvoiceLine (persistence)",
+      "fields": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "cost_base_unit": "g"
+      }
+    },
+    {
+      "stage": "recipeOperationalCostFieldsFromInvoiceLine",
+      "fields": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "cost_base_unit": "g"
+      }
+    },
+    {
+      "stage": "buildLastPurchaseCostPresentation (detail UI)",
+      "lastPurchase": "5 bunches",
+      "procurementCost": "€2.06 / bunch",
+      "operationalCost": "€20.60 / kg"
+    },
+    {
+      "stage": "inferUnitFamily",
+      "unitFamily": "weight"
+    }
+  ],
+  "q4_conversionHintAudit": {
+    "definedAt": {
+      "token": "MANJERICAO",
+      "group": "fresh herbs",
+      "estimatedQuantity": 100,
+      "unit": "g",
+      "confidence": 0.58,
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "lines": "413-417"
+    },
+    "detectConversionHintResult": {
+      "purchase_unit": "un",
+      "estimated_quantity": 100,
+      "stock_unit": "g",
+      "recipe_usage_unit": "g",
+      "label": "fresh herbs",
+      "confidence": 0.58,
+      "reason": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+    },
+    "appliedAt": [
+      "inferPurchaseUnitsFromLineItemName → conversion_hint on UnitInferenceResult",
+      "resolveInvoiceLinePurchaseFormat → kind=inferred when conversion_hint present",
+      "stock-normalization computeUsableFromPurchaseStructure → purchaseQuantity × estimated_quantity",
+      "resolveUsablePerPricedUnit → per-bunch grams (100g when row qty > 1)",
+      "computeEffectiveUsableCost → unit_price / (grams/1000) → €/kg",
+      "recipeOperationalCostFieldsFromInvoiceLine → purchase_quantity=100, cost_base_unit=g"
+    ],
+    "persisted": false,
+    "persistenceNote": "detectConversionHint comment: intentionally not persisted — schema has no field for estimated usable yield distinct from pack cost fields; operational fields derived at runtime from invoice line",
+    "persistedIngredientFields": {
+      "current_price": 2.06,
+      "purchase_quantity": 100,
+      "cost_base_unit": "g"
+    },
+    "tests": [
+      {
+        "file": "src/lib/invoice-purchase-price-semantics.test.ts",
+        "assertion": "formatRowPurchaseQuantityLabel({ name: \"Manjericão\", quantity: 2, unit: \"mo\" }) → \"2 bunches\""
+      },
+      {
+        "file": ".tmp/fresh-produce-conversion-audit/results.json",
+        "assertion": "MANJERICAO in PRODUCE_CONVERSION_HINTS; detectConversionHint → 100g"
+      },
+      {
+        "file": "src/lib/ingredient-unit-inference.ts",
+        "assertion": "PRODUCE_CONVERSION_HINTS tokens include MANJERICAO at 100g fresh herbs group"
+      }
+    ]
+  },
+  "q5_recipeCosting": {
+    "formula": "resolvedOperationalUnitCostEur = current_price / purchase_quantity; ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) = qty × unitCost",
+    "sourceFields": {
+      "current_price": 2.06,
+      "purchase_quantity": 100,
+      "cost_base_unit": "g"
+    },
+    "dbPersistedFields": {
+      "current_price": 2.06,
+      "purchase_quantity": 100,
+      "cost_base_unit": "g"
+    },
+    "scenarios": [
+      {
+        "source": "invoiceTrace_g",
+        "qty": 10,
+        "recipeUnit": "g",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) → qty × (current_price / purchase_quantity) when cost_base_unit=g",
+        "unitCostEur": 0.0206,
+        "effectiveIngredientUnitCostEur": 0.0206,
+        "lineCostEur": 0.20600000000000002,
+        "denominator": 100,
+        "calculation": "10 × (2.06 / 100) = 0.20600000000000002"
+      },
+      {
+        "source": "dbPersisted_g",
+        "qty": 10,
+        "recipeUnit": "g",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) → qty × (current_price / purchase_quantity) when cost_base_unit=g",
+        "unitCostEur": 0.0206,
+        "effectiveIngredientUnitCostEur": 0.0206,
+        "lineCostEur": 0.20600000000000002,
+        "denominator": 100,
+        "calculation": "10 × (2.06 / 100) = 0.20600000000000002"
+      },
+      {
+        "source": "invoiceTrace_g",
+        "qty": 25,
+        "recipeUnit": "g",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) → qty × (current_price / purchase_quantity) when cost_base_unit=g",
+        "unitCostEur": 0.0206,
+        "effectiveIngredientUnitCostEur": 0.0206,
+        "lineCostEur": 0.515,
+        "denominator": 100,
+        "calculation": "25 × (2.06 / 100) = 0.515"
+      },
+      {
+        "source": "dbPersisted_g",
+        "qty": 25,
+        "recipeUnit": "g",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) → qty × (current_price / purchase_quantity) when cost_base_unit=g",
+        "unitCostEur": 0.0206,
+        "effectiveIngredientUnitCostEur": 0.0206,
+        "lineCostEur": 0.515,
+        "denominator": 100,
+        "calculation": "25 × (2.06 / 100) = 0.515"
+      },
+      {
+        "source": "invoiceTrace_g",
+        "qty": 50,
+        "recipeUnit": "g",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) → qty × (current_price / purchase_quantity) when cost_base_unit=g",
+        "unitCostEur": 0.0206,
+        "effectiveIngredientUnitCostEur": 0.0206,
+        "lineCostEur": 1.03,
+        "denominator": 100,
+        "calculation": "50 × (2.06 / 100) = 1.03"
+      },
+      {
+        "source": "dbPersisted_g",
+        "qty": 50,
+        "recipeUnit": "g",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) → qty × (current_price / purchase_quantity) when cost_base_unit=g",
+        "unitCostEur": 0.0206,
+        "effectiveIngredientUnitCostEur": 0.0206,
+        "lineCostEur": 1.03,
+        "denominator": 100,
+        "calculation": "50 × (2.06 / 100) = 1.03"
+      },
+      {
+        "source": "invoiceTrace_g",
+        "qty": 100,
+        "recipeUnit": "g",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) → qty × (current_price / purchase_quantity) when cost_base_unit=g",
+        "unitCostEur": 0.0206,
+        "effectiveIngredientUnitCostEur": 0.0206,
+        "lineCostEur": 2.06,
+        "denominator": 100,
+        "calculation": "100 × (2.06 / 100) = 2.06"
+      },
+      {
+        "source": "dbPersisted_g",
+        "qty": 100,
+        "recipeUnit": "g",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) → qty × (current_price / purchase_quantity) when cost_base_unit=g",
+        "unitCostEur": 0.0206,
+        "effectiveIngredientUnitCostEur": 0.0206,
+        "lineCostEur": 2.06,
+        "denominator": 100,
+        "calculation": "100 × (2.06 / 100) = 2.06"
+      }
+    ]
+  },
+  "q6_compare": {
+    "manjericao": {
+      "ingredient": "Manjericão",
+      "procurement": "€2.06 / bunch",
+      "operational": "€20.60 / kg",
+      "recipeUnit": "g",
+      "purchase_quantity": 100,
+      "conversionHint": {
+        "purchase_unit": "un",
+        "estimated_quantity": 100,
+        "stock_unit": "g",
+        "recipe_usage_unit": "g",
+        "label": "fresh herbs",
+        "confidence": 0.58,
+        "reason": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+      },
+      "structuredKind": "inferred",
+      "perUnitUsable": {
+        "amount": 100,
+        "unit": "g"
+      }
+    },
+    "tomilho": {
+      "ingredient": "Tomilho",
+      "procurement": "€2.06 / bunch",
+      "operational": null,
+      "recipeUnit": "un",
+      "purchase_quantity": 1,
+      "conversionHint": null,
+      "structuredKind": "row_only",
+      "perUnitUsable": null
+    },
+    "ovo": {
+      "ingredient": "Ovo Classe M",
+      "procurement": "€38.44 / case",
+      "operational": "€0.2136 / egg",
+      "recipeUnit": "un",
+      "purchase_quantity": 180,
+      "conversionHint": null,
+      "structuredKind": "multi_unit_pack",
+      "perUnitUsable": {
+        "amount": 180,
+        "unit": "un"
+      }
+    },
+    "salada": {
+      "ingredient": "Salada ibérica",
+      "procurement": "€2.19 / pack",
+      "operational": "€8.76 / kg",
+      "recipeUnit": "g",
+      "purchase_quantity": 250,
+      "conversionHint": null,
+      "structuredKind": "weight_or_volume",
+      "perUnitUsable": {
+        "amount": 250,
+        "unit": "g"
+      }
+    }
+  },
+  "q7_consistency": {
+    "inputs": {
+      "bunches": 5,
+      "unitPricePerBunch": 2.06,
+      "gramsPerBunch": 100,
+      "lineTotal": 10.28
+    },
+    "operationalKg": {
+      "formula": "unit_price / (gramsPerBunch / 1000)",
+      "calculation": "2.06 / (100 / 1000)",
+      "result": 20.599999999999998,
+      "displayed": "€20.60 / kg",
+      "matchesDisplay": true
+    },
+    "totalUsable": {
+      "formula": "rowQuantity × gramsPerBunch",
+      "calculation": "5 × 100",
+      "result": 500,
+      "normalizedUsableQuantity": 500,
+      "matches": true
+    },
+    "recipeDenominator": {
+      "purchase_quantity": 100,
+      "cost_base_unit": "g",
+      "expected": {
+        "purchase_quantity": 100,
+        "cost_base_unit": "g"
+      },
+      "matches": true
+    },
+    "recipeAligned": true,
+    "dbAligned": true,
+    "overallYes": true,
+    "answer": "YES",
+    "summary": "5 bunches × €2.06 = €10.30 line total; 100g/bunch → 500g usable; €2.06/bunch ÷ 0.1kg = €20.60/kg"
+  },
+  "requiredTable": [
+    {
+      "concept": "Purchase Unit",
+      "current": "5 bunches",
+      "intendedByArchitecture": "bunch — formatRowPurchaseQuantityLabel maps mo → bunch; invoice row qty=5 mo"
+    },
+    {
+      "concept": "Procurement Unit",
+      "current": "€2.06 / bunch",
+      "intendedByArchitecture": "bunch — resolvePriceSuffix maps mo → bunch; unit_price is €/bunch on invoice"
+    },
+    {
+      "concept": "Operational Unit",
+      "current": "€20.60 / kg",
+      "intendedByArchitecture": "kg — detectConversionHint MANJERICAO → 100g/bunch → computeEffectiveUsableCost → €/kg"
+    },
+    {
+      "concept": "Recipe Consumption Unit",
+      "current": "g (persisted base_unit=g, purchase_quantity=100)",
+      "intendedByArchitecture": "g with purchase_quantity=100 (grams per priced bunch from conversion hint); current_price=€/bunch"
+    },
+    {
+      "concept": "Conversion Hint",
+      "current": "100g/bunch (runtime)",
+      "intendedByArchitecture": "PRODUCE_CONVERSION_HINTS fresh herbs MANJERICAO → 100g usable per bunch; runtime only (not persisted)"
+    }
+  ],
+  "manjericaoTrace": {
+    "invoiceItemId": "b47828a9-e042-4437-b0b7-8944c812509a",
+    "procurement": {
+      "current_price": 2.06,
+      "purchase_quantity": 100,
+      "purchase_unit": "g",
+      "base_unit": "g",
+      "unit": "g",
+      "includeCatalogUnitFields": false
+    },
+    "persistFields": {
+      "current_price": 2.06,
+      "purchase_quantity": 100,
+      "cost_base_unit": "g"
+    },
+    "recipeFields": {
+      "current_price": 2.06,
+      "purchase_quantity": 100,
+      "cost_base_unit": "g"
+    },
+    "structuredFields": {
+      "purchase_quantity": 500,
+      "purchase_unit": "g",
+      "base_unit": "g"
+    },
+    "conversionHint": {
+      "purchase_unit": "un",
+      "estimated_quantity": 100,
+      "stock_unit": "g",
+      "recipe_usage_unit": "g",
+      "label": "fresh herbs",
+      "confidence": 0.58,
+      "reason": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+    },
+    "perUnit": {
+      "amount": 100,
+      "unit": "g"
+    },
+    "effective": {
+      "cost": 20.599999999999998,
+      "unit": "kg"
+    }
+  },
+  "manjericaoIngredient": {
+    "id": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+    "name": "Manjericão",
+    "current_price": 2.06,
+    "purchase_quantity": 100,
+    "purchase_unit": "g",
+    "base_unit": "g",
+    "unit": "g",
+    "normalized_name": "manjericao",
+    "supplier": null
+  },
+  "manjericaoMatch": {
+    "ingredient_id": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+    "status": "confirmed",
+    "match_kind": "confirmed-alias"
+  },
+  "priceHistory": [
+    {
+      "id": "cab6571b-919b-4572-860e-7fb3a59fd8e8",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "new_price": 0.0206,
+      "created_at": "2026-05-25T12:00:00+00:00"
+    }
+  ],
+  "aliases": [
+    {
+      "alias_name": "Manjericão",
+      "confirmed_by_user": true,
+      "supplier_name": "Bidfood Portugal"
+    }
+  ],
+  "manjericaoItems": [
+    {
+      "id": "b47828a9-e042-4437-b0b7-8944c812509a",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "name": "Manjericão",
+      "quantity": 5,
+      "unit": "mo",
+      "unit_price": 2.06,
+      "total": 10.28,
+      "created_at": "2026-06-20T01:24:45.305604+00:00",
+      "invoices": {
+        "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice_date": "2026-05-25",
+        "supplier_name": "Bidfood Portugal, SA"
+      }
+    }
+  ]
+}

@@ -410,7 +410,7 @@ const PRODUCE_CONVERSION_HINTS: {
     confidence: 0.62,
   },
   {
-    tokens: ["COENTROS", "SALSA", "MANJERICAO", "HORTELA", "CEBOLINHO"],
+    tokens: ["COENTROS", "SALSA", "MANJERICAO", "HORTELA", "CEBOLINHO", "TOMILHO"],
     estimatedQuantity: 100,
     label: "fresh herbs",
     confidence: 0.58,

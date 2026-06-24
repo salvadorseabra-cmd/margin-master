@@ -6,10 +6,11 @@
 import { formatCurrency, formatUnitCostCurrency } from "@/lib/display-format";
 import type { PackageType } from "@/lib/ingredient-unit-inference";
 import {
-  isCaseRowWithEmbeddedPieceWeightOnly,
   resolveInvoiceLinePurchaseFormat,
   resolveInvoiceLineStockPresentation,
   resolveStructuredPurchaseForDisplay,
+  type InvoiceLineStockPresentation,
+  shouldApplyCasePieceWeightOperationalShortcut,
   type InvoiceLinePurchaseInput,
   type StructuredPurchaseFormat,
 } from "@/lib/invoice-purchase-format";
@@ -325,7 +326,7 @@ function resolvePriceSuffix(
   rowUnit: string | null | undefined,
   name: string,
 ): string | null {
-  if (isCaseRowWithEmbeddedPieceWeightOnly(name, rowUnit)) {
+  if (shouldApplyCasePieceWeightOperationalShortcut(name, rowUnit)) {
     const normalizedRowUnit = normalizeToken(rowUnit);
     if (normalizedRowUnit && ROW_UNIT_PRICE_SUFFIX[normalizedRowUnit]) {
       return ROW_UNIT_PRICE_SUFFIX[normalizedRowUnit];
@@ -519,7 +520,7 @@ export function computeEffectiveUsableCost(
   structured: StructuredPurchaseFormat,
   name: string,
 ): { cost: number; unit: string } | null {
-  if (isCaseRowWithEmbeddedPieceWeightOnly(name, metadata.unit)) {
+  if (shouldApplyCasePieceWeightOperationalShortcut(name, metadata.unit)) {
     return { cost: unitPrice, unit: "case" };
   }
 
@@ -809,6 +810,94 @@ function formatPurchaseTotalLine(metadata: InvoicePurchasePriceMetadata): Invoic
   return { text: `${formatCurrency(total)} total`, variant: "muted" };
 }
 
+const OPERATIONAL_COST_TOLERANCE_ABS = 0.005;
+
+function normalizeTokenForComparison(value: string | null | undefined): string {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase();
+}
+
+function procurementUnitsEquivalent(
+  procurementSuffix: string | null | undefined,
+  operationalUnit: string | null | undefined,
+): boolean {
+  const procurement = normalizeTokenForComparison(procurementSuffix);
+  const operational = normalizeTokenForComparison(operationalUnit);
+  if (!procurement || !operational) return false;
+  return procurement === operational;
+}
+
+function operationalCostsEquivalent(procurementCost: number, operationalCost: number): boolean {
+  return Math.abs(procurementCost - operationalCost) <= OPERATIONAL_COST_TOLERANCE_ABS;
+}
+
+/** Row purchase quantity in the same base unit as stock normalization (g, ml, or un). */
+function normalizePurchaseQuantityToUsableBase(
+  metadata: InvoicePurchasePriceMetadata,
+): { amount: number; unit: "g" | "ml" | "un" } | null {
+  const rowQuantity = metadata.quantity == null ? null : Number(metadata.quantity);
+  if (!Number.isFinite(rowQuantity) || rowQuantity == null || rowQuantity <= 0) return null;
+
+  const rowUnit = normalizeToken(metadata.unit);
+  if (rowUnit === "kg" || rowUnit === "kgs") return { amount: rowQuantity * 1000, unit: "g" };
+  if (rowUnit === "g") return { amount: rowQuantity, unit: "g" };
+  if (rowUnit === "l" || rowUnit === "lt" || rowUnit === "ltr") {
+    return { amount: rowQuantity * 1000, unit: "ml" };
+  }
+  if (rowUnit === "ml") return { amount: rowQuantity, unit: "ml" };
+
+  if (
+    rowUnit === "un" ||
+    rowUnit === "uni" ||
+    rowUnit === "unid" ||
+    rowUnit === "unit" ||
+    rowUnit === "units" ||
+    rowUnit === "pc" ||
+    rowUnit === "pcs"
+  ) {
+    return { amount: rowQuantity, unit: "un" };
+  }
+
+  return null;
+}
+
+function usableQuantityMatchesPurchaseQuantity(
+  metadata: InvoicePurchasePriceMetadata,
+  stock: InvoiceLineStockPresentation,
+): boolean {
+  const purchase = normalizePurchaseQuantityToUsableBase(metadata);
+  if (!purchase || stock.usableQuantity == null || !stock.usableUnit) return false;
+  if (purchase.unit !== stock.usableUnit) return false;
+  return Math.abs(purchase.amount - stock.usableQuantity) < 0.01;
+}
+
+export type InvoiceOperationalCollapseInput = {
+  metadata: InvoicePurchasePriceMetadata;
+  stock: InvoiceLineStockPresentation;
+  unitPrice: number | null;
+  priceSuffix: string | null;
+  effective: { cost: number; unit: string } | null;
+  usableStockLabel: string | null;
+};
+
+/**
+ * Invoice Review display-only rule: hide the operational block when procurement and
+ * operational semantics are identical (quantity, unit, and effective cost).
+ */
+export function shouldCollapseInvoiceOperationalDisplay(
+  input: InvoiceOperationalCollapseInput,
+): boolean {
+  const { metadata, stock, unitPrice, priceSuffix, effective, usableStockLabel } = input;
+  if (unitPrice == null || !Number.isFinite(unitPrice) || effective == null) return false;
+  if (!procurementUnitsEquivalent(priceSuffix, effective.unit)) return false;
+  if (!operationalCostsEquivalent(unitPrice, effective.cost)) return false;
+
+  if (!usableStockLabel) return true;
+
+  return usableQuantityMatchesPurchaseQuantity(metadata, stock);
+}
+
 function buildNormalizationCard(args: {
   rowQuantityLabel: string | null;
   purchasedPackDetail: string | null;
@@ -817,12 +906,13 @@ function buildNormalizationCard(args: {
   usableStockLabel: string | null;
   effectiveUsableCostLabel: string | null;
   effectiveUnit: string | null;
+  collapseOperational: boolean;
 }): InvoiceLineNormalizationCard {
   const totalLine = formatPurchaseTotalLine(args.metadata);
   const purchasePriceLine = joinPresentationParts([args.priceDisplay, totalLine?.text ?? null]);
 
   let usableCostLine: string | null = null;
-  if (args.effectiveUsableCostLabel && args.effectiveUnit) {
+  if (!args.collapseOperational && args.effectiveUsableCostLabel && args.effectiveUnit) {
     const costOnly = args.effectiveUsableCostLabel.replace(/\s*\/\s*\S+$/, "").trim();
     usableCostLine = `${costOnly} / ${args.effectiveUnit} usable`;
   }
@@ -830,7 +920,7 @@ function buildNormalizationCard(args: {
   return {
     purchaseQuantityLine: joinPresentationParts([args.rowQuantityLabel, args.purchasedPackDetail]),
     purchasePriceLine,
-    normalizedLine: args.usableStockLabel,
+    normalizedLine: args.collapseOperational ? null : args.usableStockLabel,
     usableCostLine,
   };
 }
@@ -1142,26 +1232,36 @@ export function resolveInvoiceLinePricingPresentation(
     priceKind === "pack" ? "Pack price" : priceKind === "purchase" ? "Purchase price" : "Price";
 
   let priceDisplay: string | null = null;
+  let priceSuffix: string | null = null;
   let effectiveUnit: string | null = null;
+  let effectiveUsableCostLabel: string | null = null;
+  let effective: { cost: number; unit: string } | null = null;
+
   if (unitPrice != null && Number.isFinite(unitPrice)) {
-    const suffix = resolvePriceSuffix(structured, metadata.unit, name);
-    priceDisplay = suffix
-      ? `${formatUnitCostCurrency(unitPrice)} / ${suffix}`
+    priceSuffix = resolvePriceSuffix(structured, metadata.unit, name);
+    priceDisplay = priceSuffix
+      ? `${formatUnitCostCurrency(unitPrice)} / ${priceSuffix}`
       : formatUnitCostCurrency(unitPrice);
+
+    effective = computeEffectiveUsableCost(unitPrice, metadata, structured, name);
+    if (effective != null && Number.isFinite(effective.cost) && effective.cost > 0) {
+      effectiveUnit = effective.unit;
+      effectiveUsableCostLabel = `${formatUnitCostCurrency(effective.cost)} / ${effective.unit}`;
+    }
   }
 
   const rowQuantityLabel = formatRowPurchaseQuantityLabel(metadata);
   const purchasedPackDetail = formatPurchasedPackDetail(structured, name, metadata.unit);
   const usableStockLabel = stock.quantityLabel;
 
-  let effectiveUsableCostLabel: string | null = null;
-  if (unitPrice != null && Number.isFinite(unitPrice)) {
-    const effective = computeEffectiveUsableCost(unitPrice, metadata, structured, name);
-    if (effective != null && Number.isFinite(effective.cost) && effective.cost > 0) {
-      effectiveUnit = effective.unit;
-      effectiveUsableCostLabel = `${formatUnitCostCurrency(effective.cost)} / ${effective.unit}`;
-    }
-  }
+  const collapseOperational = shouldCollapseInvoiceOperationalDisplay({
+    metadata,
+    stock,
+    unitPrice,
+    priceSuffix,
+    effective,
+    usableStockLabel,
+  });
 
   const card = buildNormalizationCard({
     rowQuantityLabel,
@@ -1171,6 +1271,7 @@ export function resolveInvoiceLinePricingPresentation(
     usableStockLabel,
     effectiveUsableCostLabel,
     effectiveUnit,
+    collapseOperational,
   });
   const blocks = buildOperationalBlocksFromCard(card);
 

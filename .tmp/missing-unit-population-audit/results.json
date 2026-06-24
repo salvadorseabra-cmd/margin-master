@@ -1,0 +1,279 @@
+{
+  "generatedAt": "2026-06-23T09:42:57.796Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "mode": "STRICT_READ_ONLY_MISSING_UNIT_POPULATION_AUDIT",
+  "scope": {
+    "totalInvoiceItems": 52,
+    "totalInvoices": 7,
+    "qtyGt1UnitNull": 2,
+    "emporioInvoice": "ab52796d-de1d-418d-86e7-230c8f056f09"
+  },
+  "task1_nullUnitGt1Scan": [
+    {
+      "invoice": "ab52796d",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null
+    },
+    {
+      "invoice": "ab52796d",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "product": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 24,
+      "unit": null
+    }
+  ],
+  "task2_classification": [
+    {
+      "invoiceItemId": "728517aa-8578-4f6f-a415-aae06f05f5c4",
+      "product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "classification": "expected_un",
+      "reason": "embedded measure in name + qty>1 countable; resolver fallback_null",
+      "structuredKind": "weight_or_volume",
+      "purchaseUnitResolution": "fallback_null"
+    },
+    {
+      "invoiceItemId": "634a418b-1509-42a9-bf01-563705967b6f",
+      "product": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 24,
+      "classification": "expected_un",
+      "reason": "embedded measure in name + qty>1 countable; resolver fallback_null",
+      "structuredKind": "weight_or_volume",
+      "purchaseUnitResolution": "fallback_null"
+    }
+  ],
+  "task3_frequencyTable": {
+    "category": "ALL invoice_items (VL)",
+    "totalItems": 52,
+    "unitPresent": 50,
+    "unitNull": 2,
+    "unitNullQtyGt1": 2,
+    "nullExpectedUn": 2,
+    "nullExpectedCx": 0,
+    "nullCorrectlyNull": 0,
+    "nullUnknown": 0,
+    "allNullRows": {
+      "total": 2,
+      "expectedUn": 2,
+      "expectedCx": 0,
+      "correctlyNull": 0,
+      "unknown": 0
+    }
+  },
+  "task4_familyAnalysis": {
+    "embedded_g": {
+      "count": 1,
+      "products": [
+        "De Cecco - Paccheri Lisci Nr. 125 - 500g"
+      ],
+      "invoices": [
+        "Emporio Italia, Lda."
+      ],
+      "classifications": {
+        "expected_un": 1,
+        "expected_cx": 0,
+        "correctly_null": 0,
+        "unknown": 0
+      },
+      "impacts": {
+        "NONE": 0,
+        "DISPLAY_ONLY": 1,
+        "CALCULATION_RISK": 0
+      }
+    },
+    "embedded_cl": {
+      "count": 1,
+      "products": [
+        "Baladin - Ginger Beer 0.20cl"
+      ],
+      "invoices": [
+        "Emporio Italia, Lda."
+      ],
+      "classifications": {
+        "expected_un": 1,
+        "expected_cx": 0,
+        "correctly_null": 0,
+        "unknown": 0
+      },
+      "impacts": {
+        "NONE": 0,
+        "DISPLAY_ONLY": 1,
+        "CALCULATION_RISK": 0
+      }
+    }
+  },
+  "task5_impactPerRow": [
+    {
+      "invoiceItemId": "728517aa-8578-4f6f-a415-aae06f05f5c4",
+      "product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "impact": "DISPLAY_ONLY",
+      "labelNull": "24",
+      "labelUn": "24 un",
+      "usableDiffers": false,
+      "costDiffers": false,
+      "procDiffers": false
+    },
+    {
+      "invoiceItemId": "634a418b-1509-42a9-bf01-563705967b6f",
+      "product": "Baladin - Ginger Beer 0.20cl",
+      "impact": "DISPLAY_ONLY",
+      "labelNull": "24",
+      "labelUn": "24 un",
+      "usableDiffers": false,
+      "costDiffers": false,
+      "procDiffers": false
+    }
+  ],
+  "task5_impactSummary": {
+    "NONE": 0,
+    "DISPLAY_ONLY": 2,
+    "CALCULATION_RISK": 0
+  },
+  "task6_priority": {
+    "choice": "B",
+    "label": "Fix after Invoice Editing",
+    "rationale": "All impacts DISPLAY_ONLY (Last Purchase label); no calculation divergence — fix after Invoice Editing"
+  },
+  "verdict": {
+    "scope": "Isolated",
+    "rationale": "Only 2 qty>1 null-unit rows; all expected_un are Paccheri/Ginger pattern on Emporio",
+    "paccheriGingerInLargerFamily": false,
+    "paccheriGingerCount": 2,
+    "totalExpectedUn": 2,
+    "uniqueInvoicesWithNullGt1": 1,
+    "uniqueSuppliersWithNullGt1": 1
+  },
+  "priorAudits": [
+    ".tmp/invoice-unit-persistence-audit/",
+    ".tmp/purchase-unit-representation-audit/",
+    ".tmp/outer-quantity-population-audit/"
+  ],
+  "rows": [
+    {
+      "invoiceItemId": "728517aa-8578-4f6f-a415-aae06f05f5c4",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoice": "ab52796d",
+      "supplier": "Emporio Italia, Lda.",
+      "product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "quantity": 24,
+      "unit": null,
+      "structuredKind": "weight_or_volume",
+      "purchaseUnitResolution": "fallback_null",
+      "classification": "expected_un",
+      "classificationReason": "embedded measure in name + qty>1 countable; resolver fallback_null",
+      "familyPattern": "embedded_g",
+      "impact": "DISPLAY_ONLY",
+      "impactDetails": {
+        "labelNull": "24",
+        "labelUn": "24 un",
+        "usableNull": 12000,
+        "usableUn": 12000,
+        "usableUnitNull": "g",
+        "usableUnitUn": "g",
+        "usableChainNull": {
+          "qty": 12000,
+          "unit": "g",
+          "source": "structure_recomputed"
+        },
+        "usableChainUn": {
+          "qty": 12000,
+          "unit": "g",
+          "source": "structure_recomputed"
+        },
+        "costNull": {
+          "cost": 4.2,
+          "unit": "kg"
+        },
+        "costUn": {
+          "cost": 4.2,
+          "unit": "kg"
+        },
+        "procNull": {
+          "current_price": 2.1,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 500
+        },
+        "procUn": {
+          "current_price": 2.1,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 500
+        },
+        "purchaseQtyNull": 1,
+        "purchaseQtyUn": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      },
+      "wouldResolveUn": "un",
+      "emporioKey": true
+    },
+    {
+      "invoiceItemId": "634a418b-1509-42a9-bf01-563705967b6f",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "invoice": "ab52796d",
+      "supplier": "Emporio Italia, Lda.",
+      "product": "Baladin - Ginger Beer 0.20cl",
+      "quantity": 24,
+      "unit": null,
+      "structuredKind": "weight_or_volume",
+      "purchaseUnitResolution": "fallback_null",
+      "classification": "expected_un",
+      "classificationReason": "embedded measure in name + qty>1 countable; resolver fallback_null",
+      "familyPattern": "embedded_cl",
+      "impact": "DISPLAY_ONLY",
+      "impactDetails": {
+        "labelNull": "24",
+        "labelUn": "24 un",
+        "usableNull": 4800,
+        "usableUn": 4800,
+        "usableUnitNull": "ml",
+        "usableUnitUn": "ml",
+        "usableChainNull": {
+          "qty": 4800,
+          "unit": "ml",
+          "source": "structure_recomputed"
+        },
+        "usableChainUn": {
+          "qty": 4800,
+          "unit": "ml",
+          "source": "structure_recomputed"
+        },
+        "costNull": {
+          "cost": 4.05,
+          "unit": "L"
+        },
+        "costUn": {
+          "cost": 4.05,
+          "unit": "L"
+        },
+        "procNull": {
+          "current_price": 0.81,
+          "purchase_quantity": 200,
+          "cost_base_unit": "ml"
+        },
+        "procUn": {
+          "current_price": 0.81,
+          "purchase_quantity": 200,
+          "cost_base_unit": "ml"
+        },
+        "purchaseQtyNull": 1,
+        "purchaseQtyUn": 1,
+        "displayDiffers": true,
+        "usableDiffers": false,
+        "costDiffers": false,
+        "procDiffers": false,
+        "purchaseQtyDiffers": false
+      },
+      "wouldResolveUn": "un",
+      "emporioKey": true
+    }
+  ]
+}

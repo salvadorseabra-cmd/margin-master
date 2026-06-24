@@ -1,0 +1,551 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "auditedAt": "2026-06-24T01:10:01.020Z",
+  "mode": "STRICT_READ_ONLY",
+  "product": "Tomilho",
+  "canonicalName": "Tomilho",
+  "bidfoodInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+  "verdict": "C",
+  "verdictOptions": {
+    "A": "Correct — bunch-only costing with no operational layer is intended for Tomilho",
+    "B": "Display bug — operational value computed but not rendered",
+    "C": "Missing operational conversion — Tomilho excluded from fresh-herb hint table that Manjericão uses",
+    "D": "Architecture ambiguity — no documented rule for mo-unit herbs without name tokens",
+    "E": "Data inconsistency — DB fields diverge from pipeline trace"
+  },
+  "verdictQuestion": "How does Marginly currently intend to cost Tomilho inside recipes?",
+  "verdictAnswer": "As implemented: recipeOperationalCostFieldsFromInvoiceLine yields current_price=2.06, purchase_quantity=1, cost_base_unit=un → ingredientLineCostEur(N, fields, { recipeUnit: 'un' }) = N × €2.06 (one recipe 'un' = one priced bunch). No operational €/kg because detectConversionHint returns null for 'Tomilho' (not in PRODUCE_CONVERSION_HINTS); structured.kind=row_only; resolveUsablePerPricedUnit=null; computeEffectiveUsableCost=null. Manjericão on the same invoice gets €20.60/kg via MANJERICAO token → 100g/bunch inferred path.",
+  "q1_dbState": {
+    "ingredient_id": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041",
+    "name": "Tomilho",
+    "current_price": 2.06,
+    "purchase_quantity": 1,
+    "purchase_unit": "un",
+    "cost_base_unit": "un",
+    "usable_quantity": null,
+    "usable_unit": null,
+    "purchase_structure_kind": "row_only"
+  },
+  "q1_dbStateTable": [
+    {
+      "field": "ingredient_id",
+      "currentValue": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041",
+      "source": "ingredients.id"
+    },
+    {
+      "field": "name",
+      "currentValue": "Tomilho",
+      "source": "ingredients.name"
+    },
+    {
+      "field": "current_price",
+      "currentValue": 2.06,
+      "source": "ingredients.current_price (pack/bunch price)"
+    },
+    {
+      "field": "purchase_quantity",
+      "currentValue": 1,
+      "source": "ingredients.purchase_quantity"
+    },
+    {
+      "field": "purchase_unit",
+      "currentValue": "un",
+      "source": "ingredients.purchase_unit"
+    },
+    {
+      "field": "cost_base_unit",
+      "currentValue": "un",
+      "source": "ingredients.base_unit"
+    },
+    {
+      "field": "usable_quantity",
+      "currentValue": null,
+      "source": "resolveInvoiceLinePurchaseFormat.normalizedUsableQuantity (trace)"
+    },
+    {
+      "field": "usable_unit",
+      "currentValue": null,
+      "source": "resolveInvoiceLinePurchaseFormat.usableQuantityUnit (trace)"
+    },
+    {
+      "field": "purchase_structure_kind",
+      "currentValue": "row_only",
+      "source": "parsePurchaseStructureFromText.tier / structured.kind"
+    }
+  ],
+  "q2_latestPurchase": {
+    "invoice_item_id": "f2d094ab-f50a-483d-b6cb-76554d5bf195",
+    "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "quantity": 1,
+    "unit": "mo",
+    "unit_price": 2.06,
+    "line_total": 2.06,
+    "purchase_structure_kind": "row_only",
+    "parsedStructure": {
+      "tier": null,
+      "matchedText": null,
+      "structuredKind": "row_only",
+      "unitsPerPack": null,
+      "conversionHint": null
+    },
+    "persistedAs": "1 bunch",
+    "persistedInterpretation": "bunch (mo → 1 bunch via formatRowPurchaseQuantityLabel)",
+    "supplier": "Bidfood Portugal, SA",
+    "invoice_date": "2026-05-25"
+  },
+  "q3_fullTrace": [
+    {
+      "stage": "invoice_item (DB)",
+      "quantity": 1,
+      "unit": "mo",
+      "unit_price": 2.06,
+      "total": 2.06
+    },
+    {
+      "stage": "normalizeInvoiceItemFields",
+      "quantity": 1,
+      "unit": "mo"
+    },
+    {
+      "stage": "parsePurchaseStructureFromText",
+      "tier": null,
+      "matchedText": null,
+      "unitSize": null,
+      "unitMeasurement": null
+    },
+    {
+      "stage": "detectConversionHint (ingredient-unit-inference)",
+      "hint": null
+    },
+    {
+      "stage": "computeUsableFromPurchaseStructure",
+      "usableQuantity": null,
+      "usableUnit": null,
+      "usableSource": null
+    },
+    {
+      "stage": "resolveInvoiceLinePurchaseFormat",
+      "kind": "row_only",
+      "normalizedUsableQuantity": null,
+      "usableQuantityUnit": null,
+      "purchaseContainerCount": 1,
+      "purchaseContainerUnit": "mo",
+      "inferred": {
+        "purchase_quantity": 1,
+        "purchase_unit": null,
+        "base_unit": null,
+        "package_type": null,
+        "package_count": null,
+        "confidence": 0,
+        "reason": "no unit tokens matched",
+        "purchase_unit_count": 1,
+        "pack_size": null,
+        "pack_size_unit": null,
+        "size_is_metadata_only": false,
+        "normalized_stock_quantity": null,
+        "stock_unit": null,
+        "recipe_usage_unit": null,
+        "conversion_hint": null
+      }
+    },
+    {
+      "stage": "resolveUnitsPerPack",
+      "unitsPerPack": null
+    },
+    {
+      "stage": "resolveUsablePerPricedUnit",
+      "perUnit": null
+    },
+    {
+      "stage": "computeEffectiveUsableCost",
+      "effective": null
+    },
+    {
+      "stage": "resolveInvoiceLinePricingPresentation",
+      "priceDisplay": "€2.06 / bunch",
+      "effectiveUsableCostLabel": null
+    },
+    {
+      "stage": "procurementPackFieldsFromInvoiceLine",
+      "fields": {
+        "current_price": 2.06,
+        "purchase_quantity": 1,
+        "purchase_unit": "un",
+        "base_unit": "un",
+        "unit": "un",
+        "includeCatalogUnitFields": true
+      }
+    },
+    {
+      "stage": "operationalCostFieldsFromInvoiceLine (persistence)",
+      "fields": {
+        "current_price": 2.06,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un"
+      }
+    },
+    {
+      "stage": "recipeOperationalCostFieldsFromInvoiceLine",
+      "fields": {
+        "current_price": 2.06,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un"
+      }
+    },
+    {
+      "stage": "buildLastPurchaseCostPresentation (detail UI)",
+      "lastPurchase": "1 bunch",
+      "procurementCost": "€2.06 / bunch",
+      "operationalCost": null
+    },
+    {
+      "stage": "inferUnitFamily",
+      "unitFamily": "countable"
+    }
+  ],
+  "q4_operationalQuantity": {
+    "selected": "C",
+    "options": {
+      "A": "present — operational €/kg or per-unit shown",
+      "B": "missing — null because no usable denominator",
+      "C": "intentionally suppressed — display omitted when computeEffectiveUsableCost returns null"
+    },
+    "evidence": {
+      "effectiveUsableCostLabel": null,
+      "computeEffectiveUsableCost": null,
+      "normalizedUsableQuantity": null,
+      "conversionHint": null
+    }
+  },
+  "q5_recipeCosting": {
+    "formula": "effectiveIngredientUnitCostEur = current_price / max(purchase_quantity, 1); ingredientLineCostEur(qty, fields, { recipeUnit })",
+    "sourceFields": {
+      "current_price": 2.06,
+      "purchase_quantity": 1,
+      "cost_base_unit": "un"
+    },
+    "dbPersistedFields": {
+      "current_price": 2.06,
+      "purchase_quantity": 1,
+      "cost_base_unit": "un"
+    },
+    "scenarios": [
+      {
+        "source": "invoiceTrace_un",
+        "qty": 1,
+        "recipeUnit": "un",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'un' }) → qty × (current_price / purchase_quantity)",
+        "unitCostEur": 2.06,
+        "effectiveIngredientUnitCostEur": 2.06,
+        "lineCostEur": 2.06,
+        "denominator": 1
+      },
+      {
+        "source": "dbPersisted_un",
+        "qty": 1,
+        "recipeUnit": "un",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'un' }) → qty × (current_price / purchase_quantity)",
+        "unitCostEur": 2.06,
+        "effectiveIngredientUnitCostEur": 2.06,
+        "lineCostEur": 2.06,
+        "denominator": 1
+      },
+      {
+        "source": "invoiceTrace_g",
+        "qty": 1,
+        "recipeUnit": "g",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) → qty × (current_price / purchase_quantity) when cost_base_unit=g",
+        "unitCostEur": 2.06,
+        "effectiveIngredientUnitCostEur": 2.06,
+        "lineCostEur": null,
+        "denominator": 1
+      },
+      {
+        "source": "dbPersisted_g",
+        "qty": 1,
+        "recipeUnit": "g",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) → qty × (current_price / purchase_quantity) when cost_base_unit=g",
+        "unitCostEur": 2.06,
+        "effectiveIngredientUnitCostEur": 2.06,
+        "lineCostEur": null,
+        "denominator": 1
+      },
+      {
+        "source": "invoiceTrace_un",
+        "qty": 5,
+        "recipeUnit": "un",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'un' }) → qty × (current_price / purchase_quantity)",
+        "unitCostEur": 2.06,
+        "effectiveIngredientUnitCostEur": 2.06,
+        "lineCostEur": 10.3,
+        "denominator": 1
+      },
+      {
+        "source": "dbPersisted_un",
+        "qty": 5,
+        "recipeUnit": "un",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'un' }) → qty × (current_price / purchase_quantity)",
+        "unitCostEur": 2.06,
+        "effectiveIngredientUnitCostEur": 2.06,
+        "lineCostEur": 10.3,
+        "denominator": 1
+      },
+      {
+        "source": "invoiceTrace_g",
+        "qty": 5,
+        "recipeUnit": "g",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) → qty × (current_price / purchase_quantity) when cost_base_unit=g",
+        "unitCostEur": 2.06,
+        "effectiveIngredientUnitCostEur": 2.06,
+        "lineCostEur": null,
+        "denominator": 1
+      },
+      {
+        "source": "dbPersisted_g",
+        "qty": 5,
+        "recipeUnit": "g",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) → qty × (current_price / purchase_quantity) when cost_base_unit=g",
+        "unitCostEur": 2.06,
+        "effectiveIngredientUnitCostEur": 2.06,
+        "lineCostEur": null,
+        "denominator": 1
+      },
+      {
+        "source": "invoiceTrace_un",
+        "qty": 10,
+        "recipeUnit": "un",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'un' }) → qty × (current_price / purchase_quantity)",
+        "unitCostEur": 2.06,
+        "effectiveIngredientUnitCostEur": 2.06,
+        "lineCostEur": 20.6,
+        "denominator": 1
+      },
+      {
+        "source": "dbPersisted_un",
+        "qty": 10,
+        "recipeUnit": "un",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'un' }) → qty × (current_price / purchase_quantity)",
+        "unitCostEur": 2.06,
+        "effectiveIngredientUnitCostEur": 2.06,
+        "lineCostEur": 20.6,
+        "denominator": 1
+      },
+      {
+        "source": "invoiceTrace_g",
+        "qty": 10,
+        "recipeUnit": "g",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) → qty × (current_price / purchase_quantity) when cost_base_unit=g",
+        "unitCostEur": 2.06,
+        "effectiveIngredientUnitCostEur": 2.06,
+        "lineCostEur": null,
+        "denominator": 1
+      },
+      {
+        "source": "dbPersisted_g",
+        "qty": 10,
+        "recipeUnit": "g",
+        "formula": "ingredientLineCostEur(qty, fields, { recipeUnit: 'g' }) → qty × (current_price / purchase_quantity) when cost_base_unit=g",
+        "unitCostEur": 2.06,
+        "effectiveIngredientUnitCostEur": 2.06,
+        "lineCostEur": null,
+        "denominator": 1
+      }
+    ],
+    "hypotheticalIf100gLikeManjericao": {
+      "purchase_quantity": 100,
+      "cost_base_unit": "g",
+      "unitCostPerG": 0.0206,
+      "lineCosts": [
+        {
+          "grams": 1,
+          "cost": 0.0206
+        },
+        {
+          "grams": 5,
+          "cost": 0.10300000000000001
+        },
+        {
+          "grams": 10,
+          "cost": 0.20600000000000002
+        }
+      ]
+    }
+  },
+  "q6_compare": {
+    "tomilho": {
+      "ingredient": "Tomilho",
+      "procurement": "€2.06 / bunch",
+      "operational": null,
+      "recipeUnit": "un",
+      "purchase_quantity": 1,
+      "conversionHint": null,
+      "structuredKind": "row_only"
+    },
+    "manjericao": {
+      "ingredient": "Manjericão",
+      "procurement": "€2.06 / bunch",
+      "operational": "€20.60 / kg",
+      "recipeUnit": "g",
+      "purchase_quantity": 100,
+      "conversionHint": {
+        "purchase_unit": "un",
+        "estimated_quantity": 100,
+        "stock_unit": "g",
+        "recipe_usage_unit": "g",
+        "label": "fresh herbs",
+        "confidence": 0.58,
+        "reason": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+      },
+      "structuredKind": "inferred"
+    },
+    "ovo": {
+      "ingredient": "Ovo Classe M",
+      "procurement": "€38.44 / case",
+      "operational": "€0.2136 / egg",
+      "recipeUnit": "un",
+      "purchase_quantity": 180,
+      "conversionHint": null,
+      "structuredKind": "multi_unit_pack"
+    },
+    "salada": {
+      "ingredient": "Salada ibérica",
+      "procurement": "€2.19 / pack",
+      "operational": "€8.76 / kg",
+      "recipeUnit": "g",
+      "purchase_quantity": 250,
+      "conversionHint": null,
+      "structuredKind": "weight_or_volume"
+    }
+  },
+  "q7_shouldOperationalDisplay": {
+    "selected": [
+      "A",
+      "B",
+      "C"
+    ],
+    "options": {
+      "A": "no usable conversion — resolveUsablePerPricedUnit returns null (row_only, no conversion hint for Tomilho)",
+      "B": "countable architecture — inferUnitFamily(mo)→countable; operational display suppressed when no per-unit usable",
+      "C": "display suppression — effectiveUsableCostLabel omitted when computeEffectiveUsableCost returns null",
+      "D": "bug — should show €/kg like Manjericão but Tomilho missing from PRODUCE_CONVERSION_HINTS",
+      "E": "intentionally suppressed — herbs without embedded weight have no operational layer by design"
+    },
+    "evidence": {
+      "resolveUsablePerPricedUnit": null,
+      "computeEffectiveUsableCost": null,
+      "effectiveUsableCostLabel": null,
+      "structuredKind": "row_only",
+      "conversionHint": null,
+      "manjericaoConversionHint": {
+        "purchase_unit": "un",
+        "estimated_quantity": 100,
+        "stock_unit": "g",
+        "recipe_usage_unit": "g",
+        "label": "fresh herbs",
+        "confidence": 0.58,
+        "reason": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+      },
+      "isCasePieceWeight": false,
+      "unitFamily": "countable"
+    },
+    "operationalShown": false
+  },
+  "requiredTable": [
+    {
+      "concept": "Purchase Unit",
+      "current": "1 bunch",
+      "intendedByArchitecture": "bunch — formatRowPurchaseQuantityLabel maps mo → bunch; invoice row qty=1 mo"
+    },
+    {
+      "concept": "Procurement Unit",
+      "current": "€2.06 / bunch",
+      "intendedByArchitecture": "bunch — resolvePriceSuffix maps mo → bunch via ROW_UNIT_PRICE_SUFFIX; unit_price is €/bunch"
+    },
+    {
+      "concept": "Operational Unit",
+      "current": "null / not shown",
+      "intendedByArchitecture": "kg (when fresh-herb conversion hint applies) — detectConversionHint lists MANJERICAO/HORTELA etc. at 100g/bunch → computeEffectiveUsableCost → €/kg; Tomilho absent from PRODUCE_CONVERSION_HINTS"
+    },
+    {
+      "concept": "Recipe Consumption Unit",
+      "current": "un (persisted base_unit=un, purchase_quantity=1)",
+      "intendedByArchitecture": "g when herb hint applies (purchase_quantity=100, cost_base_unit=g); un/countable when row_only with no hint (purchase_quantity=1)"
+    }
+  ],
+  "tomilhoTrace": {
+    "invoiceItemId": "f2d094ab-f50a-483d-b6cb-76554d5bf195",
+    "isCasePieceWeight": false,
+    "procurement": {
+      "current_price": 2.06,
+      "purchase_quantity": 1,
+      "purchase_unit": "un",
+      "base_unit": "un",
+      "unit": "un",
+      "includeCatalogUnitFields": true
+    },
+    "persistFields": {
+      "current_price": 2.06,
+      "purchase_quantity": 1,
+      "cost_base_unit": "un"
+    },
+    "recipeFields": {
+      "current_price": 2.06,
+      "purchase_quantity": 1,
+      "cost_base_unit": "un"
+    },
+    "structuredFields": {
+      "purchase_quantity": 1,
+      "purchase_unit": "un",
+      "base_unit": "un"
+    },
+    "conversionHint": null
+  },
+  "tomilhoIngredient": {
+    "id": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041",
+    "name": "Tomilho",
+    "current_price": 2.06,
+    "purchase_quantity": 1,
+    "purchase_unit": "un",
+    "base_unit": "un",
+    "unit": "un",
+    "normalized_name": "tomilho",
+    "supplier": null
+  },
+  "tomilhoMatch": {
+    "ingredient_id": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041",
+    "status": "confirmed",
+    "match_kind": "confirmed-alias"
+  },
+  "priceHistory": [
+    {
+      "id": "25c318d5-64d8-4317-8d1e-57dff5aaa1e5",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "new_price": 2.06,
+      "created_at": "2026-05-25T12:00:00+00:00"
+    }
+  ],
+  "aliases": [
+    {
+      "alias_name": "Tomilho",
+      "confirmed_by_user": true,
+      "supplier_name": "Bidfood Portugal"
+    }
+  ],
+  "tomilhoItems": [
+    {
+      "id": "f2d094ab-f50a-483d-b6cb-76554d5bf195",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "name": "Tomilho",
+      "quantity": 1,
+      "unit": "mo",
+      "unit_price": 2.06,
+      "total": 2.06,
+      "created_at": "2026-06-20T01:24:45.305604+00:00",
+      "invoices": {
+        "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice_date": "2026-05-25",
+        "supplier_name": "Bidfood Portugal, SA"
+      }
+    }
+  ]
+}

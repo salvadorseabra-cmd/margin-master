@@ -1,0 +1,631 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "auditedAt": "2026-06-24T01:17:52.878Z",
+  "mode": "STRICT_READ_ONLY",
+  "task1_produceConversionHintsInventory": [
+    {
+      "ingredientToken": "ALFACE",
+      "conversion": 500,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "leafy produce",
+      "confidence": 0.62
+    },
+    {
+      "ingredientToken": "LETTUCE",
+      "conversion": 500,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "leafy produce",
+      "confidence": 0.62
+    },
+    {
+      "ingredientToken": "RUCULA",
+      "conversion": 500,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "leafy produce",
+      "confidence": 0.62
+    },
+    {
+      "ingredientToken": "ARUGULA",
+      "conversion": 500,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "leafy produce",
+      "confidence": 0.62
+    },
+    {
+      "ingredientToken": "AGRIAO",
+      "conversion": 500,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "leafy produce",
+      "confidence": 0.62
+    },
+    {
+      "ingredientToken": "ESPINAFRE",
+      "conversion": 500,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "leafy produce",
+      "confidence": 0.62
+    },
+    {
+      "ingredientToken": "COUVE",
+      "conversion": 500,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "leafy produce",
+      "confidence": 0.62
+    },
+    {
+      "ingredientToken": "COENTROS",
+      "conversion": 100,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "fresh herbs",
+      "confidence": 0.58
+    },
+    {
+      "ingredientToken": "SALSA",
+      "conversion": 100,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "fresh herbs",
+      "confidence": 0.58
+    },
+    {
+      "ingredientToken": "MANJERICAO",
+      "conversion": 100,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "fresh herbs",
+      "confidence": 0.58
+    },
+    {
+      "ingredientToken": "HORTELA",
+      "conversion": 100,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "fresh herbs",
+      "confidence": 0.58
+    },
+    {
+      "ingredientToken": "CEBOLINHO",
+      "conversion": 100,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "fresh herbs",
+      "confidence": 0.58
+    },
+    {
+      "ingredientToken": "BROCOLOS",
+      "conversion": 700,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "whole vegetable",
+      "confidence": 0.56
+    },
+    {
+      "ingredientToken": "COUVE-FLOR",
+      "conversion": 700,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "whole vegetable",
+      "confidence": 0.56
+    },
+    {
+      "ingredientToken": "COUVE FLOR",
+      "conversion": 700,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "whole vegetable",
+      "confidence": 0.56
+    },
+    {
+      "ingredientToken": "REPOLHO",
+      "conversion": 700,
+      "unit": "g",
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "hintLabel": "whole vegetable",
+      "confidence": 0.56
+    }
+  ],
+  "task1_targetHerbProbe": [
+    {
+      "token": "MANJERICAO",
+      "displayName": "Manjericão",
+      "inProduceConversionHints": true,
+      "detectConversionHint": {
+        "estimated_quantity": 100,
+        "stock_unit": "g",
+        "label": "fresh herbs",
+        "reason": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+      }
+    },
+    {
+      "token": "SALSA",
+      "displayName": "Salsa",
+      "inProduceConversionHints": true,
+      "detectConversionHint": {
+        "estimated_quantity": 100,
+        "stock_unit": "g",
+        "label": "fresh herbs",
+        "reason": "fresh herbs token \"SALSA\" → estimated 100g usable"
+      }
+    },
+    {
+      "token": "COENTROS",
+      "displayName": "Coentros",
+      "inProduceConversionHints": true,
+      "detectConversionHint": {
+        "estimated_quantity": 100,
+        "stock_unit": "g",
+        "label": "fresh herbs",
+        "reason": "fresh herbs token \"COENTROS\" → estimated 100g usable"
+      }
+    },
+    {
+      "token": "HORTELA",
+      "displayName": "Hortelã",
+      "inProduceConversionHints": true,
+      "detectConversionHint": {
+        "estimated_quantity": 100,
+        "stock_unit": "g",
+        "label": "fresh herbs",
+        "reason": "fresh herbs token \"HORTELA\" → estimated 100g usable"
+      }
+    },
+    {
+      "token": "ALECRIM",
+      "displayName": "Alecrim",
+      "inProduceConversionHints": false,
+      "detectConversionHint": null
+    },
+    {
+      "token": "CEBOLINHO",
+      "displayName": "Cebolinho",
+      "inProduceConversionHints": true,
+      "detectConversionHint": {
+        "estimated_quantity": 100,
+        "stock_unit": "g",
+        "label": "fresh herbs",
+        "reason": "fresh herbs token \"CEBOLINHO\" → estimated 100g usable"
+      }
+    },
+    {
+      "token": "ESTRAGAO",
+      "displayName": "Estragão",
+      "inProduceConversionHints": false,
+      "detectConversionHint": null
+    },
+    {
+      "token": "TOMILHO",
+      "displayName": "Tomilho",
+      "inProduceConversionHints": false,
+      "detectConversionHint": null
+    }
+  ],
+  "task2_coverageAnalysis": [
+    {
+      "ingredientGroup": "leafy produce",
+      "conversion": 500,
+      "operationalUnit": "kg",
+      "category": "Vegetables",
+      "tokenCount": 7,
+      "tokens": [
+        "ALFACE",
+        "LETTUCE",
+        "RUCULA",
+        "ARUGULA",
+        "AGRIAO",
+        "ESPINAFRE",
+        "COUVE"
+      ]
+    },
+    {
+      "ingredientGroup": "fresh herbs",
+      "conversion": 100,
+      "operationalUnit": "kg",
+      "category": "Herbs",
+      "tokenCount": 5,
+      "tokens": [
+        "COENTROS",
+        "SALSA",
+        "MANJERICAO",
+        "HORTELA",
+        "CEBOLINHO"
+      ]
+    },
+    {
+      "ingredientGroup": "whole vegetable",
+      "conversion": 700,
+      "operationalUnit": "kg",
+      "category": "Vegetables",
+      "tokenCount": 4,
+      "tokens": [
+        "BROCOLOS",
+        "COUVE-FLOR",
+        "COUVE FLOR",
+        "REPOLHO"
+      ]
+    }
+  ],
+  "task2_categoryCounts": {
+    "Vegetables": 11,
+    "Herbs": 5
+  },
+  "task3_vlCorpus": {
+    "totalInvoiceItems": 52,
+    "bunchUnitRows": 2,
+    "uniqueBunchProducts": 2,
+    "molhoNameRows": 0,
+    "rows": [
+      {
+        "product": "Tomilho",
+        "invoiceItemId": "f2d094ab-f50a-483d-b6cb-76554d5bf195",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "quantity": 1,
+        "unit": "mo",
+        "unitPrice": 2.06,
+        "parsedConversion": false,
+        "conversionHint": null,
+        "structuredKind": "row_only",
+        "normalizedUsableQuantity": null,
+        "usableQuantityUnit": null,
+        "operationalVisible": false,
+        "operationalLabel": null,
+        "procurementLabel": "€2.06 / bunch",
+        "source": "invoice_items",
+        "status": "MISSING",
+        "detectConversionHintToken": null
+      },
+      {
+        "product": "Manjericão",
+        "invoiceItemId": "b47828a9-e042-4437-b0b7-8944c812509a",
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "quantity": 5,
+        "unit": "mo",
+        "unitPrice": 2.06,
+        "parsedConversion": true,
+        "conversionHint": {
+          "purchase_unit": "un",
+          "estimated_quantity": 100,
+          "stock_unit": "g",
+          "recipe_usage_unit": "g",
+          "label": "fresh herbs",
+          "confidence": 0.58,
+          "reason": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+        },
+        "structuredKind": "inferred",
+        "normalizedUsableQuantity": 500,
+        "usableQuantityUnit": "g",
+        "operationalVisible": true,
+        "operationalLabel": "€20.60 / kg",
+        "procurementLabel": "€2.06 / bunch",
+        "source": "invoice_items",
+        "status": "SAFE",
+        "detectConversionHintToken": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+      }
+    ],
+    "herbBunchSummary": {
+      "total": 2,
+      "safe": 1,
+      "partial": 0,
+      "missing": 1,
+      "missingProducts": [
+        "Tomilho"
+      ]
+    },
+    "broaderProduceScan": {
+      "rowCount": 5,
+      "rows": [
+        {
+          "product": "Tomilho",
+          "unit": "mo",
+          "parsedConversion": false,
+          "operationalVisible": false,
+          "operationalLabel": null,
+          "structuredKind": "row_only",
+          "conversionHint": null,
+          "status": "MISSING"
+        },
+        {
+          "product": "Salada Ibérica FSTK EMB. 250g",
+          "unit": "em",
+          "parsedConversion": true,
+          "operationalVisible": true,
+          "operationalLabel": "€8.76 / kg",
+          "structuredKind": "weight_or_volume",
+          "conversionHint": null,
+          "status": "SAFE"
+        },
+        {
+          "product": "Manjericão",
+          "unit": "mo",
+          "parsedConversion": true,
+          "operationalVisible": true,
+          "operationalLabel": "€20.60 / kg",
+          "structuredKind": "inferred",
+          "conversionHint": "fresh herbs token \"MANJERICAO\" → estimated 100g usable",
+          "status": "SAFE"
+        },
+        {
+          "product": "Hortelã",
+          "unit": "kg",
+          "parsedConversion": true,
+          "operationalVisible": true,
+          "operationalLabel": "€5.40 / kg",
+          "structuredKind": "weight_or_volume",
+          "conversionHint": "fresh herbs token \"HORTELA\" → estimated 100g usable",
+          "status": "SAFE"
+        },
+        {
+          "product": "Pepino",
+          "unit": "kg",
+          "parsedConversion": true,
+          "operationalVisible": true,
+          "operationalLabel": "€1.42 / kg",
+          "structuredKind": "weight_or_volume",
+          "conversionHint": null,
+          "status": "SAFE"
+        }
+      ],
+      "missingOperational": [
+        {
+          "product": "Tomilho",
+          "unit": "mo",
+          "parsedConversion": false,
+          "operationalVisible": false,
+          "operationalLabel": null,
+          "structuredKind": "row_only",
+          "conversionHint": null,
+          "status": "MISSING"
+        }
+      ],
+      "safeOperational": [
+        {
+          "product": "Salada Ibérica FSTK EMB. 250g",
+          "unit": "em",
+          "parsedConversion": true,
+          "operationalVisible": true,
+          "operationalLabel": "€8.76 / kg",
+          "structuredKind": "weight_or_volume",
+          "conversionHint": null,
+          "status": "SAFE"
+        },
+        {
+          "product": "Manjericão",
+          "unit": "mo",
+          "parsedConversion": true,
+          "operationalVisible": true,
+          "operationalLabel": "€20.60 / kg",
+          "structuredKind": "inferred",
+          "conversionHint": "fresh herbs token \"MANJERICAO\" → estimated 100g usable",
+          "status": "SAFE"
+        },
+        {
+          "product": "Hortelã",
+          "unit": "kg",
+          "parsedConversion": true,
+          "operationalVisible": true,
+          "operationalLabel": "€5.40 / kg",
+          "structuredKind": "weight_or_volume",
+          "conversionHint": "fresh herbs token \"HORTELA\" → estimated 100g usable",
+          "status": "SAFE"
+        },
+        {
+          "product": "Pepino",
+          "unit": "kg",
+          "parsedConversion": true,
+          "operationalVisible": true,
+          "operationalLabel": "€1.42 / kg",
+          "structuredKind": "weight_or_volume",
+          "conversionHint": null,
+          "status": "SAFE"
+        }
+      ]
+    }
+  },
+  "codeLevelHerbTokenGap": {
+    "missingFromTable": [
+      {
+        "token": "ALECRIM",
+        "displayName": "Alecrim"
+      },
+      {
+        "token": "ESTRAGAO",
+        "displayName": "Estragão"
+      },
+      {
+        "token": "TOMILHO",
+        "displayName": "Tomilho"
+      }
+    ],
+    "inTable": [
+      "MANJERICAO",
+      "SALSA",
+      "COENTROS",
+      "HORTELA",
+      "CEBOLINHO"
+    ],
+    "latentGapNote": "3/8 target herbs absent from PRODUCE_CONVERSION_HINTS (TOMILHO, ALECRIM, ESTRAGAO); only TOMILHO appears in VL with operational impact"
+  },
+  "task4_tomilhoRootCause": {
+    "tomilhoItem": {
+      "id": "f2d094ab-f50a-483d-b6cb-76554d5bf195",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "name": "Tomilho",
+      "quantity": 1,
+      "unit": "mo",
+      "unit_price": 2.06,
+      "total": 2.06
+    },
+    "manjericaoItem": {
+      "id": "b47828a9-e042-4437-b0b7-8944c812509a",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "name": "Manjericão",
+      "quantity": 5,
+      "unit": "mo",
+      "unit_price": 2.06,
+      "total": 10.28
+    },
+    "divergencePath": [
+      {
+        "stage": "invoice_item.unit",
+        "tomilho": "mo",
+        "manjericao": "mo",
+        "diverges": false
+      },
+      {
+        "stage": "detectConversionHint(name)",
+        "tomilho": null,
+        "manjericao": {
+          "purchase_unit": "un",
+          "estimated_quantity": 100,
+          "stock_unit": "g",
+          "recipe_usage_unit": "g",
+          "label": "fresh herbs",
+          "confidence": 0.58,
+          "reason": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+        },
+        "diverges": true,
+        "codeRef": "src/lib/ingredient-unit-inference.ts detectConversionHint / PRODUCE_CONVERSION_HINTS"
+      },
+      {
+        "stage": "resolveInvoiceLinePurchaseFormat.kind",
+        "tomilho": "row_only",
+        "manjericao": "inferred",
+        "diverges": true,
+        "codeRef": "src/lib/invoice-purchase-format.ts"
+      },
+      {
+        "stage": "normalizedUsableQuantity",
+        "tomilho": null,
+        "manjericao": 500,
+        "diverges": true,
+        "codeRef": "src/lib/stock-normalization.ts computeUsableFromInference conversion_hint branch"
+      },
+      {
+        "stage": "resolveUsablePerPricedUnit",
+        "tomilho": null,
+        "manjericao": {
+          "amount": 100,
+          "unit": "g"
+        },
+        "diverges": true,
+        "codeRef": "src/lib/invoice-purchase-price-semantics.ts"
+      },
+      {
+        "stage": "computeEffectiveUsableCost",
+        "tomilho": null,
+        "manjericao": {
+          "cost": 20.599999999999998,
+          "unit": "kg"
+        },
+        "diverges": true,
+        "codeRef": "src/lib/invoice-purchase-price-semantics.ts"
+      },
+      {
+        "stage": "effectiveUsableCostLabel",
+        "tomilho": null,
+        "manjericao": "€20.60 / kg",
+        "diverges": true,
+        "codeRef": "src/lib/invoice-purchase-price-semantics.ts resolveInvoiceLinePricingPresentation"
+      },
+      {
+        "stage": "recipeOperationalCostFieldsFromInvoiceLine",
+        "tomilho": {
+          "current_price": 2.06,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "manjericao": {
+          "current_price": 2.06,
+          "purchase_quantity": 100,
+          "cost_base_unit": "g"
+        },
+        "diverges": true,
+        "codeRef": "src/lib/invoice-purchase-price-semantics.ts recipeOperationalCostFieldsFromInvoiceLine"
+      }
+    ],
+    "firstDivergenceStage": "detectConversionHint(name)",
+    "firstDivergence": {
+      "stage": "detectConversionHint(name)",
+      "tomilho": null,
+      "manjericao": {
+        "purchase_unit": "un",
+        "estimated_quantity": 100,
+        "stock_unit": "g",
+        "recipe_usage_unit": "g",
+        "label": "fresh herbs",
+        "confidence": 0.58,
+        "reason": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+      },
+      "diverges": true,
+      "codeRef": "src/lib/ingredient-unit-inference.ts detectConversionHint / PRODUCE_CONVERSION_HINTS"
+    },
+    "exactDivergence": "detectConversionHint: Tomilho → null (TOMILHO not in PRODUCE_CONVERSION_HINTS); Manjericão → MANJERICAO token → 100g/bunch → structured.kind=inferred → €/kg operational"
+  },
+  "task5_architecturalIntent": {
+    "selected": "D",
+    "options": {
+      "A": "Isolated missing hint — Tomilho alone lacks token; other mo herbs covered",
+      "B": "Small herb-family gap — multiple herbs (e.g. Tomilho, Alecrim, Estragão) missing from fresh-herb table while siblings covered",
+      "C": "Broad fresh-produce gap — PRODUCE_CONVERSION_HINTS covers only 17 tokens; many VL bunch/whole-produce rows lack operational conversion",
+      "D": "Architecture ambiguity — hints are lightweight/estimated, intentionally not persisted; no rule mandates all mo herbs get €/kg"
+    },
+    "evidence": [
+      "ingredient-unit-inference.ts L426-429: hints are 'lightweight operational hints' 'intentionally not persisted automatically because the schema has no field for estimated usable yield'",
+      "invoice-purchase-format.test.ts: estimated_yield renderSource for ALFACE without explicit pack — partial token coverage by design",
+      "stock-normalization.test.ts: 'does not invent usable weight without shorthand or match signal' for Tomate cherry",
+      "No test asserts all mo-unit herbs must match PRODUCE_CONVERSION_HINTS; Manjericão path tested via formatRowPurchaseQuantityLabel only"
+    ]
+  },
+  "task6_blastRadius": {
+    "ifTomilhoGotManjericaoTreatment": {
+      "herbRowsGainingOperational": 1,
+      "products": [
+        "Tomilho"
+      ],
+      "rowIds": [
+        "f2d094ab-f50a-483d-b6cb-76554d5bf195"
+      ]
+    },
+    "allMissingBunchRows": 1,
+    "allMissingBunchProducts": [
+      "Tomilho"
+    ]
+  },
+  "requiredTable": [
+    {
+      "ingredient": "Tomilho",
+      "purchaseUnit": "mo",
+      "conversion": null,
+      "operationalUnit": null,
+      "status": "MISSING",
+      "procurementLabel": "€2.06 / bunch",
+      "operationalLabel": null
+    },
+    {
+      "ingredient": "Manjericão",
+      "purchaseUnit": "mo",
+      "conversion": "100 g/bunch",
+      "operationalUnit": "kg",
+      "status": "SAFE",
+      "procurementLabel": "€2.06 / bunch",
+      "operationalLabel": "€20.60 / kg"
+    }
+  ],
+  "finalVerdict": "A",
+  "finalVerdictQuestion": "Is Tomilho one-off or larger coverage problem?",
+  "finalVerdictAnswer": "Tomilho is an isolated missing-hint case among VL herb bunch purchases.",
+  "finalVerdictExplanation": "Only Tomilho among VL mo-bunch herb rows lacks operational conversion. VL mo corpus is Tomilho (MISSING) + Manjericão (SAFE). Code table also omits ALECRIM/ESTRAGAO but those are untriggered in VL.",
+  "verdictOptions": {
+    "A": "Isolated missing hint — Tomilho alone lacks token; other mo herbs covered",
+    "B": "Small herb-family gap — multiple herbs (e.g. Tomilho, Alecrim, Estragão) missing from fresh-herb table while siblings covered",
+    "C": "Broad fresh-produce gap — PRODUCE_CONVERSION_HINTS covers only 17 tokens; many VL bunch/whole-produce rows lack operational conversion",
+    "D": "Architecture ambiguity — hints are lightweight/estimated, intentionally not persisted; no rule mandates all mo herbs get €/kg"
+  }
+}

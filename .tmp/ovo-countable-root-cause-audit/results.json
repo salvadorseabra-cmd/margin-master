@@ -1,0 +1,913 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "auditedAt": "2026-06-24T00:30:36.086Z",
+  "mode": "STRICT_READ_ONLY",
+  "product": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+  "verdict": "C",
+  "verdictOptions": {
+    "A": "OCR never extracts it",
+    "B": "Extraction extracts but normalization loses it",
+    "C": "Purchase structure parser fails",
+    "D": "Structure recognized but persistence drops it",
+    "E": "Structure persisted but recipe costing ignores it",
+    "F": "Multiple failures"
+  },
+  "verdictQuestion": "What exact code path prevents 1 case of 15 dozen eggs from becoming 180 recipe eggs?",
+  "verdictAnswer": "parsePurchaseStructureFromText in stock-normalization.ts receives the full name 'Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)' but returns null — no regex tier matches 'Cx.15 dúzias' (dúzias ∉ MEASURE_UNIT_TOKEN, ∉ INNER_UNIT_TOKEN; CAIXA_COUNT_ONLY_RE matches 'Cx.15' but requires embedded g/ml piece weight via findEmbeddedPieceMeasure). Downstream resolveInvoiceLinePurchaseFormat → row_only → resolveUnitsPerPack null → resolveCountablePurchaseQuantityForCost(cx) → 1 → persistence purchase_quantity=1. Recipe costing divides €38.44 by 1, not 180.",
+  "q1_rawOcrExtraction": {
+    "question": "Did extraction capture 15, dúzias, carton?",
+    "answer": {
+      "captured15": true,
+      "capturedDuzias": true,
+      "capturedCarton": true,
+      "verdict": "YES — all three appear in persisted invoice_items.name"
+    },
+    "dbRow": {
+      "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 38.44,
+      "total": 38.44
+    },
+    "normalized": {
+      "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "quantity": 1,
+      "unit": "cx",
+      "gross_unit_price": null,
+      "discount_pct": null,
+      "line_total_net": null,
+      "unit_price": 38.44,
+      "total": 38.44
+    },
+    "rawTextInName": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)"
+  },
+  "q2_purchaseStructureParsing": {
+    "parserReceives": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+    "truncated": false,
+    "parsePurchaseStructureFromText": null,
+    "structuredKind": "row_only",
+    "resolveInvoiceLinePurchaseFormat": {
+      "kind": "row_only",
+      "ingredientIdentityHint": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "purchaseContainerCount": 1,
+      "purchaseContainerUnit": "cx",
+      "packageQuantity": null,
+      "packageMeasurementUnit": null,
+      "normalizedUsableQuantity": null,
+      "usableQuantityUnit": null,
+      "packageType": "caixa",
+      "inferred": {
+        "purchase_quantity": 1,
+        "purchase_unit": null,
+        "base_unit": null,
+        "package_type": "caixa",
+        "package_count": null,
+        "confidence": 0,
+        "reason": "no unit tokens matched",
+        "purchase_unit_count": 1,
+        "pack_size": null,
+        "pack_size_unit": null,
+        "size_is_metadata_only": false,
+        "normalized_stock_quantity": null,
+        "stock_unit": null,
+        "recipe_usage_unit": null,
+        "conversion_hint": null
+      },
+      "confidence": 0.7,
+      "reason": "invoice row quantity and unit only",
+      "stockNormalizationPipeline": "unified"
+    },
+    "parseTest": {
+      "input": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "parsePurchaseStructureFromText": null,
+      "caixaCountOnlyWouldMatch": false,
+      "matchedSubstring": [
+        "Cx.15",
+        "15"
+      ],
+      "requiresEmbeddedWeightForCaixaCountOnly": true,
+      "measureUnitTokens": "kg|g|ml|cl|l — no dúzia/dz/dozen"
+    }
+  },
+  "q3_countableConversionSupport": {
+    "dozenInMeasureTokens": false,
+    "dozenInInnerUnitTokens": false,
+    "eggsPerDozenConstant": null,
+    "eggNounInPriceSemantics": true,
+    "dzInInvoiceUnitToken": true,
+    "dzInPurchaseStructureParser": false,
+    "fileHits": {
+      "src/lib/stock-normalization.ts": [
+        "262:/** `80g 120 UN` bakery tail — defers to unit-count inference instead of bare 80g. */",
+        "391:/** OCR often turns `80g 120 UN` into `1 pack x 120 g` — skip when a per-piece weight is already in the title. */"
+      ],
+      "src/lib/invoice-purchase-format.ts": [
+        "641:/** Per-item weight in the name (80G) is metadata when inference found an outer unit count (120 UN). */"
+      ],
+      "src/lib/invoice-purchase-price-semantics.ts": [
+        "391:  if (/\\b(egg|eggs|ovo|ovos)\\b/.test(normalized)) return \"egg\";",
+        "406:  if (/\\b(egg|eggs|ovo|ovos)\\b/.test(normalized)) {",
+        "407:    return count === 1 ? \"egg\" : \"eggs\";",
+        "601:    const unitsPerPack = resolveUnitsPerPack(structured);",
+        "602:    if (unitsPerPack != null && unitsPerPack > 0) return unitsPerPack;"
+      ],
+      "src/lib/ingredient-auto-persist.ts": []
+    }
+  },
+  "q4_persistenceTrace": {
+    "exactPayload": {
+      "purchase_quantity": 1,
+      "purchase_unit": "un",
+      "usable_quantity": null,
+      "usable_unit": null,
+      "cost_base_unit": "un",
+      "current_price": 38.44
+    },
+    "whyPurchaseQuantity1": [
+      "parsePurchaseStructureFromText(OVO_NAME) → null (no regex tier matches Cx.15 dúzias)",
+      "resolveInvoiceLinePurchaseFormat → kind=row_only, normalizedUsableQuantity=null",
+      "resolveUnitsPerPack(structured) → null (not multi_unit_pack)",
+      "resolveCountablePurchaseQuantityForCost: rowUnit=cx + unitsPerPack null → return 1",
+      "operationalCostFieldsFromInvoiceLine → purchase_quantity=1, cost_base_unit=un"
+    ],
+    "persistTrace": {
+      "procurementPackFieldsFromInvoiceLine": {
+        "current_price": 38.44,
+        "purchase_quantity": 1,
+        "purchase_unit": "un",
+        "base_unit": "un",
+        "unit": "un",
+        "includeCatalogUnitFields": true
+      },
+      "operationalCostFieldsFromInvoiceLine": {
+        "current_price": 38.44,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un"
+      },
+      "structuredPurchaseToIngredientFields": {
+        "purchase_quantity": 1,
+        "purchase_unit": "un",
+        "base_unit": "un"
+      }
+    }
+  },
+  "q5_workingCountablesCompare": {
+    "Ovo MORENO Classe M": {
+      "parsedStructure": null,
+      "structuredKind": "row_only",
+      "purchaseQty": 1,
+      "operationalQty": null,
+      "operationalCost": null,
+      "unitCost": 38.44
+    },
+    "peroni": {
+      "parsedStructure": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 24,
+        "innerUnitType": null,
+        "unitSize": 33,
+        "unitMeasurement": "cl",
+        "totalUsableAmount": 7920,
+        "usableUnit": "ml",
+        "tier": "size_count",
+        "matchedText": "33cl*24 ",
+        "multiplierChain": {
+          "purchaseQuantity": 1,
+          "innerUnitCount": 24,
+          "unitSize": 33,
+          "unitMeasurement": "cl",
+          "perItemBase": 330,
+          "usableUnit": "ml",
+          "totalUsableAmount": 7920,
+          "expression": "1 × 24 × 33 cl"
+        }
+      },
+      "structuredKind": "multi_unit_pack",
+      "purchaseQty": 7920,
+      "operationalQty": {
+        "amount": 7920,
+        "unit": "ml"
+      },
+      "operationalCost": {
+        "cost": 3.2424242424242427,
+        "unit": "L"
+      },
+      "unitCost": 0.0001351010101010101
+    },
+    "pellegrino": {
+      "parsedStructure": {
+        "purchaseQuantity": 1,
+        "purchaseFormat": "unit",
+        "innerUnitCount": 15,
+        "innerUnitType": "unit",
+        "unitSize": 75,
+        "unitMeasurement": "cl",
+        "totalUsableAmount": 11250,
+        "usableUnit": "ml",
+        "tier": "size_count",
+        "matchedText": "75cl x 15ud",
+        "multiplierChain": {
+          "purchaseQuantity": 1,
+          "innerUnitCount": 15,
+          "unitSize": 75,
+          "unitMeasurement": "cl",
+          "perItemBase": 750,
+          "usableUnit": "ml",
+          "totalUsableAmount": 11250,
+          "expression": "1 × 15 × 75 cl"
+        }
+      },
+      "structuredKind": "multi_unit_pack",
+      "purchaseQty": 11250,
+      "operationalQty": {
+        "amount": 11250,
+        "unit": "ml"
+      },
+      "operationalCost": {
+        "cost": 1.7137777777777778,
+        "unit": "L"
+      },
+      "unitCost": 0.0017137777777777778
+    }
+  },
+  "q6_smallestMissingFact": {
+    "singleAbsentDenominator": 180,
+    "explanation": "purchase_quantity denominator for recipe costing — should be total eggs per priced case (15 dozen × 12 = 180), never computed because parsePurchaseStructureFromText does not parse dúzias",
+    "formula": "effectiveIngredientUnitCostEur = current_price / purchase_quantity → 38.44 / 1 = €38.44 per recipe 'un' (whole case)",
+    "hypothetical": "38.44 / 180 = €0.2136 per egg — unreachable without parsed egg count"
+  },
+  "pipelineTable": [
+    {
+      "stage": "OCR / DB invoice_items",
+      "representation": {
+        "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 38.44
+      }
+    },
+    {
+      "stage": "normalizeInvoiceItemFields",
+      "representation": {
+        "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+        "quantity": 1,
+        "unit": "cx",
+        "gross_unit_price": null,
+        "discount_pct": null,
+        "line_total_net": null,
+        "unit_price": 38.44,
+        "total": 38.44
+      }
+    },
+    {
+      "stage": "parsePurchaseStructureFromText(name)",
+      "representation": "null"
+    },
+    {
+      "stage": "computeUsableFromPurchaseStructure",
+      "representation": "null"
+    },
+    {
+      "stage": "resolveInvoiceLinePurchaseFormat",
+      "representation": {
+        "kind": "row_only",
+        "normalizedUsableQuantity": null,
+        "usableQuantityUnit": null,
+        "purchaseContainerCount": 1,
+        "inferred": {
+          "purchase_quantity": 1,
+          "purchase_unit": null,
+          "base_unit": null,
+          "package_type": "caixa",
+          "package_count": null,
+          "confidence": 0,
+          "reason": "no unit tokens matched",
+          "purchase_unit_count": 1,
+          "pack_size": null,
+          "pack_size_unit": null,
+          "size_is_metadata_only": false,
+          "normalized_stock_quantity": null,
+          "stock_unit": null,
+          "recipe_usage_unit": null,
+          "conversion_hint": null
+        }
+      }
+    },
+    {
+      "stage": "resolveUnitsPerPack",
+      "representation": null
+    },
+    {
+      "stage": "resolveUsablePerPricedUnit",
+      "representation": null
+    },
+    {
+      "stage": "computeEffectiveUsableCost",
+      "representation": null
+    },
+    {
+      "stage": "procurementPackFieldsFromInvoiceLine",
+      "representation": {
+        "current_price": 38.44,
+        "purchase_quantity": 1,
+        "purchase_unit": "un",
+        "base_unit": "un",
+        "unit": "un",
+        "includeCatalogUnitFields": true
+      }
+    },
+    {
+      "stage": "operationalCostFieldsFromInvoiceLine (persistence)",
+      "representation": {
+        "current_price": 38.44,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un"
+      }
+    },
+    {
+      "stage": "ingredients DB row",
+      "representation": {
+        "id": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+        "name": "Ovo classe M",
+        "current_price": 38.44,
+        "purchase_quantity": 1,
+        "purchase_unit": "un",
+        "base_unit": "un"
+      }
+    },
+    {
+      "stage": "recipeOperationalCostFieldsFromInvoiceLine",
+      "representation": {
+        "current_price": 38.44,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un"
+      }
+    },
+    {
+      "stage": "Recipe costing (1 egg, recipeUnit=un)",
+      "representation": {
+        "unitCostEur": 38.44,
+        "lineCost1Egg": 38.44,
+        "formula": "qty × (current_price / purchase_quantity)"
+      }
+    }
+  ],
+  "ovoTrace": {
+    "raw": {
+      "id": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+      "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 38.44,
+      "total": 38.44,
+      "created_at": "2026-06-20T01:24:45.305604+00:00",
+      "invoices": {
+        "id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "invoice_date": "2026-05-25",
+        "supplier_name": "Bidfood Portugal, SA"
+      }
+    },
+    "bound": {
+      "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "quantity": 1,
+      "unit": "cx",
+      "gross_unit_price": null,
+      "discount_pct": null,
+      "line_total_net": null,
+      "unit_price": 38.44,
+      "total": 38.44
+    },
+    "parserInput": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+    "parserInputTruncated": false,
+    "structure": null,
+    "structureSummary": null,
+    "usableChain": null,
+    "structured": {
+      "kind": "row_only",
+      "ingredientIdentityHint": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "purchaseContainerCount": 1,
+      "purchaseContainerUnit": "cx",
+      "packageQuantity": null,
+      "packageMeasurementUnit": null,
+      "normalizedUsableQuantity": null,
+      "usableQuantityUnit": null,
+      "packageType": "caixa",
+      "inferred": {
+        "purchase_quantity": 1,
+        "purchase_unit": null,
+        "base_unit": null,
+        "package_type": "caixa",
+        "package_count": null,
+        "confidence": 0,
+        "reason": "no unit tokens matched",
+        "purchase_unit_count": 1,
+        "pack_size": null,
+        "pack_size_unit": null,
+        "size_is_metadata_only": false,
+        "normalized_stock_quantity": null,
+        "stock_unit": null,
+        "recipe_usage_unit": null,
+        "conversion_hint": null
+      },
+      "confidence": 0.7,
+      "reason": "invoice row quantity and unit only",
+      "stockNormalizationPipeline": "unified"
+    },
+    "presentation": {
+      "card": {
+        "purchaseQuantityLine": "1 case",
+        "purchasePriceLine": "€38.44 / case",
+        "normalizedLine": null,
+        "usableCostLine": null
+      },
+      "blocks": [
+        {
+          "id": "purchase",
+          "title": "Purchase",
+          "lines": [
+            {
+              "text": "1 case",
+              "variant": "default"
+            },
+            {
+              "text": "€38.44 / case",
+              "variant": "secondary"
+            }
+          ]
+        }
+      ],
+      "badges": [],
+      "insights": [],
+      "priceLabel": "Pack price",
+      "priceDisplay": "€38.44 / case",
+      "purchasedPackDetail": null,
+      "usableStockLabel": null,
+      "effectiveUsableCostLabel": null
+    },
+    "purchaseUnitResolution": {
+      "unit": "cx",
+      "source": "ocr_explicit"
+    },
+    "structuredFields": {
+      "purchase_quantity": 1,
+      "purchase_unit": "un",
+      "base_unit": "un"
+    },
+    "procurement": {
+      "current_price": 38.44,
+      "purchase_quantity": 1,
+      "purchase_unit": "un",
+      "base_unit": "un",
+      "unit": "un",
+      "includeCatalogUnitFields": true
+    },
+    "persistFields": {
+      "current_price": 38.44,
+      "purchase_quantity": 1,
+      "cost_base_unit": "un"
+    },
+    "recipeFields": {
+      "current_price": 38.44,
+      "purchase_quantity": 1,
+      "cost_base_unit": "un"
+    },
+    "perUnit": null,
+    "effective": null,
+    "unitsPerPack": null,
+    "unitFamily": "countable",
+    "rowQtyLabel": "1 case",
+    "unitCostEur": 38.44,
+    "effectiveUnitCostEur": 38.44,
+    "recipeLineCost1Egg": 38.44
+  },
+  "ovoIngredient": {
+    "id": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+    "name": "Ovo classe M",
+    "current_price": 38.44,
+    "purchase_quantity": 1,
+    "purchase_unit": "un",
+    "base_unit": "un",
+    "unit": "un"
+  },
+  "controls": {
+    "peroni": {
+      "dbItem": {
+        "id": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 1.07,
+        "total": 25.69,
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d"
+      },
+      "trace": {
+        "raw": {
+          "id": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+          "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 1.07,
+          "total": 25.69,
+          "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d"
+        },
+        "bound": {
+          "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "quantity": 24,
+          "unit": "un",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 1.07,
+          "total": 25.69
+        },
+        "parserInput": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "parserInputTruncated": false,
+        "structure": {
+          "purchaseQuantity": 1,
+          "purchaseFormat": "unit",
+          "innerUnitCount": 24,
+          "unitSize": 33,
+          "unitMeasurement": "cl",
+          "totalUsableAmount": 7920,
+          "usableUnit": "ml",
+          "matchedText": "33cl*24 ",
+          "tier": "size_count"
+        },
+        "structureSummary": {
+          "purchaseQuantity": 1,
+          "purchaseFormat": "unit",
+          "innerUnitCount": 24,
+          "innerUnitType": null,
+          "unitSize": 33,
+          "unitMeasurement": "cl",
+          "totalUsableAmount": 7920,
+          "usableUnit": "ml",
+          "tier": "size_count",
+          "matchedText": "33cl*24 ",
+          "multiplierChain": {
+            "purchaseQuantity": 1,
+            "innerUnitCount": 24,
+            "unitSize": 33,
+            "unitMeasurement": "cl",
+            "perItemBase": 330,
+            "usableUnit": "ml",
+            "totalUsableAmount": 7920,
+            "expression": "1 × 24 × 33 cl"
+          }
+        },
+        "usableChain": {
+          "purchaseContainerCount": 1,
+          "usableQuantity": 7920,
+          "usableUnit": "ml",
+          "unitFamily": "volume",
+          "usableSource": "structure_total",
+          "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+          "weak_scalar_activated": false
+        },
+        "structured": {
+          "kind": "multi_unit_pack",
+          "ingredientIdentityHint": "Birra Peroni Nastro Azzurro PNA Nastro Azzurro",
+          "purchaseContainerCount": 24,
+          "purchaseContainerUnit": "un",
+          "packageQuantity": 33,
+          "packageMeasurementUnit": "cl",
+          "normalizedUsableQuantity": 7920,
+          "usableQuantityUnit": "ml",
+          "packageType": null,
+          "inferred": {
+            "purchase_quantity": 24,
+            "purchase_unit": "un",
+            "base_unit": "un",
+            "package_type": null,
+            "package_count": 24,
+            "confidence": 0.93,
+            "reason": "SIZE x N \"33CL*24\" → 24 un",
+            "purchase_unit_count": 24,
+            "pack_size": 330,
+            "pack_size_unit": "ml",
+            "size_is_metadata_only": false,
+            "normalized_stock_quantity": 7920,
+            "stock_unit": "ml",
+            "recipe_usage_unit": "un",
+            "conversion_hint": null
+          },
+          "confidence": 0.98,
+          "reason": "purchase structure (size_count); purchase structure (size_count)",
+          "stockNormalizationPipeline": "unified"
+        },
+        "presentation": {
+          "card": {
+            "purchaseQuantityLine": "24 un · 24 × 33 cl",
+            "purchasePriceLine": "€1.07 / bottle · €25.69 total",
+            "normalizedLine": "7.92 L usable",
+            "usableCostLine": "€3.24 / L usable"
+          },
+          "blocks": [
+            {
+              "id": "purchase",
+              "title": "Purchase",
+              "lines": [
+                {
+                  "text": "24 un · 24 × 33 cl",
+                  "variant": "default"
+                },
+                {
+                  "text": "€1.07 / bottle · €25.69 total",
+                  "variant": "secondary"
+                }
+              ]
+            },
+            {
+              "id": "normalized",
+              "title": "Normalized",
+              "lines": [
+                {
+                  "text": "7.92 L usable",
+                  "variant": "default"
+                }
+              ]
+            },
+            {
+              "id": "recipe-cost",
+              "title": "Normalized",
+              "lines": [
+                {
+                  "text": "€3.24 / L usable",
+                  "variant": "emphasis"
+                }
+              ]
+            }
+          ],
+          "badges": [],
+          "insights": [],
+          "priceLabel": "Pack price",
+          "priceDisplay": "€1.07 / bottle",
+          "purchasedPackDetail": "24 × 33 cl",
+          "usableStockLabel": "7.92 L usable",
+          "effectiveUsableCostLabel": "€3.24 / L"
+        },
+        "purchaseUnitResolution": {
+          "unit": "un",
+          "source": "preserved_countable"
+        },
+        "structuredFields": {
+          "purchase_quantity": 24,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "procurement": {
+          "current_price": 1.07,
+          "purchase_quantity": 24,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "persistFields": {
+          "current_price": 1.07,
+          "purchase_quantity": 7920,
+          "cost_base_unit": "ml"
+        },
+        "recipeFields": {
+          "current_price": 1.07,
+          "purchase_quantity": 7920,
+          "cost_base_unit": "ml"
+        },
+        "perUnit": {
+          "amount": 7920,
+          "unit": "ml"
+        },
+        "effective": {
+          "cost": 3.2424242424242427,
+          "unit": "L"
+        },
+        "unitsPerPack": 24,
+        "unitFamily": "countable",
+        "rowQtyLabel": "24 un",
+        "unitCostEur": 0.0001351010101010101,
+        "effectiveUnitCostEur": 0.0001351010101010101,
+        "recipeLineCost1Egg": 0.0001351010101010101,
+        "dbItem": {
+          "id": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+          "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 1.07,
+          "total": 25.69,
+          "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d"
+        }
+      }
+    },
+    "pellegrino": {
+      "dbItem": {
+        "id": "31ceb310-b232-4ed0-ba75-ea08b13990d8",
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 19.28,
+        "total": 38.56,
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09"
+      },
+      "trace": {
+        "raw": {
+          "id": "31ceb310-b232-4ed0-ba75-ea08b13990d8",
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 19.28,
+          "total": 38.56,
+          "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09"
+        },
+        "bound": {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "un",
+          "gross_unit_price": null,
+          "discount_pct": null,
+          "line_total_net": null,
+          "unit_price": 19.28,
+          "total": 38.56
+        },
+        "parserInput": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "parserInputTruncated": false,
+        "structure": {
+          "purchaseQuantity": 1,
+          "purchaseFormat": "unit",
+          "innerUnitCount": 15,
+          "innerUnitType": "unit",
+          "unitSize": 75,
+          "unitMeasurement": "cl",
+          "totalUsableAmount": 11250,
+          "usableUnit": "ml",
+          "matchedText": "75cl x 15ud",
+          "tier": "size_count"
+        },
+        "structureSummary": {
+          "purchaseQuantity": 1,
+          "purchaseFormat": "unit",
+          "innerUnitCount": 15,
+          "innerUnitType": "unit",
+          "unitSize": 75,
+          "unitMeasurement": "cl",
+          "totalUsableAmount": 11250,
+          "usableUnit": "ml",
+          "tier": "size_count",
+          "matchedText": "75cl x 15ud",
+          "multiplierChain": {
+            "purchaseQuantity": 1,
+            "innerUnitCount": 15,
+            "unitSize": 75,
+            "unitMeasurement": "cl",
+            "perItemBase": 750,
+            "usableUnit": "ml",
+            "totalUsableAmount": 11250,
+            "expression": "1 × 15 × 75 cl"
+          }
+        },
+        "usableChain": {
+          "purchaseContainerCount": 2,
+          "usableQuantity": 22500,
+          "usableUnit": "ml",
+          "unitFamily": "volume",
+          "usableSource": "structure_scaled_outer",
+          "fallbackReason": "outer count 2 (name 1)",
+          "weak_scalar_activated": false
+        },
+        "structured": {
+          "kind": "multi_unit_pack",
+          "ingredientIdentityHint": "SanPellegrino - Acqua in vitro",
+          "purchaseContainerCount": 15,
+          "purchaseContainerUnit": "unit",
+          "packageQuantity": 75,
+          "packageMeasurementUnit": "cl",
+          "normalizedUsableQuantity": 22500,
+          "usableQuantityUnit": "ml",
+          "packageType": null,
+          "inferred": {
+            "purchase_quantity": 15,
+            "purchase_unit": "un",
+            "base_unit": "un",
+            "package_type": null,
+            "package_count": 15,
+            "confidence": 0.93,
+            "reason": "SIZE x N \"75CL X 15UD\" → 15 un",
+            "purchase_unit_count": 15,
+            "pack_size": 750,
+            "pack_size_unit": "ml",
+            "size_is_metadata_only": false,
+            "normalized_stock_quantity": 11250,
+            "stock_unit": "ml",
+            "recipe_usage_unit": "un",
+            "conversion_hint": null
+          },
+          "confidence": 0.98,
+          "reason": "purchase structure (size_count); purchase structure (size_count)",
+          "stockNormalizationPipeline": "unified"
+        },
+        "presentation": {
+          "card": {
+            "purchaseQuantityLine": "2 un · 15 × 75 cl",
+            "purchasePriceLine": "€19.28 / case · €38.56 total",
+            "normalizedLine": "22.5 L usable",
+            "usableCostLine": "€1.71 / L usable"
+          },
+          "blocks": [
+            {
+              "id": "purchase",
+              "title": "Purchase",
+              "lines": [
+                {
+                  "text": "2 un · 15 × 75 cl",
+                  "variant": "default"
+                },
+                {
+                  "text": "€19.28 / case · €38.56 total",
+                  "variant": "secondary"
+                }
+              ]
+            },
+            {
+              "id": "normalized",
+              "title": "Normalized",
+              "lines": [
+                {
+                  "text": "22.5 L usable",
+                  "variant": "default"
+                }
+              ]
+            },
+            {
+              "id": "recipe-cost",
+              "title": "Normalized",
+              "lines": [
+                {
+                  "text": "€1.71 / L usable",
+                  "variant": "emphasis"
+                }
+              ]
+            }
+          ],
+          "badges": [],
+          "insights": [],
+          "priceLabel": "Pack price",
+          "priceDisplay": "€19.28 / case",
+          "purchasedPackDetail": "15 × 75 cl",
+          "usableStockLabel": "22.5 L usable",
+          "effectiveUsableCostLabel": "€1.71 / L"
+        },
+        "purchaseUnitResolution": {
+          "unit": "un",
+          "source": "preserved_countable"
+        },
+        "structuredFields": {
+          "purchase_quantity": 15,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "procurement": {
+          "current_price": 19.28,
+          "purchase_quantity": 2,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "persistFields": {
+          "current_price": 19.28,
+          "purchase_quantity": 11250,
+          "cost_base_unit": "ml"
+        },
+        "recipeFields": {
+          "current_price": 19.28,
+          "purchase_quantity": 11250,
+          "cost_base_unit": "ml"
+        },
+        "perUnit": {
+          "amount": 11250,
+          "unit": "ml"
+        },
+        "effective": {
+          "cost": 1.7137777777777778,
+          "unit": "L"
+        },
+        "unitsPerPack": 15,
+        "unitFamily": "countable",
+        "rowQtyLabel": "2 un",
+        "unitCostEur": 0.0017137777777777778,
+        "effectiveUnitCostEur": 0.0017137777777777778,
+        "recipeLineCost1Egg": 0.0017137777777777778,
+        "dbItem": {
+          "id": "31ceb310-b232-4ed0-ba75-ea08b13990d8",
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 19.28,
+          "total": 38.56,
+          "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09"
+        }
+      }
+    }
+  }
+}

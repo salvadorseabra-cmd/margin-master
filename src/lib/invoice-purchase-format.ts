@@ -224,13 +224,31 @@ export function isCaseRowWithEmbeddedPieceWeightOnly(
   return true;
 }
 
+/** Wholesale case rows where embedded bare_measure is per-piece, not full pack content. */
+const WHOLESALE_CASE_ROW_UNITS = new Set([
+  "cx",
+  "caixa",
+  "caixas",
+  "case",
+  "cases",
+]);
+
+export function shouldApplyCasePieceWeightOperationalShortcut(
+  name: string,
+  rowUnit: string | null | undefined,
+): boolean {
+  if (!isCaseRowWithEmbeddedPieceWeightOnly(name, rowUnit)) return false;
+  const normalized = rowUnit?.trim().toLowerCase();
+  return normalized != null && WHOLESALE_CASE_ROW_UNITS.has(normalized);
+}
+
 function adjustCasePieceWeightDisplay(
   structured: StructuredPurchaseFormat,
   item: InvoiceLinePurchaseInput,
 ): StructuredPurchaseFormat {
   const name = String(item.name ?? "").trim();
   const rowUnit = item.unit?.trim() || null;
-  if (!isCaseRowWithEmbeddedPieceWeightOnly(name, rowUnit)) return structured;
+  if (!shouldApplyCasePieceWeightOperationalShortcut(name, rowUnit)) return structured;
 
   return {
     ...structured,

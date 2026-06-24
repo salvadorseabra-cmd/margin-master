@@ -1,0 +1,246 @@
+{
+  "generatedAt": "2026-06-24T00:00:00.000Z",
+  "mode": "STRICT_DESIGN_ONLY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "product": "Salada Ibérica FSTK EMB. 250g",
+  "ingredientId": "47cd8362-79f4-4285-8491-f016229eaa21",
+  "invoiceItemId": "593e7560-ba2a-4c60-8300-ff34a26335b9",
+  "confirmedBug": {
+    "symptom": "Operational Cost shows €2.19 / case instead of €8.76 / kg",
+    "rootCause": "isCaseRowWithEmbeddedPieceWeightOnly(name, em)=true → computeEffectiveUsableCost short-circuits to { cost: unitPrice, unit: 'case' }",
+    "forkPoint": {
+      "file": "src/lib/invoice-purchase-price-semantics.ts",
+      "function": "computeEffectiveUsableCost",
+      "lines": "522-524"
+    },
+    "secondaryFork": {
+      "file": "src/lib/invoice-purchase-format.ts",
+      "function": "adjustCasePieceWeightDisplay",
+      "lines": "227-242",
+      "effect": "Nulls normalizedUsableQuantity on display path, blocking g→kg fallback even if shortcut removed"
+    },
+    "persistenceCorrect": true,
+    "recipeCorrect": true,
+    "displayOnly": true
+  },
+  "task1_currentFlow": {
+    "forkPoint": "computeEffectiveUsableCost L522-524 when isCaseRowWithEmbeddedPieceWeightOnly=true",
+    "pipeline": [
+      { "stage": "invoice_item (DB)", "quantity": 4, "unit": "em", "unit_price": 2.19, "total": 8.76 },
+      { "stage": "normalizeInvoiceItemFields", "quantity": 4, "unit": "em" },
+      { "stage": "parsePurchaseStructureFromText", "tier": "bare_measure", "matchedText": "250g", "unitSize": 250, "unitMeasurement": "g" },
+      { "stage": "computeUsableFromPurchaseStructure", "usableQuantity": 250, "usableUnit": "g", "usableSource": "structure_total" },
+      { "stage": "resolveInvoiceLinePurchaseFormat", "normalizedUsableQuantity": 250, "usableQuantityUnit": "g", "kind": "weight_or_volume" },
+      { "stage": "resolveStructuredPurchaseForDisplay", "normalizedUsableQuantity": null, "usableQuantityUnit": null, "reason": "case row piece-weight-only display" },
+      { "stage": "resolvePriceSuffix", "suffix": "pack", "path": "em → ROW_UNIT_PRICE_SUFFIX" },
+      { "stage": "isCaseRowWithEmbeddedPieceWeightOnly", "result": true },
+      { "stage": "resolveUsablePerPricedUnit (persisted)", "perUnit": { "amount": 250, "unit": "g" } },
+      { "stage": "computeEffectiveUsableCost", "effective": { "cost": 2.19, "unit": "case" }, "fork": true },
+      { "stage": "resolveInvoiceLinePricingPresentation", "priceDisplay": "€2.19 / pack", "effectiveUsableCostLabel": "€2.19 / case" },
+      { "stage": "operationalCostFieldsFromInvoiceLine", "fields": { "current_price": 2.19, "purchase_quantity": 250, "cost_base_unit": "g" } },
+      { "stage": "recipeOperationalCostFieldsFromInvoiceLine", "fields": { "current_price": 2.19, "purchase_quantity": 250, "cost_base_unit": "g" } },
+      { "stage": "buildLastPurchaseCostPresentation", "procurementCost": "€2.19 / pack", "operationalCost": "€2.19 / case" }
+    ]
+  },
+  "task2_similarProducts": {
+    "familyBehaviour": {
+      "wholesaleCase": {
+        "rowUnits": ["cx", "caixa", "case"],
+        "embeddedMeasure": "per-piece weight; case inner count unknown",
+        "procurement": "€/case",
+        "operational": "€/case",
+        "example": "Angus 180G @ 1 cx"
+      },
+      "retailEmbPack": {
+        "rowUnits": ["em", "emb", "pack"],
+        "embeddedMeasure": "full pack content weight",
+        "procurement": "€/pack",
+        "operational": "€/kg",
+        "example": "Salada Ibérica FSTK EMB. 250g"
+      },
+      "trueBulk": {
+        "rowUnits": ["kg", "L"],
+        "embeddedMeasure": "line is the measure",
+        "procurement": "€/kg or €/L",
+        "operational": "same as procurement",
+        "example": "Manteiga Coimbra EMB 1 Kg @ kg"
+      }
+    },
+    "vlSample": [
+      {
+        "product": "Manteiga Coimbra s/Sal EMB 1 Kg",
+        "invoiceItemId": "e1fcc019-499b-46a9-a99e-e5b51a7578db",
+        "rowUnit": "kg",
+        "procurementDisplay": "€8.90 / kg",
+        "operationalDisplay": "€8.90 / kg",
+        "isCasePieceWeight": false,
+        "status": "correct"
+      },
+      {
+        "product": "Salada Ibérica FSTK EMB. 250g",
+        "invoiceItemId": "593e7560-ba2a-4c60-8300-ff34a26335b9",
+        "rowUnit": "em",
+        "procurementDisplay": "€2.19 / pack",
+        "operationalDisplay": "€2.19 / case",
+        "isCasePieceWeight": true,
+        "status": "broken",
+        "vlOutlier": true
+      }
+    ]
+  },
+  "task3_designOptions": [
+    {
+      "id": "A",
+      "name": "Label-only",
+      "behaviour": "Keep shortcut; change operational suffix case → pack for em rows",
+      "risk": "high",
+      "riskDetail": "Still €2.19/pack operational; misaligned with recipe €/g basis",
+      "scope": "1 line",
+      "recommended": false
+    },
+    {
+      "id": "B",
+      "name": "Narrow case shortcut to wholesale case units",
+      "behaviour": "Apply case-piece-weight shortcut only for cx/caixa/case. EMB pack rows use g→kg normalization",
+      "risk": "low",
+      "riskDetail": "Angus cx unchanged; Salada em gets €8.76/kg; display usable restored via same gate on adjustCasePieceWeightDisplay",
+      "scope": "invoice-purchase-format.ts + invoice-purchase-price-semantics.ts (~15 lines)",
+      "recommended": true
+    },
+    {
+      "id": "C",
+      "name": "Persisted-structured cost call",
+      "behaviour": "resolveInvoiceLinePricingPresentation passes resolveInvoiceLinePurchaseFormat to computeEffectiveUsableCost",
+      "risk": "medium",
+      "riskDetail": "Insufficient alone if shortcut still fires; does not fix usable-stock suppression",
+      "scope": "1 call site",
+      "recommended": false
+    },
+    {
+      "id": "D",
+      "name": "Split detector",
+      "behaviour": "New isWholesaleCaseRowWithPieceWeightOnly (cx-only); deprecate broad isCaseRow for operational paths",
+      "risk": "low",
+      "riskDetail": "Clearest semantics; slightly more refactor than B",
+      "scope": "2 files + test updates",
+      "recommended": false
+    }
+  ],
+  "preferredOption": {
+    "id": "B",
+    "name": "Narrow case shortcut to wholesale case units",
+    "confidence": 0.91,
+    "gate": {
+      "helperName": "shouldApplyCasePieceWeightOperationalShortcut",
+      "file": "src/lib/invoice-purchase-format.ts",
+      "wholesaleCaseRowUnits": ["cx", "caixa", "caixas", "case", "cases"],
+      "pseudocode": "return isCaseRowWithEmbeddedPieceWeightOnly(name, rowUnit) && WHOLESALE_CASE_ROW_UNITS.has(normalize(rowUnit))"
+    },
+    "integrationPoints": [
+      {
+        "file": "src/lib/invoice-purchase-price-semantics.ts",
+        "function": "computeEffectiveUsableCost",
+        "lines": "522-524",
+        "change": "Replace isCaseRowWithEmbeddedPieceWeightOnly with shouldApplyCasePieceWeightOperationalShortcut"
+      },
+      {
+        "file": "src/lib/invoice-purchase-format.ts",
+        "function": "adjustCasePieceWeightDisplay",
+        "lines": "233",
+        "change": "Same gate — do not null usable for EMB pack rows"
+      },
+      {
+        "file": "src/lib/invoice-purchase-price-semantics.ts",
+        "function": "resolvePriceSuffix",
+        "lines": "328",
+        "change": "Same gate — Salada em falls through to pack suffix (unchanged procurement)"
+      }
+    ],
+    "postFixTrace": {
+      "shouldApplyCasePieceWeightOperationalShortcut": false,
+      "resolveUsablePerPricedUnit": { "amount": 250, "unit": "g" },
+      "computeEffectiveUsableCost": { "cost": 8.76, "unit": "kg" },
+      "effectiveUsableCostLabel": "€8.76 / kg",
+      "priceDisplay": "€2.19 / pack"
+    }
+  },
+  "task4_regressionAnalysis": [
+    { "product": "Salada Ibérica", "procurement": "€2.19 / pack", "operationalBefore": "€2.19 / case", "displayChanges": true, "operationalAfter": "€8.76 / kg" },
+    { "product": "Manteiga EMB 1kg", "procurement": "€8.90 / kg", "operationalBefore": "€8.90 / kg", "displayChanges": false, "operationalAfter": "€8.90 / kg" },
+    { "product": "Ovo classe M", "procurement": "€38.44 / case", "operationalBefore": null, "displayChanges": false, "operationalAfter": null },
+    { "product": "Tomilho", "procurement": "€2.06 / bunch", "operationalBefore": null, "displayChanges": false, "operationalAfter": null },
+    { "product": "Manjericão", "procurement": "€2.06 / bunch", "operationalBefore": "€20.60 / kg", "displayChanges": false, "operationalAfter": "€20.60 / kg" },
+    { "product": "Pellegrino", "procurement": "€19.28 / case", "operationalBefore": "€1.71 / L", "displayChanges": false, "operationalAfter": "€1.71 / L" },
+    { "product": "Peroni", "procurement": "€1.07 / bottle", "operationalBefore": "€3.24 / L", "displayChanges": false, "operationalAfter": "€3.24 / L" },
+    { "product": "Mozzarella 2Kg", "procurement": "€13.69 / bag", "operationalBefore": "€6.85 / kg", "displayChanges": false, "operationalAfter": "€6.85 / kg" },
+    { "product": "Guanciale", "procurement": "€89.50 / unit", "operationalBefore": "€8.52 / kg", "displayChanges": false, "operationalAfter": "€8.52 / kg" },
+    { "product": "Ginger Beer", "procurement": "€9.69 / unit", "operationalBefore": "€48.45 / L", "displayChanges": false, "operationalAfter": "€48.45 / L" },
+    { "product": "Angus 180G cx", "procurement": "€24.90 / case", "operationalBefore": "€24.90 / case", "displayChanges": false, "operationalAfter": "€24.90 / case" }
+  ],
+  "task5_expectedResult": {
+    "saladaIberica": {
+      "lastPurchase": "4 packs",
+      "procurementCost": "€2.19 / pack",
+      "operationalCost": "€8.76 / kg",
+      "totalPaid": "€8.76",
+      "recipeCostPerG": 0.00876,
+      "recipeLineCost100g": 0.876,
+      "usableStockLabel": "250 g usable"
+    }
+  },
+  "task6_validationMatrix": {
+    "mustCorrect": [
+      {
+        "product": "Salada Ibérica",
+        "assertion": "operationalCost === '€8.76 / kg'",
+        "ids": {
+          "ingredientId": "47cd8362-79f4-4285-8491-f016229eaa21",
+          "invoiceItemId": "593e7560-ba2a-4c60-8300-ff34a26335b9"
+        }
+      }
+    ],
+    "mustNotChange": [
+      "Manteiga EMB 1kg",
+      "Ovo classe M",
+      "Tomilho",
+      "Manjericão",
+      "Pellegrino",
+      "Peroni",
+      "Mozzarella",
+      "Guanciale",
+      "Ginger Beer",
+      "Angus 180G cx"
+    ]
+  },
+  "task7_readiness": {
+    "verdict": "A",
+    "verdictLabel": "Ready for implementation",
+    "confidence": 0.91,
+    "rationale": "Root cause isolated to display-path case shortcut; persistence/recipe verified correct; narrow cx-only gate with full control replay; no schema migration",
+    "residualRisk": "Unknown em/pack rows with per-piece bare_measure in opaque multi-packs (no VL examples) would gain €/kg display",
+    "outOfScope": [
+      "Ginger Beer cx row masking",
+      "Guanciale/Mozzarella/Pellegrino outer-qty stock-normalization (separate designs)"
+    ]
+  },
+  "testsToAdd": [
+    {
+      "file": "src/lib/invoice-purchase-price-semantics.test.ts",
+      "case": "Salada Ibérica EMB 250g @ em → €8.76/kg operational, €2.19/pack procurement"
+    },
+    {
+      "file": "src/lib/invoice-purchase-format.test.ts",
+      "case": "isCaseRow true for Salada em but shouldApplyCasePieceWeightOperationalShortcut false"
+    },
+    {
+      "file": "src/lib/invoice-purchase-price-semantics.test.ts",
+      "case": "Angus cx case regression — must remain €/case"
+    }
+  ],
+  "evidenceFiles": [
+    ".tmp/salada-iberica-unit-audit/REPORT.md",
+    ".tmp/salada-iberica-unit-audit/results.json",
+    ".tmp/salada-iberica-operational-semantics-audit/REPORT.md",
+    ".tmp/salada-iberica-operational-semantics-audit/results.json"
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "generatedAt": "2026-06-23T10:39:40.735Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "fix": "invoices.tsx resolveInvoiceItemUnit now passes quantity to resolveInvoicePersistedItemUnit",
+  "totalInvoiceItems": 52,
+  "changedRowCount": 2,
+  "changedRows": [
+    {
+      "invoiceItemId": "b06c61ac-d5d4-4aa5-92ca-7ce7918d0e2f",
+      "product": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "dbQuantity": 24,
+      "dbUnit": null,
+      "ocrUnit": null,
+      "structuredKind": "weight_or_volume",
+      "beforeInsertUnit": null,
+      "afterInsertUnit": "un",
+      "unitChanged": true
+    },
+    {
+      "invoiceItemId": "4219f6f9-3d4f-4bc1-aad9-d65dbab16239",
+      "product": "Baladin - Ginger Beer 0.20cl",
+      "dbQuantity": 24,
+      "dbUnit": null,
+      "ocrUnit": null,
+      "structuredKind": "weight_or_volume",
+      "beforeInsertUnit": null,
+      "afterInsertUnit": "un",
+      "unitChanged": true
+    }
+  ],
+  "expectedFixes": [
+    {
+      "key": "paccheri",
+      "label": "Paccheri 500g",
+      "found": true,
+      "before": null,
+      "after": "un",
+      "dbUnit": null,
+      "quantity": 24,
+      "pass": true
+    },
+    {
+      "key": "ginger",
+      "label": "Ginger Beer 0.20cl",
+      "found": true,
+      "before": null,
+      "after": "un",
+      "dbUnit": null,
+      "quantity": 24,
+      "pass": true
+    }
+  ],
+  "mustNotRegress": [
+    {
+      "key": "peroni",
+      "label": "Peroni 33cl×24",
+      "found": true,
+      "before": "un",
+      "after": "un",
+      "dbUnit": "un",
+      "unchanged": true
+    },
+    {
+      "key": "pellegrino",
+      "label": "Pellegrino 75cl×15",
+      "found": true,
+      "before": "un",
+      "after": "un",
+      "dbUnit": "un",
+      "unchanged": true
+    },
+    {
+      "key": "acucar",
+      "label": "Açúcar 10x1kg",
+      "found": true,
+      "before": "cx",
+      "after": "cx",
+      "dbUnit": "cx",
+      "unchanged": true
+    },
+    {
+      "key": "pomodori",
+      "label": "Pomodori 2.5kg×6",
+      "found": true,
+      "before": "un",
+      "after": "un",
+      "dbUnit": "un",
+      "unchanged": true
+    },
+    {
+      "key": "mozzarella",
+      "label": "Mozzarella 125g×8",
+      "found": true,
+      "before": "un",
+      "after": "un",
+      "dbUnit": "un",
+      "unchanged": true
+    },
+    {
+      "key": "guanciale",
+      "label": "Guanciale",
+      "found": true,
+      "before": "un",
+      "after": "un",
+      "dbUnit": "un",
+      "unchanged": true
+    }
+  ],
+  "checks": {
+    "paccheri500gToUn": true,
+    "gingerBeer020clToUn": true,
+    "noRegressionOnControls": true,
+    "blastRadiusOnlyPaccheriAndGinger": true
+  },
+  "verdict": "Safe to merge"
+}

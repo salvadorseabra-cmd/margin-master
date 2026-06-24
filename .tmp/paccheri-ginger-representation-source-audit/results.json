@@ -1,0 +1,156 @@
+{
+  "generatedAt": "2026-06-23T12:00:00.000Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "mode": "STRICT_READ_ONLY",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "supplier": "Emporio Italia, Lda.",
+  "goalClassification": "C) Persistence/re-read required",
+  "finalVerdict": "A) Re-read required only",
+  "implementationNote": "gated embedded-measure un inference in resolveInvoicePersistedItemUnit (src/lib/invoice-purchase-format.ts) — merged in workspace, not yet reflected in VL invoice_items rows",
+  "liveDbQueryAt": "2026-06-23",
+  "products": {
+    "paccheri": {
+      "invoiceItemId": "cdecef89-2881-4795-92ba-93c06bc7c8e8",
+      "ingredientId": "d7fcbb41-4e19-47ee-bbea-058e7b44a040",
+      "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "invoice_items": { "quantity": 24, "unit": null },
+      "purchaseQuantity": 24,
+      "purchaseUnit": "g",
+      "purchaseFormat": {
+        "kind": "weight_or_volume",
+        "purchaseContainerCount": 24,
+        "purchaseContainerUnit": "g",
+        "packageQuantity": 500,
+        "packageMeasurementUnit": "g",
+        "normalizedUsableQuantity": 12000,
+        "usableQuantityUnit": "g"
+      },
+      "ingredient_purchase_unit": "un",
+      "ingredient_purchase_quantity": 1,
+      "resolveInvoiceLinePurchaseUnit": { "unit": null, "source": "fallback_null" },
+      "resolveInvoicePersistedItemUnit_currentCode": "un",
+      "extraction_ab52796d": { "quantity": 24, "unit": null },
+      "extraction_pass_c_raw": { "quantity": 24, "unit": "un" }
+    },
+    "gingerBeer": {
+      "invoiceItemId": "e41a41e6-dc12-403e-abe3-47872412435c",
+      "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+      "name": "Baladin - Ginger Beer 0.20cl",
+      "invoice_items": { "quantity": 24, "unit": null },
+      "purchaseQuantity": 24,
+      "purchaseUnit": "cl",
+      "purchaseFormat": {
+        "kind": "weight_or_volume",
+        "purchaseContainerCount": 24,
+        "purchaseContainerUnit": "cl",
+        "packageQuantity": 20,
+        "packageMeasurementUnit": "cl",
+        "normalizedUsableQuantity": 4800,
+        "usableQuantityUnit": "ml"
+      },
+      "ingredient_purchase_unit": "ml",
+      "ingredient_purchase_quantity": 2,
+      "resolveInvoiceLinePurchaseUnit": { "unit": null, "source": "fallback_null" },
+      "resolveInvoicePersistedItemUnit_currentCode": "un",
+      "extraction_ab52796d": { "quantity": 24, "unit": null },
+      "extraction_pass_c_raw": { "quantity": 24, "unit": "un" }
+    },
+    "pellegrino": {
+      "invoiceItemId": "68ae8c0c-df02-4cfd-8b7f-5b3806d0c55d",
+      "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+      "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "invoice_items": { "quantity": 2, "unit": "un" },
+      "purchaseQuantity": 15,
+      "purchaseUnit": "un",
+      "purchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 15,
+        "purchaseContainerUnit": "un",
+        "packageQuantity": 75,
+        "packageMeasurementUnit": "cl",
+        "normalizedUsableQuantity": 22500,
+        "usableQuantityUnit": "ml"
+      },
+      "ingredient_purchase_unit": "un",
+      "ingredient_purchase_quantity": 15,
+      "resolveInvoiceLinePurchaseUnit": { "unit": "un", "source": "preserved_countable" },
+      "resolveInvoicePersistedItemUnit_currentCode": "un"
+    }
+  },
+  "stageTable": [
+    {
+      "stage": "Extraction",
+      "paccheri": "qty 24, unit null (ab52796d upload path); pass-c-raw variant unit=un",
+      "gingerBeer": "qty 24, unit null (ab52796d upload path); pass-c-raw variant unit=un",
+      "pellegrino": "qty 2, unit un (Emporio live); raw extract may emit cx"
+    },
+    {
+      "stage": "Persisted unit",
+      "paccheri": "invoice_items.unit = null",
+      "gingerBeer": "invoice_items.unit = null",
+      "pellegrino": "invoice_items.unit = un"
+    },
+    {
+      "stage": "Purchase format",
+      "paccheri": "weight_or_volume — 24 packs × 500 g (bare_measure)",
+      "gingerBeer": "weight_or_volume — 24 bottles × 20 cl (bare_measure)",
+      "pellegrino": "multi_unit_pack — 15 × 75 cl per outer unit"
+    },
+    {
+      "stage": "Query output",
+      "paccheri": "loadItems / loadIngredientMatchedInvoiceProducts → quantity=24, unit=null",
+      "gingerBeer": "same",
+      "pellegrino": "quantity=2, unit=un"
+    },
+    {
+      "stage": "UI formatter input",
+      "paccheri": "formatRowPurchaseQuantityLabel({qty:24, unit:null}); formatPurchasedPackDetail → null",
+      "gingerBeer": "formatRowPurchaseQuantityLabel({qty:24, unit:null}); formatPurchasedPackDetail → null",
+      "pellegrino": "formatRowPurchaseQuantityLabel({qty:2, unit:un}); formatPurchasedPackDetail → 15 × 75 cl"
+    },
+    {
+      "stage": "UI rendered output",
+      "paccheri": "Invoice Review: 24 · Ingredient Last Purchase: 24",
+      "gingerBeer": "Invoice Review: 24 · Ingredient Last Purchase: 24",
+      "pellegrino": "Invoice Review: 2 un · 15 × 75 cl · Ingredient Last Purchase: 2 un"
+    }
+  ],
+  "answers": {
+    "q1_paccheri_trace": "invoice_items: 24/null. Structured purchase: weight_or_volume, purchaseContainerCount=24, package 500g. purchaseQuantity=24 (row qty), purchaseUnit=g (structured usable). ingredients.purchase_unit=un (catalog/procurement, not used for Last Purchase label).",
+    "q2_ginger_trace": "invoice_items: 24/null. Structured purchase: weight_or_volume, purchaseContainerCount=24, package 20cl. purchaseQuantity=24, purchaseUnit=cl→ml in ingredient fields. ingredients.purchase_unit=ml. Same display path as Paccheri.",
+    "q3_invoiceReview_fieldPath": "resolveInvoiceLinePricingPresentation → card.purchaseQuantityLine = join(formatRowPurchaseQuantityLabel(invoice_items.quantity + invoice_items.unit), formatPurchasedPackDetail(structured, name, invoice_items.unit)). Does NOT read ingredients.purchase_unit or structured purchase format for the row-quantity noun.",
+    "q4_ingredientDetail_fieldPath": "loadIngredientMatchedInvoiceProducts → invoice_items.unit → invoiceMetadataFromProduct → buildRecentPurchases → formatRowPurchaseQuantityLabel(metadata). Last Purchase = purchaseQuantityLabel only. ingredients.purchase_unit and purchase history price rows are separate lines (Procurement Cost, etc.).",
+    "q5_reread_unit_becomes_un": "YES — resolveInvoicePersistedItemUnit now infers un via shouldInferUnForEmbeddedMeasureCountable when OCR unit is null, qty>1 integer, weight_or_volume, embedded g/cl in name, no pack markers. Corroborated by .tmp/embedded-measure-un-inference-validation/results.json (afterResolvedUnit=un for both rows).",
+    "q6_ui_auto_shows_24_un": "YES — formatRowPurchaseQuantityLabel with unit=un returns 24 un (line 783-784 invoice-purchase-price-semantics.ts). No UI code change required.",
+    "q7_pellegrino_vs_paccheri_formatter": "Pellegrino has persisted unit=un AND multi_unit_pack → row label 2 un + formatPurchasedPackDetail 15 × 75 cl. Paccheri has unit=null → bare formatPurchaseCount(24); weight_or_volume never produces purchasedPackDetail (resolveUnitsPerPack requires multi_unit_pack)."
+  },
+  "reReadVisualDelta": {
+    "paccheri": {
+      "invoiceReviewBefore": "24",
+      "invoiceReviewAfter": "24 un",
+      "ingredientLastPurchaseBefore": "24",
+      "ingredientLastPurchaseAfter": "24 un",
+      "normalizedUsableUnchanged": "12 kg usable",
+      "packDetailSuffix": "none (weight_or_volume — no · 500 g suffix in Invoice Review)"
+    },
+    "gingerBeer": {
+      "invoiceReviewBefore": "24",
+      "invoiceReviewAfter": "24 un",
+      "ingredientLastPurchaseBefore": "24",
+      "ingredientLastPurchaseAfter": "24 un",
+      "normalizedUsableUnchanged": "4.8 L usable",
+      "packDetailSuffix": "none"
+    },
+    "pellegrino": "unchanged — already 2 un · 15 × 75 cl",
+    "calculationImpact": "DISPLAY_ONLY per embedded-measure-un-inference-validation (stock math identical null vs un)"
+  },
+  "evidenceSources": [
+    ".tmp/embedded-measure-un-inference-validation/results.json",
+    ".tmp/purchase-unit-representation-audit/results.json",
+    ".tmp/invoice-unit-persistence-audit/results.json",
+    "VL live read invoice_items ab52796d 2026-06-23",
+    "src/lib/invoice-purchase-format.ts resolveInvoicePersistedItemUnit",
+    "src/lib/invoice-purchase-price-semantics.ts formatRowPurchaseQuantityLabel",
+    "src/routes/invoices.tsx runExtraction insert path"
+  ]
+}

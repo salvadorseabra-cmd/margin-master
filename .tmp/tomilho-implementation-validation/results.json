@@ -1,0 +1,551 @@
+{
+  "generatedAt": "2026-06-24T01:48:08.613Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "changedFiles": [
+    "src/lib/ingredient-unit-inference.ts",
+    "src/lib/ingredient-unit-inference.test.ts"
+  ],
+  "implementation": {
+    "change": "Add TOMILHO token to PRODUCE_CONVERSION_HINTS fresh herbs group (100g/bunch)",
+    "scope": "conversion hint only — no changes to recipe costing, persistence, stock-normalization, or parser"
+  },
+  "tomilho": {
+    "before": {
+      "conversionHint": null,
+      "structuredKind": "row_only",
+      "normalizedUsableQuantity": null,
+      "procurementDisplay": "€2.06 / bunch",
+      "operationalDisplay": null,
+      "purchase_quantity": 1,
+      "cost_base_unit": "un",
+      "recipeCosts": {
+        "g10": null,
+        "g25": null,
+        "g50": null,
+        "g100": null
+      }
+    },
+    "after": {
+      "conversionHint": {
+        "purchase_unit": "un",
+        "estimated_quantity": 100,
+        "stock_unit": "g",
+        "recipe_usage_unit": "g",
+        "label": "fresh herbs",
+        "confidence": 0.58,
+        "reason": "fresh herbs token \"TOMILHO\" → estimated 100g usable"
+      },
+      "structuredKind": "inferred",
+      "normalizedUsableQuantity": 100,
+      "procurementDisplay": "€2.06 / bunch",
+      "operationalDisplay": "€20.60 / kg",
+      "purchase_quantity": 100,
+      "cost_base_unit": "g",
+      "effective": {
+        "cost": 20.599999999999998,
+        "unit": "kg"
+      },
+      "recipeCosts": {
+        "g10": 0.20600000000000002,
+        "g25": 0.515,
+        "g50": 1.03,
+        "g100": 2.06
+      }
+    },
+    "recipeCostChecks": {
+      "g10": true,
+      "g25": true,
+      "g50": true,
+      "g100": true
+    }
+  },
+  "regressionMatrix": [
+    {
+      "product": "Tomilho",
+      "mustCorrect": true,
+      "mustNotChange": false,
+      "expectedAfter": {
+        "conversionHint": true,
+        "procurementDisplay": "€2.06 / bunch",
+        "operationalDisplay": "€20.60 / kg",
+        "purchase_quantity": 100,
+        "cost_base_unit": "g"
+      },
+      "actual": {
+        "conversionHint": true,
+        "hint": {
+          "purchase_unit": "un",
+          "estimated_quantity": 100,
+          "stock_unit": "g",
+          "recipe_usage_unit": "g",
+          "label": "fresh herbs",
+          "confidence": 0.58,
+          "reason": "fresh herbs token \"TOMILHO\" → estimated 100g usable"
+        },
+        "structuredKind": "inferred",
+        "normalizedUsableQuantity": 100,
+        "procurementDisplay": "€2.06 / bunch",
+        "operationalDisplay": "€20.60 / kg",
+        "purchase_quantity": 100,
+        "cost_base_unit": "g",
+        "effective": {
+          "cost": 20.599999999999998,
+          "unit": "kg"
+        },
+        "perUnit": {
+          "amount": 100,
+          "unit": "g"
+        }
+      },
+      "checks": {
+        "conversionHint": true,
+        "procurementDisplay": true,
+        "operationalDisplay": true,
+        "purchase_quantity": true,
+        "cost_base_unit": true
+      },
+      "pass": true
+    },
+    {
+      "product": "Manjericão",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedAfter": {
+        "conversionHint": true,
+        "procurementDisplay": "€2.06 / bunch",
+        "operationalDisplay": "€20.60 / kg",
+        "purchase_quantity": 100,
+        "cost_base_unit": "g"
+      },
+      "actual": {
+        "conversionHint": true,
+        "hint": {
+          "purchase_unit": "un",
+          "estimated_quantity": 100,
+          "stock_unit": "g",
+          "recipe_usage_unit": "g",
+          "label": "fresh herbs",
+          "confidence": 0.58,
+          "reason": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+        },
+        "structuredKind": "inferred",
+        "normalizedUsableQuantity": 100,
+        "procurementDisplay": "€2.06 / bunch",
+        "operationalDisplay": "€20.60 / kg",
+        "purchase_quantity": 100,
+        "cost_base_unit": "g",
+        "effective": {
+          "cost": 20.599999999999998,
+          "unit": "kg"
+        },
+        "perUnit": {
+          "amount": 100,
+          "unit": "g"
+        }
+      },
+      "checks": {
+        "conversionHint": true,
+        "procurementDisplay": true,
+        "operationalDisplay": true,
+        "purchase_quantity": true,
+        "cost_base_unit": true
+      },
+      "pass": true
+    },
+    {
+      "product": "Salsa",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedAfter": {
+        "conversionHint": true,
+        "procurementDisplay": "€1.50 / bunch",
+        "operationalDisplay": "€15.00 / kg",
+        "purchase_quantity": 100,
+        "cost_base_unit": "g"
+      },
+      "actual": {
+        "conversionHint": true,
+        "hint": {
+          "purchase_unit": "un",
+          "estimated_quantity": 100,
+          "stock_unit": "g",
+          "recipe_usage_unit": "g",
+          "label": "fresh herbs",
+          "confidence": 0.58,
+          "reason": "fresh herbs token \"SALSA\" → estimated 100g usable"
+        },
+        "structuredKind": "inferred",
+        "normalizedUsableQuantity": 100,
+        "procurementDisplay": "€1.50 / bunch",
+        "operationalDisplay": "€15.00 / kg",
+        "purchase_quantity": 100,
+        "cost_base_unit": "g",
+        "effective": {
+          "cost": 15,
+          "unit": "kg"
+        },
+        "perUnit": {
+          "amount": 100,
+          "unit": "g"
+        }
+      },
+      "checks": {
+        "conversionHint": true,
+        "procurementDisplay": true,
+        "operationalDisplay": true,
+        "purchase_quantity": true,
+        "cost_base_unit": true
+      },
+      "pass": true
+    },
+    {
+      "product": "Coentros",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedAfter": {
+        "conversionHint": true,
+        "procurementDisplay": "€1.50 / bunch",
+        "operationalDisplay": "€15.00 / kg",
+        "purchase_quantity": 100,
+        "cost_base_unit": "g"
+      },
+      "actual": {
+        "conversionHint": true,
+        "hint": {
+          "purchase_unit": "un",
+          "estimated_quantity": 100,
+          "stock_unit": "g",
+          "recipe_usage_unit": "g",
+          "label": "fresh herbs",
+          "confidence": 0.58,
+          "reason": "fresh herbs token \"COENTROS\" → estimated 100g usable"
+        },
+        "structuredKind": "inferred",
+        "normalizedUsableQuantity": 100,
+        "procurementDisplay": "€1.50 / bunch",
+        "operationalDisplay": "€15.00 / kg",
+        "purchase_quantity": 100,
+        "cost_base_unit": "g",
+        "effective": {
+          "cost": 15,
+          "unit": "kg"
+        },
+        "perUnit": {
+          "amount": 100,
+          "unit": "g"
+        }
+      },
+      "checks": {
+        "conversionHint": true,
+        "procurementDisplay": true,
+        "operationalDisplay": true,
+        "purchase_quantity": true,
+        "cost_base_unit": true
+      },
+      "pass": true
+    },
+    {
+      "product": "Hortelã",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedAfter": {
+        "conversionHint": true,
+        "procurementDisplay": "€5.40 / kg",
+        "operationalDisplay": "€5.40 / kg",
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g"
+      },
+      "actual": {
+        "conversionHint": true,
+        "hint": {
+          "purchase_unit": "un",
+          "estimated_quantity": 100,
+          "stock_unit": "g",
+          "recipe_usage_unit": "g",
+          "label": "fresh herbs",
+          "confidence": 0.58,
+          "reason": "fresh herbs token \"HORTELA\" → estimated 100g usable"
+        },
+        "structuredKind": "weight_or_volume",
+        "normalizedUsableQuantity": 500,
+        "procurementDisplay": "€5.40 / kg",
+        "operationalDisplay": "€5.40 / kg",
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g",
+        "effective": {
+          "cost": 5.4,
+          "unit": "kg"
+        },
+        "perUnit": {
+          "amount": 1000,
+          "unit": "g"
+        }
+      },
+      "checks": {
+        "conversionHint": true,
+        "procurementDisplay": true,
+        "operationalDisplay": true,
+        "purchase_quantity": true,
+        "cost_base_unit": true
+      },
+      "pass": true
+    },
+    {
+      "product": "Cebolinho",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedAfter": {
+        "conversionHint": true,
+        "procurementDisplay": "€1.80 / bunch",
+        "operationalDisplay": "€18.00 / kg",
+        "purchase_quantity": 100,
+        "cost_base_unit": "g"
+      },
+      "actual": {
+        "conversionHint": true,
+        "hint": {
+          "purchase_unit": "un",
+          "estimated_quantity": 100,
+          "stock_unit": "g",
+          "recipe_usage_unit": "g",
+          "label": "fresh herbs",
+          "confidence": 0.58,
+          "reason": "fresh herbs token \"CEBOLINHO\" → estimated 100g usable"
+        },
+        "structuredKind": "inferred",
+        "normalizedUsableQuantity": 100,
+        "procurementDisplay": "€1.80 / bunch",
+        "operationalDisplay": "€18.00 / kg",
+        "purchase_quantity": 100,
+        "cost_base_unit": "g",
+        "effective": {
+          "cost": 18,
+          "unit": "kg"
+        },
+        "perUnit": {
+          "amount": 100,
+          "unit": "g"
+        }
+      },
+      "checks": {
+        "conversionHint": true,
+        "procurementDisplay": true,
+        "operationalDisplay": true,
+        "purchase_quantity": true,
+        "cost_base_unit": true
+      },
+      "pass": true
+    },
+    {
+      "product": "Salada Ibérica",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedAfter": {
+        "conversionHint": false,
+        "procurementDisplay": "€2.19 / pack",
+        "operationalDisplay": "€8.76 / kg",
+        "purchase_quantity": 250,
+        "cost_base_unit": "g"
+      },
+      "actual": {
+        "conversionHint": false,
+        "hint": null,
+        "structuredKind": "weight_or_volume",
+        "normalizedUsableQuantity": 250,
+        "procurementDisplay": "€2.19 / pack",
+        "operationalDisplay": "€8.76 / kg",
+        "purchase_quantity": 250,
+        "cost_base_unit": "g",
+        "effective": {
+          "cost": 8.76,
+          "unit": "kg"
+        },
+        "perUnit": {
+          "amount": 250,
+          "unit": "g"
+        }
+      },
+      "checks": {
+        "conversionHint": true,
+        "procurementDisplay": true,
+        "operationalDisplay": true,
+        "purchase_quantity": true,
+        "cost_base_unit": true
+      },
+      "pass": true
+    },
+    {
+      "product": "Ovo classe M",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedAfter": {
+        "conversionHint": false,
+        "procurementDisplay": "€38.44 / case",
+        "operationalDisplay": "€0.2136 / egg",
+        "purchase_quantity": 180,
+        "cost_base_unit": "un"
+      },
+      "actual": {
+        "conversionHint": false,
+        "hint": null,
+        "structuredKind": "multi_unit_pack",
+        "normalizedUsableQuantity": 180,
+        "procurementDisplay": "€38.44 / case",
+        "operationalDisplay": "€0.2136 / egg",
+        "purchase_quantity": 180,
+        "cost_base_unit": "un",
+        "effective": {
+          "cost": 0.21355555555555555,
+          "unit": "egg"
+        },
+        "perUnit": {
+          "amount": 180,
+          "unit": "un"
+        }
+      },
+      "checks": {
+        "conversionHint": true,
+        "procurementDisplay": true,
+        "operationalDisplay": true,
+        "purchase_quantity": true,
+        "cost_base_unit": true
+      },
+      "pass": true
+    },
+    {
+      "product": "Peroni",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedAfter": {
+        "conversionHint": false,
+        "procurementDisplay": "€1.07 / bottle",
+        "operationalDisplay": "€3.24 / L",
+        "purchase_quantity": 7920,
+        "cost_base_unit": "ml"
+      },
+      "actual": {
+        "conversionHint": false,
+        "hint": null,
+        "structuredKind": "multi_unit_pack",
+        "normalizedUsableQuantity": 7920,
+        "procurementDisplay": "€1.07 / bottle",
+        "operationalDisplay": "€3.24 / L",
+        "purchase_quantity": 7920,
+        "cost_base_unit": "ml",
+        "effective": {
+          "cost": 3.2424242424242427,
+          "unit": "L"
+        },
+        "perUnit": {
+          "amount": 7920,
+          "unit": "ml"
+        }
+      },
+      "checks": {
+        "conversionHint": true,
+        "procurementDisplay": true,
+        "operationalDisplay": true,
+        "purchase_quantity": true,
+        "cost_base_unit": true
+      },
+      "pass": true
+    },
+    {
+      "product": "Pellegrino",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedAfter": {
+        "conversionHint": false,
+        "procurementDisplay": "€19.28 / case",
+        "operationalDisplay": "€1.71 / L",
+        "purchase_quantity": 15,
+        "cost_base_unit": "un"
+      },
+      "actual": {
+        "conversionHint": false,
+        "hint": null,
+        "structuredKind": "multi_unit_pack",
+        "normalizedUsableQuantity": 22500,
+        "procurementDisplay": "€19.28 / case",
+        "operationalDisplay": "€1.71 / L",
+        "purchase_quantity": 15,
+        "cost_base_unit": "un",
+        "effective": {
+          "cost": 1.7137777777777778,
+          "unit": "L"
+        },
+        "perUnit": {
+          "amount": 11250,
+          "unit": "ml"
+        }
+      },
+      "checks": {
+        "conversionHint": true,
+        "procurementDisplay": true,
+        "operationalDisplay": true,
+        "purchase_quantity": true,
+        "cost_base_unit": true
+      },
+      "pass": true
+    },
+    {
+      "product": "Guanciale",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedAfter": {
+        "conversionHint": false,
+        "procurementDisplay": "€89.50 / unit",
+        "operationalDisplay": "€8.52 / kg",
+        "purchase_quantity": 1,
+        "cost_base_unit": "un"
+      },
+      "actual": {
+        "conversionHint": false,
+        "hint": null,
+        "structuredKind": "multi_unit_pack",
+        "normalizedUsableQuantity": 10500,
+        "procurementDisplay": "€89.50 / unit",
+        "operationalDisplay": "€8.52 / kg",
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "effective": {
+          "cost": 8.523809523809524,
+          "unit": "kg"
+        },
+        "perUnit": {
+          "amount": 10500,
+          "unit": "g"
+        }
+      },
+      "checks": {
+        "conversionHint": true,
+        "procurementDisplay": true,
+        "operationalDisplay": true,
+        "purchase_quantity": true,
+        "cost_base_unit": true
+      },
+      "pass": true
+    }
+  ],
+  "vlBlastRadius": {
+    "totalItems": 52,
+    "newlyConvertedRows": [
+      {
+        "id": "f2d094ab-f50a-483d-b6cb-76554d5bf195",
+        "name": "Tomilho",
+        "hint": "fresh herbs token \"TOMILHO\" → estimated 100g usable"
+      }
+    ]
+  },
+  "summary": {
+    "tomilhoFixed": true,
+    "allRecipeCostsPass": true,
+    "allRegressionsPass": true,
+    "blastRadiusOk": true,
+    "blastRadiusCount": 1,
+    "regressionPassed": 10,
+    "regressionTotal": 10
+  },
+  "verdict": "A",
+  "verdictLabel": "Safe to merge"
+}

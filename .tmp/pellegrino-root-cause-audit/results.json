@@ -1,0 +1,634 @@
+{
+  "generatedAt": "2026-06-23T08:56:46.547Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "mode": "STRICT_READ_ONLY",
+  "userScenario": {
+    "productName": "ACQUA S.PELLEGRINO (CX 75CL*15) / Emporio equivalent",
+    "note": "€38.56 total matches Emporio line (9cdd22ba); Bocconcino line (ef25be0f) has €42.07",
+    "purchasedCases": 2,
+    "totalPaid": 38.56,
+    "uiOperationalCostPerL": 3.43,
+    "commercialUsableLiters": 22.5,
+    "commercialOpCostPerL": 1.7137777777777778,
+    "systemUsableLiters": 11.25,
+    "systemOpCostPerL": 3.4275555555555557
+  },
+  "traces": [
+    {
+      "label": "pellegrino_boc",
+      "invoiceItemId": "ef25be0f-f153-40de-b377-25151d147637",
+      "stages": {
+        "extraction": {
+          "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 20.97,
+          "total": 42.07
+        },
+        "purchaseFormat": {
+          "kind": "multi_unit_pack",
+          "purchaseContainerCount": 15,
+          "normalizedUsableQuantity": 11250,
+          "usableQuantityUnit": "ml",
+          "packageQuantity": 75,
+          "packageMeasurementUnit": "cl"
+        },
+        "stockNormalization": {
+          "tier": "size_count",
+          "matchedText": "75CL*15",
+          "innerUnitCount": 15,
+          "unitSize": 75,
+          "unitMeasurement": "cl",
+          "totalUsableAmount": 11250,
+          "purchaseQuantity": 1,
+          "resolveStructurePurchaseQuantity": 1,
+          "structureTotalIsFinalForGenericRow": true,
+          "shouldScaleOuterPackForSizeCountGenericRow": false,
+          "usableSource": "structure_total",
+          "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+          "purchaseContainerCount": 1,
+          "usableQuantity": 11250,
+          "usableUnit": "ml"
+        },
+        "ingredientPersistence": {
+          "operationalCostFields": {
+            "current_price": 20.97,
+            "purchase_quantity": 11250,
+            "cost_base_unit": "ml"
+          },
+          "catalogFields": {
+            "purchase_quantity": 1,
+            "purchase_unit": "un",
+            "normalized_usable_quantity": 11250,
+            "usable_quantity_unit": "ml"
+          },
+          "recipeFields": {
+            "current_price": 20.97,
+            "purchase_quantity": 11250,
+            "cost_base_unit": "ml"
+          }
+        },
+        "purchaseHistory": {
+          "procurementCostLabel": "€20.97 / case",
+          "operationalCostLabel": "€3.73 / L",
+          "usableStockLabel": "11.25 L usable",
+          "rowQuantityLabel": null
+        }
+      },
+      "quantityFields": {
+        "invoiceQuantity": 2,
+        "purchaseQuantity": 11250,
+        "purchaseUnit": "un",
+        "purchaseContainerCount": 15,
+        "normalizedUsableQuantity": 11250,
+        "operationalQuantity": 11250,
+        "current_price_inputs": {
+          "current_price": 20.97,
+          "purchase_quantity": 11250,
+          "cost_base_unit": "ml"
+        },
+        "countablePurchaseQuantityForCost": 1,
+        "usablePerPricedUnit": {
+          "amount": 11250,
+          "unit": "ml"
+        }
+      },
+      "math": {
+        "totalPaid": 42.07,
+        "usableLiters": 11.25,
+        "operationalCostPerL": 3.7279999999999998,
+        "expectedOpCostAt225L": 1.8697777777777778,
+        "impliedLitersFromOpCost": 11.284871244635195,
+        "check": true
+      }
+    },
+    {
+      "label": "pellegrino_emp",
+      "invoiceItemId": "9cdd22ba-051b-4422-a122-3e6a39e9ef8c",
+      "stages": {
+        "extraction": {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 19.28,
+          "total": 38.56
+        },
+        "purchaseFormat": {
+          "kind": "multi_unit_pack",
+          "purchaseContainerCount": 15,
+          "normalizedUsableQuantity": 11250,
+          "usableQuantityUnit": "ml",
+          "packageQuantity": 75,
+          "packageMeasurementUnit": "cl"
+        },
+        "stockNormalization": {
+          "tier": "size_count",
+          "matchedText": "75cl x 15ud",
+          "innerUnitCount": 15,
+          "unitSize": 75,
+          "unitMeasurement": "cl",
+          "totalUsableAmount": 11250,
+          "purchaseQuantity": 1,
+          "resolveStructurePurchaseQuantity": 1,
+          "structureTotalIsFinalForGenericRow": true,
+          "shouldScaleOuterPackForSizeCountGenericRow": false,
+          "usableSource": "structure_total",
+          "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+          "purchaseContainerCount": 1,
+          "usableQuantity": 11250,
+          "usableUnit": "ml"
+        },
+        "ingredientPersistence": {
+          "operationalCostFields": {
+            "current_price": 19.28,
+            "purchase_quantity": 11250,
+            "cost_base_unit": "ml"
+          },
+          "catalogFields": {
+            "purchase_quantity": 1,
+            "purchase_unit": "un",
+            "normalized_usable_quantity": 11250,
+            "usable_quantity_unit": "ml"
+          },
+          "recipeFields": {
+            "current_price": 19.28,
+            "purchase_quantity": 11250,
+            "cost_base_unit": "ml"
+          }
+        },
+        "purchaseHistory": {
+          "procurementCostLabel": "€19.28 / case",
+          "operationalCostLabel": "€3.43 / L",
+          "usableStockLabel": "11.25 L usable",
+          "rowQuantityLabel": null
+        }
+      },
+      "quantityFields": {
+        "invoiceQuantity": 2,
+        "purchaseQuantity": 11250,
+        "purchaseUnit": "un",
+        "purchaseContainerCount": 15,
+        "normalizedUsableQuantity": 11250,
+        "operationalQuantity": 11250,
+        "current_price_inputs": {
+          "current_price": 19.28,
+          "purchase_quantity": 11250,
+          "cost_base_unit": "ml"
+        },
+        "countablePurchaseQuantityForCost": 1,
+        "usablePerPricedUnit": {
+          "amount": 11250,
+          "unit": "ml"
+        }
+      },
+      "math": {
+        "totalPaid": 38.56,
+        "usableLiters": 11.25,
+        "operationalCostPerL": 3.4275555555555557,
+        "expectedOpCostAt225L": 1.7137777777777778,
+        "impliedLitersFromOpCost": 11.25,
+        "check": true
+      }
+    },
+    {
+      "label": "peroni",
+      "invoiceItemId": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+      "stages": {
+        "extraction": {
+          "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 1.07,
+          "total": 25.69
+        },
+        "purchaseFormat": {
+          "kind": "multi_unit_pack",
+          "purchaseContainerCount": 24,
+          "normalizedUsableQuantity": 7920,
+          "usableQuantityUnit": "ml",
+          "packageQuantity": 33,
+          "packageMeasurementUnit": "cl"
+        },
+        "stockNormalization": {
+          "tier": "size_count",
+          "matchedText": "33cl*24 ",
+          "innerUnitCount": 24,
+          "unitSize": 33,
+          "unitMeasurement": "cl",
+          "totalUsableAmount": 7920,
+          "purchaseQuantity": 1,
+          "resolveStructurePurchaseQuantity": 1,
+          "structureTotalIsFinalForGenericRow": true,
+          "shouldScaleOuterPackForSizeCountGenericRow": false,
+          "usableSource": "structure_total",
+          "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+          "purchaseContainerCount": 1,
+          "usableQuantity": 7920,
+          "usableUnit": "ml"
+        },
+        "ingredientPersistence": {
+          "operationalCostFields": {
+            "current_price": 1.07,
+            "purchase_quantity": 7920,
+            "cost_base_unit": "ml"
+          },
+          "catalogFields": {
+            "purchase_quantity": 1,
+            "purchase_unit": "un",
+            "normalized_usable_quantity": 7920,
+            "usable_quantity_unit": "ml"
+          },
+          "recipeFields": {
+            "current_price": 1.07,
+            "purchase_quantity": 7920,
+            "cost_base_unit": "ml"
+          }
+        },
+        "purchaseHistory": {
+          "procurementCostLabel": "€1.07 / bottle",
+          "operationalCostLabel": "€3.24 / L",
+          "usableStockLabel": "7.92 L usable",
+          "rowQuantityLabel": null
+        }
+      },
+      "quantityFields": {
+        "invoiceQuantity": 24,
+        "purchaseQuantity": 7920,
+        "purchaseUnit": "un",
+        "purchaseContainerCount": 24,
+        "normalizedUsableQuantity": 7920,
+        "operationalQuantity": 7920,
+        "current_price_inputs": {
+          "current_price": 1.07,
+          "purchase_quantity": 7920,
+          "cost_base_unit": "ml"
+        },
+        "countablePurchaseQuantityForCost": 1,
+        "usablePerPricedUnit": {
+          "amount": 7920,
+          "unit": "ml"
+        }
+      },
+      "math": {
+        "totalPaid": 25.69,
+        "usableLiters": 7.92,
+        "operationalCostPerL": 3.2424242424242427,
+        "expectedOpCostAt225L": 1.1417777777777778,
+        "impliedLitersFromOpCost": 7.923084112149533,
+        "check": true
+      }
+    },
+    {
+      "label": "pomodori",
+      "invoiceItemId": "9a52cc46-1c5a-4798-9621-d06177e04208",
+      "stages": {
+        "extraction": {
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 22.05,
+          "total": 22.05
+        },
+        "purchaseFormat": {
+          "kind": "multi_unit_pack",
+          "purchaseContainerCount": 6,
+          "normalizedUsableQuantity": 15000,
+          "usableQuantityUnit": "g",
+          "packageQuantity": 2.5,
+          "packageMeasurementUnit": "kg"
+        },
+        "stockNormalization": {
+          "tier": "size_count",
+          "matchedText": "2,5KG*6",
+          "innerUnitCount": 6,
+          "unitSize": 2.5,
+          "unitMeasurement": "kg",
+          "totalUsableAmount": 15000,
+          "purchaseQuantity": 1,
+          "resolveStructurePurchaseQuantity": 1,
+          "structureTotalIsFinalForGenericRow": true,
+          "shouldScaleOuterPackForSizeCountGenericRow": false,
+          "usableSource": "structure_total",
+          "fallbackReason": "name N×SIZE total is final; generic row does not rescale inner pack",
+          "purchaseContainerCount": 1,
+          "usableQuantity": 15000,
+          "usableUnit": "g"
+        },
+        "ingredientPersistence": {
+          "operationalCostFields": {
+            "current_price": 22.05,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 15000
+          },
+          "catalogFields": {
+            "purchase_quantity": 1,
+            "purchase_unit": "un",
+            "normalized_usable_quantity": 15000,
+            "usable_quantity_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 22.05,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 15000
+          }
+        },
+        "purchaseHistory": {
+          "procurementCostLabel": "€22.05 / case",
+          "operationalCostLabel": "€1.47 / kg",
+          "usableStockLabel": "15 kg usable",
+          "rowQuantityLabel": null
+        }
+      },
+      "quantityFields": {
+        "invoiceQuantity": 1,
+        "purchaseQuantity": 1,
+        "purchaseUnit": "un",
+        "purchaseContainerCount": 6,
+        "normalizedUsableQuantity": 15000,
+        "operationalQuantity": 1,
+        "current_price_inputs": {
+          "current_price": 22.05,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 15000
+        },
+        "countablePurchaseQuantityForCost": 1,
+        "usablePerPricedUnit": {
+          "amount": 15000,
+          "unit": "g"
+        }
+      },
+      "math": {
+        "totalPaid": 22.05,
+        "usableLiters": null,
+        "operationalCostPerL": null,
+        "expectedOpCostAt225L": 0.98,
+        "impliedLitersFromOpCost": null,
+        "check": null
+      }
+    },
+    {
+      "label": "acucar_avijudo",
+      "invoiceItemId": "478442d5-cf8f-4e21-a905-01b7cc327fab",
+      "stages": {
+        "extraction": {
+          "name": "Açucar Branco METRO Chef 10x1 Kg",
+          "quantity": 1,
+          "unit": "cx",
+          "unit_price": 9.99,
+          "total": 9.99
+        },
+        "purchaseFormat": {
+          "kind": "multi_unit_pack",
+          "purchaseContainerCount": 10,
+          "normalizedUsableQuantity": 10000,
+          "usableQuantityUnit": "g",
+          "packageQuantity": 1,
+          "packageMeasurementUnit": "kg"
+        },
+        "stockNormalization": {
+          "tier": "count_size",
+          "matchedText": "10x1 Kg",
+          "unitSize": 1,
+          "unitMeasurement": "kg",
+          "totalUsableAmount": 10000,
+          "purchaseQuantity": 10,
+          "resolveStructurePurchaseQuantity": 1,
+          "structureTotalIsFinalForGenericRow": true,
+          "shouldScaleOuterPackForSizeCountGenericRow": false,
+          "usableSource": "structure_total",
+          "fallbackReason": "count_size total is final; generic row does not rescale inner N×SIZE",
+          "purchaseContainerCount": 1,
+          "usableQuantity": 10000,
+          "usableUnit": "g"
+        },
+        "ingredientPersistence": {
+          "operationalCostFields": {
+            "current_price": 9.99,
+            "purchase_quantity": 10,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 10000
+          },
+          "catalogFields": {
+            "purchase_quantity": 10,
+            "purchase_unit": "cx",
+            "normalized_usable_quantity": 10000,
+            "usable_quantity_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 9.99,
+            "purchase_quantity": 10,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 10000
+          }
+        },
+        "purchaseHistory": {
+          "procurementCostLabel": "€9.99 / case",
+          "operationalCostLabel": "€0.999 / kg",
+          "usableStockLabel": "10 kg usable",
+          "rowQuantityLabel": null
+        }
+      },
+      "quantityFields": {
+        "invoiceQuantity": 1,
+        "purchaseQuantity": 10,
+        "purchaseUnit": "cx",
+        "purchaseContainerCount": 10,
+        "normalizedUsableQuantity": 10000,
+        "operationalQuantity": 10,
+        "current_price_inputs": {
+          "current_price": 9.99,
+          "purchase_quantity": 10,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 10000
+        },
+        "countablePurchaseQuantityForCost": 10,
+        "usablePerPricedUnit": {
+          "amount": 10000,
+          "unit": "g"
+        }
+      },
+      "math": {
+        "totalPaid": 9.99,
+        "usableLiters": null,
+        "operationalCostPerL": null,
+        "expectedOpCostAt225L": 0.444,
+        "impliedLitersFromOpCost": null,
+        "check": null
+      }
+    },
+    {
+      "label": "acucar_aviludo",
+      "invoiceItemId": "693004ee-b902-4e18-8442-5d488e175e42",
+      "stages": {
+        "extraction": {
+          "name": "Açúcar Branco Metro Chef 10x1Kg",
+          "quantity": 1,
+          "unit": "cx",
+          "unit_price": 9.29,
+          "total": 9.29
+        },
+        "purchaseFormat": {
+          "kind": "multi_unit_pack",
+          "purchaseContainerCount": 10,
+          "normalizedUsableQuantity": 10000,
+          "usableQuantityUnit": "g",
+          "packageQuantity": 1,
+          "packageMeasurementUnit": "kg"
+        },
+        "stockNormalization": {
+          "tier": "count_size",
+          "matchedText": "10x1Kg",
+          "unitSize": 1,
+          "unitMeasurement": "kg",
+          "totalUsableAmount": 10000,
+          "purchaseQuantity": 10,
+          "resolveStructurePurchaseQuantity": 1,
+          "structureTotalIsFinalForGenericRow": true,
+          "shouldScaleOuterPackForSizeCountGenericRow": false,
+          "usableSource": "structure_total",
+          "fallbackReason": "count_size total is final; generic row does not rescale inner N×SIZE",
+          "purchaseContainerCount": 1,
+          "usableQuantity": 10000,
+          "usableUnit": "g"
+        },
+        "ingredientPersistence": {
+          "operationalCostFields": {
+            "current_price": 9.29,
+            "purchase_quantity": 10,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 10000
+          },
+          "catalogFields": {
+            "purchase_quantity": 10,
+            "purchase_unit": "cx",
+            "normalized_usable_quantity": 10000,
+            "usable_quantity_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 9.29,
+            "purchase_quantity": 10,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 10000
+          }
+        },
+        "purchaseHistory": {
+          "procurementCostLabel": "€9.29 / case",
+          "operationalCostLabel": "€0.929 / kg",
+          "usableStockLabel": "10 kg usable",
+          "rowQuantityLabel": null
+        }
+      },
+      "quantityFields": {
+        "invoiceQuantity": 1,
+        "purchaseQuantity": 10,
+        "purchaseUnit": "cx",
+        "purchaseContainerCount": 10,
+        "normalizedUsableQuantity": 10000,
+        "operationalQuantity": 10,
+        "current_price_inputs": {
+          "current_price": 9.29,
+          "purchase_quantity": 10,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 10000
+        },
+        "countablePurchaseQuantityForCost": 10,
+        "usablePerPricedUnit": {
+          "amount": 10000,
+          "unit": "g"
+        }
+      },
+      "math": {
+        "totalPaid": 9.29,
+        "usableLiters": null,
+        "operationalCostPerL": null,
+        "expectedOpCostAt225L": 0.41288888888888886,
+        "impliedLitersFromOpCost": null,
+        "check": null
+      }
+    }
+  ],
+  "firstIncorrectByProduct": {
+    "undefined": {
+      "stages": [
+        {
+          "stage": "extraction",
+          "correct": false,
+          "value": {
+            "name": "Açúcar Branco Metro Chef 10x1Kg",
+            "quantity": 1,
+            "unit": "cx",
+            "unit_price": 9.29,
+            "total": 9.29
+          }
+        },
+        {
+          "stage": "purchase-format",
+          "correct": true,
+          "value": {
+            "kind": "multi_unit_pack",
+            "purchaseContainerCount": 10,
+            "normalizedUsableQuantity": 10000,
+            "usableQuantityUnit": "g",
+            "packageQuantity": 1,
+            "packageMeasurementUnit": "kg"
+          }
+        },
+        {
+          "stage": "stock-normalization",
+          "correct": false,
+          "value": {
+            "gotUsable": 10000,
+            "expectedUsableMl": 11250,
+            "usableSource": "structure_total",
+            "fallbackReason": "count_size total is final; generic row does not rescale inner N×SIZE"
+          },
+          "note": "usable 10000ml vs expected 11250ml"
+        },
+        {
+          "stage": "ingredient persistence",
+          "correct": false,
+          "value": {
+            "operationalCostFields": {
+              "current_price": 9.29,
+              "purchase_quantity": 10,
+              "cost_base_unit": "un",
+              "usable_weight_grams": 10000
+            },
+            "catalogFields": {
+              "purchase_quantity": 10,
+              "purchase_unit": "cx",
+              "normalized_usable_quantity": 10000,
+              "usable_quantity_unit": "g"
+            },
+            "recipeFields": {
+              "current_price": 9.29,
+              "purchase_quantity": 10,
+              "cost_base_unit": "un",
+              "usable_weight_grams": 10000
+            }
+          }
+        },
+        {
+          "stage": "purchase history / UI",
+          "correct": false,
+          "value": {
+            "procurementCostLabel": "€9.29 / case",
+            "operationalCostLabel": "€0.929 / kg",
+            "usableStockLabel": "10 kg usable",
+            "rowQuantityLabel": null
+          }
+        }
+      ],
+      "firstIncorrectStage": "extraction"
+    }
+  },
+  "classification": {
+    "pellegrino": "C) stock-normalization",
+    "rationale": "structureTotalIsFinalForGenericRow + SIZE_COUNT_RE treats one-case structure_total (11250ml) as final; invoice outer qty=2 not multiplied",
+    "scope": "quantity>1 family within SIZE_COUNT_RE when rowQty !== innerCount and unitMeasurement is cl (volume); distinct from Mozzarella g-scaling fix path"
+  },
+  "verdict": "READY"
+}

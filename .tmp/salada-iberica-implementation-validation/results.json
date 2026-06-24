@@ -1,0 +1,384 @@
+{
+  "generatedAt": "2026-06-24T00:21:14.493Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "option": "B",
+  "changedFiles": [
+    "src/lib/invoice-purchase-format.ts",
+    "src/lib/invoice-purchase-price-semantics.ts",
+    "src/lib/invoice-purchase-format.test.ts",
+    "src/lib/invoice-purchase-price-semantics.test.ts"
+  ],
+  "gate": {
+    "helper": "shouldApplyCasePieceWeightOperationalShortcut",
+    "wholesaleCaseRowUnits": [
+      "cx",
+      "caixa",
+      "caixas",
+      "case",
+      "cases"
+    ]
+  },
+  "saladaIberica": {
+    "before": {
+      "procurementDisplay": "€2.19 / pack",
+      "operationalDisplay": "€2.19 / case"
+    },
+    "after": {
+      "procurementDisplay": "€2.19 / pack",
+      "operationalDisplay": "€8.76 / kg",
+      "usableStockLabel": "250 g usable",
+      "shouldApplyCasePieceWeightOperationalShortcut": false
+    },
+    "recipeUnchanged": {
+      "current_price": 2.19,
+      "purchase_quantity": 250,
+      "cost_base_unit": "g"
+    }
+  },
+  "regressionMatrix": [
+    {
+      "product": "Salada Ibérica",
+      "mustCorrect": true,
+      "mustNotChange": false,
+      "expectedBefore": {
+        "procurementDisplay": "€2.19 / pack",
+        "operationalDisplay": "€2.19 / case"
+      },
+      "expectedAfter": {
+        "procurementDisplay": "€2.19 / pack",
+        "operationalDisplay": "€8.76 / kg"
+      },
+      "actual": {
+        "procurementDisplay": "€2.19 / pack",
+        "operationalDisplay": "€8.76 / kg",
+        "usableStockLabel": "250 g usable",
+        "effective": {
+          "cost": 8.76,
+          "unit": "kg"
+        },
+        "recipeFields": {
+          "current_price": 2.19,
+          "purchase_quantity": 250,
+          "cost_base_unit": "g"
+        },
+        "isCaseRowWithEmbeddedPieceWeightOnly": true,
+        "shouldApplyCasePieceWeightOperationalShortcut": false,
+        "displayStructuredUsable": 250
+      },
+      "pass": true,
+      "procurementOk": true,
+      "operationalOk": true
+    },
+    {
+      "product": "Manteiga EMB 1kg",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedBefore": null,
+      "expectedAfter": {
+        "procurementDisplay": "€8.90 / kg",
+        "operationalDisplay": "€8.90 / kg"
+      },
+      "actual": {
+        "procurementDisplay": "€8.90 / kg",
+        "operationalDisplay": "€8.90 / kg",
+        "usableStockLabel": "1 kg usable",
+        "effective": {
+          "cost": 8.9,
+          "unit": "kg"
+        },
+        "recipeFields": {
+          "current_price": 8.9,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "isCaseRowWithEmbeddedPieceWeightOnly": false,
+        "shouldApplyCasePieceWeightOperationalShortcut": false,
+        "displayStructuredUsable": 1000
+      },
+      "pass": true,
+      "procurementOk": true,
+      "operationalOk": true
+    },
+    {
+      "product": "Ovo classe M",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedBefore": null,
+      "expectedAfter": {
+        "procurementDisplay": "€38.44 / case",
+        "operationalDisplay": null
+      },
+      "actual": {
+        "procurementDisplay": "€38.44 / case",
+        "operationalDisplay": null,
+        "usableStockLabel": null,
+        "effective": null,
+        "recipeFields": {
+          "current_price": 38.44,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "isCaseRowWithEmbeddedPieceWeightOnly": false,
+        "shouldApplyCasePieceWeightOperationalShortcut": false,
+        "displayStructuredUsable": null
+      },
+      "pass": true,
+      "procurementOk": true,
+      "operationalOk": true
+    },
+    {
+      "product": "Tomilho",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedBefore": null,
+      "expectedAfter": {
+        "procurementDisplay": "€2.06 / bunch",
+        "operationalDisplay": null
+      },
+      "actual": {
+        "procurementDisplay": "€2.06 / bunch",
+        "operationalDisplay": null,
+        "usableStockLabel": null,
+        "effective": null,
+        "recipeFields": {
+          "current_price": 2.06,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un"
+        },
+        "isCaseRowWithEmbeddedPieceWeightOnly": false,
+        "shouldApplyCasePieceWeightOperationalShortcut": false,
+        "displayStructuredUsable": null
+      },
+      "pass": true,
+      "procurementOk": true,
+      "operationalOk": true
+    },
+    {
+      "product": "Manjericão",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedBefore": null,
+      "expectedAfter": {
+        "procurementDisplay": "€2.06 / bunch",
+        "operationalDisplay": "€20.60 / kg"
+      },
+      "actual": {
+        "procurementDisplay": "€2.06 / bunch",
+        "operationalDisplay": "€20.60 / kg",
+        "usableStockLabel": "100 g usable",
+        "effective": {
+          "cost": 20.599999999999998,
+          "unit": "kg"
+        },
+        "recipeFields": {
+          "current_price": 2.06,
+          "purchase_quantity": 100,
+          "cost_base_unit": "g"
+        },
+        "isCaseRowWithEmbeddedPieceWeightOnly": false,
+        "shouldApplyCasePieceWeightOperationalShortcut": false,
+        "displayStructuredUsable": 100
+      },
+      "pass": true,
+      "procurementOk": true,
+      "operationalOk": true
+    },
+    {
+      "product": "Pellegrino",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedBefore": null,
+      "expectedAfter": {
+        "procurementDisplay": "€19.28 / case",
+        "operationalDisplay": "€1.71 / L"
+      },
+      "actual": {
+        "procurementDisplay": "€19.28 / case",
+        "operationalDisplay": "€1.71 / L",
+        "usableStockLabel": "22.5 L usable",
+        "effective": {
+          "cost": 1.7137777777777778,
+          "unit": "L"
+        },
+        "recipeFields": {
+          "current_price": 19.28,
+          "purchase_quantity": 15,
+          "cost_base_unit": "un",
+          "usable_volume_ml": 11250
+        },
+        "isCaseRowWithEmbeddedPieceWeightOnly": false,
+        "shouldApplyCasePieceWeightOperationalShortcut": false,
+        "displayStructuredUsable": 22500
+      },
+      "pass": true,
+      "procurementOk": true,
+      "operationalOk": true
+    },
+    {
+      "product": "Peroni",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedBefore": null,
+      "expectedAfter": {
+        "procurementDisplay": "€1.07 / bottle",
+        "operationalDisplay": "€3.24 / L"
+      },
+      "actual": {
+        "procurementDisplay": "€1.07 / bottle",
+        "operationalDisplay": "€3.24 / L",
+        "usableStockLabel": "7.92 L usable",
+        "effective": {
+          "cost": 3.2424242424242427,
+          "unit": "L"
+        },
+        "recipeFields": {
+          "current_price": 1.07,
+          "purchase_quantity": 7920,
+          "cost_base_unit": "ml"
+        },
+        "isCaseRowWithEmbeddedPieceWeightOnly": false,
+        "shouldApplyCasePieceWeightOperationalShortcut": false,
+        "displayStructuredUsable": 7920
+      },
+      "pass": true,
+      "procurementOk": true,
+      "operationalOk": true
+    },
+    {
+      "product": "Mozzarella",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedBefore": null,
+      "expectedAfter": {
+        "procurementDisplay": "€20.03 / bag",
+        "operationalDisplay": "€6.68 / kg"
+      },
+      "actual": {
+        "procurementDisplay": "€20.03 / bag",
+        "operationalDisplay": "€6.68 / kg",
+        "usableStockLabel": "3 kg usable",
+        "effective": {
+          "cost": 6.676666666666667,
+          "unit": "kg"
+        },
+        "recipeFields": {
+          "current_price": 20.03,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 3000
+        },
+        "isCaseRowWithEmbeddedPieceWeightOnly": false,
+        "shouldApplyCasePieceWeightOperationalShortcut": false,
+        "displayStructuredUsable": 3000
+      },
+      "pass": true,
+      "procurementOk": true,
+      "operationalOk": true
+    },
+    {
+      "product": "Guanciale",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedBefore": null,
+      "expectedAfter": {
+        "procurementDisplay": "€89.50 / unit",
+        "operationalDisplay": "€8.52 / kg"
+      },
+      "actual": {
+        "procurementDisplay": "€89.50 / unit",
+        "operationalDisplay": "€8.52 / kg",
+        "usableStockLabel": "10.5 kg usable",
+        "effective": {
+          "cost": 8.523809523809524,
+          "unit": "kg"
+        },
+        "recipeFields": {
+          "current_price": 89.5,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 10500
+        },
+        "isCaseRowWithEmbeddedPieceWeightOnly": false,
+        "shouldApplyCasePieceWeightOperationalShortcut": false,
+        "displayStructuredUsable": 10500
+      },
+      "pass": true,
+      "procurementOk": true,
+      "operationalOk": true
+    },
+    {
+      "product": "Ginger Beer",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedBefore": null,
+      "expectedAfter": {
+        "procurementDisplay": "€9.69 / unit",
+        "operationalDisplay": "€48.45 / L"
+      },
+      "actual": {
+        "procurementDisplay": "€9.69 / unit",
+        "operationalDisplay": "€48.45 / L",
+        "usableStockLabel": "200 ml usable",
+        "effective": {
+          "cost": 48.449999999999996,
+          "unit": "L"
+        },
+        "recipeFields": {
+          "current_price": 9.69,
+          "purchase_quantity": 200,
+          "cost_base_unit": "ml"
+        },
+        "isCaseRowWithEmbeddedPieceWeightOnly": false,
+        "shouldApplyCasePieceWeightOperationalShortcut": false,
+        "displayStructuredUsable": 200
+      },
+      "pass": true,
+      "procurementOk": true,
+      "operationalOk": true
+    },
+    {
+      "product": "Angus 180G cx",
+      "mustCorrect": false,
+      "mustNotChange": true,
+      "expectedBefore": null,
+      "expectedAfter": {
+        "procurementDisplay": "€24.90 / case",
+        "operationalDisplay": "€24.90 / case"
+      },
+      "actual": {
+        "procurementDisplay": "€24.90 / case",
+        "operationalDisplay": "€24.90 / case",
+        "usableStockLabel": null,
+        "effective": {
+          "cost": 24.9,
+          "unit": "case"
+        },
+        "recipeFields": {
+          "current_price": 24.9,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 180
+        },
+        "isCaseRowWithEmbeddedPieceWeightOnly": true,
+        "shouldApplyCasePieceWeightOperationalShortcut": true,
+        "displayStructuredUsable": 180
+      },
+      "pass": true,
+      "procurementOk": true,
+      "operationalOk": true
+    }
+  ],
+  "summary": {
+    "total": 11,
+    "passed": 11,
+    "failed": 0,
+    "saladaFixed": true,
+    "allRegressionsPass": true
+  },
+  "verdict": "A",
+  "verdictLabel": "Safe to merge",
+  "openIssues": [
+    "Unknown em/pack rows with per-piece bare_measure in opaque multi-packs may gain €/kg display (aligns with weight-family recipe model)",
+    "Ginger Beer cx row masking remains out of scope"
+  ]
+}

@@ -1,0 +1,580 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "auditedAt": "2026-06-24T01:42:50.131Z",
+  "mode": "STRICT_READ_ONLY",
+  "task1_produceConversionHintsOrigin": {
+    "group": {
+      "tokens": [
+        "COENTROS",
+        "SALSA",
+        "MANJERICAO",
+        "HORTELA",
+        "CEBOLINHO"
+      ],
+      "estimatedQuantity": 100,
+      "label": "fresh herbs",
+      "confidence": 0.58,
+      "sourceFile": "src/lib/ingredient-unit-inference.ts",
+      "lines": "412-417",
+      "gitIntroduced": "04cefd7c6e7093e624d0e7699cf7a0bcb3bce297",
+      "gitDate": "2026-05-18",
+      "gitMessage": "Add conservative ingredient matching and invoice identity improvements"
+    },
+    "perHerb": [
+      {
+        "token": "MANJERICAO",
+        "displayName": "Manjericão",
+        "conversion": 100,
+        "inTable": true,
+        "firstIntroduction": {
+          "commit": "04cefd7c6e7093e624d0e7699cf7a0bcb3bce297",
+          "date": "2026-05-18",
+          "message": "Add conservative ingredient matching and invoice identity improvements",
+          "note": "All five fresh-herb tokens introduced together in single PRODUCE_CONVERSION_HINTS group at 100g"
+        },
+        "comments": [
+          "L426-429: lightweight operational hints, intentionally not persisted automatically",
+          "L443: reason template 'fresh herbs token \"TOKEN\" → estimated 100g usable'",
+          "confidence 0.58"
+        ],
+        "tests": [
+          "No dedicated test asserts 100g for this herb token",
+          "invoice-purchase-format.test.ts: ALFACE estimated_yield (leafy 500g group parallel, not herbs)",
+          "invoice-purchase-price-semantics.test.ts: formatRowPurchaseQuantityLabel for Manjericão/Tomilho bunch labels only"
+        ],
+        "detectConversionHint": {
+          "purchase_unit": "un",
+          "estimated_quantity": 100,
+          "stock_unit": "g",
+          "recipe_usage_unit": "g",
+          "label": "fresh herbs",
+          "confidence": 0.58,
+          "reason": "fresh herbs token \"MANJERICAO\" → estimated 100g usable"
+        }
+      },
+      {
+        "token": "SALSA",
+        "displayName": "Salsa",
+        "conversion": 100,
+        "inTable": true,
+        "firstIntroduction": {
+          "commit": "04cefd7c6e7093e624d0e7699cf7a0bcb3bce297",
+          "date": "2026-05-18",
+          "message": "Add conservative ingredient matching and invoice identity improvements",
+          "note": "All five fresh-herb tokens introduced together in single PRODUCE_CONVERSION_HINTS group at 100g"
+        },
+        "comments": [
+          "L426-429: lightweight operational hints, intentionally not persisted automatically",
+          "L443: reason template 'fresh herbs token \"TOKEN\" → estimated 100g usable'",
+          "confidence 0.58"
+        ],
+        "tests": [
+          "No dedicated test asserts 100g for this herb token",
+          "invoice-purchase-format.test.ts: ALFACE estimated_yield (leafy 500g group parallel, not herbs)",
+          "invoice-purchase-price-semantics.test.ts: formatRowPurchaseQuantityLabel for Manjericão/Tomilho bunch labels only"
+        ],
+        "detectConversionHint": {
+          "purchase_unit": "un",
+          "estimated_quantity": 100,
+          "stock_unit": "g",
+          "recipe_usage_unit": "g",
+          "label": "fresh herbs",
+          "confidence": 0.58,
+          "reason": "fresh herbs token \"SALSA\" → estimated 100g usable"
+        }
+      },
+      {
+        "token": "COENTROS",
+        "displayName": "Coentros",
+        "conversion": 100,
+        "inTable": true,
+        "firstIntroduction": {
+          "commit": "04cefd7c6e7093e624d0e7699cf7a0bcb3bce297",
+          "date": "2026-05-18",
+          "message": "Add conservative ingredient matching and invoice identity improvements",
+          "note": "All five fresh-herb tokens introduced together in single PRODUCE_CONVERSION_HINTS group at 100g"
+        },
+        "comments": [
+          "L426-429: lightweight operational hints, intentionally not persisted automatically",
+          "L443: reason template 'fresh herbs token \"TOKEN\" → estimated 100g usable'",
+          "confidence 0.58"
+        ],
+        "tests": [
+          "No dedicated test asserts 100g for this herb token",
+          "invoice-purchase-format.test.ts: ALFACE estimated_yield (leafy 500g group parallel, not herbs)",
+          "invoice-purchase-price-semantics.test.ts: formatRowPurchaseQuantityLabel for Manjericão/Tomilho bunch labels only"
+        ],
+        "detectConversionHint": {
+          "purchase_unit": "un",
+          "estimated_quantity": 100,
+          "stock_unit": "g",
+          "recipe_usage_unit": "g",
+          "label": "fresh herbs",
+          "confidence": 0.58,
+          "reason": "fresh herbs token \"COENTROS\" → estimated 100g usable"
+        }
+      },
+      {
+        "token": "HORTELA",
+        "displayName": "Hortelã",
+        "conversion": 100,
+        "inTable": true,
+        "firstIntroduction": {
+          "commit": "04cefd7c6e7093e624d0e7699cf7a0bcb3bce297",
+          "date": "2026-05-18",
+          "message": "Add conservative ingredient matching and invoice identity improvements",
+          "note": "All five fresh-herb tokens introduced together in single PRODUCE_CONVERSION_HINTS group at 100g"
+        },
+        "comments": [
+          "L426-429: lightweight operational hints, intentionally not persisted automatically",
+          "L443: reason template 'fresh herbs token \"TOKEN\" → estimated 100g usable'",
+          "confidence 0.58"
+        ],
+        "tests": [
+          "No dedicated test asserts 100g for this herb token",
+          "invoice-purchase-format.test.ts: ALFACE estimated_yield (leafy 500g group parallel, not herbs)",
+          "invoice-purchase-price-semantics.test.ts: formatRowPurchaseQuantityLabel for Manjericão/Tomilho bunch labels only"
+        ],
+        "detectConversionHint": {
+          "purchase_unit": "un",
+          "estimated_quantity": 100,
+          "stock_unit": "g",
+          "recipe_usage_unit": "g",
+          "label": "fresh herbs",
+          "confidence": 0.58,
+          "reason": "fresh herbs token \"HORTELA\" → estimated 100g usable"
+        }
+      },
+      {
+        "token": "CEBOLINHO",
+        "displayName": "Cebolinho",
+        "conversion": 100,
+        "inTable": true,
+        "firstIntroduction": {
+          "commit": "04cefd7c6e7093e624d0e7699cf7a0bcb3bce297",
+          "date": "2026-05-18",
+          "message": "Add conservative ingredient matching and invoice identity improvements",
+          "note": "All five fresh-herb tokens introduced together in single PRODUCE_CONVERSION_HINTS group at 100g"
+        },
+        "comments": [
+          "L426-429: lightweight operational hints, intentionally not persisted automatically",
+          "L443: reason template 'fresh herbs token \"TOKEN\" → estimated 100g usable'",
+          "confidence 0.58"
+        ],
+        "tests": [
+          "No dedicated test asserts 100g for this herb token",
+          "invoice-purchase-format.test.ts: ALFACE estimated_yield (leafy 500g group parallel, not herbs)",
+          "invoice-purchase-price-semantics.test.ts: formatRowPurchaseQuantityLabel for Manjericão/Tomilho bunch labels only"
+        ],
+        "detectConversionHint": {
+          "purchase_unit": "un",
+          "estimated_quantity": 100,
+          "stock_unit": "g",
+          "recipe_usage_unit": "g",
+          "label": "fresh herbs",
+          "confidence": 0.58,
+          "reason": "fresh herbs token \"CEBOLINHO\" → estimated 100g usable"
+        }
+      },
+      {
+        "token": "TOMILHO",
+        "displayName": "Tomilho",
+        "conversion": null,
+        "inTable": false,
+        "firstIntroduction": null,
+        "comments": [
+          "Absent from PRODUCE_CONVERSION_HINTS fresh herbs group"
+        ],
+        "tests": [
+          "No test references this token in PRODUCE_CONVERSION_HINTS"
+        ],
+        "detectConversionHint": null
+      },
+      {
+        "token": "ALECRIM",
+        "displayName": "Alecrim",
+        "conversion": null,
+        "inTable": false,
+        "firstIntroduction": null,
+        "comments": [
+          "Absent from PRODUCE_CONVERSION_HINTS fresh herbs group"
+        ],
+        "tests": [
+          "No test references this token in PRODUCE_CONVERSION_HINTS"
+        ],
+        "detectConversionHint": null
+      },
+      {
+        "token": "ESTRAGAO",
+        "displayName": "Estragão",
+        "conversion": null,
+        "inTable": false,
+        "firstIntroduction": null,
+        "comments": [
+          "Absent from PRODUCE_CONVERSION_HINTS fresh herbs group"
+        ],
+        "tests": [
+          "No test references this token in PRODUCE_CONVERSION_HINTS"
+        ],
+        "detectConversionHint": null
+      }
+    ]
+  },
+  "task2_architectureAudit": {
+    "whyAllShare100g": "Architecture uses category-level estimatedQuantity per PRODUCE_CONVERSION_HINTS entry, not per-product weights. Fresh herbs group assigns one value (100g) to all tokens in the array.",
+    "oneBunchEquals100g": "Code maps mo/bunch purchases through detectConversionHint → estimated_quantity 100 → resolveUsablePerPricedUnit 100g per priced bunch → €/kg operational",
+    "notIndividualWeights": "No herb-specific weight table; Hortelã on VL is kg-priced but still matches HORTELA token at 100g hint (parallel path)",
+    "evidence": [
+      "ingredient-unit-inference.ts L412-417: single fresh herbs entry, estimatedQuantity: 100",
+      "ingredient-unit-inference.ts L426-429: estimated, not persisted",
+      "stock-normalization.ts L1690-1695: conversion_hint multiplies purchaseQuantity × estimated_quantity",
+      "invoice-purchase-format.test.ts L519-529: leafy parallel — estimated_yield for ALFACE at group 500g",
+      "manjericao-audit: €2.06/bunch ÷ 0.1kg = €20.60/kg verified"
+    ]
+  },
+  "task3_vlCorpus": [
+    {
+      "product": "Manjericão",
+      "token": "MANJERICAO",
+      "inProduceConversionHints": true,
+      "ingredientId": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+      "dbState": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "purchase_unit": "g",
+        "base_unit": "g"
+      },
+      "purchaseUnit": "mo",
+      "conversion": 100,
+      "conversionLabel": "100 g/bunch",
+      "operationalCost": "€20.60 / kg",
+      "procurementLabel": null,
+      "structuredKind": "inferred",
+      "invoiceRowCount": 1,
+      "recipeLineCount": 0,
+      "recipeLines": []
+    },
+    {
+      "product": "Salsa",
+      "token": "SALSA",
+      "inProduceConversionHints": true,
+      "ingredientId": null,
+      "dbState": null,
+      "purchaseUnit": null,
+      "conversion": null,
+      "conversionLabel": null,
+      "operationalCost": null,
+      "procurementLabel": null,
+      "structuredKind": null,
+      "invoiceRowCount": 0,
+      "recipeLineCount": 0,
+      "recipeLines": []
+    },
+    {
+      "product": "Coentros",
+      "token": "COENTROS",
+      "inProduceConversionHints": true,
+      "ingredientId": null,
+      "dbState": null,
+      "purchaseUnit": null,
+      "conversion": null,
+      "conversionLabel": null,
+      "operationalCost": null,
+      "procurementLabel": null,
+      "structuredKind": null,
+      "invoiceRowCount": 0,
+      "recipeLineCount": 0,
+      "recipeLines": []
+    },
+    {
+      "product": "Hortelã",
+      "token": "HORTELA",
+      "inProduceConversionHints": true,
+      "ingredientId": "6e3011e0-b160-48c9-867c-1234cd743802",
+      "dbState": {
+        "current_price": 5.4,
+        "purchase_quantity": 1000,
+        "purchase_unit": "g",
+        "base_unit": "g"
+      },
+      "purchaseUnit": "kg",
+      "conversion": 100,
+      "conversionLabel": "100 g/bunch",
+      "operationalCost": "€5.40 / kg",
+      "procurementLabel": null,
+      "structuredKind": "weight_or_volume",
+      "invoiceRowCount": 1,
+      "recipeLineCount": 0,
+      "recipeLines": []
+    },
+    {
+      "product": "Cebolinho",
+      "token": "CEBOLINHO",
+      "inProduceConversionHints": true,
+      "ingredientId": null,
+      "dbState": null,
+      "purchaseUnit": null,
+      "conversion": null,
+      "conversionLabel": null,
+      "operationalCost": null,
+      "procurementLabel": null,
+      "structuredKind": null,
+      "invoiceRowCount": 0,
+      "recipeLineCount": 0,
+      "recipeLines": []
+    },
+    {
+      "product": "Tomilho",
+      "token": "TOMILHO",
+      "inProduceConversionHints": false,
+      "ingredientId": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041",
+      "dbState": {
+        "current_price": 2.06,
+        "purchase_quantity": 1,
+        "purchase_unit": "un",
+        "base_unit": "un"
+      },
+      "purchaseUnit": "mo",
+      "conversion": null,
+      "conversionLabel": null,
+      "operationalCost": null,
+      "procurementLabel": null,
+      "structuredKind": "row_only",
+      "invoiceRowCount": 1,
+      "recipeLineCount": 0,
+      "recipeLines": []
+    },
+    {
+      "product": "Alecrim",
+      "token": "ALECRIM",
+      "inProduceConversionHints": false,
+      "ingredientId": null,
+      "dbState": null,
+      "purchaseUnit": null,
+      "conversion": null,
+      "conversionLabel": null,
+      "operationalCost": null,
+      "procurementLabel": null,
+      "structuredKind": null,
+      "invoiceRowCount": 0,
+      "recipeLineCount": 0,
+      "recipeLines": []
+    },
+    {
+      "product": "Estragão",
+      "token": "ESTRAGAO",
+      "inProduceConversionHints": false,
+      "ingredientId": null,
+      "dbState": null,
+      "purchaseUnit": null,
+      "conversion": null,
+      "conversionLabel": null,
+      "operationalCost": null,
+      "procurementLabel": null,
+      "structuredKind": null,
+      "invoiceRowCount": 0,
+      "recipeLineCount": 0,
+      "recipeLines": []
+    }
+  ],
+  "task4_safetyAnalysis": {
+    "currentTomilho": {
+      "operationalLabel": null,
+      "recipeFields": {
+        "current_price": 2.06,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un"
+      },
+      "structuredKind": "row_only"
+    },
+    "ifTomilho100g": {
+      "operationalKg": 20.599999999999998,
+      "operationalLabel": "€20.60 / kg",
+      "recipeFields": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "cost_base_unit": "g"
+      },
+      "recipeCosts": [
+        {
+          "grams": 1,
+          "cost": 0.0206
+        },
+        {
+          "grams": 5,
+          "cost": 0.10300000000000001
+        },
+        {
+          "grams": 10,
+          "cost": 0.20600000000000002
+        }
+      ]
+    },
+    "manjericaoReference": {
+      "operationalLabel": "€20.60 / kg",
+      "recipeFields": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "cost_base_unit": "g"
+      },
+      "perUnit": {
+        "amount": 100,
+        "unit": "g"
+      }
+    },
+    "operationalEurPerKg": 20.599999999999998,
+    "recipeDenominator": 100,
+    "recipeDenominatorUnit": "g",
+    "existingIngredientsChange": {
+      "manjericao": "unchanged — already MANJERICAO token at 100g",
+      "otherTableHerbs": "unchanged — same group",
+      "tomilhoDbUntilReread": {
+        "note": "ingredients row persists purchase_quantity=1, base_unit=un until invoice re-read",
+        "current": {
+          "id": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041",
+          "name": "Tomilho",
+          "current_price": 2.06,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        }
+      },
+      "recipeLinesAffected": 0
+    },
+    "sideEffects": [
+      "detectConversionHint('Tomilho') would return fresh herbs 100g (same as siblings)",
+      "structured.kind would become inferred (from row_only)",
+      "operational display €20.60/kg at €2.06/bunch (identical math to Manjericão)",
+      "recipeOperationalCostFieldsFromInvoiceLine → purchase_quantity=100, cost_base_unit=g",
+      "recipe lines in g would cost qty × €0.0206/g vs current null for g",
+      "recipe lines in un would remain N × €2.06 if cost_base_unit stays un until persistence refresh"
+    ]
+  },
+  "task5_family": {
+    "alecrim": {
+      "inTable": false,
+      "detectConversionHint": null,
+      "vlInvoiceRows": 0,
+      "vlIngredient": null
+    },
+    "estragao": {
+      "inTable": false,
+      "detectConversionHint": null,
+      "vlInvoiceRows": 0,
+      "vlIngredient": null
+    },
+    "evidenceForSameTreatment": [
+      "Same PRODUCE_CONVERSION_HINTS architecture: token-list group with single estimatedQuantity per label",
+      "ALECRIM and ESTRAGAO absent from table alongside TOMILHO — 3/8 target herbs missing",
+      "No VL invoice_items rows for Alecrim or Estragão (blast radius 0 in VL)",
+      "No ingredient catalog rows for Alecrim or Estragão on VL",
+      "If added at 100g, would follow identical fresh herbs group pattern as MANJERICAO et al."
+    ],
+    "verdict": "YES — architecturally parallel (same missing-token gap, same fresh-herb group semantics); VL evidence N/A (no rows)"
+  },
+  "task6_blastRadius": {
+    "tomilhoOnly": {
+      "allUnitRows": 1,
+      "bunchRows": 1,
+      "products": [
+        "Tomilho"
+      ],
+      "rowIds": [
+        "f2d094ab-f50a-483d-b6cb-76554d5bf195"
+      ]
+    },
+    "tomilhoAlecrimEstragao": {
+      "allUnitRows": 1,
+      "bunchRows": 1,
+      "products": [
+        "Tomilho"
+      ],
+      "rowIds": [
+        "f2d094ab-f50a-483d-b6cb-76554d5bf195"
+      ],
+      "note": "ALECRIM and ESTRAGAO contribute 0 VL rows"
+    }
+  },
+  "requiredTable": [
+    {
+      "herb": "Manjericão",
+      "currentConversion": "100 g/bunch (fresh herbs group)",
+      "intendedConversion": "100 g/bunch (fresh herbs group pattern)",
+      "evidenceLevel": "code+VL"
+    },
+    {
+      "herb": "Salsa",
+      "currentConversion": "100 g/bunch (fresh herbs group)",
+      "intendedConversion": "100 g/bunch (fresh herbs group pattern)",
+      "evidenceLevel": "code-only"
+    },
+    {
+      "herb": "Coentros",
+      "currentConversion": "100 g/bunch (fresh herbs group)",
+      "intendedConversion": "100 g/bunch (fresh herbs group pattern)",
+      "evidenceLevel": "code-only"
+    },
+    {
+      "herb": "Hortelã",
+      "currentConversion": "100 g/bunch (fresh herbs group)",
+      "intendedConversion": "100 g/bunch (fresh herbs group pattern)",
+      "evidenceLevel": "code+VL"
+    },
+    {
+      "herb": "Cebolinho",
+      "currentConversion": "100 g/bunch (fresh herbs group)",
+      "intendedConversion": "100 g/bunch (fresh herbs group pattern)",
+      "evidenceLevel": "code-only"
+    },
+    {
+      "herb": "Tomilho",
+      "currentConversion": null,
+      "intendedConversion": "100 g/bunch (fresh herbs group pattern)",
+      "evidenceLevel": "VL-gap"
+    },
+    {
+      "herb": "Alecrim",
+      "currentConversion": null,
+      "intendedConversion": "100 g/bunch (fresh herbs group pattern)",
+      "evidenceLevel": "none"
+    },
+    {
+      "herb": "Estragão",
+      "currentConversion": null,
+      "intendedConversion": "100 g/bunch (fresh herbs group pattern)",
+      "evidenceLevel": "none"
+    }
+  ],
+  "hundredGramOrigin": {
+    "question": "Is 100g: A) generic herb assumption B) product-specific C) restaurant assumption D) arbitrary placeholder?",
+    "evidence": {
+      "A_genericHerbAssumption": [
+        "Single 'fresh herbs' group with one estimatedQuantity: 100 shared by all 5 tokens",
+        "No per-token weight differentiation in code",
+        "detectConversionHint reason: 'fresh herbs token X → estimated 100g usable'",
+        "Parallel leafy produce group uses single 500g for 7 tokens"
+      ],
+      "B_productSpecific": [
+        "No product-specific weights; Manjericão and Hortelã share same 100g despite different VL purchase units (mo vs kg)"
+      ],
+      "C_restaurantAssumption": [
+        "No restaurant-specific yield data, supplier spec, or VL weighing evidence in code or commits"
+      ],
+      "D_arbitraryPlaceholder": [
+        "confidence 0.58 (lowest of three produce groups)",
+        "comment: 'estimated usable yield', 'lightweight operational hints'",
+        "no test pins 100g to measured bunch weight",
+        "introduced without per-herb justification in commit message"
+      ]
+    },
+    "selected": "A",
+    "selectedLabel": "generic herb assumption"
+  },
+  "finalVerdict": {
+    "question": "Is 100g for Tomilho consistent with existing herb-conversion architecture?",
+    "selected": "A",
+    "selectedLabel": "generic herb assumption — YES, consistent",
+    "answer": "Adding TOMILHO at 100g matches the existing fresh-herb group design: one shared estimatedQuantity per label, same pipeline as MANJERICAO. Tomilho is the only VL bunch herb missing the token; €20.60/kg and recipe denominator 100g follow Manjericão math at identical €2.06/bunch.",
+    "safetyNote": "Code-token addition alone does not rewrite persisted ingredients row (purchase_quantity=1, base_unit=un) until re-read; 0 VL recipe_ingredients rows for Tomilho today."
+  }
+}

@@ -1,0 +1,283 @@
+{
+  "generatedAt": "2026-06-24T12:00:00.000Z",
+  "mode": "STRICT_DESIGN_ONLY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "product": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+  "ingredientId": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+  "invoiceItemId": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+  "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+  "finalVerdict": {
+    "status": "A",
+    "label": "Ready",
+    "confidence": 0.92,
+    "summary": "Isolated parser gap. Add caixa_dozen_count tier in parsePurchaseStructureFromText. No persistence or recipe-costing changes required."
+  },
+  "confirmedBug": {
+    "symptom": "purchase_quantity=1 → €38.44/egg instead of €0.2136/egg",
+    "expectedDenominator": 180,
+    "formula": "1 cx × 15 dozen × 12 eggs/dozen",
+    "rootCause": "parsePurchaseStructureFromText returns null — dúzias unsupported; Cx.15 dot breaks CAIXA_COUNT_ONLY_RE; caixa_count_only requires embedded g/ml",
+    "forkPoint": {
+      "file": "src/lib/stock-normalization.ts",
+      "function": "parsePurchaseStructureFromText",
+      "lines": "637-911"
+    }
+  },
+  "task1_currentFlow": {
+    "insertionPoint": {
+      "file": "src/lib/stock-normalization.ts",
+      "function": "parsePurchaseStructureFromText",
+      "afterTier": "caixa_compact_size",
+      "beforeTier": "units_size",
+      "approxLine": 702
+    },
+    "pipeline": [
+      {
+        "stage": "OCR / invoice_items (DB)",
+        "representation": { "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)", "quantity": 1, "unit": "cx", "unit_price": 38.44 }
+      },
+      {
+        "stage": "normalizeInvoiceItemFields",
+        "file": "src/lib/invoice-item-fields.ts",
+        "representation": "name unchanged; qty=1, unit=cx"
+      },
+      {
+        "stage": "parsePurchaseStructureFromText",
+        "file": "src/lib/stock-normalization.ts",
+        "representationBefore": null,
+        "representationAfter": {
+          "tier": "caixa_dozen_count",
+          "purchaseQuantity": 1,
+          "innerUnitCount": 15,
+          "unitSize": 12,
+          "unitMeasurement": "un",
+          "totalUsableAmount": 180,
+          "usableUnit": "un"
+        }
+      },
+      {
+        "stage": "computeUsableFromPurchaseStructure",
+        "file": "src/lib/stock-normalization.ts",
+        "representationBefore": { "usableQuantity": null, "usableSource": "inference" },
+        "representationAfter": { "usableQuantity": 180, "usableUnit": "un", "usableSource": "structure_total" }
+      },
+      {
+        "stage": "resolveInvoiceLinePurchaseFormat",
+        "file": "src/lib/invoice-purchase-format.ts",
+        "representationBefore": { "kind": "row_only", "normalizedUsableQuantity": null },
+        "representationAfter": { "kind": "multi_unit_pack", "normalizedUsableQuantity": 180, "usableQuantityUnit": "un" }
+      },
+      {
+        "stage": "recipeOperationalCostFieldsFromInvoiceLine",
+        "file": "src/lib/invoice-purchase-price-semantics.ts",
+        "representationBefore": { "purchase_quantity": 1, "cost_base_unit": "un" },
+        "representationAfter": { "purchase_quantity": 180, "cost_base_unit": "un" }
+      },
+      {
+        "stage": "operationalCostFieldsFromInvoiceLine → persistence",
+        "file": "src/lib/ingredient-auto-persist.ts",
+        "representationBefore": { "purchase_quantity": 1, "purchase_unit": "un", "usable_quantity": null },
+        "representationAfter": { "purchase_quantity": 180, "purchase_unit": "un", "usable_quantity": 180, "usable_unit": "un" }
+      },
+      {
+        "stage": "ingredientLineCostEur (recipe costing)",
+        "file": "src/lib/recipe-prep-cost.ts",
+        "representationBefore": "1 un × (38.44/1) = €38.44",
+        "representationAfter": "1 un × (38.44/180) = €0.2136"
+      }
+    ]
+  },
+  "task2_designOptions": {
+    "recommended": "A",
+    "options": [
+      {
+        "id": "A",
+        "name": "Dedicated dozen parser tier",
+        "description": "CAIXA_DOZEN_RE + buildStructure with innerUnitCount=dozenCount, unitSize=12, unitMeasurement=un, tier=caixa_dozen_count",
+        "filesTouched": ["src/lib/stock-normalization.ts", "src/lib/stock-normalization.test.ts"],
+        "blastRadius": "VL: 1 row",
+        "risk": "low"
+      },
+      {
+        "id": "B",
+        "name": "Generic countable multiplier",
+        "description": "Extend INNER_UNIT_TOKEN with dozen tokens; refactor parseSizeAndUnit to accept un-based inner units",
+        "filesTouched": ["src/lib/stock-normalization.ts", "src/lib/invoice-purchase-format.ts"],
+        "blastRadius": "All caixa_units_size / size_count paths",
+        "risk": "medium-high"
+      },
+      {
+        "id": "C",
+        "name": "Inference-only post-parser multiplier",
+        "description": "Special-case dozen in inferPurchaseUnitsFromLineItemName or resolveCountablePurchaseQuantityForCost",
+        "filesTouched": ["src/lib/ingredient-unit-inference.ts", "src/lib/invoice-purchase-price-semantics.ts"],
+        "blastRadius": "Bypasses purchase_structure — stock/usable labels stay broken",
+        "risk": "medium (incomplete fix)"
+      }
+    ]
+  },
+  "task3_expectedParserOutput": {
+    "input": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+    "type": "PurchaseStructure",
+    "typeSource": "src/lib/stock-normalization.ts:34-53",
+    "output": {
+      "purchaseQuantity": 1,
+      "purchaseFormat": "case",
+      "innerUnitCount": 15,
+      "innerUnitType": "dozen",
+      "unitSize": 12,
+      "unitMeasurement": "un",
+      "totalUsableAmount": 180,
+      "usableUnit": "un",
+      "matchedText": "Cx.15 dúzias",
+      "tier": "caixa_dozen_count"
+    },
+    "multiplierChain": {
+      "expression": "1 × 15 × 12 un",
+      "perItemBase": 12,
+      "totalUsableAmount": 180
+    },
+    "packPhrase": {
+      "kind": "multi_unit_pack",
+      "containerCount": 15,
+      "packageQuantity": 12,
+      "packageUnit": "un"
+    },
+    "structuredFormat": {
+      "kind": "multi_unit_pack",
+      "normalizedUsableQuantity": 180,
+      "usableQuantityUnit": "un"
+    }
+  },
+  "task4_persistenceEffect": {
+    "invoiceLine": { "quantity": 1, "unit": "cx", "unit_price": 38.44 },
+    "before": {
+      "current_price": 38.44,
+      "purchase_quantity": 1,
+      "purchase_unit": "un",
+      "cost_base_unit": "un",
+      "usable_quantity": null,
+      "usable_unit": null,
+      "base_unit": "un"
+    },
+    "after": {
+      "current_price": 38.44,
+      "purchase_quantity": 180,
+      "purchase_unit": "un",
+      "cost_base_unit": "un",
+      "usable_quantity": 180,
+      "usable_unit": "un",
+      "base_unit": "un"
+    },
+    "denominatorPath": "resolveCountablePurchaseQuantityForCost → usableQuantityUnit=un branch → resolveUsablePerPricedUnit → 180 (not resolveUnitsPerPack=15)"
+  },
+  "task5_recipeCosting": {
+    "formula": {
+      "unitCost": "resolvedOperationalUnitCostEur = current_price / purchase_quantity",
+      "lineCost": "directCountableLineCostEur = recipeQty × unitCost (recipeUnit=un, cost_base_unit=un)"
+    },
+    "unitCostEur": 0.21355555555555555,
+    "scenarios": [
+      { "recipeQty": 1, "recipeUnit": "un", "lineCostEur": 0.21355555555555555 },
+      { "recipeQty": 2, "recipeUnit": "un", "lineCostEur": 0.4271111111111111 },
+      { "recipeQty": 6, "recipeUnit": "un", "lineCostEur": 1.2813333333333333 },
+      { "recipeQty": 12, "recipeUnit": "un", "lineCostEur": 2.5626666666666665 }
+    ],
+    "operationalDisplay": { "cost": 0.21355555555555555, "unit": "egg" }
+  },
+  "task6_regressionMatrix": [
+    { "product": "Peroni", "parseTierBefore": "size_count", "parserChange": false },
+    { "product": "Pellegrino", "parseTierBefore": "size_count", "parserChange": false },
+    { "product": "Nata", "parseTierBefore": "count_size", "parserChange": false },
+    { "product": "Chocolate", "parseTierBefore": "count_size", "parserChange": false },
+    { "product": "Açúcar", "parseTierBefore": "count_size", "parserChange": false },
+    { "product": "Mozzarella", "parseTierBefore": "size_count", "parserChange": false },
+    { "product": "Guanciale", "parseTierBefore": "size_count", "parserChange": false },
+    { "product": "Ginger Beer", "parseTierBefore": "bare_measure", "parserChange": false },
+    { "product": "Salada", "parseTierBefore": "bare_measure", "parserChange": false },
+    { "product": "Ovo Classe M", "parseTierBefore": null, "parserChange": true }
+  ],
+  "task7_blastRadius": {
+    "totalVlInvoiceItems": 52,
+    "rowsChanged": 1,
+    "changedRows": [
+      {
+        "id": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+        "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+        "ingredientId": "9f167402-9ea8-4fac-92dc-2cb11a525359"
+      }
+    ]
+  },
+  "task8_validationPlan": {
+    "phases": [
+      {
+        "phase": "parser_unit_tests",
+        "file": "src/lib/stock-normalization.test.ts",
+        "cases": [
+          { "input": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)", "tier": "caixa_dozen_count", "totalUsableAmount": 180, "usableUnit": "un" },
+          { "input": "Ovo Classe M cx 15 dúzias", "tier": "caixa_dozen_count", "totalUsableAmount": 180, "usableUnit": "un" },
+          { "input": "Ovo Classe M Cx.15 duzias", "tier": "caixa_dozen_count", "totalUsableAmount": 180, "usableUnit": "un" },
+          { "input": "Chocolate Pantagruel 10x200g", "tier": "count_size", "unchanged": true },
+          { "input": "Caixa 40 un x 180g", "tier": "caixa_units_size", "unchanged": true }
+        ]
+      },
+      {
+        "phase": "persistence_replay",
+        "script": ".tmp/ovo-countable-root-cause-audit/audit.mts",
+        "beforeAfter": {
+          "parsePurchaseStructureFromText": { "before": null, "after": { "totalUsableAmount": 180 } },
+          "purchase_quantity": { "before": 1, "after": 180 },
+          "effectiveIngredientUnitCostEur": { "before": 38.44, "after": 0.2136 }
+        }
+      },
+      {
+        "phase": "recipe_costing_replay",
+        "function": "ingredientLineCostEur",
+        "cases": [
+          { "qty": 1, "expected": 0.2136 },
+          { "qty": 12, "expected": 2.5627 }
+        ]
+      },
+      {
+        "phase": "regression_sweep",
+        "script": ".tmp/countable-multiplier-coverage-audit/replay.mts",
+        "expect": { "brokenCount": 0 }
+      }
+    ]
+  },
+  "recommendedImplementation": {
+    "option": "A",
+    "constants": {
+      "EGGS_PER_DOZEN": 12,
+      "DOZEN_UNIT_TOKEN": "dúzia|dúzias|duzia|duzias|dozen|dozens|dz"
+    },
+    "regex": {
+      "CAIXA_DOZEN_RE": "\\b(?:caixa|caixas|cx)\\s*\\.?\\s*(?<inner>\\d+(?:[.,]\\d+)?)\\s*(?<dozenUnit>DOZEN_UNIT_TOKEN)\\b"
+    },
+    "pseudocode": "findBestRegexMatch(trimmed, CAIXA_DOZEN_RE, scoreDozenMatch) → buildStructure({ purchaseQuantity:1, purchaseFormat:'case', innerUnitCount:dozenCount, innerUnitType:'dozen', unitSize:12, unitMeasurement:'un', tier:'caixa_dozen_count' })",
+    "safetyGates": [
+      "Dozen unit token required in match (blocks bare Cx.15)",
+      "Do NOT fix CAIXA_COUNT_ONLY_RE dot alone — still requires embedded g/ml",
+      "Optional egg noun gate for non-VL corpora — omit for minimal VL fix"
+    ],
+    "typeChanges": [
+      "PurchaseStructure.tier += 'caixa_dozen_count'"
+    ],
+    "filesToChange": [
+      "src/lib/stock-normalization.ts",
+      "src/lib/stock-normalization.test.ts"
+    ],
+    "filesUnchanged": [
+      "src/lib/invoice-purchase-price-semantics.ts",
+      "src/lib/ingredient-auto-persist.ts",
+      "src/lib/recipe-prep-cost.ts",
+      "src/lib/invoice-purchase-format.ts"
+    ]
+  },
+  "evidenceSources": [
+    ".tmp/ovo-countable-root-cause-audit/REPORT.md",
+    ".tmp/ovo-countable-root-cause-audit/results.json",
+    ".tmp/countable-multiplier-coverage-audit/REPORT.md",
+    ".tmp/countable-multiplier-coverage-audit/results.json"
+  ]
+}

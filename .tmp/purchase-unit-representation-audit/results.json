@@ -1,0 +1,719 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "auditedAt": "2026-06-23T09:16:58.948Z",
+  "products": [
+    {
+      "product": "Paccheri Lisci",
+      "invoiceItemId": "728517aa-8578-4f6f-a415-aae06f05f5c4",
+      "ingredientId": "d7fcbb41-4e19-47ee-bbea-058e7b44a040",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "invoiceQuantity": 24,
+      "invoiceUnit": null,
+      "invoiceUnitRaw": null,
+      "purchaseQuantity": 24,
+      "purchaseUnit": "g",
+      "persistedPurchaseUnit": {
+        "invoice_items_unit": null,
+        "ingredient_purchase_unit": "un",
+        "ingredient_purchase_quantity": 1,
+        "procurement_purchase_unit": "un",
+        "resolveInvoiceLinePurchaseUnit": {
+          "unit": null,
+          "source": "fallback_null"
+        },
+        "structuredPurchaseToIngredientFields": {
+          "purchase_quantity": 12000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        }
+      },
+      "ingredientDetailValue": "24",
+      "invoiceReviewPurchaseDisplay": "24",
+      "rowQuantityLabel": "24",
+      "purchasedPackDetail": null,
+      "structuredPurchaseDisplay": "24 packs x 500 g",
+      "expectedDisplay": "24 un",
+      "status": "DATA_LOSS"
+    },
+    {
+      "product": "Ginger Beer (Baladin)",
+      "invoiceItemId": "634a418b-1509-42a9-bf01-563705967b6f",
+      "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia, Lda.",
+      "invoiceQuantity": 24,
+      "invoiceUnit": null,
+      "invoiceUnitRaw": null,
+      "purchaseQuantity": 24,
+      "purchaseUnit": "cl",
+      "persistedPurchaseUnit": {
+        "invoice_items_unit": null,
+        "ingredient_purchase_unit": "ml",
+        "ingredient_purchase_quantity": 2,
+        "procurement_purchase_unit": "ml",
+        "resolveInvoiceLinePurchaseUnit": {
+          "unit": null,
+          "source": "fallback_null"
+        },
+        "structuredPurchaseToIngredientFields": {
+          "purchase_quantity": 4800,
+          "purchase_unit": "ml",
+          "base_unit": "ml"
+        }
+      },
+      "ingredientDetailValue": "24",
+      "invoiceReviewPurchaseDisplay": "24",
+      "rowQuantityLabel": "24",
+      "purchasedPackDetail": null,
+      "structuredPurchaseDisplay": "24 bottles x 20 cl",
+      "expectedDisplay": "24 un",
+      "status": "DATA_LOSS"
+    },
+    {
+      "product": "Peroni Nastro Azzurro 33cl",
+      "invoiceItemId": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+      "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "invoiceQuantity": 24,
+      "invoiceUnit": "un",
+      "invoiceUnitRaw": "un",
+      "purchaseQuantity": 24,
+      "purchaseUnit": "un",
+      "persistedPurchaseUnit": {
+        "invoice_items_unit": "un",
+        "ingredient_purchase_unit": "un",
+        "ingredient_purchase_quantity": 24,
+        "procurement_purchase_unit": "un",
+        "resolveInvoiceLinePurchaseUnit": {
+          "unit": "un",
+          "source": "preserved_countable"
+        },
+        "structuredPurchaseToIngredientFields": {
+          "purchase_quantity": 24,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        }
+      },
+      "ingredientDetailValue": "24 un",
+      "invoiceReviewPurchaseDisplay": "24 un · 24 × 33 cl",
+      "rowQuantityLabel": "24 un",
+      "purchasedPackDetail": "24 × 33 cl",
+      "structuredPurchaseDisplay": "24 x 33 cl",
+      "expectedDisplay": "24 un",
+      "status": "OK"
+    },
+    {
+      "product": "Pellegrino 75cl×15",
+      "invoiceItemId": "ef25be0f-f153-40de-b377-25151d147637",
+      "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceQuantity": 2,
+      "invoiceUnit": "un",
+      "invoiceUnitRaw": "un",
+      "purchaseQuantity": 15,
+      "purchaseUnit": "un",
+      "persistedPurchaseUnit": {
+        "invoice_items_unit": "un",
+        "ingredient_purchase_unit": "un",
+        "ingredient_purchase_quantity": 15,
+        "procurement_purchase_unit": "un",
+        "resolveInvoiceLinePurchaseUnit": {
+          "unit": "un",
+          "source": "preserved_countable"
+        },
+        "structuredPurchaseToIngredientFields": {
+          "purchase_quantity": 15,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        }
+      },
+      "ingredientDetailValue": "2 un",
+      "invoiceReviewPurchaseDisplay": "2 un · 15 × 75 cl",
+      "rowQuantityLabel": "2 un",
+      "purchasedPackDetail": "15 × 75 cl",
+      "structuredPurchaseDisplay": "15 cases x 75 cl",
+      "expectedDisplay": "2 un",
+      "status": "OK"
+    },
+    {
+      "product": "Açúcar Branco 10x1kg",
+      "invoiceItemId": "693004ee-b902-4e18-8442-5d488e175e42",
+      "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "invoiceQuantity": 1,
+      "invoiceUnit": "cx",
+      "invoiceUnitRaw": "cx",
+      "purchaseQuantity": 10,
+      "purchaseUnit": "kg",
+      "persistedPurchaseUnit": {
+        "invoice_items_unit": "cx",
+        "ingredient_purchase_unit": "un",
+        "ingredient_purchase_quantity": 10,
+        "procurement_purchase_unit": "un",
+        "resolveInvoiceLinePurchaseUnit": {
+          "unit": "cx",
+          "source": "ocr_explicit"
+        },
+        "structuredPurchaseToIngredientFields": {
+          "purchase_quantity": 10,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        }
+      },
+      "ingredientDetailValue": "1 case",
+      "invoiceReviewPurchaseDisplay": "1 case · 10 × 1 kg",
+      "rowQuantityLabel": "1 case",
+      "purchasedPackDetail": "10 × 1 kg",
+      "structuredPurchaseDisplay": "10 x 1 kg",
+      "expectedDisplay": "1 case",
+      "status": "OK"
+    },
+    {
+      "product": "Pomodori",
+      "invoiceItemId": "9a52cc46-1c5a-4798-9621-d06177e04208",
+      "ingredientId": "52f7bf70-eeca-4039-987d-241b35248119",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceQuantity": 1,
+      "invoiceUnit": "un",
+      "invoiceUnitRaw": "un",
+      "purchaseQuantity": 6,
+      "purchaseUnit": "un",
+      "persistedPurchaseUnit": {
+        "invoice_items_unit": "un",
+        "ingredient_purchase_unit": "un",
+        "ingredient_purchase_quantity": 1,
+        "procurement_purchase_unit": "un",
+        "resolveInvoiceLinePurchaseUnit": {
+          "unit": "un",
+          "source": "preserved_countable"
+        },
+        "structuredPurchaseToIngredientFields": {
+          "purchase_quantity": 6,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        }
+      },
+      "ingredientDetailValue": "1 un",
+      "invoiceReviewPurchaseDisplay": "1 un · 6 × 2.5 kg",
+      "rowQuantityLabel": "1 un",
+      "purchasedPackDetail": "6 × 2.5 kg",
+      "structuredPurchaseDisplay": "6 cases x 2.5 kg",
+      "expectedDisplay": "1 un",
+      "status": "OK"
+    }
+  ],
+  "lifecycle": {
+    "paccheri": {
+      "extraction": {
+        "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "quantity": 24,
+        "unit": null
+      },
+      "invoice_items": {
+        "id": "728517aa-8578-4f6f-a415-aae06f05f5c4",
+        "quantity": 24,
+        "unit": null
+      },
+      "purchaseFormat": {
+        "kind": "weight_or_volume",
+        "purchaseContainerCount": 24,
+        "purchaseContainerUnit": "g",
+        "packageQuantity": 500,
+        "packageMeasurementUnit": "g",
+        "normalizedUsableQuantity": 12000,
+        "usableQuantityUnit": "g"
+      },
+      "stockNormalization": {
+        "pipelineId": "unified",
+        "reason": "purchase structure (bare_measure); purchase structure (bare_measure)"
+      },
+      "ingredientPersistence": {
+        "procurement": {
+          "current_price": 2.1,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "structuredFields": {
+          "purchase_quantity": 12000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "catalog": {
+          "id": "d7fcbb41-4e19-47ee-bbea-058e7b44a040",
+          "name": "Paccheri lisci",
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "current_price": 2.1
+        }
+      },
+      "purchaseHistory": {
+        "purchaseQuantityLabel": "24",
+        "priceHistoryRows": [
+          {
+            "id": "d35170c1-d94e-49d5-ac45-1871e00bd98b",
+            "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+            "new_price": 2.1,
+            "created_at": "2026-05-19T12:00:00+00:00"
+          }
+        ]
+      },
+      "ingredientDetailQuery": {
+        "usesIngredientPurchaseUnit": false,
+        "usesInvoiceItemQuantityUnit": true,
+        "purchaseQuantityLabelSource": "formatRowPurchaseQuantityLabel(metadata)"
+      },
+      "ingredientDetailUI": {
+        "lastPurchase": "24",
+        "lines": [
+          {
+            "label": "Last Purchase",
+            "value": "24"
+          }
+        ]
+      },
+      "invoiceReviewUI": {
+        "purchaseQuantityLine": "24",
+        "purchasePriceLine": "€2.10 · €50.40 total",
+        "normalizedLine": "12 kg usable",
+        "usableCostLine": "€4.20 / kg usable"
+      }
+    },
+    "ginger-beer": {
+      "extraction": {
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 24,
+        "unit": null
+      },
+      "invoice_items": {
+        "id": "634a418b-1509-42a9-bf01-563705967b6f",
+        "quantity": 24,
+        "unit": null
+      },
+      "purchaseFormat": {
+        "kind": "weight_or_volume",
+        "purchaseContainerCount": 24,
+        "purchaseContainerUnit": "cl",
+        "packageQuantity": 20,
+        "packageMeasurementUnit": "cl",
+        "normalizedUsableQuantity": 4800,
+        "usableQuantityUnit": "ml"
+      },
+      "stockNormalization": {
+        "pipelineId": "unified",
+        "reason": "purchase structure (bare_measure); purchase structure (bare_measure)"
+      },
+      "ingredientPersistence": {
+        "procurement": {
+          "current_price": 0.81,
+          "purchase_quantity": 200,
+          "purchase_unit": "ml",
+          "base_unit": "ml",
+          "unit": "ml",
+          "includeCatalogUnitFields": false
+        },
+        "structuredFields": {
+          "purchase_quantity": 4800,
+          "purchase_unit": "ml",
+          "base_unit": "ml"
+        },
+        "catalog": {
+          "id": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+          "name": "Ginger beer",
+          "purchase_quantity": 2,
+          "purchase_unit": "ml",
+          "base_unit": "ml",
+          "unit": "ml",
+          "current_price": 10.85
+        }
+      },
+      "purchaseHistory": {
+        "purchaseQuantityLabel": "24",
+        "priceHistoryRows": []
+      },
+      "ingredientDetailQuery": {
+        "usesIngredientPurchaseUnit": false,
+        "usesInvoiceItemQuantityUnit": true,
+        "purchaseQuantityLabelSource": "formatRowPurchaseQuantityLabel(metadata)"
+      },
+      "ingredientDetailUI": {
+        "lastPurchase": "24",
+        "lines": [
+          {
+            "label": "Last Purchase",
+            "value": "24"
+          }
+        ]
+      },
+      "invoiceReviewUI": {
+        "purchaseQuantityLine": "24",
+        "purchasePriceLine": "€0.81 · €19.38 total",
+        "normalizedLine": "4.8 L usable",
+        "usableCostLine": "€4.05 / L usable"
+      }
+    },
+    "peroni": {
+      "extraction": {
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit": "un"
+      },
+      "invoice_items": {
+        "id": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+        "quantity": 24,
+        "unit": "un"
+      },
+      "purchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 24,
+        "purchaseContainerUnit": "un",
+        "packageQuantity": 33,
+        "packageMeasurementUnit": "cl",
+        "normalizedUsableQuantity": 7920,
+        "usableQuantityUnit": "ml"
+      },
+      "stockNormalization": {
+        "pipelineId": "unified",
+        "reason": "purchase structure (size_count); purchase structure (size_count)"
+      },
+      "ingredientPersistence": {
+        "procurement": {
+          "current_price": 1.07,
+          "purchase_quantity": 24,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "structuredFields": {
+          "purchase_quantity": 24,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "catalog": {
+          "id": "70f5a744-839c-4def-8252-52aaf7529b4b",
+          "name": "Peroni nastro azzurro 33cl",
+          "purchase_quantity": 24,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "current_price": 1.07
+        }
+      },
+      "purchaseHistory": {
+        "purchaseQuantityLabel": "24 un",
+        "priceHistoryRows": [
+          {
+            "id": "7d6b70fa-543f-41c2-89e5-2b691afcdff4",
+            "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+            "new_price": 0.0001351010101010101,
+            "created_at": "2026-05-19T12:00:00+00:00"
+          }
+        ]
+      },
+      "ingredientDetailQuery": {
+        "usesIngredientPurchaseUnit": false,
+        "usesInvoiceItemQuantityUnit": true,
+        "purchaseQuantityLabelSource": "formatRowPurchaseQuantityLabel(metadata)"
+      },
+      "ingredientDetailUI": {
+        "lastPurchase": "24 un",
+        "lines": [
+          {
+            "label": "Last Purchase",
+            "value": "24 un"
+          }
+        ]
+      },
+      "invoiceReviewUI": {
+        "purchaseQuantityLine": "24 un · 24 × 33 cl",
+        "purchasePriceLine": "€1.07 / bottle · €25.69 total",
+        "normalizedLine": "7.92 L usable",
+        "usableCostLine": "€3.24 / L usable"
+      }
+    },
+    "pellegrino": {
+      "extraction": {
+        "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "quantity": 2,
+        "unit": "un"
+      },
+      "invoice_items": {
+        "id": "ef25be0f-f153-40de-b377-25151d147637",
+        "quantity": 2,
+        "unit": "un"
+      },
+      "purchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 15,
+        "purchaseContainerUnit": "un",
+        "packageQuantity": 75,
+        "packageMeasurementUnit": "cl",
+        "normalizedUsableQuantity": 22500,
+        "usableQuantityUnit": "ml"
+      },
+      "stockNormalization": {
+        "pipelineId": "unified",
+        "reason": "purchase structure (size_count); purchase structure (size_count)"
+      },
+      "ingredientPersistence": {
+        "procurement": {
+          "current_price": 20.97,
+          "purchase_quantity": 15,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "structuredFields": {
+          "purchase_quantity": 15,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "catalog": {
+          "id": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+          "name": "Água san pellegrino",
+          "purchase_quantity": 15,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "current_price": 19.28
+        }
+      },
+      "purchaseHistory": {
+        "purchaseQuantityLabel": "2 un",
+        "priceHistoryRows": [
+          {
+            "id": "4a00605a-a9e7-4b93-969b-92e5aae8e714",
+            "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+            "new_price": 0.0017137777777777778,
+            "created_at": "2026-05-19T12:00:00+00:00"
+          },
+          {
+            "id": "4bd5e0f1-8579-4726-9b1b-9c4a53e188a7",
+            "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+            "new_price": 0.001864,
+            "created_at": "2026-05-08T12:00:00+00:00"
+          }
+        ]
+      },
+      "ingredientDetailQuery": {
+        "usesIngredientPurchaseUnit": false,
+        "usesInvoiceItemQuantityUnit": true,
+        "purchaseQuantityLabelSource": "formatRowPurchaseQuantityLabel(metadata)"
+      },
+      "ingredientDetailUI": {
+        "lastPurchase": "2 un",
+        "lines": [
+          {
+            "label": "Last Purchase",
+            "value": "2 un"
+          }
+        ]
+      },
+      "invoiceReviewUI": {
+        "purchaseQuantityLine": "2 un · 15 × 75 cl",
+        "purchasePriceLine": "€20.97 / case · €42.07 total",
+        "normalizedLine": "22.5 L usable",
+        "usableCostLine": "€1.86 / L usable"
+      }
+    },
+    "acucar": {
+      "extraction": {
+        "name": "Açúcar Branco Metro Chef 10x1Kg",
+        "quantity": 1,
+        "unit": "cx"
+      },
+      "invoice_items": {
+        "id": "693004ee-b902-4e18-8442-5d488e175e42",
+        "quantity": 1,
+        "unit": "cx"
+      },
+      "purchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 10,
+        "purchaseContainerUnit": "kg",
+        "packageQuantity": 1,
+        "packageMeasurementUnit": "kg",
+        "normalizedUsableQuantity": 10000,
+        "usableQuantityUnit": "g"
+      },
+      "stockNormalization": {
+        "pipelineId": "unified",
+        "reason": "purchase structure (count_size); purchase structure (count_size)"
+      },
+      "ingredientPersistence": {
+        "procurement": {
+          "current_price": 9.29,
+          "purchase_quantity": 10,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "structuredFields": {
+          "purchase_quantity": 10,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "catalog": {
+          "id": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+          "name": "Açúcar branco",
+          "purchase_quantity": 10,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "current_price": 9.29
+        }
+      },
+      "purchaseHistory": {
+        "purchaseQuantityLabel": "1 case",
+        "priceHistoryRows": [
+          {
+            "id": "1d9d5133-724b-461c-b141-605392f2b64d",
+            "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+            "new_price": 0.999,
+            "created_at": "2026-05-19T12:00:00+00:00"
+          },
+          {
+            "id": "73df8387-6906-4341-8e33-0864f70f502a",
+            "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+            "new_price": 0.9289999999999999,
+            "created_at": "2026-04-17T12:00:00+00:00"
+          }
+        ]
+      },
+      "ingredientDetailQuery": {
+        "usesIngredientPurchaseUnit": false,
+        "usesInvoiceItemQuantityUnit": true,
+        "purchaseQuantityLabelSource": "formatRowPurchaseQuantityLabel(metadata)"
+      },
+      "ingredientDetailUI": {
+        "lastPurchase": "1 case",
+        "lines": [
+          {
+            "label": "Last Purchase",
+            "value": "1 case"
+          }
+        ]
+      },
+      "invoiceReviewUI": {
+        "purchaseQuantityLine": "1 case · 10 × 1 kg",
+        "purchasePriceLine": "€9.29 / case",
+        "normalizedLine": "10 kg usable",
+        "usableCostLine": "€0.929 / kg usable"
+      }
+    },
+    "pomodori": {
+      "extraction": {
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "un"
+      },
+      "invoice_items": {
+        "id": "9a52cc46-1c5a-4798-9621-d06177e04208",
+        "quantity": 1,
+        "unit": "un"
+      },
+      "purchaseFormat": {
+        "kind": "multi_unit_pack",
+        "purchaseContainerCount": 6,
+        "purchaseContainerUnit": "un",
+        "packageQuantity": 2.5,
+        "packageMeasurementUnit": "kg",
+        "normalizedUsableQuantity": 15000,
+        "usableQuantityUnit": "g"
+      },
+      "stockNormalization": {
+        "pipelineId": "unified",
+        "reason": "purchase structure (size_count); purchase structure (size_count)"
+      },
+      "ingredientPersistence": {
+        "procurement": {
+          "current_price": 22.05,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "structuredFields": {
+          "purchase_quantity": 6,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "catalog": {
+          "id": "52f7bf70-eeca-4039-987d-241b35248119",
+          "name": "Pomodori pelati",
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "current_price": 22.05
+        }
+      },
+      "purchaseHistory": {
+        "purchaseQuantityLabel": "1 un",
+        "priceHistoryRows": [
+          {
+            "id": "ca320e47-4677-49e7-8b39-eb73f02bb314",
+            "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+            "new_price": 22.05,
+            "created_at": "2026-05-08T12:00:00+00:00"
+          }
+        ]
+      },
+      "ingredientDetailQuery": {
+        "usesIngredientPurchaseUnit": false,
+        "usesInvoiceItemQuantityUnit": true,
+        "purchaseQuantityLabelSource": "formatRowPurchaseQuantityLabel(metadata)"
+      },
+      "ingredientDetailUI": {
+        "lastPurchase": "1 un",
+        "lines": [
+          {
+            "label": "Last Purchase",
+            "value": "1 un"
+          }
+        ]
+      },
+      "invoiceReviewUI": {
+        "purchaseQuantityLine": "1 un · 6 × 2.5 kg",
+        "purchasePriceLine": "€22.05 / case",
+        "normalizedLine": "15 kg usable",
+        "usableCostLine": "€1.47 / kg usable"
+      }
+    }
+  },
+  "answers": {
+    "q1_paccheri_purchaseUnit_in_db": true,
+    "q2_ginger_purchaseUnit_in_db": true,
+    "q3_ingredient_detail_fetches_purchaseUnit": false,
+    "q4_purchaseUnit_discarded_before_ui": true,
+    "q5_ui_intentionally_quantity_only_when_unit_null": true,
+    "q6_first_stage_unit_disappears": "invoice_items.unit is null at persistence for Paccheri/Ginger Beer (Emporio May 2026); formatRowPurchaseQuantityLabel omits unit when metadata.unit is empty",
+    "q7_classification": "D) Mixed — DATA_LOSS at invoice_items.unit persistence for affected rows; UI correctly reflects missing unit via formatRowPurchaseQuantityLabel fallback to bare quantity",
+    "verdict": "Mixed"
+  },
+  "crossCheck": {
+    "summary": "Invoice Review combines rowQuantityLabel + purchasedPackDetail (e.g. '2 cases · 15 × 75 cl'). Ingredient Detail Last Purchase uses only formatRowPurchaseQuantityLabel (row qty + invoice_items.unit). Rows with null unit show bare quantity; rows with cx/lata/un show container nouns or unit suffix.",
+    "richDisplayProducts": [
+      "pellegrino",
+      "acucar",
+      "pomodori"
+    ],
+    "bareQuantityProducts": [
+      "paccheri",
+      "ginger-beer"
+    ]
+  }
+}

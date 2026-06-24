@@ -1,0 +1,193 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "auditedAt": "2026-06-24T00:13:31.834Z",
+  "mode": "STRICT_READ_ONLY",
+  "product": "Salada Ibérica FSTK EMB. 250g",
+  "verdict": "A",
+  "verdictRationale": "Operational Cost display label is wrong (shows 'case' instead of €/kg or pack-equivalent weight cost), but recipe costing uses correct gram-based denominator (€2.19/250g). Numeric €2.19 matches pack price — suffix 'case' is the bug, not the persisted cost basis.",
+  "architectureQuestion": {
+    "intendedOperationalUnitForEmb250g": "Weight-normalized: internal g (cost_base_unit), display €/kg; NOT case. Pack is procurement only.",
+    "recipeShouldConsume": "B) grams (or C) kg in recipe UI — RECIPE_USAGE_UNIT_OPTIONS = [ml, L, g, kg, un]; weight-family EMB rows persist purchase_quantity in grams per pack",
+    "evidence": [
+      "recipeOperationalCostFieldsFromInvoiceLine returns cost_base_unit=g, purchase_quantity=250 for Salada",
+      "inferUnitFamily('em', { usableQuantityUnit: 'g' }) = 'weight' because em ∉ COUNTABLE_ROW_UNITS",
+      "computeEffectiveUsableCost short-circuits to { unit: 'case' } via isCaseRowWithEmbeddedPieceWeightOnly — display-only path",
+      "effectiveIngredientUnitCostEur = current_price / purchase_quantity = 2.19/250 = €0.00876/g"
+    ]
+  },
+  "recipe100gAnswer": {
+    "question": "If a recipe uses 100g of Salada Ibérica, what operational cost model is Marginly intending to apply?",
+    "model": "Gram-denominated operational cost: lineCost = 100 × (current_price / purchase_quantity)",
+    "calculation": 0.876,
+    "unitCostPerG": 0.00876,
+    "unitCostPerKgDisplay": "€8.76/kg",
+    "persistedFields": {
+      "current_price": 2.19,
+      "purchase_quantity": 250,
+      "cost_base_unit": "g"
+    },
+    "notCaseModel": "Recipe does NOT charge €2.19/case × (100g/250g); it uses €/g from purchase_quantity denominator"
+  },
+  "architectureTable": {
+    "purchaseUnit": {
+      "current": "pack (invoice row unit `em`, qty 4 → '4 packs')",
+      "intended": "pack — invoice procurement unit is the priced container (EM = embalagem/pack); formatRowPurchaseQuantityLabel maps em → pack"
+    },
+    "procurementUnit": {
+      "current": "pack (€2.19 / pack via resolvePriceSuffix em→pack)",
+      "intended": "pack — procurement display reflects what was paid per invoice line container (ROW_UNIT_PRICE_SUFFIX['em'] = 'pack')"
+    },
+    "operationalUnit": {
+      "current": "case (display: €2.19 / case via isCaseRowWithEmbeddedPieceWeightOnly shortcut)",
+      "intended": "kg (display) / g (internal cost_base_unit) — weight-family EMB products with embedded g should derive €/kg operational display from pack price ÷ usable grams; recipe layer persists cost_base_unit=g, purchase_quantity=250"
+    },
+    "recipeConsumptionUnit": {
+      "current": "g (RECIPE_USAGE_UNIT_OPTIONS includes g/kg; persisted purchase_quantity=250, cost_base_unit=g)",
+      "intended": "g (or kg in UI) — recipe costing uses effectiveIngredientUnitCostEur = current_price / purchase_quantity with gram denominator for weight-family pack rows"
+    }
+  },
+  "saladaIngredient": {
+    "id": "47cd8362-79f4-4285-8491-f016229eaa21",
+    "name": "Salada ibérica",
+    "current_price": 2.19,
+    "purchase_quantity": 250,
+    "purchase_unit": "g",
+    "base_unit": "g",
+    "unit": "g",
+    "normalized_name": "salada iberica",
+    "supplier": null
+  },
+  "saladaItem": {
+    "id": "593e7560-ba2a-4c60-8300-ff34a26335b9",
+    "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+    "name": "Salada Ibérica FSTK EMB. 250g",
+    "quantity": 4,
+    "unit": "em",
+    "unit_price": 2.19,
+    "total": 8.76,
+    "created_at": "2026-06-20T01:24:45.305604+00:00"
+  },
+  "saladaTrace": {
+    "pipeline": {
+      "purchase_quantity": 250,
+      "purchase_unit": "g",
+      "usable_quantity": 250,
+      "usable_unit": "g",
+      "current_price": 2.19,
+      "cost_base_unit": "g",
+      "effectiveUsableCost": {
+        "cost": 2.19,
+        "unit": "case"
+      },
+      "hypotheticalKgOperational": {
+        "cost": 8.76,
+        "unit": "kg"
+      },
+      "procurementDisplay": "€2.19 / pack",
+      "operationalDisplay": "€2.19 / case",
+      "isCaseRowWithEmbeddedPieceWeightOnly": true,
+      "unitFamily": "weight"
+    },
+    "detailPresentation": {
+      "lastPurchase": "4 packs",
+      "procurementCost": "€2.19 / pack",
+      "operationalCost": "€2.19 / case",
+      "totalPaid": "€8.76",
+      "supplier": null,
+      "purchaseDate": null,
+      "lines": [
+        {
+          "label": "Last Purchase",
+          "value": "4 packs"
+        },
+        {
+          "label": "Procurement Cost",
+          "value": "€2.19 / pack"
+        },
+        {
+          "label": "Operational Cost",
+          "value": "€2.19 / case"
+        },
+        {
+          "label": "Total Paid",
+          "value": "€8.76"
+        }
+      ]
+    },
+    "persistFields": {
+      "current_price": 2.19,
+      "purchase_quantity": 250,
+      "cost_base_unit": "g"
+    },
+    "recipeFields": {
+      "current_price": 2.19,
+      "purchase_quantity": 250,
+      "cost_base_unit": "g"
+    }
+  },
+  "saladaRecipes": [],
+  "similarProducts": [
+    {
+      "product": "Manteiga Coimbra s/Sal EMB 1 Kg",
+      "invoiceItemId": "e1fcc019-499b-46a9-a99e-e5b51a7578db",
+      "invoiceQtyUnit": "8 / kg",
+      "procurementDisplay": "€8.90 / kg",
+      "operationalDisplay": "€8.90 / kg",
+      "usableQuantity": "1000 g",
+      "isCasePieceWeight": false,
+      "recipeCostBaseUnit": "g",
+      "purchaseQuantity": 1000,
+      "unitFamily": "weight",
+      "embeddedWeight": "1 Kg"
+    },
+    {
+      "product": "Salada Ibérica FSTK EMB. 250g",
+      "invoiceItemId": "593e7560-ba2a-4c60-8300-ff34a26335b9",
+      "invoiceQtyUnit": "4 / em",
+      "procurementDisplay": "€2.19 / pack",
+      "operationalDisplay": "€2.19 / case",
+      "usableQuantity": "250 g",
+      "isCasePieceWeight": true,
+      "recipeCostBaseUnit": "g",
+      "purchaseQuantity": 250,
+      "unitFamily": "weight",
+      "embeddedWeight": "250g"
+    }
+  ],
+  "saladaOutlierAnalysis": {
+    "totalSimilar": 2,
+    "sameCaseOperationalLabel": 1,
+    "kgOperationalLabel": 1,
+    "nullOperational": 0,
+    "packProcurement": 1,
+    "gramRecipeBase": 2,
+    "saladaIsOutlierOnVl": true,
+    "note": "Only Salada (em pack + embedded g) hits case shortcut on VL; Manteiga EMB uses kg row unit"
+  },
+  "fullPipelineTrace": [
+    { "stage": "invoice_item (DB)", "quantity": 4, "unit": "em", "unit_price": 2.19, "total": 8.76 },
+    { "stage": "parsePurchaseStructureFromText", "tier": "bare_measure", "matchedText": "250g", "unitSize": 250, "unitMeasurement": "g" },
+    { "stage": "computeUsableFromPurchaseStructure", "usableQuantity": 250, "usableUnit": "g", "usableSource": "structure_total" },
+    { "stage": "resolveInvoiceLinePurchaseFormat", "normalizedUsableQuantity": 250, "usableQuantityUnit": "g", "kind": "weight_or_volume" },
+    { "stage": "isCaseRowWithEmbeddedPieceWeightOnly", "result": true },
+    { "stage": "resolveUsablePerPricedUnit", "perUnit": { "amount": 250, "unit": "g" } },
+    { "stage": "computeEffectiveUsableCost", "effective": { "cost": 2.19, "unit": "case" } },
+    { "stage": "resolveInvoiceLinePricingPresentation", "priceDisplay": "€2.19 / pack", "effectiveUsableCostLabel": "€2.19 / case" },
+    { "stage": "operationalCostFieldsFromInvoiceLine", "fields": { "current_price": 2.19, "purchase_quantity": 250, "cost_base_unit": "g" } },
+    { "stage": "recipeOperationalCostFieldsFromInvoiceLine", "fields": { "current_price": 2.19, "purchase_quantity": 250, "cost_base_unit": "g" } }
+  ],
+  "bugClassification": {
+    "1_wrong_label": true,
+    "2_wrong_operational_unit": "partial — display only",
+    "3_wrong_cost_basis": false,
+    "4_expected_architecture": false
+  },
+  "codeReferences": {
+    "isCaseRowWithEmbeddedPieceWeightOnly": "src/lib/invoice-purchase-format.ts:213-224",
+    "computeEffectiveUsableCostCaseShortcut": "src/lib/invoice-purchase-price-semantics.ts:522-524",
+    "recipeOperationalCostFieldsFromInvoiceLine": "src/lib/invoice-purchase-price-semantics.ts:657-715",
+    "effectiveIngredientUnitCostEur": "src/lib/ingredient-unit-cost.ts:108-110",
+    "ingredientLineCostEur": "src/lib/recipe-prep-cost.ts:205+",
+    "inferUnitFamilyEmWeight": "src/lib/recipe-unit-normalization.ts:64-86 (em + usableQuantityUnit g → weight)"
+  }
+}

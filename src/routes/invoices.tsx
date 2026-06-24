@@ -653,7 +653,7 @@ const formatPackSize = (inferred: UnitInferenceResult) => {
   return formatOperationalQuantityWithUnit(inferred.pack_size, inferred.pack_size_unit);
 };
 
-const resolveInvoiceItemUnit = (item: Pick<ItemRow, "name" | "unit">) =>
+const resolveInvoiceItemUnit = (item: Pick<ItemRow, "name" | "unit" | "quantity">) =>
   resolveInvoicePersistedItemUnit(item, isGenericUnit);
 
 const pickUnitTracePayload = (item: {
@@ -694,7 +694,11 @@ const traceUnitResolveForAllItems = (items: ItemRow[], extra?: Record<string, un
     const name = String(it.name ?? "Unknown");
     const fields = pickUnitTracePayload({ name, quantity: it.quantity, unit: it.unit });
     console.debug("[UNIT_TRACE] RESOLVE_INPUT", { index, ...fields, ...extra });
-    const resolvedUnit = resolveInvoiceItemUnit({ name, unit: it.unit });
+    const resolvedUnit = resolveInvoiceItemUnit({
+      name,
+      quantity: it.quantity,
+      unit: it.unit,
+    });
     console.debug("[UNIT_TRACE] RESOLVE_OUTPUT", {
       index,
       ...fields,
@@ -1445,7 +1449,11 @@ function InvoicesPage() {
       traceUnitResolveForAllItems(normalizedItems, { invoiceId });
       const insertRows = normalizedItems.map((it: ItemRow) => {
         const name = String(it.name ?? "Unknown");
-        const unit = resolveInvoiceItemUnit({ name, unit: it.unit });
+        const unit = resolveInvoiceItemUnit({
+          name,
+          quantity: it.quantity,
+          unit: it.unit,
+        });
         return {
           invoice_id: invoiceId,
           user_id: user.id,
@@ -1487,7 +1495,11 @@ function InvoicesPage() {
           return {
             name,
             quantity: it.quantity ?? null,
-            unit: resolveInvoiceItemUnit({ name, unit: it.unit }),
+            unit: resolveInvoiceItemUnit({
+              name,
+              quantity: it.quantity,
+              unit: it.unit,
+            }),
             unit_price: it.unit_price ?? null,
             total: it.total ?? null,
             supplierName: supplierForSync,

@@ -1,0 +1,270 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T02:15:25.592Z",
+  "verdict": "A) Safe to merge",
+  "comparisonRule": {
+    "collapseWhenAllTrue": [
+      "usable quantity == purchase quantity (normalized to g/ml/un base)",
+      "operational unit == procurement unit (price suffix)",
+      "effective operational cost == procurement unit_price (±0.005)"
+    ],
+    "specialCase": "When usableStockLabel is null but cost+unit match (Angus case shortcut), collapse operational block.",
+    "implementation": "shouldCollapseInvoiceOperationalDisplay in invoice-purchase-price-semantics.ts"
+  },
+  "filesChanged": [
+    "src/lib/invoice-purchase-price-semantics.ts",
+    "src/lib/invoice-purchase-price-semantics.test.ts"
+  ],
+  "blastRadius": {
+    "scope": "Invoice Review presentation only (InvoiceNormalizationCardCell via resolveInvoiceLinePricingPresentation)",
+    "unchanged": [
+      "persistence",
+      "recipe costing",
+      "ingredient detail modal",
+      "computeEffectiveUsableCost",
+      "recipeOperationalCostFieldsFromInvoiceLine"
+    ]
+  },
+  "regressionMatrix": [
+    {
+      "id": "A-pera",
+      "product": "Pêra Abacate Hasse",
+      "designCase": "A",
+      "mustCollapse": true,
+      "before": {
+        "normalizedLine": "3.28 kg usable",
+        "usableCostLine": "€4.26 / kg usable"
+      },
+      "after": {
+        "card": {
+          "purchaseQuantityLine": "3.28 kg",
+          "purchasePriceLine": "€4.26 / kg · €13.96 total",
+          "normalizedLine": null,
+          "usableCostLine": null
+        },
+        "priceDisplay": "€4.26 / kg",
+        "effectiveUsableCostLabel": "€4.26 / kg",
+        "collapsed": true,
+        "collapseRule": true
+      },
+      "pass": true
+    },
+    {
+      "id": "B-salada",
+      "product": "Salada Ibérica",
+      "designCase": "B",
+      "mustCollapse": false,
+      "before": {
+        "normalizedLine": "250 g usable",
+        "usableCostLine": "€8.76 / kg usable"
+      },
+      "after": {
+        "card": {
+          "purchaseQuantityLine": "4 packs",
+          "purchasePriceLine": "€2.19 / pack · €8.76 total",
+          "normalizedLine": "250 g usable",
+          "usableCostLine": "€8.76 / kg usable"
+        },
+        "priceDisplay": "€2.19 / pack",
+        "effectiveUsableCostLabel": "€8.76 / kg",
+        "collapsed": false,
+        "collapseRule": false
+      },
+      "pass": true
+    },
+    {
+      "id": "C-ovo",
+      "product": "Ovo classe M",
+      "designCase": "C",
+      "mustCollapse": false,
+      "before": {
+        "normalizedLine": "180 un usable",
+        "usableCostLine": "€0.2136 / egg usable"
+      },
+      "after": {
+        "card": {
+          "purchaseQuantityLine": "1 case",
+          "purchasePriceLine": "€38.44 / case",
+          "normalizedLine": "180 un usable",
+          "usableCostLine": "€0.2136 / egg usable"
+        },
+        "priceDisplay": "€38.44 / case",
+        "effectiveUsableCostLabel": "€0.2136 / egg",
+        "collapsed": false,
+        "collapseRule": false
+      },
+      "pass": true
+    },
+    {
+      "id": "D-tomilho",
+      "product": "Tomilho",
+      "designCase": "D",
+      "mustCollapse": false,
+      "before": {
+        "normalizedLine": "100 g usable",
+        "usableCostLine": "€20.60 / kg usable"
+      },
+      "after": {
+        "card": {
+          "purchaseQuantityLine": "1 bunch",
+          "purchasePriceLine": "€2.06 / bunch",
+          "normalizedLine": "100 g usable",
+          "usableCostLine": "€20.60 / kg usable"
+        },
+        "priceDisplay": "€2.06 / bunch",
+        "effectiveUsableCostLabel": "€20.60 / kg",
+        "collapsed": false,
+        "collapseRule": false
+      },
+      "pass": true
+    },
+    {
+      "id": "E-manjericao",
+      "product": "Manjericão",
+      "designCase": "E",
+      "mustCollapse": false,
+      "before": {
+        "normalizedLine": "500 g usable",
+        "usableCostLine": "€20.60 / kg usable"
+      },
+      "after": {
+        "card": {
+          "purchaseQuantityLine": "5 bunches",
+          "purchasePriceLine": "€2.06 / bunch · €10.28 total",
+          "normalizedLine": "500 g usable",
+          "usableCostLine": "€20.60 / kg usable"
+        },
+        "priceDisplay": "€2.06 / bunch",
+        "effectiveUsableCostLabel": "€20.60 / kg",
+        "collapsed": false,
+        "collapseRule": false
+      },
+      "pass": true
+    },
+    {
+      "id": "same-unit-hortela",
+      "product": "Hortelã (kg row)",
+      "designCase": null,
+      "mustCollapse": true,
+      "before": {
+        "normalizedLine": "500 g usable",
+        "usableCostLine": "€6.74 / kg usable"
+      },
+      "after": {
+        "card": {
+          "purchaseQuantityLine": "0.50 kg",
+          "purchasePriceLine": "€6.74 / kg",
+          "normalizedLine": null,
+          "usableCostLine": null
+        },
+        "priceDisplay": "€6.74 / kg",
+        "effectiveUsableCostLabel": "€6.74 / kg",
+        "collapsed": true,
+        "collapseRule": true
+      },
+      "pass": true
+    },
+    {
+      "id": "angus-case",
+      "product": "Angus burger case",
+      "designCase": null,
+      "mustCollapse": false,
+      "before": {
+        "normalizedLine": "7.2 kg usable",
+        "usableCostLine": "€6.39 / kg usable"
+      },
+      "after": {
+        "card": {
+          "purchaseQuantityLine": "2 cases · 40 × 180 g",
+          "purchasePriceLine": "€46.00 / case · €92.00 total",
+          "normalizedLine": "7.2 kg usable",
+          "usableCostLine": "€6.39 / kg usable"
+        },
+        "priceDisplay": "€46.00 / case",
+        "effectiveUsableCostLabel": "€6.39 / kg",
+        "collapsed": false,
+        "collapseRule": false
+      },
+      "pass": true
+    },
+    {
+      "id": "angus-shortcut",
+      "product": "Angus case shortcut",
+      "designCase": null,
+      "mustCollapse": true,
+      "before": {
+        "normalizedLine": null,
+        "usableCostLine": "€24.90 / case usable"
+      },
+      "after": {
+        "card": {
+          "purchaseQuantityLine": "1 case",
+          "purchasePriceLine": "€24.90 / case",
+          "normalizedLine": null,
+          "usableCostLine": null
+        },
+        "priceDisplay": "€24.90 / case",
+        "effectiveUsableCostLabel": "€24.90 / case",
+        "collapsed": true,
+        "collapseRule": true
+      },
+      "pass": true
+    },
+    {
+      "id": "bac-strk",
+      "product": "BAC STRK (unit vs kg)",
+      "designCase": null,
+      "mustCollapse": false,
+      "before": {
+        "normalizedLine": "6 kg usable",
+        "usableCostLine": "€8.95 / kg usable"
+      },
+      "after": {
+        "card": {
+          "purchaseQuantityLine": "6 un · 6 × 1 kg",
+          "purchasePriceLine": "€8.95 / unit · €53.70 total",
+          "normalizedLine": "6 kg usable",
+          "usableCostLine": "€8.95 / kg usable"
+        },
+        "priceDisplay": "€8.95 / unit",
+        "effectiveUsableCostLabel": "€8.95 / kg",
+        "collapsed": false,
+        "collapseRule": false
+      },
+      "pass": true
+    },
+    {
+      "id": "batata-name-2kg",
+      "product": "BATATA PALHA 2KG (row 1 kg, usable 2 kg)",
+      "designCase": null,
+      "mustCollapse": false,
+      "before": {
+        "normalizedLine": "2 kg usable",
+        "usableCostLine": "€14.50 / kg usable"
+      },
+      "after": {
+        "card": {
+          "purchaseQuantityLine": "1 kg",
+          "purchasePriceLine": "€14.50 / kg",
+          "normalizedLine": "2 kg usable",
+          "usableCostLine": "€14.50 / kg usable"
+        },
+        "priceDisplay": "€14.50 / kg",
+        "effectiveUsableCostLabel": "€14.50 / kg",
+        "collapsed": false,
+        "collapseRule": false
+      },
+      "pass": true
+    }
+  ],
+  "matrixSummary": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0
+  },
+  "tests": {
+    "suite": "invoice-purchase-price-semantics.test.ts",
+    "pass": true,
+    "excerpt": " Test Files  1 passed (1)\n      Tests  63 passed (63)\n   Start at  03:15:24\n   Duration  913ms (transform 399ms, setup 0ms, collect 495ms, tests 84ms, environment 0ms, prepare 64ms)\n\n"
+  }
+}

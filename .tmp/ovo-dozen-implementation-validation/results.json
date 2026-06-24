@@ -1,0 +1,191 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "validatedAt": "2026-06-24T00:48:01.767Z",
+  "mode": "IMPLEMENTATION_VALIDATION",
+  "product": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+  "changedFiles": [
+    "src/lib/stock-normalization.ts",
+    "src/lib/stock-normalization.test.ts"
+  ],
+  "beforeAfter": {
+    "ovo": {
+      "before": {
+        "parsePurchaseStructureFromText": null,
+        "purchase_quantity": 1,
+        "unitCostEur": 38.44,
+        "recipeCost1Egg": 38.44,
+        "recipeCost6Eggs": 230.64,
+        "recipeCost12Eggs": 461.28,
+        "structuredKind": "row_only",
+        "normalizedUsableQuantity": null
+      },
+      "after": {
+        "parsePurchaseStructureFromText": {
+          "purchaseQuantity": 1,
+          "purchaseFormat": "case",
+          "innerUnitCount": 15,
+          "innerUnitType": "dozen",
+          "unitSize": 12,
+          "unitMeasurement": "un",
+          "totalUsableAmount": 180,
+          "usableUnit": "un",
+          "tier": "caixa_dozen_count",
+          "matchedText": "Cx.15 dúzias",
+          "multiplierChain": {
+            "purchaseQuantity": 1,
+            "innerUnitCount": 15,
+            "unitSize": 12,
+            "unitMeasurement": "un",
+            "perItemBase": 12,
+            "usableUnit": "un",
+            "totalUsableAmount": 180,
+            "expression": "1 × 15 × 12 un"
+          }
+        },
+        "purchase_quantity": 180,
+        "persist_purchase_quantity": 180,
+        "unitCostEur": 0.21355555555555555,
+        "structuredKind": "multi_unit_pack",
+        "normalizedUsableQuantity": 180
+      }
+    }
+  },
+  "recipeReplay": {
+    "unitCostExpected": 0.21355555555555555,
+    "scenarios": [
+      {
+        "qty": 1,
+        "expected": 0.2136,
+        "actual": 0.21355555555555555
+      },
+      {
+        "qty": 6,
+        "expected": 1.28,
+        "actual": 1.2813333333333334
+      },
+      {
+        "qty": 12,
+        "expected": 2.56,
+        "actual": 2.562666666666667
+      }
+    ]
+  },
+  "ovoChecks": {
+    "parserNotNull": true,
+    "tier": true,
+    "totalUsableAmount": true,
+    "usableUnit": true,
+    "innerUnitCount": true,
+    "unitSize": true,
+    "purchase_quantity": true,
+    "persist_purchase_quantity": true,
+    "structuredKind": true,
+    "normalizedUsableQuantity": true,
+    "unitCostEur": true,
+    "recipeCost1Egg": true,
+    "recipeCost6Eggs": true,
+    "recipeCost12Eggs": true,
+    "unitsPerPack": true
+  },
+  "regressionMatrix": [
+    {
+      "product": "Peroni",
+      "name": "Birra Peroni 33cl*24",
+      "tier": "size_count",
+      "totalUsableAmount": 7920,
+      "structuredKind": "multi_unit_pack",
+      "purchase_quantity": 24,
+      "parserChanged": false
+    },
+    {
+      "product": "Pellegrino",
+      "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "tier": "size_count",
+      "totalUsableAmount": 11250,
+      "structuredKind": "multi_unit_pack",
+      "purchase_quantity": 15,
+      "parserChanged": false
+    },
+    {
+      "product": "Nata",
+      "name": "Nata para Culinaria 6x1L",
+      "tier": "count_size",
+      "totalUsableAmount": 6000,
+      "structuredKind": "multi_unit_pack",
+      "purchase_quantity": 6,
+      "parserChanged": false
+    },
+    {
+      "product": "Chocolate",
+      "name": "Chocolate Culinaria Pantagruel 10x200 g",
+      "tier": "count_size",
+      "totalUsableAmount": 2000,
+      "structuredKind": "multi_unit_pack",
+      "purchase_quantity": 10,
+      "parserChanged": false
+    },
+    {
+      "product": "Açúcar",
+      "name": "Açucar Branco 10x1 Kg",
+      "tier": "count_size",
+      "totalUsableAmount": 10000,
+      "structuredKind": "multi_unit_pack",
+      "purchase_quantity": 10,
+      "parserChanged": false
+    },
+    {
+      "product": "Mozzarella",
+      "name": "Mozzarella 125GR*8",
+      "tier": "size_count",
+      "totalUsableAmount": 1000,
+      "structuredKind": "multi_unit_pack",
+      "purchase_quantity": 8,
+      "parserChanged": false
+    },
+    {
+      "product": "Guanciale",
+      "name": "Guanciale 1,5kg*7",
+      "tier": "size_count",
+      "totalUsableAmount": 10500,
+      "structuredKind": "multi_unit_pack",
+      "purchase_quantity": 7,
+      "parserChanged": false
+    },
+    {
+      "product": "Ginger Beer",
+      "name": "Baladin Ginger Beer 0.20cl",
+      "tier": "bare_measure",
+      "totalUsableAmount": 200,
+      "structuredKind": "weight_or_volume",
+      "purchase_quantity": 24,
+      "parserChanged": false
+    },
+    {
+      "product": "Salada",
+      "name": "Salada Ibérica FSTK EMB. 250g",
+      "tier": "bare_measure",
+      "totalUsableAmount": 250,
+      "structuredKind": "weight_or_volume",
+      "purchase_quantity": 250,
+      "parserChanged": false
+    }
+  ],
+  "regressionUnchanged": true,
+  "blastRadius": {
+    "totalItems": 52,
+    "changedRows": [
+      {
+        "id": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+        "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+        "tierBefore": null,
+        "tierAfter": "caixa_dozen_count"
+      }
+    ]
+  },
+  "verdict": "A",
+  "verdictLabels": {
+    "A": "Safe to merge",
+    "B": "Needs adjustment",
+    "C": "Rejected"
+  }
+}

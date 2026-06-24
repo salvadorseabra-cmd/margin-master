@@ -1,0 +1,651 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "auditedAt": "2026-06-23T09:24:52.364Z",
+  "mode": "STRICT_READ_ONLY",
+  "verdict": {
+    "firstIncorrectStage": "GPT Pass C unit omission → resolveInvoicePersistedItemUnit fallback_null on weight_or_volume rows when OCR unit absent",
+    "classification": "D) Mixed — extraction variance + client resolver cannot infer un for embedded-measure countables without multipack name pattern",
+    "scope": "Paccheri Lisci + Ginger Beer on Emporio ab52796d; Peroni/Pellegrino/Pomodori/Açúcar preserve unit via multi_unit_pack inference or explicit OCR cx/un",
+    "readiness": "READY",
+    "ab52796dActualExtractUnit": null,
+    "reExtractVariance": "Frozen extracts MIXED: pass-c-raw returns unit=un; final-validation-lab-rerun v25 returns unit=null for Paccheri",
+    "resolvePreservesUnitWhenExtractHasUn": true,
+    "resolveNullWhenOcrNullPaccheriGinger": true,
+    "dbNull": true,
+    "historicalRegression": "17aa3591 (Jun 10) had unit=un for Paccheri/Ginger; ab52796d (re-inserted 2026-06-20) has unit=null",
+    "corroboration": ".tmp/discount-binding-root-cause-output.json paccheri_pipeline stage_3–7 unit:null through INSERT"
+  },
+  "answers": {
+    "q1_paccheri_unit_un_last_seen": "17aa3591 DB (Jun 10, unit=un); pass-c-raw re-extract (unit=un). NOT on ab52796d actual upload path (unit null from Pass C)",
+    "q2_ginger_unit_un_last_seen": "Same as Paccheri",
+    "q3_extraction_output_contains_unit": "ab52796d upload: NO (discount-binding stage_3 unit:null). Re-extracts: MIXED (v25 null, legacy un)",
+    "q4_post_processing_removes_unit": "NO — bindMonetaryColumns and normalizeInvoiceItemFields pass unit through; resolveInvoicePersistedItemUnit preserves un when extract supplies it",
+    "q5_insert_receives_unit": "Receives null for ab52796d Paccheri/Ginger because normalizedItems[].unit is null",
+    "q6_db_persist_null": "NULL explicitly inserted (insertRows.unit: null); schema allows null; no DB trigger strips unit",
+    "q7_why_peroni_survives": "multi_unit_pack name (33cl*24) infers un even when OCR null; Mammafiore extract also includes unit=un"
+  },
+  "comparisonTable": [
+    {
+      "product": "Paccheri Lisci",
+      "key": "paccheri",
+      "db": {
+        "invoiceItemId": "728517aa-8578-4f6f-a415-aae06f05f5c4",
+        "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "supplier": "Emporio Italia, Lda.",
+        "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "quantity": 24,
+        "unit": null,
+        "created_at": "2026-06-20T01:25:08.339203+00:00"
+      },
+      "emporioLiveRow": {
+        "id": "728517aa-8578-4f6f-a415-aae06f05f5c4",
+        "unit": null,
+        "quantity": 24
+      },
+      "historicalDeletedInvoice": {
+        "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 2.35,
+        "total": 50.2,
+        "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+        "created_at": "2026-06-10T18:27:15.828822+00:00"
+      },
+      "frozenExtractPrimary": {
+        "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 2.35,
+        "total": 50.2
+      },
+      "extractWouldInsertUnit": "un",
+      "dbWouldReinsertUnit": null,
+      "lastPurchaseLabel": "24",
+      "unitLostAt": "resolveInvoicePersistedItemUnit (would persist unit but DB null — stale/wipe path)",
+      "status": "DATA_LOSS"
+    },
+    {
+      "product": "Ginger Beer (Baladin)",
+      "key": "ginger-beer",
+      "db": {
+        "invoiceItemId": "634a418b-1509-42a9-bf01-563705967b6f",
+        "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "supplier": "Emporio Italia, Lda.",
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 24,
+        "unit": null,
+        "created_at": "2026-06-20T01:25:08.339203+00:00"
+      },
+      "emporioLiveRow": {
+        "id": "634a418b-1509-42a9-bf01-563705967b6f",
+        "unit": null,
+        "quantity": 24
+      },
+      "historicalDeletedInvoice": {
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 0.85,
+        "total": 19.38,
+        "invoice_id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+        "created_at": "2026-06-10T18:27:15.828822+00:00"
+      },
+      "frozenExtractPrimary": {
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 0.85,
+        "total": 19.38
+      },
+      "extractWouldInsertUnit": "un",
+      "dbWouldReinsertUnit": null,
+      "lastPurchaseLabel": "24",
+      "unitLostAt": "resolveInvoicePersistedItemUnit (would persist unit but DB null — stale/wipe path)",
+      "status": "DATA_LOSS"
+    },
+    {
+      "product": "Peroni Nastro Azzurro 33cl",
+      "key": "peroni",
+      "db": {
+        "invoiceItemId": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "supplier": "Mammafiore Portugal",
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit": "un",
+        "created_at": "2026-06-17T21:28:14.257398+00:00"
+      },
+      "emporioLiveRow": null,
+      "historicalDeletedInvoice": null,
+      "frozenExtractPrimary": null,
+      "extractWouldInsertUnit": null,
+      "dbWouldReinsertUnit": "un",
+      "lastPurchaseLabel": "24 un",
+      "unitLostAt": "none — unit preserved",
+      "status": "OK"
+    },
+    {
+      "product": "Pellegrino 75cl×15",
+      "key": "pellegrino",
+      "db": {
+        "invoiceItemId": "ef25be0f-f153-40de-b377-25151d147637",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "supplier": "Il Bocconcino Distribuição Alimentar",
+        "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "quantity": 2,
+        "unit": "un",
+        "created_at": "2026-06-23T01:27:04.369091+00:00"
+      },
+      "emporioLiveRow": {
+        "id": "9cdd22ba-051b-4422-a122-3e6a39e9ef8c",
+        "unit": "un",
+        "quantity": 2
+      },
+      "historicalDeletedInvoice": null,
+      "frozenExtractPrimary": {
+        "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 19.32,
+        "total": 38.65
+      },
+      "extractWouldInsertUnit": "cx",
+      "dbWouldReinsertUnit": "un",
+      "lastPurchaseLabel": "2 un",
+      "unitLostAt": "none — unit preserved",
+      "status": "OK"
+    },
+    {
+      "product": "Açúcar Branco 10x1kg",
+      "key": "acucar",
+      "db": {
+        "invoiceItemId": "693004ee-b902-4e18-8442-5d488e175e42",
+        "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+        "supplier": "Aviludo",
+        "name": "Açúcar Branco Metro Chef 10x1Kg",
+        "quantity": 1,
+        "unit": "cx",
+        "created_at": "2026-06-17T21:28:34.759823+00:00"
+      },
+      "emporioLiveRow": null,
+      "historicalDeletedInvoice": null,
+      "frozenExtractPrimary": null,
+      "extractWouldInsertUnit": null,
+      "dbWouldReinsertUnit": "cx",
+      "lastPurchaseLabel": "1 case",
+      "unitLostAt": "none — unit preserved",
+      "status": "OK"
+    },
+    {
+      "product": "Pomodori",
+      "key": "pomodori",
+      "db": {
+        "invoiceItemId": "9a52cc46-1c5a-4798-9621-d06177e04208",
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "supplier": "Il Bocconcino Distribuição Alimentar",
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "un",
+        "created_at": "2026-06-23T01:27:04.369091+00:00"
+      },
+      "emporioLiveRow": null,
+      "historicalDeletedInvoice": null,
+      "frozenExtractPrimary": null,
+      "extractWouldInsertUnit": null,
+      "dbWouldReinsertUnit": "un",
+      "lastPurchaseLabel": "1 un",
+      "unitLostAt": "none — unit preserved",
+      "status": "OK"
+    }
+  ],
+  "pipelineTraces": {
+    "paccheri": {
+      "stages": {
+        "1_gpt_pass_c": {
+          "unit": "un",
+          "quantity": 24,
+          "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g"
+        },
+        "2_monetary_binding": {
+          "unit": "un",
+          "quantity": 24
+        },
+        "3_normalizeInvoiceItemFields": {
+          "unit": "un"
+        },
+        "4_resolveInvoicePersistedItemUnit": {
+          "inputUnit": "un",
+          "outputUnit": "un",
+          "resolution": {
+            "unit": "un",
+            "source": "preserved_countable"
+          },
+          "structuredKind": "weight_or_volume",
+          "preserveCountable": "un"
+        },
+        "5_insert_payload": {
+          "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 2.35,
+          "total": 50.2
+        },
+        "6_db_persisted": {
+          "unit": null,
+          "quantity": 24
+        },
+        "7_ui_formatRowPurchaseQuantityLabel": "24"
+      },
+      "historicalComparison": {
+        "deletedInvoice17aa3591": {
+          "ocrUnit": "un",
+          "normalizedUnit": "un",
+          "resolvedInsertUnit": "un",
+          "purchaseUnitResolution": {
+            "unit": "un",
+            "source": "preserved_countable"
+          },
+          "structuredKind": "weight_or_volume",
+          "preserveCountableExtractedUnit": "un",
+          "insertPayload": {
+            "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+            "quantity": 24,
+            "unit": "un",
+            "unit_price": 2.35,
+            "total": 50.2
+          },
+          "rowLabel": "24 un"
+        },
+        "liveInvoiceAb52796d": {
+          "ocrUnit": null,
+          "normalizedUnit": null,
+          "resolvedInsertUnit": null,
+          "purchaseUnitResolution": {
+            "unit": null,
+            "source": "fallback_null"
+          },
+          "structuredKind": "weight_or_volume",
+          "preserveCountableExtractedUnit": null,
+          "insertPayload": {
+            "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+            "quantity": 24,
+            "unit": null,
+            "unit_price": 2.1,
+            "total": 50.4
+          },
+          "rowLabel": "24"
+        },
+        "unitRegression": "YES — unit lost on re-upload"
+      },
+      "allFrozenExtractUnits": {
+        ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json": {
+          "unit": "un",
+          "qty": 24
+        },
+        ".tmp/final-validation-lab-rerun/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json": {
+          "unit": null,
+          "qty": 24
+        },
+        ".tmp/emporio-footer-fix/emporio-italia-extract.json": {
+          "unit": "un",
+          "qty": 24
+        }
+      }
+    },
+    "ginger-beer": {
+      "stages": {
+        "1_gpt_pass_c": {
+          "unit": "un",
+          "quantity": 24,
+          "name": "Baladin - Ginger Beer 0.20cl"
+        },
+        "2_monetary_binding": {
+          "unit": "un",
+          "quantity": 24
+        },
+        "3_normalizeInvoiceItemFields": {
+          "unit": "un"
+        },
+        "4_resolveInvoicePersistedItemUnit": {
+          "inputUnit": "un",
+          "outputUnit": "un",
+          "resolution": {
+            "unit": "un",
+            "source": "preserved_countable"
+          },
+          "structuredKind": "weight_or_volume",
+          "preserveCountable": "un"
+        },
+        "5_insert_payload": {
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 0.85,
+          "total": 19.38
+        },
+        "6_db_persisted": {
+          "unit": null,
+          "quantity": 24
+        },
+        "7_ui_formatRowPurchaseQuantityLabel": "24"
+      },
+      "historicalComparison": {
+        "deletedInvoice17aa3591": {
+          "ocrUnit": "un",
+          "normalizedUnit": "un",
+          "resolvedInsertUnit": "un",
+          "purchaseUnitResolution": {
+            "unit": "un",
+            "source": "preserved_countable"
+          },
+          "structuredKind": "weight_or_volume",
+          "preserveCountableExtractedUnit": "un",
+          "insertPayload": {
+            "name": "Baladin - Ginger Beer 0.20cl",
+            "quantity": 24,
+            "unit": "un",
+            "unit_price": 0.85,
+            "total": 19.38
+          },
+          "rowLabel": "24 un"
+        },
+        "liveInvoiceAb52796d": {
+          "ocrUnit": null,
+          "normalizedUnit": null,
+          "resolvedInsertUnit": null,
+          "purchaseUnitResolution": {
+            "unit": null,
+            "source": "fallback_null"
+          },
+          "structuredKind": "weight_or_volume",
+          "preserveCountableExtractedUnit": null,
+          "insertPayload": {
+            "name": "Baladin - Ginger Beer 0.20cl",
+            "quantity": 24,
+            "unit": null,
+            "unit_price": 0.81,
+            "total": 19.38
+          },
+          "rowLabel": "24"
+        },
+        "unitRegression": "YES — unit lost on re-upload"
+      },
+      "allFrozenExtractUnits": {
+        ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json": {
+          "unit": "un",
+          "qty": 24
+        },
+        ".tmp/final-validation-lab-rerun/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json": {
+          "unit": null,
+          "qty": 24
+        },
+        ".tmp/emporio-footer-fix/emporio-italia-extract.json": {
+          "unit": "un",
+          "qty": 2
+        }
+      }
+    },
+    "peroni": {
+      "stages": {
+        "1_gpt_pass_c": null,
+        "2_monetary_binding": null,
+        "3_normalizeInvoiceItemFields": null,
+        "4_resolveInvoicePersistedItemUnit": null,
+        "5_insert_payload": null,
+        "6_db_persisted": {
+          "unit": "un",
+          "quantity": 24
+        },
+        "7_ui_formatRowPurchaseQuantityLabel": "24 un"
+      },
+      "historicalComparison": {
+        "deletedInvoice17aa3591": null,
+        "liveInvoiceAb52796d": {
+          "ocrUnit": "un",
+          "normalizedUnit": "un",
+          "resolvedInsertUnit": "un",
+          "purchaseUnitResolution": {
+            "unit": "un",
+            "source": "preserved_countable"
+          },
+          "structuredKind": "multi_unit_pack",
+          "preserveCountableExtractedUnit": "un",
+          "insertPayload": {
+            "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+            "quantity": 24,
+            "unit": "un",
+            "unit_price": 1.07,
+            "total": 25.69
+          },
+          "rowLabel": "24 un"
+        },
+        "unitRegression": "NO"
+      },
+      "allFrozenExtractUnits": {
+        ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json": null,
+        ".tmp/final-validation-lab-rerun/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json": null,
+        ".tmp/emporio-footer-fix/emporio-italia-extract.json": null
+      }
+    },
+    "pellegrino": {
+      "stages": {
+        "1_gpt_pass_c": {
+          "unit": "cx",
+          "quantity": 2,
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud"
+        },
+        "2_monetary_binding": {
+          "unit": "cx",
+          "quantity": 2
+        },
+        "3_normalizeInvoiceItemFields": {
+          "unit": "cx"
+        },
+        "4_resolveInvoicePersistedItemUnit": {
+          "inputUnit": "cx",
+          "outputUnit": "cx",
+          "resolution": {
+            "unit": "cx",
+            "source": "ocr_explicit"
+          },
+          "structuredKind": "multi_unit_pack",
+          "preserveCountable": null
+        },
+        "5_insert_payload": {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "cx",
+          "unit_price": 19.32,
+          "total": 38.65
+        },
+        "6_db_persisted": {
+          "unit": "un",
+          "quantity": 2
+        },
+        "7_ui_formatRowPurchaseQuantityLabel": "2 un"
+      },
+      "historicalComparison": {
+        "deletedInvoice17aa3591": null,
+        "liveInvoiceAb52796d": {
+          "ocrUnit": "un",
+          "normalizedUnit": "un",
+          "resolvedInsertUnit": "un",
+          "purchaseUnitResolution": {
+            "unit": "un",
+            "source": "preserved_countable"
+          },
+          "structuredKind": "multi_unit_pack",
+          "preserveCountableExtractedUnit": "un",
+          "insertPayload": {
+            "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+            "quantity": 2,
+            "unit": "un",
+            "unit_price": 20.97,
+            "total": 42.07
+          },
+          "rowLabel": "2 un"
+        },
+        "unitRegression": "NO"
+      },
+      "allFrozenExtractUnits": {
+        ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json": {
+          "unit": "cx",
+          "qty": 2
+        },
+        ".tmp/final-validation-lab-rerun/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json": {
+          "unit": null,
+          "qty": 2
+        },
+        ".tmp/emporio-footer-fix/emporio-italia-extract.json": {
+          "unit": "cx",
+          "qty": 2.56
+        }
+      }
+    },
+    "acucar": {
+      "stages": {
+        "1_gpt_pass_c": null,
+        "2_monetary_binding": null,
+        "3_normalizeInvoiceItemFields": null,
+        "4_resolveInvoicePersistedItemUnit": null,
+        "5_insert_payload": null,
+        "6_db_persisted": {
+          "unit": "cx",
+          "quantity": 1
+        },
+        "7_ui_formatRowPurchaseQuantityLabel": "1 case"
+      },
+      "historicalComparison": {
+        "deletedInvoice17aa3591": null,
+        "liveInvoiceAb52796d": {
+          "ocrUnit": "cx",
+          "normalizedUnit": "cx",
+          "resolvedInsertUnit": "cx",
+          "purchaseUnitResolution": {
+            "unit": "cx",
+            "source": "ocr_explicit"
+          },
+          "structuredKind": "multi_unit_pack",
+          "preserveCountableExtractedUnit": null,
+          "insertPayload": {
+            "name": "Açúcar Branco Metro Chef 10x1Kg",
+            "quantity": 1,
+            "unit": "cx",
+            "unit_price": 9.29,
+            "total": 9.29
+          },
+          "rowLabel": "1 case"
+        },
+        "unitRegression": "NO"
+      },
+      "allFrozenExtractUnits": {
+        ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json": null,
+        ".tmp/final-validation-lab-rerun/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json": null,
+        ".tmp/emporio-footer-fix/emporio-italia-extract.json": null
+      }
+    },
+    "pomodori": {
+      "stages": {
+        "1_gpt_pass_c": null,
+        "2_monetary_binding": null,
+        "3_normalizeInvoiceItemFields": null,
+        "4_resolveInvoicePersistedItemUnit": null,
+        "5_insert_payload": null,
+        "6_db_persisted": {
+          "unit": "un",
+          "quantity": 1
+        },
+        "7_ui_formatRowPurchaseQuantityLabel": "1 un"
+      },
+      "historicalComparison": {
+        "deletedInvoice17aa3591": null,
+        "liveInvoiceAb52796d": {
+          "ocrUnit": "un",
+          "normalizedUnit": "un",
+          "resolvedInsertUnit": "un",
+          "purchaseUnitResolution": {
+            "unit": "un",
+            "source": "preserved_countable"
+          },
+          "structuredKind": "multi_unit_pack",
+          "preserveCountableExtractedUnit": "un",
+          "insertPayload": {
+            "name": "POMODORI PELATI (CX 2,5KG*6)",
+            "quantity": 1,
+            "unit": "un",
+            "unit_price": 22.05,
+            "total": 22.05
+          },
+          "rowLabel": "1 un"
+        },
+        "unitRegression": "NO"
+      },
+      "allFrozenExtractUnits": {
+        ".tmp/persistence-audit/pass-c-raw/17aa3591-ec98-4c21-89c9-5ae946bc97bb-extract-invoice.json": null,
+        ".tmp/final-validation-lab-rerun/extracts/17aa3591-ec98-4c21-89c9-5ae946bc97bb.json": null,
+        ".tmp/emporio-footer-fix/emporio-italia-extract.json": null
+      }
+    }
+  },
+  "emporioTimeline": {
+    "deletedInvoice": {
+      "id": "17aa3591-ec98-4c21-89c9-5ae946bc97bb",
+      "paccheriUnit": "un",
+      "gingerUnit": "un",
+      "source": ".tmp/emporio-italia-investigation/invoice-items.json",
+      "created_at": "2026-06-10T18:27:15"
+    },
+    "liveInvoice": {
+      "id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "items": [
+        {
+          "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+          "quantity": 24,
+          "unit": null
+        },
+        {
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 2,
+          "unit": "kg"
+        },
+        {
+          "name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5KG",
+          "quantity": 4.3,
+          "unit": "kg"
+        },
+        {
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+          "quantity": 3.11,
+          "unit": "kg"
+        },
+        {
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "un"
+        },
+        {
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+          "quantity": 1.83,
+          "unit": "kg"
+        },
+        {
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "quantity": 24,
+          "unit": null
+        },
+        {
+          "name": "Rovagnati - Salame Ventricina 2,5 Kg",
+          "quantity": 2.6,
+          "unit": "kg"
+        }
+      ]
+    }
+  },
+  "codePaths": {
+    "extractHandoff": "supabase/functions/extract-invoice/index.ts → finalizeExtractedLineItems → monetaryToInvoiceLineItem (unit passed through)",
+    "clientPersist": "src/routes/invoices.tsx runExtraction → normalizeInvoiceItemFields → resolveInvoiceItemUnit → insert",
+    "unitResolver": "src/lib/invoice-purchase-format.ts resolveInvoicePersistedItemUnit / resolveInvoiceLinePurchaseUnit",
+    "uiDisplay": "src/lib/invoice-purchase-price-semantics.ts formatRowPurchaseQuantityLabel — bare qty when unit null",
+    "reReadPath": "src/routes/invoices.tsx reExtract → same runExtraction (identical persist path)"
+  }
+}
