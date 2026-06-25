@@ -1,0 +1,42 @@
+{
+  "auditType": "STRICT_READ_ONLY_QUANTITY_SOURCE_OF_TRUTH",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "generatedAt": "2026-06-24T23:30:00.000Z",
+  "recommendation": "D",
+  "recommendationLabel": "Hybrid — keep GPT reads, wire deterministic math inverse when monetary columns reconcile",
+  "deterministicQtyExistsInProduction": false,
+  "quantityReadTwice": true,
+  "activeQtySources": ["gpt_qty_prepass", "gpt_pass_c"],
+  "dormantQtySources": ["parseContinente", "parsePadaria", "math_inverse_from_monetary_columns"],
+  "ocrEnginePresent": false,
+  "pdfTextLayerPresent": false,
+  "gorgonzolaPipelineTrace": {
+    "pdfQty": 1.35,
+    "prepassQty": 1.3,
+    "passCQty": 1.05,
+    "anchoredQty": 1.3,
+    "persistedQty": 1.3,
+    "firstWrongStage": "gpt_qty_prepass"
+  },
+  "latentDeterministicPath": {
+    "formula": "line_total_net / (gross_unit_price * (1 - discount_pct/100))",
+    "canProduce135": true,
+    "wiredInProduction": false,
+    "blocker": "Pass C often fails to persist gross/discount; bindMonetaryColumns never inverts qty"
+  },
+  "finalAnswers": {
+    "readingSameQuantityTwice": true,
+    "deterministicQuantityExists": false,
+    "whyGptStillReading": "Only digit reader in system; no Tesseract/PDF-text",
+    "smallestImprovement": "Wire math inverse qty when gross+discount+total reconcile",
+    "chosenStrategy": "D"
+  },
+  "priorAuditReferences": [
+    ".tmp/final-gorgonzola-validation/",
+    ".tmp/ocr-reading-strategy-audit/",
+    ".tmp/qtd-strip-precision-audit/",
+    ".tmp/qtd-strip-width-escalation-audit/",
+    ".tmp/gorgonzola-mathematical-trace-audit/"
+  ]
+}

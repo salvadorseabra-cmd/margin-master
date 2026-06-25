@@ -1,0 +1,60 @@
+{
+  "auditType": "STRICT_READ_ONLY_DETERMINISTIC_QUANTITY_RECONSTRUCTION_COVERAGE",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-24T23:45:00.000Z",
+  "corpusSize": 52,
+  "reconstructable": 45,
+  "reconstructablePct": 86.54,
+  "reconstructableDbOnly": 44,
+  "reconstructableDbOnlyPct": 84.62,
+  "classification": {
+    "A_impossible": 7,
+    "B_net_unit_price": 44,
+    "C_gross_discount": 1,
+    "D_both": 0
+  },
+  "outcomes": {
+    "already_correct": 44,
+    "would_improve": 1,
+    "would_worsen": 0,
+    "impossible": 7
+  },
+  "verdict": "B",
+  "verdictLabel": "Useful for isolated edge cases; latent path D if gross/disc available at extraction",
+  "gorgonzola": {
+    "persistedQty": 1.3,
+    "methodCQty": 1.35,
+    "methodBQty": 1.36,
+    "pdfQty": 1.35,
+    "wouldBecomeCorrectViaMethodC": true,
+    "wouldBecomeCorrectDbOnly": false
+  },
+  "schemaFinding": {
+    "gross_unit_price_persisted": false,
+    "discount_pct_persisted": false,
+    "blocker": "Structured cols stripped at persist; bindMonetaryColumns never inverts qty"
+  },
+  "regressionControls": {
+    "prosciutto": "no_regression",
+    "mortadella": "no_regression",
+    "bresaola": "no_regression",
+    "pellegrino_emporio": "no_regression",
+    "paccheri": "no_regression",
+    "ovo": "no_regression",
+    "tomilho": "no_regression",
+    "salada": "no_regression"
+  },
+  "finalAnswers": {
+    "rowsReconstructable": "45/52 (86.5%)",
+    "rowsWouldImprove": 1,
+    "gorgonzolaCorrect": "Yes via Method C at extraction time",
+    "regressionsIfUngated": "Yes on discount/rounding rows (Ginger Beer 24→23.93)",
+    "chosenStrategy": "B"
+  },
+  "priorAuditReferences": [
+    ".tmp/quantity-source-of-truth-audit/",
+    ".tmp/final-gorgonzola-validation/",
+    ".tmp/gorgonzola-mathematical-trace-audit/",
+    ".tmp/mathematical-consistency-coverage-audit/"
+  ]
+}

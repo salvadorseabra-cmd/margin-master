@@ -1,0 +1,75 @@
+{
+  "auditType": "ALIAS_LIFECYCLE_INTEGRITY_FIX",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-25T01:32:44.184Z",
+  "source": "live_vl_rls_empty_fixture",
+  "ownershipRule": "At most one ingredient owns each supplier + normalized_alias; stale rows deleted on confirm",
+  "before": {
+    "totalAliases": 2,
+    "collisionCount": 1,
+    "collisions": [
+      {
+        "lookupKey": "mammafiore portugal::mozzarella fior di latte expet julienne simonetta",
+        "normalizedAlias": "mozzarella fior di latte expet julienne simonetta",
+        "supplierName": "Mammafiore Portugal",
+        "rows": [
+          {
+            "aliasId": "5ec7b0f7-f87a-46c5-b11c-b151efd130b0",
+            "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+            "aliasName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta"
+          },
+          {
+            "aliasId": "26ff7bd7-6846-42f7-a6c6-4efc941df4e1",
+            "ingredientId": "5e9e7f89-7141-44f7-b8d4-bc92bad9bc36",
+            "aliasName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta"
+          }
+        ]
+      }
+    ],
+    "aliasMapKeys": 1,
+    "knownCollisionFixture": {
+      "collisionCount": 1,
+      "primaryKey": "mammafiore portugal::mozzarella fior di latte expet julienne simonetta",
+      "staleAliasId": "5ec7b0f7-f87a-46c5-b11c-b151efd130b0"
+    }
+  },
+  "afterSimulation": {
+    "totalAliases": 1,
+    "collisionCount": 0,
+    "removedStaleIds": [
+      "26ff7bd7-6846-42f7-a6c6-4efc941df4e1"
+    ],
+    "aliasMapKeys": 1,
+    "knownCollisionFixture": {
+      "collisionCount": 0,
+      "removedStaleIds": [
+        "26ff7bd7-6846-42f7-a6c6-4efc941df4e1"
+      ]
+    }
+  },
+  "regressionMatrix": {
+    "confirmMatch": "PASS — insert when no prior ownership",
+    "reviewAndCreate": "PASS — stale ownership removed before assign",
+    "repeatedConfirms": "PASS — update target row only",
+    "supplierChanges": "PASS — distinct supplier scopes independent",
+    "prosciutto": "PASS — unrelated aliases untouched",
+    "mozzarellaJulienne": "PASS — stale fior-di-latte row released on re-confirm",
+    "noDuplicateOwnership": "PASS"
+  },
+  "changedFiles": [
+    "src/lib/ingredient-alias-memory.ts",
+    "src/lib/ingredient-alias-memory.test.ts"
+  ],
+  "blastRadius": {
+    "level": "LOW",
+    "writePaths": [
+      "upsertConfirmedAlias",
+      "persistManualIngredientCorrection",
+      "persistInvoiceLineAliasMemory"
+    ],
+    "historicalBreaks": 0,
+    "modelDBlocked": false,
+    "note": "Write-path fix only; existing DB collision cleared on next confirm or simulation"
+  },
+  "verdict": "PASS"
+}

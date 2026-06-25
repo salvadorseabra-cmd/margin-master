@@ -67,16 +67,32 @@ function normalizeSupplierScope(raw: string | null | undefined): string | null {
   return normalized || null;
 }
 
-function existingAliasQuery(
+export type AliasOwnershipRow = {
+  id: string;
+  ingredient_id: string;
+  alias_name?: string;
+  confidence: number;
+};
+
+export type AliasOwnershipCollision = {
+  lookupKey: string;
+  normalizedAlias: string;
+  supplierName: string | null;
+  rows: Array<{
+    aliasId: string;
+    ingredientId: string;
+    aliasName: string;
+  }>;
+};
+
+function aliasOwnershipScopeQuery(
   client: AppSupabaseClient,
-  ingredientId: string,
   normalizedAlias: string,
   supplierName: string | null,
 ) {
   let query = client
     .from("ingredient_aliases")
-    .select("id, confidence")
-    .eq("ingredient_id", ingredientId)
+    .select("id, ingredient_id, alias_name, confidence")
     .eq("normalized_alias", normalizedAlias);
 
   if (supplierName) {
@@ -85,12 +101,122 @@ function existingAliasQuery(
     query = query.is("supplier_name", null);
   }
 
-  return query.maybeSingle();
+  return query;
+}
+
+function existingAliasQuery(
+  client: AppSupabaseClient,
+  ingredientId: string,
+  normalizedAlias: string,
+  supplierName: string | null,
+) {
+  return aliasOwnershipScopeQuery(client, normalizedAlias, supplierName)
+    .eq("ingredient_id", ingredientId)
+    .maybeSingle();
+}
+
+/** Rows sharing the same supplier-scoped ownership key (any ingredient). */
+export async function listAliasOwnershipRows(
+  client: AppSupabaseClient,
+  normalizedAlias: string,
+  supplierName: string | null,
+): Promise<{ rows: AliasOwnershipRow[]; error: PostgrestError | null }> {
+  const { data, error } = await aliasOwnershipScopeQuery(client, normalizedAlias, supplierName);
+  if (error) {
+    return { rows: [], error };
+  }
+  return { rows: (data ?? []) as AliasOwnershipRow[], error: null };
+}
+
+/**
+ * Remove alias rows on other ingredients that own the same supplier + normalized_alias.
+ * Only identical ownership keys are affected — distinct suppliers or aliases are untouched.
+ */
+export async function releaseStaleAliasOwnership(
+  client: AppSupabaseClient,
+  targetIngredientId: string,
+  normalizedAlias: string,
+  supplierName: string | null,
+): Promise<{ releasedIds: string[]; error: PostgrestError | null }> {
+  const { rows, error } = await listAliasOwnershipRows(client, normalizedAlias, supplierName);
+  if (error) {
+    return { releasedIds: [], error };
+  }
+
+  const staleRows = rows.filter((row) => row.ingredient_id !== targetIngredientId);
+  if (staleRows.length === 0) {
+    return { releasedIds: [], error: null };
+  }
+
+  const releasedIds: string[] = [];
+  for (const staleRow of staleRows) {
+    traceIngredientAliases("releaseStaleAliasOwnership:delete", {
+      staleAliasId: staleRow.id,
+      staleIngredientId: staleRow.ingredient_id,
+      targetIngredientId,
+      normalizedAlias,
+      supplierName,
+    });
+    const { error: deleteError } = await client
+      .from("ingredient_aliases")
+      .delete()
+      .eq("id", staleRow.id);
+    if (deleteError) {
+      logSupabaseError("releaseStaleAliasOwnership delete", deleteError);
+      return { releasedIds, error: deleteError };
+    }
+    releasedIds.push(staleRow.id);
+  }
+
+  return { releasedIds, error: null };
+}
+
+/** Read-only scan: same supplier + normalized_alias mapped to multiple ingredients. */
+export function detectAliasOwnershipCollisions(
+  rows: Array<{
+    id: string;
+    ingredient_id: string;
+    alias_name: string;
+    normalized_alias: string;
+    supplier_name: string | null;
+  }>,
+): AliasOwnershipCollision[] {
+  const byKey = new Map<string, AliasOwnershipCollision>();
+
+  for (const row of rows) {
+    const normalizedAlias = row.normalized_alias?.trim();
+    if (!normalizedAlias) continue;
+    const supplier = normalizeSupplierScope(row.supplier_name);
+    const lookupKey = buildIngredientAliasLookupKey(normalizedAlias, supplier);
+    const existing = byKey.get(lookupKey);
+    const entry = {
+      aliasId: row.id,
+      ingredientId: row.ingredient_id,
+      aliasName: row.alias_name,
+    };
+    if (existing) {
+      if (!existing.rows.some((r) => r.ingredientId === row.ingredient_id && r.aliasId === row.id)) {
+        existing.rows.push(entry);
+      }
+    } else {
+      byKey.set(lookupKey, {
+        lookupKey,
+        normalizedAlias,
+        supplierName: supplier,
+        rows: [entry],
+      });
+    }
+  }
+
+  return [...byKey.values()].filter((collision) => {
+    const uniqueIngredients = new Set(collision.rows.map((r) => r.ingredientId));
+    return uniqueIngredients.size > 1;
+  });
 }
 
 /**
  * Persist a user-confirmed invoice line → ingredient link.
- * Dedupes on ingredient + normalized alias (+ supplier when provided).
+ * Dedupes on supplier + normalized alias globally; at most one ingredient owns each key.
  */
 export async function upsertConfirmedAlias({
   ingredientId,
@@ -136,6 +262,36 @@ export async function upsertConfirmedAlias({
   }
 
   const supplier = normalizeSupplierScope(supplierName);
+
+  const { releasedIds, error: releaseError } = await releaseStaleAliasOwnership(
+    supabase,
+    ingredientId,
+    normalizedAlias,
+    supplier,
+  );
+  if (releaseError) {
+    logSupabaseError("upsertConfirmedAlias releaseStaleAliasOwnership", releaseError);
+    traceIngredientAliasesInsertError({
+      function: "upsertConfirmedAlias",
+      phase: "release_stale_ownership",
+      aliasName: alias,
+      error: {
+        message: releaseError.message,
+        code: releaseError.code,
+        details: releaseError.details,
+      },
+    });
+    return { error: releaseError };
+  }
+  if (releasedIds.length > 0) {
+    traceIngredientAliases("upsertConfirmedAlias:released-stale-ownership", {
+      aliasName: alias,
+      ingredientId,
+      normalizedAlias,
+      supplierName: supplier,
+      releasedIds,
+    });
+  }
 
   const { data: existing, error: selectError, status: selectStatus } = await existingAliasQuery(
     supabase,

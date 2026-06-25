@@ -1,0 +1,1877 @@
+{
+  "auditType": "STRICT_READ_ONLY_OPERATIONAL_IDENTITY_REPLAY",
+  "model": "D",
+  "modelLabel": "Layered Identity Architecture",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-25T00:48:16.785Z",
+  "mode": "STRICT_READ_ONLY",
+  "constraints": {
+    "codeChanges": false,
+    "dbWrites": false,
+    "deployments": false
+  },
+  "simulation": {
+    "currentPath": "buildOverrideKeysFromInvoiceLine (production)",
+    "modelDPath": "stripInvoiceBrandPrefix → normalizeOperationalAliasKey (simulated spine addition)",
+    "aliasMapRebuild": "resolveNormalizedAliasFromConfirmedRow equivalent with Model D strip on alias_name",
+    "beverageExclusion": "San Pellegrino NOT in INVOICE_BRAND_PREFIX_STRIP_RE"
+  },
+  "corpusStats": {
+    "invoiceItems": 51,
+    "aliasRows": 69,
+    "matchRows": 51,
+    "confirmedMatches": 49
+  },
+  "impact": {
+    "totalRows": 51,
+    "recoveredConfirmed": 1,
+    "recoveredSuggested": 0,
+    "materialChanges": 1,
+    "cosmeticKindOnlyChanges": 35,
+    "unchanged": 15,
+    "unchangedMaterial": 50,
+    "falsePositives": 0,
+    "regressions": 0,
+    "statusOnlyChanges": 1,
+    "ingredientIdChanges": 0,
+    "prefixRows": 7,
+    "prefixRowsMaterialChange": 1
+  },
+  "rowReplays": [
+    {
+      "invoiceItemId": "d69123d3-40af-4b9e-a566-bde7a8989e49",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "rawName": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "displayName": "Farina do pasta fresca e gnocchi",
+      "currentAliasKey": "farina do pasta fresca e gnocchi caputo",
+      "proposedOperationalIdentity": "farina do pasta fresca e gnocchi caputo",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "7c850fb7-71e5-4649-8ecc-d1641d5b9e95",
+        "ingredientName": "Farina do pasta fresca e gnocchi",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "7c850fb7-71e5-4649-8ecc-d1641d5b9e95",
+        "ingredientName": "Farina do pasta fresca e gnocchi",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "53167dd9-c734-412f-9679-10b022060980",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "rawName": "Recargo por combustivel",
+      "displayName": "Recargo por combustivel",
+      "currentAliasKey": "recargo por combustivel",
+      "proposedOperationalIdentity": "recargo por combustivel",
+      "currentAliasHit": false,
+      "modelDAliasHit": false,
+      "currentMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "status": "unmatched",
+        "matchKind": null,
+        "confidence": "none"
+      },
+      "predictedMatch": {
+        "ingredientId": null,
+        "ingredientName": null,
+        "status": "unmatched",
+        "matchKind": null,
+        "confidence": "none",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "e418468e-cb13-44f3-93b2-1857ae6eaa4d",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "rawName": "Rulo Di Capra 1kg*2 Simonetta",
+      "displayName": "Rulo di capra",
+      "currentAliasKey": "rulo di capra simonetta",
+      "proposedOperationalIdentity": "rulo di capra simonetta",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "4dd38782-c986-4d4b-8ecb-fd84359744b1",
+        "ingredientName": "Rulo di capra",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "4dd38782-c986-4d4b-8ecb-fd84359744b1",
+        "ingredientName": "Rulo di capra",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "d13fce65-832c-4ca2-9c52-049579c99663",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "rawName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "displayName": "Mozza fior di latte julienne",
+      "currentAliasKey": "mozzarella fior di latte expet julienne simonetta",
+      "proposedOperationalIdentity": "mozzarella fior di latte expet julienne simonetta",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "5e9e7f89-7141-44f7-b8d4-bc92bad9bc36",
+        "ingredientName": "Mozzarella julienne",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "5e9e7f89-7141-44f7-b8d4-bc92bad9bc36",
+        "ingredientName": "Mozzarella julienne",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "rawName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "displayName": "Aceto balsamico di modena IGP",
+      "currentAliasKey": "aceto balsamico di modenaigppet toschi",
+      "proposedOperationalIdentity": "aceto balsamico di modenaigppet toschi",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4",
+        "ingredientName": "Aceto balsamico di modena IGP",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4",
+        "ingredientName": "Aceto balsamico di modena IGP",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "rawName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "displayName": "Birra peroni nastro azzurro 33cl",
+      "currentAliasKey": "birra peroni nastro azzurropna azzurro 24",
+      "proposedOperationalIdentity": "birra peroni nastro azzurropna azzurro 24",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b",
+        "ingredientName": "Peroni nastro azzurro 33cl",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b",
+        "ingredientName": "Peroni nastro azzurro 33cl",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "65ced122-bedd-4f87-bc23-3b85477ebe8b",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "rawName": "Farina Speciale pizza 25kg Amoruso",
+      "displayName": "Farina speciale pizza",
+      "currentAliasKey": "farina speciale pizza amoruso",
+      "proposedOperationalIdentity": "farina speciale pizza amoruso",
+      "currentAliasHit": false,
+      "modelDAliasHit": false,
+      "currentMatch": {
+        "ingredientId": "3976c267-f8aa-4173-abc7-55410811f399",
+        "ingredientName": "Farine speciale pizza",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "3976c267-f8aa-4173-abc7-55410811f399",
+        "ingredientName": "Farine speciale pizza",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "rawName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "displayName": "Guanciale di suino stagionato",
+      "currentAliasKey": "guanciale di suino stagionato sorrentino",
+      "proposedOperationalIdentity": "guanciale di suino stagionato sorrentino",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6",
+        "ingredientName": "Guanciale stagionato",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6",
+        "ingredientName": "Guanciale stagionato",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "7e6f6f69-81ed-42be-a062-e28ffc015f0c",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "rawName": "Filete de Anchoas Alconfirosa LI 495 g",
+      "displayName": "Filete de anchoas alconfirosa LI 495g",
+      "currentAliasKey": "filete de anchoas alconfirosa li 495",
+      "proposedOperationalIdentity": "filete de anchoas alconfirosa li 495",
+      "currentAliasHit": false,
+      "modelDAliasHit": false,
+      "currentMatch": {
+        "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+        "ingredientName": "Anchoas",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+        "ingredientName": "Anchoas",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "77d804e3-b2ff-4a06-b4df-a78d3ff405a5",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "rawName": "Ovo Líquido Past.Gema Dovo 1 Kg",
+      "displayName": "Ovo líquido past.gema dovo",
+      "currentAliasKey": "ovo liquido past gema dovo",
+      "proposedOperationalIdentity": "ovo liquido past gema dovo",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+        "ingredientName": "Gema líquida",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+        "ingredientName": "Gema líquida",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "86d75d64-4a8a-4fc5-95d5-cd352ba29b5f",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "rawName": "Pepinos Extra Uli Frasco 6x720 g",
+      "displayName": "Pepinos extra uli frasco 6x720 g",
+      "currentAliasKey": "pepinos extra uli frasco 6x720g",
+      "proposedOperationalIdentity": "pepinos extra uli frasco 6x720g",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "ingredientName": "Pepino conserva",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "ingredientName": "Pepino conserva",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "c7c7f16b-917f-4ce6-80ad-e8484bda1bbe",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "rawName": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+      "displayName": "Atum oleo bolsa nau catrineta",
+      "currentAliasKey": "atum oleo bolsa nau catrineta",
+      "proposedOperationalIdentity": "atum oleo bolsa nau catrineta",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+        "ingredientName": "Atum em óleo",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+        "ingredientName": "Atum em óleo",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "8e36bac6-c3b6-4bc3-885c-e81514feba61",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "rawName": "Arroz Agulha Metro Chef 12x1 kg",
+      "displayName": "Arroz agulha 12x1 kg",
+      "currentAliasKey": "arroz agulha metro cheddar 12x1kg",
+      "proposedOperationalIdentity": "arroz agulha metro cheddar 12x1kg",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+        "ingredientName": "Arroz agulha",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+        "ingredientName": "Arroz agulha",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "fa0d0138-577e-42fe-9212-fe5f53c7ead8",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "rawName": "Chocolate Culinaria Pantagruel 10x200 g",
+      "displayName": "Chocolate culinaria pantagruel 10x200 g",
+      "currentAliasKey": "chocolate culinaria pantagruel 10x200g",
+      "proposedOperationalIdentity": "chocolate culinaria pantagruel 10x200g",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+        "ingredientName": "Chocolate culinária",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+        "ingredientName": "Chocolate culinária",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "478442d5-cf8f-4e21-a905-01b7cc327fab",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "rawName": "Açucar Branco METRO Chef 10x1 Kg",
+      "displayName": "Açucar branco 10x1 kg",
+      "currentAliasKey": "acucar branco metro cheddar 10x1kg",
+      "proposedOperationalIdentity": "acucar branco metro cheddar 10x1kg",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+        "ingredientName": "Açúcar branco",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+        "ingredientName": "Açúcar branco",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "2b5cea32-ec1f-4454-a4d9-cb4bb2612866",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Avijudo",
+      "rawName": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+      "displayName": "Nata culinaria 22% reny picot 6x1 lt",
+      "currentAliasKey": "nata culinaria reny picot 22 6x1lt",
+      "proposedOperationalIdentity": "nata culinaria reny picot 22 6x1lt",
+      "currentAliasHit": false,
+      "modelDAliasHit": false,
+      "currentMatch": {
+        "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+        "ingredientName": "Nata culinária",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+        "ingredientName": "Nata culinária",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "a352ec6f-8e78-4752-9eee-47f900e4a916",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "rawName": "Pepinos Extra II Frasco 6X720g",
+      "displayName": "Pepinos extra II frasco 6x720g",
+      "currentAliasKey": "pepinos extra ii frasco 6x720g",
+      "proposedOperationalIdentity": "pepinos extra ii frasco 6x720g",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "ingredientName": "Pepino conserva",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+        "ingredientName": "Pepino conserva",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "9af131b9-159f-48d6-807b-47b6124a9045",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "rawName": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+      "displayName": "Atum óleo bolsa nau catrineta",
+      "currentAliasKey": "atum oleo bolsa nau catrineta",
+      "proposedOperationalIdentity": "atum oleo bolsa nau catrineta",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+        "ingredientName": "Atum em óleo",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+        "ingredientName": "Atum em óleo",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "a5771209-414e-4fd4-81eb-2b1ba7cc52a6",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "rawName": "Arroz Agulha Metro Chef 12x1kg",
+      "displayName": "Arroz agulha",
+      "currentAliasKey": "arroz agulha metro cheddar 12x1kg",
+      "proposedOperationalIdentity": "arroz agulha metro cheddar 12x1kg",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+        "ingredientName": "Arroz agulha",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+        "ingredientName": "Arroz agulha",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "11024922-0c2b-4daf-b178-06d622899b18",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "rawName": "Chocolate Pantagruel 10x200g",
+      "displayName": "Chocolate pantagruel 10x200g",
+      "currentAliasKey": "chocolate pantagruel 10x200g",
+      "proposedOperationalIdentity": "chocolate pantagruel 10x200g",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+        "ingredientName": "Chocolate culinária",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+        "ingredientName": "Chocolate culinária",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "693004ee-b902-4e18-8442-5d488e175e42",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "rawName": "Açúcar Branco Metro Chef 10x1Kg",
+      "displayName": "Açúcar branco",
+      "currentAliasKey": "acucar branco metro cheddar 10x1kg",
+      "proposedOperationalIdentity": "acucar branco metro cheddar 10x1kg",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+        "ingredientName": "Açúcar branco",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+        "ingredientName": "Açúcar branco",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "fead3fbb-df70-439c-b9e0-1ceb58cecc0e",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "rawName": "Nata Reny Picot 22% 6x1L",
+      "displayName": "Nata reny picot 22% 6x1l",
+      "currentAliasKey": "nata reny picot 22 6x1l",
+      "proposedOperationalIdentity": "nata reny picot 22 6x1l",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+        "ingredientName": "Nata culinária",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+        "ingredientName": "Nata culinária",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "27144491-6c66-4f0a-a6d4-659623a785b5",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "rawName": "Mozzarella Flor di Latte 2Kg",
+      "displayName": "Mozzarella flor di latte",
+      "currentAliasKey": "mozzarella flor di latte",
+      "proposedOperationalIdentity": "mozzarella flor di latte",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+        "ingredientName": "Mozzarella fior di latte",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+        "ingredientName": "Mozzarella fior di latte",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "8476c916-26a1-4d2a-b6e7-f211560f6e95",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "rawName": "Filete de Anchovas Alconfrista Lt 495 g",
+      "displayName": "Filete de anchovas alconfrista lt 495g",
+      "currentAliasKey": "filete de anchovas alconfrista 495",
+      "proposedOperationalIdentity": "filete de anchovas alconfrista 495",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+        "ingredientName": "Anchoas",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+        "ingredientName": "Anchoas",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "c3533ceb-8784-49de-a0a9-ecf168d68c40",
+      "invoiceId": "c2f52357-0f80-491a-ba14-c97ff4837472",
+      "supplier": "Aviludo",
+      "rawName": "Ovo Líquido Past.Gema Dovo 1kg",
+      "displayName": "Ovo líquido past.gema dovo",
+      "currentAliasKey": "ovo liquido past gema dovo",
+      "proposedOperationalIdentity": "ovo liquido past gema dovo",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+        "ingredientName": "Gema líquida",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+        "ingredientName": "Gema líquida",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "5700a733-3cd9-4147-8d21-cb524976a3d7",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "rawName": "Alho Francês",
+      "displayName": "Alho francês",
+      "currentAliasKey": "alho frances",
+      "proposedOperationalIdentity": "alho frances",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "446f3217-9a6f-428a-abc6-10927a958168",
+        "ingredientName": "Alho francês",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "446f3217-9a6f-428a-abc6-10927a958168",
+        "ingredientName": "Alho francês",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "dee41356-7df1-430e-a288-7de2a40ff979",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "rawName": "Abóbora Butternut",
+      "displayName": "Abóbora butternut",
+      "currentAliasKey": "abobora butternut",
+      "proposedOperationalIdentity": "abobora butternut",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "9338970d-b55b-4526-be36-ab8497cd9da8",
+        "ingredientName": "Abóbora butternut",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "9338970d-b55b-4526-be36-ab8497cd9da8",
+        "ingredientName": "Abóbora butternut",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "b64d5a44-d15b-4c1e-8f25-5809fa3f5541",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "rawName": "Courgettes",
+      "displayName": "Courgettes",
+      "currentAliasKey": "courgettes",
+      "proposedOperationalIdentity": "courgettes",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "6c7ab001-9f87-448e-9b34-87d3aa21f9ca",
+        "ingredientName": "Courgettes",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "6c7ab001-9f87-448e-9b34-87d3aa21f9ca",
+        "ingredientName": "Courgettes",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "e1fcc019-499b-46a9-a99e-e5b51a7578db",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "rawName": "Manteiga Coimbra s/Sal EMB 1 Kg",
+      "displayName": "Manteiga s/sal",
+      "currentAliasKey": "manteiga coimbra s sal emb",
+      "proposedOperationalIdentity": "manteiga coimbra s sal emb",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "30fd4652-be74-47eb-afb1-60b2a15a14fc",
+        "ingredientName": "Manteiga s/sal",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "30fd4652-be74-47eb-afb1-60b2a15a14fc",
+        "ingredientName": "Manteiga s/sal",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "rawName": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "displayName": "Ovo classe M",
+      "currentAliasKey": "ovo moreno classe m duzias cartao 15",
+      "proposedOperationalIdentity": "ovo moreno classe m duzias cartao 15",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+        "ingredientName": "Ovo classe M",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+        "ingredientName": "Ovo classe M",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "f2d094ab-f50a-483d-b6cb-76554d5bf195",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "rawName": "Tomilho",
+      "displayName": "Tomilho",
+      "currentAliasKey": "tomilho",
+      "proposedOperationalIdentity": "tomilho",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041",
+        "ingredientName": "Tomilho",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041",
+        "ingredientName": "Tomilho",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "593e7560-ba2a-4c60-8300-ff34a26335b9",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "rawName": "Salada Ibérica FSTK EMB. 250g",
+      "displayName": "Salada ibérica",
+      "currentAliasKey": "salada iberica fstk emb 250",
+      "proposedOperationalIdentity": "salada iberica fstk emb 250",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "47cd8362-79f4-4285-8491-f016229eaa21",
+        "ingredientName": "Salada ibérica",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "47cd8362-79f4-4285-8491-f016229eaa21",
+        "ingredientName": "Salada ibérica",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "b47828a9-e042-4437-b0b7-8944c812509a",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "rawName": "Manjericão",
+      "displayName": "Manjericão",
+      "currentAliasKey": "manjericao",
+      "proposedOperationalIdentity": "manjericao",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+        "ingredientName": "Manjericão",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+        "ingredientName": "Manjericão",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "90823d87-6da6-414b-8a5e-1f8787db4aa9",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "rawName": "Hortelã",
+      "displayName": "Hortelã",
+      "currentAliasKey": "hortela",
+      "proposedOperationalIdentity": "hortela",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "6e3011e0-b160-48c9-867c-1234cd743802",
+        "ingredientName": "Hortelã",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "6e3011e0-b160-48c9-867c-1234cd743802",
+        "ingredientName": "Hortelã",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "0b373627-9e78-4387-9945-35a504174b93",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "rawName": "Pepino",
+      "displayName": "Pepino",
+      "currentAliasKey": "pepino",
+      "proposedOperationalIdentity": "pepino",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "963d3a72-6f74-427b-8658-8d98b6a8d8df",
+        "ingredientName": "Pepino fresco",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "963d3a72-6f74-427b-8658-8d98b6a8d8df",
+        "ingredientName": "Pepino fresco",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "dd6efa1e-60a0-471a-87b8-0c8df1bafcf0",
+      "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "supplier": "Bidfood Portugal, SA",
+      "rawName": "Pêra Abacate Hasse",
+      "displayName": "Pêra abacate",
+      "currentAliasKey": "pera abacate hasse",
+      "proposedOperationalIdentity": "pera abacate hasse",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "d8a90b20-f20c-464f-a153-d65e062d5ff9",
+        "ingredientName": "Pêra abacate",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "d8a90b20-f20c-464f-a153-d65e062d5ff9",
+        "ingredientName": "Pêra abacate",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "f2a672e0-016c-43d7-a53f-1ee8b8976f4b",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "rawName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "displayName": "Mozzarella fior DI latte \"il bocconcino\" 125gr*8",
+      "currentAliasKey": "mozzarella fior di latte il bocconcino r 125",
+      "proposedOperationalIdentity": "mozzarella fior di latte il bocconcino r 125",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+        "ingredientName": "Mozzarella fior di latte",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+        "ingredientName": "Mozzarella fior di latte",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "793e9cd0-a7b5-4228-8ece-e6f16b047515",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "rawName": "STRACCIATELLA 250 GR",
+      "displayName": "Stracciatella 250gr",
+      "currentAliasKey": "stracciatella 250",
+      "proposedOperationalIdentity": "stracciatella 250",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "d96e176e-7fa7-438d-beda-6b9d7fe7b41d",
+        "ingredientName": "Stracciatella",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "d96e176e-7fa7-438d-beda-6b9d7fe7b41d",
+        "ingredientName": "Stracciatella",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "bf43813b-6377-459d-9c8f-b342eb969452",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "rawName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "displayName": "Mezzi paccheri mancini",
+      "currentAliasKey": "mezzi paccheri mancinicx",
+      "proposedOperationalIdentity": "mezzi paccheri mancinicx",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+        "ingredientName": "Mezzi paccheri mancini",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+        "ingredientName": "Mezzi paccheri mancini",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "9a52cc46-1c5a-4798-9621-d06177e04208",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "rawName": "POMODORI PELATI (CX 2,5KG*6)",
+      "displayName": "Pomodori pelati",
+      "currentAliasKey": "pomodori pelaticx",
+      "proposedOperationalIdentity": "pomodori pelaticx",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "52f7bf70-eeca-4039-987d-241b35248119",
+        "ingredientName": "Pomodori pelati",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "52f7bf70-eeca-4039-987d-241b35248119",
+        "ingredientName": "Pomodori pelati",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "ef25be0f-f153-40de-b377-25151d147637",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "rawName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "displayName": "Água san pellegrino 75cl",
+      "currentAliasKey": "acqua s pellegrinocx 15",
+      "proposedOperationalIdentity": "acqua s pellegrinocx 15",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+        "ingredientName": "Água san pellegrino",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+        "ingredientName": "Água san pellegrino",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "28777b03-2389-4759-bc48-c9bd1839d970",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "rawName": "RICOTTA TREVIGIANA 1,5KG",
+      "displayName": "Ricotta trevigiana",
+      "currentAliasKey": "ricotta trevigiana",
+      "proposedOperationalIdentity": "ricotta trevigiana",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "6ec0bc6b-409a-4db2-b21f-fb01394f0014",
+        "ingredientName": "Ricotta trevigiana",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "6ec0bc6b-409a-4db2-b21f-fb01394f0014",
+        "ingredientName": "Ricotta trevigiana",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "655aa967-b1dc-48e2-ae46-fd0ca962e9e3",
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "rawName": "ROLO DE CABRA E VACA 1KG",
+      "displayName": "Rolo DE cabra e vaca",
+      "currentAliasKey": "rolo de cabra e vaca",
+      "proposedOperationalIdentity": "rolo de cabra e vaca",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "b091e1d0-e7e2-49a8-a9a7-f61c8a4d4263",
+        "ingredientName": "Rolo de cabra e vaca",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "b091e1d0-e7e2-49a8-a9a7-f61c8a4d4263",
+        "ingredientName": "Rolo de cabra e vaca",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "9a2e9311-a1bd-408d-8261-b7a445e7043d",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia",
+      "rawName": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+      "displayName": "Prosciutto cotto scelto",
+      "currentAliasKey": "rovagnati assaporami prosciutto cotto sceltohc",
+      "proposedOperationalIdentity": "assaporami prosciutto cotto sceltohc",
+      "currentAliasHit": false,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+        "ingredientName": "Prosciutto cotto scelto",
+        "status": "suggested",
+        "matchKind": "semantic",
+        "confidence": "suggested"
+      },
+      "predictedMatch": {
+        "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+        "ingredientName": "Prosciutto cotto scelto",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "recovered_via_alias"
+      },
+      "brandPrefixOnLine": true,
+      "prefixStrippedByModelD": true
+    },
+    {
+      "invoiceItemId": "fd785aba-bac4-4a1a-804d-fe32ed06ddbe",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia",
+      "rawName": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "displayName": "Gorgonzola DOP dolce linea castelfrigo",
+      "currentAliasKey": "arrigoni formaggi gorgonzoladop dolce linea castelfrigo",
+      "proposedOperationalIdentity": "gorgonzoladop dolce linea castelfrigo",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+        "ingredientName": "Gorgonzola DOP dolce",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+        "ingredientName": "Gorgonzola DOP dolce",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": true,
+      "prefixStrippedByModelD": true
+    },
+    {
+      "invoiceItemId": "f1c94b2e-4bec-47e8-9c96-76f9ee7a41c0",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia",
+      "rawName": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "displayName": "Paccheri lisci",
+      "currentAliasKey": "de cecco paccheri lisci nr 500 125",
+      "proposedOperationalIdentity": "paccheri lisci nr 500 125",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "d7fcbb41-4e19-47ee-bbea-058e7b44a040",
+        "ingredientName": "Paccheri lisci",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "d7fcbb41-4e19-47ee-bbea-058e7b44a040",
+        "ingredientName": "Paccheri lisci",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": true,
+      "prefixStrippedByModelD": true
+    },
+    {
+      "invoiceItemId": "2777bd8a-c549-488d-8f6b-6610782ade95",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia",
+      "rawName": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "displayName": "Salame ventricina",
+      "currentAliasKey": "rovagnati salame ventricina",
+      "proposedOperationalIdentity": "salame ventricina",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "06cc0c4d-9933-4ae2-8abe-64d196575f9f",
+        "ingredientName": "Rovagnati salame ventricina",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "06cc0c4d-9933-4ae2-8abe-64d196575f9f",
+        "ingredientName": "Rovagnati salame ventricina",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": true,
+      "prefixStrippedByModelD": true
+    },
+    {
+      "invoiceItemId": "a1ac4ed6-5385-4477-9d86-14b46547f58e",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia",
+      "rawName": "Baladin - Ginger Beer 0.20cl",
+      "displayName": "Ginger beer",
+      "currentAliasKey": "baladin ginger beer",
+      "proposedOperationalIdentity": "ginger beer",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+        "ingredientName": "Ginger beer",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+        "ingredientName": "Ginger beer",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": true,
+      "prefixStrippedByModelD": true
+    },
+    {
+      "invoiceItemId": "67c3ed94-3e5f-4b85-8315-c198e0507d36",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia",
+      "rawName": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+      "displayName": "Bresaola punta d'anca oro",
+      "currentAliasKey": "rigamonti bresaola punta d anca oro",
+      "proposedOperationalIdentity": "bresaola punta d anca oro",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "31d6da3f-d812-4836-9086-92a5616250d1",
+        "ingredientName": "Rigamonti bresaola punta d'anca oro",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "31d6da3f-d812-4836-9086-92a5616250d1",
+        "ingredientName": "Rigamonti bresaola punta d'anca oro",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": true,
+      "prefixStrippedByModelD": true
+    },
+    {
+      "invoiceItemId": "090e69f4-7e87-413e-950b-a4eb32fbb434",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia",
+      "rawName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "displayName": "San pellegrino água in vitro 75cl",
+      "currentAliasKey": "sanpellegrino acqua in vitro x ud 15",
+      "proposedOperationalIdentity": "sanpellegrino acqua in vitro x ud 15",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+        "ingredientName": "Água san pellegrino",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+        "ingredientName": "Água san pellegrino",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false,
+      "prefixStrippedByModelD": false
+    },
+    {
+      "invoiceItemId": "874600db-be80-4850-945b-986dea4f5329",
+      "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "supplier": "Emporio Italia",
+      "rawName": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+      "displayName": "Mortadella IGP 'massima' con pistacchio",
+      "currentAliasKey": "rovagnati mortadellaigp massimacon pistacchio",
+      "proposedOperationalIdentity": "mortadellaigp massimacon pistacchio",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "9c853a47-82fe-4d6d-88bc-f0aa007e0a59",
+        "ingredientName": "Mortadella IGP massima con pistacchio",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "9c853a47-82fe-4d6d-88bc-f0aa007e0a59",
+        "ingredientName": "Mortadella IGP massima con pistacchio",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": true,
+      "prefixStrippedByModelD": true
+    }
+  ],
+  "knownProducts": {
+    "Prosciutto": {
+      "invoiceItemId": "9a2e9311-a1bd-408d-8261-b7a445e7043d",
+      "rawName": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+      "displayName": "Prosciutto cotto scelto",
+      "currentAliasKey": "rovagnati assaporami prosciutto cotto sceltohc",
+      "proposedOperationalIdentity": "assaporami prosciutto cotto sceltohc",
+      "currentAliasHit": false,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+        "ingredientName": "Prosciutto cotto scelto",
+        "status": "suggested",
+        "matchKind": "semantic",
+        "confidence": "suggested"
+      },
+      "predictedMatch": {
+        "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+        "ingredientName": "Prosciutto cotto scelto",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "recovered_via_alias"
+      },
+      "brandPrefixOnLine": true
+    },
+    "Mortadella": {
+      "invoiceItemId": "874600db-be80-4850-945b-986dea4f5329",
+      "rawName": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+      "displayName": "Mortadella IGP 'massima' con pistacchio",
+      "currentAliasKey": "rovagnati mortadellaigp massimacon pistacchio",
+      "proposedOperationalIdentity": "mortadellaigp massimacon pistacchio",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "9c853a47-82fe-4d6d-88bc-f0aa007e0a59",
+        "ingredientName": "Mortadella IGP massima con pistacchio",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "9c853a47-82fe-4d6d-88bc-f0aa007e0a59",
+        "ingredientName": "Mortadella IGP massima con pistacchio",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": true
+    },
+    "Bresaola": {
+      "invoiceItemId": "67c3ed94-3e5f-4b85-8315-c198e0507d36",
+      "rawName": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+      "displayName": "Bresaola punta d'anca oro",
+      "currentAliasKey": "rigamonti bresaola punta d anca oro",
+      "proposedOperationalIdentity": "bresaola punta d anca oro",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "31d6da3f-d812-4836-9086-92a5616250d1",
+        "ingredientName": "Rigamonti bresaola punta d'anca oro",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "31d6da3f-d812-4836-9086-92a5616250d1",
+        "ingredientName": "Rigamonti bresaola punta d'anca oro",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": true
+    },
+    "Gorgonzola": {
+      "invoiceItemId": "fd785aba-bac4-4a1a-804d-fe32ed06ddbe",
+      "rawName": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "displayName": "Gorgonzola DOP dolce linea castelfrigo",
+      "currentAliasKey": "arrigoni formaggi gorgonzoladop dolce linea castelfrigo",
+      "proposedOperationalIdentity": "gorgonzoladop dolce linea castelfrigo",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+        "ingredientName": "Gorgonzola DOP dolce",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+        "ingredientName": "Gorgonzola DOP dolce",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": true
+    },
+    "Paccheri": {
+      "invoiceItemId": "bf43813b-6377-459d-9c8f-b342eb969452",
+      "rawName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "displayName": "Mezzi paccheri mancini",
+      "currentAliasKey": "mezzi paccheri mancinicx",
+      "proposedOperationalIdentity": "mezzi paccheri mancinicx",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+        "ingredientName": "Mezzi paccheri mancini",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+        "ingredientName": "Mezzi paccheri mancini",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false
+    },
+    "Chocolate": {
+      "invoiceItemId": "fa0d0138-577e-42fe-9212-fe5f53c7ead8",
+      "rawName": "Chocolate Culinaria Pantagruel 10x200 g",
+      "displayName": "Chocolate culinaria pantagruel 10x200 g",
+      "currentAliasKey": "chocolate culinaria pantagruel 10x200g",
+      "proposedOperationalIdentity": "chocolate culinaria pantagruel 10x200g",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+        "ingredientName": "Chocolate culinária",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+        "ingredientName": "Chocolate culinária",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false
+    },
+    "Atum": {
+      "invoiceItemId": "c7c7f16b-917f-4ce6-80ad-e8484bda1bbe",
+      "rawName": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+      "displayName": "Atum oleo bolsa nau catrineta",
+      "currentAliasKey": "atum oleo bolsa nau catrineta",
+      "proposedOperationalIdentity": "atum oleo bolsa nau catrineta",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+        "ingredientName": "Atum em óleo",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+        "ingredientName": "Atum em óleo",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false
+    },
+    "Mozzarella": {
+      "invoiceItemId": "27144491-6c66-4f0a-a6d4-659623a785b5",
+      "rawName": "Mozzarella Flor di Latte 2Kg",
+      "displayName": "Mozzarella flor di latte",
+      "currentAliasKey": "mozzarella flor di latte",
+      "proposedOperationalIdentity": "mozzarella flor di latte",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+        "ingredientName": "Mozzarella fior di latte",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+        "ingredientName": "Mozzarella fior di latte",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false
+    },
+    "Pepino": {
+      "invoiceItemId": "0b373627-9e78-4387-9945-35a504174b93",
+      "rawName": "Pepino",
+      "displayName": "Pepino",
+      "currentAliasKey": "pepino",
+      "proposedOperationalIdentity": "pepino",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "963d3a72-6f74-427b-8658-8d98b6a8d8df",
+        "ingredientName": "Pepino fresco",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "963d3a72-6f74-427b-8658-8d98b6a8d8df",
+        "ingredientName": "Pepino fresco",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": false,
+        "changeType": null
+      },
+      "brandPrefixOnLine": false
+    },
+    "Pellegrino": {
+      "invoiceItemId": "ef25be0f-f153-40de-b377-25151d147637",
+      "rawName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "displayName": "Água san pellegrino 75cl",
+      "currentAliasKey": "acqua s pellegrinocx 15",
+      "proposedOperationalIdentity": "acqua s pellegrinocx 15",
+      "currentAliasHit": true,
+      "modelDAliasHit": true,
+      "currentMatch": {
+        "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+        "ingredientName": "Água san pellegrino",
+        "status": "confirmed",
+        "matchKind": "confirmed-override",
+        "confidence": "high"
+      },
+      "predictedMatch": {
+        "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+        "ingredientName": "Água san pellegrino",
+        "status": "confirmed",
+        "matchKind": "confirmed-alias",
+        "confidence": "high",
+        "changed": true,
+        "changeType": "other"
+      },
+      "brandPrefixOnLine": false
+    }
+  },
+  "collisionAudit": {
+    "canonicalCollisions": [
+      {
+        "operationalIdentity": "Mammafiore Portugal::mozzarella fior di latte expet julienne simonetta",
+        "aliases": [
+          {
+            "aliasName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+            "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+            "supplier": "Mammafiore Portugal"
+          },
+          {
+            "aliasName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+            "ingredientId": "5e9e7f89-7141-44f7-b8d4-bc92bad9bc36",
+            "supplier": "Mammafiore Portugal"
+          }
+        ],
+        "ingredientIds": [
+          "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+          "5e9e7f89-7141-44f7-b8d4-bc92bad9bc36"
+        ]
+      }
+    ],
+    "aliasMerges": [
+      {
+        "operationalIdentity": "Mammafiore Portugal::mozzarella fior di latte expet julienne simonetta",
+        "aliasCount": 2,
+        "sameIngredient": false,
+        "aliases": [
+          "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+          "MOZZA Fior di Latte Expet Julienne 3kg Simonetta"
+        ]
+      }
+    ],
+    "collisionCount": 1,
+    "mergeCount": 1
+  },
+  "historicalConfirmations": {
+    "totalConfirmed": 49,
+    "stillResolveViaModelDAlias": 46,
+    "aliasOnlyConfirmGaps": [
+      {
+        "invoiceItemId": "65ced122-bedd-4f87-bc23-3b85477ebe8b",
+        "rawName": "Farina Speciale pizza 25kg Amoruso",
+        "currentIngredientId": "3976c267-f8aa-4173-abc7-55410811f399",
+        "currentMatchKind": "confirmed-alias",
+        "note": "Confirmed via semantic/exact path; alias layer miss is pre-existing, not introduced by Model D"
+      },
+      {
+        "invoiceItemId": "7e6f6f69-81ed-42be-a062-e28ffc015f0c",
+        "rawName": "Filete de Anchoas Alconfirosa LI 495 g",
+        "currentIngredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+        "currentMatchKind": "confirmed-alias",
+        "note": "Confirmed via semantic/exact path; alias layer miss is pre-existing, not introduced by Model D"
+      },
+      {
+        "invoiceItemId": "2b5cea32-ec1f-4454-a4d9-cb4bb2612866",
+        "rawName": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+        "currentIngredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+        "currentMatchKind": "confirmed-alias",
+        "note": "Confirmed via semantic/exact path; alias layer miss is pre-existing, not introduced by Model D"
+      }
+    ],
+    "materialBreaks": []
+  },
+  "supplierIntelligenceImpact": {
+    "currentAliasMapKeys": 132,
+    "modelDAliasMapKeys": 132,
+    "currentUniqueOperationalKeys": 66,
+    "modelDUniqueOperationalKeys": 66,
+    "supplierScopedAliasRows": 69
+  },
+  "recipeImpact": {
+    "ingredientIdChanges": [],
+    "confirmedIngredientIdChanges": 0,
+    "netChange": 0
+  },
+  "blastRadius": "LOW",
+  "finalAnswers": {
+    "rowsImprove": 1,
+    "regress": 0,
+    "collisions": 1,
+    "prosciuttoFixed": true,
+    "confirmedBreaks": 0,
+    "aliasOnlyConfirmGaps": 3,
+    "recipeChanges": 0,
+    "modelDProductionReady": false,
+    "recommendedNextStep": "D with pre-deploy duplicate-alias cleanup (mozzarella julienne collision)"
+  },
+  "priorAuditReferences": [
+    ".tmp/operational-identity-canonicalization-audit/design.json",
+    ".tmp/alias-write-path-consistency-audit/",
+    ".tmp/brand-prefix-alias-coverage-audit/",
+    ".tmp/possible-match-regression-audit/"
+  ]
+}

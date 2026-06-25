@@ -1,0 +1,55 @@
+{
+  "auditType": "STRICT_DESIGN_ONLY_OPERATIONAL_IDENTITY_CANONICALIZATION",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-25T02:00:00.000Z",
+  "recommendedModel": "D",
+  "recommendedModelLabel": "Layered Identity Architecture",
+  "confidence": 0.87,
+  "operationalIdentityDefinition": {
+    "core": "Canonical operational wording (Model B)",
+    "recall": "Supplier-scoped alias equivalence classes (Model C mechanism)",
+    "evidence": "Immutable raw invoice line (Model A, not identity)",
+    "excludes": ["commodity invoice brand prefixes", "bulk pack/case weights", "marketing noise"],
+    "preserves": ["product form/cut", "distinguishing gram SKU weights", "beverage brand names"],
+    "orthogonal": ["purchase unit / economic identity", "supplier scope key"]
+  },
+  "modelComparison": {
+    "A_raw": { "score": 2, "blocker": "re-read/OCR drift" },
+    "B_canonical": { "score": 7, "gap": "needs alias recall layer" },
+    "C_multi_alias": { "score": 5, "gap": "normalization drift without B spine" },
+    "D_layered": { "score": 9, "note": "aligns existing architecture" }
+  },
+  "migrationPlan": {
+    "phase1": "Shared brand-prefix strip on read+write alias spine (exclude beverages)",
+    "phase2_measure": "Backfill normalized_alias collision audit",
+    "dualCompat": "resolveNormalizedAliasFromConfirmedRow re-derives from alias_name",
+    "neverDo": "Rewrite invoice_items.name or alias_name raw text",
+    "vlImpactEstimate": {
+      "liveRegressionsRecovered": 1,
+      "displayAliasGapRows": 6,
+      "prefixRowsTotal": 8,
+      "falsePositivesObserved": 0
+    }
+  },
+  "finalAnswers": {
+    "operationalIdentity": "Canonical product+form+SKU weight; strip commodity brand/pack noise",
+    "invoiceWordingAsIdentity": false,
+    "manufacturerPrefixesAsIdentity": false,
+    "supplierWordingAsIdentity": "Supplier scopes aliases only",
+    "aliasesRole": "Equivalence-class recall, not identity definition",
+    "bestScalingArchitecture": "D",
+    "minimizesRegressions": "D with read+write spine alignment",
+    "choice": "D"
+  },
+  "priorAuditReferences": [
+    ".tmp/possible-match-regression-audit/",
+    ".tmp/brand-prefix-alias-coverage-audit/",
+    ".tmp/alias-write-path-consistency-audit/"
+  ],
+  "keyEvidenceFiles": [
+    "src/lib/canonical-ingredient-display-name.ts",
+    "src/lib/ingredient-operational-alias-memory.ts",
+    "src/lib/ingredient-match-override.ts",
+    "src/lib/ingredient-operational-identity.ts"
+  ]
+}

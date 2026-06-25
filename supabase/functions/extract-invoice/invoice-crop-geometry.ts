@@ -95,4 +95,6 @@ export const TOTALS_SCAN_END_FRACTION = 0.88;
 
 /** Emporio Italia Qtd column (438–478 on 724px reference raster). */
 export const EMPORIO_QTD_COLUMN_X_FRAC = { x0: 0.605, x1: 0.661 } as const;
+/** Extra pixels past fractional x1 so right-aligned digits (e.g. 1,35) are not clipped. */
+export const QTD_STRIP_RIGHT_PAD_PX = 2;
 export const QTD_STRIP_MIN_WIDTH_PX = 24;

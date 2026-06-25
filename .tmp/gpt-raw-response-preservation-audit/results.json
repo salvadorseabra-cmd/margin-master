@@ -1,0 +1,47 @@
+{
+  "auditType": "STRICT_READ_ONLY_GPT_RAW_RESPONSE_PRESERVATION",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "deployVersion": 41,
+  "generatedAt": "2026-06-25T00:15:00.000Z",
+  "rawResponseDiscardedAt": {
+    "file": "supabase/functions/extract-invoice/invoice-date-extraction.ts",
+    "function": "callOpenAiJson",
+    "lines": "87-93"
+  },
+  "pipelineCanTransform135To130": false,
+  "evidenceOfTransformation": false,
+  "rawGptResponsePreserved": false,
+  "futureAuditsCanProveGptDirectly": false,
+  "classification": "A",
+  "classificationLabel": "GPT prepass returned numeric 1.3; pipeline faithfully propagated it",
+  "classificationCaveat": "Literal model output string not preserved; JSON erases trailing zeros",
+  "gorgonzolaTrace": {
+    "pdfQty": 1.35,
+    "ocrQuantity": 1.3,
+    "passCQuantity": 1.05,
+    "anchoredQty": 1.3,
+    "persistedQty": 1.3,
+    "firstWrongStage": "gpt_prepass_json_parse"
+  },
+  "quantityPassthroughChain": [
+    "callOpenAiJson JSON.parse",
+    "normalizePrepassRows typeof check only",
+    "anchorQuantities copies ocrQty verbatim",
+    "bindMonetaryColumns round2 on prices only",
+    "client insert direct"
+  ],
+  "minimalInstrumentation": {
+    "location": "callOpenAiJson before JSON.parse",
+    "mechanism": "INVOICE_OCR_PRESERVE_RAW env-gated console.log of content",
+    "linesEstimate": 3,
+    "dbChanges": false
+  },
+  "finalAnswers": {
+    "canPipelineTransform": false,
+    "transformationEvidence": false,
+    "rawPreserved": false,
+    "futureProofWithoutInstrumentation": false,
+    "chosenClassification": "A"
+  }
+}

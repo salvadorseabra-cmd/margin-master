@@ -10,11 +10,12 @@ import { parseImageDataUrl, toImageDataUrl } from "./invoice-image-crop.ts";
 import {
   EMPORIO_QTD_COLUMN_X_FRAC,
   QTD_STRIP_MIN_WIDTH_PX,
+  QTD_STRIP_RIGHT_PAD_PX,
 } from "./invoice-crop-geometry.ts";
 
 const REPO_ROOT = join(new URL(".", import.meta.url).pathname, "../../..");
 
-Deno.test("cropQtdColumnStrip: Emporio table-crop → ~40px Qtd strip", async () => {
+Deno.test("cropQtdColumnStrip: Emporio table-crop → ~43px Qtd strip", async () => {
   const tableCropPath = join(
     REPO_ROOT,
     ".tmp/fraction-row-crop-audit/table-crop.png",
@@ -28,8 +29,10 @@ Deno.test("cropQtdColumnStrip: Emporio table-crop → ~40px Qtd strip", async ()
   const { bytes: stripBytes } = parseImageDataUrl(stripUrl);
   const strip = await Image.decode(stripBytes);
   const source = await Image.decode(bytes);
-  const expectedWidth = Math.ceil(
-    source.width * EMPORIO_QTD_COLUMN_X_FRAC.x1,
+  const expectedWidth = Math.min(
+    source.width,
+    Math.ceil(source.width * EMPORIO_QTD_COLUMN_X_FRAC.x1) +
+      QTD_STRIP_RIGHT_PAD_PX,
   ) - Math.floor(source.width * EMPORIO_QTD_COLUMN_X_FRAC.x0);
 
   assertEquals(strip.width, expectedWidth);

@@ -1,0 +1,107 @@
+{
+  "auditType": "STRICT_READ_ONLY_POST_DEPLOY_REGRESSION",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "generatedAt": "2026-06-24T18:00:00.000Z",
+  "preDeployVersion": 39,
+  "postDeployVersion": 40,
+  "verdict": "CONTINUE_WITH_FOLLOWUPS",
+  "finalAnswers": {
+    "prosciuttoRegressionReal": true,
+    "prosciuttoRegressionFromV40Extraction": false,
+    "uiOnlyOrDataChange": "Both possible — client match layer; data if re-read persisted new names/IDs",
+    "deployAffectedMatching": false,
+    "gorgonzola130Vs135": "Strip OCR precision on 41px Qtd column; fixed 2→1.30 but under-reads final digit",
+    "safeToContinueOrRollback": "Continue — rollback regresses Gorgonzola/Bresaola without fixing Prosciutto match"
+  },
+  "gorgonzolaStripPrecisionGap": {
+    "pdfQty": 1.35,
+    "v39Prepass": 2,
+    "v40Prepass": 1.3,
+    "v39Final": 1.05,
+    "v40Final": 1.3,
+    "deltaFromPdf": -0.05
+  },
+  "validationMatrix": {
+    "gorgonzola": {
+      "pdfQty": 1.35,
+      "preV39Prepass": 2,
+      "postV40Prepass": 1.3,
+      "preV39PassC": 1.05,
+      "postV40PassC": 1.05,
+      "preV39Final": 1.05,
+      "postV40Final": 1.3,
+      "preV39Anchored": false,
+      "postV40Anchored": true,
+      "status": "PARTIAL_FIX",
+      "firstDivergenceStage": "qty_prepass"
+    },
+    "bresaola": {
+      "pdfQty": 1.83,
+      "preV39Prepass": 2,
+      "postV40Prepass": 1.8,
+      "preV39PassC": 1.83,
+      "postV40PassC": 1.83,
+      "preV39Final": 1.83,
+      "postV40Final": 1.83,
+      "preV39Anchored": false,
+      "postV40Anchored": false,
+      "status": "FIX",
+      "firstDivergenceStage": "qty_prepass"
+    },
+    "prosciutto": {
+      "pdfQty": 4.3,
+      "preV39Prepass": 4.3,
+      "postV40Prepass": 4.3,
+      "preV39PassC": 4.3,
+      "postV40PassC": 4.3,
+      "preV39Final": 4.3,
+      "postV40Final": 4.3,
+      "preV39Anchored": false,
+      "postV40Anchored": false,
+      "status": "UNCHANGED",
+      "firstDivergenceStage": "none_extraction_pipeline"
+    },
+    "mortadella": {
+      "pdfQty": 3.11,
+      "preV39Prepass": 3.1,
+      "postV40Prepass": 3.1,
+      "preV39PassC": 3.11,
+      "postV40PassC": 3.11,
+      "preV39Final": 3.11,
+      "postV40Final": 3.11,
+      "preV39Anchored": false,
+      "postV40Anchored": false,
+      "status": "UNCHANGED",
+      "firstDivergenceStage": "none"
+    }
+  },
+  "prosciuttoMatchRegression": {
+    "extractionApiChanged": false,
+    "matchLayerChanged": true,
+    "rootCause": [
+      "Confirmed override keyed on normalized description without Rovagnati prefix / Produto de Stock suffix",
+      "v39/v40 API returns full Pass C name — override key miss",
+      "Re-read delete/recreate rotates invoice_item_id — orphaned invoice_item_matches",
+      "Virtual matcher returns semantic/operational-equivalent → Possible match"
+    ],
+    "notCausedBy": "v40 Qtd strip prepass"
+  },
+  "v40BlastRadiusConfirmed": {
+    "changed": ["qty_prepass_input_image", "gorgonzola_bresaola_ocr_quantity", "gorgonzola_anchoring"],
+    "unchanged": ["pass_c", "description", "unit_price", "matching_code", "persistence_schema", "prosciutto_all_fields"]
+  },
+  "recommendations": [
+    "Continue v40 — do not rollback",
+    "Strip precision hardening for Gorgonzola 1.30→1.35",
+    "Fix Prosciutto match via alias key for Rovagnati variant or re-seed matches on re-read"
+  ],
+  "artifacts": [
+    ".tmp/ocr-prepass-fix-implementation/live-reextract.json",
+    ".tmp/ocr-prepass-forensics-audit/results.json",
+    ".tmp/ocr-anchoring-decision-audit/results.json",
+    ".tmp/fraction-row-crop-audit/results.json",
+    ".tmp/emporio-deli-family-audit/results.json",
+    ".tmp/post-deploy-persistence-verification/results.json"
+  ]
+}

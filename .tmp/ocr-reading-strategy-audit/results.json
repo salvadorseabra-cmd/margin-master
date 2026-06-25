@@ -1,0 +1,82 @@
+{
+  "auditType": "STRICT_READ_ONLY_OCR_READING_STRATEGY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "deployVersion": 41,
+  "generatedAt": "2026-06-24T23:00:00.000Z",
+  "openAiKeyAvailable": false,
+  "ocrMethod": "inference_from_prior_audits_and_v41_live_baseline",
+  "knownFactsRespected": [
+    "fraction_metadata_no_longer_dominates",
+    "43px_strip_contains_digit_5",
+    "gpt_returns_1.30_not_1.35",
+    "anchoring_works_once_ocr_produced"
+  ],
+  "productionFlow": {
+    "chain": [
+      "cropTableRegionForLineItems",
+      "cropQtdColumnStrip",
+      "runQuantityPrePass",
+      "Pass C",
+      "anchorQuantities"
+    ],
+    "stripWidthPx": 43,
+    "stripPrompt": "QTD_STRIP_SYSTEM_PROMPT",
+    "failOpenPrompt": "QTY_PREPAS_SYSTEM_PROMPT"
+  },
+  "strategies": {
+    "A": {
+      "label": "Current 43px strip",
+      "gorgonzolaQty": 1.3,
+      "bresaolaQty": 1.83,
+      "prosciuttoQty": 4.3,
+      "method": "live_v41",
+      "couldProduce130": true,
+      "recommend": false
+    },
+    "B": {
+      "label": "Same strip, alt prompt",
+      "gorgonzolaQty": 1.3,
+      "method": "inferred",
+      "couldProduce130": true,
+      "recommend": false
+    },
+    "C": {
+      "label": "Full table Qtd-only prompt",
+      "gorgonzolaQty": 2.0,
+      "method": "live_v39",
+      "couldProduce130": true,
+      "recommend": false
+    },
+    "D": {
+      "label": "Full table + explicit coords",
+      "gorgonzolaQty": 2.0,
+      "method": "inferred_v39",
+      "couldProduce130": true,
+      "recommend": false
+    },
+    "E": {
+      "label": "Hybrid full table + Qtd bounds + row index",
+      "gorgonzolaQty": 1.35,
+      "method": "hypothesis",
+      "couldProduce130": true,
+      "recommend": true
+    }
+  },
+  "finalAnswers": {
+    "stripFundamentallyWrong": false,
+    "fullTableConstrainedMoreReliable": false,
+    "widerStripsSolveIssue": "inconclusive_inferred_only",
+    "smallestSafeImprovement": "hybrid_full_table_with_qtd_bounds_and_row_index",
+    "chosenStrategy": "E"
+  },
+  "finalChoice": "E",
+  "priorAuditReferences": [
+    ".tmp/qtd-strip-precision-audit/",
+    ".tmp/qtd-strip-width-escalation-audit/",
+    ".tmp/ocr-prepass-fix-implementation/",
+    ".tmp/fraction-row-crop-audit/",
+    ".tmp/final-gorgonzola-validation/",
+    ".tmp/ocr-prepass-fix-design/"
+  ]
+}

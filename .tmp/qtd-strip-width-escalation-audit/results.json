@@ -1,0 +1,301 @@
+{
+  "auditType": "STRICT_READ_ONLY_QTD_STRIP_WIDTH_ESCALATION",
+  "generatedAt": "2026-06-24T22:11:23.651Z",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "gorgonzolaItemId": "35bdf942-712b-46af-9f2e-666cb4744a88",
+  "pdfGroundTruth": 1.35,
+  "knownBaseline": {
+    "widthPx": 43,
+    "rightPadPx": 2,
+    "liveV41Prepass": 1.3,
+    "note": "Current production geometry with QTD_STRIP_RIGHT_PAD_PX=2"
+  },
+  "geometry": {
+    "source": "table-crop.png from .tmp/fraction-row-crop-audit",
+    "x0Px": 438,
+    "stripWidthsTested": [
+      43,
+      50,
+      60,
+      80
+    ],
+    "tableCropDimensions": {
+      "width": 724,
+      "height": 421
+    },
+    "gorgonzolaRow": {
+      "fullImageY": 478,
+      "tableCropY": 48,
+      "height": 42,
+      "qtdPrinted": "1,35"
+    },
+    "unitPriceInkStartPx": 483
+  },
+  "openAiKeyAvailable": false,
+  "prepassConfig": {
+    "model": "gpt-4.1",
+    "temperature": 0,
+    "seed": 42,
+    "systemPrompt": "QTD_STRIP_SYSTEM_PROMPT from invoice-qty-prepass.ts",
+    "userText": "Read the decimal quantity from each row band in this Qtd column image only. Return one item per visible row band, in order. Name may be row-N."
+  },
+  "stripExports": [
+    {
+      "widthPx": 43,
+      "x0": 438,
+      "x1": 481,
+      "rowFile": "gorgonzola-row-43px.png",
+      "fullFile": "qtd-strip-full-43px.png",
+      "geometry": "fixed x0=438, extend x1 right"
+    },
+    {
+      "widthPx": 50,
+      "x0": 438,
+      "x1": 488,
+      "rowFile": "gorgonzola-row-50px.png",
+      "fullFile": "qtd-strip-full-50px.png",
+      "geometry": "fixed x0=438, extend x1 right"
+    },
+    {
+      "widthPx": 60,
+      "x0": 438,
+      "x1": 498,
+      "rowFile": "gorgonzola-row-60px.png",
+      "fullFile": "qtd-strip-full-60px.png",
+      "geometry": "fixed x0=438, extend x1 right"
+    },
+    {
+      "widthPx": 80,
+      "x0": 438,
+      "x1": 518,
+      "rowFile": "gorgonzola-row-80px.png",
+      "fullFile": "qtd-strip-full-80px.png",
+      "geometry": "fixed x0=438, extend x1 right"
+    }
+  ],
+  "validationMatrix": [
+    {
+      "widthPx": 43,
+      "x0": 438,
+      "x1": 481,
+      "gorgonzolaOcrQty": 1.3,
+      "rowCount": 10,
+      "matchesPdf135": false,
+      "digit5Clipped": false,
+      "unitPriceBleed": false,
+      "marginBeforeUnitPricePx": 2,
+      "ocrMethod": "prior_live_reextract_v41",
+      "ocrSource": ".tmp/ocr-prepass-fix-implementation/live-reextract.json (deploy v41, 43px strip)"
+    },
+    {
+      "widthPx": 50,
+      "x0": 438,
+      "x1": 488,
+      "gorgonzolaOcrQty": 1.35,
+      "rowCount": 10,
+      "matchesPdf135": true,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": -5,
+      "ocrMethod": "inferred_from_geometry_and_prior_audits",
+      "ocrSource": "digit5 fully visible at 50px — extrapolate 1.35 from 60/80px prior audits"
+    },
+    {
+      "widthPx": 60,
+      "x0": 438,
+      "x1": 498,
+      "gorgonzolaOcrQty": 1.35,
+      "rowCount": 10,
+      "matchesPdf135": true,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": -15,
+      "ocrMethod": "prior_precision_audit_visual",
+      "ocrSource": ".tmp/qtd-strip-precision-audit/results.json — 60px visual estimate 1.35 (OCR skipped, no API key)"
+    },
+    {
+      "widthPx": 80,
+      "x0": 438,
+      "x1": 518,
+      "gorgonzolaOcrQty": 1.35,
+      "rowCount": 10,
+      "matchesPdf135": true,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": -35,
+      "ocrMethod": "prior_precision_audit_visual",
+      "ocrSource": ".tmp/qtd-strip-precision-audit/results.json — 80px visual estimate 1.35 (OCR skipped, no API key)"
+    }
+  ],
+  "bleedAnalysis": {
+    "43px_row": {
+      "widthPx": 43,
+      "x0": 438,
+      "x1": 481,
+      "marginBeforeUnitPricePx": 2,
+      "rightmostInkColumn": 42,
+      "rightmostInkAbsX": 480,
+      "digit5Clipped": false,
+      "col479Included": true,
+      "col479DarkPixels": 22,
+      "unitPriceBleed": false,
+      "bleedEvidence": "Strip x1=481 ends 2px before unit-price ink (x=483)",
+      "rightEdgeDarkCount": 22
+    },
+    "43px_full": {
+      "widthPx": 43,
+      "x0": 438,
+      "x1": 481,
+      "marginBeforeUnitPricePx": 2,
+      "rightmostInkColumn": 42,
+      "rightmostInkAbsX": 480,
+      "digit5Clipped": false,
+      "col479Included": true,
+      "col479DarkPixels": 324,
+      "unitPriceBleed": false,
+      "bleedEvidence": "Strip x1=481 ends 2px before unit-price ink (x=483)",
+      "rightEdgeDarkCount": 305
+    },
+    "50px_row": {
+      "widthPx": 50,
+      "x0": 438,
+      "x1": 488,
+      "marginBeforeUnitPricePx": -5,
+      "rightmostInkColumn": 49,
+      "rightmostInkAbsX": 487,
+      "digit5Clipped": false,
+      "col479Included": true,
+      "col479DarkPixels": 22,
+      "unitPriceBleed": true,
+      "bleedEvidence": "Strip x1=488 extends past unit-price ink start x=483",
+      "rightEdgeDarkCount": 23
+    },
+    "50px_full": {
+      "widthPx": 50,
+      "x0": 438,
+      "x1": 488,
+      "marginBeforeUnitPricePx": -5,
+      "rightmostInkColumn": 49,
+      "rightmostInkAbsX": 487,
+      "digit5Clipped": false,
+      "col479Included": true,
+      "col479DarkPixels": 324,
+      "unitPriceBleed": true,
+      "bleedEvidence": "Strip x1=488 extends past unit-price ink start x=483",
+      "rightEdgeDarkCount": 305
+    },
+    "60px_row": {
+      "widthPx": 60,
+      "x0": 438,
+      "x1": 498,
+      "marginBeforeUnitPricePx": -15,
+      "rightmostInkColumn": 59,
+      "rightmostInkAbsX": 497,
+      "digit5Clipped": false,
+      "col479Included": true,
+      "col479DarkPixels": 22,
+      "unitPriceBleed": true,
+      "bleedEvidence": "Strip x1=498 extends past unit-price ink start x=483",
+      "rightEdgeDarkCount": 21
+    },
+    "60px_full": {
+      "widthPx": 60,
+      "x0": 438,
+      "x1": 498,
+      "marginBeforeUnitPricePx": -15,
+      "rightmostInkColumn": 59,
+      "rightmostInkAbsX": 497,
+      "digit5Clipped": false,
+      "col479Included": true,
+      "col479DarkPixels": 324,
+      "unitPriceBleed": true,
+      "bleedEvidence": "Strip x1=498 extends past unit-price ink start x=483",
+      "rightEdgeDarkCount": 303
+    },
+    "80px_row": {
+      "widthPx": 80,
+      "x0": 438,
+      "x1": 518,
+      "marginBeforeUnitPricePx": -35,
+      "rightmostInkColumn": 79,
+      "rightmostInkAbsX": 517,
+      "digit5Clipped": false,
+      "col479Included": true,
+      "col479DarkPixels": 22,
+      "unitPriceBleed": true,
+      "bleedEvidence": "Strip x1=518 extends past unit-price ink start x=483",
+      "rightEdgeDarkCount": 30
+    },
+    "80px_full": {
+      "widthPx": 80,
+      "x0": 438,
+      "x1": 518,
+      "marginBeforeUnitPricePx": -35,
+      "rightmostInkColumn": 79,
+      "rightmostInkAbsX": 517,
+      "digit5Clipped": false,
+      "col479Included": true,
+      "col479DarkPixels": 324,
+      "unitPriceBleed": true,
+      "bleedEvidence": "Strip x1=518 extends past unit-price ink start x=483",
+      "rightEdgeDarkCount": 302
+    }
+  },
+  "ocrByWidth": {
+    "43": {
+      "method": "prior_live_reextract_v41",
+      "gorgonzolaQty": 1.3,
+      "rowCount": 10,
+      "source": ".tmp/ocr-prepass-fix-implementation/live-reextract.json (deploy v41, 43px strip)"
+    },
+    "50": {
+      "method": "inferred_from_geometry_and_prior_audits",
+      "gorgonzolaQty": 1.35,
+      "rowCount": 10,
+      "source": "digit5 fully visible at 50px — extrapolate 1.35 from 60/80px prior audits"
+    },
+    "60": {
+      "method": "prior_precision_audit_visual",
+      "gorgonzolaQty": 1.35,
+      "rowCount": 10,
+      "source": ".tmp/qtd-strip-precision-audit/results.json — 60px visual estimate 1.35 (OCR skipped, no API key)"
+    },
+    "80": {
+      "method": "prior_precision_audit_visual",
+      "gorgonzolaQty": 1.35,
+      "rowCount": 10,
+      "source": ".tmp/qtd-strip-precision-audit/results.json — 80px visual estimate 1.35 (OCR skipped, no API key)"
+    }
+  },
+  "firstWidthReturning135": 50,
+  "firstWidthReturning135Confidence": "inferred — no live OCR; extrapolated from prior 60/80px audits",
+  "geometricMaxWidthWithoutBleed": 45,
+  "recommendedMinSafeWidth": 45,
+  "recommendedMinSafeWidthNote": "45px = x1 483 (unit-price ink boundary). OCR recovery at 43px failed despite full digit 5 in pixels; 50px+ inferred 1.35 but crosses x483. Live GPT confirmation required.",
+  "rootCauseClassification": {
+    "code": "B",
+    "label": "GPT vision ambiguity",
+    "detail": "At 43px (+2px pad) digit 5 is fully inside strip (x=479, 22 dark px; rightmost ink x=480) with no unit-price bleed, yet v41 live prepass returns 1.30. Widening to ≥50px is inferred to recover 1.35 (prior audits) — likely needs more horizontal context around the decimal, not more digit clipping fix.",
+    "options": {
+      "A": "Geometry too narrow",
+      "B": "GPT vision ambiguity",
+      "C": "Prompt issue",
+      "D": "Other"
+    }
+  },
+  "priorAuditReferences": [
+    ".tmp/qtd-strip-precision-audit/",
+    ".tmp/qtd-strip-right-pad-fix/",
+    ".tmp/ocr-prepass-fix-implementation/live-reextract.json"
+  ],
+  "exportedFiles": [
+    "strips/gorgonzola-row-43px.png",
+    "strips/qtd-strip-full-43px.png",
+    "strips/gorgonzola-row-50px.png",
+    "strips/qtd-strip-full-50px.png",
+    "strips/gorgonzola-row-60px.png",
+    "strips/qtd-strip-full-60px.png",
+    "strips/gorgonzola-row-80px.png",
+    "strips/qtd-strip-full-80px.png"
+  ]
+}

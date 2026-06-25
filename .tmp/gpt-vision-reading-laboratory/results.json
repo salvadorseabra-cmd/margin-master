@@ -1,0 +1,986 @@
+{
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "auditType": "STRICT_READ_ONLY_GPT_VISION_QUANTITY_READING_LABORATORY",
+  "generatedAt": "2026-06-24T23:04:28.328Z",
+  "openAiKeyAvailable": false,
+  "openAiKeySource": "unavailable — supabase secret exists but not readable via CLI",
+  "prepassConfig": {
+    "model": "gpt-4.1",
+    "temperature": 0,
+    "seed": 42,
+    "systemPrompt": "QTD_STRIP_SYSTEM_PROMPT from invoice-qty-prepass.ts",
+    "userText": "Read the decimal quantity from each row band in this Qtd column image only. Return one item per visible row band, in order. Name may be row-N."
+  },
+  "groundTruth": {
+    "gorgonzola": 1.35,
+    "prosciutto": 4.3,
+    "bresaola": 1.83
+  },
+  "sources": {
+    "invoiceFull": "/Users/salvadorseabra1/margin-master/.tmp/emporio-italia-investigation/invoice-full.png",
+    "tableCrop": "/Users/salvadorseabra1/margin-master/.tmp/fraction-row-crop-audit/table-crop.png",
+    "rowCropsDir": "/Users/salvadorseabra1/margin-master/.tmp/fraction-row-crop-audit",
+    "geometry": {
+      "qtdX0": 438,
+      "emporioQtdColumnXFrac": {
+        "x0": 0.605,
+        "x1": 0.661
+      },
+      "productionStripWidthPx": 43,
+      "gorgonzolaRowInTableCrop": {
+        "y": 48,
+        "height": 42
+      },
+      "tableCropTop": 430,
+      "tableDimensions": {
+        "width": 724,
+        "height": 421
+      }
+    }
+  },
+  "variants": [
+    {
+      "id": "A",
+      "label": "43px strip (production)",
+      "kind": "strip",
+      "width": 43
+    },
+    {
+      "id": "B",
+      "label": "45px strip",
+      "kind": "strip",
+      "width": 45
+    },
+    {
+      "id": "C",
+      "label": "47px strip",
+      "kind": "strip",
+      "width": 47
+    },
+    {
+      "id": "D",
+      "label": "50px strip",
+      "kind": "strip",
+      "width": 50
+    },
+    {
+      "id": "E",
+      "label": "60px strip",
+      "kind": "strip",
+      "width": 60
+    },
+    {
+      "id": "F",
+      "label": "80px strip",
+      "kind": "strip",
+      "width": 80
+    },
+    {
+      "id": "G",
+      "label": "Full row crop",
+      "kind": "row"
+    },
+    {
+      "id": "H",
+      "label": "Full row + Qtd highlight",
+      "kind": "row_highlight"
+    },
+    {
+      "id": "I",
+      "label": "Table crop + Gorgonzola marker",
+      "kind": "table_marker"
+    },
+    {
+      "id": "J",
+      "label": "43px strip enlarged 2x",
+      "kind": "strip_enlarge",
+      "width": 43,
+      "scale": 2
+    },
+    {
+      "id": "K",
+      "label": "43px strip enlarged 3x",
+      "kind": "strip_enlarge",
+      "width": 43,
+      "scale": 3
+    }
+  ],
+  "exportedImages": [
+    {
+      "variant": "A",
+      "gptImage": "A-qtd-strip-full.png",
+      "previewRow": "A-gorgonzola-row.png",
+      "widthPx": 43,
+      "scale": 1
+    },
+    {
+      "variant": "B",
+      "gptImage": "B-qtd-strip-full.png",
+      "previewRow": "B-gorgonzola-row.png",
+      "widthPx": 45,
+      "scale": 1
+    },
+    {
+      "variant": "C",
+      "gptImage": "C-qtd-strip-full.png",
+      "previewRow": "C-gorgonzola-row.png",
+      "widthPx": 47,
+      "scale": 1
+    },
+    {
+      "variant": "D",
+      "gptImage": "D-qtd-strip-full.png",
+      "previewRow": "D-gorgonzola-row.png",
+      "widthPx": 50,
+      "scale": 1
+    },
+    {
+      "variant": "E",
+      "gptImage": "E-qtd-strip-full.png",
+      "previewRow": "E-gorgonzola-row.png",
+      "widthPx": 60,
+      "scale": 1
+    },
+    {
+      "variant": "F",
+      "gptImage": "F-qtd-strip-full.png",
+      "previewRow": "F-gorgonzola-row.png",
+      "widthPx": 80,
+      "scale": 1
+    },
+    {
+      "variant": "G",
+      "product": "gorgonzola",
+      "gptImage": "G-gorgonzola-row.png"
+    },
+    {
+      "variant": "G",
+      "product": "prosciutto",
+      "gptImage": "G-prosciutto-row.png"
+    },
+    {
+      "variant": "G",
+      "product": "bresaola",
+      "gptImage": "G-bresaola-row.png"
+    },
+    {
+      "variant": "H",
+      "product": "gorgonzola",
+      "gptImage": "H-gorgonzola-row.png"
+    },
+    {
+      "variant": "H",
+      "product": "prosciutto",
+      "gptImage": "H-prosciutto-row.png"
+    },
+    {
+      "variant": "H",
+      "product": "bresaola",
+      "gptImage": "H-bresaola-row.png"
+    },
+    {
+      "variant": "I",
+      "gptImage": "I-table-marker.png"
+    },
+    {
+      "variant": "J",
+      "gptImage": "J-qtd-strip-full.png",
+      "previewRow": "J-gorgonzola-row.png",
+      "widthPx": 43,
+      "scale": 2
+    },
+    {
+      "variant": "K",
+      "gptImage": "K-qtd-strip-full.png",
+      "previewRow": "K-gorgonzola-row.png",
+      "widthPx": 43,
+      "scale": 3
+    }
+  ],
+  "runMatrix": [
+    {
+      "variant": "A",
+      "product": "gorgonzola",
+      "runs": [
+        1.3,
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": 1.3,
+      "correct": false,
+      "truth": 1.35,
+      "imageFile": "images/A-qtd-strip-full.png",
+      "status": "partial_reference"
+    },
+    {
+      "variant": "B",
+      "product": "gorgonzola",
+      "runs": [
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "truth": 1.35,
+      "imageFile": "images/B-qtd-strip-full.png",
+      "status": "pending_live"
+    },
+    {
+      "variant": "B",
+      "product": "bresaola",
+      "runs": [
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "truth": 1.83,
+      "imageFile": "images/B-qtd-strip-full.png",
+      "status": "pending_live"
+    },
+    {
+      "variant": "B",
+      "product": "prosciutto",
+      "runs": [
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "truth": 4.3,
+      "imageFile": "images/B-qtd-strip-full.png",
+      "status": "pending_live"
+    },
+    {
+      "variant": "C",
+      "product": "gorgonzola",
+      "runs": [
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "truth": 1.35,
+      "imageFile": "images/C-qtd-strip-full.png",
+      "status": "pending_live"
+    },
+    {
+      "variant": "C",
+      "product": "bresaola",
+      "runs": [
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "truth": 1.83,
+      "imageFile": "images/C-qtd-strip-full.png",
+      "status": "pending_live"
+    },
+    {
+      "variant": "C",
+      "product": "prosciutto",
+      "runs": [
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "truth": 4.3,
+      "imageFile": "images/C-qtd-strip-full.png",
+      "status": "pending_live"
+    },
+    {
+      "variant": "D",
+      "product": "gorgonzola",
+      "runs": [
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "truth": 1.35,
+      "imageFile": "images/D-qtd-strip-full.png",
+      "status": "pending_live"
+    },
+    {
+      "variant": "E",
+      "product": "gorgonzola",
+      "runs": [
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "truth": 1.35,
+      "imageFile": "images/E-qtd-strip-full.png",
+      "status": "pending_live"
+    },
+    {
+      "variant": "F",
+      "product": "gorgonzola",
+      "runs": [
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "truth": 1.35,
+      "imageFile": "images/F-qtd-strip-full.png",
+      "status": "pending_live"
+    },
+    {
+      "variant": "G",
+      "product": "gorgonzola",
+      "runs": [
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "truth": 1.35,
+      "imageFile": "images/G-gorgonzola-row.png",
+      "status": "pending_live"
+    },
+    {
+      "variant": "H",
+      "product": "gorgonzola",
+      "runs": [
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "truth": 1.35,
+      "imageFile": "images/H-gorgonzola-row.png",
+      "status": "pending_live"
+    },
+    {
+      "variant": "I",
+      "product": "gorgonzola",
+      "runs": [
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "truth": 1.35,
+      "imageFile": "images/I-table-marker.png",
+      "status": "pending_live"
+    },
+    {
+      "variant": "J",
+      "product": "gorgonzola",
+      "runs": [
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "truth": 1.35,
+      "imageFile": "images/J-qtd-strip-full.png",
+      "status": "pending_live"
+    },
+    {
+      "variant": "K",
+      "product": "gorgonzola",
+      "runs": [
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE",
+        "PENDING_LIVE"
+      ],
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "truth": 1.35,
+      "imageFile": "images/K-qtd-strip-full.png",
+      "status": "pending_live"
+    }
+  ],
+  "visualAnalysis": {
+    "images/A-qtd-strip-full.png": {
+      "widthPx": 43,
+      "heightPx": 421,
+      "rightmostInkAbsX": 480,
+      "digit5Clipped": false,
+      "unitPriceBleed": false,
+      "marginBeforeUnitPricePx": 2,
+      "rightEdgeDarkCount": 316,
+      "meanLuminance": 186.36789482406232,
+      "darkPixelFraction": 0.718610175109098,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Multi-row Qtd strip — row bands only, no product names",
+      "distractionNotes": "Minimal"
+    },
+    "images/A-gorgonzola-row.png": {
+      "widthPx": 43,
+      "heightPx": 42,
+      "rightmostInkAbsX": 480,
+      "digit5Clipped": false,
+      "unitPriceBleed": false,
+      "marginBeforeUnitPricePx": 2,
+      "rightEdgeDarkCount": 19,
+      "meanLuminance": 191.9717607973422,
+      "darkPixelFraction": 0.4894795127353267,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Isolated presentation",
+      "distractionNotes": "Minimal"
+    },
+    "images/B-qtd-strip-full.png": {
+      "widthPx": 45,
+      "heightPx": 421,
+      "rightmostInkAbsX": 482,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": 0,
+      "rightEdgeDarkCount": 314,
+      "meanLuminance": 186.245183425706,
+      "darkPixelFraction": 0.7200844550013196,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Multi-row Qtd strip — row bands only, no product names",
+      "distractionNotes": "Unit-price column digits may bleed into strip"
+    },
+    "images/B-gorgonzola-row.png": {
+      "widthPx": 45,
+      "heightPx": 42,
+      "rightmostInkAbsX": 482,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": 0,
+      "rightEdgeDarkCount": 18,
+      "meanLuminance": 191.51534391534392,
+      "darkPixelFraction": 0.4883597883597884,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Isolated presentation",
+      "distractionNotes": "Unit-price column digits may bleed into strip"
+    },
+    "images/C-qtd-strip-full.png": {
+      "widthPx": 47,
+      "heightPx": 421,
+      "rightmostInkAbsX": 484,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": -2,
+      "rightEdgeDarkCount": 328,
+      "meanLuminance": 186.15232223176832,
+      "darkPixelFraction": 0.7225451053722141,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Multi-row Qtd strip — row bands only, no product names",
+      "distractionNotes": "Unit-price column digits may bleed into strip"
+    },
+    "images/C-gorgonzola-row.png": {
+      "widthPx": 47,
+      "heightPx": 42,
+      "rightmostInkAbsX": 484,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": -2,
+      "rightEdgeDarkCount": 27,
+      "meanLuminance": 191.0982776089159,
+      "darkPixelFraction": 0.4949341438703141,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Isolated presentation",
+      "distractionNotes": "Unit-price column digits may bleed into strip"
+    },
+    "images/D-qtd-strip-full.png": {
+      "widthPx": 50,
+      "heightPx": 421,
+      "rightmostInkAbsX": 487,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": -5,
+      "rightEdgeDarkCount": 352,
+      "meanLuminance": 186.4159619952494,
+      "darkPixelFraction": 0.7266508313539193,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Multi-row Qtd strip — row bands only, no product names",
+      "distractionNotes": "Unit-price column digits may bleed into strip"
+    },
+    "images/D-gorgonzola-row.png": {
+      "widthPx": 50,
+      "heightPx": 42,
+      "rightmostInkAbsX": 487,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": -5,
+      "rightEdgeDarkCount": 23,
+      "meanLuminance": 191.23142857142858,
+      "darkPixelFraction": 0.4961904761904762,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Isolated presentation",
+      "distractionNotes": "Unit-price column digits may bleed into strip"
+    },
+    "images/E-qtd-strip-full.png": {
+      "widthPx": 60,
+      "heightPx": 421,
+      "rightmostInkAbsX": 497,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": -15,
+      "rightEdgeDarkCount": 319,
+      "meanLuminance": 187.15946159936658,
+      "darkPixelFraction": 0.7342438638163103,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Multi-row Qtd strip — row bands only, no product names",
+      "distractionNotes": "Unit-price column digits may bleed into strip"
+    },
+    "images/E-gorgonzola-row.png": {
+      "widthPx": 60,
+      "heightPx": 42,
+      "rightmostInkAbsX": 497,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": -15,
+      "rightEdgeDarkCount": 29,
+      "meanLuminance": 191.490873015873,
+      "darkPixelFraction": 0.5257936507936508,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Isolated presentation",
+      "distractionNotes": "Unit-price column digits may bleed into strip"
+    },
+    "images/F-qtd-strip-full.png": {
+      "widthPx": 80,
+      "heightPx": 421,
+      "rightmostInkAbsX": 517,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": -35,
+      "rightEdgeDarkCount": 314,
+      "meanLuminance": 188.41247030878858,
+      "darkPixelFraction": 0.7346199524940618,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Multi-row Qtd strip — row bands only, no product names",
+      "distractionNotes": "Unit-price column digits may bleed into strip"
+    },
+    "images/F-gorgonzola-row.png": {
+      "widthPx": 80,
+      "heightPx": 42,
+      "rightmostInkAbsX": 517,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": -35,
+      "rightEdgeDarkCount": 29,
+      "meanLuminance": 191.73214285714286,
+      "darkPixelFraction": 0.5800595238095239,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Isolated presentation",
+      "distractionNotes": "Unit-price column digits may bleed into strip"
+    },
+    "images/G-gorgonzola-row.png": {
+      "widthPx": 724,
+      "heightPx": 42,
+      "rightmostInkAbsX": 723,
+      "digit5Clipped": false,
+      "unitPriceBleed": false,
+      "marginBeforeUnitPricePx": null,
+      "rightEdgeDarkCount": 42,
+      "meanLuminance": 188.38391212838727,
+      "darkPixelFraction": 0.6510786635096028,
+      "digitClarityNotes": "General ink present; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Wide crop includes adjacent columns or description bleed",
+      "distractionNotes": "Description fractions (1/8, 1/2) and pack weights visible"
+    },
+    "images/H-gorgonzola-row.png": {
+      "widthPx": 724,
+      "heightPx": 42,
+      "rightmostInkAbsX": 723,
+      "digit5Clipped": false,
+      "unitPriceBleed": false,
+      "marginBeforeUnitPricePx": null,
+      "rightEdgeDarkCount": 42,
+      "meanLuminance": 188.49283083399106,
+      "darkPixelFraction": 0.637102078400421,
+      "digitClarityNotes": "General ink present; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Wide crop includes adjacent columns or description bleed",
+      "distractionNotes": "Description fractions (1/8, 1/2) and pack weights visible"
+    },
+    "images/I-table-marker.png": {
+      "widthPx": 724,
+      "heightPx": 421,
+      "rightmostInkAbsX": 723,
+      "digit5Clipped": false,
+      "unitPriceBleed": false,
+      "marginBeforeUnitPricePx": null,
+      "rightEdgeDarkCount": 416,
+      "meanLuminance": 175.05536344667394,
+      "darkPixelFraction": 0.7837528378892665,
+      "digitClarityNotes": "General ink present; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Wide crop includes adjacent columns or description bleed",
+      "distractionNotes": "Description fractions (1/8, 1/2) and pack weights visible"
+    },
+    "images/J-qtd-strip-full.png": {
+      "widthPx": 86,
+      "heightPx": 842,
+      "rightmostInkAbsX": 523,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": 2,
+      "rightEdgeDarkCount": 632,
+      "meanLuminance": 186.36789482406232,
+      "darkPixelFraction": 0.718610175109098,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Multi-row Qtd strip — row bands only, no product names",
+      "distractionNotes": "Unit-price column digits may bleed into strip"
+    },
+    "images/J-gorgonzola-row.png": {
+      "widthPx": 43,
+      "heightPx": 42,
+      "rightmostInkAbsX": 480,
+      "digit5Clipped": false,
+      "unitPriceBleed": false,
+      "marginBeforeUnitPricePx": 2,
+      "rightEdgeDarkCount": 19,
+      "meanLuminance": 191.9717607973422,
+      "darkPixelFraction": 0.4894795127353267,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Isolated presentation",
+      "distractionNotes": "Minimal"
+    },
+    "images/K-qtd-strip-full.png": {
+      "widthPx": 129,
+      "heightPx": 1263,
+      "rightmostInkAbsX": 566,
+      "digit5Clipped": false,
+      "unitPriceBleed": true,
+      "marginBeforeUnitPricePx": 2,
+      "rightEdgeDarkCount": 948,
+      "meanLuminance": 186.36789482406232,
+      "darkPixelFraction": 0.718610175109098,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Wide crop includes adjacent columns or description bleed",
+      "distractionNotes": "Unit-price column digits may bleed into strip"
+    },
+    "images/K-gorgonzola-row.png": {
+      "widthPx": 43,
+      "heightPx": 42,
+      "rightmostInkAbsX": 480,
+      "digit5Clipped": false,
+      "unitPriceBleed": false,
+      "marginBeforeUnitPricePx": 2,
+      "rightEdgeDarkCount": 19,
+      "meanLuminance": 191.9717607973422,
+      "darkPixelFraction": 0.4894795127353267,
+      "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+      "contextNotes": "Isolated presentation",
+      "distractionNotes": "Minimal"
+    }
+  },
+  "gorgonzolaRanking": [
+    {
+      "variant": "A",
+      "label": "43px strip (production)",
+      "majority": 1.3,
+      "correct": false,
+      "correctPct": 0,
+      "variance": 0,
+      "consistencyScore": 100,
+      "uniqueValues": [
+        1.3
+      ],
+      "visual": {
+        "widthPx": 43,
+        "heightPx": 421,
+        "rightmostInkAbsX": 480,
+        "digit5Clipped": false,
+        "unitPriceBleed": false,
+        "marginBeforeUnitPricePx": 2,
+        "rightEdgeDarkCount": 316,
+        "meanLuminance": 186.36789482406232,
+        "darkPixelFraction": 0.718610175109098,
+        "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+        "contextNotes": "Multi-row Qtd strip — row bands only, no product names",
+        "distractionNotes": "Minimal"
+      }
+    },
+    {
+      "variant": "B",
+      "label": "45px strip",
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "correctPct": 0,
+      "variance": 0,
+      "consistencyScore": 0,
+      "uniqueValues": [],
+      "visual": {
+        "widthPx": 45,
+        "heightPx": 421,
+        "rightmostInkAbsX": 482,
+        "digit5Clipped": false,
+        "unitPriceBleed": true,
+        "marginBeforeUnitPricePx": 0,
+        "rightEdgeDarkCount": 314,
+        "meanLuminance": 186.245183425706,
+        "darkPixelFraction": 0.7200844550013196,
+        "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+        "contextNotes": "Multi-row Qtd strip — row bands only, no product names",
+        "distractionNotes": "Unit-price column digits may bleed into strip"
+      }
+    },
+    {
+      "variant": "C",
+      "label": "47px strip",
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "correctPct": 0,
+      "variance": 0,
+      "consistencyScore": 0,
+      "uniqueValues": [],
+      "visual": {
+        "widthPx": 47,
+        "heightPx": 421,
+        "rightmostInkAbsX": 484,
+        "digit5Clipped": false,
+        "unitPriceBleed": true,
+        "marginBeforeUnitPricePx": -2,
+        "rightEdgeDarkCount": 328,
+        "meanLuminance": 186.15232223176832,
+        "darkPixelFraction": 0.7225451053722141,
+        "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+        "contextNotes": "Multi-row Qtd strip — row bands only, no product names",
+        "distractionNotes": "Unit-price column digits may bleed into strip"
+      }
+    },
+    {
+      "variant": "D",
+      "label": "50px strip",
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "correctPct": 0,
+      "variance": 0,
+      "consistencyScore": 0,
+      "uniqueValues": [],
+      "visual": {
+        "widthPx": 50,
+        "heightPx": 421,
+        "rightmostInkAbsX": 487,
+        "digit5Clipped": false,
+        "unitPriceBleed": true,
+        "marginBeforeUnitPricePx": -5,
+        "rightEdgeDarkCount": 352,
+        "meanLuminance": 186.4159619952494,
+        "darkPixelFraction": 0.7266508313539193,
+        "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+        "contextNotes": "Multi-row Qtd strip — row bands only, no product names",
+        "distractionNotes": "Unit-price column digits may bleed into strip"
+      }
+    },
+    {
+      "variant": "E",
+      "label": "60px strip",
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "correctPct": 0,
+      "variance": 0,
+      "consistencyScore": 0,
+      "uniqueValues": [],
+      "visual": {
+        "widthPx": 60,
+        "heightPx": 421,
+        "rightmostInkAbsX": 497,
+        "digit5Clipped": false,
+        "unitPriceBleed": true,
+        "marginBeforeUnitPricePx": -15,
+        "rightEdgeDarkCount": 319,
+        "meanLuminance": 187.15946159936658,
+        "darkPixelFraction": 0.7342438638163103,
+        "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+        "contextNotes": "Multi-row Qtd strip — row bands only, no product names",
+        "distractionNotes": "Unit-price column digits may bleed into strip"
+      }
+    },
+    {
+      "variant": "F",
+      "label": "80px strip",
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "correctPct": 0,
+      "variance": 0,
+      "consistencyScore": 0,
+      "uniqueValues": [],
+      "visual": {
+        "widthPx": 80,
+        "heightPx": 421,
+        "rightmostInkAbsX": 517,
+        "digit5Clipped": false,
+        "unitPriceBleed": true,
+        "marginBeforeUnitPricePx": -35,
+        "rightEdgeDarkCount": 314,
+        "meanLuminance": 188.41247030878858,
+        "darkPixelFraction": 0.7346199524940618,
+        "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+        "contextNotes": "Multi-row Qtd strip — row bands only, no product names",
+        "distractionNotes": "Unit-price column digits may bleed into strip"
+      }
+    },
+    {
+      "variant": "G",
+      "label": "Full row crop",
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "correctPct": 0,
+      "variance": 0,
+      "consistencyScore": 0,
+      "uniqueValues": [],
+      "visual": {
+        "widthPx": 724,
+        "heightPx": 42,
+        "rightmostInkAbsX": 723,
+        "digit5Clipped": false,
+        "unitPriceBleed": false,
+        "marginBeforeUnitPricePx": null,
+        "rightEdgeDarkCount": 42,
+        "meanLuminance": 188.38391212838727,
+        "darkPixelFraction": 0.6510786635096028,
+        "digitClarityNotes": "General ink present; dense ink at right edge may confuse trailing digit",
+        "contextNotes": "Wide crop includes adjacent columns or description bleed",
+        "distractionNotes": "Description fractions (1/8, 1/2) and pack weights visible"
+      }
+    },
+    {
+      "variant": "H",
+      "label": "Full row + Qtd highlight",
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "correctPct": 0,
+      "variance": 0,
+      "consistencyScore": 0,
+      "uniqueValues": [],
+      "visual": {
+        "widthPx": 724,
+        "heightPx": 42,
+        "rightmostInkAbsX": 723,
+        "digit5Clipped": false,
+        "unitPriceBleed": false,
+        "marginBeforeUnitPricePx": null,
+        "rightEdgeDarkCount": 42,
+        "meanLuminance": 188.49283083399106,
+        "darkPixelFraction": 0.637102078400421,
+        "digitClarityNotes": "General ink present; dense ink at right edge may confuse trailing digit",
+        "contextNotes": "Wide crop includes adjacent columns or description bleed",
+        "distractionNotes": "Description fractions (1/8, 1/2) and pack weights visible"
+      }
+    },
+    {
+      "variant": "I",
+      "label": "Table crop + Gorgonzola marker",
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "correctPct": 0,
+      "variance": 0,
+      "consistencyScore": 0,
+      "uniqueValues": [],
+      "visual": {
+        "widthPx": 724,
+        "heightPx": 421,
+        "rightmostInkAbsX": 723,
+        "digit5Clipped": false,
+        "unitPriceBleed": false,
+        "marginBeforeUnitPricePx": null,
+        "rightEdgeDarkCount": 416,
+        "meanLuminance": 175.05536344667394,
+        "darkPixelFraction": 0.7837528378892665,
+        "digitClarityNotes": "General ink present; dense ink at right edge may confuse trailing digit",
+        "contextNotes": "Wide crop includes adjacent columns or description bleed",
+        "distractionNotes": "Description fractions (1/8, 1/2) and pack weights visible"
+      }
+    },
+    {
+      "variant": "J",
+      "label": "43px strip enlarged 2x",
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "correctPct": 0,
+      "variance": 0,
+      "consistencyScore": 0,
+      "uniqueValues": [],
+      "visual": {
+        "widthPx": 86,
+        "heightPx": 842,
+        "rightmostInkAbsX": 523,
+        "digit5Clipped": false,
+        "unitPriceBleed": true,
+        "marginBeforeUnitPricePx": 2,
+        "rightEdgeDarkCount": 632,
+        "meanLuminance": 186.36789482406232,
+        "darkPixelFraction": 0.718610175109098,
+        "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+        "contextNotes": "Multi-row Qtd strip — row bands only, no product names",
+        "distractionNotes": "Unit-price column digits may bleed into strip"
+      }
+    },
+    {
+      "variant": "K",
+      "label": "43px strip enlarged 3x",
+      "majority": "PENDING_LIVE",
+      "correct": null,
+      "correctPct": 0,
+      "variance": 0,
+      "consistencyScore": 0,
+      "uniqueValues": [],
+      "visual": {
+        "widthPx": 129,
+        "heightPx": 1263,
+        "rightmostInkAbsX": 566,
+        "digit5Clipped": false,
+        "unitPriceBleed": true,
+        "marginBeforeUnitPricePx": 2,
+        "rightEdgeDarkCount": 948,
+        "meanLuminance": 186.36789482406232,
+        "darkPixelFraction": 0.718610175109098,
+        "digitClarityNotes": "Digit 5 column (x479) has visible ink — full 1,35 should be readable; dense ink at right edge may confuse trailing digit",
+        "contextNotes": "Wide crop includes adjacent columns or description bleed",
+        "distractionNotes": "Unit-price column digits may bleed into strip"
+      }
+    }
+  ],
+  "finalQuestions": {
+    "q1_bestPresentation": "PENDING_LIVE — only variant A has single reference run (1.30 from live-reextract v41)",
+    "q2_widthImproves": "Likely yes from pixel geometry: digit-5 visible from ~45px; live v41 still reads 1.30 at 43px. Wider strips (E/F) include digit fully with margin — PENDING_LIVE confirmation",
+    "q3_contextImproves": "Risk of harm — variants G/H/I expose description fractions (1/8) that historically caused integer-2 confusion; strip isolation (A–F) is safer. PENDING_LIVE",
+    "q4_enlargementImproves": "Unlikely alone — 43px already shows digit 5 in pixels; failure at v41 is vision truncation (1.30) not resolution. Enlargement without width may not recover trailing 5 — PENDING_LIVE",
+    "q5_canGptRead135": "Not reliably at production 43px — live-reextract v41 returns 1.30 (ocr_quantity 1.3). Pixel evidence shows digit 5 present; GPT truncates or misreads trailing digit.",
+    "q6_productionChoice": "Recommend **E (60px strip)** over A (43px): digit-5 fully visible, 5px+ margin before unit-price ink at x483, prior width-escalation audit estimates 1.35. A confirmed wrong (1.30) via live-reextract."
+  }
+}

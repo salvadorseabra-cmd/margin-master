@@ -1,0 +1,67 @@
+{
+  "auditType": "STRICT_READ_ONLY_DUPLICATE_ALIAS_COLLISION",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-25T03:00:00.000Z",
+  "classification": "C",
+  "classificationLabel": "Alias persistence bug — distinct products, stale alias on wrong ingredient",
+  "collisionCount": 1,
+  "catalogHealth": {
+    "totalAliases": 69,
+    "uniqueNormalized": 68,
+    "trueCollisions": 1,
+    "falsePositives": 0
+  },
+  "primaryCollision": {
+    "normalizedAlias": "mozzarella fior di latte expet julienne simonetta",
+    "supplier": "Mammafiore Portugal",
+    "staleAliasId": "5ec7b0f7-f87a-46c5-b11c-b151efd130b0",
+    "correctAliasId": "26ff7bd7-6846-42f7-a6c6-4efc941df4e1",
+    "wrongIngredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+    "wrongIngredientName": "Mozzarella fior di latte",
+    "correctIngredientId": "5e9e7f89-7141-44f7-b8d4-bc92bad9bc36",
+    "correctIngredientName": "Mozzarella julienne"
+  },
+  "ingredients": {
+    "fiorDiLatte": {
+      "id": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "createdAt": "2026-06-08T23:08:43Z",
+      "currentPrice": 8.12,
+      "recipeUsage": 0,
+      "suppliers": ["Aviludo", "Il Bocconcino"]
+    },
+    "julienne": {
+      "id": "5e9e7f89-7141-44f7-b8d4-bc92bad9bc36",
+      "createdAt": "2026-06-16T18:18:49Z",
+      "currentPrice": 20.03,
+      "recipeUsage": 0,
+      "suppliers": ["Mammafiore Portugal"]
+    }
+  },
+  "rootCause": "upsertConfirmedAlias dedupes per ingredient_id only; Review&Create left stale alias on fior di latte when julienne ingredient created",
+  "mergeSafety": {
+    "mergeIngredients": "CRITICAL — do not merge",
+    "deleteStaleAliasOnly": "SAFE",
+    "recipeRisk": "none",
+    "purchaseHistoryRiskIfMerge": "critical",
+    "purchaseHistoryRiskIfAliasCleanup": "none"
+  },
+  "modelDReadiness": {
+    "waitForCleanup": true,
+    "recommendedAction": "delete_stale_alias_5ec7b0f7",
+    "thenProceed": true
+  },
+  "finalAnswers": {
+    "actuallyDuplicated": false,
+    "whyDuplication": "Alias persistence bug — premature confirm before julienne ingredient existed",
+    "safeToMerge": false,
+    "recipeRisk": "none",
+    "purchaseHistoryRisk": "none if alias cleanup only",
+    "additionalCollisions": 0,
+    "modelDWait": true,
+    "confidencePct": 93
+  },
+  "priorAuditReferences": [
+    ".tmp/operational-identity-replay-audit/",
+    ".tmp/final-canonical-cleanup/FINAL_EDGE_CASE_RESULTS.md"
+  ]
+}

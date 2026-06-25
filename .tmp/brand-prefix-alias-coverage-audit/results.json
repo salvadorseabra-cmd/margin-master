@@ -1,0 +1,72 @@
+{
+  "auditType": "STRICT_READ_ONLY_BRAND_PREFIX_ALIAS_COVERAGE",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-25T01:00:00.000Z",
+  "classification": "D",
+  "classificationLabel": "Structural normalization gap",
+  "manifestation": "Small Emporio family — live regression Prosciutto only",
+  "confidencePct": 86,
+  "corpusStats": {
+    "totalInvoiceItems": 51,
+    "rowsWithBrandPrefix": 8,
+    "prefixChangesAliasResultLive": 1,
+    "recoveredByPrefixRemoval": 1,
+    "recoveryPctLiveRegressions": 100,
+    "recoveryPctAllRows": 2,
+    "recoveryPctPrefixRows": 12.5,
+    "displayAliasGapRows": 6
+  },
+  "divergencePoint": {
+    "display": "stripInvoiceBrandPrefix in canonical-ingredient-display-name.ts",
+    "alias": "normalizeOperationalAliasKey — no brand prefix strip",
+    "file": "src/lib/ingredient-match-override.ts buildOverrideKeysFromInvoiceLine"
+  },
+  "brandPrefixInventory": {
+    "rovagnati": { "invoiceRows": 3, "inDisplayStripRE": true, "inAliasStrip": false },
+    "rigamonti": { "invoiceRows": 1, "inDisplayStripRE": true, "inAliasStrip": false },
+    "arrigoniFormaggi": { "invoiceRows": 1, "inDisplayStripRE": true, "inAliasStrip": false },
+    "deCecco": { "invoiceRows": 1, "inDisplayStripRE": true, "inAliasStrip": false },
+    "baladin": { "invoiceRows": 1, "inDisplayStripRE": true, "inAliasStrip": false },
+    "sanPellegrino": { "invoiceRows": 1, "mustNotStrip": true }
+  },
+  "prosciutto": {
+    "storedAlias": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5Kg",
+    "normalizedAlias": "assaporami prosciutto cotto sceltohc",
+    "currentLine": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+    "currentHit": false,
+    "hitAfterPrefixRemoval": true,
+    "currentStatus": "suggested/semantic",
+    "expectedAfterFix": "confirmed-override"
+  },
+  "regressionCandidates": {
+    "prosciutto": { "activeRegression": true, "prefixGapRisk": "ACTIVE" },
+    "mortadella": { "activeRegression": false, "aliasStoredWithPrefix": true },
+    "gorgonzola": { "activeRegression": false, "aliasStoredWithPrefix": true },
+    "bresaola": { "activeRegression": false, "aliasStoredWithPrefix": true },
+    "paccheri": { "activeRegression": false },
+    "mozzarella": { "activeRegression": false },
+    "chocolate": { "activeRegression": false },
+    "atum": { "activeRegression": false },
+    "tomilho": { "activeRegression": false },
+    "pepino": { "activeRegression": false }
+  },
+  "falsePositiveRisks": {
+    "sanPellegrinoStrip": "HIGH — must not apply charcuterie rules to beverages",
+    "assaporamiHcOverStrip": "MEDIUM — stored alias includes assaporami + sceltohc",
+    "readWriteAsymmetry": "MEDIUM — aliases stored with prefix on some products"
+  },
+  "finalAnswers": {
+    "productsAffectedLive": 1,
+    "productsAtRiskPattern": "6-8",
+    "aliasesRecover": 1,
+    "falsePositivesObserved": false,
+    "oneNormalizationFixesMultiple": "Yes partially — shared strip on read+write alias paths",
+    "chosenClassification": "D"
+  },
+  "priorAuditReferences": [
+    ".tmp/possible-match-regression-audit/",
+    ".tmp/post-deploy-regression-audit/",
+    ".tmp/emporio-deli-family-audit/",
+    ".tmp/italian-supplier-pattern-analysis/"
+  ]
+}

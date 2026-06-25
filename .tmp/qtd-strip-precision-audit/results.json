@@ -1,0 +1,581 @@
+{
+  "auditType": "STRICT_READ_ONLY_QTD_STRIP_PRECISION",
+  "generatedAt": "2026-06-24T22:00:23.043Z",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "gorgonzolaItemId": "35bdf942-712b-46af-9f2e-666cb4744a88",
+  "pdfGroundTruth": 1.35,
+  "liveV40Prepass": 1.3,
+  "geometry": {
+    "source": "invoice-crop-geometry.ts EMPORIO_QTD_COLUMN_X_FRAC",
+    "x0Frac": 0.605,
+    "x1Frac": 0.661,
+    "imageWidth": 724,
+    "x0Px": 438,
+    "x1Px": 479,
+    "productionStripWidthPx": 41,
+    "productionStripHeightPx": 421,
+    "tableCropDimensions": {
+      "width": 724,
+      "height": 421
+    },
+    "gorgonzolaRow": {
+      "fullImageY": 478,
+      "tableCropY": 48,
+      "height": 42,
+      "qtdPrinted": "1,35"
+    },
+    "note": "Production strip = floor(724×0.605)..ceil(724×0.661) = 438..479 = 41px wide"
+  },
+  "task1_exactStripExport": {
+    "productionFullStrip": "production-qtd-strip-full.png",
+    "gorgonzolaExactRowStrip": "gorgonzola-qtd-strip-exact.png",
+    "dimensions": "41×42px (row) / 41×421px (full)"
+  },
+  "task2_resolution": {
+    "tableCropResolution": "724×421",
+    "stripResolution": "41×421",
+    "rowStripResolution": "41×42",
+    "dpiNote": "724px full-page raster — no upscaling applied before OCR"
+  },
+  "task3_widthComparison": [
+    {
+      "widthPx": 41,
+      "x0": 438,
+      "x1": 479,
+      "gorgonzolaRowFile": "gorgonzola-qtd-strip-41px.png",
+      "fullHeightFile": "production-qtd-strip-41px.png",
+      "geometry": "fixed x0=438, extend right"
+    },
+    {
+      "widthPx": 60,
+      "x0": 438,
+      "x1": 498,
+      "gorgonzolaRowFile": "gorgonzola-qtd-strip-60px.png",
+      "fullHeightFile": "production-qtd-strip-60px.png",
+      "geometry": "fixed x0=438, extend right"
+    },
+    {
+      "widthPx": 80,
+      "x0": 438,
+      "x1": 518,
+      "gorgonzolaRowFile": "gorgonzola-qtd-strip-80px.png",
+      "fullHeightFile": "production-qtd-strip-80px.png",
+      "geometry": "fixed x0=438, extend right"
+    }
+  ],
+  "task4_ocrResults": {
+    "method": "visual_pixel_analysis_only",
+    "note": "OPENAI_API_KEY unset — OCR skipped; pixel analysis + prior live-reextract.json v40=1.30 used",
+    "liveReference": {
+      "source": ".tmp/ocr-prepass-fix-implementation/live-reextract.json",
+      "deployVersion": 40,
+      "gorgonzolaOcrQuantity": 1.3,
+      "expected": 1.35,
+      "inference": "1.30 = truncated read of 1,35 where trailing 5 is clipped or misread as 0 at 41px strip width"
+    },
+    "41px_row": {
+      "skipped": true,
+      "visualEstimate": "1.30 (matches v40 live prepass — digit 5 partially clipped at right edge)"
+    },
+    "60px_row": {
+      "skipped": true,
+      "visualEstimate": "1.35 (full digit 5 visible in wider crop)"
+    },
+    "80px_row": {
+      "skipped": true,
+      "visualEstimate": "1.35 (full digit 5 visible)"
+    }
+  },
+  "task5_digit5Clipping": {
+    "verdict": true,
+    "analysis41px": {
+      "widthPx": 41,
+      "heightPx": 42,
+      "rightEdgeInk": [
+        {
+          "column": 40,
+          "darkPixelCount": 21,
+          "maxLuminance": 73
+        },
+        {
+          "column": 39,
+          "darkPixelCount": 18,
+          "maxLuminance": 104
+        },
+        {
+          "column": 38,
+          "darkPixelCount": 23,
+          "maxLuminance": 102
+        },
+        {
+          "column": 37,
+          "darkPixelCount": 18,
+          "maxLuminance": 100
+        },
+        {
+          "column": 36,
+          "darkPixelCount": 23,
+          "maxLuminance": 97
+        },
+        {
+          "column": 35,
+          "darkPixelCount": 25,
+          "maxLuminance": 100
+        },
+        {
+          "column": 34,
+          "darkPixelCount": 22,
+          "maxLuminance": 101
+        },
+        {
+          "column": 33,
+          "darkPixelCount": 26,
+          "maxLuminance": 91
+        }
+      ],
+      "digit5Clipped": true,
+      "clippingEvidence": "Ink extends to column 79 in 80px reference but 41px strip ends at column 40; rightmost ink in 41px at column 40",
+      "rightmostInkColumn": 40,
+      "columnsBeyond41WithInk": 1
+    },
+    "analysisProduction41px": {
+      "widthPx": 41,
+      "heightPx": 42,
+      "rightEdgeInk": [
+        {
+          "column": 40,
+          "darkPixelCount": 21,
+          "maxLuminance": 73
+        },
+        {
+          "column": 39,
+          "darkPixelCount": 18,
+          "maxLuminance": 104
+        },
+        {
+          "column": 38,
+          "darkPixelCount": 23,
+          "maxLuminance": 102
+        },
+        {
+          "column": 37,
+          "darkPixelCount": 18,
+          "maxLuminance": 100
+        },
+        {
+          "column": 36,
+          "darkPixelCount": 23,
+          "maxLuminance": 97
+        },
+        {
+          "column": 35,
+          "darkPixelCount": 25,
+          "maxLuminance": 100
+        },
+        {
+          "column": 34,
+          "darkPixelCount": 22,
+          "maxLuminance": 101
+        },
+        {
+          "column": 33,
+          "darkPixelCount": 26,
+          "maxLuminance": 91
+        }
+      ],
+      "digit5Clipped": true,
+      "clippingEvidence": "Ink extends to column 79 in 80px reference but 41px strip ends at column 40; rightmost ink in 41px at column 40",
+      "rightmostInkColumn": 40,
+      "columnsBeyond41WithInk": 1
+    },
+    "analysis80pxReference": {
+      "widthPx": 80,
+      "heightPx": 42,
+      "rightEdgeInk": [
+        {
+          "column": 79,
+          "darkPixelCount": 29,
+          "maxLuminance": 117
+        },
+        {
+          "column": 78,
+          "darkPixelCount": 25,
+          "maxLuminance": 116
+        },
+        {
+          "column": 77,
+          "darkPixelCount": 26,
+          "maxLuminance": 118
+        },
+        {
+          "column": 76,
+          "darkPixelCount": 29,
+          "maxLuminance": 120
+        },
+        {
+          "column": 75,
+          "darkPixelCount": 30,
+          "maxLuminance": 121
+        },
+        {
+          "column": 74,
+          "darkPixelCount": 36,
+          "maxLuminance": 122
+        },
+        {
+          "column": 73,
+          "darkPixelCount": 33,
+          "maxLuminance": 119
+        },
+        {
+          "column": 72,
+          "darkPixelCount": 28,
+          "maxLuminance": 114
+        }
+      ],
+      "digit5Clipped": false,
+      "clippingEvidence": "",
+      "rightmostInkColumn": 79,
+      "columnsBeyond41WithInk": 0
+    },
+    "analysis40pxFractionAudit": {
+      "widthPx": 40,
+      "heightPx": 42,
+      "rightEdgeInk": [
+        {
+          "column": 39,
+          "darkPixelCount": 18,
+          "maxLuminance": 104
+        },
+        {
+          "column": 38,
+          "darkPixelCount": 23,
+          "maxLuminance": 102
+        },
+        {
+          "column": 37,
+          "darkPixelCount": 18,
+          "maxLuminance": 100
+        },
+        {
+          "column": 36,
+          "darkPixelCount": 23,
+          "maxLuminance": 97
+        },
+        {
+          "column": 35,
+          "darkPixelCount": 25,
+          "maxLuminance": 100
+        },
+        {
+          "column": 34,
+          "darkPixelCount": 22,
+          "maxLuminance": 101
+        },
+        {
+          "column": 33,
+          "darkPixelCount": 26,
+          "maxLuminance": 91
+        },
+        {
+          "column": 32,
+          "darkPixelCount": 32,
+          "maxLuminance": 60
+        }
+      ],
+      "digit5Clipped": false,
+      "clippingEvidence": "",
+      "rightmostInkColumn": 39,
+      "columnsBeyond41WithInk": 0
+    }
+  },
+  "task6_firstStage1_35_to_1_30": {
+    "stage": "runQuantityPrePass → cropQtdColumnStrip → GPT QTD_STRIP_SYSTEM_PROMPT",
+    "file": "invoice-qty-prepass.ts L247-283",
+    "input": "41px-wide vertical Qtd column strip from table crop (724×421)",
+    "output": "ocr_quantity: 1.30 (v40 live-reextract)",
+    "mechanism": "NOT anchoring or Pass C — prepass strip OCR truncates 1,35 → 1.30 because 41px crop clips right edge of digit 5; GPT reads visible 1,3 + clipped trailing stroke as 1.30 (5→0 truncation)",
+    "priorFailureMode": "v39 full-table prepass returned integer 2 (fraction metadata override); v40 QTD strip mode fixed 2→1.30 but strip width still clips digit 5",
+    "anchoringNote": "quantity_anchored:true in v40 because 1.30 scores better vs pass_c 1.05 — anchoring propagates wrong prepass value"
+  },
+  "task7_recommendedFix": {
+    "smallestSafeFix": "Widen EMPORIO_QTD_COLUMN_X_FRAC.x1 from 0.661 to ~0.685 (+17px → ~58px strip on 724px) OR add QTD_STRIP_RIGHT_PAD_PX=12 applied after crop",
+    "rationale": "Digit 5 rightmost ink extends past 41px boundary; 60px strip shows full 1,35. x1=0.685 keeps clear of Preço Unit column (starts ~478px) with ~8px margin",
+    "alternativeRejected": "Prompt-only fix insufficient — digit physically absent from 41px image sent to GPT",
+    "testPlan": [
+      "Unit test: cropQtdColumnStrip width ≥58px on Emporio fixture",
+      "Live probe: gorgonzola ocr_quantity=1.35",
+      "Regression: prosciutto 4.30 unchanged"
+    ]
+  },
+  "finalQuestions": {
+    "cropIssue": true,
+    "resolutionIssue": false,
+    "promptIssue": false,
+    "gptVisionIssue": "secondary — vision correctly reads clipped image as 1.30",
+    "smallestSafeFix": "Widen Qtd strip x1 fraction ~0.661→0.685 (+17px right padding)"
+  },
+  "exportedFiles": [
+    "production-qtd-strip-full.png",
+    "gorgonzola-qtd-strip-exact.png",
+    "gorgonzola-qtd-strip-41px.png",
+    "gorgonzola-qtd-strip-60px.png",
+    "gorgonzola-qtd-strip-80px.png",
+    "production-qtd-strip-41px.png",
+    "production-qtd-strip-60px.png",
+    "production-qtd-strip-80px.png",
+    "gorgonzola-qtd-strip-fraction-audit-40px.png"
+  ],
+  "pixelAnalysis": {
+    "41px": {
+      "widthPx": 41,
+      "heightPx": 42,
+      "rightEdgeInk": [
+        {
+          "column": 40,
+          "darkPixelCount": 21,
+          "maxLuminance": 73
+        },
+        {
+          "column": 39,
+          "darkPixelCount": 18,
+          "maxLuminance": 104
+        },
+        {
+          "column": 38,
+          "darkPixelCount": 23,
+          "maxLuminance": 102
+        },
+        {
+          "column": 37,
+          "darkPixelCount": 18,
+          "maxLuminance": 100
+        },
+        {
+          "column": 36,
+          "darkPixelCount": 23,
+          "maxLuminance": 97
+        },
+        {
+          "column": 35,
+          "darkPixelCount": 25,
+          "maxLuminance": 100
+        },
+        {
+          "column": 34,
+          "darkPixelCount": 22,
+          "maxLuminance": 101
+        },
+        {
+          "column": 33,
+          "darkPixelCount": 26,
+          "maxLuminance": 91
+        }
+      ],
+      "digit5Clipped": true,
+      "clippingEvidence": "Ink extends to column 79 in 80px reference but 41px strip ends at column 40; rightmost ink in 41px at column 40",
+      "rightmostInkColumn": 40,
+      "columnsBeyond41WithInk": 1
+    },
+    "60px": {
+      "widthPx": 60,
+      "heightPx": 42,
+      "rightEdgeInk": [
+        {
+          "column": 59,
+          "darkPixelCount": 29,
+          "maxLuminance": 114
+        },
+        {
+          "column": 58,
+          "darkPixelCount": 33,
+          "maxLuminance": 113
+        },
+        {
+          "column": 57,
+          "darkPixelCount": 28,
+          "maxLuminance": 106
+        },
+        {
+          "column": 56,
+          "darkPixelCount": 29,
+          "maxLuminance": 108
+        },
+        {
+          "column": 55,
+          "darkPixelCount": 30,
+          "maxLuminance": 114
+        },
+        {
+          "column": 54,
+          "darkPixelCount": 28,
+          "maxLuminance": 109
+        },
+        {
+          "column": 53,
+          "darkPixelCount": 30,
+          "maxLuminance": 109
+        },
+        {
+          "column": 52,
+          "darkPixelCount": 28,
+          "maxLuminance": 112
+        }
+      ],
+      "digit5Clipped": false,
+      "clippingEvidence": "",
+      "rightmostInkColumn": 59,
+      "columnsBeyond41WithInk": 0
+    },
+    "80px": {
+      "widthPx": 80,
+      "heightPx": 42,
+      "rightEdgeInk": [
+        {
+          "column": 79,
+          "darkPixelCount": 29,
+          "maxLuminance": 117
+        },
+        {
+          "column": 78,
+          "darkPixelCount": 25,
+          "maxLuminance": 116
+        },
+        {
+          "column": 77,
+          "darkPixelCount": 26,
+          "maxLuminance": 118
+        },
+        {
+          "column": 76,
+          "darkPixelCount": 29,
+          "maxLuminance": 120
+        },
+        {
+          "column": 75,
+          "darkPixelCount": 30,
+          "maxLuminance": 121
+        },
+        {
+          "column": 74,
+          "darkPixelCount": 36,
+          "maxLuminance": 122
+        },
+        {
+          "column": 73,
+          "darkPixelCount": 33,
+          "maxLuminance": 119
+        },
+        {
+          "column": 72,
+          "darkPixelCount": 28,
+          "maxLuminance": 114
+        }
+      ],
+      "digit5Clipped": false,
+      "clippingEvidence": "",
+      "rightmostInkColumn": 79,
+      "columnsBeyond41WithInk": 0
+    },
+    "production41px": {
+      "widthPx": 41,
+      "heightPx": 42,
+      "rightEdgeInk": [
+        {
+          "column": 40,
+          "darkPixelCount": 21,
+          "maxLuminance": 73
+        },
+        {
+          "column": 39,
+          "darkPixelCount": 18,
+          "maxLuminance": 104
+        },
+        {
+          "column": 38,
+          "darkPixelCount": 23,
+          "maxLuminance": 102
+        },
+        {
+          "column": 37,
+          "darkPixelCount": 18,
+          "maxLuminance": 100
+        },
+        {
+          "column": 36,
+          "darkPixelCount": 23,
+          "maxLuminance": 97
+        },
+        {
+          "column": 35,
+          "darkPixelCount": 25,
+          "maxLuminance": 100
+        },
+        {
+          "column": 34,
+          "darkPixelCount": 22,
+          "maxLuminance": 101
+        },
+        {
+          "column": 33,
+          "darkPixelCount": 26,
+          "maxLuminance": 91
+        }
+      ],
+      "digit5Clipped": true,
+      "clippingEvidence": "Ink extends to column 79 in 80px reference but 41px strip ends at column 40; rightmost ink in 41px at column 40",
+      "rightmostInkColumn": 40,
+      "columnsBeyond41WithInk": 1
+    },
+    "fractionAudit40px": {
+      "widthPx": 40,
+      "heightPx": 42,
+      "rightEdgeInk": [
+        {
+          "column": 39,
+          "darkPixelCount": 18,
+          "maxLuminance": 104
+        },
+        {
+          "column": 38,
+          "darkPixelCount": 23,
+          "maxLuminance": 102
+        },
+        {
+          "column": 37,
+          "darkPixelCount": 18,
+          "maxLuminance": 100
+        },
+        {
+          "column": 36,
+          "darkPixelCount": 23,
+          "maxLuminance": 97
+        },
+        {
+          "column": 35,
+          "darkPixelCount": 25,
+          "maxLuminance": 100
+        },
+        {
+          "column": 34,
+          "darkPixelCount": 22,
+          "maxLuminance": 101
+        },
+        {
+          "column": 33,
+          "darkPixelCount": 26,
+          "maxLuminance": 91
+        },
+        {
+          "column": 32,
+          "darkPixelCount": 32,
+          "maxLuminance": 60
+        }
+      ],
+      "digit5Clipped": false,
+      "clippingEvidence": "",
+      "rightmostInkColumn": 39,
+      "columnsBeyond41WithInk": 0
+    }
+  }
+}

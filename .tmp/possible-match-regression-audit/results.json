@@ -1,0 +1,440 @@
+{
+  "auditType": "STRICT_READ_ONLY_POSSIBLE_MATCH_REGRESSION",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "subagentId": "2a540841-f4c4-425f-b75d-ed064ea17896",
+  "generatedAt": "2026-06-25T00:30:00.000Z",
+  "evidenceDate": "2026-06-25",
+  "mode": "STRICT_READ_ONLY",
+  "constraints": {
+    "codeChanges": false,
+    "dbWrites": false,
+    "deployments": false,
+    "fixesApplied": false
+  },
+  "classification": "F",
+  "classificationLabel": "Combination E (persistence/state) + A (matching alias recall)",
+  "classificationDetail": {
+    "A_matchingRegression": {
+      "applies": "partial",
+      "note": "Alias recall fails on Pass C brand-prefixed names; semantic fallback working as designed"
+    },
+    "B_threshold": {
+      "applies": false,
+      "note": "Constants unchanged; Prosciutto passes semantic bar"
+    },
+    "C_candidateGeneration": {
+      "applies": false,
+      "note": "Candidate found and promoted for all investigated products"
+    },
+    "D_reviewUI": {
+      "applies": false,
+      "note": "Renders suggested correctly; Review & Create never listed suggested rows by design"
+    },
+    "E_persistenceState": {
+      "applies": true,
+      "primary": true,
+      "note": "Re-read rotates invoice_item_id; CASCADE drops old matches; alias keyed on pre-Pass-C spelling"
+    },
+    "F_combination": {
+      "applies": true,
+      "components": ["E", "A"],
+      "note": "Re-read persistence + alias key geometry"
+    }
+  },
+  "executiveVerdict": "Dominant Prosciutto regression is alias/override key miss after re-read (Pass C adds Rovagnati - brand prefix) combined with re-read item-ID rotation orphaning prior confirmed match rows. Not threshold or UI discard. VL suggested count 4→1: 3 user confirmations (expected) + 1 new Prosciutto regression.",
+  "firstRegressionPoint": {
+    "step": "1a — lookupIngredientMatchOverride / alias lookup miss",
+    "location": "Before scoring, in findCanonicalIngredientMatch alias/override path",
+    "trigger": "Pass C re-read adds Rovagnati - brand prefix to invoice item name",
+    "mechanism": "buildOverrideKeysFromInvoiceLine → normalizeOperationalAliasKey does not strip brand prefix; canonical-ingredient-display-name.ts does strip /^rovagnati\\s*-\\s*/i for display only",
+    "prosciuttoSpecific": "Stored alias Assaporami Prosciutto… vs line Rovagnati - Assaporami Prosciutto… → semantic fallback → Possible match (was Matched automatically)"
+  },
+  "prosciutto": {
+    "itemId": "9a2e9311-a1bd-408d-8261-b7a445e7043d",
+    "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "supplier": "Emporio Italia",
+    "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+    "ingredientName": "Prosciutto cotto scelto",
+    "currentName": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+    "priorName": "Assaporami Prosciutto Cotto Scelto HC 4-4,25Kg",
+    "storedAlias": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5Kg",
+    "normalizedAlias": "assaporami prosciutto cotto sceltohc",
+    "storedSupplier": "Emporio Italia",
+    "matchStatus": "suggested",
+    "matchKind": "semantic",
+    "uiLabel": "Possible match",
+    "priorStatus": "confirmed-override",
+    "priorUiLabel": "Matched automatically",
+    "aliasKeyAnalysis": {
+      "reReadHitsStoredKey": false,
+      "oldHitsStoredKey": false,
+      "storedAliasNameWouldHit": true,
+      "denoReplayNote": "Re-read and old spelling miss stored alias key; stored alias name alone hits override"
+    }
+  },
+  "vlSuggestedCount": {
+    "current": 1,
+    "historical20260613": 4,
+    "delta": -3,
+    "deltaExplanation": "3 user-confirmed (Atum, Chocolate, Mozzarella) + 1 new Prosciutto regression",
+    "historicalLines20260613": [
+      "Atum (×2)",
+      "Chocolate",
+      "Mozzarella Bocconcino"
+    ],
+    "currentLines20260625": [
+      "Prosciutto"
+    ],
+    "sourceHistorical": ".tmp/remove-match-investigation/query-summary.json"
+  },
+  "vlMatchDistribution": {
+    "queriedAt": "2026-06-25",
+    "totalItems": null,
+    "matchRows": 52,
+    "byStatus": {
+      "confirmed": 49,
+      "suggested": 1,
+      "unmatched": 2
+    },
+    "confirmedBreakdown": {
+      "override": 35,
+      "alias": 14
+    },
+    "unmatchedLines": [
+      "Lenha",
+      "fuel surcharge"
+    ],
+    "suggestedLines": [
+      "Prosciutto (Rovagnati - Assaporami …)"
+    ]
+  },
+  "t1_pipelineTrace": {
+    "stages": [
+      "OCR/Pass C name",
+      "normalizeInvoiceItemFields (invoice-item-fields.ts)",
+      "findInvoiceItemIngredientMatch (invoice-ingredient-match-propagation.ts)",
+      "findCanonicalIngredientMatch (ingredient-canonical.ts) with alias/override → scoring → threshold",
+      "getInvoiceRowIngredientMatchState (ingredient-match-explanation.ts)",
+      "resolveReadCutoverMatch optional (invoice-item-match-read-cutover.ts)",
+      "ItemsTable render (invoices.tsx)",
+      "User Confirm → persistIngredientCorrectionForItem"
+    ],
+    "reviewAndCreateSeparatePath": true,
+    "reviewAndCreateScope": "collectUnmatchedRowsForBulkCreate — displayState === unmatched only"
+  },
+  "t2_candidateGeneration": {
+    "model": "single-best-candidate (not top-10 list)",
+    "loopLocation": "findCanonicalIngredientMatch — iterates catalog, keeps best",
+    "products": [
+      {
+        "product": "Prosciutto (post re-read)",
+        "candidatesEvaluated": true,
+        "bestCandidate": "Prosciutto cotto scelto",
+        "kindIfPromoted": "semantic → suggested",
+        "path": "Alias miss → semantic loop"
+      },
+      {
+        "product": "Pepino",
+        "candidatesEvaluated": true,
+        "bestCandidate": "Pepino fresco",
+        "kindIfPromoted": "confirmed-alias → confirmed",
+        "path": "Alias hit early"
+      },
+      {
+        "product": "Tomilho",
+        "candidatesEvaluated": true,
+        "bestCandidate": "Tomilho",
+        "kindIfPromoted": "confirmed-alias → confirmed",
+        "path": "Alias hit"
+      },
+      {
+        "product": "Mozzarella Bocconcino",
+        "candidatesEvaluated": true,
+        "bestCandidate": "Mozzarella fior di latte",
+        "kindIfPromoted": "confirmed-override → confirmed",
+        "path": "Was semantic; now override after user confirm"
+      },
+      {
+        "product": "Chocolate Pantagruel",
+        "candidatesEvaluated": true,
+        "bestCandidate": "Chocolate culinária",
+        "kindIfPromoted": "confirmed-override → confirmed",
+        "path": "Was semantic; now override after user confirm"
+      },
+      {
+        "product": "Atum Catrineta",
+        "candidatesEvaluated": true,
+        "bestCandidate": "Atum em óleo",
+        "kindIfPromoted": "confirmed-override → confirmed",
+        "path": "Was semantic; now override after user confirm"
+      }
+    ],
+    "preScoringGates": {
+      "familyGate": "none block Prosciutto",
+      "formCompatibility": "none block Prosciutto",
+      "rejectedPairs": "none block Prosciutto",
+      "operationalFamilySkip": "none block Prosciutto"
+    }
+  },
+  "t3_thresholdAudit": {
+    "thresholdsUnchanged": true,
+    "thresholds": {
+      "SEMANTIC_MATCH_MIN_SCORE": {
+        "value": 0.72,
+        "file": "src/lib/ingredient-canonical.ts",
+        "line": 476
+      },
+      "SEMANTIC_AUTO_MATCH_MIN_SCORE": {
+        "value": 0.88,
+        "file": "src/lib/ingredient-canonical.ts",
+        "line": 478
+      },
+      "OPERATIONAL_EQUIVALENT_MIN_SCORE": {
+        "value": 0.58,
+        "file": "src/lib/ingredient-identity.ts",
+        "line": 273
+      }
+    },
+    "prosciuttoThresholdTable": [
+      {
+        "candidate": "Prosciutto cotto scelto (via semantic)",
+        "scoreEvidence": "Persisted match_kind: semantic, status: suggested",
+        "threshold": ">=0.72 semantic",
+        "shown": true,
+        "uiLabel": "Possible match",
+        "reason": "Alias miss → semantic promotion"
+      },
+      {
+        "candidate": "Prosciutto cotto scelto (via confirmed-override)",
+        "scoreEvidence": "Would be auto-confirmed if alias hit",
+        "threshold": "N/A",
+        "shown": false,
+        "uiLabel": null,
+        "reason": "Override key miss on Rovagnati - prefix"
+      }
+    ],
+    "prosciuttoFilteredByThreshold": false,
+    "prosciuttoBlockedAtAliasLayer": true
+  },
+  "t4_uiAudit": {
+    "backendProducesSuggestedForProsciutto": true,
+    "clientTransformDrops": false,
+    "reactSuppressesRender": false,
+    "labelMappingCorrect": true,
+    "readCutoverFlag": {
+      "envVar": "VITE_MATCH_LIFECYCLE_READ_CUTOVER",
+      "defaultOnVL": false,
+      "source": ".tmp/pepino-live-validation/baseline.json",
+      "prosciuttoVirtualVsPersisted": "Both agree on suggested"
+    },
+    "reviewAndCreateBanner": {
+      "triggersOn": "unmatchedCount > 0",
+      "vlUnmatchedCount": 2,
+      "vlSuggestedInSheet": false
+    },
+    "possibleMatchHeaderSummary": true
+  },
+  "t5_gitHistory": [
+    {
+      "commit": "dd6b4b7",
+      "area": "Match lifecycle v1 + read cutover",
+      "possibleMatchImpact": "Virtual vs persisted drift taxonomy; Pepino-class intentional drift"
+    },
+    {
+      "commit": "d9f91e4",
+      "area": "Match lifecycle v1 + read cutover",
+      "possibleMatchImpact": "Virtual vs persisted drift taxonomy"
+    },
+    {
+      "commit": "5b4a171",
+      "area": "Match lifecycle v1 + read cutover",
+      "possibleMatchImpact": "Virtual vs persisted drift taxonomy"
+    },
+    {
+      "commit": "d022996",
+      "area": "Canonical identity cleanup",
+      "possibleMatchImpact": "Matcher gates, display-name stripping (alias path not aligned)"
+    },
+    {
+      "commit": "7d97ca3",
+      "area": "Bulk Review & Create",
+      "possibleMatchImpact": "Unmatched-only sheet; never included suggested rows"
+    },
+    {
+      "commit": "e0bde91",
+      "area": "OCR qty prepass v40",
+      "possibleMatchImpact": "No matching code change (confirmed by prior post-deploy audit)"
+    },
+    {
+      "commit": "415ce1b",
+      "area": "Cost presentation",
+      "possibleMatchImpact": "Label only; no match classification"
+    },
+    {
+      "commit": "e3f3694",
+      "area": "Cost presentation",
+      "possibleMatchImpact": "Label only; no match classification"
+    }
+  ],
+  "t6_vlReplay": {
+    "productMatrix": [
+      {
+        "product": "Prosciutto",
+        "itemId": "9a2e9311-a1bd-408d-8261-b7a445e7043d",
+        "itemName": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+        "supplier": "Emporio Italia",
+        "currentIngredient": "Prosciutto cotto scelto",
+        "expectedUserMemory": "Matched automatically",
+        "actualVlStatus": "suggested/semantic",
+        "virtualCutoverOffDisplay": "Possible match",
+        "why": "Re-read Pass C name + alias key miss"
+      },
+      {
+        "product": "Pepino",
+        "itemId": "0b373627-9e78-4387-9945-35a504174b93",
+        "itemName": "Pepino",
+        "supplier": "Bidfood Portugal, SA",
+        "currentIngredient": "Pepino fresco",
+        "expectedUserMemory": "Confirmed",
+        "actualVlStatus": "confirmed/confirmed-alias",
+        "virtualCutoverOffDisplay": "Matched automatically",
+        "why": "Stable alias Bidfood::pepino"
+      },
+      {
+        "product": "Tomilho",
+        "itemId": "f2d094ab-f50a-483d-b6cb-76554d5bf195",
+        "itemName": "Tomilho",
+        "supplier": "Bidfood Portugal, SA",
+        "currentIngredient": "Tomilho",
+        "expectedUserMemory": "Confirmed",
+        "actualVlStatus": "confirmed/confirmed-alias",
+        "virtualCutoverOffDisplay": "Matched automatically",
+        "why": "Alias hit"
+      },
+      {
+        "product": "Mozzarella",
+        "itemId": "f2a672e0-016c-43d7-a53f-1ee8b8976f4b",
+        "itemName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "supplier": "Bocconcino",
+        "currentIngredient": "Mozzarella fior di latte",
+        "expectedUserMemory": "Was Possible → confirmed",
+        "actualVlStatus": "confirmed/confirmed-override",
+        "virtualCutoverOffDisplay": "Matched automatically",
+        "why": "User confirmed 2026-06-23"
+      },
+      {
+        "product": "Chocolate",
+        "itemId": "11024922-0c2b-4daf-b178-06d622899b18",
+        "itemName": "Chocolate Pantagruel 10x200g",
+        "supplier": "Aviludo",
+        "currentIngredient": "Chocolate culinária",
+        "expectedUserMemory": "Was Possible → confirmed",
+        "actualVlStatus": "confirmed/confirmed-override",
+        "virtualCutoverOffDisplay": "Matched automatically",
+        "why": "User confirmed 2026-06-17"
+      },
+      {
+        "product": "Atum",
+        "itemId": "9af131b9-159f-48d6-807b-47b6124a9045",
+        "itemName": "Atum Óleo Bolsa Nau Catrineta 1 Kg",
+        "supplier": "Aviludo",
+        "currentIngredient": "Atum em óleo",
+        "expectedUserMemory": "Was Possible → confirmed",
+        "actualVlStatus": "confirmed/confirmed-override",
+        "virtualCutoverOffDisplay": "Matched automatically",
+        "why": "User confirmed 2026-06-17"
+      }
+    ],
+    "historicalSuggestedPopulation": [
+      {
+        "date": "2026-06-13",
+        "count": 4,
+        "lines": ["Atum×2", "Chocolate", "Mozzarella Bocconcino"]
+      },
+      {
+        "date": "2026-06-25",
+        "count": 1,
+        "lines": ["Prosciutto (new regression)"]
+      }
+    ]
+  },
+  "t7_regressionClassification": {
+    "verdict": "F",
+    "firstRegressionPointProsciutto": "lookupIngredientMatchOverride / alias lookup miss when name gains Rovagnati - prefix after Pass C re-read",
+    "firstRegressionPointFewerMatchesOverall": "User confirmations semantic → confirmed-override (expected lifecycle)"
+  },
+  "finalAnswers": {
+    "candidatesGenerated": true,
+    "candidatesGeneratedDetail": "Yes for all investigated products; Prosciutto gets semantic best-candidate",
+    "filteredByThreshold": false,
+    "filteredDetail": "No threshold filter for Prosciutto; alias layer filters out confirmed path",
+    "backendCorrect": true,
+    "backendCorrectDetail": "Persisted suggested/semantic matches virtual matcher given current alias map",
+    "frontendCorrect": true,
+    "frontendCorrectDetail": "Displays Possible match when displayState=suggested; no discard",
+    "firstRegressionPoint": "Alias/override key miss at ingest name change (re-read Pass C), before scoring",
+    "smallestFixIdentifyOnly": [
+      "Align alias lookup with brand-prefix normalization used in display synthesis",
+      "Add alias for Pass C Prosciutto spelling",
+      "T8 preserve policy on re-read"
+    ],
+    "smallestFixNote": "Not proven which is smallest until alias-key replay confirms exact normalized key delta",
+    "confidencePct": 88,
+    "confidenceOverallPct": 85,
+    "confidenceNote": "VL replay matcher scores not re-run in-process due to @/ import constraints; alias key evidence from DB + prior audits is strong"
+  },
+  "reviewAndCreateNote": {
+    "function": "collectUnmatchedRowsForBulkCreate",
+    "file": "src/lib/bulk-canonical-ingredient-create.ts",
+    "line": 125,
+    "scope": "unmatched only",
+    "excludesSuggested": true,
+    "byDesign": true,
+    "userExpectationGap": "User suspicion that Possible Matches no longer appear in Review & Create reflects intentional scope boundary, not missing UI feature",
+    "vlEligibleUnmatched": ["Lenha", "fuel surcharge"],
+    "vlExcludedSuggested": ["Prosciutto"]
+  },
+  "keyFileReferences": {
+    "pipeline": [
+      "src/lib/invoice-ingredient-match-propagation.ts",
+      "src/lib/ingredient-canonical.ts"
+    ],
+    "displayState": [
+      "src/lib/ingredient-match-explanation.ts"
+    ],
+    "cutover": [
+      "src/lib/invoice-item-match-read-cutover.ts",
+      "src/lib/match-lifecycle-flags.ts"
+    ],
+    "aliasLookup": [
+      "src/lib/ingredient-alias-lookup.ts",
+      "src/lib/ingredient-match-override.ts",
+      "src/lib/ingredient-operational-alias-memory.ts"
+    ],
+    "brandPrefixDisplayOnly": [
+      "src/lib/canonical-ingredient-display-name.ts"
+    ],
+    "ui": [
+      "src/routes/invoices.tsx"
+    ],
+    "reviewAndCreate": [
+      "src/lib/bulk-canonical-ingredient-create.ts"
+    ],
+    "rowDisplay": [
+      "src/lib/invoice-ingredient-row-display.ts"
+    ],
+    "persistedMatch": [
+      "src/lib/invoice-item-match-helpers.ts",
+      "src/lib/invoice-item-match-shadow-seed.ts"
+    ]
+  },
+  "priorAuditReferences": [
+    ".tmp/post-deploy-regression-audit/",
+    ".tmp/emporio-deli-family-audit/",
+    ".tmp/remove-match-investigation/query-summary.json",
+    ".tmp/match-lifecycle-phase4-readiness/DRIFT_ANALYSIS.md",
+    ".tmp/pepino-live-validation/baseline.json",
+    ".tmp/match-lifecycle-phase4b-validation/PEPINO_BEHAVIOR.md",
+    ".tmp/match-lifecycle-phase4b-validation/READ_CUTOVER_REPORT.md"
+  ]
+}

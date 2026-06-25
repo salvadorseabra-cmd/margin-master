@@ -2,6 +2,7 @@ import { Image } from "https://deno.land/x/imagescript@1.3.0/mod.ts";
 import {
   EMPORIO_QTD_COLUMN_X_FRAC,
   QTD_STRIP_MIN_WIDTH_PX,
+  QTD_STRIP_RIGHT_PAD_PX,
 } from "./invoice-crop-geometry.ts";
 import {
   parseImageDataUrl,
@@ -42,7 +43,11 @@ export async function cropQtdColumnStrip(
   const { bytes } = parseImageDataUrl(tableCropDataUrl);
   const image = await Image.decode(bytes);
   const x0 = Math.floor(image.width * EMPORIO_QTD_COLUMN_X_FRAC.x0);
-  const x1 = Math.ceil(image.width * EMPORIO_QTD_COLUMN_X_FRAC.x1);
+  const x1 = Math.min(
+    image.width,
+    Math.ceil(image.width * EMPORIO_QTD_COLUMN_X_FRAC.x1) +
+      QTD_STRIP_RIGHT_PAD_PX,
+  );
   const stripWidth = x1 - x0;
 
   if (stripWidth < QTD_STRIP_MIN_WIDTH_PX) return null;

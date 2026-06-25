@@ -1,0 +1,53 @@
+{
+  "auditType": "STRICT_READ_ONLY_ALIAS_WRITE_PATH_CONSISTENCY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-25T01:30:00.000Z",
+  "classification": "E",
+  "classificationLabel": "Combination C (read+write structural gap) + D (historical data)",
+  "classificationComponents": ["C", "D"],
+  "writeReadSymmetric": true,
+  "brandPrefixStripOnAliasPath": false,
+  "brandPrefixStripOnDisplayPath": true,
+  "confidencePct": 91,
+  "keyCreationFunctions": [
+    "buildManualIngredientCorrectionKeys",
+    "buildOverrideKeysFromInvoiceLine",
+    "normalizeOperationalAliasKey",
+    "buildIngredientAliasLookupKey",
+    "upsertConfirmedAlias"
+  ],
+  "prosciutto": {
+    "storedAlias": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5Kg",
+    "normalizedAlias": "assaporami prosciutto cotto sceltohc",
+    "currentLine": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+    "lookupHit": false,
+    "confirmTodayWouldStore": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+    "confirmTodaySelfHealsCurrentSpelling": true,
+    "stillFragileToOcrDrift": true
+  },
+  "historicalReplay": {
+    "prosciutto": { "prefixAtConfirm": false, "lookupHitToday": false },
+    "mortadella": { "prefixAtConfirm": true, "lookupHitToday": true },
+    "gorgonzola": { "prefixAtConfirm": true, "lookupHitToday": true },
+    "bresaola": { "prefixAtConfirm": true, "lookupHitToday": true },
+    "paccheri": { "prefixAtConfirm": true, "lookupHitToday": true }
+  },
+  "dbConsistency": {
+    "perRowConsistent": true,
+    "corpusMixedPrefixPresence": true,
+    "prosciuttoOnlyWithoutPrefix": true
+  },
+  "finalAnswers": {
+    "whereKeysCreated": "buildOverrideKeysFromInvoiceLine via persistManualIngredientCorrection",
+    "writeReadIdentical": true,
+    "confirmTodaySameRegressionLater": "Partially — fixes current line, fragile to future drift",
+    "dbInternallyConsistent": "Per-row yes; corpus mixed prefix spelling",
+    "oneNormalizationFunctionEnough": "Almost — add brand strip to shared spine with beverage exclusions",
+    "chosenClassification": "E"
+  },
+  "priorAuditReferences": [
+    ".tmp/possible-match-regression-audit/",
+    ".tmp/brand-prefix-alias-coverage-audit/",
+    ".tmp/emporio-deli-family-audit/"
+  ]
+}

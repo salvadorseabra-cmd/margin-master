@@ -1,0 +1,154 @@
+{
+  "fixType": "QTD_STRIP_RIGHT_PAD_PX",
+  "fixValue": 2,
+  "generatedAt": "2026-06-24T22:04:29.200Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "geometryDiff": {
+    "before": {
+      "x0Frac": 0.605,
+      "x1Frac": 0.661,
+      "rightPadPx": 0,
+      "x0Px": 438,
+      "x1Px": 479,
+      "stripWidthPx": 41
+    },
+    "after": {
+      "x0Frac": 0.605,
+      "x1Frac": 0.661,
+      "rightPadPx": 2,
+      "x0Px": 438,
+      "x1Px": 481,
+      "stripWidthPx": 43,
+      "equivalentX1Frac": 0.664364640883978
+    },
+    "unitPriceInkStartPx": 483,
+    "marginBeforeUnitPricePx": 2
+  },
+  "validationMatrix": {
+    "gorgonzola": {
+      "pdfQty": 1.35,
+      "beforeStripWidth": 41,
+      "afterStripWidth": 43,
+      "beforeDigit5Clipped": true,
+      "afterDigit5Clipped": false,
+      "beforeRightmostInk": 40,
+      "afterRightmostInk": 42,
+      "expectedPrepass": 1.35,
+      "expectedPassC": 1.05,
+      "expectedAnchored": 1.35
+    }
+  },
+  "regressionMatrix": {
+    "gorgonzola": {
+      "pdfQty": 1.35,
+      "expected": 1.35,
+      "rowFile": "after-gorgonzola-row.png",
+      "rightmostInkColumn": 42,
+      "unitPriceBleed": false,
+      "stripWidthPx": 43,
+      "status": "OK"
+    },
+    "bresaola": {
+      "pdfQty": 1.83,
+      "expected": 1.83,
+      "rowFile": "after-bresaola-row.png",
+      "rightmostInkColumn": 42,
+      "unitPriceBleed": false,
+      "stripWidthPx": 43,
+      "status": "OK"
+    },
+    "prosciutto": {
+      "pdfQty": 4.3,
+      "expected": 4.3,
+      "rowFile": "after-prosciutto-row.png",
+      "rightmostInkColumn": 42,
+      "unitPriceBleed": false,
+      "stripWidthPx": 43,
+      "status": "OK"
+    },
+    "mortadella": {
+      "pdfQty": 3.11,
+      "expected": 3.11,
+      "rowFile": "after-mortadella-row.png",
+      "rightmostInkColumn": 42,
+      "unitPriceBleed": false,
+      "stripWidthPx": 43,
+      "status": "OK"
+    }
+  },
+  "pixelAnalysis": {
+    "before": {
+      "widthPx": 41,
+      "rightmostInkColumn": 40,
+      "digit5Clipped": true,
+      "clippingEvidence": "x=479 outside strip (ends at x=478)",
+      "col479Included": false,
+      "col479DarkPixels": 0,
+      "unitPriceBleed": false,
+      "rightEdgeDarkCount": 23
+    },
+    "after": {
+      "widthPx": 43,
+      "rightmostInkColumn": 42,
+      "digit5Clipped": false,
+      "clippingEvidence": "x=479 fully inside strip (22 dark px)",
+      "col479Included": true,
+      "col479DarkPixels": 22,
+      "unitPriceBleed": false,
+      "rightEdgeDarkCount": 22
+    }
+  },
+  "testResults": {
+    "exitCode": 0,
+    "pass": true,
+    "summary": "All extract-invoice tests passed",
+    "stdoutTail": "A) OCR 1.35 Pass C 1.05 → anchor to 1.35 ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(0ms)\u001b[0m\nB) OCR 1.35 Pass C 2.00 total 13.44 → anchor to 1.35 ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(0ms)\u001b[0m\nC) OCR 1.35 Pass C 1.35 → no-op ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(0ms)\u001b[0m\nS3) OCR 1.35 Pass C 2.00 total 18.72 → mismatch flag, keep Pass C ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(0ms)\u001b[0m\ncontrol: Prosciutto 4.30 agreement → no-op ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(0ms)\u001b[0m\nA) Gorgonzola 1/8 desc: prepass 1.35 anchors over Pass C 1.05 ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(0ms)\u001b[0m\nA-fallback) Gorgonzola 1/8: integer prepass 2 flags fraction conflict ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(0ms)\u001b[0m\nB) Bresaola 1/2 desc: prepass 1.83 agrees with Pass C ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(0ms)\u001b[0m\nB-fallback) Bresaola 1/2: integer prepass 2 below 10% delta — no heuristic flag ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(0ms)\u001b[0m\nC) Paccheri integer row unchanged — no fraction conflict ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(0ms)\u001b[0m\nfraction conflict helper: Mortadella 3.1 vs 3.11 no flag ... \u001b[0m\u001b[32mok\u001b[0m \u001b[0m\u001b[38;5;245m(0ms)\u001b[0m\n\n\u001b[0m\u001b[32mok\u001b[0m | 40 passed | 0 failed \u001b[0m\u001b[38;5;245m(1s)\u001b[0m\n\n",
+    "stderr": ""
+  },
+  "successCriteria": {
+    "gorgonzola": {
+      "pdf": 1.35,
+      "prepass": 1.35,
+      "passC": 1.05,
+      "anchored": 1.35
+    },
+    "bresaola": {
+      "pdf": 1.83,
+      "prepass": 1.83
+    },
+    "prosciutto": {
+      "pdf": 4.3,
+      "unchanged": true
+    },
+    "mortadella": {
+      "pdf": 3.11,
+      "unchanged": true
+    }
+  },
+  "exportedFiles": [
+    "before-qtd-strip-full.png",
+    "after-qtd-strip-full.png",
+    "before-gorgonzola-row.png",
+    "after-gorgonzola-row.png",
+    "after-gorgonzola-row.png",
+    "after-bresaola-row.png",
+    "after-prosciutto-row.png",
+    "after-mortadella-row.png"
+  ],
+  "verdict": "PASS",
+  "verdictReasons": {
+    "digit5Fixed": true,
+    "noUnitPriceBleed": true,
+    "testsPass": true
+  },
+  "liveValidation": {
+    "deployVersion": 41,
+    "status": 200,
+    "artifact": ".tmp/ocr-prepass-fix-implementation/live-reextract.json",
+    "gorgonzolaPrepass135": false,
+    "gorgonzolaOcrQuantity": 1.3,
+    "controlsOk": true,
+    "liveVerdict": "PARTIAL — geometry fixed; Gorgonzola GPT prepass still 1.30"
+  }
+}

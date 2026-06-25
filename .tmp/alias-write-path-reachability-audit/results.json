@@ -1,0 +1,36 @@
+{
+  "auditType": "STRICT_READ_ONLY_ALIAS_WRITE_PATH_REACHABILITY",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "generatedAt": "2026-06-25T04:00:00.000Z",
+  "verdict": "PASS",
+  "productionCallers": {
+    "liveDirectCallers": 1,
+    "deadDirectCallers": 1,
+    "uiEntryPoints": 5,
+    "intermediateFunctions": ["persistManualIngredientCorrection"]
+  },
+  "deadPaths": ["persistInvoiceLineAliasMemory"],
+  "automaticReachable": false,
+  "staleDeletionWithoutHuman": false,
+  "modelDChangesCallPaths": false,
+  "uiEntryPoints": [
+    "confirmIngredientMatch",
+    "selectIngredientForItem",
+    "saveCanonicalIngredientFromInvoice",
+    "saveBulkCanonicalIngredientsFromInvoice",
+    "reassignCatalogReviewInvoiceLineMatch"
+  ],
+  "finalAnswers": {
+    "productionCallers": "1 live (persistManualIngredientCorrection), 1 dead (persistInvoiceLineAliasMemory)",
+    "humanInitiated": 5,
+    "automaticCaller": false,
+    "reReadTriggersCleanup": false,
+    "autoMatchTriggersCleanup": false,
+    "semanticMatchingTriggersCleanup": false,
+    "safelyIsolated": true,
+    "confidencePct": 97
+  },
+  "priorAuditReferences": [
+    ".tmp/alias-lifecycle-integrity-fix/"
+  ]
+}
