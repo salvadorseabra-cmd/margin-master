@@ -305,7 +305,7 @@ describe("supermarket and OCR purchase phrases", () => {
     {
       input: "24x33cl",
       kind: "multi_unit_pack",
-      display: "24 x 330 ml",
+      display: "24 x 33 cl",
       usable: 7920,
       usableUnit: "ml",
     },
@@ -347,7 +347,7 @@ describe("supermarket and OCR purchase phrases", () => {
     {
       input: "CERVEJA 24 X 33CL",
       kind: "multi_unit_pack",
-      display: "24 x 330 ml",
+      display: "24 x 33 cl",
       usable: 7920,
       usableUnit: "ml",
     },

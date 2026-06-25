@@ -412,6 +412,8 @@ describe("parsePurchaseStructureFromText — beverage cl pack patterns", () => {
   });
 
   it.each([
+    { input: "12x25cl", pack_count: 12, inner_quantity: 25, inner_unit: "cl" as const, usable_quantity: 3000 },
+    { input: "6x20cl", pack_count: 6, inner_quantity: 20, inner_unit: "cl" as const, usable_quantity: 1200 },
     { input: "6x1L", pack_count: 6, inner_quantity: 1, inner_unit: "L" as const, usable_quantity: 6000 },
     { input: "12x1kg", pack_count: 12, inner_quantity: 1, inner_unit: "kg" as const, usable_quantity: 12000 },
     { input: "10x200g", pack_count: 10, inner_quantity: 200, inner_unit: "g" as const, usable_quantity: 2000 },
@@ -423,6 +425,24 @@ describe("parsePurchaseStructureFromText — beverage cl pack patterns", () => {
     expect(phrase.packageQuantity).toBe(inner_quantity);
     expect(structure!.unitMeasurement).toBe(inner_unit);
     expect(structure!.totalUsableAmount).toBe(usable_quantity);
+  });
+});
+
+describe("parsePurchaseStructureFromText — bare volume regression", () => {
+  it.each([
+    { input: "1L", unitSize: 1, unit: "L" as const, usable: 1000 },
+    { input: "750ml", unitSize: 750, unit: "ml" as const, usable: 750 },
+    { input: "500ml", unitSize: 500, unit: "ml" as const, usable: 500 },
+    { input: "5L", unitSize: 5, unit: "L" as const, usable: 5000 },
+    { input: "10L", unitSize: 10, unit: "L" as const, usable: 10000 },
+  ])("parses $input", ({ input, unitSize, unit, usable }) => {
+    const structure = parsePurchaseStructureFromText(input);
+    expect(structure).not.toBeNull();
+    expect(structure!.unitSize).toBe(unitSize);
+    expect(structure!.unitMeasurement).toBe(unit);
+    expect(structure!.totalUsableAmount).toBe(usable);
+    expect(structure!.usableUnit).toBe("ml");
+    expect(structure!.tier).toBe("bare_measure");
   });
 });
 

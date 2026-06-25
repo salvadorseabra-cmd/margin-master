@@ -582,6 +582,8 @@ function parseSizeAndUnit(
   const rawSize = sizeRaw ?? "";
   let unitSize = parseQuantityToken(rawSize);
   const unitMeasurement = normalizeMeasureUnit(unitRaw ?? "");
+  // Multipack beverage notation (24x33cl) keeps centiliters at package level; ml conversion
+  // is deferred to measureToBase for usable totals (33 cl → 330 ml per bottle).
   if (unitSize != null && unitMeasurement === "cl") {
     unitSize = normalizeDecimalLeadingClQuantity(rawSize, unitSize);
   }
