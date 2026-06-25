@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-06-25T09:47:15.676Z",
+  "generatedAt": "2026-06-25T11:28:10.929Z",
   "validationLab": "bjhnlrgodcqoyzddbpbd",
   "summary": {
     "invoiceCount": 7,
     "itemCount": 52,
-    "totalFindings": 40,
+    "totalFindings": 39,
     "rowsWithFindings": 38,
     "rowsWithoutFindings": 14,
     "bySupplier": {
@@ -31,6 +31,15 @@
           "SUGGESTED_INGREDIENT_MATCH": 2
         }
       },
+      "Mammafiore Portugal": {
+        "items": 8,
+        "findings": 9,
+        "codes": {
+          "SUGGESTED_INGREDIENT_MATCH": 7,
+          "MATHEMATICAL_INCONSISTENCY": 1,
+          "UNMATCHED_INGREDIENT": 1
+        }
+      },
       "Emporio Italia": {
         "items": 8,
         "findings": 6,
@@ -54,22 +63,11 @@
           "SUGGESTED_INGREDIENT_MATCH": 1,
           "UNMATCHED_INGREDIENT": 1
         }
-      },
-      "Mammafiore Portugal": {
-        "items": 8,
-        "findings": 10,
-        "codes": {
-          "OPERATIONAL_NORMALIZATION_INCONSISTENCY": 1,
-          "SUGGESTED_INGREDIENT_MATCH": 6,
-          "UNMATCHED_INGREDIENT": 2,
-          "MATHEMATICAL_INCONSISTENCY": 1
-        }
       }
     },
     "codeCounts": {
-      "UNMATCHED_INGREDIENT": 19,
-      "SUGGESTED_INGREDIENT_MATCH": 19,
-      "OPERATIONAL_NORMALIZATION_INCONSISTENCY": 1,
+      "UNMATCHED_INGREDIENT": 18,
+      "SUGGESTED_INGREDIENT_MATCH": 20,
       "MATHEMATICAL_INCONSISTENCY": 1
     }
   },
@@ -81,76 +79,15 @@
         "OPERATIONAL_NORMALIZATION_INCONSISTENCY"
       ],
       "notes": "Pack weight vs billed qty — €6.18/kg vs €10.83/kg",
-      "found": true,
-      "actualCodes": [
-        "OPERATIONAL_NORMALIZATION_INCONSISTENCY",
-        "SUGGESTED_INGREDIENT_MATCH"
+      "found": false,
+      "actualCodes": [],
+      "missingExpected": [
+        "OPERATIONAL_NORMALIZATION_INCONSISTENCY"
       ],
-      "missingExpected": [],
-      "unexpectedCodes": [
-        "SUGGESTED_INGREDIENT_MATCH"
-      ],
+      "unexpectedCodes": [],
       "pass": false,
-      "itemName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
-      "findings": [
-        {
-          "id": "6efebedf-c78e-46c1-9ae1-58792229834b:OPERATIONAL_NORMALIZATION_INCONSISTENCY",
-          "code": "OPERATIONAL_NORMALIZATION_INCONSISTENCY",
-          "severity": "warning",
-          "category": "operational",
-          "title": "Operational mismatch",
-          "description": "Pack structure normalization does not reconcile with invoice weight economics.",
-          "suggestedAction": "Confirm whether row quantity is billed weight or whether pack notation should scale usable stock.",
-          "evidence": {
-            "expected": {
-              "value": 10.83,
-              "unit": "EUR/kg",
-              "label": "Invoice operational cost"
-            },
-            "actual": {
-              "value": 6.18,
-              "unit": "EUR/kg",
-              "label": "Calculated operational cost"
-            },
-            "difference": {
-              "absolute": 4.65,
-              "percent": 42.94
-            },
-            "extra": {
-              "check": "pack_structure_vs_row_weight",
-              "structure_usable_kg": 10.5,
-              "purchased_weight_kg": 6,
-              "line_total": 64.93,
-              "quantity": 5.996,
-              "row_unit": "un",
-              "pack_structure": {
-                "container_count": 7,
-                "container_unit": "un",
-                "package_quantity": 1.5,
-                "package_measurement_unit": "kg"
-              },
-              "usable_quantity": 10500,
-              "usable_quantity_unit": "g"
-            }
-          }
-        },
-        {
-          "id": "6efebedf-c78e-46c1-9ae1-58792229834b:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Guanciale stagionato",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
+      "itemName": null,
+      "findings": []
     },
     {
       "key": "gorgonzola",
@@ -193,34 +130,13 @@
       "invoiceItemId": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
       "expectedCodes": [],
       "notes": "Multipack control — should NOT flag operational",
-      "found": true,
-      "actualCodes": [
-        "SUGGESTED_INGREDIENT_MATCH"
-      ],
+      "found": false,
+      "actualCodes": [],
       "missingExpected": [],
-      "unexpectedCodes": [
-        "SUGGESTED_INGREDIENT_MATCH"
-      ],
+      "unexpectedCodes": [],
       "pass": false,
-      "itemName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
-      "findings": [
-        {
-          "id": "979a9928-dbdb-4fe5-a231-2caaae327ed9:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Peroni nastro azzurro 33cl",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
+      "itemName": null,
+      "findings": []
     },
     {
       "key": "mozzarella",
@@ -238,6 +154,17 @@
   ],
   "duplicateMathRows": [],
   "falseNegativeCandidates": [
+    {
+      "type": "known_problem_missed",
+      "key": "guanciale",
+      "invoiceItemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
+      "itemName": null,
+      "expected": [
+        "OPERATIONAL_NORMALIZATION_INCONSISTENCY"
+      ],
+      "actual": [],
+      "why": "Pack weight vs billed qty — €6.18/kg vs €10.83/kg"
+    },
     {
       "type": "known_problem_missed",
       "key": "gorgonzola",
@@ -260,6 +187,18 @@
       ],
       "actual": [],
       "why": "Stale VL row if still present: 1.05×10.88≠13.44"
+    },
+    {
+      "type": "sub_threshold_math_gap",
+      "invoiceItemId": "5d46d914-1860-40e8-b5c4-8d9aad1d4d2b",
+      "itemName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "supplier": "Mammafiore Portugal",
+      "quantity": 24,
+      "unit_price": 1.07,
+      "total": 25.69,
+      "variance_abs": 0.01,
+      "variance_pct": 0.04,
+      "why": "Small math gap below MATHEMATICAL_INCONSISTENCY OR thresholds — may be intentional tolerance"
     },
     {
       "type": "sub_threshold_math_gap",
@@ -343,18 +282,6 @@
       "total": 74.54,
       "variance_abs": 0.1,
       "variance_pct": 0.13,
-      "why": "Small math gap below MATHEMATICAL_INCONSISTENCY OR thresholds — may be intentional tolerance"
-    },
-    {
-      "type": "sub_threshold_math_gap",
-      "invoiceItemId": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
-      "itemName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
-      "supplier": "Mammafiore Portugal",
-      "quantity": 24,
-      "unit_price": 1.07,
-      "total": 25.69,
-      "variance_abs": 0.01,
-      "variance_pct": 0.04,
       "why": "Small math gap below MATHEMATICAL_INCONSISTENCY OR thresholds — may be intentional tolerance"
     },
     {
@@ -846,7 +773,7 @@
       "evidence": {
         "field": "ingredient",
         "extra": {
-          "suggested_ingredient": "Mozzarella julienne",
+          "suggested_ingredient": "Mozzarella fior di latte",
           "confidence": "Suggested match"
         }
       },
@@ -859,6 +786,247 @@
       "unit": "un",
       "unit_price": 13.69,
       "total": 13.69
+    },
+    {
+      "id": "d592c2cc-fd23-41ad-afd0-4fe693eef08a:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Guanciale stagionato",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "d592c2cc-fd23-41ad-afd0-4fe693eef08a",
+      "itemName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "matchDisplayState": "suggested",
+      "quantity": 5.996,
+      "unit": "un",
+      "unit_price": 10.83,
+      "total": 64.93
+    },
+    {
+      "id": "18b97c30-12ae-4642-9ee5-1434da490bb7:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Farine speciale pizza",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "18b97c30-12ae-4642-9ee5-1434da490bb7",
+      "itemName": "Farine Speciale pizza 25kg Amoruso",
+      "matchDisplayState": "suggested",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 26.52,
+      "total": 26.52
+    },
+    {
+      "id": "5d46d914-1860-40e8-b5c4-8d9aad1d4d2b:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Peroni nastro azzurro 33cl",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "5d46d914-1860-40e8-b5c4-8d9aad1d4d2b",
+      "itemName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "matchDisplayState": "suggested",
+      "quantity": 24,
+      "unit": "un",
+      "unit_price": 1.07,
+      "total": 25.69
+    },
+    {
+      "id": "ef4c6f72-7f74-4ebb-b567-24cef8e90ae5:MATHEMATICAL_INCONSISTENCY",
+      "code": "MATHEMATICAL_INCONSISTENCY",
+      "severity": "error",
+      "category": "mathematics",
+      "title": "Math inconsistency",
+      "description": "Quantity × unit price does not reconcile with line total",
+      "suggestedAction": "Correct quantity, unit price, or line total so the row reconciles.",
+      "evidence": {
+        "expected": {
+          "value": 15.55,
+          "unit": "EUR",
+          "label": "Calculated total"
+        },
+        "actual": {
+          "value": 16.09,
+          "unit": "EUR",
+          "label": "Invoice total"
+        },
+        "difference": {
+          "absolute": 0.54,
+          "percent": 3.36
+        },
+        "extra": {
+          "quantity": 1,
+          "unit_price": 15.55
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "ef4c6f72-7f74-4ebb-b567-24cef8e90ae5",
+      "itemName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "matchDisplayState": "suggested",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 15.55,
+      "total": 16.09
+    },
+    {
+      "id": "ef4c6f72-7f74-4ebb-b567-24cef8e90ae5:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Aceto balsamico di modena IGP",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "ef4c6f72-7f74-4ebb-b567-24cef8e90ae5",
+      "itemName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "matchDisplayState": "suggested",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 15.55,
+      "total": 16.09
+    },
+    {
+      "id": "1700ab82-9f9e-4830-be6d-405155616d07:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Mozzarella fior di latte",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "1700ab82-9f9e-4830-be6d-405155616d07",
+      "itemName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "matchDisplayState": "suggested",
+      "quantity": 10,
+      "unit": "un",
+      "unit_price": 20.03,
+      "total": 200.3
+    },
+    {
+      "id": "a8f0a5e3-0612-4315-802b-27130b899839:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Rulo di capra",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "a8f0a5e3-0612-4315-802b-27130b899839",
+      "itemName": "Rulo Di Capra 1kg*2 Simonetta",
+      "matchDisplayState": "suggested",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 10.86,
+      "total": 10.86
+    },
+    {
+      "id": "896110ca-85b6-42de-baac-d3c4f5c68608:UNMATCHED_INGREDIENT:ingredient",
+      "code": "UNMATCHED_INGREDIENT",
+      "severity": "warning",
+      "category": "matching",
+      "title": "Unmatched ingredient",
+      "description": "This line is not linked to a catalog ingredient.",
+      "suggestedAction": "Match or create a canonical ingredient.",
+      "evidence": {
+        "field": "ingredient",
+        "expected": {
+          "value": "catalog match",
+          "label": "Linked ingredient"
+        },
+        "extra": {
+          "item_name": "Recargo por combustivel"
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "896110ca-85b6-42de-baac-d3c4f5c68608",
+      "itemName": "Recargo por combustivel",
+      "matchDisplayState": "unmatched",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 2,
+      "total": 2
+    },
+    {
+      "id": "cb75a796-0c40-48c0-a315-a2067c6c4673:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Farina do pasta fresca e gnocchi",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "cb75a796-0c40-48c0-a315-a2067c6c4673",
+      "itemName": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "matchDisplayState": "suggested",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 30.11,
+      "total": 30.11
     },
     {
       "id": "71da1c6a-21b7-43de-aa92-0ab253204bed:SUGGESTED_INGREDIENT_MATCH:ingredient",
@@ -1130,7 +1298,7 @@
       "evidence": {
         "field": "ingredient",
         "extra": {
-          "suggested_ingredient": "Mozzarella julienne",
+          "suggested_ingredient": "Mozzarella fior di latte",
           "confidence": "Suggested match"
         }
       },
@@ -1143,300 +1311,6 @@
       "unit": "un",
       "unit_price": 8.12,
       "total": 81.23
-    },
-    {
-      "id": "6efebedf-c78e-46c1-9ae1-58792229834b:OPERATIONAL_NORMALIZATION_INCONSISTENCY",
-      "code": "OPERATIONAL_NORMALIZATION_INCONSISTENCY",
-      "severity": "warning",
-      "category": "operational",
-      "title": "Operational mismatch",
-      "description": "Pack structure normalization does not reconcile with invoice weight economics.",
-      "suggestedAction": "Confirm whether row quantity is billed weight or whether pack notation should scale usable stock.",
-      "evidence": {
-        "expected": {
-          "value": 10.83,
-          "unit": "EUR/kg",
-          "label": "Invoice operational cost"
-        },
-        "actual": {
-          "value": 6.18,
-          "unit": "EUR/kg",
-          "label": "Calculated operational cost"
-        },
-        "difference": {
-          "absolute": 4.65,
-          "percent": 42.94
-        },
-        "extra": {
-          "check": "pack_structure_vs_row_weight",
-          "structure_usable_kg": 10.5,
-          "purchased_weight_kg": 6,
-          "line_total": 64.93,
-          "quantity": 5.996,
-          "row_unit": "un",
-          "pack_structure": {
-            "container_count": 7,
-            "container_unit": "un",
-            "package_quantity": 1.5,
-            "package_measurement_unit": "kg"
-          },
-          "usable_quantity": 10500,
-          "usable_quantity_unit": "g"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
-      "itemName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
-      "matchDisplayState": "suggested",
-      "quantity": 5.996,
-      "unit": "un",
-      "unit_price": 10.83,
-      "total": 64.93
-    },
-    {
-      "id": "6efebedf-c78e-46c1-9ae1-58792229834b:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Guanciale stagionato",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "6efebedf-c78e-46c1-9ae1-58792229834b",
-      "itemName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
-      "matchDisplayState": "suggested",
-      "quantity": 5.996,
-      "unit": "un",
-      "unit_price": 10.83,
-      "total": 64.93
-    },
-    {
-      "id": "65ced122-bedd-4f87-bc23-3b85477ebe8b:UNMATCHED_INGREDIENT:ingredient",
-      "code": "UNMATCHED_INGREDIENT",
-      "severity": "warning",
-      "category": "matching",
-      "title": "Unmatched ingredient",
-      "description": "This line is not linked to a catalog ingredient.",
-      "suggestedAction": "Match or create a canonical ingredient.",
-      "evidence": {
-        "field": "ingredient",
-        "expected": {
-          "value": "catalog match",
-          "label": "Linked ingredient"
-        },
-        "extra": {
-          "item_name": "Farina Speciale pizza 25kg Amoruso"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "65ced122-bedd-4f87-bc23-3b85477ebe8b",
-      "itemName": "Farina Speciale pizza 25kg Amoruso",
-      "matchDisplayState": "unmatched",
-      "quantity": 1,
-      "unit": "un",
-      "unit_price": 26.52,
-      "total": 26.52
-    },
-    {
-      "id": "979a9928-dbdb-4fe5-a231-2caaae327ed9:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Peroni nastro azzurro 33cl",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
-      "itemName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
-      "matchDisplayState": "suggested",
-      "quantity": 24,
-      "unit": "un",
-      "unit_price": 1.07,
-      "total": 25.69
-    },
-    {
-      "id": "1ccf0bd0-12ef-4823-b504-3833df0899c7:MATHEMATICAL_INCONSISTENCY",
-      "code": "MATHEMATICAL_INCONSISTENCY",
-      "severity": "error",
-      "category": "mathematics",
-      "title": "Math inconsistency",
-      "description": "Quantity × unit price does not reconcile with line total",
-      "suggestedAction": "Correct quantity, unit price, or line total so the row reconciles.",
-      "evidence": {
-        "expected": {
-          "value": 15.55,
-          "unit": "EUR",
-          "label": "Calculated total"
-        },
-        "actual": {
-          "value": 16.09,
-          "unit": "EUR",
-          "label": "Invoice total"
-        },
-        "difference": {
-          "absolute": 0.54,
-          "percent": 3.36
-        },
-        "extra": {
-          "quantity": 1,
-          "unit_price": 15.55
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
-      "itemName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
-      "matchDisplayState": "suggested",
-      "quantity": 1,
-      "unit": "un",
-      "unit_price": 15.55,
-      "total": 16.09
-    },
-    {
-      "id": "1ccf0bd0-12ef-4823-b504-3833df0899c7:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Aceto balsamico di modena IGP",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
-      "itemName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
-      "matchDisplayState": "suggested",
-      "quantity": 1,
-      "unit": "un",
-      "unit_price": 15.55,
-      "total": 16.09
-    },
-    {
-      "id": "d13fce65-832c-4ca2-9c52-049579c99663:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Mozzarella julienne",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "d13fce65-832c-4ca2-9c52-049579c99663",
-      "itemName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
-      "matchDisplayState": "suggested",
-      "quantity": 10,
-      "unit": "un",
-      "unit_price": 20.03,
-      "total": 200.3
-    },
-    {
-      "id": "e418468e-cb13-44f3-93b2-1857ae6eaa4d:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Rulo di capra",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "e418468e-cb13-44f3-93b2-1857ae6eaa4d",
-      "itemName": "Rulo Di Capra 1kg*2 Simonetta",
-      "matchDisplayState": "suggested",
-      "quantity": 1,
-      "unit": "un",
-      "unit_price": 10.86,
-      "total": 10.86
-    },
-    {
-      "id": "53167dd9-c734-412f-9679-10b022060980:UNMATCHED_INGREDIENT:ingredient",
-      "code": "UNMATCHED_INGREDIENT",
-      "severity": "warning",
-      "category": "matching",
-      "title": "Unmatched ingredient",
-      "description": "This line is not linked to a catalog ingredient.",
-      "suggestedAction": "Match or create a canonical ingredient.",
-      "evidence": {
-        "field": "ingredient",
-        "expected": {
-          "value": "catalog match",
-          "label": "Linked ingredient"
-        },
-        "extra": {
-          "item_name": "Recargo por combustivel"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "53167dd9-c734-412f-9679-10b022060980",
-      "itemName": "Recargo por combustivel",
-      "matchDisplayState": "unmatched",
-      "quantity": 1,
-      "unit": "un",
-      "unit_price": 2,
-      "total": 2
-    },
-    {
-      "id": "d69123d3-40af-4b9e-a566-bde7a8989e49:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Farina do pasta fresca e gnocchi",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "d69123d3-40af-4b9e-a566-bde7a8989e49",
-      "itemName": "Farina do pasta fresca e gnocchi25kg Caputo",
-      "matchDisplayState": "suggested",
-      "quantity": 1,
-      "unit": "un",
-      "unit_price": 30.11,
-      "total": 30.11
     },
     {
       "id": "ef25be0f-f153-40de-b377-25151d147637:UNMATCHED_INGREDIENT:ingredient",
@@ -2076,7 +1950,295 @@
           "evidence": {
             "field": "ingredient",
             "extra": {
-              "suggested_ingredient": "Mozzarella julienne",
+              "suggested_ingredient": "Mozzarella fior di latte",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "item": {
+        "id": "d592c2cc-fd23-41ad-afd0-4fe693eef08a",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit": "un",
+        "unit_price": 10.83,
+        "total": 64.93
+      },
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "d592c2cc-fd23-41ad-afd0-4fe693eef08a:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Guanciale stagionato",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "item": {
+        "id": "18b97c30-12ae-4642-9ee5-1434da490bb7",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Farine Speciale pizza 25kg Amoruso",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 26.52,
+        "total": 26.52
+      },
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "18b97c30-12ae-4642-9ee5-1434da490bb7:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Farine speciale pizza",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "item": {
+        "id": "5d46d914-1860-40e8-b5c4-8d9aad1d4d2b",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 1.07,
+        "total": 25.69
+      },
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "5d46d914-1860-40e8-b5c4-8d9aad1d4d2b:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Peroni nastro azzurro 33cl",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "item": {
+        "id": "ef4c6f72-7f74-4ebb-b567-24cef8e90ae5",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 15.55,
+        "total": 16.09
+      },
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "ef4c6f72-7f74-4ebb-b567-24cef8e90ae5:MATHEMATICAL_INCONSISTENCY",
+          "code": "MATHEMATICAL_INCONSISTENCY",
+          "severity": "error",
+          "category": "mathematics",
+          "title": "Math inconsistency",
+          "description": "Quantity × unit price does not reconcile with line total",
+          "suggestedAction": "Correct quantity, unit price, or line total so the row reconciles.",
+          "evidence": {
+            "expected": {
+              "value": 15.55,
+              "unit": "EUR",
+              "label": "Calculated total"
+            },
+            "actual": {
+              "value": 16.09,
+              "unit": "EUR",
+              "label": "Invoice total"
+            },
+            "difference": {
+              "absolute": 0.54,
+              "percent": 3.36
+            },
+            "extra": {
+              "quantity": 1,
+              "unit_price": 15.55
+            }
+          }
+        },
+        {
+          "id": "ef4c6f72-7f74-4ebb-b567-24cef8e90ae5:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Aceto balsamico di modena IGP",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "item": {
+        "id": "1700ab82-9f9e-4830-be6d-405155616d07",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+        "quantity": 10,
+        "unit": "un",
+        "unit_price": 20.03,
+        "total": 200.3
+      },
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "1700ab82-9f9e-4830-be6d-405155616d07:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Mozzarella fior di latte",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "item": {
+        "id": "a8f0a5e3-0612-4315-802b-27130b899839",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 10.86,
+        "total": 10.86
+      },
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "a8f0a5e3-0612-4315-802b-27130b899839:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Rulo di capra",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "item": {
+        "id": "896110ca-85b6-42de-baac-d3c4f5c68608",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Recargo por combustivel",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 2,
+        "total": 2
+      },
+      "matchDisplayState": "unmatched",
+      "findings": [
+        {
+          "id": "896110ca-85b6-42de-baac-d3c4f5c68608:UNMATCHED_INGREDIENT:ingredient",
+          "code": "UNMATCHED_INGREDIENT",
+          "severity": "warning",
+          "category": "matching",
+          "title": "Unmatched ingredient",
+          "description": "This line is not linked to a catalog ingredient.",
+          "suggestedAction": "Match or create a canonical ingredient.",
+          "evidence": {
+            "field": "ingredient",
+            "expected": {
+              "value": "catalog match",
+              "label": "Linked ingredient"
+            },
+            "extra": {
+              "item_name": "Recargo por combustivel"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "item": {
+        "id": "cb75a796-0c40-48c0-a315-a2067c6c4673",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Farina do pasta fresca e gnocchi25kg Caputo",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 30.11,
+        "total": 30.11
+      },
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "cb75a796-0c40-48c0-a315-a2067c6c4673:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Farina do pasta fresca e gnocchi",
               "confidence": "Suggested match"
             }
           }
@@ -2572,7 +2734,7 @@
           "evidence": {
             "field": "ingredient",
             "extra": {
-              "suggested_ingredient": "Mozzarella julienne",
+              "suggested_ingredient": "Mozzarella fior di latte",
               "confidence": "Suggested match"
             }
           }
@@ -2593,338 +2755,6 @@
       },
       "matchDisplayState": "confirmed",
       "findings": []
-    },
-    {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "item": {
-        "id": "6efebedf-c78e-46c1-9ae1-58792229834b",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
-        "quantity": 5.996,
-        "unit": "un",
-        "unit_price": 10.83,
-        "total": 64.93
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "6efebedf-c78e-46c1-9ae1-58792229834b:OPERATIONAL_NORMALIZATION_INCONSISTENCY",
-          "code": "OPERATIONAL_NORMALIZATION_INCONSISTENCY",
-          "severity": "warning",
-          "category": "operational",
-          "title": "Operational mismatch",
-          "description": "Pack structure normalization does not reconcile with invoice weight economics.",
-          "suggestedAction": "Confirm whether row quantity is billed weight or whether pack notation should scale usable stock.",
-          "evidence": {
-            "expected": {
-              "value": 10.83,
-              "unit": "EUR/kg",
-              "label": "Invoice operational cost"
-            },
-            "actual": {
-              "value": 6.18,
-              "unit": "EUR/kg",
-              "label": "Calculated operational cost"
-            },
-            "difference": {
-              "absolute": 4.65,
-              "percent": 42.94
-            },
-            "extra": {
-              "check": "pack_structure_vs_row_weight",
-              "structure_usable_kg": 10.5,
-              "purchased_weight_kg": 6,
-              "line_total": 64.93,
-              "quantity": 5.996,
-              "row_unit": "un",
-              "pack_structure": {
-                "container_count": 7,
-                "container_unit": "un",
-                "package_quantity": 1.5,
-                "package_measurement_unit": "kg"
-              },
-              "usable_quantity": 10500,
-              "usable_quantity_unit": "g"
-            }
-          }
-        },
-        {
-          "id": "6efebedf-c78e-46c1-9ae1-58792229834b:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Guanciale stagionato",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "item": {
-        "id": "65ced122-bedd-4f87-bc23-3b85477ebe8b",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "Farina Speciale pizza 25kg Amoruso",
-        "quantity": 1,
-        "unit": "un",
-        "unit_price": 26.52,
-        "total": 26.52
-      },
-      "matchDisplayState": "unmatched",
-      "findings": [
-        {
-          "id": "65ced122-bedd-4f87-bc23-3b85477ebe8b:UNMATCHED_INGREDIENT:ingredient",
-          "code": "UNMATCHED_INGREDIENT",
-          "severity": "warning",
-          "category": "matching",
-          "title": "Unmatched ingredient",
-          "description": "This line is not linked to a catalog ingredient.",
-          "suggestedAction": "Match or create a canonical ingredient.",
-          "evidence": {
-            "field": "ingredient",
-            "expected": {
-              "value": "catalog match",
-              "label": "Linked ingredient"
-            },
-            "extra": {
-              "item_name": "Farina Speciale pizza 25kg Amoruso"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "item": {
-        "id": "979a9928-dbdb-4fe5-a231-2caaae327ed9",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
-        "quantity": 24,
-        "unit": "un",
-        "unit_price": 1.07,
-        "total": 25.69
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "979a9928-dbdb-4fe5-a231-2caaae327ed9:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Peroni nastro azzurro 33cl",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "item": {
-        "id": "1ccf0bd0-12ef-4823-b504-3833df0899c7",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
-        "quantity": 1,
-        "unit": "un",
-        "unit_price": 15.55,
-        "total": 16.09
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "1ccf0bd0-12ef-4823-b504-3833df0899c7:MATHEMATICAL_INCONSISTENCY",
-          "code": "MATHEMATICAL_INCONSISTENCY",
-          "severity": "error",
-          "category": "mathematics",
-          "title": "Math inconsistency",
-          "description": "Quantity × unit price does not reconcile with line total",
-          "suggestedAction": "Correct quantity, unit price, or line total so the row reconciles.",
-          "evidence": {
-            "expected": {
-              "value": 15.55,
-              "unit": "EUR",
-              "label": "Calculated total"
-            },
-            "actual": {
-              "value": 16.09,
-              "unit": "EUR",
-              "label": "Invoice total"
-            },
-            "difference": {
-              "absolute": 0.54,
-              "percent": 3.36
-            },
-            "extra": {
-              "quantity": 1,
-              "unit_price": 15.55
-            }
-          }
-        },
-        {
-          "id": "1ccf0bd0-12ef-4823-b504-3833df0899c7:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Aceto balsamico di modena IGP",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "item": {
-        "id": "d13fce65-832c-4ca2-9c52-049579c99663",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
-        "quantity": 10,
-        "unit": "un",
-        "unit_price": 20.03,
-        "total": 200.3
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "d13fce65-832c-4ca2-9c52-049579c99663:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Mozzarella julienne",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "item": {
-        "id": "e418468e-cb13-44f3-93b2-1857ae6eaa4d",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "Rulo Di Capra 1kg*2 Simonetta",
-        "quantity": 1,
-        "unit": "un",
-        "unit_price": 10.86,
-        "total": 10.86
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "e418468e-cb13-44f3-93b2-1857ae6eaa4d:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Rulo di capra",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "item": {
-        "id": "53167dd9-c734-412f-9679-10b022060980",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "Recargo por combustivel",
-        "quantity": 1,
-        "unit": "un",
-        "unit_price": 2,
-        "total": 2
-      },
-      "matchDisplayState": "unmatched",
-      "findings": [
-        {
-          "id": "53167dd9-c734-412f-9679-10b022060980:UNMATCHED_INGREDIENT:ingredient",
-          "code": "UNMATCHED_INGREDIENT",
-          "severity": "warning",
-          "category": "matching",
-          "title": "Unmatched ingredient",
-          "description": "This line is not linked to a catalog ingredient.",
-          "suggestedAction": "Match or create a canonical ingredient.",
-          "evidence": {
-            "field": "ingredient",
-            "expected": {
-              "value": "catalog match",
-              "label": "Linked ingredient"
-            },
-            "extra": {
-              "item_name": "Recargo por combustivel"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "item": {
-        "id": "d69123d3-40af-4b9e-a566-bde7a8989e49",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "Farina do pasta fresca e gnocchi25kg Caputo",
-        "quantity": 1,
-        "unit": "un",
-        "unit_price": 30.11,
-        "total": 30.11
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "d69123d3-40af-4b9e-a566-bde7a8989e49:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Farina do pasta fresca e gnocchi",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
     },
     {
       "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",

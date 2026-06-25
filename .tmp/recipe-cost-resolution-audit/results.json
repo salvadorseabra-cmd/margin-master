@@ -1,0 +1,628 @@
+{
+  "generatedAt": "2026-06-25T13:02:43.157Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "mode": "STRICT_READ_ONLY",
+  "summary": {
+    "allThreeSameBug": true,
+    "rootCause": "E",
+    "rootCauseLabel": "recipe costing bug",
+    "rootCauseDetail": "preferInvoiceCountableOverlayFields corrupts invoice g-base (pq=100/250) to un; Ginger beer lacks ml→un bridge when invoice ml wins over catalog un",
+    "exactLocation": {
+      "primary": {
+        "function": "preferInvoiceCountableOverlayFields",
+        "file": "src/lib/resolve-operational-ingredient-cost.ts",
+        "lines": "152-170"
+      },
+      "secondary": [
+        {
+          "function": "normalizeCountableOperationalCostFields",
+          "file": "src/lib/resolve-operational-ingredient-cost.ts",
+          "lines": "172-178"
+        },
+        {
+          "function": "ingredientLineCostEur",
+          "file": "src/lib/recipe-prep-cost.ts",
+          "lines": "336-338"
+        },
+        {
+          "function": "directCountableLineCostEur",
+          "file": "src/lib/usable-unit-conversion.ts",
+          "lines": "305-317"
+        }
+      ]
+    },
+    "lineCostNullReason": "preferInvoiceCountableOverlayFields rewrites invoice cost_base_unit from g to un when purchase_quantity is 100/250 (gram denominators), blocking weight-recipe multiplication; Ginger beer invoice ml overlay cannot reach recipe un via directCountable.",
+    "smallestCorrection": "Preserve cost_base_unit=g when invoice overlay already sets gram denominator (pq<1000); for multipack beverages with recipe un, prefer catalog un base or bridge via usable_volume_ml per bottle.",
+    "ifFixed": {
+      "passRecipes": 12,
+      "failRecipes": 0,
+      "passLines": 34,
+      "failLines": 0,
+      "certificationDecision": "green",
+      "confidence": 92
+    }
+  },
+  "failCases": [
+    {
+      "ingredientId": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+      "name": "Manjericão",
+      "recipeQty": 12,
+      "recipeUnit": "g",
+      "catalog": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "cost_base_unit": "g"
+      },
+      "catalogCostBase": "g",
+      "invoiceItem": {
+        "invoiceDate": "2026-05-25",
+        "fields": {
+          "current_price": 2.06,
+          "purchase_quantity": 100,
+          "cost_base_unit": "g"
+        },
+        "latestInvoiceUnitCost": 2.06
+      },
+      "rawInvoiceFields": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "cost_base_unit": "g"
+      },
+      "afterPreferCountable": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "cost_base_unit": "un"
+      },
+      "afterMergeCatalog": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "cost_base_unit": "g"
+      },
+      "resolveDecision": {
+        "source": "invoice",
+        "chosenDate": "2026-05-25",
+        "catalogAvailable": true,
+        "embedAvailable": true,
+        "invoiceAvailable": true,
+        "embedPreferredOverCatalog": false
+      },
+      "resolvedFields": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "cost_base_unit": "un"
+      },
+      "costBase": "un",
+      "costFamily": "countable",
+      "recipeNorm": {
+        "quantity": 12,
+        "baseUnit": "g"
+      },
+      "recipeFamily": "weight",
+      "familiesCompatible": false,
+      "unitCostEur": 0.0206,
+      "conversionAttempts": {
+        "directCountable": {
+          "lineCostEur": null,
+          "path": "direct_countable"
+        },
+        "packagedLiquid": {
+          "lineCostEur": null,
+          "converted": false,
+          "packMl": null
+        },
+        "usableConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null,
+          "usableSource": null
+        },
+        "densityConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null
+        },
+        "usablePerCountableUnit": {
+          "usableWeightGrams": null,
+          "usableVolumeMl": null,
+          "source": null
+        }
+      },
+      "lineCostEur": null,
+      "pricingResolved": false,
+      "unresolvedReason": "HYBRID_CONVERSION_MISSING",
+      "stopPoint": "HYBRID_CONVERSION_MISSING: no usable_weight_grams on overlay"
+    },
+    {
+      "ingredientId": "47cd8362-79f4-4285-8491-f016229eaa21",
+      "name": "Salada ibérica",
+      "recipeQty": 100,
+      "recipeUnit": "g",
+      "catalog": {
+        "current_price": 2.19,
+        "purchase_quantity": 250,
+        "cost_base_unit": "g"
+      },
+      "catalogCostBase": "g",
+      "invoiceItem": {
+        "invoiceDate": "2026-05-25",
+        "fields": {
+          "current_price": 2.19,
+          "purchase_quantity": 250,
+          "cost_base_unit": "g"
+        },
+        "latestInvoiceUnitCost": 2.19
+      },
+      "rawInvoiceFields": {
+        "current_price": 2.19,
+        "purchase_quantity": 250,
+        "cost_base_unit": "g"
+      },
+      "afterPreferCountable": {
+        "current_price": 2.19,
+        "purchase_quantity": 250,
+        "cost_base_unit": "un"
+      },
+      "afterMergeCatalog": {
+        "current_price": 2.19,
+        "purchase_quantity": 250,
+        "cost_base_unit": "g"
+      },
+      "resolveDecision": {
+        "source": "invoice",
+        "chosenDate": "2026-05-25",
+        "catalogAvailable": true,
+        "embedAvailable": true,
+        "invoiceAvailable": true,
+        "embedPreferredOverCatalog": false
+      },
+      "resolvedFields": {
+        "current_price": 2.19,
+        "purchase_quantity": 250,
+        "cost_base_unit": "un"
+      },
+      "costBase": "un",
+      "costFamily": "countable",
+      "recipeNorm": {
+        "quantity": 100,
+        "baseUnit": "g"
+      },
+      "recipeFamily": "weight",
+      "familiesCompatible": false,
+      "unitCostEur": 0.00876,
+      "conversionAttempts": {
+        "directCountable": {
+          "lineCostEur": null,
+          "path": "direct_countable"
+        },
+        "packagedLiquid": {
+          "lineCostEur": null,
+          "converted": false,
+          "packMl": null
+        },
+        "usableConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null,
+          "usableSource": null
+        },
+        "densityConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null
+        },
+        "usablePerCountableUnit": {
+          "usableWeightGrams": null,
+          "usableVolumeMl": null,
+          "source": null
+        }
+      },
+      "lineCostEur": null,
+      "pricingResolved": false,
+      "unresolvedReason": "HYBRID_CONVERSION_MISSING",
+      "stopPoint": "HYBRID_CONVERSION_MISSING: no usable_weight_grams on overlay"
+    },
+    {
+      "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+      "name": "Ginger beer",
+      "recipeQty": 6,
+      "recipeUnit": "un",
+      "catalog": {
+        "current_price": 0.81,
+        "purchase_quantity": 24,
+        "cost_base_unit": "un"
+      },
+      "catalogCostBase": "un",
+      "invoiceItem": {
+        "invoiceDate": "2026-05-19",
+        "fields": {
+          "current_price": 0.81,
+          "purchase_quantity": 200,
+          "cost_base_unit": "ml"
+        },
+        "latestInvoiceUnitCost": 0.81
+      },
+      "rawInvoiceFields": {
+        "current_price": 0.81,
+        "purchase_quantity": 200,
+        "cost_base_unit": "ml"
+      },
+      "afterPreferCountable": {
+        "current_price": 0.81,
+        "purchase_quantity": 200,
+        "cost_base_unit": "ml"
+      },
+      "afterMergeCatalog": {
+        "current_price": 0.81,
+        "purchase_quantity": 200,
+        "cost_base_unit": "ml"
+      },
+      "resolveDecision": {
+        "source": "invoice",
+        "chosenDate": "2026-05-19",
+        "catalogAvailable": true,
+        "embedAvailable": true,
+        "invoiceAvailable": true,
+        "embedPreferredOverCatalog": false
+      },
+      "resolvedFields": {
+        "current_price": 0.81,
+        "purchase_quantity": 200,
+        "cost_base_unit": "ml"
+      },
+      "costBase": "ml",
+      "costFamily": "volume",
+      "recipeNorm": {
+        "quantity": 6,
+        "baseUnit": "un"
+      },
+      "recipeFamily": "countable",
+      "familiesCompatible": false,
+      "unitCostEur": 0.004050000000000001,
+      "conversionAttempts": {
+        "directCountable": {
+          "lineCostEur": null,
+          "path": "direct_countable"
+        },
+        "packagedLiquid": {
+          "lineCostEur": null,
+          "converted": false,
+          "packMl": null
+        },
+        "usableConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null,
+          "usableSource": null
+        },
+        "densityConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null
+        },
+        "usablePerCountableUnit": {
+          "usableWeightGrams": null,
+          "usableVolumeMl": null,
+          "source": null
+        }
+      },
+      "lineCostEur": null,
+      "pricingResolved": false,
+      "unresolvedReason": "HYBRID_CONVERSION_MISSING",
+      "stopPoint": "UNIT_FAMILY_MISMATCH: volume overlay vs recipe un (no directCountable)"
+    }
+  ],
+  "passComparators": [
+    {
+      "ingredientId": "9c853a47-82fe-4d6d-88bc-f0aa007e0a59",
+      "name": "Mortadella (grams PASS)",
+      "recipeQty": 80,
+      "recipeUnit": "g",
+      "catalog": {
+        "current_price": 9.99,
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g"
+      },
+      "catalogCostBase": "g",
+      "invoiceItem": {
+        "invoiceDate": "2026-05-19",
+        "fields": {
+          "current_price": 9.99,
+          "purchase_quantity": 1000,
+          "cost_base_unit": "g"
+        },
+        "latestInvoiceUnitCost": 9.99
+      },
+      "rawInvoiceFields": {
+        "current_price": 9.99,
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g"
+      },
+      "afterPreferCountable": {
+        "current_price": 9.99,
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g"
+      },
+      "afterMergeCatalog": {
+        "current_price": 9.99,
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g"
+      },
+      "resolveDecision": {
+        "source": "invoice",
+        "chosenDate": "2026-05-19",
+        "catalogAvailable": true,
+        "embedAvailable": true,
+        "invoiceAvailable": true,
+        "embedPreferredOverCatalog": false
+      },
+      "resolvedFields": {
+        "current_price": 9.99,
+        "purchase_quantity": 1000,
+        "cost_base_unit": "g"
+      },
+      "costBase": "g",
+      "costFamily": "weight",
+      "recipeNorm": {
+        "quantity": 80,
+        "baseUnit": "g"
+      },
+      "recipeFamily": "weight",
+      "familiesCompatible": true,
+      "unitCostEur": 0.00999,
+      "conversionAttempts": {
+        "directCountable": {
+          "lineCostEur": null,
+          "path": "direct_countable"
+        },
+        "packagedLiquid": {
+          "lineCostEur": null,
+          "converted": false,
+          "packMl": null
+        },
+        "usableConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null,
+          "usableSource": null
+        },
+        "densityConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null
+        },
+        "usablePerCountableUnit": {
+          "usableWeightGrams": null,
+          "usableVolumeMl": null,
+          "source": null
+        }
+      },
+      "lineCostEur": 0.7992,
+      "pricingResolved": true,
+      "unresolvedReason": null,
+      "stopPoint": "resolved",
+      "divergenceFromFail": "HYBRID_CONVERSION_MISSING: no usable_weight_grams on overlay",
+      "firstDivergence": "compatible_base_multiply or direct_countable"
+    },
+    {
+      "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4",
+      "name": "Aceto (litres PASS)",
+      "recipeQty": 15,
+      "recipeUnit": "ml",
+      "catalog": {
+        "current_price": 16.09,
+        "purchase_quantity": 2,
+        "cost_base_unit": "un"
+      },
+      "catalogCostBase": "un",
+      "invoiceItem": {
+        "invoiceDate": "2026-05-19",
+        "fields": {
+          "current_price": 16.09,
+          "purchase_quantity": 10000,
+          "cost_base_unit": "ml"
+        },
+        "latestInvoiceUnitCost": 16.09
+      },
+      "rawInvoiceFields": {
+        "current_price": 16.09,
+        "purchase_quantity": 10000,
+        "cost_base_unit": "ml"
+      },
+      "afterPreferCountable": {
+        "current_price": 16.09,
+        "purchase_quantity": 10000,
+        "cost_base_unit": "ml"
+      },
+      "afterMergeCatalog": {
+        "current_price": 16.09,
+        "purchase_quantity": 10000,
+        "cost_base_unit": "ml"
+      },
+      "resolveDecision": {
+        "source": "invoice",
+        "chosenDate": "2026-05-19",
+        "catalogAvailable": true,
+        "embedAvailable": true,
+        "invoiceAvailable": true,
+        "embedPreferredOverCatalog": false
+      },
+      "resolvedFields": {
+        "current_price": 16.09,
+        "purchase_quantity": 10000,
+        "cost_base_unit": "ml"
+      },
+      "costBase": "ml",
+      "costFamily": "volume",
+      "recipeNorm": {
+        "quantity": 15,
+        "baseUnit": "ml"
+      },
+      "recipeFamily": "volume",
+      "familiesCompatible": true,
+      "unitCostEur": 0.001609,
+      "conversionAttempts": {
+        "directCountable": {
+          "lineCostEur": null,
+          "path": "direct_countable"
+        },
+        "packagedLiquid": {
+          "lineCostEur": null,
+          "converted": false,
+          "packMl": null
+        },
+        "usableConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null,
+          "usableSource": null
+        },
+        "densityConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null
+        },
+        "usablePerCountableUnit": {
+          "usableWeightGrams": null,
+          "usableVolumeMl": null,
+          "source": null
+        }
+      },
+      "lineCostEur": 0.024135,
+      "pricingResolved": true,
+      "unresolvedReason": null,
+      "stopPoint": "resolved",
+      "divergenceFromFail": "N/A",
+      "firstDivergence": "compatible_base_multiply or direct_countable"
+    },
+    {
+      "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+      "name": "Anchoas (units PASS)",
+      "recipeQty": 3,
+      "recipeUnit": "un",
+      "catalog": {
+        "current_price": 9.99,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un"
+      },
+      "catalogCostBase": "un",
+      "invoiceItem": {
+        "invoiceDate": "2026-05-19",
+        "fields": {
+          "current_price": 9.99,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 495
+        },
+        "latestInvoiceUnitCost": 9.99
+      },
+      "rawInvoiceFields": {
+        "current_price": 9.99,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 495
+      },
+      "afterPreferCountable": {
+        "current_price": 9.99,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 495
+      },
+      "afterMergeCatalog": {
+        "current_price": 9.99,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 495
+      },
+      "resolveDecision": {
+        "source": "invoice",
+        "chosenDate": "2026-05-19",
+        "catalogAvailable": true,
+        "embedAvailable": true,
+        "invoiceAvailable": true,
+        "embedPreferredOverCatalog": false
+      },
+      "resolvedFields": {
+        "current_price": 9.99,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 495
+      },
+      "costBase": "un",
+      "costFamily": "countable",
+      "recipeNorm": {
+        "quantity": 3,
+        "baseUnit": "un"
+      },
+      "recipeFamily": "countable",
+      "familiesCompatible": true,
+      "unitCostEur": 9.99,
+      "conversionAttempts": {
+        "directCountable": {
+          "lineCostEur": 29.97,
+          "path": "direct_countable"
+        },
+        "packagedLiquid": {
+          "lineCostEur": null,
+          "converted": false,
+          "packMl": null
+        },
+        "usableConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null,
+          "usableSource": null
+        },
+        "densityConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null
+        },
+        "usablePerCountableUnit": {
+          "usableWeightGrams": 495,
+          "usableVolumeMl": null,
+          "source": "explicit_fields"
+        }
+      },
+      "lineCostEur": 29.97,
+      "pricingResolved": true,
+      "unresolvedReason": null,
+      "stopPoint": "resolved",
+      "divergenceFromFail": "UNIT_FAMILY_MISMATCH: volume overlay vs recipe un (no directCountable)",
+      "firstDivergence": "compatible_base_multiply or direct_countable"
+    }
+  ],
+  "invoiceOverlayFields": {
+    "8fe3ab95-b508-48b5-9890-d737dee78cc6": {
+      "current_price": 2.06,
+      "purchase_quantity": 100,
+      "cost_base_unit": "g"
+    },
+    "47cd8362-79f4-4285-8491-f016229eaa21": {
+      "current_price": 2.19,
+      "purchase_quantity": 250,
+      "cost_base_unit": "g"
+    },
+    "7aa5dd9e-44c2-43e3-b673-890ad6d6da41": {
+      "current_price": 0.81,
+      "purchase_quantity": 200,
+      "cost_base_unit": "ml"
+    }
+  },
+  "catalogFields": {
+    "8fe3ab95-b508-48b5-9890-d737dee78cc6": {
+      "current_price": 2.06,
+      "purchase_quantity": 100,
+      "cost_base_unit": "g"
+    },
+    "47cd8362-79f4-4285-8491-f016229eaa21": {
+      "current_price": 2.19,
+      "purchase_quantity": 250,
+      "cost_base_unit": "g"
+    },
+    "7aa5dd9e-44c2-43e3-b673-890ad6d6da41": {
+      "current_price": 0.81,
+      "purchase_quantity": 24,
+      "cost_base_unit": "un"
+    }
+  }
+}

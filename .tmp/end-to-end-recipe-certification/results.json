@@ -1,0 +1,1292 @@
+{
+  "generatedAt": "2026-06-25T12:53:32.519Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "scope": {
+    "recipeCount": 12,
+    "recipeLineCount": 34,
+    "prefix": "VL-E2E"
+  },
+  "summary": {
+    "totalRecipesValidated": 12,
+    "passCount": 9,
+    "failCount": 3,
+    "linePassCount": 31,
+    "lineFailCount": 3,
+    "mathematicalDiscrepancies": [
+      {
+        "recipe": "VL-E2E Multipack",
+        "failures": [
+          "Ginger beer: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 6 un vs overlay/cost base mismatch"
+        ],
+        "lines": [
+          {
+            "ingredient": "Ginger beer",
+            "expected": null,
+            "actual": null,
+            "delta": null
+          }
+        ]
+      },
+      {
+        "recipe": "VL-E2E Pizza Margherita",
+        "failures": [
+          "Manjericão: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 12 g vs overlay/cost base mismatch"
+        ],
+        "lines": [
+          {
+            "ingredient": "Manjericão",
+            "expected": null,
+            "actual": null,
+            "delta": null
+          }
+        ]
+      },
+      {
+        "recipe": "VL-E2E Salad Gorgonzola",
+        "failures": [
+          "Salada ibérica: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 100 g vs overlay/cost base mismatch"
+        ],
+        "lines": [
+          {
+            "ingredient": "Salada ibérica",
+            "expected": null,
+            "actual": null,
+            "delta": null
+          }
+        ]
+      }
+    ],
+    "singleOperationalSourceOfTruth": true,
+    "usesPriceHistoryInRecipePath": false,
+    "neverPriceHistory": true,
+    "recipeRecalculationAfterPriceChange": true,
+    "regression": {
+      "tested": true,
+      "recipe": "VL-E2E Salad Gorgonzola",
+      "baselineTotalEur": 0.6432,
+      "bumpedTotalEur": 0.683,
+      "expectedDeltaEur": 0.0398,
+      "actualDeltaEur": 0.0398,
+      "pass": true
+    },
+    "usesFlaggedIngredients": false,
+    "certificationDecision": "yellow",
+    "confidence": 67,
+    "issueClassification": [
+      {
+        "ingredient": "Manjericão",
+        "recipe": "VL-E2E Pizza Margherita",
+        "class": "Recipe-layer bug",
+        "detail": "Invoice overlay cost_base_unit=un blocks recipe usage in g; catalog has correct g base but invoice wins"
+      },
+      {
+        "ingredient": "Salada ibérica",
+        "recipe": "VL-E2E Salad Gorgonzola",
+        "class": "Recipe-layer bug",
+        "detail": "Invoice overlay cost_base_unit=un blocks recipe usage in g; usable-weight conversion not applied"
+      },
+      {
+        "ingredient": "Ginger beer",
+        "recipe": "VL-E2E Multipack",
+        "class": "Recipe-layer bug",
+        "detail": "Invoice overlay cost_base_unit=ml; recipe line in un — direct countable path missing for multipack"
+      }
+    ]
+  },
+  "foundationPillars": {
+    "procurement": "green",
+    "operationalNormalization": "green",
+    "ingredientCatalog": "yellow",
+    "recipeCosting": "yellow",
+    "historicalPricing": "yellow",
+    "validationEngine": "green",
+    "matching": "yellow"
+  },
+  "remainingFoundationBlockers": [
+    "Match read cutover (VITE_MATCH_LIFECYCLE_READ_CUTOVER) — isolated from recipe costing",
+    "History sync: Ovo/Tomilho pack-level new_price — not referenced in VL-E2E recipes",
+    "Prosciutto match lifecycle orphan history — not referenced in VL-E2E recipes"
+  ],
+  "recipes": [
+    {
+      "recipeId": "032263f3-7d1d-4f6a-910b-ba17d83c9dcf",
+      "recipeName": "VL-E2E Charcuterie kg",
+      "recipeType": "dish",
+      "sellingPrice": 15,
+      "status": "PASS",
+      "totalExpectedEur": 3.8262,
+      "totalActualEur": 3.8262,
+      "totalDeltaEur": 0,
+      "summaryFoodCostEur": 3.8262,
+      "pdfTotalFoodCostEur": 3.8262,
+      "ingredientLines": [
+        {
+          "lineId": "27ddc4bf-2a79-4081-ad82-2b69f9374b0c",
+          "ingredientId": "9c853a47-82fe-4d6d-88bc-f0aa007e0a59",
+          "subRecipeId": null,
+          "ingredientName": "Mortadella IGP massima con pistacchio",
+          "quantity": 0.18,
+          "unit": "kg",
+          "opUnitCostEur": 0.00999,
+          "costSource": "invoice",
+          "expectedLineCostEur": 1.7982,
+          "actualLineCostEur": 1.7982,
+          "deltaEur": 0,
+          "catalogOpEur": 0.00999,
+          "detailOpEur": 0.00999,
+          "uiUnitCostEur": 0.00999,
+          "pdfLineCostEur": 1.7982,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "943d79b3-d421-448e-bd8e-39051ba5efd0",
+            "invoiceLineName": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+            "invoiceQty": 3.11,
+            "invoiceUnit": "kg",
+            "invoiceUnitPrice": 9.99
+          }
+        },
+        {
+          "lineId": "3c52db3d-a902-4b65-a77d-f06d993bcbd0",
+          "ingredientId": "31d6da3f-d812-4836-9086-92a5616250d1",
+          "subRecipeId": null,
+          "ingredientName": "Rigamonti bresaola punta d'anca oro",
+          "quantity": 0.075,
+          "unit": "kg",
+          "opUnitCostEur": 0.02704,
+          "costSource": "invoice",
+          "expectedLineCostEur": 2.028,
+          "actualLineCostEur": 2.028,
+          "deltaEur": 0,
+          "catalogOpEur": 0.027039999999999998,
+          "detailOpEur": 0.027039999999999998,
+          "uiUnitCostEur": 0.02704,
+          "pdfLineCostEur": 2.028,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "01fba9c8-3938-4009-924c-96920439570d",
+            "invoiceLineName": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+            "invoiceQty": 1.83,
+            "invoiceUnit": "kg",
+            "invoiceUnitPrice": 27.04
+          }
+        }
+      ],
+      "failures": [],
+      "coverageTags": [
+        "weight-kg",
+        "recipe-unit-kg"
+      ]
+    },
+    {
+      "recipeId": "b813f4ec-812e-4a3e-accc-7c5bb0baa316",
+      "recipeName": "VL-E2E Countable Units",
+      "recipeType": "dish",
+      "sellingPrice": 10,
+      "status": "PASS",
+      "totalExpectedEur": 56.17,
+      "totalActualEur": 56.17,
+      "totalDeltaEur": 0,
+      "summaryFoodCostEur": 56.17,
+      "pdfTotalFoodCostEur": 56.17,
+      "ingredientLines": [
+        {
+          "lineId": "ef1ecb3d-a16a-45f5-a601-1d86f7017124",
+          "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+          "subRecipeId": null,
+          "ingredientName": "Anchoas",
+          "quantity": 3,
+          "unit": "un",
+          "opUnitCostEur": 9.99,
+          "costSource": "invoice",
+          "expectedLineCostEur": 29.97,
+          "actualLineCostEur": 29.97,
+          "deltaEur": 0,
+          "catalogOpEur": 9.99,
+          "detailOpEur": 9.99,
+          "uiUnitCostEur": 9.99,
+          "pdfLineCostEur": 29.97,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "8b65efaa-ffb8-4469-b34b-5caa486ee525",
+            "invoiceLineName": "Filete de Anchoas Alconfirosa LI 495 g",
+            "invoiceQty": 2,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 9.99
+          }
+        },
+        {
+          "lineId": "56fa3a50-001f-441c-b4f7-387d2dfd7e13",
+          "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+          "subRecipeId": null,
+          "ingredientName": "Atum em óleo",
+          "quantity": 2,
+          "unit": "un",
+          "opUnitCostEur": 13.1,
+          "costSource": "invoice",
+          "expectedLineCostEur": 26.2,
+          "actualLineCostEur": 26.2,
+          "deltaEur": 0,
+          "catalogOpEur": 13.1,
+          "detailOpEur": 13.1,
+          "uiUnitCostEur": 13.1,
+          "pdfLineCostEur": 26.2,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "f1d95452-2302-4467-80a1-afc9d726eed3",
+            "invoiceLineName": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+            "invoiceQty": 1,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 13.1
+          }
+        }
+      ],
+      "failures": [],
+      "coverageTags": [
+        "countable",
+        "recipe-unit-un"
+      ]
+    },
+    {
+      "recipeId": "7134059b-fc6e-488f-a745-a67c064c224e",
+      "recipeName": "VL-E2E Dessert Nata",
+      "recipeType": "dish",
+      "sellingPrice": 7.5,
+      "status": "PASS",
+      "totalExpectedEur": 14.1224,
+      "totalActualEur": 14.1224,
+      "totalDeltaEur": 0,
+      "summaryFoodCostEur": 14.122416666666666,
+      "pdfTotalFoodCostEur": 14.1224,
+      "ingredientLines": [
+        {
+          "lineId": "f94fce54-4a30-4bfc-8642-537b5f6b6ecc",
+          "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+          "subRecipeId": null,
+          "ingredientName": "Chocolate culinária",
+          "quantity": 2,
+          "unit": "un",
+          "opUnitCostEur": 2.9989999999999997,
+          "costSource": "invoice",
+          "expectedLineCostEur": 5.997999999999999,
+          "actualLineCostEur": 5.997999999999999,
+          "deltaEur": 0,
+          "catalogOpEur": 2.9989999999999997,
+          "detailOpEur": 2.9989999999999997,
+          "uiUnitCostEur": 2.9989999999999997,
+          "pdfLineCostEur": 5.997999999999999,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "c450b962-de47-4127-93d9-88ef7fc5db2b",
+            "invoiceLineName": "Chocolate Culinaria Pantagruel 10x200 g",
+            "invoiceQty": 2,
+            "invoiceUnit": "cx",
+            "invoiceUnitPrice": 29.99
+          }
+        },
+        {
+          "lineId": "730bc7ce-34f4-4509-9e43-8008220e323e",
+          "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+          "subRecipeId": null,
+          "ingredientName": "Nata culinária",
+          "quantity": 300,
+          "unit": "ml",
+          "opUnitCostEur": 0.0005247222222222222,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.15741666666666668,
+          "actualLineCostEur": 0.15741666666666668,
+          "deltaEur": 0,
+          "catalogOpEur": 3.1483333333333334,
+          "detailOpEur": 3.1483333333333334,
+          "uiUnitCostEur": 0.0005247222222222222,
+          "pdfLineCostEur": 0.15741666666666668,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [
+            "overlay op 0.0005 ≠ recomputed line op 3.1483"
+          ],
+          "trace": {
+            "invoiceItemId": "8498e893-1d03-42c8-aaf5-3be182a28f9e",
+            "invoiceLineName": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+            "invoiceQty": 5,
+            "invoiceUnit": "cx",
+            "invoiceUnitPrice": 18.89
+          }
+        },
+        {
+          "lineId": "3f69a1c3-a8e3-47fc-8d26-a3f2da56da2a",
+          "ingredientId": "6ec0bc6b-409a-4db2-b21f-fb01394f0014",
+          "subRecipeId": null,
+          "ingredientName": "Ricotta trevigiana",
+          "quantity": 1,
+          "unit": "un",
+          "opUnitCostEur": 7.967,
+          "costSource": "invoice",
+          "expectedLineCostEur": 7.967,
+          "actualLineCostEur": 7.967,
+          "deltaEur": 0,
+          "catalogOpEur": 7.967,
+          "detailOpEur": 7.967,
+          "uiUnitCostEur": 7.967,
+          "pdfLineCostEur": 7.967,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "3457193a-f60e-4642-8d18-3412a29a834f",
+            "invoiceLineName": "RICOTTA TREVIGIANA 1,5KG",
+            "invoiceQty": 1,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 7.967
+          }
+        }
+      ],
+      "failures": [],
+      "coverageTags": [
+        "dessert",
+        "recipe-unit-un",
+        "recipe-unit-ml"
+      ]
+    },
+    {
+      "recipeId": "825706ab-1b85-4719-b462-6960015e4af0",
+      "recipeName": "VL-E2E Liquid ml/L",
+      "recipeType": "dish",
+      "sellingPrice": 5,
+      "status": "PASS",
+      "totalExpectedEur": 1.1836,
+      "totalActualEur": 1.1836,
+      "totalDeltaEur": 0,
+      "summaryFoodCostEur": 1.1835822222222223,
+      "pdfTotalFoodCostEur": 1.1836,
+      "ingredientLines": [
+        {
+          "lineId": "a809dea2-1d8f-4ab7-812d-94c33ef07d35",
+          "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+          "subRecipeId": null,
+          "ingredientName": "Água san pellegrino",
+          "quantity": 600,
+          "unit": "ml",
+          "opUnitCostEur": 0.0017137777777777778,
+          "costSource": "invoice",
+          "expectedLineCostEur": 1.0282666666666667,
+          "actualLineCostEur": 1.0282666666666667,
+          "deltaEur": 0,
+          "catalogOpEur": 1.2853333333333334,
+          "detailOpEur": 1.2853333333333334,
+          "uiUnitCostEur": 0.0017137777777777778,
+          "pdfLineCostEur": 1.0282666666666667,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "7b893edb-6cf9-4650-983c-e95268bea65b",
+            "invoiceLineName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+            "invoiceQty": 2,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 19.28
+          }
+        },
+        {
+          "lineId": "8c0c2bfa-690d-4003-b814-14f808ad5959",
+          "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+          "subRecipeId": null,
+          "ingredientName": "Nata culinária",
+          "quantity": 0.25,
+          "unit": "L",
+          "opUnitCostEur": 0.0005247222222222222,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.13118055555555555,
+          "actualLineCostEur": 0.13118055555555555,
+          "deltaEur": 0,
+          "catalogOpEur": 3.1483333333333334,
+          "detailOpEur": 3.1483333333333334,
+          "uiUnitCostEur": 0.0005247222222222222,
+          "pdfLineCostEur": 0.13118055555555555,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [
+            "overlay op 0.0005 ≠ recomputed line op 3.1483"
+          ],
+          "trace": {
+            "invoiceItemId": "8498e893-1d03-42c8-aaf5-3be182a28f9e",
+            "invoiceLineName": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+            "invoiceQty": 5,
+            "invoiceUnit": "cx",
+            "invoiceUnitPrice": 18.89
+          }
+        },
+        {
+          "lineId": "13be8cdd-92e2-421d-80c6-39677d14a996",
+          "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4",
+          "subRecipeId": null,
+          "ingredientName": "Aceto balsamico di modena IGP",
+          "quantity": 15,
+          "unit": "ml",
+          "opUnitCostEur": 0.001609,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.024135,
+          "actualLineCostEur": 0.024135,
+          "deltaEur": 0,
+          "catalogOpEur": 8.045,
+          "detailOpEur": 8.045,
+          "uiUnitCostEur": 0.001609,
+          "pdfLineCostEur": 0.024135,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "c181f493-473e-4467-845c-d4c1bfd889ee",
+            "invoiceLineName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+            "invoiceQty": 1,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 16.09
+          }
+        }
+      ],
+      "failures": [],
+      "coverageTags": [
+        "liquid-ml-L",
+        "recipe-unit-ml",
+        "recipe-unit-L"
+      ]
+    },
+    {
+      "recipeId": "26237fee-c4d9-493c-b50b-5ec02dada6d5",
+      "recipeName": "VL-E2E Multipack",
+      "recipeType": "dish",
+      "sellingPrice": 6,
+      "status": "FAIL",
+      "totalExpectedEur": 2.325,
+      "totalActualEur": 2.325,
+      "totalDeltaEur": 0,
+      "summaryFoodCostEur": 2.3249999999999997,
+      "pdfTotalFoodCostEur": 2.325,
+      "ingredientLines": [
+        {
+          "lineId": "f96caef5-8f14-4596-9b25-ddf6e31b02ae",
+          "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+          "subRecipeId": null,
+          "ingredientName": "Ginger beer",
+          "quantity": 6,
+          "unit": "un",
+          "opUnitCostEur": 0.004050000000000001,
+          "costSource": "invoice",
+          "expectedLineCostEur": null,
+          "actualLineCostEur": null,
+          "deltaEur": null,
+          "catalogOpEur": 0.03375,
+          "detailOpEur": 0.03375,
+          "uiUnitCostEur": 0.004050000000000001,
+          "pdfLineCostEur": null,
+          "usesPriceHistory": false,
+          "status": "FAIL",
+          "notes": [
+            "math: expected 0 actual 0",
+            "UI line cost mismatch",
+            "unresolved: recipe 6 un vs overlay/cost base mismatch"
+          ],
+          "trace": {
+            "invoiceItemId": "de0946a9-b7e4-467b-ae21-8b0401fcb363",
+            "invoiceLineName": "Baladin - Ginger Beer 0.20cl",
+            "invoiceQty": 24,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 0.81
+          }
+        },
+        {
+          "lineId": "a61dd38a-f3ec-44f7-b9c4-82cb3be32afb",
+          "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+          "subRecipeId": null,
+          "ingredientName": "Arroz agulha",
+          "quantity": 2,
+          "unit": "un",
+          "opUnitCostEur": 1.1624999999999999,
+          "costSource": "invoice",
+          "expectedLineCostEur": 2.3249999999999997,
+          "actualLineCostEur": 2.3249999999999997,
+          "deltaEur": 0,
+          "catalogOpEur": 1.1624999999999999,
+          "detailOpEur": 1.1624999999999999,
+          "uiUnitCostEur": 1.1624999999999999,
+          "pdfLineCostEur": 2.3249999999999997,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "61bedc5b-ce0d-4835-945a-22efb41684f0",
+            "invoiceLineName": "Arroz Agulha Metro Chef 12x1 kg",
+            "invoiceQty": 1,
+            "invoiceUnit": "cx",
+            "invoiceUnitPrice": 13.95
+          }
+        }
+      ],
+      "failures": [
+        "Ginger beer: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 6 un vs overlay/cost base mismatch"
+      ],
+      "coverageTags": [
+        "multipack",
+        "recipe-unit-un"
+      ]
+    },
+    {
+      "recipeId": "4523652f-bd5f-4032-af66-6b9b5257f73d",
+      "recipeName": "VL-E2E Pasta Stracciatella",
+      "recipeType": "dish",
+      "sellingPrice": 14.5,
+      "status": "PASS",
+      "totalExpectedEur": 31.5077,
+      "totalActualEur": 31.5077,
+      "totalDeltaEur": 0,
+      "summaryFoodCostEur": 31.5077,
+      "pdfTotalFoodCostEur": 31.5077,
+      "ingredientLines": [
+        {
+          "lineId": "8d033ca0-bc2a-46d3-bae8-b127d49d7ec5",
+          "ingredientId": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+          "subRecipeId": null,
+          "ingredientName": "Mezzi paccheri mancini",
+          "quantity": 2,
+          "unit": "un",
+          "opUnitCostEur": 13.65,
+          "costSource": "invoice",
+          "expectedLineCostEur": 27.3,
+          "actualLineCostEur": 27.3,
+          "deltaEur": 0,
+          "catalogOpEur": 13.65,
+          "detailOpEur": 13.65,
+          "uiUnitCostEur": 13.65,
+          "pdfLineCostEur": 27.3,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "65e0a86d-dc5f-4e23-94ce-4612bc1b6669",
+            "invoiceLineName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+            "invoiceQty": 2,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 13.65
+          }
+        },
+        {
+          "lineId": "a87e9aa0-3dd8-47a2-8941-a1890ad47404",
+          "ingredientId": "9c853a47-82fe-4d6d-88bc-f0aa007e0a59",
+          "subRecipeId": null,
+          "ingredientName": "Mortadella IGP massima con pistacchio",
+          "quantity": 80,
+          "unit": "g",
+          "opUnitCostEur": 0.00999,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.7992,
+          "actualLineCostEur": 0.7992,
+          "deltaEur": 0,
+          "catalogOpEur": 0.00999,
+          "detailOpEur": 0.00999,
+          "uiUnitCostEur": 0.00999,
+          "pdfLineCostEur": 0.7992,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "943d79b3-d421-448e-bd8e-39051ba5efd0",
+            "invoiceLineName": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+            "invoiceQty": 3.11,
+            "invoiceUnit": "kg",
+            "invoiceUnitPrice": 9.99
+          }
+        },
+        {
+          "lineId": "a2bbea77-a580-4806-a53a-52eeab5d7afb",
+          "ingredientId": "d96e176e-7fa7-438d-beda-6b9d7fe7b41d",
+          "subRecipeId": null,
+          "ingredientName": "Stracciatella",
+          "quantity": 1,
+          "unit": "un",
+          "opUnitCostEur": 3.11,
+          "costSource": "invoice",
+          "expectedLineCostEur": 3.11,
+          "actualLineCostEur": 3.11,
+          "deltaEur": 0,
+          "catalogOpEur": 3.11,
+          "detailOpEur": 3.11,
+          "uiUnitCostEur": 3.11,
+          "pdfLineCostEur": 3.11,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "3ae0cf99-7664-4be1-a378-51297463c0a0",
+            "invoiceLineName": "STRACCIATELLA 250 GR",
+            "invoiceQty": 24,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 3.11
+          }
+        },
+        {
+          "lineId": "3c8de46f-5dbe-4f81-b2d1-b4f99072f03a",
+          "ingredientId": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+          "subRecipeId": null,
+          "ingredientName": "Gorgonzola DOP dolce",
+          "quantity": 30,
+          "unit": "g",
+          "opUnitCostEur": 0.009949999999999999,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.2985,
+          "actualLineCostEur": 0.2985,
+          "deltaEur": 0,
+          "catalogOpEur": 0.009949999999999999,
+          "detailOpEur": 0.009949999999999999,
+          "uiUnitCostEur": 0.009949999999999999,
+          "pdfLineCostEur": 0.2985,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "5fab58a8-8cfc-4625-ab97-e956d07aade9",
+            "invoiceLineName": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+            "invoiceQty": 1.35,
+            "invoiceUnit": "kg",
+            "invoiceUnitPrice": 9.95
+          }
+        }
+      ],
+      "failures": [],
+      "coverageTags": [
+        "mixed",
+        "recipe-unit-un",
+        "recipe-unit-g"
+      ]
+    },
+    {
+      "recipeId": "bc63b77b-d09b-481b-bf0c-e20705fa87ad",
+      "recipeName": "VL-E2E Pasta with Sauce",
+      "recipeType": "dish",
+      "sellingPrice": 13,
+      "status": "PASS",
+      "totalExpectedEur": 18.1102,
+      "totalActualEur": 18.1102,
+      "totalDeltaEur": 0,
+      "summaryFoodCostEur": 18.11018,
+      "pdfTotalFoodCostEur": 18.1102,
+      "ingredientLines": [
+        {
+          "lineId": "f19e6107-7978-4799-a296-af0dab4fc679",
+          "ingredientId": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+          "subRecipeId": null,
+          "ingredientName": "Mezzi paccheri mancini",
+          "quantity": 1,
+          "unit": "un",
+          "opUnitCostEur": 13.65,
+          "costSource": "invoice",
+          "expectedLineCostEur": 13.65,
+          "actualLineCostEur": 13.65,
+          "deltaEur": 0,
+          "catalogOpEur": 13.65,
+          "detailOpEur": 13.65,
+          "uiUnitCostEur": 13.65,
+          "pdfLineCostEur": 13.65,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "65e0a86d-dc5f-4e23-94ce-4612bc1b6669",
+            "invoiceLineName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+            "invoiceQty": 2,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 13.65
+          }
+        },
+        {
+          "lineId": "3aa81e52-bf73-4ad7-af0e-9e03ec30deb4",
+          "ingredientId": null,
+          "subRecipeId": "8f8125d6-919e-4462-a8b1-6badec564798",
+          "ingredientName": null,
+          "quantity": 200,
+          "unit": "ml",
+          "opUnitCostEur": null,
+          "costSource": "prep",
+          "expectedLineCostEur": 4.46018,
+          "actualLineCostEur": 4.46018,
+          "deltaEur": 0,
+          "catalogOpEur": null,
+          "detailOpEur": null,
+          "uiUnitCostEur": null,
+          "pdfLineCostEur": 4.46018,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": null,
+            "invoiceLineName": null,
+            "invoiceQty": null,
+            "invoiceUnit": null,
+            "invoiceUnitPrice": null
+          }
+        }
+      ],
+      "failures": [],
+      "coverageTags": [
+        "mixed",
+        "sauce/prep",
+        "recipe-unit-un",
+        "recipe-unit-ml",
+        "sub-recipe"
+      ]
+    },
+    {
+      "recipeId": "744f447d-de23-4616-afed-67d6661b5cd6",
+      "recipeName": "VL-E2E Pizza Margherita",
+      "recipeType": "dish",
+      "sellingPrice": 12,
+      "status": "FAIL",
+      "totalExpectedEur": 17.1675,
+      "totalActualEur": 17.1675,
+      "totalDeltaEur": 0,
+      "summaryFoodCostEur": 17.167455999999998,
+      "pdfTotalFoodCostEur": 17.1675,
+      "ingredientLines": [
+        {
+          "lineId": "0b329105-5092-4535-8d26-b042f4578f1d",
+          "ingredientId": "3976c267-f8aa-4173-abc7-55410811f399",
+          "subRecipeId": null,
+          "ingredientName": "Farine speciale pizza",
+          "quantity": 0.32,
+          "unit": "kg",
+          "opUnitCostEur": 0.0010608000000000002,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.33945600000000004,
+          "actualLineCostEur": 0.33945600000000004,
+          "deltaEur": 0,
+          "catalogOpEur": 26.52,
+          "detailOpEur": 26.52,
+          "uiUnitCostEur": 0.0010608000000000002,
+          "pdfLineCostEur": 0.33945600000000004,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "742e976a-4c92-4690-b497-8c101293042b",
+            "invoiceLineName": "Farine Speciale pizza 25kg Amoruso",
+            "invoiceQty": 1,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 26.52
+          }
+        },
+        {
+          "lineId": "1d33c7d5-294f-415e-8cc6-fa11d617ec34",
+          "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+          "subRecipeId": null,
+          "ingredientName": "Mozzarella fior di latte",
+          "quantity": 2,
+          "unit": "un",
+          "opUnitCostEur": 8.12,
+          "costSource": "invoice",
+          "expectedLineCostEur": 16.24,
+          "actualLineCostEur": 16.24,
+          "deltaEur": 0,
+          "catalogOpEur": 8.12,
+          "detailOpEur": 8.12,
+          "uiUnitCostEur": 8.12,
+          "pdfLineCostEur": 16.24,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "63958019-9af9-4738-bc13-404d27796b24",
+            "invoiceLineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+            "invoiceQty": 10,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 8.12
+          }
+        },
+        {
+          "lineId": "a9f2c2cb-f5d3-4595-b7e9-7fc334ea55bf",
+          "ingredientId": "52f7bf70-eeca-4039-987d-241b35248119",
+          "subRecipeId": null,
+          "ingredientName": "Pomodori pelati",
+          "quantity": 400,
+          "unit": "g",
+          "opUnitCostEur": 0.0014700000000000002,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.5880000000000001,
+          "actualLineCostEur": 0.5880000000000001,
+          "deltaEur": 0,
+          "catalogOpEur": 22.05,
+          "detailOpEur": 22.05,
+          "uiUnitCostEur": 0.0014700000000000002,
+          "pdfLineCostEur": 0.5880000000000001,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "b6b00e15-c38d-48e7-8d66-53f4ffbf3f1b",
+            "invoiceLineName": "POMODORI PELATI (CX 2,5KG*6)",
+            "invoiceQty": 1,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 22.05
+          }
+        },
+        {
+          "lineId": "b9162ffe-9c79-48cf-b33b-039f47c902cf",
+          "ingredientId": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+          "subRecipeId": null,
+          "ingredientName": "Manjericão",
+          "quantity": 12,
+          "unit": "g",
+          "opUnitCostEur": 0.0206,
+          "costSource": "invoice",
+          "expectedLineCostEur": null,
+          "actualLineCostEur": null,
+          "deltaEur": null,
+          "catalogOpEur": 0.0206,
+          "detailOpEur": 0.0206,
+          "uiUnitCostEur": 0.0206,
+          "pdfLineCostEur": null,
+          "usesPriceHistory": false,
+          "status": "FAIL",
+          "notes": [
+            "math: expected 0 actual 0",
+            "UI line cost mismatch",
+            "unresolved: recipe 12 g vs overlay/cost base mismatch"
+          ],
+          "trace": {
+            "invoiceItemId": "b47828a9-e042-4437-b0b7-8944c812509a",
+            "invoiceLineName": "Manjericão",
+            "invoiceQty": 5,
+            "invoiceUnit": "mo",
+            "invoiceUnitPrice": 2.06
+          }
+        }
+      ],
+      "failures": [
+        "Manjericão: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 12 g vs overlay/cost base mismatch"
+      ],
+      "coverageTags": [
+        "mixed",
+        "recipe-unit-kg",
+        "recipe-unit-un",
+        "recipe-unit-g"
+      ]
+    },
+    {
+      "recipeId": "deb5bbf5-7faa-4774-9a47-f4f1abe5418a",
+      "recipeName": "VL-E2E Salad Gorgonzola",
+      "recipeType": "dish",
+      "sellingPrice": 9,
+      "status": "FAIL",
+      "totalExpectedEur": 0.6432,
+      "totalActualEur": 0.6432,
+      "totalDeltaEur": 0,
+      "summaryFoodCostEur": 0.64318,
+      "pdfTotalFoodCostEur": 0.6432,
+      "ingredientLines": [
+        {
+          "lineId": "48ab7e73-a67e-4d41-a9be-59fa6732e422",
+          "ingredientId": "47cd8362-79f4-4285-8491-f016229eaa21",
+          "subRecipeId": null,
+          "ingredientName": "Salada ibérica",
+          "quantity": 100,
+          "unit": "g",
+          "opUnitCostEur": 0.00876,
+          "costSource": "invoice",
+          "expectedLineCostEur": null,
+          "actualLineCostEur": null,
+          "deltaEur": null,
+          "catalogOpEur": 0.00876,
+          "detailOpEur": 0.00876,
+          "uiUnitCostEur": 0.00876,
+          "pdfLineCostEur": null,
+          "usesPriceHistory": false,
+          "status": "FAIL",
+          "notes": [
+            "math: expected 0 actual 0",
+            "UI line cost mismatch",
+            "unresolved: recipe 100 g vs overlay/cost base mismatch"
+          ],
+          "trace": {
+            "invoiceItemId": "593e7560-ba2a-4c60-8300-ff34a26335b9",
+            "invoiceLineName": "Salada Ibérica FSTK EMB. 250g",
+            "invoiceQty": 4,
+            "invoiceUnit": "em",
+            "invoiceUnitPrice": 2.19
+          }
+        },
+        {
+          "lineId": "f8c7a770-64bf-44dc-a20a-8b084d6547d9",
+          "ingredientId": "963d3a72-6f74-427b-8658-8d98b6a8d8df",
+          "subRecipeId": null,
+          "ingredientName": "Pepino fresco",
+          "quantity": 150,
+          "unit": "g",
+          "opUnitCostEur": 0.0014199999999999998,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.21299999999999997,
+          "actualLineCostEur": 0.21299999999999997,
+          "deltaEur": 0,
+          "catalogOpEur": 0.0014199999999999998,
+          "detailOpEur": 0.0014199999999999998,
+          "uiUnitCostEur": 0.0014199999999999998,
+          "pdfLineCostEur": 0.21299999999999997,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "0b373627-9e78-4387-9945-35a504174b93",
+            "invoiceLineName": "Pepino",
+            "invoiceQty": 3.36,
+            "invoiceUnit": "kg",
+            "invoiceUnitPrice": 1.42
+          }
+        },
+        {
+          "lineId": "ef7e978b-0cac-42f5-9880-9cb7d1fd107f",
+          "ingredientId": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+          "subRecipeId": null,
+          "ingredientName": "Gorgonzola DOP dolce",
+          "quantity": 40,
+          "unit": "g",
+          "opUnitCostEur": 0.009949999999999999,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.39799999999999996,
+          "actualLineCostEur": 0.39799999999999996,
+          "deltaEur": 0,
+          "catalogOpEur": 0.009949999999999999,
+          "detailOpEur": 0.009949999999999999,
+          "uiUnitCostEur": 0.009949999999999999,
+          "pdfLineCostEur": 0.39799999999999996,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "5fab58a8-8cfc-4625-ab97-e956d07aade9",
+            "invoiceLineName": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+            "invoiceQty": 1.35,
+            "invoiceUnit": "kg",
+            "invoiceUnitPrice": 9.95
+          }
+        },
+        {
+          "lineId": "bd6d00bd-b0ac-4c82-9fd0-4a3dd1b76eb3",
+          "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4",
+          "subRecipeId": null,
+          "ingredientName": "Aceto balsamico di modena IGP",
+          "quantity": 20,
+          "unit": "ml",
+          "opUnitCostEur": 0.001609,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.03218,
+          "actualLineCostEur": 0.03218,
+          "deltaEur": 0,
+          "catalogOpEur": 8.045,
+          "detailOpEur": 8.045,
+          "uiUnitCostEur": 0.001609,
+          "pdfLineCostEur": 0.03218,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "c181f493-473e-4467-845c-d4c1bfd889ee",
+            "invoiceLineName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+            "invoiceQty": 1,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 16.09
+          }
+        }
+      ],
+      "failures": [
+        "Salada ibérica: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 100 g vs overlay/cost base mismatch"
+      ],
+      "coverageTags": [
+        "salad",
+        "recipe-unit-g",
+        "recipe-unit-ml"
+      ]
+    },
+    {
+      "recipeId": "f32c5a7f-171b-4d36-8b89-2805e76c09fe",
+      "recipeName": "VL-E2E Sandwich Bresaola",
+      "recipeType": "dish",
+      "sellingPrice": 11,
+      "status": "PASS",
+      "totalExpectedEur": 13.5536,
+      "totalActualEur": 13.5536,
+      "totalDeltaEur": 0,
+      "summaryFoodCostEur": 13.553600000000001,
+      "pdfTotalFoodCostEur": 13.5536,
+      "ingredientLines": [
+        {
+          "lineId": "c26c6b96-6e10-41e2-84f0-1d2c7e0919f4",
+          "ingredientId": "31d6da3f-d812-4836-9086-92a5616250d1",
+          "subRecipeId": null,
+          "ingredientName": "Rigamonti bresaola punta d'anca oro",
+          "quantity": 30,
+          "unit": "g",
+          "opUnitCostEur": 0.027039999999999998,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.8111999999999999,
+          "actualLineCostEur": 0.8111999999999999,
+          "deltaEur": 0,
+          "catalogOpEur": 0.027039999999999998,
+          "detailOpEur": 0.027039999999999998,
+          "uiUnitCostEur": 0.027039999999999998,
+          "pdfLineCostEur": 0.8111999999999999,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "01fba9c8-3938-4009-924c-96920439570d",
+            "invoiceLineName": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+            "invoiceQty": 1.83,
+            "invoiceUnit": "kg",
+            "invoiceUnitPrice": 27.04
+          }
+        },
+        {
+          "lineId": "adc535a7-4892-4068-84c1-753dba8b08f4",
+          "ingredientId": "b091e1d0-e7e2-49a8-a9a7-f61c8a4d4263",
+          "subRecipeId": null,
+          "ingredientName": "Rolo de cabra e vaca",
+          "quantity": 1,
+          "unit": "un",
+          "opUnitCostEur": 12.71,
+          "costSource": "invoice",
+          "expectedLineCostEur": 12.71,
+          "actualLineCostEur": 12.71,
+          "deltaEur": 0,
+          "catalogOpEur": 12.71,
+          "detailOpEur": 12.71,
+          "uiUnitCostEur": 12.71,
+          "pdfLineCostEur": 12.71,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "14f5c7bf-5ee1-4493-a1b0-1e5c274a0258",
+            "invoiceLineName": "ROLO DE CABRA VACA 1KG",
+            "invoiceQty": 1,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 12.71
+          }
+        },
+        {
+          "lineId": "60b93dd2-9d06-435b-882e-c1929c583c23",
+          "ingredientId": "6e3011e0-b160-48c9-867c-1234cd743802",
+          "subRecipeId": null,
+          "ingredientName": "Hortelã",
+          "quantity": 6,
+          "unit": "g",
+          "opUnitCostEur": 0.005399999999999999,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.0324,
+          "actualLineCostEur": 0.0324,
+          "deltaEur": 0,
+          "catalogOpEur": 0.0054,
+          "detailOpEur": 0.0054,
+          "uiUnitCostEur": 0.005399999999999999,
+          "pdfLineCostEur": 0.0324,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "90823d87-6da6-414b-8a5e-1f8787db4aa9",
+            "invoiceLineName": "Hortelã",
+            "invoiceQty": 0.5,
+            "invoiceUnit": "kg",
+            "invoiceUnitPrice": 5.4
+          }
+        }
+      ],
+      "failures": [],
+      "coverageTags": [
+        "mixed",
+        "recipe-unit-g",
+        "recipe-unit-un"
+      ]
+    },
+    {
+      "recipeId": "8f8125d6-919e-4462-a8b1-6badec564798",
+      "recipeName": "VL-E2E Tomato Sauce",
+      "recipeType": "prep",
+      "sellingPrice": null,
+      "status": "PASS",
+      "totalExpectedEur": 22.3009,
+      "totalActualEur": 22.3009,
+      "totalDeltaEur": 0,
+      "summaryFoodCostEur": 22.300900000000002,
+      "pdfTotalFoodCostEur": 22.3009,
+      "ingredientLines": [
+        {
+          "lineId": "9766eea2-e6de-4f7e-8a68-2dd3b6e55d3a",
+          "ingredientId": "52f7bf70-eeca-4039-987d-241b35248119",
+          "subRecipeId": null,
+          "ingredientName": "Pomodori pelati",
+          "quantity": 1,
+          "unit": "un",
+          "opUnitCostEur": 22.05,
+          "costSource": "invoice",
+          "expectedLineCostEur": 22.05,
+          "actualLineCostEur": 22.05,
+          "deltaEur": 0,
+          "catalogOpEur": 22.05,
+          "detailOpEur": 22.05,
+          "uiUnitCostEur": 22.05,
+          "pdfLineCostEur": 22.05,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "b6b00e15-c38d-48e7-8d66-53f4ffbf3f1b",
+            "invoiceLineName": "POMODORI PELATI (CX 2,5KG*6)",
+            "invoiceQty": 1,
+            "invoiceUnit": "un",
+            "invoiceUnitPrice": 22.05
+          }
+        },
+        {
+          "lineId": "66dee025-9f9b-4b10-ad19-e7fe473faa84",
+          "ingredientId": "446f3217-9a6f-428a-abc6-10927a958168",
+          "subRecipeId": null,
+          "ingredientName": "Alho francês",
+          "quantity": 20,
+          "unit": "g",
+          "opUnitCostEur": 0.0014199999999999998,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.028399999999999995,
+          "actualLineCostEur": 0.028399999999999995,
+          "deltaEur": 0,
+          "catalogOpEur": 0.0014199999999999998,
+          "detailOpEur": 0.0014199999999999998,
+          "uiUnitCostEur": 0.0014199999999999998,
+          "pdfLineCostEur": 0.028399999999999995,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "5700a733-3cd9-4147-8d21-cb524976a3d7",
+            "invoiceLineName": "Alho Francês",
+            "invoiceQty": 5.42,
+            "invoiceUnit": "kg",
+            "invoiceUnitPrice": 1.42
+          }
+        },
+        {
+          "lineId": "0de9e80e-d7b6-4593-bb62-cbde3093548b",
+          "ingredientId": "30fd4652-be74-47eb-afb1-60b2a15a14fc",
+          "subRecipeId": null,
+          "ingredientName": "Manteiga s/sal",
+          "quantity": 25,
+          "unit": "g",
+          "opUnitCostEur": 0.0089,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.2225,
+          "actualLineCostEur": 0.2225,
+          "deltaEur": 0,
+          "catalogOpEur": 0.0089,
+          "detailOpEur": 0.0089,
+          "uiUnitCostEur": 0.0089,
+          "pdfLineCostEur": 0.2225,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "e1fcc019-499b-46a9-a99e-e5b51a7578db",
+            "invoiceLineName": "Manteiga Coimbra s/Sal EMB 1 Kg",
+            "invoiceQty": 8,
+            "invoiceUnit": "kg",
+            "invoiceUnitPrice": 8.9
+          }
+        }
+      ],
+      "failures": [],
+      "coverageTags": [
+        "sauce/prep",
+        "recipe-unit-un",
+        "recipe-unit-g"
+      ]
+    },
+    {
+      "recipeId": "b9022265-ba96-431c-a073-45f8d1bf40bf",
+      "recipeName": "VL-E2E Weight kg/g",
+      "recipeType": "dish",
+      "sellingPrice": 8,
+      "status": "PASS",
+      "totalExpectedEur": 1.9218,
+      "totalActualEur": 1.9218,
+      "totalDeltaEur": 0,
+      "summaryFoodCostEur": 1.9218000000000002,
+      "pdfTotalFoodCostEur": 1.9218,
+      "ingredientLines": [
+        {
+          "lineId": "73e3950b-9fce-4fb4-a350-a1e7d7980e65",
+          "ingredientId": "9338970d-b55b-4526-be36-ab8497cd9da8",
+          "subRecipeId": null,
+          "ingredientName": "Abóbora butternut",
+          "quantity": 1.5,
+          "unit": "kg",
+          "opUnitCostEur": 0.00099,
+          "costSource": "invoice",
+          "expectedLineCostEur": 1.485,
+          "actualLineCostEur": 1.485,
+          "deltaEur": 0,
+          "catalogOpEur": 0.00099,
+          "detailOpEur": 0.00099,
+          "uiUnitCostEur": 0.00099,
+          "pdfLineCostEur": 1.485,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "dee41356-7df1-430e-a288-7de2a40ff979",
+            "invoiceLineName": "Abóbora Butternut",
+            "invoiceQty": 5.64,
+            "invoiceUnit": "kg",
+            "invoiceUnitPrice": 0.99
+          }
+        },
+        {
+          "lineId": "300662a0-a871-4ee6-b4b3-f6a7df6cc04b",
+          "ingredientId": "6c7ab001-9f87-448e-9b34-87d3aa21f9ca",
+          "subRecipeId": null,
+          "ingredientName": "Courgettes",
+          "quantity": 280,
+          "unit": "g",
+          "opUnitCostEur": 0.00156,
+          "costSource": "invoice",
+          "expectedLineCostEur": 0.43679999999999997,
+          "actualLineCostEur": 0.43679999999999997,
+          "deltaEur": 0,
+          "catalogOpEur": 0.00156,
+          "detailOpEur": 0.00156,
+          "uiUnitCostEur": 0.00156,
+          "pdfLineCostEur": 0.43679999999999997,
+          "usesPriceHistory": false,
+          "status": "PASS",
+          "notes": [],
+          "trace": {
+            "invoiceItemId": "b64d5a44-d15b-4c1e-8f25-5809fa3f5541",
+            "invoiceLineName": "Courgettes",
+            "invoiceQty": 3.3,
+            "invoiceUnit": "kg",
+            "invoiceUnitPrice": 1.56
+          }
+        }
+      ],
+      "failures": [],
+      "coverageTags": [
+        "weight-kg-g",
+        "recipe-unit-kg",
+        "recipe-unit-g"
+      ]
+    }
+  ]
+}
