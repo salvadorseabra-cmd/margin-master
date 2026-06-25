@@ -2,7 +2,7 @@ import type { PostgrestError } from "@supabase/supabase-js";
 import {
   rememberConfirmedAliasInMap,
   type AppSupabaseClient,
-  upsertConfirmedAlias,
+  upsertConfirmedAliasDualIdentity,
 } from "@/lib/ingredient-alias-memory";
 import type { IngredientAliasMap } from "@/lib/ingredient-canonical";
 import {
@@ -11,7 +11,7 @@ import {
 } from "@/lib/ingredient-match-override";
 import { normalizeSupplierShorthand } from "@/lib/ingredient-operational-aliases";
 import {
-  normalizeOperationalAliasKey,
+  buildOperationalIdentityAliasKey,
   rememberOperationalAlias,
 } from "@/lib/ingredient-operational-alias-memory";
 import type { InvoiceRowIngredientMatchState } from "@/lib/ingredient-match-explanation";
@@ -78,7 +78,7 @@ export function buildManualIngredientCorrectionKeys(
   }
 
   const expandedName = normalizeSupplierShorthand(aliasName);
-  const operationalAliasKey = normalizeOperationalAliasKey(expandedName || aliasName);
+  const operationalAliasKey = buildOperationalIdentityAliasKey(aliasName);
   if (!operationalAliasKey) {
     traceIngredientAliasesNormalizationRejection(
       "buildManualIngredientCorrectionKeys",
@@ -132,13 +132,22 @@ export function applyManualIngredientCorrection(
     return null;
   }
 
-  const nextConfirmedAliases = rememberConfirmedAliasInMap(
+  let nextConfirmedAliases = rememberConfirmedAliasInMap(
     confirmedAliases,
     keys.aliasName,
     keys.normalizedAlias,
     payload.ingredientId,
     payload.supplierName,
   );
+  if (keys.operationalAliasKey !== keys.normalizedAlias) {
+    nextConfirmedAliases = rememberConfirmedAliasInMap(
+      nextConfirmedAliases,
+      keys.aliasName,
+      keys.operationalAliasKey,
+      payload.ingredientId,
+      payload.supplierName,
+    );
+  }
 
   rememberOperationalAlias(
     payload.itemName,
@@ -274,10 +283,10 @@ export async function persistManualIngredientCorrection({
     compareBucket: getAliasTraceCompareBucket(itemName),
   });
 
-  const { error } = await upsertConfirmedAlias({
+  const { error } = await upsertConfirmedAliasDualIdentity({
     ingredientId,
     aliasName: applied.aliasName,
-    normalizedAlias: applied.normalizedAlias,
+    rawNormalizedAlias: applied.normalizedAlias,
     supplierName,
     supabase,
     manualConfirmation: true,

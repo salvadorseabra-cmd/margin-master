@@ -6,7 +6,10 @@
 import { buildIngredientAliasLookupKey } from "@/lib/ingredient-alias-lookup";
 import type { IngredientAliasMap, IngredientCanonicalInput } from "@/lib/ingredient-canonical";
 import { normalizeSupplierShorthand } from "@/lib/ingredient-operational-aliases";
-import { normalizeOperationalAliasKey } from "@/lib/ingredient-operational-alias-memory";
+import {
+  buildOperationalIdentityAliasKey,
+  normalizeOperationalAliasKey,
+} from "@/lib/ingredient-operational-alias-memory";
 import { normalizeSupplierDisplayName } from "@/lib/supplier-identity";
 import {
   traceIngredientAliasesNormalizationRejection,
@@ -42,14 +45,20 @@ export function buildIngredientMatchOverrideLookupKey(
  * Same key shape used when persisting manual corrections and when matching invoice lines.
  * Applies supplier shorthand before operational alias normalization.
  */
+export type OverrideKeysFromInvoiceLine = {
+  /** Legacy exact alias key (no brand-prefix strip). */
+  rawNormalized: string;
+  /** Model D operational identity key (commodity brand prefix stripped). */
+  operationalIdentityKey: string;
+  lookupKey: string;
+  operationalLookupKey: string;
+  invoiceSupplierNormalized?: string;
+};
+
 export function buildOverrideKeysFromInvoiceLine(
   itemName: string,
   supplierName?: string | null,
-): {
-  rawNormalized: string;
-  lookupKey: string;
-  invoiceSupplierNormalized?: string;
-} | null {
+): OverrideKeysFromInvoiceLine | null {
   const trimmed = itemName?.trim();
   if (!trimmed) {
     traceIngredientAliasesValidationRejection("buildOverrideKeysFromInvoiceLine", "empty_trim", {
@@ -69,12 +78,26 @@ export function buildOverrideKeysFromInvoiceLine(
     return null;
   }
 
+  const operationalIdentityKey = buildOperationalIdentityAliasKey(trimmed) || rawNormalized;
   const invoiceSupplierNormalized = normalizeSupplierScope(supplierName);
   return {
     rawNormalized,
+    operationalIdentityKey,
     lookupKey: buildIngredientMatchOverrideLookupKey(rawNormalized, supplierName),
+    operationalLookupKey: buildIngredientMatchOverrideLookupKey(
+      operationalIdentityKey,
+      supplierName,
+    ),
     invoiceSupplierNormalized,
   };
+}
+
+function collectOverrideLookupKeys(keys: OverrideKeysFromInvoiceLine): string[] {
+  const out = [keys.lookupKey, keys.rawNormalized];
+  if (keys.operationalIdentityKey !== keys.rawNormalized) {
+    out.push(keys.operationalLookupKey, keys.operationalIdentityKey);
+  }
+  return out;
 }
 
 export function rememberIngredientMatchOverride(
@@ -95,8 +118,9 @@ export function rememberIngredientMatchOverride(
     confirmedByUser: true,
     createdAt,
   };
-  ingredientMatchOverrides.set(keys.lookupKey, entry);
-  ingredientMatchOverrides.set(keys.rawNormalized, entry);
+  for (const key of collectOverrideLookupKeys(keys)) {
+    ingredientMatchOverrides.set(key, entry);
+  }
   return entry;
 }
 
@@ -111,7 +135,7 @@ export function lookupIngredientMatchOverride(
   for (const name of names) {
     const keys = buildOverrideKeysFromInvoiceLine(name, supplierName);
     if (!keys) continue;
-    for (const key of [keys.lookupKey, keys.rawNormalized]) {
+    for (const key of collectOverrideLookupKeys(keys)) {
       if (tried.has(key)) continue;
       tried.add(key);
       const hit = ingredientMatchOverrides.get(key);
@@ -122,7 +146,7 @@ export function lookupIngredientMatchOverride(
   for (const name of names) {
     const keys = buildOverrideKeysFromInvoiceLine(name, null);
     if (!keys) continue;
-    for (const key of [keys.lookupKey, keys.rawNormalized]) {
+    for (const key of collectOverrideLookupKeys(keys)) {
       if (tried.has(key)) continue;
       tried.add(key);
       const hit = ingredientMatchOverrides.get(key);

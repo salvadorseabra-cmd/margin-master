@@ -5,6 +5,7 @@
  * No vector DB, embeddings, or UI persistence — session/static/confirmed-bridge only.
  */
 
+import { stripInvoiceBrandPrefix } from "@/lib/canonical-ingredient-display-name";
 import {
   isArchivedIngredientEntry,
   type IngredientAliasMap,
@@ -239,6 +240,18 @@ function tokenizeForBrandPreCollapse(raw: string): string[] {
     .replace(/[^a-z0-9\s]+/g, " ")
     .split(/\s+/)
     .filter(Boolean);
+}
+
+/**
+ * Model D operational identity: strip commodity brand prefix, then supplier shorthand
+ * and compact alias normalization. Beverage brands (San Pellegrino, etc.) are preserved.
+ */
+export function buildOperationalIdentityAliasKey(raw: string): string {
+  const trimmed = raw?.trim();
+  if (!trimmed) return "";
+  const stripped = stripInvoiceBrandPrefix(trimmed);
+  const expanded = normalizeSupplierShorthand(stripped || trimmed);
+  return normalizeOperationalAliasKey(expanded || stripped || trimmed);
 }
 
 /**

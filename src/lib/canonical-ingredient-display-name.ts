@@ -221,7 +221,8 @@ function removePackagingPhrases(value: string): string {
     .replace(CX_COUNT_PHRASE_RE, " ");
 }
 
-function stripInvoiceBrandPrefix(value: string): string {
+/** Strip commodity charcuterie/cheese/pasta invoice prefixes; beverages (e.g. San Pellegrino) are excluded. */
+export function stripInvoiceBrandPrefix(value: string): string {
   let out = value;
   for (const pattern of INVOICE_BRAND_PREFIX_STRIP_RE) {
     out = out.replace(pattern, "");

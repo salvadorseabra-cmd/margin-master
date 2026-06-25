@@ -4,7 +4,10 @@ import type { IngredientAliasMap } from "@/lib/ingredient-canonical";
 import { normalizeInvoiceAliasMemoryKey } from "@/lib/normalize-ingredient-name";
 import { buildOverrideKeysFromInvoiceLine } from "@/lib/ingredient-match-override";
 import { normalizeSupplierShorthand } from "@/lib/ingredient-operational-aliases";
-import { normalizeOperationalAliasKey } from "@/lib/ingredient-operational-alias-memory";
+import {
+  buildOperationalIdentityAliasKey,
+  normalizeOperationalAliasKey,
+} from "@/lib/ingredient-operational-alias-memory";
 import {
   traceAliasHiddenConstraint,
   traceAliasReloadCollision,
@@ -478,6 +481,52 @@ export async function upsertConfirmedAlias({
   return { error: insertError };
 }
 
+/**
+ * Persist raw + operational identity alias rows when commodity brand prefix strip yields
+ * a distinct lookup key. Uses releaseStaleAliasOwnership per key — no duplicate ownership.
+ */
+export async function upsertConfirmedAliasDualIdentity({
+  ingredientId,
+  aliasName,
+  rawNormalizedAlias,
+  supplierName,
+  supabase,
+  manualConfirmation = false,
+}: {
+  ingredientId: string;
+  aliasName: string;
+  rawNormalizedAlias: string;
+  supplierName?: string | null;
+  supabase: AppSupabaseClient;
+  manualConfirmation?: boolean;
+}): Promise<{ error: PostgrestError | null }> {
+  const operationalAlias = buildOperationalIdentityAliasKey(aliasName) || rawNormalizedAlias;
+
+  const { error: primaryError } = await upsertConfirmedAlias({
+    ingredientId,
+    aliasName,
+    normalizedAlias: rawNormalizedAlias,
+    supplierName,
+    supabase,
+    manualConfirmation,
+  });
+  if (primaryError) return { error: primaryError };
+
+  if (operationalAlias !== rawNormalizedAlias) {
+    const { error: operationalError } = await upsertConfirmedAlias({
+      ingredientId,
+      aliasName,
+      normalizedAlias: operationalAlias,
+      supplierName,
+      supabase,
+      manualConfirmation,
+    });
+    if (operationalError) return { error: operationalError };
+  }
+
+  return { error: null };
+}
+
 export type ConfirmedIngredientAliasRow = {
   ingredient_id: string;
   alias_name: string;
@@ -485,20 +534,25 @@ export type ConfirmedIngredientAliasRow = {
   supplier_name: string | null;
 };
 
-/** Resolve lookup key from DB row — prefer live line wording over stored normalized_alias. */
+/** Resolve lookup key from DB row — prefer operational identity re-derived from alias_name. */
 export function resolveNormalizedAliasFromConfirmedRow(
   row: ConfirmedIngredientAliasRow,
 ): string | null {
-  const fromLine = row.alias_name?.trim()
-    ? buildOverrideKeysFromInvoiceLine(row.alias_name, row.supplier_name)
+  const aliasName = row.alias_name?.trim();
+  if (aliasName) {
+    const operational = buildOperationalIdentityAliasKey(aliasName);
+    if (operational) return operational;
+  }
+
+  const fromLine = aliasName
+    ? buildOverrideKeysFromInvoiceLine(aliasName, row.supplier_name)
     : null;
   if (fromLine?.rawNormalized) return fromLine.rawNormalized;
 
-  const aliasName = row.alias_name?.trim();
   if (aliasName) {
     const expanded = normalizeSupplierShorthand(aliasName);
-    const operational = normalizeOperationalAliasKey(expanded || aliasName);
-    if (operational) return operational;
+    const fallback = normalizeOperationalAliasKey(expanded || aliasName);
+    if (fallback) return fallback;
   }
 
   return row.normalized_alias?.trim().toLowerCase() || null;

@@ -6,7 +6,7 @@ import type { PostgrestError } from "@supabase/supabase-js";
 import {
   rememberConfirmedAliasInMap,
   type AppSupabaseClient,
-  upsertConfirmedAlias,
+  upsertConfirmedAliasDualIdentity,
 } from "@/lib/ingredient-alias-memory";
 import type { IngredientAliasMap, IngredientCanonicalMatch } from "@/lib/ingredient-canonical";
 import { isConfirmedIngredientMatch } from "@/lib/ingredient-match-explanation";
@@ -83,13 +83,22 @@ export function recordInvoiceLineAliasMemory(
     return { nextConfirmedAliases: confirmedAliases, recorded: false };
   }
 
-  const nextConfirmedAliases = rememberConfirmedAliasInMap(
+  let nextConfirmedAliases = rememberConfirmedAliasInMap(
     confirmedAliases,
     itemName.trim(),
     keys.rawNormalized,
     ingredientId,
     supplierName,
   );
+  if (keys.operationalIdentityKey !== keys.rawNormalized) {
+    nextConfirmedAliases = rememberConfirmedAliasInMap(
+      nextConfirmedAliases,
+      itemName.trim(),
+      keys.operationalIdentityKey,
+      ingredientId,
+      supplierName,
+    );
+  }
 
   rememberOperationalAlias(itemName, ingredientId, ingredientName, "confirmed", 8);
 
@@ -129,10 +138,13 @@ export async function persistInvoiceLineAliasMemory(
   });
 
   const keys = buildOverrideKeysFromInvoiceLine(params.itemName, params.supplierName);
-  const { error } = await upsertConfirmedAlias({
+  if (!keys) {
+    return { nextConfirmedAliases: applied.nextConfirmedAliases, error: null };
+  }
+  const { error } = await upsertConfirmedAliasDualIdentity({
     ingredientId: params.match.ingredient.id,
     aliasName: params.itemName.trim(),
-    normalizedAlias: keys?.rawNormalized,
+    rawNormalizedAlias: keys.rawNormalized,
     supplierName: params.supplierName,
     supabase: params.supabase,
     manualConfirmation: false,

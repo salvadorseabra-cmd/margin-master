@@ -1,6 +1,6 @@
 import type { IngredientAliasMap } from "@/lib/ingredient-canonical";
 import { fuzzyLookupIngredientIdFromAliasMap } from "@/lib/ingredient-alias-fuzzy-lookup";
-import { buildOverrideKeysFromInvoiceLine } from "@/lib/ingredient-match-override";
+import { buildOverrideKeysFromInvoiceLine, type OverrideKeysFromInvoiceLine } from "@/lib/ingredient-match-override";
 import { traceManualIngredientMatch } from "@/lib/manual-ingredient-match-trace";
 import { normalizeInvoiceAliasMemoryKey } from "@/lib/normalize-ingredient-name";
 import { normalizeSupplierKey } from "@/lib/supplier-identity";
@@ -30,6 +30,14 @@ export function buildIngredientAliasLookupKey(
   return supplier ? `${supplier}::${normalizedAlias}` : normalizedAlias;
 }
 
+function collectAliasLookupKeys(keys: OverrideKeysFromInvoiceLine): string[] {
+  const out = [keys.lookupKey, keys.rawNormalized];
+  if (keys.operationalIdentityKey !== keys.rawNormalized) {
+    out.push(keys.operationalLookupKey, keys.operationalIdentityKey);
+  }
+  return out;
+}
+
 export function lookupIngredientIdFromAliasMap(
   aliases: IngredientAliasMap,
   normalizedItemName: string,
@@ -42,12 +50,14 @@ export function lookupIngredientIdFromAliasMap(
     if (!name?.trim()) continue;
     const keys = buildOverrideKeysFromInvoiceLine(name, supplierName);
     if (!keys) continue;
-    operationalCandidates.add(keys.lookupKey);
-    operationalCandidates.add(keys.rawNormalized);
+    for (const key of collectAliasLookupKeys(keys)) {
+      operationalCandidates.add(key);
+    }
     const globalKeys = buildOverrideKeysFromInvoiceLine(name, null);
     if (globalKeys) {
-      operationalCandidates.add(globalKeys.lookupKey);
-      operationalCandidates.add(globalKeys.rawNormalized);
+      for (const key of collectAliasLookupKeys(globalKeys)) {
+        operationalCandidates.add(key);
+      }
     }
   }
 
@@ -128,6 +138,12 @@ export function lookupIngredientIdFromAliasMap(
       if (!name?.trim()) continue;
       const keys = buildOverrideKeysFromInvoiceLine(name, supplierName);
       if (keys?.rawNormalized) fuzzyCandidates.add(keys.rawNormalized);
+      if (
+        keys?.operationalIdentityKey &&
+        keys.operationalIdentityKey !== keys.rawNormalized
+      ) {
+        fuzzyCandidates.add(keys.operationalIdentityKey);
+      }
     }
     fuzzyCandidates.add(normalizedItemName);
 
