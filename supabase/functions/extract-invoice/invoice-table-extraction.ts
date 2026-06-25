@@ -208,6 +208,12 @@ MAMMAFIORE COLUMN ISOLATION (Pr. Unitário | Desc. | IVA | Valor):
 → gross_unit_price: 33.154, discount_pct: 20, line_total_net: 26.52 (GOOD — copied Valor digit by digit)
 → line_total_net: 25.52 (BAD — digit drift on Valor; read 26,52 not 25,52)
 
+"Aceto balsamico di Modena IGP pet 5l*2 Toschi" with Qtd "1", Pr. Unitário "18,929", Desc. "15,00", IVA "6,00", Valor "16,09"
+→ quantity: 1 (NOT 2 — *2 is 2×5L pack metadata, not qty purchased)
+→ gross_unit_price: 18.929, discount_pct: 15, line_total_net: 16.09 (GOOD — Desc. 15,00 is 15% discount, NOT a euro price)
+→ discount_pct: 15 (from Desc. column — NOT gross_unit_price or line_total_net)
+→ line_total_net: 16.09 (from Valor — discounted line; 1 × 18,929 × 0,85 ≈ 16,09)
+
 Mammafiore Valor digit rule: when gross_unit_price and discount_pct are read, qty × gross × (1 − discount/100) should match the printed Valor. If discount math confirms Valor (e.g. 33,154 × 0,80 ≈ 26,52), copy the printed Valor exactly — do not alter Valor digits.
 
 "Baladin - Ginger Beer 0.20cl" with quantity column "2"
@@ -271,8 +277,8 @@ PRICE ACCURACY
 - When quantity is 1, unit_price usually equals line total (unless discount applies).
 - Do not read numerics from the description into price fields; weight ranges (4-4,25KG) are not prices.
 
-"Aceto balsamico di Modena IGP pet 5l*2 Toschi" with qty=1, unit_price=18,83, total=16,09
-→ total: 16.09 (from VALOR — discounted line; do not substitute qty×price)
+"Aceto balsamico di Modena IGP pet 5l*2 Toschi" with Qtd "1", Pr. Unitário "18,929", Desc. "15,00", Valor "16,09"
+→ gross_unit_price: 18.929, discount_pct: 15, line_total_net: 16.09 (structured columns — do not substitute qty×gross)
 
 ═══════════════════════════════════════════════════════════════
 OUTPUT INTEGRITY

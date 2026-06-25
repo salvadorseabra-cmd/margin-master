@@ -256,7 +256,39 @@ Deno.test("Effective paid price: Courgettes with line_total_net only", () => {
   assertEquals(items[0].total, 5.15);
 });
 
-Deno.test("Effective paid price regression: Aceto total above unit unchanged", () => {
+Deno.test("Aceto: structured gross+discount+net binds to net unit", () => {
+  const items = bindMonetaryColumns(parseMonetaryLineItems([{
+    name: "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+    quantity: 1,
+    unit: "un",
+    gross_unit_price: 18.929,
+    discount_pct: 15,
+    line_total_net: 16.09,
+    unit_price: 18.295,
+    total: 16.09,
+  }]));
+
+  assertEquals(items[0].unit_price, 16.09);
+  assertEquals(items[0].total, 16.09);
+});
+
+Deno.test("Aceto: wrong gross with discount+Valor trusts printed net for qty=1", () => {
+  const items = bindMonetaryColumns(parseMonetaryLineItems([{
+    name: "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+    quantity: 1,
+    unit: "un",
+    gross_unit_price: 18.295,
+    discount_pct: 15,
+    line_total_net: 16.09,
+    unit_price: 15.55,
+    total: 16.09,
+  }]));
+
+  assertEquals(items[0].unit_price, 16.09);
+  assertEquals(items[0].total, 16.09);
+});
+
+Deno.test("Regression: legacy-only Aceto without structured fields unchanged", () => {
   const items = bindMonetaryColumns(parseMonetaryLineItems([{
     name: "Aceto balsamico di modena IGP pet 5l*2 Toschi",
     quantity: 1,
@@ -270,4 +302,52 @@ Deno.test("Effective paid price regression: Aceto total above unit unchanged", (
 
   assertEquals(items[0].unit_price, 15.55);
   assertEquals(items[0].total, 16.09);
+});
+
+Deno.test("Regression: Guanciale Mammafiore discount line preserved", () => {
+  const items = bindMonetaryColumns(parseMonetaryLineItems([{
+    name: "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+    quantity: 5.996,
+    unit: "un",
+    gross_unit_price: 16.922,
+    discount_pct: 36,
+    line_total_net: 64.93,
+    unit_price: 16.922,
+    total: 64.93,
+  }]));
+
+  assertEquals(items[0].unit_price, 10.83);
+  assertEquals(items[0].total, 64.93);
+});
+
+Deno.test("Regression: Peroni multipack line preserved", () => {
+  const items = bindMonetaryColumns(parseMonetaryLineItems([{
+    name: "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+    quantity: 24,
+    unit: "un",
+    gross_unit_price: 1.529,
+    discount_pct: null,
+    line_total_net: 25.69,
+    unit_price: 1.529,
+    total: 25.69,
+  }]));
+
+  assertEquals(items[0].unit_price, 1.07);
+  assertEquals(items[0].total, 25.69);
+});
+
+Deno.test("Regression: Gorgonzola Emporio discount line preserved", () => {
+  const items = bindMonetaryColumns(parseMonetaryLineItems([{
+    name: "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+    quantity: 1.35,
+    unit: "kg",
+    gross_unit_price: 12.9,
+    discount_pct: 22.85,
+    line_total_net: 13.44,
+    unit_price: 12.9,
+    total: 13.44,
+  }]));
+
+  assertEquals(items[0].unit_price, 9.95);
+  assertEquals(items[0].total, 13.44);
 });

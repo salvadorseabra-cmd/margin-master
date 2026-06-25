@@ -65,7 +65,16 @@ function applyStructuredBinding(item: MonetaryLineItem): MonetaryLineItem {
 
   const derivedNet = deriveNetUnitPrice(gross_unit_price, discount_pct);
   if (derivedNet != null) {
-    unit_price = derivedNet;
+    if (
+      line_total_net != null &&
+      item.quantity === 1 &&
+      Math.abs(derivedNet - line_total_net) > PRICE_TOLERANCE
+    ) {
+      // Qty-1 discount rows: trust printed Valor when gross×discount drifts (e.g. Aceto).
+      unit_price = round2(line_total_net);
+    } else {
+      unit_price = derivedNet;
+    }
   } else if (gross_unit_price != null && unit_price == null) {
     unit_price = gross_unit_price;
   }
@@ -192,8 +201,18 @@ function triggersRuleF(item: MonetaryLineItem): boolean {
 }
 
 function applyRuleF(item: MonetaryLineItem): MonetaryLineItem {
+  if (item.line_total_net == null) return item;
+
+  if (item.quantity === 1) {
+    return {
+      ...item,
+      unit_price: round2(item.line_total_net),
+      total: item.line_total_net,
+    };
+  }
+
   const derivedNet = deriveNetUnitPrice(item.gross_unit_price, item.discount_pct);
-  if (derivedNet == null || item.line_total_net == null) return item;
+  if (derivedNet == null) return item;
   return {
     ...item,
     unit_price: derivedNet,

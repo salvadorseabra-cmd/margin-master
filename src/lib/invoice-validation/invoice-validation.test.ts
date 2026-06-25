@@ -64,6 +64,20 @@ describe("validateMathematicsFindings", () => {
     const input = { quantity: 1.35, unit_price: 9.95, total: 13.44 };
     expect(hasMathematicalInconsistency(input)).toBe(false);
   });
+
+  it("does not flag Aceto after structured monetary binding", () => {
+    const input = { quantity: 1, unit_price: 16.09, total: 16.09 };
+    expect(hasMathematicalInconsistency(input)).toBe(false);
+    const findings = validateInvoiceLine({
+      id: "1ccf0bd0-12ef-4823-b504-3833df0899c7",
+      name: "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      ...input,
+      unit: "un",
+    });
+    expect(
+      findings.some((f) => f.code === MATHEMATICAL_INCONSISTENCY_CODE),
+    ).toBe(false);
+  });
 });
 
 describe("validateOperationalFindings", () => {
