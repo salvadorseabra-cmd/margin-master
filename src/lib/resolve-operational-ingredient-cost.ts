@@ -145,6 +145,9 @@ export function logRecipeHydrate(input: {
   });
 }
 
+/** Gram pack denominators from invoice/parser produce rows — not per-piece countable mis-tags (e.g. brioche 80g). */
+const LEGITIMATE_GRAM_PACK_DENOMINATORS = new Set([100, 250, 500, 750, 1000]);
+
 /**
  * Invoice overlay sometimes carries a legacy mass `cost_base_unit` while pack size is countable (`un`).
  * Prefer countable invoice semantics without changing pack price / quantity normalization.
@@ -155,12 +158,14 @@ export function preferInvoiceCountableOverlayFields(
   if (fields.cost_base_unit !== "g" && fields.cost_base_unit !== "ml") {
     return fields;
   }
+  const pq = purchaseQuantityDenom(fields.purchase_quantity);
+  // Genuine mass-based overlays (herbs, salad packs) — keep explicit g denominator.
+  if (fields.cost_base_unit === "g" && LEGITIMATE_GRAM_PACK_DENOMINATORS.has(pq)) {
+    return fields;
+  }
   // Pack-volume ml (e.g. 450 ml jar) — not legacy g/un mis-tags.
-  if (fields.cost_base_unit === "ml") {
-    const pq = purchaseQuantityDenom(fields.purchase_quantity);
-    if (pq > 1 && pq < 1000) {
-      return fields;
-    }
+  if (fields.cost_base_unit === "ml" && pq > 1 && pq < 1000) {
+    return fields;
   }
   const { cost_base_unit: _legacyBase, ...withoutExplicitBase } = fields;
   if (inferIngredientCostBaseUnit(withoutExplicitBase) === "un") {

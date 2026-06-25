@@ -330,6 +330,80 @@ describe("resolveOperationalIngredientCostFields", () => {
     expect(resolved.unresolvedReason).toBeNull();
   });
 
+  it("preserves Manjericão g/100 overlay for 12g recipe line cost", () => {
+    const invoiceFields = {
+      current_price: 2.06,
+      purchase_quantity: 100,
+      cost_base_unit: "g" as const,
+    };
+    expect(preferInvoiceCountableOverlayFields(invoiceFields).cost_base_unit).toBe("g");
+
+    const invoiceById = new Map<string, OperationalInvoiceCostEntry>([
+      [
+        "manjericao",
+        {
+          fields: invoiceFields,
+          invoiceDate: "2026-05-25",
+          latestInvoiceUnitCost: 0.0206,
+          supplierLabel: null,
+        },
+      ],
+    ]);
+    const catalogById = buildOperationalIngredientCostById([
+      { id: "manjericao", ...invoiceFields },
+    ]);
+
+    const resolved = resolveRecipeLineOperationalCost(
+      "manjericao",
+      12,
+      catalogById,
+      invoiceFields,
+      invoiceById,
+      { recipeUnit: "g", ingredientName: "Manjericão" },
+    );
+    expect(resolved.fields.cost_base_unit).toBe("g");
+    expect(resolved.pricingResolved).toBe(true);
+    expect(resolved.lineCostEur).toBeCloseTo(0.2472, 3);
+    expect(isRecipeLineCostUnresolved(resolved.lineCostEur)).toBe(false);
+  });
+
+  it("preserves Salada ibérica g/250 overlay for 100g recipe line cost", () => {
+    const invoiceFields = {
+      current_price: 2.19,
+      purchase_quantity: 250,
+      cost_base_unit: "g" as const,
+    };
+    expect(preferInvoiceCountableOverlayFields(invoiceFields).cost_base_unit).toBe("g");
+
+    const invoiceById = new Map<string, OperationalInvoiceCostEntry>([
+      [
+        "salada",
+        {
+          fields: invoiceFields,
+          invoiceDate: "2026-05-25",
+          latestInvoiceUnitCost: 0.00876,
+          supplierLabel: null,
+        },
+      ],
+    ]);
+    const catalogById = buildOperationalIngredientCostById([
+      { id: "salada", ...invoiceFields },
+    ]);
+
+    const resolved = resolveRecipeLineOperationalCost(
+      "salada",
+      100,
+      catalogById,
+      invoiceFields,
+      invoiceById,
+      { recipeUnit: "g", ingredientName: "Salada ibérica" },
+    );
+    expect(resolved.fields.cost_base_unit).toBe("g");
+    expect(resolved.pricingResolved).toBe(true);
+    expect(resolved.lineCostEur).toBeCloseTo(0.876, 3);
+    expect(isRecipeLineCostUnresolved(resolved.lineCostEur)).toBe(false);
+  });
+
   it("catalog-only brioche with pq=80 unit price repairs to €0.21/un", () => {
     const catalogById = buildOperationalIngredientCostById([
       {
