@@ -44,15 +44,16 @@ import {
   resolveInvoiceLineStockPresentation,
   resolveInvoicePurchaseDisplayLabel,
 } from "@/lib/invoice-purchase-format";
+import { type InvoiceOcrQtyExtractionMeta } from "@/lib/invoice-extraction-review";
 import {
-  deriveMathematicalReconciliationReviewReason,
-  deriveOcrQtyMismatchReviewReason,
-  MATHEMATICAL_RECONCILIATION_FAILURE_MESSAGE,
-  needsMathematicalReconciliationReview,
-  needsOcrQtyMismatchReview,
-  OCR_QUANTITY_MISMATCH_MESSAGE,
-  type InvoiceOcrQtyExtractionMeta,
-} from "@/lib/invoice-extraction-review";
+  isPlaceholderItemName,
+  lineNeedsExtractionReview,
+  needsAmountConfirmation,
+  needsQuantityUnitConfirmation,
+  reviewRowValidationFindings,
+  validateInvoiceLine,
+} from "@/lib/invoice-validation";
+import { ValidationFindingBadge } from "@/components/validation-finding-badge";
 import {
   deriveInvoiceRowInlineChips,
   resolveInvoiceLinePricingPresentation,
@@ -512,27 +513,28 @@ const toInvoiceRow = (
 const normalizeExtractedItemName = (name: string | null | undefined) =>
   name?.trim().toLowerCase() ?? "";
 
-const isPlaceholderItemName = (name: string) => {
-  const normalizedName = normalizeExtractedItemName(name);
-  return !normalizedName || normalizedName === "unknown";
-};
-
-const needsQuantityUnitConfirmation = (item: ItemRow) => {
-  if (item.quantity != null && item.unit) return false;
-  return !hasClearInferredQuantityUnit(item);
-};
-
-const needsAmountConfirmation = (item: ItemRow) => item.unit_price == null || item.total == null;
-
-const needsExtractionConfirmation = (
+const buildInvoiceLineValidationInput = (
   item: ItemRow,
-  ocrMeta?: InvoiceOcrQtyExtractionMeta | null,
-) =>
-  isPlaceholderItemName(item.name) ||
-  needsQuantityUnitConfirmation(item) ||
-  needsAmountConfirmation(item) ||
-  needsMathematicalReconciliationReview(item) ||
-  needsOcrQtyMismatchReview(ocrMeta);
+  options: {
+    ocrMeta?: InvoiceOcrQtyExtractionMeta | null;
+    matchedIngredientName?: string | null;
+    suggestedIngredientName?: string | null;
+    matchConfidence?: string | null;
+    matchDisplayState?: "confirmed" | "suggested" | "unmatched" | null;
+  } = {},
+) => ({
+  id: item.id,
+  name: item.name,
+  quantity: item.quantity,
+  unit: item.unit,
+  unit_price: item.unit_price,
+  total: item.total,
+  ocrMeta: options.ocrMeta,
+  matchedIngredientName: options.matchedIngredientName ?? null,
+  suggestedIngredientName: options.suggestedIngredientName ?? null,
+  matchConfidence: options.matchConfidence ?? null,
+  matchDisplayState: options.matchDisplayState ?? null,
+});
 
 const GENERIC_UNIT_TOKENS = new Set(["un", "unit", "units", "und", "unds", "unid", "unids"]);
 const RECIPE_COMPATIBLE_DISPLAY_UNITS = new Set(["kg", "g", "ml", "l"]);
@@ -575,20 +577,6 @@ const resolveItemPurchaseFormat = (item: InvoicePurchaseContext) =>
     unit: item.unit,
     matchedIngredientName: item.matchedIngredientName ?? null,
   });
-
-const hasClearInferredQuantityUnit = (item: Pick<ItemRow, "name" | "quantity" | "unit">) => {
-  const inferred = resolveItemPurchaseFormat(item).inferred;
-  const hasUsableInference =
-    inferred.confidence >= 0.86 &&
-    inferred.purchase_quantity > 0 &&
-    inferred.purchase_unit != null &&
-    inferred.base_unit != null;
-  if (!hasUsableInference) return false;
-  if (item.quantity == null) {
-    return inferred.purchase_unit_count > 1 || inferred.size_is_metadata_only;
-  }
-  return isGenericUnit(item.unit) || !item.unit;
-};
 
 const resolveUnitDrivenQuantity = (
   item: Pick<ItemRow, "quantity">,
@@ -3411,7 +3399,16 @@ function ItemsTable({
         summary.unmatchedIngredients += 1;
       }
 
-      if (needsExtractionConfirmation(item, extractionMetaByItemId[rowItem.id])) {
+      if (
+        lineNeedsExtractionReview(
+          validateInvoiceLine(
+            buildInvoiceLineValidationInput(item, {
+              ocrMeta: extractionMetaByItemId[rowItem.id],
+              matchDisplayState: state.displayState,
+            }),
+          ),
+        )
+      ) {
         summary.extractionReview += 1;
       }
       if (needsQuantityUnitConfirmation(item)) summary.quantityReview += 1;
@@ -3645,17 +3642,6 @@ function ItemsTable({
                   unmatched: unmatchedIngredient,
                   badgeLabel: suggestedMatchBadgeLabel,
                 } = ingredientMatchState;
-                const extractionReview = needsExtractionConfirmation(
-                  renderItem,
-                  extractionMetaByItemId[renderItem.id],
-                );
-                const quantityReview = needsQuantityUnitConfirmation(renderItem);
-                const amountReview = needsAmountConfirmation(renderItem);
-                const mathematicalReconciliationReviewReason =
-                  deriveMathematicalReconciliationReviewReason(renderItem);
-                const ocrQtyMismatchReviewReason = deriveOcrQtyMismatchReviewReason(
-                  extractionMetaByItemId[renderItem.id],
-                );
                 const canCreateIngredient = !isPlaceholderItemName(renderItem.name);
                 const creatingIngredient = !!creatingIngredientByItem[renderItem.id];
                 const creationError = ingredientCreationErrors[renderItem.id];
@@ -3664,6 +3650,24 @@ function ItemsTable({
                     ingredientMatch.ingredient.name ??
                     null)
                   : null;
+                const rowValidationFindings = validateInvoiceLine(
+                  buildInvoiceLineValidationInput(renderItem, {
+                    ocrMeta: extractionMetaByItemId[renderItem.id],
+                    matchedIngredientName: matchedIngredientForStock,
+                    suggestedIngredientName: possibleIngredientMatch?.ingredient.name ?? null,
+                    matchConfidence: possibleIngredientMatch
+                      ? buildMatchExplanation(possibleIngredientMatch, {
+                          confirmedAliases: confirmedIngredientAliases,
+                          supplierName,
+                        }).confidenceLabel
+                      : null,
+                    matchDisplayState: ingredientMatchState.displayState,
+                  }),
+                );
+                const extractionReview = lineNeedsExtractionReview(rowValidationFindings);
+                const quantityReview = needsQuantityUnitConfirmation(renderItem);
+                const amountReview = needsAmountConfirmation(renderItem);
+                const reviewBadges = reviewRowValidationFindings(rowValidationFindings);
                 const purchaseLabel = getInvoiceItemPurchaseLabel({
                   ...renderItem,
                   matchedIngredientName: matchedIngredientForStock,
@@ -3818,34 +3822,27 @@ function ItemsTable({
                             disabled={correctionBusy}
                           />
                         )}
-                        {(inlineChips.length > 0 ||
-                          mathematicalReconciliationReviewReason ||
-                          ocrQtyMismatchReviewReason) && (
-                          <div className="flex flex-wrap items-center gap-1 pt-0.5">
-                            {inlineChips.map((chip) => (
-                              <OperationalBadge
-                                key={chip.label}
-                                label={chip.label}
-                                tone={chip.tone}
-                                title={chip.title}
-                              />
-                            ))}
-                            {mathematicalReconciliationReviewReason && (
-                              <OperationalBadge
-                                key="mathematical-reconciliation"
-                                label="Math mismatch"
-                                tone="review"
-                                title={MATHEMATICAL_RECONCILIATION_FAILURE_MESSAGE}
-                              />
-                            )}
-                            {ocrQtyMismatchReviewReason && (
-                              <OperationalBadge
-                                key="ocr-quantity-mismatch"
-                                label="OCR qty mismatch"
-                                tone="review"
-                                title={OCR_QUANTITY_MISMATCH_MESSAGE}
-                              />
-                            )}
+                        {(inlineChips.length > 0 || reviewBadges.length > 0) && (
+                          <div className="space-y-1.5 pt-0.5">
+                            {inlineChips.length > 0 ? (
+                              <div className="flex flex-wrap items-center gap-1">
+                                {inlineChips.map((chip) => (
+                                  <OperationalBadge
+                                    key={chip.label}
+                                    label={chip.label}
+                                    tone={chip.tone}
+                                    title={chip.title}
+                                  />
+                                ))}
+                              </div>
+                            ) : null}
+                            {reviewBadges.length > 0 ? (
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                {reviewBadges.map((finding) => (
+                                  <ValidationFindingBadge key={finding.id} finding={finding} />
+                                ))}
+                              </div>
+                            ) : null}
                           </div>
                         )}
                         {correctionUi.showConfirm && possibleIngredientMatch && (
