@@ -19,9 +19,11 @@ import {
   isExtractCostSyncAuthorizedMatch,
   type InvoiceIngredientDisplayState,
 } from "@/lib/ingredient-match-explanation";
+import { getInvoiceItemMatchesForItemIds } from "@/lib/invoice-item-match-repository";
 import {
   isMatchLifecycleAliasAutoConfirmEnabled,
   isMatchLifecycleExtractGateEnabled,
+  isMatchLifecycleReadCutoverEnabled,
 } from "@/lib/match-lifecycle-flags";
 import {
   invoiceRowMatchSummaryBucket,
@@ -29,6 +31,7 @@ import {
 } from "@/lib/invoice-ingredient-row-display";
 import {
   buildCutoverContextForInvoiceItem,
+  buildPersistedMatchMapFromRows,
   type PersistedMatchForCutover,
 } from "@/lib/invoice-item-match-read-cutover";
 import { readLocalInvoiceIngredientAliases } from "@/lib/operational-review-queue";
@@ -918,10 +921,12 @@ export async function loadOperationalIngredientCostOverlay(
 ): Promise<Map<string, OperationalInvoiceCostEntry>> {
   if (catalog.length === 0) return new Map();
   const { rows } = await loadInvoiceItemsForMatchedProductScan(client);
+  const persistedMatchByItemId = await loadPersistedMatchByItemIdForScan(client, rows);
   return buildLatestOperationalIngredientCostByIngredientIdFromScan(
     catalog,
     confirmedAliases,
     rows,
+    persistedMatchByItemId,
   );
 }
 
@@ -1041,17 +1046,34 @@ export function buildLatestConfirmedPurchaseAtByIngredientIdFromScan(
   catalog: readonly IngredientCanonicalInput[],
   confirmedAliases: IngredientAliasMap,
   scanRows: readonly MatchedInvoiceItemScanRow[],
+  persistedMatchByItemId?: ReadonlyMap<string, PersistedMatchForCutover>,
 ): Record<string, string | null> {
   const glance = buildLatestPurchaseGlanceByIngredientIdFromScan(
     catalog,
     confirmedAliases,
     scanRows,
+    persistedMatchByItemId,
   );
   const latest: Record<string, string | null> = {};
   for (const [id, entry] of Object.entries(glance)) {
     latest[id] = entry.lastPurchaseAt;
   }
   return latest;
+}
+
+/** Loads persisted match rows for invoice scan when READ_CUTOVER is enabled. */
+export async function loadPersistedMatchByItemIdForScan(
+  client: DbClient,
+  scanRows: readonly { id: string }[],
+): Promise<Map<string, PersistedMatchForCutover>> {
+  if (!isMatchLifecycleReadCutoverEnabled() || scanRows.length === 0) {
+    return new Map();
+  }
+  const { data: matchRows } = await getInvoiceItemMatchesForItemIds(
+    client as AppSupabaseClient,
+    scanRows.map((row) => row.id),
+  );
+  return buildPersistedMatchMapFromRows(matchRows ?? []);
 }
 
 export async function loadInvoiceItemsForMatchedProductScan(
@@ -1118,6 +1140,7 @@ export async function loadIngredientMatchedInvoiceProducts(
     if (!owned) return empty;
 
     const { rows, truncated } = await loadInvoiceItemsForMatchedProductScan(client);
+    const persistedMatchByItemId = await loadPersistedMatchByItemIdForScan(client, rows);
     const mergedConfirmedAliases: IngredientAliasMap = {
       ...readLocalInvoiceIngredientAliases(trimmedUser),
       ...confirmedAliases,
@@ -1127,7 +1150,11 @@ export async function loadIngredientMatchedInvoiceProducts(
       catalog,
       mergedConfirmedAliases,
       rows,
-      { truncated, scanLimit: MATCHED_INVOICE_PRODUCTS_SCAN_LIMIT },
+      {
+        truncated,
+        scanLimit: MATCHED_INVOICE_PRODUCTS_SCAN_LIMIT,
+        persistedMatchByItemId,
+      },
     );
     matchedInvoiceProductsCache.set(trimmedId, { loadedAt: Date.now(), result });
     return result;

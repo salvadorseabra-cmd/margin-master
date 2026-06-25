@@ -1,0 +1,116 @@
+{
+  "validationLabId": "bjhnlrgodcqoyzddbpbd",
+  "auditDate": "2026-06-25",
+  "mode": "read-only-intent",
+  "decision": "C_mixed",
+  "confidence": 91,
+  "summary": "Operational Overlay uses virtual matcher by original design (invoice_items has no ingredient_id). Match Lifecycle added hybrid read cutover: virtual always runs, persisted wins when flag ON and row exists. Loader wiring for persistedMatchByItemId is complete in working tree but was not committed in HEAD.",
+  "parentAnswers": {
+    "virtualMatcherByDesign": true,
+    "permanentVirtualCallers": [
+      "syncOperationalIngredientCostsFromInvoiceLines",
+      "resolveInvoiceTableRowIngredientMatch (always computes virtual baseline)",
+      "ingredient-orphan-diagnostics (unwired)"
+    ],
+    "migrateToPersistedCallers": [
+      "loadOperationalIngredientCostOverlay",
+      "buildLatestOperationalIngredientCostByIngredientIdFromScan",
+      "loadLatestPurchaseGlanceByIngredientId",
+      "buildLatestPurchaseGlanceByIngredientIdFromScan",
+      "loadIngredientMatchedInvoiceProducts",
+      "buildMatchedInvoiceProductsFromScan"
+    ],
+    "unfinishedMigrationOrIntentional": "both_hybrid_intentional_loader_wiring_was_unfinished_now_in_working_tree",
+    "proceedWithImplementation": "mostly_done_commit_wiring_enable_flag_orphan_diagnostics_write_path_remain",
+    "implementationAlreadyDone": "partial_working_tree_has_loader_wiring_HEAD_did_not"
+  },
+  "phase1": {
+    "loadOperationalIngredientCostOverlay": {
+      "whyExists": "Recipe operational cost overlay per ingredient",
+      "dataNeeded": ["ingredient_id", "match_bucket", "line_pricing", "chronology", "supplier"],
+      "virtualCallSite": "buildLatestOperationalIngredientCostByIngredientIdFromScan",
+      "persistedWired": "working_tree_yes_HEAD_no",
+      "ifPersistedOnly": "assignment from map; virtual still needed for fallback, diagnostics, missing rows"
+    },
+    "buildLatestOperationalIngredientCostByIngredientIdFromScan": {
+      "whyExists": "Scan reducer for latest cost per ingredient",
+      "dataNeeded": ["ingredient_id", "match_bucket", "operationalCostFields", "chronology"],
+      "virtualCallSite": "resolveInvoiceTableRowIngredientMatch per eligible row",
+      "persistedParam": "since_5b4a171",
+      "ifPersistedOnly": "cost mapping independent of matcher; assignment can be persisted"
+    },
+    "loadLatestPurchaseGlanceByIngredientId": {
+      "whyExists": "Last purchase glance on ingredients/recipes pages",
+      "dataNeeded": ["ingredient_id", "chronology", "supplier", "line_total"],
+      "virtualCallSite": "buildLatestPurchaseGlanceByIngredientIdFromScan",
+      "persistedWired": "working_tree_yes_HEAD_no",
+      "ifPersistedOnly": "same hybrid tradeoffs"
+    },
+    "loadIngredientMatchedInvoiceProducts": {
+      "whyExists": "Ingredient detail purchase history panel",
+      "dataNeeded": ["ingredient_id", "match_presentation", "pricing", "chronology", "stock_presentation"],
+      "virtualCallSite": "buildMatchedInvoiceProductsFromScan",
+      "persistedWired": "working_tree_yes_HEAD_no",
+      "ifPersistedOnly": "persisted gives id+status; explanation still uses resolved match object"
+    }
+  },
+  "phase2": {
+    "overlayPredatesMatchLifecycle": true,
+    "invoiceItemMatchesCreated": "2026-06-14_8a054eb",
+    "operationalOverlayOrigin": "2026-05-22_da8ff44",
+    "costAggregationCommit": "2026-05-27_41d8c4a",
+    "readCutoverInfraCommit": "2026-06-14_5b4a171",
+    "originalIntent": "invoice_items has no ingredient_id; resolve at read time via ItemsTable matcher"
+  },
+  "phase3": {
+    "buildFunctionsHavePersistedParam": true,
+    "loadersWiredInHEAD": false,
+    "loadersWiredInWorkingTree": true,
+    "loadPersistedMatchByItemIdForScan": "working_tree_only",
+    "alreadyWiredConsumers": [
+      "invoices.tsx",
+      "catalog-review-current-matches.ts",
+      "invoice-unresolved-ingredient-count.ts"
+    ],
+    "unwiredPaths": [
+      "ingredient-orphan-diagnostics.ts",
+      "syncOperationalIngredientCostsFromInvoiceLines"
+    ],
+    "flagDefault": "VITE_MATCH_LIFECYCLE_READ_CUTOVER=OFF"
+  },
+  "phase4": {
+    "classifications": {
+      "loadOperationalIngredientCostOverlay": "transitional_hybrid",
+      "buildLatestOperationalIngredientCostByIngredientIdFromScan": "transitional_hybrid",
+      "loadLatestPurchaseGlanceByIngredientId": "transitional_hybrid",
+      "buildLatestPurchaseGlanceByIngredientIdFromScan": "transitional_hybrid",
+      "loadIngredientMatchedInvoiceProducts": "transitional_hybrid",
+      "buildMatchedInvoiceProductsFromScan": "transitional_hybrid",
+      "syncOperationalIngredientCostsFromInvoiceLines": "required_virtual",
+      "ingredient-orphan-diagnostics": "legacy",
+      "loadIngredientOperationalProfile": "optional_separate",
+      "resolveInvoiceTableRowIngredientMatch": "required_permanent_hybrid_primitive"
+    }
+  },
+  "phase5": {
+    "scenarios": {
+      "existingConfirmedInvoices": { "flagOff": "virtual", "flagOnNoRow": "virtual_fallback", "flagOnPersisted": "persisted" },
+      "newInvoiceNeverReviewed": { "flagOff": "virtual", "flagOnNoRow": "virtual", "flagOnPersisted": "n/a_until_dual_write" },
+      "reReadAfterConfirm": { "flagOff": "virtual_reflects_aliases", "flagOnPersisted": "persisted_frozen" },
+      "ingredientDetailPurchaseHistory": { "flagOff": "virtual_scan", "flagOn": "hybrid" },
+      "recipeOperationalOverlay": { "flagOff": "virtual_scan", "flagOn": "hybrid" }
+    },
+    "scanModel": "invoice_items scan unchanged; persisted replaces per-line assignment only"
+  },
+  "phase6": {
+    "decisionA_intentionalStay": "partial_virtual_permanent_as_fallback_and_baseline",
+    "decisionB_transitionalMigrate": "partial_loader_wiring_transitional_incomplete_in_HEAD",
+    "decisionC_mixed": "primary_hybrid_read_architecture_by_design"
+  },
+  "gitEvidence": {
+    "HEAD_commit_loaders_wired": false,
+    "working_tree_loaders_wired": true,
+    "cutoverInfraCommit": "5b4a171",
+    "schemaCommit": "8a054eb"
+  }
+}

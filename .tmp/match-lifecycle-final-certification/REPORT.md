@@ -1,12 +1,12 @@
 # Match Lifecycle Final Certification
 
-**Validation Lab:** `bjhnlrgodcqoyzddbpbd` · **Read-only** · 2026-06-25T14:25:59.343Z
+**Validation Lab:** `bjhnlrgodcqoyzddbpbd` · **Read-only** · 2026-06-25T14:41:18.434Z
 
 ## Certification Decision
 
 ### 🟡 CONDITIONAL
 
-**Subsystem closure:** Match Lifecycle V1 **write path is RC-ready** (100% item coverage, dual-write on). **Read path is not closed** — `READ_CUTOVER` off, recipe overlay unwired, dual authority (aliases + persisted + virtual). Official closure requires enabling read cutover + wiring recipe overlay + resolving Prosciutto extract-gate architecture.
+Persisted `invoice_item_matches` (52 rows, 100% item coverage) is the **write** source of truth under dual-write, but **read** paths still default to virtual alias resolution unless `VITE_MATCH_LIFECYCLE_READ_CUTOVER` is enabled. Cutover replay aligns 100% with persisted; virtual aligns 98.1%.
 
 ## Phase 1 — Architecture Map
 
@@ -73,10 +73,6 @@ Catalog Review → loadCatalogReviewInvoiceItemScan (persisted when READ_CUTOVER
 | ovo | confirmed | confirmed | confirmed | [] | 🟢 |
 | tomilho | confirmed | confirmed | confirmed | [] | 🟢 |
 
-**Prosciutto drift (only platform mismatch):** persisted `suggested` / semantic; virtual `confirmed` via confirmed alias (`assaporami prosciutto cotto sceltohc`). Cutover correctly surfaces `suggested` — intentional status drift. Virtual path would skip validation warning; cutover path emits `SUGGESTED_INGREDIENT_MATCH`. Orphan price_history from pre-confirm extract remains (foundation blocker).
-
-**Prior 26/40 virtual≠persisted figure:** largely audit-artifact from hand-rolled alias maps + pre-backfill VL; fresh replay with `buildConfirmedAliasMapFromRows` shows 51/52 virtual alignment.
-
 ## Phase 6 — Dead Code / Legacy Audit
 
 | Artifact | Status | Risk if removed |
@@ -94,7 +90,7 @@ Catalog Review → loadCatalogReviewInvoiceItemScan (persisted when READ_CUTOVER
 |------|-------|-------|
 | Write path (dual-write) | 🟢 | confirm/correct/reassign wired in invoices.tsx |
 | Persisted table coverage | 🟢 | 100% items have match rows |
-| Read cutover (Invoice Review) | 🟡 | OFF in VL; live replay 98.1% virtual↔persisted (1 drift: Prosciutto alias vs suggested row) |
+| Read cutover (Invoice Review) | 🟡 | OFF in VL; 26/40 virtual≠persisted historically |
 | Read cutover (Recipe overlay) | 🔴 | Not wired — virtual only |
 | Extract gate | 🟡 | Prosciutto history-before-confirm architectural gap |
 | Unmatch/reassign pricing | 🟢 | subtractive paths implemented + tested |

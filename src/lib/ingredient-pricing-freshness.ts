@@ -4,6 +4,7 @@ import {
   buildLatestConfirmedPurchaseAtByIngredientIdFromScan,
   buildLatestPurchaseGlanceByIngredientIdFromScan,
   loadInvoiceItemsForMatchedProductScan,
+  loadPersistedMatchByItemIdForScan,
   type IngredientLatestPurchaseGlance,
 } from "@/lib/ingredient-operational-intelligence";
 import type { Database } from "@/integrations/supabase/types";
@@ -465,7 +466,13 @@ export async function loadLatestConfirmedPurchaseAtByIngredientId(
 ): Promise<Record<string, string | null>> {
   if (catalog.length === 0) return {};
   const { rows } = await loadInvoiceItemsForMatchedProductScan(client);
-  return buildLatestConfirmedPurchaseAtByIngredientIdFromScan(catalog, confirmedAliases, rows);
+  const persistedMatchByItemId = await loadPersistedMatchByItemIdForScan(client, rows);
+  return buildLatestConfirmedPurchaseAtByIngredientIdFromScan(
+    catalog,
+    confirmedAliases,
+    rows,
+    persistedMatchByItemId,
+  );
 }
 
 export async function loadLatestPurchaseGlanceByIngredientId(
@@ -475,7 +482,13 @@ export async function loadLatestPurchaseGlanceByIngredientId(
 ): Promise<Record<string, IngredientLatestPurchaseGlance>> {
   if (catalog.length === 0) return {};
   const { rows } = await loadInvoiceItemsForMatchedProductScan(client);
-  return buildLatestPurchaseGlanceByIngredientIdFromScan(catalog, confirmedAliases, rows);
+  const persistedMatchByItemId = await loadPersistedMatchByItemIdForScan(client, rows);
+  return buildLatestPurchaseGlanceByIngredientIdFromScan(
+    catalog,
+    confirmedAliases,
+    rows,
+    persistedMatchByItemId,
+  );
 }
 
 export async function loadPriceHistoryLatestAtByIngredientId(
