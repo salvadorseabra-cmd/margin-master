@@ -67,16 +67,11 @@ describe("validateMathematicsFindings", () => {
 });
 
 describe("validateOperationalFindings", () => {
-  it("flags Guanciale operational economics mismatch", () => {
+  it("does not flag Guanciale when billed-kg normalization reconciles", () => {
     const findings = validateInvoiceLine(GUANCIALE);
-    const operational = findings.find(
-      (f) => f.code === OPERATIONAL_NORMALIZATION_INCONSISTENCY_CODE,
-    );
-    expect(operational?.severity).toBe("warning");
-    expect(operational?.category).toBe("operational");
-    expect(operational?.evidence?.expected?.value).toBeCloseTo(10.83, 2);
-    expect(operational?.evidence?.actual?.value).toBeCloseTo(6.18, 2);
-    expect(operational?.evidence?.extra?.check).toBe("pack_structure_vs_row_weight");
+    expect(
+      findings.some((f) => f.code === OPERATIONAL_NORMALIZATION_INCONSISTENCY_CODE),
+    ).toBe(false);
   });
 
   it("does not flag Mozzarella Julienne multipack row", () => {
@@ -106,7 +101,7 @@ describe("validateExtractionFindings migration", () => {
   });
 
   it("lineNeedsExtractionReview includes operational warnings", () => {
-    const findings = validateInvoiceLine(GUANCIALE);
+    const findings = validateInvoiceLine(GORGONZOLA_CANONICAL);
     expect(lineNeedsExtractionReview(findings)).toBe(true);
   });
 });

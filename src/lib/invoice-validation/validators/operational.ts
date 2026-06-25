@@ -135,29 +135,27 @@ function detectDisplayOperationalMismatch(
   });
 }
 
-/** Weight-priced generic rows where name pack total (qty=1) diverges from billed row qty. */
+/** Weight-priced generic rows where final normalized usable diverges from billed row qty. */
 function detectPackStructureInvoiceWeightMismatch(
   metadata: InvoicePurchasePriceMetadata,
   input: InvoiceLineValidationInput,
   total: number,
   quantity: number,
   rowUnit: string,
+  name: string,
 ): ValidationFinding | null {
   if (!defaultIsGenericUnit(rowUnit) || !hasFractionalQuantity(quantity)) return null;
 
-  const nameStructure = resolveStructuredPurchaseForDisplay({
-    ...metadata,
-    quantity: 1,
-  });
+  const structured = resolveStructuredPurchaseForDisplay(metadata);
   if (
-    nameStructure.usableQuantityUnit !== "g" ||
-    nameStructure.normalizedUsableQuantity == null ||
-    nameStructure.normalizedUsableQuantity <= 0
+    structured.usableQuantityUnit !== "g" ||
+    structured.normalizedUsableQuantity == null ||
+    structured.normalizedUsableQuantity <= 0
   ) {
     return null;
   }
 
-  const structureKg = nameStructure.normalizedUsableQuantity / 1000;
+  const structureKg = structured.normalizedUsableQuantity / 1000;
   const purchasedKg = quantity;
   const packVarianceKg = Math.abs(structureKg - purchasedKg);
   const packVariancePct = round2((packVarianceKg / Math.max(purchasedKg, 0.01)) * 100);
@@ -168,8 +166,16 @@ function detectPackStructureInvoiceWeightMismatch(
     return null;
   }
 
+  const unitPrice = metadata.unit_price == null ? null : Number(metadata.unit_price);
+  if (unitPrice == null || !Number.isFinite(unitPrice)) return null;
+
+  const effective = computeEffectiveUsableCost(unitPrice, metadata, structured, name);
+  if (effective == null || !Number.isFinite(effective.cost) || effective.cost <= 0) {
+    return null;
+  }
+
   const invoicePerKg = total / purchasedKg;
-  const structurePerKg = total / structureKg;
+  const structurePerKg = effective.cost;
   const varianceAbs = round2(Math.abs(invoicePerKg - structurePerKg));
   const denom = Math.max(invoicePerKg, structurePerKg, 0.01);
   const variancePct = round2((varianceAbs / denom) * 100);
@@ -195,13 +201,13 @@ function detectPackStructureInvoiceWeightMismatch(
       quantity,
       row_unit: rowUnit,
       pack_structure: {
-        container_count: nameStructure.purchaseContainerCount,
-        container_unit: nameStructure.purchaseContainerUnit,
-        package_quantity: nameStructure.packageQuantity,
-        package_measurement_unit: nameStructure.packageMeasurementUnit,
+        container_count: structured.purchaseContainerCount,
+        container_unit: structured.purchaseContainerUnit,
+        package_quantity: structured.packageQuantity,
+        package_measurement_unit: structured.packageMeasurementUnit,
       },
-      usable_quantity: nameStructure.normalizedUsableQuantity,
-      usable_quantity_unit: nameStructure.usableQuantityUnit,
+      usable_quantity: structured.normalizedUsableQuantity,
+      usable_quantity_unit: structured.usableQuantityUnit,
     },
   };
 
@@ -263,6 +269,7 @@ export function validateOperationalFindings(input: InvoiceLineValidationInput): 
     total,
     quantity,
     rowUnit,
+    input.name,
   );
   return packMismatch ? [packMismatch] : [];
 }
