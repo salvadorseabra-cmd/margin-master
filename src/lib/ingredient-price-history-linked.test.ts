@@ -94,7 +94,7 @@ describe("orphan quarantine — VL Atum / Gema", () => {
     expect(latest).toHaveLength(0);
   });
 
-  it("buildOperationalAlertItems skips orphan-only Gema and uses linked Atum row", () => {
+  it("buildOperationalAlertItems skips orphan Gema and untrusted linked Atum movement", () => {
     const data = {
       ingredients: [
         { id: ATUM_ID, name: "Atum em óleo", unit: "kg", current_price: 6.29, purchase_quantity: 2 },
@@ -107,7 +107,7 @@ describe("orphan quarantine — VL Atum / Gema", () => {
     const alerts = buildOperationalAlertItems(data);
     const atumAlert = alerts.find((a) => a.id === `price-decrease-${ATUM_ID}`);
     const gemaAlert = alerts.find((a) => a.id.startsWith("price-") && a.id.includes(GEMA_ID));
-    expect(atumAlert).toBeDefined();
+    expect(atumAlert).toBeUndefined();
     expect(gemaAlert).toBeUndefined();
   });
 

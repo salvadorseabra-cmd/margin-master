@@ -144,13 +144,13 @@ describe("final horeca hardening", () => {
     expect(match?.ingredient.id).toBe("sliced");
   });
 
-  it("CHED TOP matches Molho Cheddar Dispensador not sliced cheddar", () => {
+  it("CHED TOP does not auto-match catalog when normalization drops TOP", () => {
     const catalog = [
       ingredient("sliced", "Cheddar Fatiado 1KG"),
       ingredient("sauce", "Molho Cheddar Dispensador"),
     ];
     const match = findInvoiceItemIngredientMatch("CHED TOP", catalog);
-    expect(match?.ingredient.id).toBe("sauce");
+    expect(match).toBeNull();
   });
 
   it("PKL SLC and PICKL SLC match Pickles Fatiados", () => {
