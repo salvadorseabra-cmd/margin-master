@@ -376,6 +376,49 @@ export type ResolveRecipeLineOperationalCostResult = ResolveOperationalIngredien
   unresolvedReason: string | null;
 };
 
+/**
+ * Invoice multipack beverages often encode per-bottle volume as ml/pq while catalog stays `un`.
+ * Recipe lines counted in `un` need countable fields for line costing; keep invoice overlay for display.
+ */
+function recipeLineCostFieldsWhenInvoiceVolumeOverCatalogCountable(
+  resolved: ResolveOperationalIngredientCostResult,
+  catalog: OperationalIngredientCostFields | undefined,
+  lineContext: IngredientLineCostContext,
+): OperationalIngredientCostFields | null {
+  if (resolved.source !== "invoice") return null;
+  if (!catalog || !isOperationalPricingResolved(resolved.fields)) return null;
+
+  const recipeNorm = lineContext.recipeUnit?.trim()
+    ? normalizeToBaseUnit(1, lineContext.recipeUnit)
+    : null;
+  if (!recipeNorm || recipeNorm.baseUnit !== "un") return null;
+
+  const catalogBase = catalog.cost_base_unit ?? inferIngredientCostBaseUnit(catalog);
+  if (catalogBase !== "un") return null;
+
+  const overlayBase =
+    resolved.fields.cost_base_unit ?? inferIngredientCostBaseUnit(resolved.fields);
+  if (overlayBase !== "ml") return null;
+
+  const perPieceMl = purchaseQuantityDenom(resolved.fields.purchase_quantity);
+  if (!(perPieceMl > 1 && perPieceMl < 1000)) return null;
+
+  const bottleVolumeMl =
+    resolved.fields.usable_volume_ml != null && resolved.fields.usable_volume_ml > 0
+      ? resolved.fields.usable_volume_ml
+      : perPieceMl;
+
+  return mergeOperationalCostMetadata(
+    {
+      current_price: resolved.fields.current_price,
+      purchase_quantity: 1,
+      cost_base_unit: "un",
+      usable_volume_ml: bottleVolumeMl,
+    },
+    catalog,
+  );
+}
+
 function priceResolutionAuditBranch(
   resolved: ResolveOperationalIngredientCostResult,
   lineContext: IngredientLineCostContext,
@@ -427,7 +470,11 @@ export function resolveRecipeLineOperationalCost(
       ingredientName: lineContext.ingredientName,
     },
   );
-  const lineCostEur = ingredientLineCostEur(quantity, resolved.fields, {
+  const catalog = ingredientId.trim() ? catalogById.get(ingredientId.trim()) : undefined;
+  const lineCostFields =
+    recipeLineCostFieldsWhenInvoiceVolumeOverCatalogCountable(resolved, catalog, lineContext) ??
+    resolved.fields;
+  const lineCostEur = ingredientLineCostEur(quantity, lineCostFields, {
     ...lineContext,
     source: resolved.source,
     invoiceDate: resolved.chosenDate,

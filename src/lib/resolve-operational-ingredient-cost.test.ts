@@ -404,6 +404,50 @@ describe("resolveOperationalIngredientCostFields", () => {
     expect(isRecipeLineCostUnresolved(resolved.lineCostEur)).toBe(false);
   });
 
+  it("resolves Ginger Beer 6 un via invoice unit price with catalog countable base", () => {
+    const invoiceFields = {
+      current_price: 0.81,
+      purchase_quantity: 200,
+      cost_base_unit: "ml" as const,
+    };
+    expect(preferInvoiceCountableOverlayFields(invoiceFields).cost_base_unit).toBe("ml");
+
+    const catalogFields = {
+      current_price: 0.81,
+      purchase_quantity: 24,
+      cost_base_unit: "un" as const,
+    };
+    const invoiceById = new Map<string, OperationalInvoiceCostEntry>([
+      [
+        "ginger-beer",
+        {
+          fields: invoiceFields,
+          invoiceDate: "2026-05-19",
+          latestInvoiceUnitCost: 0.81,
+          supplierLabel: "Emporio Italia",
+        },
+      ],
+    ]);
+    const catalogById = buildOperationalIngredientCostById([
+      { id: "ginger-beer", ...catalogFields },
+    ]);
+
+    const resolved = resolveRecipeLineOperationalCost(
+      "ginger-beer",
+      6,
+      catalogById,
+      catalogFields,
+      invoiceById,
+      { recipeUnit: "un", ingredientName: "Baladin - Ginger Beer 0.20cl" },
+    );
+    expect(resolved.fields.cost_base_unit).toBe("ml");
+    expect(resolved.source).toBe("invoice");
+    expect(resolved.pricingResolved).toBe(true);
+    expect(resolved.lineCostEur).toBeCloseTo(4.86, 2);
+    expect(resolved.unitCostEur).toBeCloseTo(0.81, 2);
+    expect(isRecipeLineCostUnresolved(resolved.lineCostEur)).toBe(false);
+  });
+
   it("catalog-only brioche with pq=80 unit price repairs to €0.21/un", () => {
     const catalogById = buildOperationalIngredientCostById([
       {
