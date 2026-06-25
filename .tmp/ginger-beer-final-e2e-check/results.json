@@ -1,0 +1,122 @@
+{
+  "generatedAt": "2026-06-25T15:01:00.000Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "mode": "STRICT_READ_ONLY",
+  "investigationId": "ginger-beer-final-e2e-check",
+  "rootCause": "A",
+  "rootCauseLabel": "Part 2 bridge implemented only in resolveRecipeLineOperationalCost — not executed by aggregation/replay engine-total path",
+  "secondaryCauses": ["D", "E"],
+  "summary": {
+    "implementationCorrect": "partial",
+    "implementationCorrectDetail": "recipeLineCostFieldsWhenInvoiceVolumeOverCatalogCountable works in resolveRecipeLineOperationalCost (€4.86); not wired into computeRecipeLineCostEur / computeRecipeTotalCostEur",
+    "replayWrong": true,
+    "replayWrongDetail": "audit.mts harness compares expectedLineCost via ingredientLineCostEur(resolved.fields) without bridge; engine total uses computeRecipeTotalCostEur which bypasses bridge",
+    "vlDataStale": false,
+    "gingerBeerStillFailsE2E": true,
+    "gingerBeerLineCostResolves": true,
+    "foundationGreenIfOnlyGingerFixed": false,
+    "foundationGreenReason": "Ginger fix incomplete for list/summary totals; Prosciutto match-lifecycle blocker remains per final-foundation-certification",
+    "confidence": 94
+  },
+  "phase1_codePath": {
+    "auditCallsResolveRecipeLineOperationalCost": true,
+    "auditCallsForUiAndMath": [
+      "resolveRecipeLineOperationalCost (uiCostLines line 339, math loop line 409)"
+    ],
+    "auditEngineTotalPath": "computeRecipeTotalCostEur → computeRecipeLineCostEur → ingredientLineCostEur(enriched.ingredients) — NO bridge",
+    "part2FunctionPresent": true,
+    "part2Function": "recipeLineCostFieldsWhenInvoiceVolumeOverCatalogCountable",
+    "part2WiredIn": "resolveRecipeLineOperationalCost only",
+    "part2NotWiredIn": [
+      "computeRecipeLineCostEur",
+      "computeRecipeTotalCostEur",
+      "computeRecipePricingSummaryFromRecipe",
+      "enrichRecipeLinesForOperationalCost"
+    ],
+    "productionSplitBrain": {
+      "detailView": "getRecipeCostLines → resolveRecipeLineOperationalCost (bridge active)",
+      "listCardTotal": "computeRecipePricingSummaryFromRecipe → computeRecipeLineCostEur (bridge missing)"
+    }
+  },
+  "phase2_inputComparison": {
+    "unitTestVsLive": "identical economics",
+    "inputs": {
+      "gingerBeerId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+      "recipeLine": { "quantity": 6, "unit": "un" },
+      "catalog": { "current_price": 0.81, "purchase_quantity": 24, "cost_base_unit": "un" },
+      "invoiceOverlay": { "current_price": 0.81, "purchase_quantity": 200, "cost_base_unit": "ml" },
+      "invoiceItem": "Baladin - Ginger Beer 0.20cl · 24 un · €0.81"
+    },
+    "firstDivergence": "After resolveRecipeLineOperationalCost returns €4.86, computeRecipeLineCostEur uses enriched ml fields → null"
+  },
+  "phase3_vlLiveState": {
+    "source": "end-to-end-recipe-certification/results.json (2026-06-25T13:52:50Z) + ginger-beer-recipe-resolution audit",
+    "dataStale": false,
+    "gingerOverlay": { "cost_base_unit": "ml", "purchase_quantity": 200, "current_price": 0.81 },
+    "catalog": { "cost_base_unit": "un", "purchase_quantity": 24, "current_price": 0.81 },
+    "recipeLine": { "quantity": 6, "unit": "un" },
+    "confirmedMatch": "de0946a9-b7e4-467b-ae21-8b0401fcb363"
+  },
+  "phase4_executionTrace": {
+    "resolveOperationalIngredientCostFields": {
+      "source": "invoice",
+      "fields_cost_base_unit": "ml",
+      "fields_purchase_quantity": 200,
+      "operationalUnitCostEur_per_ml": 0.00405
+    },
+    "resolveRecipeLineOperationalCost": {
+      "lineCostEur": 4.86,
+      "unitCostEur": 0.81,
+      "pricingResolved": true,
+      "displayFields_cost_base_unit": "ml",
+      "bridgeFields_cost_base_unit": "un",
+      "bridgeFields_purchase_quantity": 1
+    },
+    "ingredientLineCostEur_on_resolvedFields_harnessExpected": null,
+    "ingredientLineCostEur_on_enrichedFields": null,
+    "computeRecipeLineCostEur_aggregationPath": null,
+    "multipackTotals": {
+      "resolveRecipeLineOperationalCost_ginger": 4.86,
+      "computeRecipeTotalCostEur_engine": 2.325,
+      "sumOfResolveRecipeLineCosts": 7.185,
+      "computeRecipePricingSummary_resolvedFoodCostEur": 2.325,
+      "pdfTotalFoodCostEur_uiPath": 7.185
+    },
+    "vitestEvidence": {
+      "test": ".tmp/ginger-beer-final-e2e-check/aggregation-gap.test.ts",
+      "resolveRecipeLineOperationalCost": "4.86 PASS",
+      "ingredientLineCostEur_enriched": "null PASS",
+      "computeRecipeLineCostEur": "null PASS",
+      "harnessExpected": "null PASS"
+    },
+    "liveAuditRerun": {
+      "attempted": true,
+      "status": "crash",
+      "reason": "import.meta.env undefined in child modules when trigger logging enabled; pre-existing tsx shim gap"
+    }
+  },
+  "phase5_classification": {
+    "A_implementationNotExecutedByReplay": true,
+    "B_staleVLData": false,
+    "C_outdatedReplayScript": false,
+    "D_realRecipeCostBug": true,
+    "E_certificationHarnessBug": true,
+    "selected": "A",
+    "rationale": "Part 2 fix is correct and live VL inputs match unit tests, but bridge runs only inside resolveRecipeLineOperationalCost. E2E engine total and list-card summary call computeRecipeLineCostEur on enriched ml fields, so Ginger Beer is excluded (€2.33 vs €7.19). Harness also marks line FAIL by comparing actual bridged cost to expected unbridged cost."
+  },
+  "phase6_foundation": {
+    "gingerAloneWouldUnblock12of12": false,
+    "reason": "Even with line-level €4.86, E2E recipe PASS requires engine total = sum of lines; computeRecipeTotalCostEur must also apply bridge. Prosciutto/history blockers remain for full foundation green.",
+    "foundationGreenIfGingerFullyFixed": "NO — partial; recipe costing pillar could reach 12/12 but foundation has separate Prosciutto blocker and sync artifacts"
+  },
+  "parentReturn": {
+    "rootCause": "A",
+    "functionOrFile": "computeRecipeLineCostEur in src/lib/recipe-prep-cost.ts (aggregation bypasses recipeLineCostFieldsWhenInvoiceVolumeOverCatalogCountable in resolve-operational-ingredient-cost.ts)",
+    "implementationCorrect": "Partial — Yes for resolveRecipeLineOperationalCost; No for end-to-end recipe totals",
+    "replayWrong": "Yes — harness expectedLineCost uses resolved.fields without bridge; engine path bypasses bridge",
+    "vlDataStale": "No",
+    "gingerBeerReallyStillFails": "Yes at E2E certification bar; No at line level via resolveRecipeLineOperationalCost",
+    "foundationGreenIfResolved": "No",
+    "confidence": 94
+  }
+}

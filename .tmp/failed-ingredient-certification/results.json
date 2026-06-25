@@ -1,0 +1,638 @@
+{
+  "generatedAt": "2026-06-25T13:50:02.500Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "scope": {
+    "targetIngredients": [
+      "aceto balsamico",
+      "pellegrino",
+      "ginger beer",
+      "ovo classe",
+      "peroni",
+      "prosciutto cotto",
+      "tomilho"
+    ],
+    "audited": 7
+  },
+  "summary": {
+    "foundationFailed": 7,
+    "reEvaluated": 7,
+    "genuineBugs": 4,
+    "falseFailures": 3,
+    "revisedFoundationTotals": {
+      "certified": 4,
+      "conditional": 32,
+      "failed": 4,
+      "totalAudited": 40
+    },
+    "revisedConfidence": 69,
+    "byStatus": {
+      "green": 0,
+      "yellow": 7,
+      "red": 0
+    }
+  },
+  "ingredients": [
+    {
+      "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4",
+      "ingredientName": "Aceto balsamico di modena IGP",
+      "foundationStatus": "failed",
+      "reEvalStatus": "conditional",
+      "statusIcon": "🟡",
+      "rootCause": "B",
+      "realBug": true,
+      "falseFailure": false,
+      "smallestAction": "Re-extract with discount-aware monetary binding (gross+discount_pct→net unit)",
+      "foundationFailures": [
+        "catalog purchase_quantity 2 ≠ computed 10000",
+        "latest history op 0.001609 ≠ catalog op 8.045",
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "line op 0.001609 ≠ catalog op 8.045",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "checks": {
+        "pdfGroundTruth": "PARTIAL",
+        "ocrPipeline": "PARTIAL",
+        "persistedInvoiceItems": "PASS",
+        "procurementMathematics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "checkNotes": {
+        "pdfGroundTruth": "PDF 1×18.929=16.09; persisted 1×16.09=16.09",
+        "ocrPipeline": "unit_price 16.09 ≠ PDF net 18.929 (total correct — discount/binding issue)",
+        "procurementMathematics": "1×16.09=16.09 vs total 16.09",
+        "operationalNormalization": "op 0.001609 from 16.09/10000 ml",
+        "ingredientCatalog": "expected pack qty 2 un; catalog 2 un; preferPack=true",
+        "priceHistory": "history op 0.001609 = line op 0.001609",
+        "matching": "persisted=confirmed; virtual=suggested (read-cutover gap — not economic failure)",
+        "validation": "clean",
+        "uiConsistency": "catalog op 8.045 differs from line op 0.001609 by design (pack catalog semantics)"
+      },
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "c181f493-473e-4467-845c-d4c1bfd889ee",
+          "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 16.09,
+          "total": 16.09
+        },
+        "catalog": {
+          "current_price": 16.09,
+          "purchase_quantity": 2,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "expectedProcurement": {
+          "current_price": 16.09,
+          "purchase_quantity": 2,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 16.09,
+            "purchase_quantity": 10000,
+            "cost_base_unit": "ml"
+          },
+          "computedOp": 0.001609,
+          "structured": "multi_unit_pack"
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested"
+        },
+        "historyCount": 1,
+        "latestHistNewPrice": 0.001609,
+        "presentation": {
+          "purchaseQuantityLine": "1 un · 2 × 5 L",
+          "purchasePriceLine": "€16.09 / unit",
+          "normalizedLine": "10 L usable",
+          "usableCostLine": "€1.61 / L"
+        }
+      }
+    },
+    {
+      "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+      "ingredientName": "Água san pellegrino",
+      "foundationStatus": "failed",
+      "reEvalStatus": "conditional",
+      "statusIcon": "🟡",
+      "rootCause": "F",
+      "realBug": false,
+      "falseFailure": true,
+      "smallestAction": "Enable VITE_MATCH_LIFECYCLE_READ_CUTOVER (read-path only)",
+      "foundationFailures": [
+        "catalog purchase_quantity 15 ≠ computed 11250",
+        "latest history op 0.0017137777777777778 ≠ catalog op 1.2853333333333334",
+        "history delta math invalid for row 4a00605a-a9e7-4b93-969b-92e5aae8e714",
+        "persisted confirmed; virtual=unmatched (alias/read-cutover gap)",
+        "line op 0.0017137777777777778 ≠ catalog op 1.2853333333333334",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "checks": {
+        "pdfGroundTruth": "PARTIAL",
+        "ocrPipeline": "PARTIAL",
+        "persistedInvoiceItems": "PASS",
+        "procurementMathematics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "checkNotes": {
+        "pdfGroundTruth": "PDF 2.56×15.06=38.56; persisted 2×19.28=38.56",
+        "ocrPipeline": "unit_price 19.28 ≠ PDF net 15.06 (total correct — discount/binding issue)",
+        "procurementMathematics": "2×19.28=38.56 vs total 38.56",
+        "operationalNormalization": "op 0.0017137777777777778 from 19.28/11250 ml",
+        "ingredientCatalog": "expected pack qty 15 un; catalog 15 un; preferPack=true",
+        "priceHistory": "history op 0.0017137777777777778 = line op 0.0017137777777777778",
+        "matching": "persisted=confirmed; virtual=unmatched (read-cutover gap — not economic failure)",
+        "validation": "clean",
+        "uiConsistency": "catalog op 1.2853333333333334 differs from line op 0.0017137777777777778 by design (pack catalog semantics)"
+      },
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "7b893edb-6cf9-4650-983c-e95268bea65b",
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 19.28,
+          "total": 38.56
+        },
+        "catalog": {
+          "current_price": 19.28,
+          "purchase_quantity": 15,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "expectedProcurement": {
+          "current_price": 19.28,
+          "purchase_quantity": 15,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 19.28,
+            "purchase_quantity": 11250,
+            "cost_base_unit": "ml"
+          },
+          "computedOp": 0.0017137777777777778,
+          "structured": "multi_unit_pack"
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "unmatched"
+        },
+        "historyCount": 2,
+        "latestHistNewPrice": 0.0017137777777777778,
+        "presentation": {
+          "purchaseQuantityLine": "2 un · 15 × 75 cl",
+          "purchasePriceLine": "€19.28 / case · €38.56 total",
+          "normalizedLine": "22.5 L usable",
+          "usableCostLine": "€1.71 / L"
+        }
+      }
+    },
+    {
+      "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+      "ingredientName": "Ginger beer",
+      "foundationStatus": "failed",
+      "reEvalStatus": "conditional",
+      "statusIcon": "🟡",
+      "rootCause": "F",
+      "realBug": false,
+      "falseFailure": true,
+      "smallestAction": "Enable VITE_MATCH_LIFECYCLE_READ_CUTOVER (read-path only)",
+      "foundationFailures": [
+        "catalog purchase_quantity 24 ≠ computed 200",
+        "latest history op 0.004050000000000001 ≠ catalog op 0.03375",
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "checks": {
+        "pdfGroundTruth": "PARTIAL",
+        "ocrPipeline": "PARTIAL",
+        "persistedInvoiceItems": "PASS",
+        "procurementMathematics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "checkNotes": {
+        "pdfGroundTruth": "PDF 2×9.69=19.38; persisted 24×0.81=19.38",
+        "ocrPipeline": "unit_price 0.81 ≠ PDF net 9.69 (total correct — discount/binding issue)",
+        "procurementMathematics": "24×0.81=19.44 vs total 19.38",
+        "operationalNormalization": "op 0.004050000000000001 from 0.81/200 ml",
+        "ingredientCatalog": "expected pack qty 24 un; catalog 24 un; preferPack=true",
+        "priceHistory": "history op 0.004050000000000001 = line op 0.004050000000000001",
+        "matching": "persisted=confirmed; virtual=suggested (read-cutover gap — not economic failure)",
+        "validation": "clean"
+      },
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "de0946a9-b7e4-467b-ae21-8b0401fcb363",
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 0.81,
+          "total": 19.38
+        },
+        "catalog": {
+          "current_price": 0.81,
+          "purchase_quantity": 24,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "expectedProcurement": {
+          "current_price": 0.81,
+          "purchase_quantity": 24,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 0.81,
+            "purchase_quantity": 200,
+            "cost_base_unit": "ml"
+          },
+          "computedOp": 0.004050000000000001,
+          "structured": "weight_or_volume"
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested"
+        },
+        "historyCount": 1,
+        "latestHistNewPrice": 0.004050000000000001,
+        "presentation": {
+          "purchaseQuantityLine": "24 un",
+          "purchasePriceLine": "€0.81 / unit · €19.38 total",
+          "normalizedLine": "4.8 L usable",
+          "usableCostLine": "€4.05 / L"
+        }
+      }
+    },
+    {
+      "ingredientId": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+      "ingredientName": "Ovo classe M",
+      "foundationStatus": "failed",
+      "reEvalStatus": "conditional",
+      "statusIcon": "🟡",
+      "rootCause": "E",
+      "realBug": true,
+      "falseFailure": false,
+      "smallestAction": "Re-sync price_history new_price to line operational cost",
+      "foundationFailures": [
+        "catalog purchase_quantity 1 ≠ computed 180",
+        "persisted confirmed; virtual=unmatched (alias/read-cutover gap)",
+        "line op 0.21355555555555555 ≠ catalog op 38.44",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "checks": {
+        "pdfGroundTruth": "PASS",
+        "ocrPipeline": "PASS",
+        "persistedInvoiceItems": "PASS",
+        "procurementMathematics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PARTIAL",
+        "priceHistory": "FAIL",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "checkNotes": {
+        "pdfGroundTruth": "PDF 1×38.44=38.44; persisted 1×38.44=38.44",
+        "procurementMathematics": "1×38.44=38.44 vs total 38.44",
+        "operationalNormalization": "op 0.21355555555555555 from 38.44/180 un",
+        "ingredientCatalog": "expected pack qty 180 un; catalog 1 un; preferPack=true",
+        "priceHistory": "history op 38.44 ≠ line op 0.21355555555555555",
+        "matching": "persisted=confirmed; virtual=unmatched (read-cutover gap — not economic failure)",
+        "validation": "clean",
+        "uiConsistency": "catalog op 38.44 differs from line op 0.21355555555555555 by design (pack catalog semantics)"
+      },
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+          "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+          "quantity": 1,
+          "unit": "cx",
+          "unit_price": 38.44,
+          "total": 38.44
+        },
+        "catalog": {
+          "current_price": 38.44,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "expectedProcurement": {
+          "current_price": 38.44,
+          "purchase_quantity": 180,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 38.44,
+            "purchase_quantity": 180,
+            "cost_base_unit": "un"
+          },
+          "computedOp": 0.21355555555555555,
+          "structured": "multi_unit_pack"
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "unmatched"
+        },
+        "historyCount": 1,
+        "latestHistNewPrice": 38.44,
+        "presentation": {
+          "purchaseQuantityLine": "1 case",
+          "purchasePriceLine": "€38.44 / case",
+          "normalizedLine": "180 un usable",
+          "usableCostLine": "€0.2136 / egg"
+        }
+      }
+    },
+    {
+      "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b",
+      "ingredientName": "Peroni nastro azzurro 33cl",
+      "foundationStatus": "failed",
+      "reEvalStatus": "conditional",
+      "statusIcon": "🟡",
+      "rootCause": "F",
+      "realBug": false,
+      "falseFailure": true,
+      "smallestAction": "Enable VITE_MATCH_LIFECYCLE_READ_CUTOVER (read-path only)",
+      "foundationFailures": [
+        "catalog purchase_quantity 24 ≠ computed 7920",
+        "latest history op 0.0001351010101010101 ≠ catalog op 0.044583333333333336",
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "checks": {
+        "pdfGroundTruth": "PARTIAL",
+        "ocrPipeline": "PARTIAL",
+        "persistedInvoiceItems": "PASS",
+        "procurementMathematics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "checkNotes": {
+        "pdfGroundTruth": "PDF 24×1.529=25.69; persisted 24×1.07=25.69",
+        "ocrPipeline": "unit_price 1.07 ≠ PDF net 1.529 (total correct — discount/binding issue)",
+        "procurementMathematics": "24×1.07=25.68 vs total 25.69",
+        "operationalNormalization": "op 0.0001351010101010101 from 1.07/7920 ml",
+        "ingredientCatalog": "expected pack qty 24 un; catalog 24 un; preferPack=true",
+        "priceHistory": "history op 0.0001351010101010101 = line op 0.0001351010101010101",
+        "matching": "persisted=confirmed; virtual=suggested (read-cutover gap — not economic failure)",
+        "validation": "clean"
+      },
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "eb0bc20a-42b3-40c8-98bc-87db12f00809",
+          "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 1.07,
+          "total": 25.69
+        },
+        "catalog": {
+          "current_price": 1.07,
+          "purchase_quantity": 24,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "expectedProcurement": {
+          "current_price": 1.07,
+          "purchase_quantity": 24,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "includeCatalogUnitFields": true
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 1.07,
+            "purchase_quantity": 7920,
+            "cost_base_unit": "ml"
+          },
+          "computedOp": 0.0001351010101010101,
+          "structured": "multi_unit_pack"
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested"
+        },
+        "historyCount": 1,
+        "latestHistNewPrice": 0.0001351010101010101,
+        "presentation": {
+          "purchaseQuantityLine": "24 un · 24 × 33 cl",
+          "purchasePriceLine": "€1.07 / bottle · €25.69 total",
+          "normalizedLine": "7.92 L usable",
+          "usableCostLine": "€3.24 / L"
+        }
+      }
+    },
+    {
+      "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+      "ingredientName": "Prosciutto cotto scelto",
+      "foundationStatus": "failed",
+      "reEvalStatus": "conditional",
+      "statusIcon": "🟡",
+      "rootCause": "F",
+      "realBug": true,
+      "falseFailure": false,
+      "smallestAction": "Confirm match before writing price_history; purge orphan history row",
+      "foundationFailures": [
+        "price_history row from unconfirmed suggested match",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "checks": {
+        "pdfGroundTruth": "PASS",
+        "ocrPipeline": "PASS",
+        "persistedInvoiceItems": "PASS",
+        "procurementMathematics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "FAIL",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "checkNotes": {
+        "pdfGroundTruth": "PDF 4.3×8.5=36.54; persisted 4.3×8.5=36.54",
+        "procurementMathematics": "4.3×8.5=36.55 vs total 36.54",
+        "operationalNormalization": "op 0.0085 from 8.5/1000 g",
+        "ingredientCatalog": "expected pack qty 1000 g; catalog 1000 g; preferPack=false",
+        "priceHistory": "history from unconfirmed suggested match",
+        "validation": "SUGGESTED_INGREDIENT_MATCH"
+      },
+      "validationCodes": [
+        "SUGGESTED_INGREDIENT_MATCH"
+      ],
+      "evidence": {
+        "line": {
+          "id": "16435f8f-0fdc-4598-a9a9-f6b2713a7d86",
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 8.5,
+          "total": 36.54
+        },
+        "catalog": {
+          "current_price": 8.5,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "expectedProcurement": {
+          "current_price": 8.5,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g",
+          "unit": "g",
+          "includeCatalogUnitFields": false
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 8.5,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.0085,
+          "structured": "weight_or_volume"
+        },
+        "matching": {
+          "persisted": "suggested",
+          "virtual": "suggested"
+        },
+        "historyCount": 1,
+        "latestHistNewPrice": 0.0085,
+        "presentation": {
+          "purchaseQuantityLine": "4.30 kg",
+          "purchasePriceLine": "€8.50 / kg · €36.54 total",
+          "normalizedLine": "4.5 kg usable",
+          "usableCostLine": "€8.50 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041",
+      "ingredientName": "Tomilho",
+      "foundationStatus": "failed",
+      "reEvalStatus": "conditional",
+      "statusIcon": "🟡",
+      "rootCause": "E",
+      "realBug": true,
+      "falseFailure": false,
+      "smallestAction": "Re-sync price_history new_price to line operational cost",
+      "foundationFailures": [
+        "catalog purchase_quantity 1 ≠ computed 100",
+        "line op 0.0206 ≠ catalog op 2.06",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "checks": {
+        "pdfGroundTruth": "PASS",
+        "ocrPipeline": "PASS",
+        "persistedInvoiceItems": "PASS",
+        "procurementMathematics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PARTIAL",
+        "priceHistory": "FAIL",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "checkNotes": {
+        "pdfGroundTruth": "PDF 1×2.06=2.06; persisted 1×2.06=2.06",
+        "procurementMathematics": "1×2.06=2.06 vs total 2.06",
+        "operationalNormalization": "op 0.0206 from 2.06/100 g",
+        "ingredientCatalog": "expected pack qty 100 g; catalog 1 un; preferPack=false",
+        "priceHistory": "history op 2.06 ≠ line op 0.0206",
+        "validation": "clean"
+      },
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "f2d094ab-f50a-483d-b6cb-76554d5bf195",
+          "name": "Tomilho",
+          "quantity": 1,
+          "unit": "mo",
+          "unit_price": 2.06,
+          "total": 2.06
+        },
+        "catalog": {
+          "current_price": 2.06,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "expectedProcurement": {
+          "current_price": 2.06,
+          "purchase_quantity": 100,
+          "purchase_unit": "g",
+          "base_unit": "g",
+          "unit": "g",
+          "includeCatalogUnitFields": false
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 2.06,
+            "purchase_quantity": 100,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.0206,
+          "structured": "inferred"
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed"
+        },
+        "historyCount": 1,
+        "latestHistNewPrice": 2.06,
+        "presentation": {
+          "purchaseQuantityLine": "1 bunch",
+          "purchasePriceLine": "€2.06 / bunch",
+          "normalizedLine": "100 g usable",
+          "usableCostLine": "€20.60 / kg"
+        }
+      }
+    }
+  ]
+}

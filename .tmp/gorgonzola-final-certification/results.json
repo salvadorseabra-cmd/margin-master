@@ -1,0 +1,262 @@
+{
+  "queriedAt": "2026-06-25T11:29:18.402Z",
+  "vl": "bjhnlrgodcqoyzddbpbd",
+  "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+  "targetItemId": "5fab58a8-8cfc-4625-ab97-e956d07aade9",
+  "itemsErr": null,
+  "pdfGroundTruth": {
+    "product": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelregio 1/8 ~1,5kg",
+    "qty": 1.35,
+    "unit": "kg",
+    "grossUnitPrice": 12.9,
+    "discountPct": 22.85,
+    "netUnitPrice": 9.95,
+    "total": 13.44
+  },
+  "gorgonzolaItems": [
+    {
+      "id": "5fab58a8-8cfc-4625-ab97-e956d07aade9",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.35,
+      "unit": "kg",
+      "unit_price": 9.95,
+      "total": 13.44,
+      "created_at": "2026-06-25T01:55:43.273848+00:00",
+      "updated_at": "2026-06-25T01:55:43.273848+00:00"
+    }
+  ],
+  "currentItem": {
+    "id": "5fab58a8-8cfc-4625-ab97-e956d07aade9",
+    "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+    "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+    "quantity": 1.35,
+    "unit": "kg",
+    "unit_price": 9.95,
+    "total": 13.44,
+    "created_at": "2026-06-25T01:55:43.273848+00:00",
+    "updated_at": "2026-06-25T01:55:43.273848+00:00"
+  },
+  "match": {
+    "invoice_item_id": "5fab58a8-8cfc-4625-ab97-e956d07aade9",
+    "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+    "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+    "ingredient_id": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+    "status": "confirmed",
+    "match_kind": "confirmed-override",
+    "confirmed_at": "2026-06-25T01:55:47.601+00:00",
+    "corrected_at": null,
+    "previous_ingredient_id": null,
+    "pack_variant_id": null,
+    "created_at": "2026-06-25T01:55:47.635374+00:00",
+    "updated_at": "2026-06-25T01:55:47.635374+00:00"
+  },
+  "allMatches": [
+    {
+      "invoice_item_id": "5fab58a8-8cfc-4625-ab97-e956d07aade9",
+      "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "ingredient_id": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+      "status": "confirmed",
+      "match_kind": "confirmed-override",
+      "confirmed_at": "2026-06-25T01:55:47.601+00:00",
+      "corrected_at": null,
+      "previous_ingredient_id": null,
+      "pack_variant_id": null,
+      "created_at": "2026-06-25T01:55:47.635374+00:00",
+      "updated_at": "2026-06-25T01:55:47.635374+00:00"
+    }
+  ],
+  "catalogIngredient": {
+    "id": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+    "user_id": "acfb54e5-785f-4bc8-b47b-3914452e18a5",
+    "name": "Gorgonzola DOP dolce",
+    "unit": "g",
+    "current_price": 9.95,
+    "supplier": null,
+    "created_at": "2026-06-15T17:49:59.870301+00:00",
+    "updated_at": "2026-06-25T01:55:44.434203+00:00",
+    "normalized_name": "gorgonzola dop dolce",
+    "purchase_quantity": 1000,
+    "purchase_unit": "g",
+    "base_unit": "g",
+    "canonical_name": null,
+    "is_archived": false,
+    "merged_into_ingredient_id": null,
+    "merged_at": null,
+    "ingredient_kind": "canonical",
+    "archived_at": null,
+    "density_g_per_ml": null
+  },
+  "priceHistory": [
+    {
+      "id": "d94a0f16-8696-4457-a42f-85ac05b417bc",
+      "ingredient_id": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+      "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "ingredient_name": "Gorgonzola DOP dolce",
+      "supplier_name": "Emporio Italia",
+      "ingredient_unit": "g",
+      "previous_price": null,
+      "new_price": 0.009949999999999999,
+      "delta": null,
+      "delta_percent": null,
+      "created_at": "2026-05-19T12:00:00+00:00"
+    }
+  ],
+  "aliases": [
+    {
+      "id": "f9025687-48cb-4c30-ba40-3dbc29d92674",
+      "ingredient_id": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+      "alias_name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "normalized_alias": "arrigoni formaggi gorgonzoladop dolce linea castelfrigo",
+      "supplier_name": "Emporio Italia",
+      "confidence": 10,
+      "confirmed_by_user": true,
+      "created_at": "2026-06-15T17:50:00.226433+00:00"
+    }
+  ],
+  "pipeline": {
+    "pdfBound": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.35,
+      "unit": "kg",
+      "gross_unit_price": 12.9,
+      "discount_pct": 22.85,
+      "line_total_net": 13.44,
+      "unit_price": 9.95,
+      "total": 13.44
+    },
+    "dbBound": {
+      "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "quantity": 1.35,
+      "unit": "kg",
+      "gross_unit_price": null,
+      "discount_pct": null,
+      "line_total_net": 13.44,
+      "unit_price": 9.95,
+      "total": 13.44
+    }
+  },
+  "economics": {
+    "presentation": {
+      "card": {
+        "purchaseQuantityLine": "1.35 kg",
+        "purchasePriceLine": "€9.95 / kg · €13.43 total",
+        "normalizedLine": "1.5 kg usable",
+        "usableCostLine": "€9.95 / kg"
+      },
+      "blocks": [
+        {
+          "id": "purchase",
+          "title": "Purchase",
+          "lines": [
+            {
+              "text": "1.35 kg",
+              "variant": "default"
+            },
+            {
+              "text": "€9.95 / kg · €13.43 total",
+              "variant": "secondary"
+            }
+          ]
+        },
+        {
+          "id": "normalized",
+          "title": "Normalized",
+          "lines": [
+            {
+              "text": "1.5 kg usable",
+              "variant": "default"
+            }
+          ]
+        },
+        {
+          "id": "recipe-cost",
+          "title": "Normalized",
+          "lines": [
+            {
+              "text": "€9.95 / kg",
+              "variant": "emphasis"
+            }
+          ]
+        }
+      ],
+      "badges": [],
+      "insights": [],
+      "priceLabel": "Purchase price",
+      "priceDisplay": "€9.95 / kg",
+      "purchasedPackDetail": null,
+      "usableStockLabel": "1.5 kg usable",
+      "effectiveUsableCostLabel": "€9.95 / kg"
+    },
+    "operational": null,
+    "structure": {
+      "purchaseQuantity": 1,
+      "purchaseFormat": "unit",
+      "unitSize": 1.5,
+      "unitMeasurement": "kg",
+      "totalUsableAmount": 1500,
+      "usableUnit": "g",
+      "matchedText": "1,5kg",
+      "tier": "bare_measure"
+    },
+    "catalogFields": {
+      "current_price": 9.95,
+      "purchase_quantity": 1000,
+      "cost_base_unit": "g"
+    },
+    "recipeFields": {
+      "current_price": 9.95,
+      "purchase_quantity": 1000,
+      "cost_base_unit": "g"
+    },
+    "lastPurchase": null,
+    "purchaseQtyLabel": "1.35 kg"
+  },
+  "validation": [
+    {
+      "invoiceItemId": "5fab58a8-8cfc-4625-ab97-e956d07aade9",
+      "severity": "warning",
+      "category": "matching",
+      "code": "UNMATCHED_INGREDIENT",
+      "title": "Unmatched ingredient",
+      "suggestedAction": "Match or create a canonical ingredient.",
+      "description": "This line is not linked to a catalog ingredient.",
+      "evidence": {
+        "field": "ingredient",
+        "expected": {
+          "value": "catalog match",
+          "label": "Linked ingredient"
+        },
+        "extra": {
+          "item_name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg"
+        }
+      },
+      "id": "5fab58a8-8cfc-4625-ab97-e956d07aade9:UNMATCHED_INGREDIENT:ingredient"
+    }
+  ],
+  "rowMatch": {
+    "match": null,
+    "state": {
+      "match": null,
+      "displayState": "unmatched",
+      "possibleMatch": null,
+      "confirmedMatch": false,
+      "unmatched": true,
+      "showMatchTargetLine": false,
+      "badgeLabel": null
+    }
+  },
+  "checks": {
+    "qtyMatchPdf": true,
+    "priceMatchPdf": true,
+    "totalMatchPdf": true,
+    "mathReconciles": true,
+    "catalogPriceSync": true,
+    "recipeMatchesCatalog": true,
+    "historyLatestPrice": 0.009949999999999999,
+    "historyLatestInvoice": "ab52796d-de1d-418d-86e7-230c8f056f09"
+  }
+}

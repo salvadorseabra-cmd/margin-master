@@ -1,0 +1,537 @@
+{
+  "generatedAt": "2026-06-25T14:25:59.343Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "mode": "read-only",
+  "envFlags": {
+    "READ_CUTOVER": false,
+    "DUAL_WRITE": true,
+    "SHADOW_SEED": true,
+    "EXTRACT_GATE": true,
+    "ALIAS_AUTO_CONFIRM": true,
+    "note": "Local process env — VL browser may differ (prior audits: DUAL_WRITE+SHADOW_SEED on, READ_CUTOVER off)"
+  },
+  "platform": {
+    "invoiceItems": 52,
+    "matchRecords": 52,
+    "coveragePct": 100,
+    "matchStatusCounts": {
+      "confirmed": 49,
+      "suggested": 1,
+      "unmatched": 2
+    },
+    "confirmedAliases": 69,
+    "aliasMapKeys": 66,
+    "drift": {
+      "totalMatches": 52,
+      "virtualAligned": 51,
+      "virtualVsPersistedDrift": 1,
+      "virtualAlignedPct": 98.1,
+      "cutoverAligned": 52,
+      "cutoverVsPersistedDrift": 0,
+      "cutoverAlignedPct": 100,
+      "confirmedTotal": 49,
+      "confirmedVirtualMiss": 0,
+      "confirmedCutoverAligned": 49,
+      "confirmedCutoverAlignedPct": 100,
+      "driftSamples": [
+        {
+          "itemId": "16435f8f-0fdc-4598-a9a9-f6b2713a7d86",
+          "lineName": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+          "persisted": {
+            "displayState": "suggested",
+            "kind": "semantic",
+            "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92"
+          },
+          "virtual": {
+            "displayState": "confirmed",
+            "kind": "confirmed-alias",
+            "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92"
+          },
+          "cutover": {
+            "displayState": "suggested",
+            "kind": "semantic",
+            "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92"
+          }
+        }
+      ]
+    }
+  },
+  "keyCases": [
+    {
+      "key": "gorgonzola",
+      "ingredientId": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+      "ingredientName": "Gorgonzola DOP dolce",
+      "line": {
+        "id": "5fab58a8-8cfc-4625-ab97-e956d07aade9",
+        "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+        "quantity": 1.35,
+        "unit": "kg",
+        "unit_price": 9.95,
+        "total": 13.44,
+        "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "supplier": "Emporio Italia",
+        "matchStatus": "confirmed",
+        "matchKind": "confirmed-override"
+      },
+      "aliases": [
+        {
+          "alias_name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "normalized_alias": "arrigoni formaggi gorgonzoladop dolce linea castelfrigo",
+          "supplier_name": "Emporio Italia",
+          "confirmed_by_user": true,
+          "created_at": "2026-06-15T17:50:00.226433+00:00"
+        }
+      ],
+      "paths": {
+        "virtual": {
+          "displayState": "confirmed",
+          "kind": "confirmed-alias",
+          "ingredientId": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed"
+        },
+        "cutover": {
+          "displayState": "confirmed",
+          "kind": "confirmed-override",
+          "ingredientId": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed"
+        },
+        "persisted": {
+          "displayState": "confirmed",
+          "kind": "confirmed-override",
+          "ingredientId": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed"
+        }
+      },
+      "validationVirtual": [],
+      "validationCutover": [],
+      "validationPersisted": [],
+      "extractGateWouldSync": true,
+      "score": "green",
+      "notes": []
+    },
+    {
+      "key": "guanciale",
+      "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6",
+      "ingredientName": "Guanciale stagionato",
+      "line": {
+        "id": "48443ad1-7303-4560-b6eb-85a77e559400",
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
+        "unit": "un",
+        "unit_price": 10.83,
+        "total": 64.93,
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "supplier": "Mammafiore Portugal",
+        "matchStatus": "confirmed",
+        "matchKind": "confirmed-override"
+      },
+      "aliases": [
+        {
+          "alias_name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+          "normalized_alias": "guanciale di suino stagionato sorrentino",
+          "supplier_name": "Mammafiore Portugal",
+          "confirmed_by_user": true,
+          "created_at": "2026-06-15T18:18:54.430135+00:00"
+        }
+      ],
+      "paths": {
+        "virtual": {
+          "displayState": "confirmed",
+          "kind": "confirmed-alias",
+          "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6"
+        },
+        "cutover": {
+          "displayState": "confirmed",
+          "kind": "confirmed-override",
+          "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6"
+        },
+        "persisted": {
+          "displayState": "confirmed",
+          "kind": "confirmed-override",
+          "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6"
+        }
+      },
+      "validationVirtual": [],
+      "validationCutover": [],
+      "validationPersisted": [],
+      "extractGateWouldSync": true,
+      "score": "green",
+      "notes": []
+    },
+    {
+      "key": "aceto",
+      "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4",
+      "ingredientName": "Aceto balsamico di modena IGP",
+      "line": {
+        "id": "c181f493-473e-4467-845c-d4c1bfd889ee",
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 16.09,
+        "total": 16.09,
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "supplier": "Mammafiore Portugal",
+        "matchStatus": "confirmed",
+        "matchKind": "confirmed-override"
+      },
+      "aliases": [
+        {
+          "alias_name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+          "normalized_alias": "aceto balsamico di modenaigppet toschi",
+          "supplier_name": "Mammafiore Portugal",
+          "confirmed_by_user": true,
+          "created_at": "2026-06-15T18:19:07.40112+00:00"
+        }
+      ],
+      "paths": {
+        "virtual": {
+          "displayState": "confirmed",
+          "kind": "confirmed-alias",
+          "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4"
+        },
+        "cutover": {
+          "displayState": "confirmed",
+          "kind": "confirmed-override",
+          "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4"
+        },
+        "persisted": {
+          "displayState": "confirmed",
+          "kind": "confirmed-override",
+          "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4"
+        }
+      },
+      "validationVirtual": [],
+      "validationCutover": [],
+      "validationPersisted": [],
+      "extractGateWouldSync": true,
+      "score": "green",
+      "notes": []
+    },
+    {
+      "key": "prosciutto",
+      "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+      "ingredientName": "Prosciutto cotto scelto",
+      "line": {
+        "id": "16435f8f-0fdc-4598-a9a9-f6b2713a7d86",
+        "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+        "quantity": 4.3,
+        "unit": "kg",
+        "unit_price": 8.5,
+        "total": 36.54,
+        "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "supplier": "Emporio Italia",
+        "matchStatus": "suggested",
+        "matchKind": "semantic"
+      },
+      "aliases": [
+        {
+          "alias_name": "Assaporami Prosciutto Cotto Scelto HC 4,3-4,5Kg",
+          "normalized_alias": "assaporami prosciutto cotto sceltohc",
+          "supplier_name": "Emporio Italia",
+          "confirmed_by_user": true,
+          "created_at": "2026-06-15T17:50:04.07604+00:00"
+        }
+      ],
+      "paths": {
+        "virtual": {
+          "displayState": "confirmed",
+          "kind": "confirmed-alias",
+          "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92"
+        },
+        "cutover": {
+          "displayState": "suggested",
+          "kind": "semantic",
+          "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92"
+        },
+        "persisted": {
+          "displayState": "suggested",
+          "kind": "semantic",
+          "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92"
+        }
+      },
+      "validationVirtual": [],
+      "validationCutover": [
+        "SUGGESTED_INGREDIENT_MATCH"
+      ],
+      "validationPersisted": [
+        "SUGGESTED_INGREDIENT_MATCH"
+      ],
+      "extractGateWouldSync": true,
+      "score": "yellow",
+      "notes": [
+        "persisted suggested — awaiting confirmation",
+        "architectural: extract wrote history before confirmation"
+      ]
+    },
+    {
+      "key": "peroni",
+      "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b",
+      "ingredientName": "Peroni nastro azzurro 33cl",
+      "line": {
+        "id": "eb0bc20a-42b3-40c8-98bc-87db12f00809",
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 1.07,
+        "total": 25.69,
+        "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "supplier": "Mammafiore Portugal",
+        "matchStatus": "confirmed",
+        "matchKind": "confirmed-override"
+      },
+      "aliases": [
+        {
+          "alias_name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "normalized_alias": "birra peroni nastro azzurropna azzurro 24",
+          "supplier_name": "Mammafiore Portugal",
+          "confirmed_by_user": true,
+          "created_at": "2026-06-15T18:19:03.50246+00:00"
+        }
+      ],
+      "paths": {
+        "virtual": {
+          "displayState": "confirmed",
+          "kind": "confirmed-alias",
+          "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b"
+        },
+        "cutover": {
+          "displayState": "confirmed",
+          "kind": "confirmed-override",
+          "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b"
+        },
+        "persisted": {
+          "displayState": "confirmed",
+          "kind": "confirmed-override",
+          "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b"
+        }
+      },
+      "validationVirtual": [],
+      "validationCutover": [],
+      "validationPersisted": [],
+      "extractGateWouldSync": true,
+      "score": "green",
+      "notes": []
+    },
+    {
+      "key": "mozzarella_fior",
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "ingredientName": "Mozzarella fior di latte",
+      "line": {
+        "id": "63958019-9af9-4738-bc13-404d27796b24",
+        "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "quantity": 10,
+        "unit": "un",
+        "unit_price": 8.12,
+        "total": 81.23,
+        "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "supplier": "Il Bocconcino Distribuição Alimentar",
+        "matchStatus": "confirmed",
+        "matchKind": "confirmed-override"
+      },
+      "aliases": [
+        {
+          "alias_name": "Mozzarella Fior di Latte 2Kg",
+          "normalized_alias": "mozzarella fior di latte",
+          "supplier_name": "AVILUDO",
+          "confirmed_by_user": true,
+          "created_at": "2026-06-08T23:08:43.263175+00:00"
+        },
+        {
+          "alias_name": "Mozzarella Flor di Latte 2Kg",
+          "normalized_alias": "mozzarella flor di latte",
+          "supplier_name": "AVILUDO",
+          "confirmed_by_user": true,
+          "created_at": "2026-06-09T13:22:34.833269+00:00"
+        },
+        {
+          "alias_name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+          "normalized_alias": "mozzarella fior di latte il bocconcino r 125",
+          "supplier_name": "IL BOCCONCINO Distribuição ALIMENTAR",
+          "confirmed_by_user": true,
+          "created_at": "2026-06-15T15:23:38.091035+00:00"
+        },
+        {
+          "alias_name": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+          "normalized_alias": "mozzarella fior di latte expet julienne simonetta",
+          "supplier_name": "Mammafiore Portugal",
+          "confirmed_by_user": true,
+          "created_at": "2026-06-15T15:27:51.061971+00:00"
+        }
+      ],
+      "paths": {
+        "virtual": {
+          "displayState": "confirmed",
+          "kind": "confirmed-alias",
+          "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d"
+        },
+        "cutover": {
+          "displayState": "confirmed",
+          "kind": "confirmed-override",
+          "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d"
+        },
+        "persisted": {
+          "displayState": "confirmed",
+          "kind": "confirmed-override",
+          "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d"
+        }
+      },
+      "validationVirtual": [],
+      "validationCutover": [],
+      "validationPersisted": [],
+      "extractGateWouldSync": true,
+      "score": "green",
+      "notes": []
+    },
+    {
+      "key": "ginger_beer",
+      "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+      "ingredientName": "Ginger beer",
+      "line": {
+        "id": "de0946a9-b7e4-467b-ae21-8b0401fcb363",
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 0.81,
+        "total": 19.38,
+        "invoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "supplier": "Emporio Italia",
+        "matchStatus": "confirmed",
+        "matchKind": "confirmed-override"
+      },
+      "aliases": [
+        {
+          "alias_name": "Baladin - Ginger Beer 0.20cl",
+          "normalized_alias": "baladin ginger beer",
+          "supplier_name": "Emporio Italia",
+          "confirmed_by_user": true,
+          "created_at": "2026-06-15T17:50:14.496995+00:00"
+        }
+      ],
+      "paths": {
+        "virtual": {
+          "displayState": "confirmed",
+          "kind": "confirmed-alias",
+          "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41"
+        },
+        "cutover": {
+          "displayState": "confirmed",
+          "kind": "confirmed-override",
+          "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41"
+        },
+        "persisted": {
+          "displayState": "confirmed",
+          "kind": "confirmed-override",
+          "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41"
+        }
+      },
+      "validationVirtual": [],
+      "validationCutover": [],
+      "validationPersisted": [],
+      "extractGateWouldSync": true,
+      "score": "green",
+      "notes": []
+    },
+    {
+      "key": "ovo",
+      "ingredientId": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+      "ingredientName": "Ovo classe M",
+      "line": {
+        "id": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+        "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 38.44,
+        "total": 38.44,
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "supplier": "Bidfood Portugal, SA",
+        "matchStatus": "confirmed",
+        "matchKind": "confirmed-alias"
+      },
+      "aliases": [
+        {
+          "alias_name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+          "normalized_alias": "ovo moreno classe m duzias cartao 15",
+          "supplier_name": "Bidfood Portugal",
+          "confirmed_by_user": true,
+          "created_at": "2026-06-15T14:00:25.977236+00:00"
+        }
+      ],
+      "paths": {
+        "virtual": {
+          "displayState": "confirmed",
+          "kind": "confirmed-alias",
+          "ingredientId": "9f167402-9ea8-4fac-92dc-2cb11a525359"
+        },
+        "cutover": {
+          "displayState": "confirmed",
+          "kind": "confirmed-alias",
+          "ingredientId": "9f167402-9ea8-4fac-92dc-2cb11a525359"
+        },
+        "persisted": {
+          "displayState": "confirmed",
+          "kind": "confirmed-alias",
+          "ingredientId": "9f167402-9ea8-4fac-92dc-2cb11a525359"
+        }
+      },
+      "validationVirtual": [],
+      "validationCutover": [],
+      "validationPersisted": [],
+      "extractGateWouldSync": true,
+      "score": "green",
+      "notes": []
+    },
+    {
+      "key": "tomilho",
+      "ingredientId": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041",
+      "ingredientName": "Tomilho",
+      "line": {
+        "id": "f2d094ab-f50a-483d-b6cb-76554d5bf195",
+        "name": "Tomilho",
+        "quantity": 1,
+        "unit": "mo",
+        "unit_price": 2.06,
+        "total": 2.06,
+        "invoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+        "supplier": "Bidfood Portugal, SA",
+        "matchStatus": "confirmed",
+        "matchKind": "confirmed-alias"
+      },
+      "aliases": [
+        {
+          "alias_name": "Tomilho",
+          "normalized_alias": "tomilho",
+          "supplier_name": "Bidfood Portugal",
+          "confirmed_by_user": true,
+          "created_at": "2026-06-15T14:00:29.901861+00:00"
+        }
+      ],
+      "paths": {
+        "virtual": {
+          "displayState": "confirmed",
+          "kind": "confirmed-alias",
+          "ingredientId": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041"
+        },
+        "cutover": {
+          "displayState": "confirmed",
+          "kind": "confirmed-alias",
+          "ingredientId": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041"
+        },
+        "persisted": {
+          "displayState": "confirmed",
+          "kind": "confirmed-alias",
+          "ingredientId": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041"
+        }
+      },
+      "validationVirtual": [],
+      "validationCutover": [],
+      "validationPersisted": [],
+      "extractGateWouldSync": true,
+      "score": "green",
+      "notes": []
+    }
+  ],
+  "certification": {
+    "decision": "conditional",
+    "singleSourceOfTruth": false,
+    "readCutoverEnableable": true,
+    "legacyRetirable": false,
+    "confidence": 82
+  }
+}

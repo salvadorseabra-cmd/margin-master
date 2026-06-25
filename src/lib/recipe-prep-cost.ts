@@ -129,7 +129,10 @@ export type RecipeIngredientLineForCost = {
   sub_recipe_id: string | null;
   quantity: number | null | undefined;
   unit?: string | null;
+  /** Display / operational overlay fields (invoice ml, catalog g, etc.). */
   ingredients?: IngredientCostFields | null;
+  /** Bridged fields for line costing when overlay unit ≠ recipe unit family. */
+  lineCostFields?: IngredientCostFields | null;
 };
 
 export type RecipeForPrepCost = PrepOutputFields & {
@@ -464,8 +467,9 @@ export function computeRecipeLineCostEur(
   const qty = safeQuantity(line.quantity);
 
   if (line.ingredient_id) {
-    if (!line.ingredients) return null;
-    return ingredientLineCostEur(qty, line.ingredients, { recipeUnit: line.unit });
+    const costFields = line.lineCostFields ?? line.ingredients;
+    if (!costFields) return null;
+    return ingredientLineCostEur(qty, costFields, { recipeUnit: line.unit });
   }
 
   if (line.sub_recipe_id) {

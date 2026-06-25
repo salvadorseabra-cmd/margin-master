@@ -19,6 +19,7 @@ import {
   enrichRecipeLinesForOperationalCost,
   resolveOperationalIngredientCostFields,
   resolveRecipeLineOperationalCost,
+  recipeLineCostFieldsForCosting,
 } from "../../src/lib/resolve-operational-ingredient-cost.ts";
 import {
   buildLinesByRecipeId,
@@ -425,8 +426,14 @@ for (const { recipe, rawLines, enrichedLines } of allEnrichedRecipes) {
         : null;
       detailOp = ing ? effectiveIngredientUnitCostEur(ing) : null;
 
-      // Expected: qty × op in compatible units via ingredientLineCostEur on resolved fields
-      expectedLineCost = ingredientLineCostEur(raw.quantity, resolved.fields, {
+      // Expected: same bridged fields as resolveRecipeLineOperationalCost → ingredientLineCostEur
+      const lineCostFields = recipeLineCostFieldsForCosting(
+        resolved.fields,
+        operationalCostById.get(ingId),
+        { recipeUnit: raw.unit, ingredientName: ingName },
+        resolved.source,
+      );
+      expectedLineCost = ingredientLineCostEur(raw.quantity, lineCostFields, {
         recipeUnit: raw.unit,
         ingredientName: ingName,
       });

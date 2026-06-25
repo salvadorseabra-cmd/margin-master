@@ -506,4 +506,24 @@ describe("computeRecipeLineCostEur", () => {
     );
     expect(cost).toBe(4);
   });
+
+  it("uses lineCostFields from enrichment when invoice volume overlays catalog countable", () => {
+    const path = new Set<string>();
+    const memo = new Map<string, number>();
+    const cost = computeRecipeLineCostEur(
+      {
+        ingredient_id: "ginger-beer",
+        sub_recipe_id: null,
+        quantity: 6,
+        unit: "un",
+        ingredients: { current_price: 0.81, purchase_quantity: 200, cost_base_unit: "ml" },
+        lineCostFields: { current_price: 0.81, purchase_quantity: 1, cost_base_unit: "un" },
+      },
+      new Map(),
+      new Map(),
+      path,
+      memo,
+    );
+    expect(cost).toBeCloseTo(4.86, 2);
+  });
 });

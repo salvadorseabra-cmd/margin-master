@@ -1,0 +1,997 @@
+{
+  "generatedAt": "2026-06-25T13:33:16.441Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "mode": "STRICT_READ_ONLY",
+  "certificationQuestion": "Is Ginger Beer a SECOND bug or another manifestation of the same architectural decision as Manjericão/Salada?",
+  "summary": {
+    "isSecondBug": true,
+    "isSecondBugLabel": "Yes — same recipe-resolution layer, different mechanism (invoice ml vs catalog un; NOT preferInvoiceCountableOverlayFields corruption)",
+    "sameArchitecturalDecision": true,
+    "architecturalDecision": "resolveOperationalIngredientCostFields always prefers invoice overlay price fields; mergeOperationalCostMetadata does not merge cost_base_unit from catalog; ingredientLineCostEur has no bridge when resolved base family ≠ recipe unit family",
+    "rootCause": "A",
+    "rootCauseLabel": "overlay priority (invoice ml wins over catalog un)",
+    "contributingCause": "B — missing ml→un countable bridge in ingredientLineCostEur",
+    "exactRootCause": "Invoice overlay cost_base_unit=ml (200 ml/bottle from 0.20cl parse) wins over catalog un (24-pack); preferInvoiceCountableOverlayFields correctly preserves ml; directCountableLineCostEur requires un base; no usable_volume_ml bridge for recipe 6 un",
+    "exactLocation": {
+      "primary": {
+        "function": "resolveOperationalIngredientCostFields",
+        "file": "src/lib/resolve-operational-ingredient-cost.ts",
+        "lines": "242-250",
+        "detail": "Invoice overlay selected unconditionally when present"
+      },
+      "secondary": [
+        {
+          "function": "mergeOperationalCostMetadata",
+          "file": "src/lib/resolve-operational-ingredient-cost.ts",
+          "lines": "184-214",
+          "detail": "Does not merge catalog cost_base_unit when invoice disagrees"
+        },
+        {
+          "function": "directCountableLineCostEur",
+          "file": "src/lib/usable-unit-conversion.ts",
+          "lines": "305-317",
+          "detail": "Returns null when costBase !== un"
+        },
+        {
+          "function": "ingredientLineCostEur",
+          "file": "src/lib/recipe-prep-cost.ts",
+          "lines": "336-338",
+          "detail": "Terminal null when all conversion branches exhausted"
+        }
+      ],
+      "notInvolved": {
+        "function": "preferInvoiceCountableOverlayFields",
+        "file": "src/lib/resolve-operational-ingredient-cost.ts",
+        "lines": "152-170",
+        "detail": "Ginger beer ml/200 passes through unchanged (pq=200 in 1..1000 guard)"
+      }
+    },
+    "smallestCorrection": "When recipe unit is un and catalog cost_base_unit is un but invoice overlay is ml with per-bottle pq (200), use catalog countable fields for line costing OR set usable_volume_ml=200 on merged fields so countable bridge applies. Do NOT change preferInvoiceCountableOverlayFields for Ginger beer.",
+    "ifFixed": {
+      "passRecipes": 12,
+      "failRecipes": 0,
+      "passLines": 34,
+      "failLines": 0,
+      "gingerExpectedLineCostEur": 4.86,
+      "gingerExpectedLineCostViaCatalogUn": 0.2025,
+      "note": "€4.86 = 6 bottles × €0.81 invoice unit_price; requires per-bottle un costing not pack÷24 catalog semantics",
+      "certificationDecision": "green",
+      "confidence": 90
+    },
+    "divergenceVsManjericao": {
+      "manjericaoFirstDivergence": "preferInvoiceCountableOverlayFields",
+      "gingerFirstDivergence": "invoice_overlay_priority_over_catalog_base",
+      "sharedLayer": "ingredientLineCostEur after invoice overlay wins",
+      "differentMechanism": true
+    },
+    "counterExampleFirstDivergence": {
+      "acqua": {
+        "name": "Água san pellegrino (Acqua PASS)",
+        "recipeUnit": "ml",
+        "resolvedBase": "ml",
+        "lineCostEur": 1.0282666666666667,
+        "firstDivergenceFromGinger": "Acqua recipe uses ml (volume family matches invoice ml); Ginger uses un (countable vs volume)"
+      },
+      "arroz": {
+        "name": "Arroz agulha (same Multipack PASS)",
+        "recipeUnit": "un",
+        "resolvedBase": "un",
+        "lineCostEur": 2.3249999999999997,
+        "firstDivergenceFromGinger": "Arroz invoice overlay is un (countable); directCountable succeeds for recipe un"
+      }
+    },
+    "regressionAssessment": {
+      "recipeCosting": "High risk",
+      "invoiceReview": "Safe",
+      "ingredientCostsUI": "Needs regression",
+      "operationalNormalization": "Needs regression",
+      "validationEngine": "Safe",
+      "procurement": "Safe",
+      "history": "Safe",
+      "marginAlerts": "Needs regression"
+    }
+  },
+  "gingerBeer": {
+    "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+    "name": "Ginger beer",
+    "recipe": "VL-E2E Multipack",
+    "recipeQty": 6,
+    "recipeUnit": "un",
+    "invoiceItems": [
+      {
+        "id": "de0946a9-b7e4-467b-ae21-8b0401fcb363",
+        "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+        "name": "Baladin - Ginger Beer 0.20cl",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 0.81,
+        "total": 19.38,
+        "created_at": "2026-06-25T01:55:43.273848+00:00"
+      }
+    ],
+    "invoiceOverlayEntry": {
+      "invoiceDate": "2026-05-19",
+      "supplierLabel": "Emporio Italia",
+      "fields": {
+        "current_price": 0.81,
+        "purchase_quantity": 200,
+        "cost_base_unit": "ml"
+      },
+      "latestInvoiceUnitCost": 0.81
+    },
+    "catalog": {
+      "current_price": 0.81,
+      "purchase_quantity": 24,
+      "cost_base_unit": "un"
+    },
+    "catalogCostBase": "un",
+    "normalizationPipeline": [
+      {
+        "step": "operationalCostFieldsFromInvoiceLine",
+        "fields": {
+          "current_price": 0.81,
+          "purchase_quantity": 200,
+          "cost_base_unit": "ml"
+        }
+      },
+      {
+        "step": "preferInvoiceCountableOverlayFields",
+        "fields": {
+          "current_price": 0.81,
+          "purchase_quantity": 200,
+          "cost_base_unit": "ml"
+        }
+      },
+      {
+        "step": "mergeOperationalCostMetadata(catalog)",
+        "fields": {
+          "current_price": 0.81,
+          "purchase_quantity": 200,
+          "cost_base_unit": "ml"
+        }
+      }
+    ],
+    "resolveDecision": {
+      "overlay": {
+        "available": true,
+        "selected": true,
+        "rejected": false,
+        "reason": "Latest confirmed invoice match wins per resolveOperationalIngredientCostFields:242-250",
+        "fields": {
+          "current_price": 0.81,
+          "purchase_quantity": 200,
+          "cost_base_unit": "ml"
+        }
+      },
+      "catalog": {
+        "available": true,
+        "selected": false,
+        "rejected": true,
+        "reason": "Invoice overlay wins; catalog has un/24 but cost_base_unit not merged",
+        "fields": {
+          "current_price": 0.81,
+          "purchase_quantity": 24,
+          "cost_base_unit": "un"
+        }
+      },
+      "embed": {
+        "available": true,
+        "selected": false,
+        "rejected": true,
+        "reason": "Invoice or catalog took precedence",
+        "fields": {
+          "id": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+          "name": "Ginger beer",
+          "current_price": 0.81,
+          "purchase_quantity": 24,
+          "purchase_unit": "un",
+          "base_unit": "un",
+          "unit": "un",
+          "density_g_per_ml": null
+        }
+      },
+      "fallback": {
+        "available": false,
+        "selected": false,
+        "rejected": false,
+        "reason": "Only when invoice, catalog, and embed all absent",
+        "fields": null
+      },
+      "selectedSource": "invoice",
+      "shouldPreferEmbedOverCatalog": false
+    },
+    "resolvedFields": {
+      "current_price": 0.81,
+      "purchase_quantity": 200,
+      "cost_base_unit": "ml"
+    },
+    "resolvedSource": "invoice",
+    "costBase": "ml",
+    "costFamily": "volume",
+    "recipeNorm": {
+      "quantity": 6,
+      "baseUnit": "un"
+    },
+    "recipeFamily": "countable",
+    "unitCostEur": 0.004050000000000001,
+    "effectiveIngredientUnitCostEur": 0.004050000000000001,
+    "conversionAttempts": {
+      "directCountable": {
+        "lineCostEur": null,
+        "guard": "costBase must be un"
+      },
+      "packagedLiquid": {
+        "lineCostEur": null,
+        "converted": false,
+        "packMl": null
+      },
+      "usableConversion": {
+        "lineCostEur": null,
+        "converted": false,
+        "conversionKind": null,
+        "usableSource": null
+      },
+      "densityConversion": {
+        "lineCostEur": null,
+        "converted": false,
+        "conversionKind": null
+      },
+      "usablePerCountableUnit": {
+        "usableWeightGrams": null,
+        "usableVolumeMl": null,
+        "source": null
+      }
+    },
+    "lineCostEur": null,
+    "pricingResolved": false,
+    "unresolvedReason": "HYBRID_CONVERSION_MISSING",
+    "resolutionBranch": "hybrid_conversion_missing",
+    "conversionFamilyAnalysis": {
+      "invoiceBase": "ml",
+      "catalogBase": "un",
+      "recipeUnit": "un",
+      "resolvedCostBase": "ml",
+      "invoiceFamily": "volume",
+      "catalogFamily": "countable",
+      "recipeFamily": "countable",
+      "resolvedFamily": "volume",
+      "familiesCompatible": false,
+      "whyConversionStops": "invoice ml overlay wins; directCountable requires un base; no usable_volume_ml bridge"
+    },
+    "firstDivergenceStep": "invoice_overlay_priority_over_catalog_base",
+    "expectedLineCostIfCatalogUn": 0.2025,
+    "expectedLineCostIfInvoicePerBottle": 4.86
+  },
+  "comparators": [
+    {
+      "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+      "name": "Água san pellegrino (Acqua PASS)",
+      "recipe": "VL-E2E Liquid ml/L",
+      "recipeQty": 600,
+      "recipeUnit": "ml",
+      "invoiceItems": [
+        {
+          "id": "7b893edb-6cf9-4650-983c-e95268bea65b",
+          "invoice_id": "ab52796d-de1d-418d-86e7-230c8f056f09",
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 19.28,
+          "total": 38.56,
+          "created_at": "2026-06-25T01:55:43.273848+00:00"
+        },
+        {
+          "id": "c6993038-5ec1-4ffb-a5c7-5c7452dc0bc5",
+          "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+          "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 21.04,
+          "total": 42.07,
+          "created_at": "2026-06-25T11:48:28.038578+00:00"
+        }
+      ],
+      "invoiceOverlayEntry": {
+        "invoiceDate": "2026-05-19",
+        "supplierLabel": "Emporio Italia",
+        "fields": {
+          "current_price": 19.28,
+          "purchase_quantity": 11250,
+          "cost_base_unit": "ml"
+        },
+        "latestInvoiceUnitCost": 19.28
+      },
+      "catalog": {
+        "current_price": 19.28,
+        "purchase_quantity": 15,
+        "cost_base_unit": "un"
+      },
+      "catalogCostBase": "un",
+      "normalizationPipeline": [
+        {
+          "step": "operationalCostFieldsFromInvoiceLine",
+          "fields": {
+            "current_price": 19.28,
+            "purchase_quantity": 11250,
+            "cost_base_unit": "ml"
+          }
+        },
+        {
+          "step": "preferInvoiceCountableOverlayFields",
+          "fields": {
+            "current_price": 19.28,
+            "purchase_quantity": 11250,
+            "cost_base_unit": "ml"
+          }
+        },
+        {
+          "step": "mergeOperationalCostMetadata(catalog)",
+          "fields": {
+            "current_price": 19.28,
+            "purchase_quantity": 11250,
+            "cost_base_unit": "ml"
+          }
+        }
+      ],
+      "resolveDecision": {
+        "overlay": {
+          "available": true,
+          "selected": true,
+          "rejected": false,
+          "reason": "Latest confirmed invoice match wins per resolveOperationalIngredientCostFields:242-250",
+          "fields": {
+            "current_price": 19.28,
+            "purchase_quantity": 11250,
+            "cost_base_unit": "ml"
+          }
+        },
+        "catalog": {
+          "available": true,
+          "selected": false,
+          "rejected": true,
+          "reason": "Invoice overlay wins; catalog has un/15 but cost_base_unit not merged",
+          "fields": {
+            "current_price": 19.28,
+            "purchase_quantity": 15,
+            "cost_base_unit": "un"
+          }
+        },
+        "embed": {
+          "available": true,
+          "selected": false,
+          "rejected": true,
+          "reason": "Invoice or catalog took precedence",
+          "fields": {
+            "id": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+            "name": "Água san pellegrino",
+            "current_price": 19.28,
+            "purchase_quantity": 15,
+            "purchase_unit": "un",
+            "base_unit": "un",
+            "unit": "un",
+            "density_g_per_ml": null
+          }
+        },
+        "fallback": {
+          "available": false,
+          "selected": false,
+          "rejected": false,
+          "reason": "Only when invoice, catalog, and embed all absent",
+          "fields": null
+        },
+        "selectedSource": "invoice",
+        "shouldPreferEmbedOverCatalog": false
+      },
+      "resolvedFields": {
+        "current_price": 19.28,
+        "purchase_quantity": 11250,
+        "cost_base_unit": "ml"
+      },
+      "resolvedSource": "invoice",
+      "costBase": "ml",
+      "costFamily": "volume",
+      "recipeNorm": {
+        "quantity": 600,
+        "baseUnit": "ml"
+      },
+      "recipeFamily": "volume",
+      "unitCostEur": 0.0017137777777777778,
+      "effectiveIngredientUnitCostEur": 0.0017137777777777778,
+      "conversionAttempts": {
+        "directCountable": {
+          "lineCostEur": null,
+          "guard": "costBase must be un"
+        },
+        "packagedLiquid": {
+          "lineCostEur": null,
+          "converted": false,
+          "packMl": null
+        },
+        "usableConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null,
+          "usableSource": null
+        },
+        "densityConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null
+        },
+        "usablePerCountableUnit": {
+          "usableWeightGrams": null,
+          "usableVolumeMl": null,
+          "source": null
+        }
+      },
+      "lineCostEur": 1.0282666666666667,
+      "pricingResolved": true,
+      "unresolvedReason": null,
+      "resolutionBranch": "resolved",
+      "conversionFamilyAnalysis": {
+        "invoiceBase": "ml",
+        "catalogBase": "un",
+        "recipeUnit": "ml",
+        "resolvedCostBase": "ml",
+        "invoiceFamily": "volume",
+        "catalogFamily": "countable",
+        "recipeFamily": "volume",
+        "resolvedFamily": "volume",
+        "familiesCompatible": true,
+        "whyConversionStops": "resolved"
+      },
+      "firstDivergenceStep": "resolved",
+      "expectedLineCostIfCatalogUn": null,
+      "expectedLineCostIfInvoicePerBottle": null
+    },
+    {
+      "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+      "name": "Arroz agulha (same Multipack PASS)",
+      "recipe": "VL-E2E Multipack",
+      "recipeQty": 2,
+      "recipeUnit": "un",
+      "invoiceItems": [
+        {
+          "id": "a5771209-414e-4fd4-81eb-2b1ba7cc52a6",
+          "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+          "name": "Arroz Agulha Metro Chef 12x1kg",
+          "quantity": 1,
+          "unit": "cx",
+          "unit_price": 13.45,
+          "total": 13.45,
+          "created_at": "2026-06-17T21:28:34.759823+00:00"
+        },
+        {
+          "id": "61bedc5b-ce0d-4835-945a-22efb41684f0",
+          "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+          "name": "Arroz Agulha Metro Chef 12x1 kg",
+          "quantity": 1,
+          "unit": "cx",
+          "unit_price": 13.95,
+          "total": 13.95,
+          "created_at": "2026-06-25T11:48:18.026802+00:00"
+        }
+      ],
+      "invoiceOverlayEntry": {
+        "invoiceDate": "2026-05-19",
+        "supplierLabel": "Aviludo",
+        "fields": {
+          "current_price": 13.95,
+          "purchase_quantity": 12,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 12000
+        },
+        "latestInvoiceUnitCost": 13.95
+      },
+      "catalog": {
+        "current_price": 13.95,
+        "purchase_quantity": 12,
+        "cost_base_unit": "un"
+      },
+      "catalogCostBase": "un",
+      "normalizationPipeline": [
+        {
+          "step": "operationalCostFieldsFromInvoiceLine",
+          "fields": {
+            "current_price": 13.95,
+            "purchase_quantity": 12,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 12000
+          }
+        },
+        {
+          "step": "preferInvoiceCountableOverlayFields",
+          "fields": {
+            "current_price": 13.95,
+            "purchase_quantity": 12,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 12000
+          }
+        },
+        {
+          "step": "mergeOperationalCostMetadata(catalog)",
+          "fields": {
+            "current_price": 13.95,
+            "purchase_quantity": 12,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 12000
+          }
+        }
+      ],
+      "resolveDecision": {
+        "overlay": {
+          "available": true,
+          "selected": true,
+          "rejected": false,
+          "reason": "Latest confirmed invoice match wins per resolveOperationalIngredientCostFields:242-250",
+          "fields": {
+            "current_price": 13.95,
+            "purchase_quantity": 12,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 12000
+          }
+        },
+        "catalog": {
+          "available": true,
+          "selected": false,
+          "rejected": true,
+          "reason": "Invoice overlay wins; catalog has un/12 but cost_base_unit not merged",
+          "fields": {
+            "current_price": 13.95,
+            "purchase_quantity": 12,
+            "cost_base_unit": "un"
+          }
+        },
+        "embed": {
+          "available": true,
+          "selected": false,
+          "rejected": true,
+          "reason": "Invoice or catalog took precedence",
+          "fields": {
+            "id": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+            "name": "Arroz agulha",
+            "current_price": 13.95,
+            "purchase_quantity": 12,
+            "purchase_unit": "un",
+            "base_unit": "un",
+            "unit": "un",
+            "density_g_per_ml": null
+          }
+        },
+        "fallback": {
+          "available": false,
+          "selected": false,
+          "rejected": false,
+          "reason": "Only when invoice, catalog, and embed all absent",
+          "fields": null
+        },
+        "selectedSource": "invoice",
+        "shouldPreferEmbedOverCatalog": false
+      },
+      "resolvedFields": {
+        "current_price": 13.95,
+        "purchase_quantity": 12,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 12000
+      },
+      "resolvedSource": "invoice",
+      "costBase": "un",
+      "costFamily": "countable",
+      "recipeNorm": {
+        "quantity": 2,
+        "baseUnit": "un"
+      },
+      "recipeFamily": "countable",
+      "unitCostEur": 1.1624999999999999,
+      "effectiveIngredientUnitCostEur": 1.1624999999999999,
+      "conversionAttempts": {
+        "directCountable": {
+          "lineCostEur": 2.3249999999999997,
+          "guard": "costBase must be un"
+        },
+        "packagedLiquid": {
+          "lineCostEur": null,
+          "converted": false,
+          "packMl": null
+        },
+        "usableConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null,
+          "usableSource": null
+        },
+        "densityConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null
+        },
+        "usablePerCountableUnit": {
+          "usableWeightGrams": 12000,
+          "usableVolumeMl": null,
+          "source": "explicit_fields"
+        }
+      },
+      "lineCostEur": 2.3249999999999997,
+      "pricingResolved": true,
+      "unresolvedReason": null,
+      "resolutionBranch": "resolved",
+      "conversionFamilyAnalysis": {
+        "invoiceBase": "un",
+        "catalogBase": "un",
+        "recipeUnit": "un",
+        "resolvedCostBase": "un",
+        "invoiceFamily": "countable",
+        "catalogFamily": "countable",
+        "recipeFamily": "countable",
+        "resolvedFamily": "countable",
+        "familiesCompatible": true,
+        "whyConversionStops": "resolved"
+      },
+      "firstDivergenceStep": "resolved",
+      "expectedLineCostIfCatalogUn": 2.3249999999999997,
+      "expectedLineCostIfInvoicePerBottle": 27.9
+    },
+    {
+      "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+      "name": "Anchoas (units PASS)",
+      "recipe": "VL-E2E Countable Units",
+      "recipeQty": 3,
+      "recipeUnit": "un",
+      "invoiceItems": [
+        {
+          "id": "8476c916-26a1-4d2a-b6e7-f211560f6e95",
+          "invoice_id": "c2f52357-0f80-491a-ba14-c97ff4837472",
+          "name": "Filete de Anchovas Alconfrista Lt 495 g",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 9.49,
+          "total": 18.98,
+          "created_at": "2026-06-17T21:28:34.759823+00:00"
+        },
+        {
+          "id": "8b65efaa-ffb8-4469-b34b-5caa486ee525",
+          "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+          "name": "Filete de Anchoas Alconfirosa LI 495 g",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 9.99,
+          "total": 19.98,
+          "created_at": "2026-06-25T11:48:18.026802+00:00"
+        }
+      ],
+      "invoiceOverlayEntry": {
+        "invoiceDate": "2026-05-19",
+        "supplierLabel": "Aviludo",
+        "fields": {
+          "current_price": 9.99,
+          "purchase_quantity": 1,
+          "cost_base_unit": "un",
+          "usable_weight_grams": 495
+        },
+        "latestInvoiceUnitCost": 9.99
+      },
+      "catalog": {
+        "current_price": 9.99,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un"
+      },
+      "catalogCostBase": "un",
+      "normalizationPipeline": [
+        {
+          "step": "operationalCostFieldsFromInvoiceLine",
+          "fields": {
+            "current_price": 9.99,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 495
+          }
+        },
+        {
+          "step": "preferInvoiceCountableOverlayFields",
+          "fields": {
+            "current_price": 9.99,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 495
+          }
+        },
+        {
+          "step": "mergeOperationalCostMetadata(catalog)",
+          "fields": {
+            "current_price": 9.99,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 495
+          }
+        }
+      ],
+      "resolveDecision": {
+        "overlay": {
+          "available": true,
+          "selected": true,
+          "rejected": false,
+          "reason": "Latest confirmed invoice match wins per resolveOperationalIngredientCostFields:242-250",
+          "fields": {
+            "current_price": 9.99,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 495
+          }
+        },
+        "catalog": {
+          "available": true,
+          "selected": false,
+          "rejected": true,
+          "reason": "Invoice overlay wins; catalog has un/1 but cost_base_unit not merged",
+          "fields": {
+            "current_price": 9.99,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un"
+          }
+        },
+        "embed": {
+          "available": true,
+          "selected": false,
+          "rejected": true,
+          "reason": "Invoice or catalog took precedence",
+          "fields": {
+            "id": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+            "name": "Anchoas",
+            "current_price": 9.99,
+            "purchase_quantity": 1,
+            "purchase_unit": "un",
+            "base_unit": "un",
+            "unit": "un",
+            "density_g_per_ml": null
+          }
+        },
+        "fallback": {
+          "available": false,
+          "selected": false,
+          "rejected": false,
+          "reason": "Only when invoice, catalog, and embed all absent",
+          "fields": null
+        },
+        "selectedSource": "invoice",
+        "shouldPreferEmbedOverCatalog": false
+      },
+      "resolvedFields": {
+        "current_price": 9.99,
+        "purchase_quantity": 1,
+        "cost_base_unit": "un",
+        "usable_weight_grams": 495
+      },
+      "resolvedSource": "invoice",
+      "costBase": "un",
+      "costFamily": "countable",
+      "recipeNorm": {
+        "quantity": 3,
+        "baseUnit": "un"
+      },
+      "recipeFamily": "countable",
+      "unitCostEur": 9.99,
+      "effectiveIngredientUnitCostEur": 9.99,
+      "conversionAttempts": {
+        "directCountable": {
+          "lineCostEur": 29.97,
+          "guard": "costBase must be un"
+        },
+        "packagedLiquid": {
+          "lineCostEur": null,
+          "converted": false,
+          "packMl": null
+        },
+        "usableConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null,
+          "usableSource": null
+        },
+        "densityConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null
+        },
+        "usablePerCountableUnit": {
+          "usableWeightGrams": 495,
+          "usableVolumeMl": null,
+          "source": "explicit_fields"
+        }
+      },
+      "lineCostEur": 29.97,
+      "pricingResolved": true,
+      "unresolvedReason": null,
+      "resolutionBranch": "resolved",
+      "conversionFamilyAnalysis": {
+        "invoiceBase": "un",
+        "catalogBase": "un",
+        "recipeUnit": "un",
+        "resolvedCostBase": "un",
+        "invoiceFamily": "countable",
+        "catalogFamily": "countable",
+        "recipeFamily": "countable",
+        "resolvedFamily": "countable",
+        "familiesCompatible": true,
+        "whyConversionStops": "resolved"
+      },
+      "firstDivergenceStep": "resolved",
+      "expectedLineCostIfCatalogUn": 29.97,
+      "expectedLineCostIfInvoicePerBottle": 29.97
+    },
+    {
+      "ingredientId": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+      "name": "Manjericão (FAIL comparator)",
+      "recipe": "VL-E2E Pizza Margherita",
+      "recipeQty": 12,
+      "recipeUnit": "g",
+      "invoiceItems": [
+        {
+          "id": "b47828a9-e042-4437-b0b7-8944c812509a",
+          "invoice_id": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+          "name": "Manjericão",
+          "quantity": 5,
+          "unit": "mo",
+          "unit_price": 2.06,
+          "total": 10.28,
+          "created_at": "2026-06-20T01:24:45.305604+00:00"
+        }
+      ],
+      "invoiceOverlayEntry": {
+        "invoiceDate": "2026-05-25",
+        "supplierLabel": "Bidfood Portugal, SA",
+        "fields": {
+          "current_price": 2.06,
+          "purchase_quantity": 100,
+          "cost_base_unit": "g"
+        },
+        "latestInvoiceUnitCost": 2.06
+      },
+      "catalog": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "cost_base_unit": "g"
+      },
+      "catalogCostBase": "g",
+      "normalizationPipeline": [
+        {
+          "step": "operationalCostFieldsFromInvoiceLine",
+          "fields": {
+            "current_price": 2.06,
+            "purchase_quantity": 100,
+            "cost_base_unit": "g"
+          }
+        },
+        {
+          "step": "preferInvoiceCountableOverlayFields",
+          "fields": {
+            "current_price": 2.06,
+            "purchase_quantity": 100,
+            "cost_base_unit": "un"
+          }
+        },
+        {
+          "step": "mergeOperationalCostMetadata(catalog)",
+          "fields": {
+            "current_price": 2.06,
+            "purchase_quantity": 100,
+            "cost_base_unit": "g"
+          }
+        }
+      ],
+      "resolveDecision": {
+        "overlay": {
+          "available": true,
+          "selected": true,
+          "rejected": false,
+          "reason": "Latest confirmed invoice match wins per resolveOperationalIngredientCostFields:242-250",
+          "fields": {
+            "current_price": 2.06,
+            "purchase_quantity": 100,
+            "cost_base_unit": "g"
+          }
+        },
+        "catalog": {
+          "available": true,
+          "selected": false,
+          "rejected": true,
+          "reason": "Invoice overlay wins; catalog has g/100 but cost_base_unit not merged",
+          "fields": {
+            "current_price": 2.06,
+            "purchase_quantity": 100,
+            "cost_base_unit": "g"
+          }
+        },
+        "embed": {
+          "available": true,
+          "selected": false,
+          "rejected": true,
+          "reason": "Invoice or catalog took precedence",
+          "fields": {
+            "id": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+            "name": "Manjericão",
+            "current_price": 2.06,
+            "purchase_quantity": 100,
+            "purchase_unit": "g",
+            "base_unit": "g",
+            "unit": "g",
+            "density_g_per_ml": null
+          }
+        },
+        "fallback": {
+          "available": false,
+          "selected": false,
+          "rejected": false,
+          "reason": "Only when invoice, catalog, and embed all absent",
+          "fields": null
+        },
+        "selectedSource": "invoice",
+        "shouldPreferEmbedOverCatalog": true
+      },
+      "resolvedFields": {
+        "current_price": 2.06,
+        "purchase_quantity": 100,
+        "cost_base_unit": "un"
+      },
+      "resolvedSource": "invoice",
+      "costBase": "un",
+      "costFamily": "countable",
+      "recipeNorm": {
+        "quantity": 12,
+        "baseUnit": "g"
+      },
+      "recipeFamily": "weight",
+      "unitCostEur": 0.0206,
+      "effectiveIngredientUnitCostEur": 0.0206,
+      "conversionAttempts": {
+        "directCountable": {
+          "lineCostEur": null,
+          "guard": "costBase must be un"
+        },
+        "packagedLiquid": {
+          "lineCostEur": null,
+          "converted": false,
+          "packMl": null
+        },
+        "usableConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null,
+          "usableSource": null
+        },
+        "densityConversion": {
+          "lineCostEur": null,
+          "converted": false,
+          "conversionKind": null
+        },
+        "usablePerCountableUnit": {
+          "usableWeightGrams": null,
+          "usableVolumeMl": null,
+          "source": null
+        }
+      },
+      "lineCostEur": null,
+      "pricingResolved": false,
+      "unresolvedReason": "HYBRID_CONVERSION_MISSING",
+      "resolutionBranch": "hybrid_conversion_missing",
+      "conversionFamilyAnalysis": {
+        "invoiceBase": "g",
+        "catalogBase": "g",
+        "recipeUnit": "g",
+        "resolvedCostBase": "un",
+        "invoiceFamily": "weight",
+        "catalogFamily": "weight",
+        "recipeFamily": "weight",
+        "resolvedFamily": "countable",
+        "familiesCompatible": false,
+        "whyConversionStops": "preferInvoiceCountableOverlayFields corrupted g→un OR countable overlay vs weight recipe"
+      },
+      "firstDivergenceStep": "preferInvoiceCountableOverlayFields",
+      "expectedLineCostIfCatalogUn": null,
+      "expectedLineCostIfInvoicePerBottle": null
+    }
+  ],
+  "manjericaoSaladaComparison": {
+    "sharedWithGinger": "All fail at ingredientLineCostEur when resolved cost_base_unit family ≠ recipe unit family",
+    "differentFromGinger": "Manjericão/Salada corrupted by preferInvoiceCountableOverlayFields g→un; Ginger beer ml preserved but invoice wins over catalog un"
+  }
+}

@@ -1,24 +1,24 @@
 # End-to-End Recipe Costing Certification
 
-**Validation Lab:** `bjhnlrgodcqoyzddbpbd` · **2026-06-25T12:53:32.519Z**
+**Validation Lab:** `bjhnlrgodcqoyzddbpbd` · **2026-06-25T14:09:50.716Z**
 
 ## Certification Decision
 
-### 🟡 CONDITIONALLY CERTIFIED
+### 🟢 CERTIFIED
 
-Validated **12** VL-E2E recipes (9 PASS / 3 FAIL). **31** ingredient lines PASS / **3** FAIL.
+Validated **12** VL-E2E recipes (12 PASS / 0 FAIL). **34** ingredient lines PASS / **0** FAIL.
 
 Recipe costing uses **invoice overlay → catalog → embed** via `resolveOperationalIngredientCostFields` / `effectiveIngredientUnitCostEur` — **never** `ingredient_price_history`.
 
-**Confidence:** 67%
+**Confidence:** 92%
 
 ## Executive Summary
 
 | Question | Answer |
 |----------|--------|
 | Total recipes validated | **12** |
-| PASS / FAIL | **9 / 3** |
-| Mathematical discrepancies | **3 recipe(s)** |
+| PASS / FAIL | **12 / 0** |
+| Mathematical discrepancies | **None** |
 | Single operational source of truth? | **Yes** |
 | Recipe recalculation after price change? | **Yes** |
 | Uses Prosciutto/Ovo/Tomilho? | **No** |
@@ -29,8 +29,8 @@ Recipe costing uses **invoice overlay → catalog → embed** via `resolveOperat
 |--------|--------|
 | Procurement | 🟢 |
 | Operational Normalization | 🟢 |
-| Ingredient Catalog | 🟡 |
-| Recipe Costing | 🟡 |
+| Ingredient Catalog | 🟢 |
+| Recipe Costing | 🟢 |
 | Historical Pricing | 🟡 |
 | Validation Engine | 🟢 |
 | Matching | 🟡 |
@@ -43,11 +43,11 @@ Recipe costing uses **invoice overlay → catalog → embed** via `resolveOperat
 | Countable Units | PASS | 2 | €56.17 | countable, recipe-unit-un | — |
 | Dessert Nata | PASS | 3 | €14.12 | dessert, recipe-unit-un, recipe-unit-ml | — |
 | Liquid ml/L | PASS | 3 | €1.18 | liquid-ml-L, recipe-unit-ml, recipe-unit-L | — |
-| Multipack | FAIL | 2 | €2.33 | multipack, recipe-unit-un | Ginger beer: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 6 un vs overlay/cost base mismatch |
+| Multipack | PASS | 2 | €7.18 | multipack, recipe-unit-un | — |
 | Pasta Stracciatella | PASS | 4 | €31.51 | mixed, recipe-unit-un, recipe-unit-g | — |
 | Pasta with Sauce | PASS | 2 | €18.11 | mixed, sauce/prep, recipe-unit-un, recipe-unit-ml, sub-recipe | — |
-| Pizza Margherita | FAIL | 4 | €17.17 | mixed, recipe-unit-kg, recipe-unit-un, recipe-unit-g | Manjericão: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 12 g vs overlay/cost base mismatch |
-| Salad Gorgonzola | FAIL | 4 | €0.64 | salad, recipe-unit-g, recipe-unit-ml | Salada ibérica: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 100 g vs overlay/cost base mismatch |
+| Pizza Margherita | PASS | 4 | €17.41 | mixed, recipe-unit-kg, recipe-unit-un, recipe-unit-g | — |
+| Salad Gorgonzola | PASS | 4 | €1.52 | salad, recipe-unit-g, recipe-unit-ml | — |
 | Sandwich Bresaola | PASS | 3 | €13.55 | mixed, recipe-unit-g, recipe-unit-un | — |
 | Tomato Sauce | PASS | 3 | €22.30 | sauce/prep, recipe-unit-un, recipe-unit-g | — |
 | Weight kg/g | PASS | 2 | €1.92 | weight-kg-g, recipe-unit-kg, recipe-unit-g | — |
@@ -67,8 +67,8 @@ Recipe costing uses **invoice overlay → catalog → embed** via `resolveOperat
 {
   "tested": true,
   "recipe": "VL-E2E Salad Gorgonzola",
-  "baselineTotalEur": 0.6432,
-  "bumpedTotalEur": 0.683,
+  "baselineTotalEur": 1.5192,
+  "bumpedTotalEur": 1.559,
   "expectedDeltaEur": 0.0398,
   "actualDeltaEur": 0.0398,
   "pass": true

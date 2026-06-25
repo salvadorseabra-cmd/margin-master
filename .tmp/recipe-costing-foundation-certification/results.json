@@ -1,0 +1,65 @@
+{
+  "generatedAt": "2026-06-25T12:40:06.921Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "scope": {
+    "recipeCount": 0,
+    "recipeLineCount": 0,
+    "uniqueIngredientsInRecipes": 0
+  },
+  "summary": {
+    "totalRecipesAudited": 0,
+    "passCount": 0,
+    "failCount": 0,
+    "passPct": 0,
+    "recipesWithFlaggedIngredients": 0,
+    "recipesWithFailedFoundationIngredients": 0,
+    "flaggedIngredientsInVL": {
+      "prosciutto": {
+        "id": "b924480a-91f3-4aa2-9852-a900795a6f92",
+        "usedInRecipes": false
+      },
+      "ovo": {
+        "id": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+        "usedInRecipes": false
+      },
+      "tomilho": {
+        "id": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041",
+        "usedInRecipes": false
+      }
+    },
+    "dependsOnHistoricalPricing": false,
+    "singleOperationalSourceOfTruth": true,
+    "certificationDecision": "yellow",
+    "confidence": 72
+  },
+  "architectureEvidence": {
+    "recipeCostingModules": [
+      "src/lib/recipe-prep-cost.ts",
+      "src/lib/ingredient-unit-cost.ts",
+      "src/lib/resolve-operational-ingredient-cost.ts",
+      "src/lib/recipe-pricing-state.ts"
+    ],
+    "usesPriceHistory": false,
+    "operationalCostFormula": "resolvedOperationalUnitCostEur = current_price / purchase_quantity",
+    "sourcePrecedence": [
+      "invoice overlay",
+      "catalog",
+      "embed"
+    ],
+    "uiPath": "recipes.tsx → enrichRecipeLinesForOperationalCost → computeRecipePricingSummaryFromRecipe",
+    "ingredientDetailPath": "ingredient-detail-panel.ts → effectiveIngredientUnitCostEur(catalog)",
+    "vlRecipeDataPresent": false,
+    "flaggedIngredientsUnusedInRecipes": true,
+    "foundationFinalClosureNote": "Prior closure: catalog stale on Ovo/Tomilho blocks recipe costing until backfill — moot on VL (0 recipes, neither ingredient referenced)."
+  },
+  "foundationPillars": {
+    "procurement": "green",
+    "operationalNormalization": "green",
+    "ingredientCatalog": "green",
+    "recipeCosting": "green",
+    "historicalPricing": "yellow",
+    "validationEngine": "green",
+    "matching": "yellow"
+  },
+  "recipes": []
+}

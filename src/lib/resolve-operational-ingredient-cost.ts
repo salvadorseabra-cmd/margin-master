@@ -380,7 +380,7 @@ export type ResolveRecipeLineOperationalCostResult = ResolveOperationalIngredien
  * Invoice multipack beverages often encode per-bottle volume as ml/pq while catalog stays `un`.
  * Recipe lines counted in `un` need countable fields for line costing; keep invoice overlay for display.
  */
-function recipeLineCostFieldsWhenInvoiceVolumeOverCatalogCountable(
+export function recipeLineCostFieldsWhenInvoiceVolumeOverCatalogCountable(
   resolved: ResolveOperationalIngredientCostResult,
   catalog: OperationalIngredientCostFields | undefined,
   lineContext: IngredientLineCostContext,
@@ -416,6 +416,27 @@ function recipeLineCostFieldsWhenInvoiceVolumeOverCatalogCountable(
       usable_volume_ml: bottleVolumeMl,
     },
     catalog,
+  );
+}
+
+/** Single bridge entry for line costing: aggregation, detail, summary, and audit paths. */
+export function recipeLineCostFieldsForCosting(
+  operationalFields: OperationalIngredientCostFields,
+  catalog: OperationalIngredientCostFields | undefined,
+  lineContext: IngredientLineCostContext,
+  source: OperationalIngredientCostSource,
+): OperationalIngredientCostFields {
+  return (
+    recipeLineCostFieldsWhenInvoiceVolumeOverCatalogCountable(
+      {
+        fields: operationalFields,
+        source,
+        chosenDate: null,
+        latestInvoiceUnitCost: null,
+      },
+      catalog,
+      lineContext,
+    ) ?? operationalFields
   );
 }
 
@@ -471,9 +492,12 @@ export function resolveRecipeLineOperationalCost(
     },
   );
   const catalog = ingredientId.trim() ? catalogById.get(ingredientId.trim()) : undefined;
-  const lineCostFields =
-    recipeLineCostFieldsWhenInvoiceVolumeOverCatalogCountable(resolved, catalog, lineContext) ??
-    resolved.fields;
+  const lineCostFields = recipeLineCostFieldsForCosting(
+    resolved.fields,
+    catalog,
+    lineContext,
+    resolved.source,
+  );
   const lineCostEur = ingredientLineCostEur(quantity, lineCostFields, {
     ...lineContext,
     source: resolved.source,
@@ -631,6 +655,15 @@ export function enrichRecipeIngredientLineForCost(
     logContext,
   );
   const { fields, source } = resolved;
+  const catalog = line.ingredient_id.trim()
+    ? catalogById.get(line.ingredient_id.trim())
+    : undefined;
+  const lineCostFields = recipeLineCostFieldsForCosting(
+    fields,
+    catalog,
+    { recipeUnit: line.unit },
+    source,
+  );
   if (embed && shouldLogOperationalCostResolve()) {
     const beforeUnitCost = effectiveIngredientUnitCostEur(embed);
     const afterUnitCost = effectiveIngredientUnitCostEur(fields);
@@ -658,7 +691,7 @@ export function enrichRecipeIngredientLineForCost(
       });
     }
   }
-  return { ...line, ingredients: fields };
+  return { ...line, ingredients: fields, lineCostFields };
 }
 
 export function enrichRecipeLinesForOperationalCost(

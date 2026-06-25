@@ -1,0 +1,106 @@
+{
+  "generatedAt": "2026-06-25T13:55:00.000Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "certificationRun": "final-foundation-certification",
+  "phase1Replays": {
+    "foundation-certification": { "status": "PASS", "exitCode": 0, "generatedAt": "2026-06-25T13:50:05.355Z" },
+    "failed-ingredient-certification": { "status": "PASS", "exitCode": 0, "generatedAt": "2026-06-25T13:50:02.500Z" },
+    "foundation-final-closure": { "status": "PASS", "exitCode": 0, "generatedAt": "2026-06-25T13:50:01.488Z" },
+    "validation-findings-acceptance-test": { "status": "PASS", "exitCode": 0, "generatedAt": "2026-06-25T13:50:17.899Z", "note": "Known-problem row IDs stale (items removed/re-extracted); 3/5 negative controls not locatable" },
+    "recipe-costing-foundation-certification": { "status": "CRASH", "exitCode": 1, "error": "TypeError: Cannot read properties of null (reading 'current_price') at ingredientLineCostEur on prep sub-recipe line" },
+    "end-to-end-recipe-certification": { "status": "PASS", "exitCode": 0, "generatedAt": "2026-06-25T13:50:16.319Z" },
+    "resolve-operational-ingredient-cost.test.ts": { "status": "PASS", "tests": 27, "exitCode": 0 }
+  },
+  "finalDecision": {
+    "certification": "conditional",
+    "icon": "🟡",
+    "label": "FOUNDATION CONDITIONALLY CERTIFIED",
+    "productionReady": "Partial",
+    "confidence": 72,
+    "justification": "Procurement→operational normalization is deterministic and recipe costing uses invoice overlay (never price_history). 11/12 VL-E2E recipes pass with 33/34 lines at €0.02 tolerance. One recipe-layer multipack failure (Ginger beer un vs ml overlay) blocks full recipe certification. Foundation economics sound; remaining gaps are match read-cutover config, VL history/catalog sync artifacts, and one match-lifecycle architectural gate."
+  },
+  "pillars": {
+    "procurement": { "status": "PASS", "score": "green", "evidence": "51/51 invoice lines persist qty×price≈total; 40 matched ingredients; Gorgonzola/Guanciale align PDF truth post re-extract" },
+    "operationalNormalization": { "status": "PASS", "score": "green", "evidence": "37/40 ingredients pass op normalization in foundation audit; multipack/weight/volume paths deterministic" },
+    "ingredientCatalog": { "status": "PARTIAL", "score": "yellow", "evidence": "Pack-level purchase_quantity intentional for multipacks; 7 ingredients show catalog op≠line op by design; produce items (Ovo/Tomilho) stale denominators" },
+    "historicalPricing": { "status": "SYNC_ARTIFACT", "score": "yellow", "evidence": "Ovo/Tomilho store pack-level new_price; 12+ multi-invoice delta drift; Prosciutto orphan from suggested match; recipe path never reads history" },
+    "validationEngine": { "status": "PASS", "score": "green", "evidence": "52 items / 38 findings (matching only); stale gorgonzola/guanciale rows no longer flagged — fixes landed" },
+    "matching": { "status": "CONFIG", "score": "yellow", "evidence": "Architecture sound; VITE_MATCH_LIFECYCLE_READ_CUTOVER off → 26/40 virtual≠persisted; invoice_item_matches table populated" },
+    "recipeCosting": { "status": "FAIL", "score": "yellow", "evidence": "12 recipes / 34 lines executed: 11 PASS / 1 FAIL; 33 line PASS / 1 FAIL; Ginger beer multipack blocks 0-failure bar" },
+    "uiConsistency": { "status": "PASS", "score": "green", "evidence": "E2E UI replay: enrichRecipeLinesForOperationalCost + resolveRecipeLineOperationalCost + computeRecipePricingSummaryFromRecipe align on 33/34 lines" },
+    "sourceOfTruthChain": { "status": "PASS", "score": "green", "evidence": "invoice overlay → catalog → embed via resolveOperationalIngredientCostFields; never ingredient_price_history; regression +10% Gorgonzola PASS" }
+  },
+  "recipeCostingExecution": {
+    "recipes": 12,
+    "lines": 34,
+    "recipePass": 11,
+    "recipeFail": 1,
+    "linePass": 33,
+    "lineFail": 1,
+    "deltasWithinTolerance": 33,
+    "zeroFailureBarMet": false,
+    "failedRecipe": "VL-E2E Multipack",
+    "failedLine": { "ingredient": "Ginger beer", "recipeQty": 6, "unit": "un", "engineTotalEur": 2.325, "pdfTotalEur": 7.185, "lineCostEur": 4.86 }
+  },
+  "issueClassification": {
+    "foundationBlockers": [
+      {
+        "id": "match-lifecycle-history-gate",
+        "severity": "P1",
+        "ingredient": "Prosciutto cotto scelto",
+        "detail": "price_history written from unconfirmed suggested match despite confirmed alias; extract gate now blocks re-write",
+        "class": "Foundation blocker"
+      },
+      {
+        "id": "ginger-beer-multipack-recipe",
+        "severity": "P1",
+        "ingredient": "Ginger beer",
+        "detail": "Invoice overlay cost_base_unit=ml; recipe line in un — direct countable path missing; recipe total under-reports vs PDF",
+        "class": "Recipe-layer bug"
+      }
+    ],
+    "syncArtifacts": [
+      { "ingredient": "Ovo classe M", "detail": "history new_price=38.44 (pack) vs op €0.2136/egg" },
+      { "ingredient": "Tomilho", "detail": "history new_price=2.06 (pack) vs op €0.0206/g" },
+      { "ingredient": "Aviludo multi-invoice chain", "detail": "12 ingredients history delta/new_price drift from April→May invoices" },
+      { "ingredient": "Aceto/Ginger/Peroni", "detail": "catalog not refreshed to latest discount economics (totals correct on line)" }
+    ],
+    "configurationIssues": [
+      { "key": "VITE_MATCH_LIFECYCLE_READ_CUTOVER", "detail": "Off in VL — virtual match display diverges from persisted invoice_item_matches; 26/40 ingredients affected" },
+      { "key": "validation-findings-acceptance-test", "detail": "Fixture invoice item IDs stale after VL re-extract; negative controls cannot run until IDs refreshed" }
+    ],
+    "futureImprovements": [
+      { "detail": "Canonical Ingredient Identity — unify alias normalization (prosciutto HC suffix)" },
+      { "detail": "Discount-aware monetary binding on re-extract (gross+discount_pct→net unit_price)" },
+      { "detail": "Catalog purchase_quantity backfill for produce/countable multipacks" },
+      { "detail": "Gate appendIngredientPriceHistory on operational unit cost, not pack price" }
+    ]
+  },
+  "counts": {
+    "foundationBlockers": 2,
+    "recipeLayerBugs": 1,
+    "syncArtifacts": 4,
+    "configurationIssues": 2,
+    "futureImprovements": 4,
+    "ingredientsAudited": 40,
+    "ingredientsCertified": 4,
+    "ingredientsConditional": 29,
+    "ingredientsFailed": 7,
+    "genuineBugsReEval": 4,
+    "falseFailuresReEval": 3
+  },
+  "sourceOfTruth": {
+    "chain": "invoice_items → invoice_item_matches → operationalCostFieldsFromInvoiceLine → resolveOperationalIngredientCostFields → effectiveIngredientUnitCostEur → ingredientLineCostEur",
+    "usesPriceHistoryInRecipePath": false,
+    "singleOperationalSource": true,
+    "regressionTest": { "recipe": "VL-E2E Salad Gorgonzola", "pass": true, "deltaEur": 0.0398 }
+  },
+  "roadmapIfGreen": {
+    "note": "Conditional — complete Ginger beer recipe fix + VL backfill before full green",
+    "sequence": [
+      "Canonical Ingredient Identity",
+      "Invoice ingestion hardening",
+      "Recipe/Prep expansion"
+    ]
+  }
+}

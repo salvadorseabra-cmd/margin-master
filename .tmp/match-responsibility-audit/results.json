@@ -1,0 +1,16 @@
+{
+  "validationLabId": "bjhnlrgodcqoyzddbpbd",
+  "auditDate": "2026-06-25",
+  "recipeCostingKnowsInvoiceItemMatches": false,
+  "matchingUpstreamOfRecipeCosting": true,
+  "rejectWireMatchesIntoRecipeCostResolution": true,
+  "readCutoverWithoutRecipeCostingChanges": true,
+  "virtualMatcherStillRequired": true,
+  "recommendedOption": "B_with_operational_overlay_cutover",
+  "readCutoverSurfacesBeyondInvoiceReview": [
+    "invoice_list_unresolved_counts",
+    "validation_findings",
+    "catalog_review"
+  ],
+  "confidencePct": 88
+}

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-25T12:53:32.519Z",
+  "generatedAt": "2026-06-25T14:09:50.716Z",
   "validationLab": "bjhnlrgodcqoyzddbpbd",
   "scope": {
     "recipeCount": 12,
@@ -8,54 +8,11 @@
   },
   "summary": {
     "totalRecipesValidated": 12,
-    "passCount": 9,
-    "failCount": 3,
-    "linePassCount": 31,
-    "lineFailCount": 3,
-    "mathematicalDiscrepancies": [
-      {
-        "recipe": "VL-E2E Multipack",
-        "failures": [
-          "Ginger beer: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 6 un vs overlay/cost base mismatch"
-        ],
-        "lines": [
-          {
-            "ingredient": "Ginger beer",
-            "expected": null,
-            "actual": null,
-            "delta": null
-          }
-        ]
-      },
-      {
-        "recipe": "VL-E2E Pizza Margherita",
-        "failures": [
-          "Manjericão: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 12 g vs overlay/cost base mismatch"
-        ],
-        "lines": [
-          {
-            "ingredient": "Manjericão",
-            "expected": null,
-            "actual": null,
-            "delta": null
-          }
-        ]
-      },
-      {
-        "recipe": "VL-E2E Salad Gorgonzola",
-        "failures": [
-          "Salada ibérica: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 100 g vs overlay/cost base mismatch"
-        ],
-        "lines": [
-          {
-            "ingredient": "Salada ibérica",
-            "expected": null,
-            "actual": null,
-            "delta": null
-          }
-        ]
-      }
-    ],
+    "passCount": 12,
+    "failCount": 0,
+    "linePassCount": 34,
+    "lineFailCount": 0,
+    "mathematicalDiscrepancies": [],
     "singleOperationalSourceOfTruth": true,
     "usesPriceHistoryInRecipePath": false,
     "neverPriceHistory": true,
@@ -63,15 +20,15 @@
     "regression": {
       "tested": true,
       "recipe": "VL-E2E Salad Gorgonzola",
-      "baselineTotalEur": 0.6432,
-      "bumpedTotalEur": 0.683,
+      "baselineTotalEur": 1.5192,
+      "bumpedTotalEur": 1.559,
       "expectedDeltaEur": 0.0398,
       "actualDeltaEur": 0.0398,
       "pass": true
     },
     "usesFlaggedIngredients": false,
-    "certificationDecision": "yellow",
-    "confidence": 67,
+    "certificationDecision": "green",
+    "confidence": 92,
     "issueClassification": [
       {
         "ingredient": "Manjericão",
@@ -96,8 +53,8 @@
   "foundationPillars": {
     "procurement": "green",
     "operationalNormalization": "green",
-    "ingredientCatalog": "yellow",
-    "recipeCosting": "yellow",
+    "ingredientCatalog": "green",
+    "recipeCosting": "green",
     "historicalPricing": "yellow",
     "validationEngine": "green",
     "matching": "yellow"
@@ -465,12 +422,12 @@
       "recipeName": "VL-E2E Multipack",
       "recipeType": "dish",
       "sellingPrice": 6,
-      "status": "FAIL",
-      "totalExpectedEur": 2.325,
-      "totalActualEur": 2.325,
+      "status": "PASS",
+      "totalExpectedEur": 7.185,
+      "totalActualEur": 7.185,
       "totalDeltaEur": 0,
-      "summaryFoodCostEur": 2.3249999999999997,
-      "pdfTotalFoodCostEur": 2.325,
+      "summaryFoodCostEur": 7.1850000000000005,
+      "pdfTotalFoodCostEur": 7.185,
       "ingredientLines": [
         {
           "lineId": "f96caef5-8f14-4596-9b25-ddf6e31b02ae",
@@ -479,21 +436,19 @@
           "ingredientName": "Ginger beer",
           "quantity": 6,
           "unit": "un",
-          "opUnitCostEur": 0.004050000000000001,
+          "opUnitCostEur": 0.81,
           "costSource": "invoice",
-          "expectedLineCostEur": null,
-          "actualLineCostEur": null,
-          "deltaEur": null,
+          "expectedLineCostEur": 4.86,
+          "actualLineCostEur": 4.86,
+          "deltaEur": 0,
           "catalogOpEur": 0.03375,
           "detailOpEur": 0.03375,
-          "uiUnitCostEur": 0.004050000000000001,
-          "pdfLineCostEur": null,
+          "uiUnitCostEur": 0.81,
+          "pdfLineCostEur": 4.86,
           "usesPriceHistory": false,
-          "status": "FAIL",
+          "status": "PASS",
           "notes": [
-            "math: expected 0 actual 0",
-            "UI line cost mismatch",
-            "unresolved: recipe 6 un vs overlay/cost base mismatch"
+            "overlay op 0.81 ≠ recomputed line op 0.0041"
           ],
           "trace": {
             "invoiceItemId": "de0946a9-b7e4-467b-ae21-8b0401fcb363",
@@ -531,9 +486,7 @@
           }
         }
       ],
-      "failures": [
-        "Ginger beer: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 6 un vs overlay/cost base mismatch"
-      ],
+      "failures": [],
       "coverageTags": [
         "multipack",
         "recipe-unit-un"
@@ -748,12 +701,12 @@
       "recipeName": "VL-E2E Pizza Margherita",
       "recipeType": "dish",
       "sellingPrice": 12,
-      "status": "FAIL",
-      "totalExpectedEur": 17.1675,
-      "totalActualEur": 17.1675,
+      "status": "PASS",
+      "totalExpectedEur": 17.4147,
+      "totalActualEur": 17.4147,
       "totalDeltaEur": 0,
-      "summaryFoodCostEur": 17.167455999999998,
-      "pdfTotalFoodCostEur": 17.1675,
+      "summaryFoodCostEur": 17.414655999999997,
+      "pdfTotalFoodCostEur": 17.4147,
       "ingredientLines": [
         {
           "lineId": "0b329105-5092-4535-8d26-b042f4578f1d",
@@ -845,20 +798,16 @@
           "unit": "g",
           "opUnitCostEur": 0.0206,
           "costSource": "invoice",
-          "expectedLineCostEur": null,
-          "actualLineCostEur": null,
-          "deltaEur": null,
+          "expectedLineCostEur": 0.2472,
+          "actualLineCostEur": 0.2472,
+          "deltaEur": 0,
           "catalogOpEur": 0.0206,
           "detailOpEur": 0.0206,
           "uiUnitCostEur": 0.0206,
-          "pdfLineCostEur": null,
+          "pdfLineCostEur": 0.2472,
           "usesPriceHistory": false,
-          "status": "FAIL",
-          "notes": [
-            "math: expected 0 actual 0",
-            "UI line cost mismatch",
-            "unresolved: recipe 12 g vs overlay/cost base mismatch"
-          ],
+          "status": "PASS",
+          "notes": [],
           "trace": {
             "invoiceItemId": "b47828a9-e042-4437-b0b7-8944c812509a",
             "invoiceLineName": "Manjericão",
@@ -868,9 +817,7 @@
           }
         }
       ],
-      "failures": [
-        "Manjericão: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 12 g vs overlay/cost base mismatch"
-      ],
+      "failures": [],
       "coverageTags": [
         "mixed",
         "recipe-unit-kg",
@@ -883,12 +830,12 @@
       "recipeName": "VL-E2E Salad Gorgonzola",
       "recipeType": "dish",
       "sellingPrice": 9,
-      "status": "FAIL",
-      "totalExpectedEur": 0.6432,
-      "totalActualEur": 0.6432,
+      "status": "PASS",
+      "totalExpectedEur": 1.5192,
+      "totalActualEur": 1.5192,
       "totalDeltaEur": 0,
-      "summaryFoodCostEur": 0.64318,
-      "pdfTotalFoodCostEur": 0.6432,
+      "summaryFoodCostEur": 1.51918,
+      "pdfTotalFoodCostEur": 1.5192,
       "ingredientLines": [
         {
           "lineId": "48ab7e73-a67e-4d41-a9be-59fa6732e422",
@@ -899,20 +846,16 @@
           "unit": "g",
           "opUnitCostEur": 0.00876,
           "costSource": "invoice",
-          "expectedLineCostEur": null,
-          "actualLineCostEur": null,
-          "deltaEur": null,
+          "expectedLineCostEur": 0.876,
+          "actualLineCostEur": 0.876,
+          "deltaEur": 0,
           "catalogOpEur": 0.00876,
           "detailOpEur": 0.00876,
           "uiUnitCostEur": 0.00876,
-          "pdfLineCostEur": null,
+          "pdfLineCostEur": 0.876,
           "usesPriceHistory": false,
-          "status": "FAIL",
-          "notes": [
-            "math: expected 0 actual 0",
-            "UI line cost mismatch",
-            "unresolved: recipe 100 g vs overlay/cost base mismatch"
-          ],
+          "status": "PASS",
+          "notes": [],
           "trace": {
             "invoiceItemId": "593e7560-ba2a-4c60-8300-ff34a26335b9",
             "invoiceLineName": "Salada Ibérica FSTK EMB. 250g",
@@ -1003,9 +946,7 @@
           }
         }
       ],
-      "failures": [
-        "Salada ibérica: math: expected 0 actual 0; UI line cost mismatch; unresolved: recipe 100 g vs overlay/cost base mismatch"
-      ],
+      "failures": [],
       "coverageTags": [
         "salad",
         "recipe-unit-g",

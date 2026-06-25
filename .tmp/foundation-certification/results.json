@@ -1,0 +1,3129 @@
+{
+  "generatedAt": "2026-06-25T13:50:05.355Z",
+  "validationLab": "bjhnlrgodcqoyzddbpbd",
+  "scope": {
+    "targetSuppliers": [
+      "aviludo",
+      "avijudo",
+      "mammafiore",
+      "bidfood",
+      "emporio",
+      "bocconcino"
+    ],
+    "invoiceCount": 6,
+    "itemCount": 51,
+    "matchedIngredientCount": 40,
+    "unmatchedLineCount": 0
+  },
+  "summary": {
+    "totalAudited": 40,
+    "certified": 4,
+    "conditional": 29,
+    "failed": 7,
+    "certifiedPct": 10
+  },
+  "risks": {
+    "p0": 0,
+    "p1": 17,
+    "p2": 1,
+    "p3": 5,
+    "p4": 0,
+    "p0Issues": [],
+    "p1Issues": [
+      "Pepino conserva: price history sync/orphan",
+      "Arroz agulha: price history sync/orphan",
+      "Chocolate culinária: price history sync/orphan",
+      "Açúcar branco: price history sync/orphan",
+      "Nata culinária: price history sync/orphan",
+      "Mozzarella fior di latte: price history sync/orphan",
+      "Ovo classe M: catalog ≠ latest invoice economics",
+      "Tomilho: catalog ≠ latest invoice economics",
+      "Água san pellegrino: catalog ≠ latest invoice economics",
+      "Água san pellegrino: price history sync/orphan",
+      "Ginger beer: catalog ≠ latest invoice economics",
+      "Ginger beer: price history sync/orphan",
+      "Prosciutto cotto scelto: price history sync/orphan",
+      "Peroni nastro azzurro 33cl: catalog ≠ latest invoice economics",
+      "Peroni nastro azzurro 33cl: price history sync/orphan",
+      "Aceto balsamico di modena IGP: catalog ≠ latest invoice economics",
+      "Aceto balsamico di modena IGP: price history sync/orphan"
+    ],
+    "p2Issues": [
+      "Atum em óleo: PDF ground truth mismatch"
+    ],
+    "p3Issues": [
+      "Ovo classe M: UI surface divergence",
+      "Tomilho: UI surface divergence",
+      "Água san pellegrino: UI surface divergence",
+      "Prosciutto cotto scelto: suggested match only",
+      "Aceto balsamico di modena IGP: UI surface divergence"
+    ],
+    "p4Issues": []
+  },
+  "biggestArchitecturalWeakness": "Match lifecycle read path — persisted invoice_item_matches not consumed when VITE_MATCH_LIFECYCLE_READ_CUTOVER is off",
+  "productionGrade": "Partial",
+  "confidence": 60,
+  "failuresByCategory": {
+    "matching": [
+      "Anchoas: persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Gema líquida: persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Pepino conserva: history delta math invalid for row 5bd9a4e1-713f-4474-9985-f46bdb1b36b0; persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Atum em óleo: PDF/ground-truth mismatch on latest invoice line; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Arroz agulha: history delta math invalid for row edc6c627-d934-40de-8eb8-cc0a25d36755; persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Chocolate culinária: history delta math invalid for row bf250ee4-388a-480f-96d7-e8c0e8e8dfb2; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Açúcar branco: history delta math invalid for row 1d9d5133-724b-461c-b141-605392f2b64d; persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Nata culinária: history delta math invalid for row da9d4ea1-f7ee-427e-869b-623aacbd550d; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Mozzarella fior di latte: history delta math invalid for row f0f76e84-f4c5-4dc1-9fb6-ba026d2384d0; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Ovo classe M: catalog purchase_quantity 1 ≠ computed 180; persisted confirmed; virtual=unmatched (alias/read-cutover gap); line op 0.21355555555555555 ≠ catalog op 38.44; procurement→operational→catalog→history chain incomplete",
+      "Pêra abacate: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Salada ibérica: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Manteiga s/sal: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Mortadella IGP massima con pistacchio: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Água san pellegrino: catalog purchase_quantity 15 ≠ computed 11250; latest history op 0.0017137777777777778 ≠ catalog op 1.2853333333333334; history delta math invalid for row 4a00605a-a9e7-4b93-969b-92e5aae8e714; persisted confirmed; virtual=unmatched (alias/read-cutover gap); line op 0.0017137777777777778 ≠ catalog op 1.2853333333333334; procurement→operational→catalog→history chain incomplete",
+      "Ginger beer: catalog purchase_quantity 24 ≠ computed 200; latest history op 0.004050000000000001 ≠ catalog op 0.03375; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Paccheri lisci: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Gorgonzola DOP dolce: persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Prosciutto cotto scelto: price_history row from unconfirmed suggested match; procurement→operational→catalog→history chain incomplete",
+      "Farina do pasta fresca e gnocchi: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Guanciale stagionato: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Farine speciale pizza: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Peroni nastro azzurro 33cl: catalog purchase_quantity 24 ≠ computed 7920; latest history op 0.0001351010101010101 ≠ catalog op 0.044583333333333336; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Aceto balsamico di modena IGP: catalog purchase_quantity 2 ≠ computed 10000; latest history op 0.001609 ≠ catalog op 8.045; persisted confirmed; virtual=suggested (alias/read-cutover gap); line op 0.001609 ≠ catalog op 8.045; procurement→operational→catalog→history chain incomplete",
+      "Mozzarella julienne: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Rulo di capra: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete"
+    ],
+    "architecture": [
+      "Anchoas: persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Gema líquida: persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Pepino conserva: history delta math invalid for row 5bd9a4e1-713f-4474-9985-f46bdb1b36b0; persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Atum em óleo: PDF/ground-truth mismatch on latest invoice line; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Arroz agulha: history delta math invalid for row edc6c627-d934-40de-8eb8-cc0a25d36755; persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Chocolate culinária: history delta math invalid for row bf250ee4-388a-480f-96d7-e8c0e8e8dfb2; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Açúcar branco: history delta math invalid for row 1d9d5133-724b-461c-b141-605392f2b64d; persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Nata culinária: history delta math invalid for row da9d4ea1-f7ee-427e-869b-623aacbd550d; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Mozzarella fior di latte: history delta math invalid for row f0f76e84-f4c5-4dc1-9fb6-ba026d2384d0; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Ovo classe M: catalog purchase_quantity 1 ≠ computed 180; persisted confirmed; virtual=unmatched (alias/read-cutover gap); line op 0.21355555555555555 ≠ catalog op 38.44; procurement→operational→catalog→history chain incomplete",
+      "Pêra abacate: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Salada ibérica: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Tomilho: catalog purchase_quantity 1 ≠ computed 100; line op 0.0206 ≠ catalog op 2.06; procurement→operational→catalog→history chain incomplete",
+      "Manteiga s/sal: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Mortadella IGP massima con pistacchio: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Água san pellegrino: catalog purchase_quantity 15 ≠ computed 11250; latest history op 0.0017137777777777778 ≠ catalog op 1.2853333333333334; history delta math invalid for row 4a00605a-a9e7-4b93-969b-92e5aae8e714; persisted confirmed; virtual=unmatched (alias/read-cutover gap); line op 0.0017137777777777778 ≠ catalog op 1.2853333333333334; procurement→operational→catalog→history chain incomplete",
+      "Ginger beer: catalog purchase_quantity 24 ≠ computed 200; latest history op 0.004050000000000001 ≠ catalog op 0.03375; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Paccheri lisci: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Gorgonzola DOP dolce: persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Prosciutto cotto scelto: price_history row from unconfirmed suggested match; procurement→operational→catalog→history chain incomplete",
+      "Farina do pasta fresca e gnocchi: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Guanciale stagionato: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Farine speciale pizza: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Peroni nastro azzurro 33cl: catalog purchase_quantity 24 ≠ computed 7920; latest history op 0.0001351010101010101 ≠ catalog op 0.044583333333333336; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Aceto balsamico di modena IGP: catalog purchase_quantity 2 ≠ computed 10000; latest history op 0.001609 ≠ catalog op 8.045; persisted confirmed; virtual=suggested (alias/read-cutover gap); line op 0.001609 ≠ catalog op 8.045; procurement→operational→catalog→history chain incomplete",
+      "Mozzarella julienne: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Rulo di capra: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete"
+    ],
+    "priceHistory": [
+      "Pepino conserva: history delta math invalid for row 5bd9a4e1-713f-4474-9985-f46bdb1b36b0; persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Arroz agulha: history delta math invalid for row edc6c627-d934-40de-8eb8-cc0a25d36755; persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Chocolate culinária: history delta math invalid for row bf250ee4-388a-480f-96d7-e8c0e8e8dfb2; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Açúcar branco: history delta math invalid for row 1d9d5133-724b-461c-b141-605392f2b64d; persisted confirmed; virtual=unmatched (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Nata culinária: history delta math invalid for row da9d4ea1-f7ee-427e-869b-623aacbd550d; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Mozzarella fior di latte: history delta math invalid for row f0f76e84-f4c5-4dc1-9fb6-ba026d2384d0; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Água san pellegrino: catalog purchase_quantity 15 ≠ computed 11250; latest history op 0.0017137777777777778 ≠ catalog op 1.2853333333333334; history delta math invalid for row 4a00605a-a9e7-4b93-969b-92e5aae8e714; persisted confirmed; virtual=unmatched (alias/read-cutover gap); line op 0.0017137777777777778 ≠ catalog op 1.2853333333333334; procurement→operational→catalog→history chain incomplete",
+      "Ginger beer: catalog purchase_quantity 24 ≠ computed 200; latest history op 0.004050000000000001 ≠ catalog op 0.03375; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Prosciutto cotto scelto: price_history row from unconfirmed suggested match; procurement→operational→catalog→history chain incomplete",
+      "Peroni nastro azzurro 33cl: catalog purchase_quantity 24 ≠ computed 7920; latest history op 0.0001351010101010101 ≠ catalog op 0.044583333333333336; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Aceto balsamico di modena IGP: catalog purchase_quantity 2 ≠ computed 10000; latest history op 0.001609 ≠ catalog op 8.045; persisted confirmed; virtual=suggested (alias/read-cutover gap); line op 0.001609 ≠ catalog op 8.045; procurement→operational→catalog→history chain incomplete"
+    ],
+    "invoiceGroundTruth": [
+      "Atum em óleo: PDF/ground-truth mismatch on latest invoice line; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Mozzarella fior di latte: history delta math invalid for row f0f76e84-f4c5-4dc1-9fb6-ba026d2384d0; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Abóbora butternut: PARTIAL",
+      "Alho francês: PARTIAL",
+      "Courgettes: PARTIAL",
+      "Pêra abacate: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Pepino fresco: PARTIAL",
+      "Hortelã: PARTIAL",
+      "Salada ibérica: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Mortadella IGP massima con pistacchio: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Água san pellegrino: catalog purchase_quantity 15 ≠ computed 11250; latest history op 0.0017137777777777778 ≠ catalog op 1.2853333333333334; history delta math invalid for row 4a00605a-a9e7-4b93-969b-92e5aae8e714; persisted confirmed; virtual=unmatched (alias/read-cutover gap); line op 0.0017137777777777778 ≠ catalog op 1.2853333333333334; procurement→operational→catalog→history chain incomplete",
+      "Rigamonti bresaola punta d'anca oro: PARTIAL",
+      "Ginger beer: catalog purchase_quantity 24 ≠ computed 200; latest history op 0.004050000000000001 ≠ catalog op 0.03375; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Rovagnati salame ventricina: PARTIAL",
+      "Paccheri lisci: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Prosciutto cotto scelto: price_history row from unconfirmed suggested match; procurement→operational→catalog→history chain incomplete",
+      "Farina do pasta fresca e gnocchi: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Guanciale stagionato: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Farine speciale pizza: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Peroni nastro azzurro 33cl: catalog purchase_quantity 24 ≠ computed 7920; latest history op 0.0001351010101010101 ≠ catalog op 0.044583333333333336; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Aceto balsamico di modena IGP: catalog purchase_quantity 2 ≠ computed 10000; latest history op 0.001609 ≠ catalog op 8.045; persisted confirmed; virtual=suggested (alias/read-cutover gap); line op 0.001609 ≠ catalog op 8.045; procurement→operational→catalog→history chain incomplete",
+      "Mozzarella julienne: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Rulo di capra: persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Mezzi paccheri mancini: PARTIAL",
+      "Stracciatella: PARTIAL"
+    ],
+    "ingredientCatalog": [
+      "Ovo classe M: catalog purchase_quantity 1 ≠ computed 180; persisted confirmed; virtual=unmatched (alias/read-cutover gap); line op 0.21355555555555555 ≠ catalog op 38.44; procurement→operational→catalog→history chain incomplete",
+      "Tomilho: catalog purchase_quantity 1 ≠ computed 100; line op 0.0206 ≠ catalog op 2.06; procurement→operational→catalog→history chain incomplete",
+      "Água san pellegrino: catalog purchase_quantity 15 ≠ computed 11250; latest history op 0.0017137777777777778 ≠ catalog op 1.2853333333333334; history delta math invalid for row 4a00605a-a9e7-4b93-969b-92e5aae8e714; persisted confirmed; virtual=unmatched (alias/read-cutover gap); line op 0.0017137777777777778 ≠ catalog op 1.2853333333333334; procurement→operational→catalog→history chain incomplete",
+      "Ginger beer: catalog purchase_quantity 24 ≠ computed 200; latest history op 0.004050000000000001 ≠ catalog op 0.03375; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Peroni nastro azzurro 33cl: catalog purchase_quantity 24 ≠ computed 7920; latest history op 0.0001351010101010101 ≠ catalog op 0.044583333333333336; persisted confirmed; virtual=suggested (alias/read-cutover gap); procurement→operational→catalog→history chain incomplete",
+      "Aceto balsamico di modena IGP: catalog purchase_quantity 2 ≠ computed 10000; latest history op 0.001609 ≠ catalog op 8.045; persisted confirmed; virtual=suggested (alias/read-cutover gap); line op 0.001609 ≠ catalog op 8.045; procurement→operational→catalog→history chain incomplete"
+    ],
+    "uiConsistency": [
+      "Ovo classe M: catalog purchase_quantity 1 ≠ computed 180; persisted confirmed; virtual=unmatched (alias/read-cutover gap); line op 0.21355555555555555 ≠ catalog op 38.44; procurement→operational→catalog→history chain incomplete",
+      "Tomilho: catalog purchase_quantity 1 ≠ computed 100; line op 0.0206 ≠ catalog op 2.06; procurement→operational→catalog→history chain incomplete",
+      "Água san pellegrino: catalog purchase_quantity 15 ≠ computed 11250; latest history op 0.0017137777777777778 ≠ catalog op 1.2853333333333334; history delta math invalid for row 4a00605a-a9e7-4b93-969b-92e5aae8e714; persisted confirmed; virtual=unmatched (alias/read-cutover gap); line op 0.0017137777777777778 ≠ catalog op 1.2853333333333334; procurement→operational→catalog→history chain incomplete",
+      "Aceto balsamico di modena IGP: catalog purchase_quantity 2 ≠ computed 10000; latest history op 0.001609 ≠ catalog op 8.045; persisted confirmed; virtual=suggested (alias/read-cutover gap); line op 0.001609 ≠ catalog op 8.045; procurement→operational→catalog→history chain incomplete"
+    ],
+    "validation": [
+      "Prosciutto cotto scelto: price_history row from unconfirmed suggested match; procurement→operational→catalog→history chain incomplete"
+    ]
+  },
+  "ingredients": [
+    {
+      "ingredientId": "c811f67f-df4d-4194-ba8b-7a15d4af38bd",
+      "ingredientName": "Anchoas",
+      "supplier": "Aviludo",
+      "latestInvoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "latestItemId": "8b65efaa-ffb8-4469-b34b-5caa486ee525",
+      "latestLineName": "Filete de Anchoas Alconfirosa LI 495 g",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "N/A",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "persisted confirmed; virtual=unmatched (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "8b65efaa-ffb8-4469-b34b-5caa486ee525",
+          "name": "Filete de Anchoas Alconfirosa LI 495 g",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 9.99,
+          "total": 19.98
+        },
+        "catalog": {
+          "current_price": 9.99,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 9.99,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 495
+          },
+          "recipeFields": {
+            "current_price": 9.99,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 495
+          },
+          "computedOp": 9.99,
+          "usableCost": {
+            "cost": 20.181818181818183,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "unmatched",
+          "hasAlias": true
+        },
+        "historyCount": 2,
+        "latestHistId": "908de185-e61a-4f41-af4c-3b70f69bd08f",
+        "presentation": {
+          "purchaseQuantityLine": "2 un",
+          "purchasePriceLine": "€9.99 / can · €19.98 total",
+          "normalizedLine": "990 g usable",
+          "usableCostLine": "€20.18 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "32dbf47d-347c-45f3-bd9f-c6e90640e767",
+      "ingredientName": "Gema líquida",
+      "supplier": "Aviludo",
+      "latestInvoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "latestItemId": "a1f408d0-5fbf-41b1-b04d-894013fe0805",
+      "latestLineName": "Ovo Líquido Past.Gema Dovo 1 Kg",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PASS",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "persisted confirmed; virtual=unmatched (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "a1f408d0-5fbf-41b1-b04d-894013fe0805",
+          "name": "Ovo Líquido Past.Gema Dovo 1 Kg",
+          "quantity": 6,
+          "unit": "un",
+          "unit_price": 10.49,
+          "total": 62.94
+        },
+        "catalog": {
+          "current_price": 10.49,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 10.49,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1000
+          },
+          "recipeFields": {
+            "current_price": 10.49,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1000
+          },
+          "computedOp": 10.49,
+          "usableCost": {
+            "cost": 10.49,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "unmatched",
+          "hasAlias": true
+        },
+        "historyCount": 2,
+        "latestHistId": "e143080d-511b-4c37-9018-11949343aedc",
+        "presentation": {
+          "purchaseQuantityLine": "6 un",
+          "purchasePriceLine": "€10.49 / unit · €62.94 total",
+          "normalizedLine": "6 kg usable",
+          "usableCostLine": "€10.49 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "635a1189-36ea-4ff2-9012-8172ab1ab81d",
+      "ingredientName": "Pepino conserva",
+      "supplier": "Aviludo",
+      "latestInvoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "latestItemId": "af7a1317-dbb8-4e81-9a3a-b3c17637e16c",
+      "latestLineName": "Pepinos Extra Uli Frasco 6x720 g",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PASS",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "FAIL",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "history delta math invalid for row 5bd9a4e1-713f-4474-9985-f46bdb1b36b0",
+        "persisted confirmed; virtual=unmatched (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "af7a1317-dbb8-4e81-9a3a-b3c17637e16c",
+          "name": "Pepinos Extra Uli Frasco 6x720 g",
+          "quantity": 1,
+          "unit": "cx",
+          "unit_price": 22.49,
+          "total": 22.49
+        },
+        "catalog": {
+          "current_price": 22.49,
+          "purchase_quantity": 6,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 22.49,
+            "purchase_quantity": 6,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 4320
+          },
+          "recipeFields": {
+            "current_price": 22.49,
+            "purchase_quantity": 6,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 4320
+          },
+          "computedOp": 3.748333333333333,
+          "usableCost": {
+            "cost": 5.206018518518518,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "unmatched",
+          "hasAlias": true
+        },
+        "historyCount": 2,
+        "latestHistId": "5bd9a4e1-713f-4474-9985-f46bdb1b36b0",
+        "presentation": {
+          "purchaseQuantityLine": "1 case · 6 × 720 g",
+          "purchasePriceLine": "€22.49 / case",
+          "normalizedLine": "4.32 kg usable",
+          "usableCostLine": "€5.21 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "0f30ccb3-bb47-40bb-83cc-ae2a4018066d",
+      "ingredientName": "Atum em óleo",
+      "supplier": "Aviludo",
+      "latestInvoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "latestItemId": "f1d95452-2302-4467-80a1-afc9d726eed3",
+      "latestLineName": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "FAIL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "PDF/ground-truth mismatch on latest invoice line",
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "f1d95452-2302-4467-80a1-afc9d726eed3",
+          "name": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 13.1,
+          "total": 13.1
+        },
+        "catalog": {
+          "current_price": 13.1,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 13.1,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1000
+          },
+          "recipeFields": {
+            "current_price": 13.1,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1000
+          },
+          "computedOp": 13.1,
+          "usableCost": {
+            "cost": 13.1,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 2,
+        "latestHistId": "781ab1ac-39d2-4462-9106-635e5603c466",
+        "presentation": {
+          "purchaseQuantityLine": "1 un",
+          "purchasePriceLine": "€13.10 / bag",
+          "normalizedLine": "1 kg usable",
+          "usableCostLine": "€13.10 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "07a55cf5-b98d-4aae-b330-b4944882e4d3",
+      "ingredientName": "Arroz agulha",
+      "supplier": "Aviludo",
+      "latestInvoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "latestItemId": "61bedc5b-ce0d-4835-945a-22efb41684f0",
+      "latestLineName": "Arroz Agulha Metro Chef 12x1 kg",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PASS",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "FAIL",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "history delta math invalid for row edc6c627-d934-40de-8eb8-cc0a25d36755",
+        "persisted confirmed; virtual=unmatched (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "61bedc5b-ce0d-4835-945a-22efb41684f0",
+          "name": "Arroz Agulha Metro Chef 12x1 kg",
+          "quantity": 1,
+          "unit": "cx",
+          "unit_price": 13.95,
+          "total": 13.95
+        },
+        "catalog": {
+          "current_price": 13.95,
+          "purchase_quantity": 12,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 13.95,
+            "purchase_quantity": 12,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 12000
+          },
+          "recipeFields": {
+            "current_price": 13.95,
+            "purchase_quantity": 12,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 12000
+          },
+          "computedOp": 1.1624999999999999,
+          "usableCost": {
+            "cost": 1.1624999999999999,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "unmatched",
+          "hasAlias": true
+        },
+        "historyCount": 2,
+        "latestHistId": "edc6c627-d934-40de-8eb8-cc0a25d36755",
+        "presentation": {
+          "purchaseQuantityLine": "1 case · 12 × 1 kg",
+          "purchasePriceLine": "€13.95 / case",
+          "normalizedLine": "12 kg usable",
+          "usableCostLine": "€1.16 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "43cba6b0-880e-4760-ab78-8d9a9c1b6f86",
+      "ingredientName": "Chocolate culinária",
+      "supplier": "Aviludo",
+      "latestInvoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "latestItemId": "c450b962-de47-4127-93d9-88ef7fc5db2b",
+      "latestLineName": "Chocolate Culinaria Pantagruel 10x200 g",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PASS",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "FAIL",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "history delta math invalid for row bf250ee4-388a-480f-96d7-e8c0e8e8dfb2",
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "c450b962-de47-4127-93d9-88ef7fc5db2b",
+          "name": "Chocolate Culinaria Pantagruel 10x200 g",
+          "quantity": 2,
+          "unit": "cx",
+          "unit_price": 29.99,
+          "total": 59.98
+        },
+        "catalog": {
+          "current_price": 29.99,
+          "purchase_quantity": 10,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 29.99,
+            "purchase_quantity": 10,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 2000
+          },
+          "recipeFields": {
+            "current_price": 29.99,
+            "purchase_quantity": 10,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 2000
+          },
+          "computedOp": 2.9989999999999997,
+          "usableCost": {
+            "cost": 14.995,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 2,
+        "latestHistId": "bf250ee4-388a-480f-96d7-e8c0e8e8dfb2",
+        "presentation": {
+          "purchaseQuantityLine": "2 cases · 10 × 200 g",
+          "purchasePriceLine": "€29.99 / case · €59.98 total",
+          "normalizedLine": "4 kg usable",
+          "usableCostLine": "€15.00 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "c46db69a-e4ae-4be8-abb8-d7708de12f3d",
+      "ingredientName": "Açúcar branco",
+      "supplier": "Aviludo",
+      "latestInvoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "latestItemId": "4713a1af-d551-4f26-ad43-94983553d72d",
+      "latestLineName": "Açúcar Branco METRO Chef 10x1 Kg",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PASS",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "FAIL",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "history delta math invalid for row 1d9d5133-724b-461c-b141-605392f2b64d",
+        "persisted confirmed; virtual=unmatched (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "4713a1af-d551-4f26-ad43-94983553d72d",
+          "name": "Açúcar Branco METRO Chef 10x1 Kg",
+          "quantity": 1,
+          "unit": "cx",
+          "unit_price": 9.99,
+          "total": 9.99
+        },
+        "catalog": {
+          "current_price": 9.99,
+          "purchase_quantity": 10,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 9.99,
+            "purchase_quantity": 10,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 10000
+          },
+          "recipeFields": {
+            "current_price": 9.99,
+            "purchase_quantity": 10,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 10000
+          },
+          "computedOp": 0.999,
+          "usableCost": {
+            "cost": 0.999,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "unmatched",
+          "hasAlias": true
+        },
+        "historyCount": 2,
+        "latestHistId": "1d9d5133-724b-461c-b141-605392f2b64d",
+        "presentation": {
+          "purchaseQuantityLine": "1 case · 10 × 1 kg",
+          "purchasePriceLine": "€9.99 / case",
+          "normalizedLine": "10 kg usable",
+          "usableCostLine": "€0.999 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "3d1af48c-be3c-494a-9e0f-be267fc9388b",
+      "ingredientName": "Nata culinária",
+      "supplier": "Aviludo",
+      "latestInvoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "latestItemId": "8498e893-1d03-42c8-aaf5-3be182a28f9e",
+      "latestLineName": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PASS",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "FAIL",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "history delta math invalid for row da9d4ea1-f7ee-427e-869b-623aacbd550d",
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "8498e893-1d03-42c8-aaf5-3be182a28f9e",
+          "name": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+          "quantity": 5,
+          "unit": "cx",
+          "unit_price": 18.89,
+          "total": 94.45
+        },
+        "catalog": {
+          "current_price": 18.89,
+          "purchase_quantity": 6,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 18.89,
+            "purchase_quantity": 6,
+            "cost_base_unit": "un",
+            "usable_volume_ml": 6000
+          },
+          "recipeFields": {
+            "current_price": 18.89,
+            "purchase_quantity": 6,
+            "cost_base_unit": "un",
+            "usable_volume_ml": 6000
+          },
+          "computedOp": 3.1483333333333334,
+          "usableCost": {
+            "cost": 3.1483333333333334,
+            "unit": "L"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 2,
+        "latestHistId": "da9d4ea1-f7ee-427e-869b-623aacbd550d",
+        "presentation": {
+          "purchaseQuantityLine": "5 cases · 6 × 1 L",
+          "purchasePriceLine": "€18.89 / case · €94.45 total",
+          "normalizedLine": "30 L usable",
+          "usableCostLine": "€3.15 / L"
+        }
+      }
+    },
+    {
+      "ingredientId": "2a99cecd-08fb-48d5-87cf-cc9ea5282a6d",
+      "ingredientName": "Mozzarella fior di latte",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "latestInvoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "latestItemId": "63958019-9af9-4738-bc13-404d27796b24",
+      "latestLineName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "latestInvoiceDate": "2026-05-08",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "FAIL",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "history delta math invalid for row f0f76e84-f4c5-4dc1-9fb6-ba026d2384d0",
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "63958019-9af9-4738-bc13-404d27796b24",
+          "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+          "quantity": 10,
+          "unit": "un",
+          "unit_price": 8.12,
+          "total": 81.23
+        },
+        "catalog": {
+          "current_price": 8.12,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 8.12,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1000
+          },
+          "recipeFields": {
+            "current_price": 8.12,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1000
+          },
+          "computedOp": 8.12,
+          "usableCost": {
+            "cost": 8.12,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 2,
+        "latestHistId": "f0f76e84-f4c5-4dc1-9fb6-ba026d2384d0",
+        "presentation": {
+          "purchaseQuantityLine": "10 un · 8 × 125 g",
+          "purchasePriceLine": "€8.12 / unit · €81.23 total",
+          "normalizedLine": "10 kg usable",
+          "usableCostLine": "€8.12 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "9f167402-9ea8-4fac-92dc-2cb11a525359",
+      "ingredientName": "Ovo classe M",
+      "supplier": "Bidfood Portugal, SA",
+      "latestInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "latestItemId": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+      "latestLineName": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+      "latestInvoiceDate": "2026-05-25",
+      "matchState": "confirmed",
+      "status": "failed",
+      "checks": {
+        "invoiceGroundTruth": "PASS",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "FAIL",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "FAIL",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "catalog purchase_quantity 1 ≠ computed 180",
+        "persisted confirmed; virtual=unmatched (alias/read-cutover gap)",
+        "line op 0.21355555555555555 ≠ catalog op 38.44",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "480e66ee-dbee-4e2a-ac78-dc13a0f9fd63",
+          "name": "Ovo MORENO Classe M Cx.15 dúzias (CARTÃO)",
+          "quantity": 1,
+          "unit": "cx",
+          "unit_price": 38.44,
+          "total": 38.44
+        },
+        "catalog": {
+          "current_price": 38.44,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 38.44,
+            "purchase_quantity": 180,
+            "cost_base_unit": "un"
+          },
+          "recipeFields": {
+            "current_price": 38.44,
+            "purchase_quantity": 180,
+            "cost_base_unit": "un"
+          },
+          "computedOp": 0.21355555555555555,
+          "usableCost": {
+            "cost": 0.21355555555555555,
+            "unit": "egg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "unmatched",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "0e70f19d-fdf2-4201-8a0c-0fa65712afd7",
+        "presentation": {
+          "purchaseQuantityLine": "1 case",
+          "purchasePriceLine": "€38.44 / case",
+          "normalizedLine": "180 un usable",
+          "usableCostLine": "€0.2136 / egg"
+        }
+      }
+    },
+    {
+      "ingredientId": "9338970d-b55b-4526-be36-ab8497cd9da8",
+      "ingredientName": "Abóbora butternut",
+      "supplier": "Bidfood Portugal, SA",
+      "latestInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "latestItemId": "dee41356-7df1-430e-a288-7de2a40ff979",
+      "latestLineName": "Abóbora Butternut",
+      "latestInvoiceDate": "2026-05-25",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "failures": [],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "dee41356-7df1-430e-a288-7de2a40ff979",
+          "name": "Abóbora Butternut",
+          "quantity": 5.64,
+          "unit": "kg",
+          "unit_price": 0.99,
+          "total": 5.59
+        },
+        "catalog": {
+          "current_price": 0.99,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 0.99,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 0.99,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.00099,
+          "usableCost": {
+            "cost": 0.99,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "010a73aa-9cce-4709-8078-c9c7a52ef780",
+        "presentation": {
+          "purchaseQuantityLine": "5.64 kg",
+          "purchasePriceLine": "€0.99 / kg · €5.59 total",
+          "normalizedLine": null,
+          "usableCostLine": null
+        }
+      }
+    },
+    {
+      "ingredientId": "446f3217-9a6f-428a-abc6-10927a958168",
+      "ingredientName": "Alho francês",
+      "supplier": "Bidfood Portugal, SA",
+      "latestInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "latestItemId": "5700a733-3cd9-4147-8d21-cb524976a3d7",
+      "latestLineName": "Alho Francês",
+      "latestInvoiceDate": "2026-05-25",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "failures": [],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "5700a733-3cd9-4147-8d21-cb524976a3d7",
+          "name": "Alho Francês",
+          "quantity": 5.42,
+          "unit": "kg",
+          "unit_price": 1.42,
+          "total": 7.67
+        },
+        "catalog": {
+          "current_price": 1.42,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 1.42,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 1.42,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.0014199999999999998,
+          "usableCost": {
+            "cost": 1.42,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "cd8d2350-7ccc-4ff8-8a83-625975ea45a0",
+        "presentation": {
+          "purchaseQuantityLine": "5.42 kg",
+          "purchasePriceLine": "€1.42 / kg · €7.67 total",
+          "normalizedLine": null,
+          "usableCostLine": null
+        }
+      }
+    },
+    {
+      "ingredientId": "6c7ab001-9f87-448e-9b34-87d3aa21f9ca",
+      "ingredientName": "Courgettes",
+      "supplier": "Bidfood Portugal, SA",
+      "latestInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "latestItemId": "b64d5a44-d15b-4c1e-8f25-5809fa3f5541",
+      "latestLineName": "Courgettes",
+      "latestInvoiceDate": "2026-05-25",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "failures": [],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "b64d5a44-d15b-4c1e-8f25-5809fa3f5541",
+          "name": "Courgettes",
+          "quantity": 3.3,
+          "unit": "kg",
+          "unit_price": 1.56,
+          "total": 5.15
+        },
+        "catalog": {
+          "current_price": 1.56,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 1.56,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 1.56,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.00156,
+          "usableCost": {
+            "cost": 1.56,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "3d1220e6-024b-46db-9d4a-088fbc83f166",
+        "presentation": {
+          "purchaseQuantityLine": "3.30 kg",
+          "purchasePriceLine": "€1.56 / kg · €5.15 total",
+          "normalizedLine": null,
+          "usableCostLine": null
+        }
+      }
+    },
+    {
+      "ingredientId": "d8a90b20-f20c-464f-a153-d65e062d5ff9",
+      "ingredientName": "Pêra abacate",
+      "supplier": "Bidfood Portugal, SA",
+      "latestInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "latestItemId": "dd6efa1e-60a0-471a-87b8-0c8df1bafcf0",
+      "latestLineName": "Pêra Abacate Hasse",
+      "latestInvoiceDate": "2026-05-25",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "dd6efa1e-60a0-471a-87b8-0c8df1bafcf0",
+          "name": "Pêra Abacate Hasse",
+          "quantity": 3.28,
+          "unit": "kg",
+          "unit_price": 4.26,
+          "total": 13.96
+        },
+        "catalog": {
+          "current_price": 4.26,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 4.26,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 4.26,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.00426,
+          "usableCost": {
+            "cost": 4.26,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "b97d3cc9-cb74-4514-8999-afdd58c5260f",
+        "presentation": {
+          "purchaseQuantityLine": "3.28 kg",
+          "purchasePriceLine": "€4.26 / kg · €13.96 total",
+          "normalizedLine": null,
+          "usableCostLine": null
+        }
+      }
+    },
+    {
+      "ingredientId": "963d3a72-6f74-427b-8658-8d98b6a8d8df",
+      "ingredientName": "Pepino fresco",
+      "supplier": "Bidfood Portugal, SA",
+      "latestInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "latestItemId": "0b373627-9e78-4387-9945-35a504174b93",
+      "latestLineName": "Pepino",
+      "latestInvoiceDate": "2026-05-25",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "failures": [],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "0b373627-9e78-4387-9945-35a504174b93",
+          "name": "Pepino",
+          "quantity": 3.36,
+          "unit": "kg",
+          "unit_price": 1.42,
+          "total": 4.76
+        },
+        "catalog": {
+          "current_price": 1.42,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 1.42,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 1.42,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.0014199999999999998,
+          "usableCost": {
+            "cost": 1.42,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "9b1eed03-a70c-44a6-8a83-68d7be851d46",
+        "presentation": {
+          "purchaseQuantityLine": "3.36 kg",
+          "purchasePriceLine": "€1.42 / kg · €4.76 total",
+          "normalizedLine": null,
+          "usableCostLine": null
+        }
+      }
+    },
+    {
+      "ingredientId": "6e3011e0-b160-48c9-867c-1234cd743802",
+      "ingredientName": "Hortelã",
+      "supplier": "Bidfood Portugal, SA",
+      "latestInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "latestItemId": "90823d87-6da6-414b-8a5e-1f8787db4aa9",
+      "latestLineName": "Hortelã",
+      "latestInvoiceDate": "2026-05-25",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "failures": [],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "90823d87-6da6-414b-8a5e-1f8787db4aa9",
+          "name": "Hortelã",
+          "quantity": 0.5,
+          "unit": "kg",
+          "unit_price": 5.4,
+          "total": 2.7
+        },
+        "catalog": {
+          "current_price": 5.4,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 5.4,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 5.4,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.0054,
+          "usableCost": {
+            "cost": 5.4,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "0040cde3-5bc4-44d6-a8c4-a29316f6e510",
+        "presentation": {
+          "purchaseQuantityLine": "0.50 kg",
+          "purchasePriceLine": "€5.40 / kg",
+          "normalizedLine": null,
+          "usableCostLine": null
+        }
+      }
+    },
+    {
+      "ingredientId": "8fe3ab95-b508-48b5-9890-d737dee78cc6",
+      "ingredientName": "Manjericão",
+      "supplier": "Bidfood Portugal, SA",
+      "latestInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "latestItemId": "b47828a9-e042-4437-b0b7-8944c812509a",
+      "latestLineName": "Manjericão",
+      "latestInvoiceDate": "2026-05-25",
+      "matchState": "confirmed",
+      "status": "certified",
+      "checks": {
+        "invoiceGroundTruth": "PASS",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "failures": [],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "b47828a9-e042-4437-b0b7-8944c812509a",
+          "name": "Manjericão",
+          "quantity": 5,
+          "unit": "mo",
+          "unit_price": 2.06,
+          "total": 10.28
+        },
+        "catalog": {
+          "current_price": 2.06,
+          "purchase_quantity": 100,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 2.06,
+            "purchase_quantity": 100,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 2.06,
+            "purchase_quantity": 100,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.0206,
+          "usableCost": {
+            "cost": 20.599999999999998,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "cab6571b-919b-4572-860e-7fb3a59fd8e8",
+        "presentation": {
+          "purchaseQuantityLine": "5 bunches",
+          "purchasePriceLine": "€2.06 / bunch · €10.28 total",
+          "normalizedLine": "500 g usable",
+          "usableCostLine": "€20.60 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "47cd8362-79f4-4285-8491-f016229eaa21",
+      "ingredientName": "Salada ibérica",
+      "supplier": "Bidfood Portugal, SA",
+      "latestInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "latestItemId": "593e7560-ba2a-4c60-8300-ff34a26335b9",
+      "latestLineName": "Salada Ibérica FSTK EMB. 250g",
+      "latestInvoiceDate": "2026-05-25",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "593e7560-ba2a-4c60-8300-ff34a26335b9",
+          "name": "Salada Ibérica FSTK EMB. 250g",
+          "quantity": 4,
+          "unit": "em",
+          "unit_price": 2.19,
+          "total": 8.76
+        },
+        "catalog": {
+          "current_price": 2.19,
+          "purchase_quantity": 250,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 2.19,
+            "purchase_quantity": 250,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 2.19,
+            "purchase_quantity": 250,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.00876,
+          "usableCost": {
+            "cost": 8.76,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "66339369-9df8-4f43-bc17-189bd39ab38e",
+        "presentation": {
+          "purchaseQuantityLine": "4 packs",
+          "purchasePriceLine": "€2.19 / pack · €8.76 total",
+          "normalizedLine": "250 g usable",
+          "usableCostLine": "€8.76 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "ac8a9cc3-66cd-4a77-95cb-a3c8104b7041",
+      "ingredientName": "Tomilho",
+      "supplier": "Bidfood Portugal, SA",
+      "latestInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "latestItemId": "f2d094ab-f50a-483d-b6cb-76554d5bf195",
+      "latestLineName": "Tomilho",
+      "latestInvoiceDate": "2026-05-25",
+      "matchState": "confirmed",
+      "status": "failed",
+      "checks": {
+        "invoiceGroundTruth": "PASS",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "FAIL",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "FAIL",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "catalog purchase_quantity 1 ≠ computed 100",
+        "line op 0.0206 ≠ catalog op 2.06",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "f2d094ab-f50a-483d-b6cb-76554d5bf195",
+          "name": "Tomilho",
+          "quantity": 1,
+          "unit": "mo",
+          "unit_price": 2.06,
+          "total": 2.06
+        },
+        "catalog": {
+          "current_price": 2.06,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 2.06,
+            "purchase_quantity": 100,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 2.06,
+            "purchase_quantity": 100,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.0206,
+          "usableCost": {
+            "cost": 20.599999999999998,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "25c318d5-64d8-4317-8d1e-57dff5aaa1e5",
+        "presentation": {
+          "purchaseQuantityLine": "1 bunch",
+          "purchasePriceLine": "€2.06 / bunch",
+          "normalizedLine": "100 g usable",
+          "usableCostLine": "€20.60 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "30fd4652-be74-47eb-afb1-60b2a15a14fc",
+      "ingredientName": "Manteiga s/sal",
+      "supplier": "Bidfood Portugal, SA",
+      "latestInvoiceId": "da472b7f-0fd9-4a26-a37c-80ad335f7f7e",
+      "latestItemId": "e1fcc019-499b-46a9-a99e-e5b51a7578db",
+      "latestLineName": "Manteiga Coimbra s/Sal EMB 1 Kg",
+      "latestInvoiceDate": "2026-05-25",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PASS",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "e1fcc019-499b-46a9-a99e-e5b51a7578db",
+          "name": "Manteiga Coimbra s/Sal EMB 1 Kg",
+          "quantity": 8,
+          "unit": "kg",
+          "unit_price": 8.9,
+          "total": 71.2
+        },
+        "catalog": {
+          "current_price": 8.9,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 8.9,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 8.9,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.0089,
+          "usableCost": {
+            "cost": 8.9,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "54995295-99b0-4879-aa09-c34125905df9",
+        "presentation": {
+          "purchaseQuantityLine": "8 kg",
+          "purchasePriceLine": "€8.90 / kg · €71.20 total",
+          "normalizedLine": "1 kg usable",
+          "usableCostLine": "€8.90 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "9c853a47-82fe-4d6d-88bc-f0aa007e0a59",
+      "ingredientName": "Mortadella IGP massima con pistacchio",
+      "supplier": "Emporio Italia",
+      "latestInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "latestItemId": "943d79b3-d421-448e-bd8e-39051ba5efd0",
+      "latestLineName": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "943d79b3-d421-448e-bd8e-39051ba5efd0",
+          "name": "Rovagnati - Mortadella IGP 'Massima' con Pistacchio 1/2 - 3,5kg",
+          "quantity": 3.11,
+          "unit": "kg",
+          "unit_price": 9.99,
+          "total": 31.07
+        },
+        "catalog": {
+          "current_price": 9.99,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 9.99,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 9.99,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.00999,
+          "usableCost": {
+            "cost": 9.99,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "2440697f-8dbd-403f-8cfe-c43ca03642f9",
+        "presentation": {
+          "purchaseQuantityLine": "3.11 kg",
+          "purchasePriceLine": "€9.99 / kg · €31.07 total",
+          "normalizedLine": "3.5 kg usable",
+          "usableCostLine": "€9.99 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "50783e60-702f-42b2-bccd-0b6a98d7635f",
+      "ingredientName": "Água san pellegrino",
+      "supplier": "Emporio Italia",
+      "latestInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "latestItemId": "7b893edb-6cf9-4650-983c-e95268bea65b",
+      "latestLineName": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "failed",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "FAIL",
+        "priceHistory": "FAIL",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "FAIL",
+        "architecture": "FAIL"
+      },
+      "failures": [
+        "catalog purchase_quantity 15 ≠ computed 11250",
+        "latest history op 0.0017137777777777778 ≠ catalog op 1.2853333333333334",
+        "history delta math invalid for row 4a00605a-a9e7-4b93-969b-92e5aae8e714",
+        "persisted confirmed; virtual=unmatched (alias/read-cutover gap)",
+        "line op 0.0017137777777777778 ≠ catalog op 1.2853333333333334",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "7b893edb-6cf9-4650-983c-e95268bea65b",
+          "name": "SanPellegrino - Acqua in vitro 75cl x 15ud",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 19.28,
+          "total": 38.56
+        },
+        "catalog": {
+          "current_price": 19.28,
+          "purchase_quantity": 15,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 19.28,
+            "purchase_quantity": 11250,
+            "cost_base_unit": "ml"
+          },
+          "recipeFields": {
+            "current_price": 19.28,
+            "purchase_quantity": 11250,
+            "cost_base_unit": "ml"
+          },
+          "computedOp": 0.0017137777777777778,
+          "usableCost": {
+            "cost": 1.7137777777777778,
+            "unit": "L"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "unmatched",
+          "hasAlias": true
+        },
+        "historyCount": 2,
+        "latestHistId": "4a00605a-a9e7-4b93-969b-92e5aae8e714",
+        "presentation": {
+          "purchaseQuantityLine": "2 un · 15 × 75 cl",
+          "purchasePriceLine": "€19.28 / case · €38.56 total",
+          "normalizedLine": "22.5 L usable",
+          "usableCostLine": "€1.71 / L"
+        }
+      }
+    },
+    {
+      "ingredientId": "31d6da3f-d812-4836-9086-92a5616250d1",
+      "ingredientName": "Rigamonti bresaola punta d'anca oro",
+      "supplier": "Emporio Italia",
+      "latestInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "latestItemId": "01fba9c8-3938-4009-924c-96920439570d",
+      "latestLineName": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "failures": [],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "01fba9c8-3938-4009-924c-96920439570d",
+          "name": "Rigamonti - Bresaola Punta d'Anca Oro 1/2 - 1,5kg",
+          "quantity": 1.83,
+          "unit": "kg",
+          "unit_price": 27.04,
+          "total": 49.48
+        },
+        "catalog": {
+          "current_price": 27.04,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 27.04,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 27.04,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.027039999999999998,
+          "usableCost": {
+            "cost": 27.04,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "5181c592-39fa-448c-b2e2-3cfae5456bea",
+        "presentation": {
+          "purchaseQuantityLine": "1.83 kg",
+          "purchasePriceLine": "€27.04 / kg · €49.48 total",
+          "normalizedLine": "1.5 kg usable",
+          "usableCostLine": "€27.04 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "7aa5dd9e-44c2-43e3-b673-890ad6d6da41",
+      "ingredientName": "Ginger beer",
+      "supplier": "Emporio Italia",
+      "latestInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "latestItemId": "de0946a9-b7e4-467b-ae21-8b0401fcb363",
+      "latestLineName": "Baladin - Ginger Beer 0.20cl",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "failed",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "FAIL",
+        "priceHistory": "FAIL",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "FAIL"
+      },
+      "failures": [
+        "catalog purchase_quantity 24 ≠ computed 200",
+        "latest history op 0.004050000000000001 ≠ catalog op 0.03375",
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "de0946a9-b7e4-467b-ae21-8b0401fcb363",
+          "name": "Baladin - Ginger Beer 0.20cl",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 0.81,
+          "total": 19.38
+        },
+        "catalog": {
+          "current_price": 0.81,
+          "purchase_quantity": 24,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 0.81,
+            "purchase_quantity": 200,
+            "cost_base_unit": "ml"
+          },
+          "recipeFields": {
+            "current_price": 0.81,
+            "purchase_quantity": 200,
+            "cost_base_unit": "ml"
+          },
+          "computedOp": 0.004050000000000001,
+          "usableCost": {
+            "cost": 4.05,
+            "unit": "L"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "ce3d00c9-e9c2-4179-9327-b14357a86ca6",
+        "presentation": {
+          "purchaseQuantityLine": "24 un",
+          "purchasePriceLine": "€0.81 / unit · €19.38 total",
+          "normalizedLine": "4.8 L usable",
+          "usableCostLine": "€4.05 / L"
+        }
+      }
+    },
+    {
+      "ingredientId": "06cc0c4d-9933-4ae2-8abe-64d196575f9f",
+      "ingredientName": "Rovagnati salame ventricina",
+      "supplier": "Emporio Italia",
+      "latestInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "latestItemId": "ee2e0910-9c9b-42ac-bbb7-ae8bae90619a",
+      "latestLineName": "Rovagnati - Salame Ventricina 2,5 Kg",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "failures": [],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "ee2e0910-9c9b-42ac-bbb7-ae8bae90619a",
+          "name": "Rovagnati - Salame Ventricina 2,5 Kg",
+          "quantity": 2.6,
+          "unit": "kg",
+          "unit_price": 15.19,
+          "total": 39.49
+        },
+        "catalog": {
+          "current_price": 15.19,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 15.19,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 15.19,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.015189999999999999,
+          "usableCost": {
+            "cost": 15.19,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "4ebd7557-a985-4328-bd18-466467296058",
+        "presentation": {
+          "purchaseQuantityLine": "2.60 kg",
+          "purchasePriceLine": "€15.19 / kg · €39.49 total",
+          "normalizedLine": "2.5 kg usable",
+          "usableCostLine": "€15.19 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "d7fcbb41-4e19-47ee-bbea-058e7b44a040",
+      "ingredientName": "Paccheri lisci",
+      "supplier": "Emporio Italia",
+      "latestInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "latestItemId": "71da1c6a-21b7-43de-aa92-0ab253204bed",
+      "latestLineName": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "71da1c6a-21b7-43de-aa92-0ab253204bed",
+          "name": "De Cecco - Paccheri Lisci Nr. 125 - 500g",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 2.1,
+          "total": 50.4
+        },
+        "catalog": {
+          "current_price": 2.1,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 2.1,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 500
+          },
+          "recipeFields": {
+            "current_price": 2.1,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 500
+          },
+          "computedOp": 2.1,
+          "usableCost": {
+            "cost": 4.2,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "d35170c1-d94e-49d5-ac45-1871e00bd98b",
+        "presentation": {
+          "purchaseQuantityLine": "24 un",
+          "purchasePriceLine": "€2.10 / unit · €50.40 total",
+          "normalizedLine": "12 kg usable",
+          "usableCostLine": "€4.20 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "1526106c-7bac-4b70-bd51-7b0fd5cc89ed",
+      "ingredientName": "Gorgonzola DOP dolce",
+      "supplier": "Emporio Italia",
+      "latestInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "latestItemId": "5fab58a8-8cfc-4625-ab97-e956d07aade9",
+      "latestLineName": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PASS",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "persisted confirmed; virtual=unmatched (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "5fab58a8-8cfc-4625-ab97-e956d07aade9",
+          "name": "Arrigoni Formaggi - Gorgonzola DOP Dolce Linea Castelfrigo 1/8 - 1,5kg",
+          "quantity": 1.35,
+          "unit": "kg",
+          "unit_price": 9.95,
+          "total": 13.44
+        },
+        "catalog": {
+          "current_price": 9.95,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 9.95,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 9.95,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.009949999999999999,
+          "usableCost": {
+            "cost": 9.95,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "unmatched",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "d94a0f16-8696-4457-a42f-85ac05b417bc",
+        "presentation": {
+          "purchaseQuantityLine": "1.35 kg",
+          "purchasePriceLine": "€9.95 / kg · €13.44 total",
+          "normalizedLine": "1.5 kg usable",
+          "usableCostLine": "€9.95 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "b924480a-91f3-4aa2-9852-a900795a6f92",
+      "ingredientName": "Prosciutto cotto scelto",
+      "supplier": "Emporio Italia",
+      "latestInvoiceId": "ab52796d-de1d-418d-86e7-230c8f056f09",
+      "latestItemId": "16435f8f-0fdc-4598-a9a9-f6b2713a7d86",
+      "latestLineName": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "suggested",
+      "status": "failed",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "FAIL",
+        "matching": "PARTIAL",
+        "validation": "PARTIAL",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "price_history row from unconfirmed suggested match",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [
+        "SUGGESTED_INGREDIENT_MATCH"
+      ],
+      "evidence": {
+        "line": {
+          "id": "16435f8f-0fdc-4598-a9a9-f6b2713a7d86",
+          "name": "Rovagnati - Assaporami Prosciutto Cotto Scelto HC 4,3-4,5kg",
+          "quantity": 4.3,
+          "unit": "kg",
+          "unit_price": 8.5,
+          "total": 36.54
+        },
+        "catalog": {
+          "current_price": 8.5,
+          "purchase_quantity": 1000,
+          "purchase_unit": "g",
+          "base_unit": "g"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 8.5,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "recipeFields": {
+            "current_price": 8.5,
+            "purchase_quantity": 1000,
+            "cost_base_unit": "g"
+          },
+          "computedOp": 0.0085,
+          "usableCost": {
+            "cost": 8.5,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "suggested",
+          "virtual": "suggested",
+          "hasAlias": false
+        },
+        "historyCount": 1,
+        "latestHistId": "b0e17b8b-22d5-4b02-8477-dca1b913f986",
+        "presentation": {
+          "purchaseQuantityLine": "4.30 kg",
+          "purchasePriceLine": "€8.50 / kg · €36.54 total",
+          "normalizedLine": "4.5 kg usable",
+          "usableCostLine": "€8.50 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "7c850fb7-71e5-4649-8ecc-d1641d5b9e95",
+      "ingredientName": "Farina do pasta fresca e gnocchi",
+      "supplier": "Mammafiore Portugal",
+      "latestInvoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "latestItemId": "dbda8fce-dd96-40f5-826c-dbb13bea69d2",
+      "latestLineName": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "dbda8fce-dd96-40f5-826c-dbb13bea69d2",
+          "name": "Farina do pasta fresca e gnocchi25kg Caputo",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 30.11,
+          "total": 30.11
+        },
+        "catalog": {
+          "current_price": 30.11,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 30.11,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 25000
+          },
+          "recipeFields": {
+            "current_price": 30.11,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 25000
+          },
+          "computedOp": 30.11,
+          "usableCost": {
+            "cost": 1.2044,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "04dd2f90-7770-47cf-9ce7-f01da203d78a",
+        "presentation": {
+          "purchaseQuantityLine": "1 un",
+          "purchasePriceLine": "€30.11 / bag",
+          "normalizedLine": "25 kg usable",
+          "usableCostLine": "€1.20 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "705dbbff-cd36-4dd6-9e68-bd68d350b9a6",
+      "ingredientName": "Guanciale stagionato",
+      "supplier": "Mammafiore Portugal",
+      "latestInvoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "latestItemId": "48443ad1-7303-4560-b6eb-85a77e559400",
+      "latestLineName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "48443ad1-7303-4560-b6eb-85a77e559400",
+          "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+          "quantity": 5.996,
+          "unit": "un",
+          "unit_price": 10.83,
+          "total": 64.93
+        },
+        "catalog": {
+          "current_price": 10.83,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 10.83,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 999.9999999999999
+          },
+          "recipeFields": {
+            "current_price": 10.83,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 999.9999999999999
+          },
+          "computedOp": 10.83,
+          "usableCost": {
+            "cost": 10.830000000000002,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "31967d4f-b9f2-4682-b6ae-5508328af824",
+        "presentation": {
+          "purchaseQuantityLine": "6.00 un · 7 × 1.5 kg",
+          "purchasePriceLine": "€10.83 / unit · €64.93 total",
+          "normalizedLine": "6 kg usable",
+          "usableCostLine": "€10.83 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "3976c267-f8aa-4173-abc7-55410811f399",
+      "ingredientName": "Farine speciale pizza",
+      "supplier": "Mammafiore Portugal",
+      "latestInvoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "latestItemId": "742e976a-4c92-4690-b497-8c101293042b",
+      "latestLineName": "Farine Speciale pizza 25kg Amoruso",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "742e976a-4c92-4690-b497-8c101293042b",
+          "name": "Farine Speciale pizza 25kg Amoruso",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 26.52,
+          "total": 26.52
+        },
+        "catalog": {
+          "current_price": 26.52,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 26.52,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 25000
+          },
+          "recipeFields": {
+            "current_price": 26.52,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 25000
+          },
+          "computedOp": 26.52,
+          "usableCost": {
+            "cost": 1.0608,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "3e837eab-c658-4d88-9988-a700659a6196",
+        "presentation": {
+          "purchaseQuantityLine": "1 un",
+          "purchasePriceLine": "€26.52 / bag",
+          "normalizedLine": "25 kg usable",
+          "usableCostLine": "€1.06 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "70f5a744-839c-4def-8252-52aaf7529b4b",
+      "ingredientName": "Peroni nastro azzurro 33cl",
+      "supplier": "Mammafiore Portugal",
+      "latestInvoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "latestItemId": "eb0bc20a-42b3-40c8-98bc-87db12f00809",
+      "latestLineName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "failed",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "FAIL",
+        "priceHistory": "FAIL",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "FAIL"
+      },
+      "failures": [
+        "catalog purchase_quantity 24 ≠ computed 7920",
+        "latest history op 0.0001351010101010101 ≠ catalog op 0.044583333333333336",
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "eb0bc20a-42b3-40c8-98bc-87db12f00809",
+          "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 1.07,
+          "total": 25.69
+        },
+        "catalog": {
+          "current_price": 1.07,
+          "purchase_quantity": 24,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 1.07,
+            "purchase_quantity": 7920,
+            "cost_base_unit": "ml"
+          },
+          "recipeFields": {
+            "current_price": 1.07,
+            "purchase_quantity": 7920,
+            "cost_base_unit": "ml"
+          },
+          "computedOp": 0.0001351010101010101,
+          "usableCost": {
+            "cost": 3.2424242424242427,
+            "unit": "L"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "7d6b70fa-543f-41c2-89e5-2b691afcdff4",
+        "presentation": {
+          "purchaseQuantityLine": "24 un · 24 × 33 cl",
+          "purchasePriceLine": "€1.07 / bottle · €25.69 total",
+          "normalizedLine": "7.92 L usable",
+          "usableCostLine": "€3.24 / L"
+        }
+      }
+    },
+    {
+      "ingredientId": "1757d2a3-e299-4d5f-84d2-61e01ae4aed4",
+      "ingredientName": "Aceto balsamico di modena IGP",
+      "supplier": "Mammafiore Portugal",
+      "latestInvoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "latestItemId": "c181f493-473e-4467-845c-d4c1bfd889ee",
+      "latestLineName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "failed",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "FAIL",
+        "priceHistory": "FAIL",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "FAIL",
+        "architecture": "FAIL"
+      },
+      "failures": [
+        "catalog purchase_quantity 2 ≠ computed 10000",
+        "latest history op 0.001609 ≠ catalog op 8.045",
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "line op 0.001609 ≠ catalog op 8.045",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "c181f493-473e-4467-845c-d4c1bfd889ee",
+          "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 16.09,
+          "total": 16.09
+        },
+        "catalog": {
+          "current_price": 16.09,
+          "purchase_quantity": 2,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 16.09,
+            "purchase_quantity": 10000,
+            "cost_base_unit": "ml"
+          },
+          "recipeFields": {
+            "current_price": 16.09,
+            "purchase_quantity": 10000,
+            "cost_base_unit": "ml"
+          },
+          "computedOp": 0.001609,
+          "usableCost": {
+            "cost": 1.609,
+            "unit": "L"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "3bedfab2-8567-4059-a931-e8473cccabbc",
+        "presentation": {
+          "purchaseQuantityLine": "1 un · 2 × 5 L",
+          "purchasePriceLine": "€16.09 / unit",
+          "normalizedLine": "10 L usable",
+          "usableCostLine": "€1.61 / L"
+        }
+      }
+    },
+    {
+      "ingredientId": "5e9e7f89-7141-44f7-b8d4-bc92bad9bc36",
+      "ingredientName": "Mozzarella julienne",
+      "supplier": "Mammafiore Portugal",
+      "latestInvoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "latestItemId": "332f88df-94d7-4362-9301-646d73fb942e",
+      "latestLineName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "332f88df-94d7-4362-9301-646d73fb942e",
+          "name": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+          "quantity": 10,
+          "unit": "un",
+          "unit_price": 20.03,
+          "total": 200.3
+        },
+        "catalog": {
+          "current_price": 20.03,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 20.03,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 3000
+          },
+          "recipeFields": {
+            "current_price": 20.03,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 3000
+          },
+          "computedOp": 20.03,
+          "usableCost": {
+            "cost": 6.676666666666667,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": false
+        },
+        "historyCount": 1,
+        "latestHistId": "44fbb625-017d-40c6-bf0d-31a460b17bb4",
+        "presentation": {
+          "purchaseQuantityLine": "10 un",
+          "purchasePriceLine": "€20.03 / bag · €200.30 total",
+          "normalizedLine": "30 kg usable",
+          "usableCostLine": "€6.68 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "4dd38782-c986-4d4b-8ecb-fd84359744b1",
+      "ingredientName": "Rulo di capra",
+      "supplier": "Mammafiore Portugal",
+      "latestInvoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "latestItemId": "88383663-5f6d-4d35-b324-26956d6b5899",
+      "latestLineName": "Rulo Di Capra 1kg*2 Simonetta",
+      "latestInvoiceDate": "2026-05-19",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PARTIAL",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PARTIAL"
+      },
+      "failures": [
+        "persisted confirmed; virtual=suggested (alias/read-cutover gap)",
+        "procurement→operational→catalog→history chain incomplete"
+      ],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "88383663-5f6d-4d35-b324-26956d6b5899",
+          "name": "Rulo Di Capra 1kg*2 Simonetta",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 10.86,
+          "total": 10.86
+        },
+        "catalog": {
+          "current_price": 10.86,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 10.86,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 2000
+          },
+          "recipeFields": {
+            "current_price": 10.86,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 2000
+          },
+          "computedOp": 10.86,
+          "usableCost": {
+            "cost": 5.43,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "suggested",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "2b9887cd-29b7-4eab-b346-9d3662494db0",
+        "presentation": {
+          "purchaseQuantityLine": "1 un · 2 × 1 kg",
+          "purchasePriceLine": "€10.86 / unit",
+          "normalizedLine": "2 kg usable",
+          "usableCostLine": "€5.43 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "6ec0bc6b-409a-4db2-b21f-fb01394f0014",
+      "ingredientName": "Ricotta trevigiana",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "latestInvoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "latestItemId": "3457193a-f60e-4642-8d18-3412a29a834f",
+      "latestLineName": "RICOTTA TREVIGIANA 1,5KG",
+      "latestInvoiceDate": "2026-05-08",
+      "matchState": "confirmed",
+      "status": "certified",
+      "checks": {
+        "invoiceGroundTruth": "PASS",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "failures": [],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "3457193a-f60e-4642-8d18-3412a29a834f",
+          "name": "RICOTTA TREVIGIANA 1,5KG",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 7.967,
+          "total": 7.97
+        },
+        "catalog": {
+          "current_price": 7.967,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 7.967,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1500
+          },
+          "recipeFields": {
+            "current_price": 7.967,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1500
+          },
+          "computedOp": 7.967,
+          "usableCost": {
+            "cost": 5.311333333333333,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "3219f379-1e51-4e6c-b1ee-a5cd1af1a989",
+        "presentation": {
+          "purchaseQuantityLine": "1 un",
+          "purchasePriceLine": "€7.97 / unit",
+          "normalizedLine": "1.5 kg usable",
+          "usableCostLine": "€5.31 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "b091e1d0-e7e2-49a8-a9a7-f61c8a4d4263",
+      "ingredientName": "Rolo de cabra e vaca",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "latestInvoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "latestItemId": "14f5c7bf-5ee1-4493-a1b0-1e5c274a0258",
+      "latestLineName": "ROLO DE CABRA VACA 1KG",
+      "latestInvoiceDate": "2026-05-08",
+      "matchState": "confirmed",
+      "status": "certified",
+      "checks": {
+        "invoiceGroundTruth": "PASS",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "failures": [],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "14f5c7bf-5ee1-4493-a1b0-1e5c274a0258",
+          "name": "ROLO DE CABRA VACA 1KG",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 12.71,
+          "total": 12.71
+        },
+        "catalog": {
+          "current_price": 12.71,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 12.71,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1000
+          },
+          "recipeFields": {
+            "current_price": 12.71,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 1000
+          },
+          "computedOp": 12.71,
+          "usableCost": {
+            "cost": 12.71,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "b28ab86d-c95c-4346-accd-2f3d770f0aef",
+        "presentation": {
+          "purchaseQuantityLine": "1 un",
+          "purchasePriceLine": "€12.71 / unit",
+          "normalizedLine": "1 kg usable",
+          "usableCostLine": "€12.71 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "52f7bf70-eeca-4039-987d-241b35248119",
+      "ingredientName": "Pomodori pelati",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "latestInvoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "latestItemId": "b6b00e15-c38d-48e7-8d66-53f4ffbf3f1b",
+      "latestLineName": "POMODORI PELATI (CX 2,5KG*6)",
+      "latestInvoiceDate": "2026-05-08",
+      "matchState": "confirmed",
+      "status": "certified",
+      "checks": {
+        "invoiceGroundTruth": "N/A",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "failures": [],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "b6b00e15-c38d-48e7-8d66-53f4ffbf3f1b",
+          "name": "POMODORI PELATI (CX 2,5KG*6)",
+          "quantity": 1,
+          "unit": "un",
+          "unit_price": 22.05,
+          "total": 22.05
+        },
+        "catalog": {
+          "current_price": 22.05,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 22.05,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 15000
+          },
+          "recipeFields": {
+            "current_price": 22.05,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 15000
+          },
+          "computedOp": 22.05,
+          "usableCost": {
+            "cost": 1.47,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "ca320e47-4677-49e7-8b39-eb73f02bb314",
+        "presentation": {
+          "purchaseQuantityLine": "1 un · 6 × 2.5 kg",
+          "purchasePriceLine": "€22.05 / case",
+          "normalizedLine": "15 kg usable",
+          "usableCostLine": "€1.47 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "6a7d0b80-764a-40e8-a3fb-9361e7d9ee98",
+      "ingredientName": "Mezzi paccheri mancini",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "latestInvoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "latestItemId": "65e0a86d-dc5f-4e23-94ce-4612bc1b6669",
+      "latestLineName": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+      "latestInvoiceDate": "2026-05-08",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "failures": [],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "65e0a86d-dc5f-4e23-94ce-4612bc1b6669",
+          "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+          "quantity": 2,
+          "unit": "un",
+          "unit_price": 13.65,
+          "total": 27.3
+        },
+        "catalog": {
+          "current_price": 13.65,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 13.65,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 6000
+          },
+          "recipeFields": {
+            "current_price": 13.65,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 6000
+          },
+          "computedOp": 13.65,
+          "usableCost": {
+            "cost": 4.55,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "27ebdf67-4ae7-4b2e-b55b-b818dda5f5aa",
+        "presentation": {
+          "purchaseQuantityLine": "2 un · 6 × 1 kg",
+          "purchasePriceLine": "€13.65 / case · €27.30 total",
+          "normalizedLine": "6 kg usable",
+          "usableCostLine": "€4.55 / kg"
+        }
+      }
+    },
+    {
+      "ingredientId": "d96e176e-7fa7-438d-beda-6b9d7fe7b41d",
+      "ingredientName": "Stracciatella",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "latestInvoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "latestItemId": "3ae0cf99-7664-4be1-a378-51297463c0a0",
+      "latestLineName": "STRACCIATELLA 250 GR",
+      "latestInvoiceDate": "2026-05-08",
+      "matchState": "confirmed",
+      "status": "conditional",
+      "checks": {
+        "invoiceGroundTruth": "PARTIAL",
+        "procurementEconomics": "PASS",
+        "operationalNormalization": "PASS",
+        "ingredientCatalog": "PASS",
+        "priceHistory": "PASS",
+        "matching": "PASS",
+        "validation": "PASS",
+        "uiConsistency": "PASS",
+        "architecture": "PASS"
+      },
+      "failures": [],
+      "validationCodes": [],
+      "evidence": {
+        "line": {
+          "id": "3ae0cf99-7664-4be1-a378-51297463c0a0",
+          "name": "STRACCIATELLA 250 GR",
+          "quantity": 24,
+          "unit": "un",
+          "unit_price": 3.11,
+          "total": 74.54
+        },
+        "catalog": {
+          "current_price": 3.11,
+          "purchase_quantity": 1,
+          "purchase_unit": "un",
+          "base_unit": "un"
+        },
+        "computed": {
+          "opFields": {
+            "current_price": 3.11,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 250
+          },
+          "recipeFields": {
+            "current_price": 3.11,
+            "purchase_quantity": 1,
+            "cost_base_unit": "un",
+            "usable_weight_grams": 250
+          },
+          "computedOp": 3.11,
+          "usableCost": {
+            "cost": 12.44,
+            "unit": "kg"
+          }
+        },
+        "matching": {
+          "persisted": "confirmed",
+          "virtual": "confirmed",
+          "hasAlias": true
+        },
+        "historyCount": 1,
+        "latestHistId": "194bb341-bd65-432e-90f0-6f62f42da8de",
+        "presentation": {
+          "purchaseQuantityLine": "24 un",
+          "purchasePriceLine": "€3.11 / unit · €74.54 total",
+          "normalizedLine": "6 kg usable",
+          "usableCostLine": "€12.44 / kg"
+        }
+      }
+    }
+  ],
+  "unmatchedLines": []
+}

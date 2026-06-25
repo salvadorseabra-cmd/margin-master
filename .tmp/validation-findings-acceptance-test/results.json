@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-06-25T11:28:10.929Z",
+  "generatedAt": "2026-06-25T13:50:17.899Z",
   "validationLab": "bjhnlrgodcqoyzddbpbd",
   "summary": {
     "invoiceCount": 7,
     "itemCount": 52,
-    "totalFindings": 39,
+    "totalFindings": 38,
     "rowsWithFindings": 38,
     "rowsWithoutFindings": 14,
     "bySupplier": {
@@ -15,29 +15,12 @@
           "UNMATCHED_INGREDIENT": 1
         }
       },
-      "Avijudo": {
-        "items": 8,
-        "findings": 8,
-        "codes": {
-          "UNMATCHED_INGREDIENT": 5,
-          "SUGGESTED_INGREDIENT_MATCH": 3
-        }
-      },
       "Aviludo": {
-        "items": 9,
-        "findings": 9,
+        "items": 17,
+        "findings": 17,
         "codes": {
-          "UNMATCHED_INGREDIENT": 7,
-          "SUGGESTED_INGREDIENT_MATCH": 2
-        }
-      },
-      "Mammafiore Portugal": {
-        "items": 8,
-        "findings": 9,
-        "codes": {
-          "SUGGESTED_INGREDIENT_MATCH": 7,
-          "MATHEMATICAL_INCONSISTENCY": 1,
-          "UNMATCHED_INGREDIENT": 1
+          "UNMATCHED_INGREDIENT": 12,
+          "SUGGESTED_INGREDIENT_MATCH": 5
         }
       },
       "Emporio Italia": {
@@ -48,6 +31,14 @@
           "UNMATCHED_INGREDIENT": 2
         }
       },
+      "Il Bocconcino Distribuição Alimentar": {
+        "items": 7,
+        "findings": 2,
+        "codes": {
+          "SUGGESTED_INGREDIENT_MATCH": 1,
+          "UNMATCHED_INGREDIENT": 1
+        }
+      },
       "Bidfood Portugal, SA": {
         "items": 11,
         "findings": 4,
@@ -56,19 +47,18 @@
           "UNMATCHED_INGREDIENT": 1
         }
       },
-      "Il Bocconcino Distribuição Alimentar": {
-        "items": 7,
-        "findings": 2,
+      "Mammafiore Portugal": {
+        "items": 8,
+        "findings": 8,
         "codes": {
-          "SUGGESTED_INGREDIENT_MATCH": 1,
+          "SUGGESTED_INGREDIENT_MATCH": 7,
           "UNMATCHED_INGREDIENT": 1
         }
       }
     },
     "codeCounts": {
       "UNMATCHED_INGREDIENT": 18,
-      "SUGGESTED_INGREDIENT_MATCH": 20,
-      "MATHEMATICAL_INCONSISTENCY": 1
+      "SUGGESTED_INGREDIENT_MATCH": 20
     }
   },
   "knownProblemRows": [
@@ -190,18 +180,6 @@
     },
     {
       "type": "sub_threshold_math_gap",
-      "invoiceItemId": "5d46d914-1860-40e8-b5c4-8d9aad1d4d2b",
-      "itemName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
-      "supplier": "Mammafiore Portugal",
-      "quantity": 24,
-      "unit_price": 1.07,
-      "total": 25.69,
-      "variance_abs": 0.01,
-      "variance_pct": 0.04,
-      "why": "Small math gap below MATHEMATICAL_INCONSISTENCY OR thresholds — may be intentional tolerance"
-    },
-    {
-      "type": "sub_threshold_math_gap",
       "invoiceItemId": "de0946a9-b7e4-467b-ae21-8b0401fcb363",
       "itemName": "Baladin - Ginger Beer 0.20cl",
       "supplier": "Emporio Italia",
@@ -210,6 +188,30 @@
       "total": 19.38,
       "variance_abs": 0.06,
       "variance_pct": 0.31,
+      "why": "Small math gap below MATHEMATICAL_INCONSISTENCY OR thresholds — may be intentional tolerance"
+    },
+    {
+      "type": "sub_threshold_math_gap",
+      "invoiceItemId": "63958019-9af9-4738-bc13-404d27796b24",
+      "itemName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "quantity": 10,
+      "unit_price": 8.12,
+      "total": 81.23,
+      "variance_abs": 0.03,
+      "variance_pct": 0.04,
+      "why": "Small math gap below MATHEMATICAL_INCONSISTENCY OR thresholds — may be intentional tolerance"
+    },
+    {
+      "type": "sub_threshold_math_gap",
+      "invoiceItemId": "3ae0cf99-7664-4be1-a378-51297463c0a0",
+      "itemName": "STRACCIATELLA 250 GR",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "quantity": 24,
+      "unit_price": 3.11,
+      "total": 74.54,
+      "variance_abs": 0.1,
+      "variance_pct": 0.13,
       "why": "Small math gap below MATHEMATICAL_INCONSISTENCY OR thresholds — may be intentional tolerance"
     },
     {
@@ -262,38 +264,14 @@
     },
     {
       "type": "sub_threshold_math_gap",
-      "invoiceItemId": "f2a672e0-016c-43d7-a53f-1ee8b8976f4b",
-      "itemName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
-      "supplier": "Il Bocconcino Distribuição Alimentar",
-      "quantity": 10,
-      "unit_price": 8.12,
-      "total": 81.23,
-      "variance_abs": 0.03,
-      "variance_pct": 0.04,
-      "why": "Small math gap below MATHEMATICAL_INCONSISTENCY OR thresholds — may be intentional tolerance"
-    },
-    {
-      "type": "sub_threshold_math_gap",
-      "invoiceItemId": "793e9cd0-a7b5-4228-8ece-e6f16b047515",
-      "itemName": "STRACCIATELLA 250 GR",
-      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceItemId": "eb0bc20a-42b3-40c8-98bc-87db12f00809",
+      "itemName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "supplier": "Mammafiore Portugal",
       "quantity": 24,
-      "unit_price": 3.11,
-      "total": 74.54,
-      "variance_abs": 0.1,
-      "variance_pct": 0.13,
-      "why": "Small math gap below MATHEMATICAL_INCONSISTENCY OR thresholds — may be intentional tolerance"
-    },
-    {
-      "type": "sub_threshold_math_gap",
-      "invoiceItemId": "ef25be0f-f153-40de-b377-25151d147637",
-      "itemName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
-      "supplier": "Il Bocconcino Distribuição Alimentar",
-      "quantity": 2,
-      "unit_price": 20.97,
-      "total": 42.07,
-      "variance_abs": 0.13,
-      "variance_pct": 0.31,
+      "unit_price": 1.07,
+      "total": 25.69,
+      "variance_abs": 0.01,
+      "variance_pct": 0.04,
       "why": "Small math gap below MATHEMATICAL_INCONSISTENCY OR thresholds — may be intentional tolerance"
     }
   ],
@@ -325,221 +303,6 @@
       "unit": "m3",
       "unit_price": 75,
       "total": 75
-    },
-    {
-      "id": "7e6f6f69-81ed-42be-a062-e28ffc015f0c:UNMATCHED_INGREDIENT:ingredient",
-      "code": "UNMATCHED_INGREDIENT",
-      "severity": "warning",
-      "category": "matching",
-      "title": "Unmatched ingredient",
-      "description": "This line is not linked to a catalog ingredient.",
-      "suggestedAction": "Match or create a canonical ingredient.",
-      "evidence": {
-        "field": "ingredient",
-        "expected": {
-          "value": "catalog match",
-          "label": "Linked ingredient"
-        },
-        "extra": {
-          "item_name": "Filete de Anchoas Alconfirosa LI 495 g"
-        }
-      },
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "itemId": "7e6f6f69-81ed-42be-a062-e28ffc015f0c",
-      "itemName": "Filete de Anchoas Alconfirosa LI 495 g",
-      "matchDisplayState": "unmatched",
-      "quantity": 2,
-      "unit": "un",
-      "unit_price": 9.99,
-      "total": 19.98
-    },
-    {
-      "id": "77d804e3-b2ff-4a06-b4df-a78d3ff405a5:UNMATCHED_INGREDIENT:ingredient",
-      "code": "UNMATCHED_INGREDIENT",
-      "severity": "warning",
-      "category": "matching",
-      "title": "Unmatched ingredient",
-      "description": "This line is not linked to a catalog ingredient.",
-      "suggestedAction": "Match or create a canonical ingredient.",
-      "evidence": {
-        "field": "ingredient",
-        "expected": {
-          "value": "catalog match",
-          "label": "Linked ingredient"
-        },
-        "extra": {
-          "item_name": "Ovo Líquido Past.Gema Dovo 1 Kg"
-        }
-      },
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "itemId": "77d804e3-b2ff-4a06-b4df-a78d3ff405a5",
-      "itemName": "Ovo Líquido Past.Gema Dovo 1 Kg",
-      "matchDisplayState": "unmatched",
-      "quantity": 6,
-      "unit": "un",
-      "unit_price": 10.49,
-      "total": 62.94
-    },
-    {
-      "id": "86d75d64-4a8a-4fc5-95d5-cd352ba29b5f:UNMATCHED_INGREDIENT:ingredient",
-      "code": "UNMATCHED_INGREDIENT",
-      "severity": "warning",
-      "category": "matching",
-      "title": "Unmatched ingredient",
-      "description": "This line is not linked to a catalog ingredient.",
-      "suggestedAction": "Match or create a canonical ingredient.",
-      "evidence": {
-        "field": "ingredient",
-        "expected": {
-          "value": "catalog match",
-          "label": "Linked ingredient"
-        },
-        "extra": {
-          "item_name": "Pepinos Extra Uli Frasco 6x720 g"
-        }
-      },
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "itemId": "86d75d64-4a8a-4fc5-95d5-cd352ba29b5f",
-      "itemName": "Pepinos Extra Uli Frasco 6x720 g",
-      "matchDisplayState": "unmatched",
-      "quantity": 1,
-      "unit": "cx",
-      "unit_price": 22.49,
-      "total": 22.49
-    },
-    {
-      "id": "c7c7f16b-917f-4ce6-80ad-e8484bda1bbe:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Atum em óleo",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "itemId": "c7c7f16b-917f-4ce6-80ad-e8484bda1bbe",
-      "itemName": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
-      "matchDisplayState": "suggested",
-      "quantity": 1,
-      "unit": "un",
-      "unit_price": 13.1,
-      "total": 13.1
-    },
-    {
-      "id": "8e36bac6-c3b6-4bc3-885c-e81514feba61:UNMATCHED_INGREDIENT:ingredient",
-      "code": "UNMATCHED_INGREDIENT",
-      "severity": "warning",
-      "category": "matching",
-      "title": "Unmatched ingredient",
-      "description": "This line is not linked to a catalog ingredient.",
-      "suggestedAction": "Match or create a canonical ingredient.",
-      "evidence": {
-        "field": "ingredient",
-        "expected": {
-          "value": "catalog match",
-          "label": "Linked ingredient"
-        },
-        "extra": {
-          "item_name": "Arroz Agulha Metro Chef 12x1 kg"
-        }
-      },
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "itemId": "8e36bac6-c3b6-4bc3-885c-e81514feba61",
-      "itemName": "Arroz Agulha Metro Chef 12x1 kg",
-      "matchDisplayState": "unmatched",
-      "quantity": 1,
-      "unit": "cx",
-      "unit_price": 13.95,
-      "total": 13.95
-    },
-    {
-      "id": "fa0d0138-577e-42fe-9212-fe5f53c7ead8:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Chocolate culinária",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "itemId": "fa0d0138-577e-42fe-9212-fe5f53c7ead8",
-      "itemName": "Chocolate Culinaria Pantagruel 10x200 g",
-      "matchDisplayState": "suggested",
-      "quantity": 2,
-      "unit": "cx",
-      "unit_price": 29.99,
-      "total": 59.98
-    },
-    {
-      "id": "478442d5-cf8f-4e21-a905-01b7cc327fab:UNMATCHED_INGREDIENT:ingredient",
-      "code": "UNMATCHED_INGREDIENT",
-      "severity": "warning",
-      "category": "matching",
-      "title": "Unmatched ingredient",
-      "description": "This line is not linked to a catalog ingredient.",
-      "suggestedAction": "Match or create a canonical ingredient.",
-      "evidence": {
-        "field": "ingredient",
-        "expected": {
-          "value": "catalog match",
-          "label": "Linked ingredient"
-        },
-        "extra": {
-          "item_name": "Açucar Branco METRO Chef 10x1 Kg"
-        }
-      },
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "itemId": "478442d5-cf8f-4e21-a905-01b7cc327fab",
-      "itemName": "Açucar Branco METRO Chef 10x1 Kg",
-      "matchDisplayState": "unmatched",
-      "quantity": 1,
-      "unit": "cx",
-      "unit_price": 9.99,
-      "total": 9.99
-    },
-    {
-      "id": "2b5cea32-ec1f-4454-a4d9-cb4bb2612866:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Nata culinária",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "itemId": "2b5cea32-ec1f-4454-a4d9-cb4bb2612866",
-      "itemName": "Nata Culinaria 22% Reny Picot 6x1 Lt",
-      "matchDisplayState": "suggested",
-      "quantity": 5,
-      "unit": "cx",
-      "unit_price": 18.89,
-      "total": 94.45
     },
     {
       "id": "8476c916-26a1-4d2a-b6e7-f211560f6e95:UNMATCHED_INGREDIENT:ingredient",
@@ -773,7 +536,7 @@
       "evidence": {
         "field": "ingredient",
         "extra": {
-          "suggested_ingredient": "Mozzarella fior di latte",
+          "suggested_ingredient": "Mozzarella julienne",
           "confidence": "Suggested match"
         }
       },
@@ -788,195 +551,7 @@
       "total": 13.69
     },
     {
-      "id": "d592c2cc-fd23-41ad-afd0-4fe693eef08a:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Guanciale stagionato",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "d592c2cc-fd23-41ad-afd0-4fe693eef08a",
-      "itemName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
-      "matchDisplayState": "suggested",
-      "quantity": 5.996,
-      "unit": "un",
-      "unit_price": 10.83,
-      "total": 64.93
-    },
-    {
-      "id": "18b97c30-12ae-4642-9ee5-1434da490bb7:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Farine speciale pizza",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "18b97c30-12ae-4642-9ee5-1434da490bb7",
-      "itemName": "Farine Speciale pizza 25kg Amoruso",
-      "matchDisplayState": "suggested",
-      "quantity": 1,
-      "unit": "un",
-      "unit_price": 26.52,
-      "total": 26.52
-    },
-    {
-      "id": "5d46d914-1860-40e8-b5c4-8d9aad1d4d2b:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Peroni nastro azzurro 33cl",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "5d46d914-1860-40e8-b5c4-8d9aad1d4d2b",
-      "itemName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
-      "matchDisplayState": "suggested",
-      "quantity": 24,
-      "unit": "un",
-      "unit_price": 1.07,
-      "total": 25.69
-    },
-    {
-      "id": "ef4c6f72-7f74-4ebb-b567-24cef8e90ae5:MATHEMATICAL_INCONSISTENCY",
-      "code": "MATHEMATICAL_INCONSISTENCY",
-      "severity": "error",
-      "category": "mathematics",
-      "title": "Math inconsistency",
-      "description": "Quantity × unit price does not reconcile with line total",
-      "suggestedAction": "Correct quantity, unit price, or line total so the row reconciles.",
-      "evidence": {
-        "expected": {
-          "value": 15.55,
-          "unit": "EUR",
-          "label": "Calculated total"
-        },
-        "actual": {
-          "value": 16.09,
-          "unit": "EUR",
-          "label": "Invoice total"
-        },
-        "difference": {
-          "absolute": 0.54,
-          "percent": 3.36
-        },
-        "extra": {
-          "quantity": 1,
-          "unit_price": 15.55
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "ef4c6f72-7f74-4ebb-b567-24cef8e90ae5",
-      "itemName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
-      "matchDisplayState": "suggested",
-      "quantity": 1,
-      "unit": "un",
-      "unit_price": 15.55,
-      "total": 16.09
-    },
-    {
-      "id": "ef4c6f72-7f74-4ebb-b567-24cef8e90ae5:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Aceto balsamico di modena IGP",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "ef4c6f72-7f74-4ebb-b567-24cef8e90ae5",
-      "itemName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
-      "matchDisplayState": "suggested",
-      "quantity": 1,
-      "unit": "un",
-      "unit_price": 15.55,
-      "total": 16.09
-    },
-    {
-      "id": "1700ab82-9f9e-4830-be6d-405155616d07:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Mozzarella fior di latte",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "1700ab82-9f9e-4830-be6d-405155616d07",
-      "itemName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
-      "matchDisplayState": "suggested",
-      "quantity": 10,
-      "unit": "un",
-      "unit_price": 20.03,
-      "total": 200.3
-    },
-    {
-      "id": "a8f0a5e3-0612-4315-802b-27130b899839:SUGGESTED_INGREDIENT_MATCH:ingredient",
-      "code": "SUGGESTED_INGREDIENT_MATCH",
-      "severity": "info",
-      "category": "matching",
-      "title": "Suggested match",
-      "description": "A possible ingredient match needs confirmation.",
-      "suggestedAction": "Confirm or change the suggested ingredient match.",
-      "evidence": {
-        "field": "ingredient",
-        "extra": {
-          "suggested_ingredient": "Rulo di capra",
-          "confidence": "Suggested match"
-        }
-      },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "a8f0a5e3-0612-4315-802b-27130b899839",
-      "itemName": "Rulo Di Capra 1kg*2 Simonetta",
-      "matchDisplayState": "suggested",
-      "quantity": 1,
-      "unit": "un",
-      "unit_price": 10.86,
-      "total": 10.86
-    },
-    {
-      "id": "896110ca-85b6-42de-baac-d3c4f5c68608:UNMATCHED_INGREDIENT:ingredient",
+      "id": "8b65efaa-ffb8-4469-b34b-5caa486ee525:UNMATCHED_INGREDIENT:ingredient",
       "code": "UNMATCHED_INGREDIENT",
       "severity": "warning",
       "category": "matching",
@@ -990,21 +565,77 @@
           "label": "Linked ingredient"
         },
         "extra": {
-          "item_name": "Recargo por combustivel"
+          "item_name": "Filete de Anchoas Alconfirosa LI 495 g"
         }
       },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "896110ca-85b6-42de-baac-d3c4f5c68608",
-      "itemName": "Recargo por combustivel",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
+      "itemId": "8b65efaa-ffb8-4469-b34b-5caa486ee525",
+      "itemName": "Filete de Anchoas Alconfirosa LI 495 g",
       "matchDisplayState": "unmatched",
-      "quantity": 1,
+      "quantity": 2,
       "unit": "un",
-      "unit_price": 2,
-      "total": 2
+      "unit_price": 9.99,
+      "total": 19.98
     },
     {
-      "id": "cb75a796-0c40-48c0-a315-a2067c6c4673:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "id": "a1f408d0-5fbf-41b1-b04d-894013fe0805:UNMATCHED_INGREDIENT:ingredient",
+      "code": "UNMATCHED_INGREDIENT",
+      "severity": "warning",
+      "category": "matching",
+      "title": "Unmatched ingredient",
+      "description": "This line is not linked to a catalog ingredient.",
+      "suggestedAction": "Match or create a canonical ingredient.",
+      "evidence": {
+        "field": "ingredient",
+        "expected": {
+          "value": "catalog match",
+          "label": "Linked ingredient"
+        },
+        "extra": {
+          "item_name": "Ovo Líquido Past.Gema Dovo 1 Kg"
+        }
+      },
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
+      "itemId": "a1f408d0-5fbf-41b1-b04d-894013fe0805",
+      "itemName": "Ovo Líquido Past.Gema Dovo 1 Kg",
+      "matchDisplayState": "unmatched",
+      "quantity": 6,
+      "unit": "un",
+      "unit_price": 10.49,
+      "total": 62.94
+    },
+    {
+      "id": "af7a1317-dbb8-4e81-9a3a-b3c17637e16c:UNMATCHED_INGREDIENT:ingredient",
+      "code": "UNMATCHED_INGREDIENT",
+      "severity": "warning",
+      "category": "matching",
+      "title": "Unmatched ingredient",
+      "description": "This line is not linked to a catalog ingredient.",
+      "suggestedAction": "Match or create a canonical ingredient.",
+      "evidence": {
+        "field": "ingredient",
+        "expected": {
+          "value": "catalog match",
+          "label": "Linked ingredient"
+        },
+        "extra": {
+          "item_name": "Pepinos Extra Uli Frasco 6x720 g"
+        }
+      },
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
+      "itemId": "af7a1317-dbb8-4e81-9a3a-b3c17637e16c",
+      "itemName": "Pepinos Extra Uli Frasco 6x720 g",
+      "matchDisplayState": "unmatched",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 22.49,
+      "total": 22.49
+    },
+    {
+      "id": "f1d95452-2302-4467-80a1-afc9d726eed3:SUGGESTED_INGREDIENT_MATCH:ingredient",
       "code": "SUGGESTED_INGREDIENT_MATCH",
       "severity": "info",
       "category": "matching",
@@ -1014,19 +645,125 @@
       "evidence": {
         "field": "ingredient",
         "extra": {
-          "suggested_ingredient": "Farina do pasta fresca e gnocchi",
+          "suggested_ingredient": "Atum em óleo",
           "confidence": "Suggested match"
         }
       },
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "itemId": "cb75a796-0c40-48c0-a315-a2067c6c4673",
-      "itemName": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
+      "itemId": "f1d95452-2302-4467-80a1-afc9d726eed3",
+      "itemName": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
       "matchDisplayState": "suggested",
       "quantity": 1,
       "unit": "un",
-      "unit_price": 30.11,
-      "total": 30.11
+      "unit_price": 13.1,
+      "total": 13.1
+    },
+    {
+      "id": "61bedc5b-ce0d-4835-945a-22efb41684f0:UNMATCHED_INGREDIENT:ingredient",
+      "code": "UNMATCHED_INGREDIENT",
+      "severity": "warning",
+      "category": "matching",
+      "title": "Unmatched ingredient",
+      "description": "This line is not linked to a catalog ingredient.",
+      "suggestedAction": "Match or create a canonical ingredient.",
+      "evidence": {
+        "field": "ingredient",
+        "expected": {
+          "value": "catalog match",
+          "label": "Linked ingredient"
+        },
+        "extra": {
+          "item_name": "Arroz Agulha Metro Chef 12x1 kg"
+        }
+      },
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
+      "itemId": "61bedc5b-ce0d-4835-945a-22efb41684f0",
+      "itemName": "Arroz Agulha Metro Chef 12x1 kg",
+      "matchDisplayState": "unmatched",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 13.95,
+      "total": 13.95
+    },
+    {
+      "id": "c450b962-de47-4127-93d9-88ef7fc5db2b:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Chocolate culinária",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
+      "itemId": "c450b962-de47-4127-93d9-88ef7fc5db2b",
+      "itemName": "Chocolate Culinaria Pantagruel 10x200 g",
+      "matchDisplayState": "suggested",
+      "quantity": 2,
+      "unit": "cx",
+      "unit_price": 29.99,
+      "total": 59.98
+    },
+    {
+      "id": "4713a1af-d551-4f26-ad43-94983553d72d:UNMATCHED_INGREDIENT:ingredient",
+      "code": "UNMATCHED_INGREDIENT",
+      "severity": "warning",
+      "category": "matching",
+      "title": "Unmatched ingredient",
+      "description": "This line is not linked to a catalog ingredient.",
+      "suggestedAction": "Match or create a canonical ingredient.",
+      "evidence": {
+        "field": "ingredient",
+        "expected": {
+          "value": "catalog match",
+          "label": "Linked ingredient"
+        },
+        "extra": {
+          "item_name": "Açúcar Branco METRO Chef 10x1 Kg"
+        }
+      },
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
+      "itemId": "4713a1af-d551-4f26-ad43-94983553d72d",
+      "itemName": "Açúcar Branco METRO Chef 10x1 Kg",
+      "matchDisplayState": "unmatched",
+      "quantity": 1,
+      "unit": "cx",
+      "unit_price": 9.99,
+      "total": 9.99
+    },
+    {
+      "id": "8498e893-1d03-42c8-aaf5-3be182a28f9e:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Nata culinária",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
+      "itemId": "8498e893-1d03-42c8-aaf5-3be182a28f9e",
+      "itemName": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+      "matchDisplayState": "suggested",
+      "quantity": 5,
+      "unit": "cx",
+      "unit_price": 18.89,
+      "total": 94.45
     },
     {
       "id": "71da1c6a-21b7-43de-aa92-0ab253204bed:SUGGESTED_INGREDIENT_MATCH:ingredient",
@@ -1185,6 +922,59 @@
       "total": 19.38
     },
     {
+      "id": "63958019-9af9-4738-bc13-404d27796b24:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Mozzarella julienne",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "itemId": "63958019-9af9-4738-bc13-404d27796b24",
+      "itemName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "matchDisplayState": "suggested",
+      "quantity": 10,
+      "unit": "un",
+      "unit_price": 8.12,
+      "total": 81.23
+    },
+    {
+      "id": "c6993038-5ec1-4ffb-a5c7-5c7452dc0bc5:UNMATCHED_INGREDIENT:ingredient",
+      "code": "UNMATCHED_INGREDIENT",
+      "severity": "warning",
+      "category": "matching",
+      "title": "Unmatched ingredient",
+      "description": "This line is not linked to a catalog ingredient.",
+      "suggestedAction": "Match or create a canonical ingredient.",
+      "evidence": {
+        "field": "ingredient",
+        "expected": {
+          "value": "catalog match",
+          "label": "Linked ingredient"
+        },
+        "extra": {
+          "item_name": "ACQUA S.PELLEGRINO (CX 75CL*15)"
+        }
+      },
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "itemId": "c6993038-5ec1-4ffb-a5c7-5c7452dc0bc5",
+      "itemName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "matchDisplayState": "unmatched",
+      "quantity": 2,
+      "unit": "un",
+      "unit_price": 21.04,
+      "total": 42.07
+    },
+    {
       "id": "e1fcc019-499b-46a9-a99e-e5b51a7578db:SUGGESTED_INGREDIENT_MATCH:ingredient",
       "code": "SUGGESTED_INGREDIENT_MATCH",
       "severity": "info",
@@ -1288,7 +1078,7 @@
       "total": 13.96
     },
     {
-      "id": "f2a672e0-016c-43d7-a53f-1ee8b8976f4b:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "id": "48443ad1-7303-4560-b6eb-85a77e559400:SUGGESTED_INGREDIENT_MATCH:ingredient",
       "code": "SUGGESTED_INGREDIENT_MATCH",
       "severity": "info",
       "category": "matching",
@@ -1298,22 +1088,147 @@
       "evidence": {
         "field": "ingredient",
         "extra": {
-          "suggested_ingredient": "Mozzarella fior di latte",
+          "suggested_ingredient": "Guanciale stagionato",
           "confidence": "Suggested match"
         }
       },
-      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-      "supplier": "Il Bocconcino Distribuição Alimentar",
-      "itemId": "f2a672e0-016c-43d7-a53f-1ee8b8976f4b",
-      "itemName": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "48443ad1-7303-4560-b6eb-85a77e559400",
+      "itemName": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+      "matchDisplayState": "suggested",
+      "quantity": 5.996,
+      "unit": "un",
+      "unit_price": 10.83,
+      "total": 64.93
+    },
+    {
+      "id": "742e976a-4c92-4690-b497-8c101293042b:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Farine speciale pizza",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "742e976a-4c92-4690-b497-8c101293042b",
+      "itemName": "Farine Speciale pizza 25kg Amoruso",
+      "matchDisplayState": "suggested",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 26.52,
+      "total": 26.52
+    },
+    {
+      "id": "eb0bc20a-42b3-40c8-98bc-87db12f00809:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Peroni nastro azzurro 33cl",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "eb0bc20a-42b3-40c8-98bc-87db12f00809",
+      "itemName": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
+      "matchDisplayState": "suggested",
+      "quantity": 24,
+      "unit": "un",
+      "unit_price": 1.07,
+      "total": 25.69
+    },
+    {
+      "id": "c181f493-473e-4467-845c-d4c1bfd889ee:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Aceto balsamico di modena IGP",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "c181f493-473e-4467-845c-d4c1bfd889ee",
+      "itemName": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
+      "matchDisplayState": "suggested",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 16.09,
+      "total": 16.09
+    },
+    {
+      "id": "332f88df-94d7-4362-9301-646d73fb942e:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Mozzarella julienne",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "332f88df-94d7-4362-9301-646d73fb942e",
+      "itemName": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
       "matchDisplayState": "suggested",
       "quantity": 10,
       "unit": "un",
-      "unit_price": 8.12,
-      "total": 81.23
+      "unit_price": 20.03,
+      "total": 200.3
     },
     {
-      "id": "ef25be0f-f153-40de-b377-25151d147637:UNMATCHED_INGREDIENT:ingredient",
+      "id": "88383663-5f6d-4d35-b324-26956d6b5899:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Rulo di capra",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "88383663-5f6d-4d35-b324-26956d6b5899",
+      "itemName": "Rulo Di Capra 1kg*2 Simonetta",
+      "matchDisplayState": "suggested",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 10.86,
+      "total": 10.86
+    },
+    {
+      "id": "7f2e0b51-d402-4ec3-9e87-aba65eccda72:UNMATCHED_INGREDIENT:ingredient",
       "code": "UNMATCHED_INGREDIENT",
       "severity": "warning",
       "category": "matching",
@@ -1327,18 +1242,43 @@
           "label": "Linked ingredient"
         },
         "extra": {
-          "item_name": "ACQUA S.PELLEGRINO (CX 75CL*15)"
+          "item_name": "Recargo por combustivel"
         }
       },
-      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-      "supplier": "Il Bocconcino Distribuição Alimentar",
-      "itemId": "ef25be0f-f153-40de-b377-25151d147637",
-      "itemName": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "7f2e0b51-d402-4ec3-9e87-aba65eccda72",
+      "itemName": "Recargo por combustivel",
       "matchDisplayState": "unmatched",
-      "quantity": 2,
+      "quantity": 1,
       "unit": "un",
-      "unit_price": 20.97,
-      "total": 42.07
+      "unit_price": 2,
+      "total": 2
+    },
+    {
+      "id": "dbda8fce-dd96-40f5-826c-dbb13bea69d2:SUGGESTED_INGREDIENT_MATCH:ingredient",
+      "code": "SUGGESTED_INGREDIENT_MATCH",
+      "severity": "info",
+      "category": "matching",
+      "title": "Suggested match",
+      "description": "A possible ingredient match needs confirmation.",
+      "suggestedAction": "Confirm or change the suggested ingredient match.",
+      "evidence": {
+        "field": "ingredient",
+        "extra": {
+          "suggested_ingredient": "Farina do pasta fresca e gnocchi",
+          "confidence": "Suggested match"
+        }
+      },
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "itemId": "dbda8fce-dd96-40f5-826c-dbb13bea69d2",
+      "itemName": "Farina do pasta fresca e gnocchi25kg Caputo",
+      "matchDisplayState": "suggested",
+      "quantity": 1,
+      "unit": "un",
+      "unit_price": 30.11,
+      "total": 30.11
     }
   ],
   "rows": [
@@ -1372,277 +1312,6 @@
             },
             "extra": {
               "item_name": "Lenha para pizzaria"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "item": {
-        "id": "7e6f6f69-81ed-42be-a062-e28ffc015f0c",
-        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-        "name": "Filete de Anchoas Alconfirosa LI 495 g",
-        "quantity": 2,
-        "unit": "un",
-        "unit_price": 9.99,
-        "total": 19.98
-      },
-      "matchDisplayState": "unmatched",
-      "findings": [
-        {
-          "id": "7e6f6f69-81ed-42be-a062-e28ffc015f0c:UNMATCHED_INGREDIENT:ingredient",
-          "code": "UNMATCHED_INGREDIENT",
-          "severity": "warning",
-          "category": "matching",
-          "title": "Unmatched ingredient",
-          "description": "This line is not linked to a catalog ingredient.",
-          "suggestedAction": "Match or create a canonical ingredient.",
-          "evidence": {
-            "field": "ingredient",
-            "expected": {
-              "value": "catalog match",
-              "label": "Linked ingredient"
-            },
-            "extra": {
-              "item_name": "Filete de Anchoas Alconfirosa LI 495 g"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "item": {
-        "id": "77d804e3-b2ff-4a06-b4df-a78d3ff405a5",
-        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-        "name": "Ovo Líquido Past.Gema Dovo 1 Kg",
-        "quantity": 6,
-        "unit": "un",
-        "unit_price": 10.49,
-        "total": 62.94
-      },
-      "matchDisplayState": "unmatched",
-      "findings": [
-        {
-          "id": "77d804e3-b2ff-4a06-b4df-a78d3ff405a5:UNMATCHED_INGREDIENT:ingredient",
-          "code": "UNMATCHED_INGREDIENT",
-          "severity": "warning",
-          "category": "matching",
-          "title": "Unmatched ingredient",
-          "description": "This line is not linked to a catalog ingredient.",
-          "suggestedAction": "Match or create a canonical ingredient.",
-          "evidence": {
-            "field": "ingredient",
-            "expected": {
-              "value": "catalog match",
-              "label": "Linked ingredient"
-            },
-            "extra": {
-              "item_name": "Ovo Líquido Past.Gema Dovo 1 Kg"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "item": {
-        "id": "86d75d64-4a8a-4fc5-95d5-cd352ba29b5f",
-        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-        "name": "Pepinos Extra Uli Frasco 6x720 g",
-        "quantity": 1,
-        "unit": "cx",
-        "unit_price": 22.49,
-        "total": 22.49
-      },
-      "matchDisplayState": "unmatched",
-      "findings": [
-        {
-          "id": "86d75d64-4a8a-4fc5-95d5-cd352ba29b5f:UNMATCHED_INGREDIENT:ingredient",
-          "code": "UNMATCHED_INGREDIENT",
-          "severity": "warning",
-          "category": "matching",
-          "title": "Unmatched ingredient",
-          "description": "This line is not linked to a catalog ingredient.",
-          "suggestedAction": "Match or create a canonical ingredient.",
-          "evidence": {
-            "field": "ingredient",
-            "expected": {
-              "value": "catalog match",
-              "label": "Linked ingredient"
-            },
-            "extra": {
-              "item_name": "Pepinos Extra Uli Frasco 6x720 g"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "item": {
-        "id": "c7c7f16b-917f-4ce6-80ad-e8484bda1bbe",
-        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-        "name": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
-        "quantity": 1,
-        "unit": "un",
-        "unit_price": 13.1,
-        "total": 13.1
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "c7c7f16b-917f-4ce6-80ad-e8484bda1bbe:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Atum em óleo",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "item": {
-        "id": "8e36bac6-c3b6-4bc3-885c-e81514feba61",
-        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-        "name": "Arroz Agulha Metro Chef 12x1 kg",
-        "quantity": 1,
-        "unit": "cx",
-        "unit_price": 13.95,
-        "total": 13.95
-      },
-      "matchDisplayState": "unmatched",
-      "findings": [
-        {
-          "id": "8e36bac6-c3b6-4bc3-885c-e81514feba61:UNMATCHED_INGREDIENT:ingredient",
-          "code": "UNMATCHED_INGREDIENT",
-          "severity": "warning",
-          "category": "matching",
-          "title": "Unmatched ingredient",
-          "description": "This line is not linked to a catalog ingredient.",
-          "suggestedAction": "Match or create a canonical ingredient.",
-          "evidence": {
-            "field": "ingredient",
-            "expected": {
-              "value": "catalog match",
-              "label": "Linked ingredient"
-            },
-            "extra": {
-              "item_name": "Arroz Agulha Metro Chef 12x1 kg"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "item": {
-        "id": "fa0d0138-577e-42fe-9212-fe5f53c7ead8",
-        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-        "name": "Chocolate Culinaria Pantagruel 10x200 g",
-        "quantity": 2,
-        "unit": "cx",
-        "unit_price": 29.99,
-        "total": 59.98
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "fa0d0138-577e-42fe-9212-fe5f53c7ead8:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Chocolate culinária",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "item": {
-        "id": "478442d5-cf8f-4e21-a905-01b7cc327fab",
-        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-        "name": "Açucar Branco METRO Chef 10x1 Kg",
-        "quantity": 1,
-        "unit": "cx",
-        "unit_price": 9.99,
-        "total": 9.99
-      },
-      "matchDisplayState": "unmatched",
-      "findings": [
-        {
-          "id": "478442d5-cf8f-4e21-a905-01b7cc327fab:UNMATCHED_INGREDIENT:ingredient",
-          "code": "UNMATCHED_INGREDIENT",
-          "severity": "warning",
-          "category": "matching",
-          "title": "Unmatched ingredient",
-          "description": "This line is not linked to a catalog ingredient.",
-          "suggestedAction": "Match or create a canonical ingredient.",
-          "evidence": {
-            "field": "ingredient",
-            "expected": {
-              "value": "catalog match",
-              "label": "Linked ingredient"
-            },
-            "extra": {
-              "item_name": "Açucar Branco METRO Chef 10x1 Kg"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-      "supplier": "Avijudo",
-      "item": {
-        "id": "2b5cea32-ec1f-4454-a4d9-cb4bb2612866",
-        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
-        "name": "Nata Culinaria 22% Reny Picot 6x1 Lt",
-        "quantity": 5,
-        "unit": "cx",
-        "unit_price": 18.89,
-        "total": 94.45
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "2b5cea32-ec1f-4454-a4d9-cb4bb2612866:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Nata culinária",
-              "confidence": "Suggested match"
             }
           }
         }
@@ -1950,7 +1619,7 @@
           "evidence": {
             "field": "ingredient",
             "extra": {
-              "suggested_ingredient": "Mozzarella fior di latte",
+              "suggested_ingredient": "Mozzarella julienne",
               "confidence": "Suggested match"
             }
           }
@@ -1958,242 +1627,21 @@
       ]
     },
     {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
       "item": {
-        "id": "d592c2cc-fd23-41ad-afd0-4fe693eef08a",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
-        "quantity": 5.996,
+        "id": "8b65efaa-ffb8-4469-b34b-5caa486ee525",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "name": "Filete de Anchoas Alconfirosa LI 495 g",
+        "quantity": 2,
         "unit": "un",
-        "unit_price": 10.83,
-        "total": 64.93
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "d592c2cc-fd23-41ad-afd0-4fe693eef08a:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Guanciale stagionato",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "item": {
-        "id": "18b97c30-12ae-4642-9ee5-1434da490bb7",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "Farine Speciale pizza 25kg Amoruso",
-        "quantity": 1,
-        "unit": "un",
-        "unit_price": 26.52,
-        "total": 26.52
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "18b97c30-12ae-4642-9ee5-1434da490bb7:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Farine speciale pizza",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "item": {
-        "id": "5d46d914-1860-40e8-b5c4-8d9aad1d4d2b",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
-        "quantity": 24,
-        "unit": "un",
-        "unit_price": 1.07,
-        "total": 25.69
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "5d46d914-1860-40e8-b5c4-8d9aad1d4d2b:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Peroni nastro azzurro 33cl",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "item": {
-        "id": "ef4c6f72-7f74-4ebb-b567-24cef8e90ae5",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
-        "quantity": 1,
-        "unit": "un",
-        "unit_price": 15.55,
-        "total": 16.09
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "ef4c6f72-7f74-4ebb-b567-24cef8e90ae5:MATHEMATICAL_INCONSISTENCY",
-          "code": "MATHEMATICAL_INCONSISTENCY",
-          "severity": "error",
-          "category": "mathematics",
-          "title": "Math inconsistency",
-          "description": "Quantity × unit price does not reconcile with line total",
-          "suggestedAction": "Correct quantity, unit price, or line total so the row reconciles.",
-          "evidence": {
-            "expected": {
-              "value": 15.55,
-              "unit": "EUR",
-              "label": "Calculated total"
-            },
-            "actual": {
-              "value": 16.09,
-              "unit": "EUR",
-              "label": "Invoice total"
-            },
-            "difference": {
-              "absolute": 0.54,
-              "percent": 3.36
-            },
-            "extra": {
-              "quantity": 1,
-              "unit_price": 15.55
-            }
-          }
-        },
-        {
-          "id": "ef4c6f72-7f74-4ebb-b567-24cef8e90ae5:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Aceto balsamico di modena IGP",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "item": {
-        "id": "1700ab82-9f9e-4830-be6d-405155616d07",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
-        "quantity": 10,
-        "unit": "un",
-        "unit_price": 20.03,
-        "total": 200.3
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "1700ab82-9f9e-4830-be6d-405155616d07:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Mozzarella fior di latte",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "item": {
-        "id": "a8f0a5e3-0612-4315-802b-27130b899839",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "Rulo Di Capra 1kg*2 Simonetta",
-        "quantity": 1,
-        "unit": "un",
-        "unit_price": 10.86,
-        "total": 10.86
-      },
-      "matchDisplayState": "suggested",
-      "findings": [
-        {
-          "id": "a8f0a5e3-0612-4315-802b-27130b899839:SUGGESTED_INGREDIENT_MATCH:ingredient",
-          "code": "SUGGESTED_INGREDIENT_MATCH",
-          "severity": "info",
-          "category": "matching",
-          "title": "Suggested match",
-          "description": "A possible ingredient match needs confirmation.",
-          "suggestedAction": "Confirm or change the suggested ingredient match.",
-          "evidence": {
-            "field": "ingredient",
-            "extra": {
-              "suggested_ingredient": "Rulo di capra",
-              "confidence": "Suggested match"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
-      "item": {
-        "id": "896110ca-85b6-42de-baac-d3c4f5c68608",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "Recargo por combustivel",
-        "quantity": 1,
-        "unit": "un",
-        "unit_price": 2,
-        "total": 2
+        "unit_price": 9.99,
+        "total": 19.98
       },
       "matchDisplayState": "unmatched",
       "findings": [
         {
-          "id": "896110ca-85b6-42de-baac-d3c4f5c68608:UNMATCHED_INGREDIENT:ingredient",
+          "id": "8b65efaa-ffb8-4469-b34b-5caa486ee525:UNMATCHED_INGREDIENT:ingredient",
           "code": "UNMATCHED_INGREDIENT",
           "severity": "warning",
           "category": "matching",
@@ -2207,28 +1655,98 @@
               "label": "Linked ingredient"
             },
             "extra": {
-              "item_name": "Recargo por combustivel"
+              "item_name": "Filete de Anchoas Alconfirosa LI 495 g"
             }
           }
         }
       ]
     },
     {
-      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-      "supplier": "Mammafiore Portugal",
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
       "item": {
-        "id": "cb75a796-0c40-48c0-a315-a2067c6c4673",
-        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
-        "name": "Farina do pasta fresca e gnocchi25kg Caputo",
+        "id": "a1f408d0-5fbf-41b1-b04d-894013fe0805",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "name": "Ovo Líquido Past.Gema Dovo 1 Kg",
+        "quantity": 6,
+        "unit": "un",
+        "unit_price": 10.49,
+        "total": 62.94
+      },
+      "matchDisplayState": "unmatched",
+      "findings": [
+        {
+          "id": "a1f408d0-5fbf-41b1-b04d-894013fe0805:UNMATCHED_INGREDIENT:ingredient",
+          "code": "UNMATCHED_INGREDIENT",
+          "severity": "warning",
+          "category": "matching",
+          "title": "Unmatched ingredient",
+          "description": "This line is not linked to a catalog ingredient.",
+          "suggestedAction": "Match or create a canonical ingredient.",
+          "evidence": {
+            "field": "ingredient",
+            "expected": {
+              "value": "catalog match",
+              "label": "Linked ingredient"
+            },
+            "extra": {
+              "item_name": "Ovo Líquido Past.Gema Dovo 1 Kg"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
+      "item": {
+        "id": "af7a1317-dbb8-4e81-9a3a-b3c17637e16c",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "name": "Pepinos Extra Uli Frasco 6x720 g",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 22.49,
+        "total": 22.49
+      },
+      "matchDisplayState": "unmatched",
+      "findings": [
+        {
+          "id": "af7a1317-dbb8-4e81-9a3a-b3c17637e16c:UNMATCHED_INGREDIENT:ingredient",
+          "code": "UNMATCHED_INGREDIENT",
+          "severity": "warning",
+          "category": "matching",
+          "title": "Unmatched ingredient",
+          "description": "This line is not linked to a catalog ingredient.",
+          "suggestedAction": "Match or create a canonical ingredient.",
+          "evidence": {
+            "field": "ingredient",
+            "expected": {
+              "value": "catalog match",
+              "label": "Linked ingredient"
+            },
+            "extra": {
+              "item_name": "Pepinos Extra Uli Frasco 6x720 g"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
+      "item": {
+        "id": "f1d95452-2302-4467-80a1-afc9d726eed3",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "name": "Atum Oleo Bolsa Nau Catrineta 1 Kg",
         "quantity": 1,
         "unit": "un",
-        "unit_price": 30.11,
-        "total": 30.11
+        "unit_price": 13.1,
+        "total": 13.1
       },
       "matchDisplayState": "suggested",
       "findings": [
         {
-          "id": "cb75a796-0c40-48c0-a315-a2067c6c4673:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "id": "f1d95452-2302-4467-80a1-afc9d726eed3:SUGGESTED_INGREDIENT_MATCH:ingredient",
           "code": "SUGGESTED_INGREDIENT_MATCH",
           "severity": "info",
           "category": "matching",
@@ -2238,7 +1756,141 @@
           "evidence": {
             "field": "ingredient",
             "extra": {
-              "suggested_ingredient": "Farina do pasta fresca e gnocchi",
+              "suggested_ingredient": "Atum em óleo",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
+      "item": {
+        "id": "61bedc5b-ce0d-4835-945a-22efb41684f0",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "name": "Arroz Agulha Metro Chef 12x1 kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 13.95,
+        "total": 13.95
+      },
+      "matchDisplayState": "unmatched",
+      "findings": [
+        {
+          "id": "61bedc5b-ce0d-4835-945a-22efb41684f0:UNMATCHED_INGREDIENT:ingredient",
+          "code": "UNMATCHED_INGREDIENT",
+          "severity": "warning",
+          "category": "matching",
+          "title": "Unmatched ingredient",
+          "description": "This line is not linked to a catalog ingredient.",
+          "suggestedAction": "Match or create a canonical ingredient.",
+          "evidence": {
+            "field": "ingredient",
+            "expected": {
+              "value": "catalog match",
+              "label": "Linked ingredient"
+            },
+            "extra": {
+              "item_name": "Arroz Agulha Metro Chef 12x1 kg"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
+      "item": {
+        "id": "c450b962-de47-4127-93d9-88ef7fc5db2b",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "name": "Chocolate Culinaria Pantagruel 10x200 g",
+        "quantity": 2,
+        "unit": "cx",
+        "unit_price": 29.99,
+        "total": 59.98
+      },
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "c450b962-de47-4127-93d9-88ef7fc5db2b:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Chocolate culinária",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
+      "item": {
+        "id": "4713a1af-d551-4f26-ad43-94983553d72d",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "name": "Açúcar Branco METRO Chef 10x1 Kg",
+        "quantity": 1,
+        "unit": "cx",
+        "unit_price": 9.99,
+        "total": 9.99
+      },
+      "matchDisplayState": "unmatched",
+      "findings": [
+        {
+          "id": "4713a1af-d551-4f26-ad43-94983553d72d:UNMATCHED_INGREDIENT:ingredient",
+          "code": "UNMATCHED_INGREDIENT",
+          "severity": "warning",
+          "category": "matching",
+          "title": "Unmatched ingredient",
+          "description": "This line is not linked to a catalog ingredient.",
+          "suggestedAction": "Match or create a canonical ingredient.",
+          "evidence": {
+            "field": "ingredient",
+            "expected": {
+              "value": "catalog match",
+              "label": "Linked ingredient"
+            },
+            "extra": {
+              "item_name": "Açúcar Branco METRO Chef 10x1 Kg"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+      "supplier": "Aviludo",
+      "item": {
+        "id": "8498e893-1d03-42c8-aaf5-3be182a28f9e",
+        "invoice_id": "3b4cb21f-8b3f-45f3-9f2d-6f15e9f438a2",
+        "name": "Nata Culinaria 22% Reny Picot 6x1 Lt",
+        "quantity": 5,
+        "unit": "cx",
+        "unit_price": 18.89,
+        "total": 94.45
+      },
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "8498e893-1d03-42c8-aaf5-3be182a28f9e:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Nata culinária",
               "confidence": "Suggested match"
             }
           }
@@ -2469,6 +2121,148 @@
         "unit": "kg",
         "unit_price": 15.19,
         "total": 39.49
+      },
+      "matchDisplayState": "confirmed",
+      "findings": []
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "item": {
+        "id": "63958019-9af9-4738-bc13-404d27796b24",
+        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
+        "quantity": 10,
+        "unit": "un",
+        "unit_price": 8.12,
+        "total": 81.23
+      },
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "63958019-9af9-4738-bc13-404d27796b24:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Mozzarella julienne",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "item": {
+        "id": "3ae0cf99-7664-4be1-a378-51297463c0a0",
+        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "name": "STRACCIATELLA 250 GR",
+        "quantity": 24,
+        "unit": "un",
+        "unit_price": 3.11,
+        "total": 74.54
+      },
+      "matchDisplayState": "confirmed",
+      "findings": []
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "item": {
+        "id": "65e0a86d-dc5f-4e23-94ce-4612bc1b6669",
+        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 13.65,
+        "total": 27.3
+      },
+      "matchDisplayState": "confirmed",
+      "findings": []
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "item": {
+        "id": "b6b00e15-c38d-48e7-8d66-53f4ffbf3f1b",
+        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 22.05,
+        "total": 22.05
+      },
+      "matchDisplayState": "confirmed",
+      "findings": []
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "item": {
+        "id": "c6993038-5ec1-4ffb-a5c7-5c7452dc0bc5",
+        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
+        "quantity": 2,
+        "unit": "un",
+        "unit_price": 21.04,
+        "total": 42.07
+      },
+      "matchDisplayState": "unmatched",
+      "findings": [
+        {
+          "id": "c6993038-5ec1-4ffb-a5c7-5c7452dc0bc5:UNMATCHED_INGREDIENT:ingredient",
+          "code": "UNMATCHED_INGREDIENT",
+          "severity": "warning",
+          "category": "matching",
+          "title": "Unmatched ingredient",
+          "description": "This line is not linked to a catalog ingredient.",
+          "suggestedAction": "Match or create a canonical ingredient.",
+          "evidence": {
+            "field": "ingredient",
+            "expected": {
+              "value": "catalog match",
+              "label": "Linked ingredient"
+            },
+            "extra": {
+              "item_name": "ACQUA S.PELLEGRINO (CX 75CL*15)"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "item": {
+        "id": "3457193a-f60e-4642-8d18-3412a29a834f",
+        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "name": "RICOTTA TREVIGIANA 1,5KG",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 7.967,
+        "total": 7.97
+      },
+      "matchDisplayState": "confirmed",
+      "findings": []
+    },
+    {
+      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
+      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "item": {
+        "id": "14f5c7bf-5ee1-4493-a1b0-1e5c274a0258",
+        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
+        "name": "ROLO DE CABRA VACA 1KG",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 12.71,
+        "total": 12.71
       },
       "matchDisplayState": "confirmed",
       "findings": []
@@ -2710,21 +2504,21 @@
       "findings": []
     },
     {
-      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
       "item": {
-        "id": "f2a672e0-016c-43d7-a53f-1ee8b8976f4b",
-        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
-        "name": "MOZZARELLA FIOR DI LATTE \"IL BOCCONCINO\" 125GR*8",
-        "quantity": 10,
+        "id": "48443ad1-7303-4560-b6eb-85a77e559400",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Guanciale di suino stagionato +/- 1,5kg*7 Sorrentino",
+        "quantity": 5.996,
         "unit": "un",
-        "unit_price": 8.12,
-        "total": 81.23
+        "unit_price": 10.83,
+        "total": 64.93
       },
       "matchDisplayState": "suggested",
       "findings": [
         {
-          "id": "f2a672e0-016c-43d7-a53f-1ee8b8976f4b:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "id": "48443ad1-7303-4560-b6eb-85a77e559400:SUGGESTED_INGREDIENT_MATCH:ingredient",
           "code": "SUGGESTED_INGREDIENT_MATCH",
           "severity": "info",
           "category": "matching",
@@ -2734,7 +2528,7 @@
           "evidence": {
             "field": "ingredient",
             "extra": {
-              "suggested_ingredient": "Mozzarella fior di latte",
+              "suggested_ingredient": "Guanciale stagionato",
               "confidence": "Suggested match"
             }
           }
@@ -2742,66 +2536,181 @@
       ]
     },
     {
-      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
       "item": {
-        "id": "793e9cd0-a7b5-4228-8ece-e6f16b047515",
-        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
-        "name": "STRACCIATELLA 250 GR",
+        "id": "742e976a-4c92-4690-b497-8c101293042b",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Farine Speciale pizza 25kg Amoruso",
+        "quantity": 1,
+        "unit": "un",
+        "unit_price": 26.52,
+        "total": 26.52
+      },
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "742e976a-4c92-4690-b497-8c101293042b:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Farine speciale pizza",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "item": {
+        "id": "eb0bc20a-42b3-40c8-98bc-87db12f00809",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Birra Peroni Nastro Azzurro PNA 33cl*24 Nastro Azzurro",
         "quantity": 24,
         "unit": "un",
-        "unit_price": 3.11,
-        "total": 74.54
+        "unit_price": 1.07,
+        "total": 25.69
       },
-      "matchDisplayState": "confirmed",
-      "findings": []
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "eb0bc20a-42b3-40c8-98bc-87db12f00809:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Peroni nastro azzurro 33cl",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
     },
     {
-      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
       "item": {
-        "id": "bf43813b-6377-459d-9c8f-b342eb969452",
-        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
-        "name": "MEZZI PACCHERI MANCINI (CX 1KG*6)",
+        "id": "c181f493-473e-4467-845c-d4c1bfd889ee",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Aceto balsamico di modena IGP pet 5l*2 Toschi",
         "quantity": 1,
         "unit": "un",
-        "unit_price": 22.05,
-        "total": 22.05
+        "unit_price": 16.09,
+        "total": 16.09
       },
-      "matchDisplayState": "confirmed",
-      "findings": []
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "c181f493-473e-4467-845c-d4c1bfd889ee:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Aceto balsamico di modena IGP",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
     },
     {
-      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
       "item": {
-        "id": "9a52cc46-1c5a-4798-9621-d06177e04208",
-        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
-        "name": "POMODORI PELATI (CX 2,5KG*6)",
+        "id": "332f88df-94d7-4362-9301-646d73fb942e",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "MOZZA Fior di Latte Expet Julienne 3kg Simonetta",
+        "quantity": 10,
+        "unit": "un",
+        "unit_price": 20.03,
+        "total": 200.3
+      },
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "332f88df-94d7-4362-9301-646d73fb942e:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Mozzarella julienne",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
+      "item": {
+        "id": "88383663-5f6d-4d35-b324-26956d6b5899",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Rulo Di Capra 1kg*2 Simonetta",
         "quantity": 1,
         "unit": "un",
-        "unit_price": 22.05,
-        "total": 22.05
+        "unit_price": 10.86,
+        "total": 10.86
       },
-      "matchDisplayState": "confirmed",
-      "findings": []
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "88383663-5f6d-4d35-b324-26956d6b5899:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Rulo di capra",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
     },
     {
-      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
       "item": {
-        "id": "ef25be0f-f153-40de-b377-25151d147637",
-        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
-        "name": "ACQUA S.PELLEGRINO (CX 75CL*15)",
-        "quantity": 2,
+        "id": "7f2e0b51-d402-4ec3-9e87-aba65eccda72",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Recargo por combustivel",
+        "quantity": 1,
         "unit": "un",
-        "unit_price": 20.97,
-        "total": 42.07
+        "unit_price": 2,
+        "total": 2
       },
       "matchDisplayState": "unmatched",
       "findings": [
         {
-          "id": "ef25be0f-f153-40de-b377-25151d147637:UNMATCHED_INGREDIENT:ingredient",
+          "id": "7f2e0b51-d402-4ec3-9e87-aba65eccda72:UNMATCHED_INGREDIENT:ingredient",
           "code": "UNMATCHED_INGREDIENT",
           "severity": "warning",
           "category": "matching",
@@ -2815,41 +2724,43 @@
               "label": "Linked ingredient"
             },
             "extra": {
-              "item_name": "ACQUA S.PELLEGRINO (CX 75CL*15)"
+              "item_name": "Recargo por combustivel"
             }
           }
         }
       ]
     },
     {
-      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-      "supplier": "Il Bocconcino Distribuição Alimentar",
+      "invoiceId": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+      "supplier": "Mammafiore Portugal",
       "item": {
-        "id": "28777b03-2389-4759-bc48-c9bd1839d970",
-        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
-        "name": "RICOTTA TREVIGIANA 1,5KG",
+        "id": "dbda8fce-dd96-40f5-826c-dbb13bea69d2",
+        "invoice_id": "36c99d19-6f9f-413f-8c2d-ae3526291a2d",
+        "name": "Farina do pasta fresca e gnocchi25kg Caputo",
         "quantity": 1,
         "unit": "un",
-        "unit_price": 7.967,
-        "total": 7.97
+        "unit_price": 30.11,
+        "total": 30.11
       },
-      "matchDisplayState": "confirmed",
-      "findings": []
-    },
-    {
-      "invoiceId": "f0aa5a08-86a3-4938-99f0-711e86073968",
-      "supplier": "Il Bocconcino Distribuição Alimentar",
-      "item": {
-        "id": "655aa967-b1dc-48e2-ae46-fd0ca962e9e3",
-        "invoice_id": "f0aa5a08-86a3-4938-99f0-711e86073968",
-        "name": "ROLO DE CABRA E VACA 1KG",
-        "quantity": 1,
-        "unit": "un",
-        "unit_price": 12.71,
-        "total": 12.71
-      },
-      "matchDisplayState": "confirmed",
-      "findings": []
+      "matchDisplayState": "suggested",
+      "findings": [
+        {
+          "id": "dbda8fce-dd96-40f5-826c-dbb13bea69d2:SUGGESTED_INGREDIENT_MATCH:ingredient",
+          "code": "SUGGESTED_INGREDIENT_MATCH",
+          "severity": "info",
+          "category": "matching",
+          "title": "Suggested match",
+          "description": "A possible ingredient match needs confirmation.",
+          "suggestedAction": "Confirm or change the suggested ingredient match.",
+          "evidence": {
+            "field": "ingredient",
+            "extra": {
+              "suggested_ingredient": "Farina do pasta fresca e gnocchi",
+              "confidence": "Suggested match"
+            }
+          }
+        }
+      ]
     }
   ]
 }
