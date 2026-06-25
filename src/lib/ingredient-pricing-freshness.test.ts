@@ -67,7 +67,10 @@ describe("ingredient-pricing-freshness", () => {
   });
 
   it("parses ISO purchase dates from invoice scan", () => {
-    const days = daysSinceRecency("2026-05-18");
+    const recent = new Date();
+    recent.setDate(recent.getDate() - 15);
+    const isoDate = recent.toISOString().slice(0, 10);
+    const days = daysSinceRecency(isoDate);
     expect(days).not.toBeNull();
     expect(days!).toBeLessThan(30);
   });

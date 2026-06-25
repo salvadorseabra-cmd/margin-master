@@ -16,7 +16,7 @@ function historyRow(
   return {
     id: overrides.id ?? `h-${overrides.created_at}`,
     ingredient_id: overrides.ingredient_id,
-    invoice_id: null,
+    invoice_id: overrides.invoice_id ?? "inv-fixture",
     ingredient_name: overrides.ingredient_name ?? "Novilho",
     supplier_name: overrides.supplier_name ?? "Metro",
     ingredient_unit: "kg",
@@ -187,7 +187,7 @@ describe("exposure-drill-down", () => {
           new_price: 10.5,
           previous_price: 10,
           delta_percent: 5,
-          created_at: new Date(NOW - 1 * 86_400_000).toISOString(),
+          created_at: new Date(Date.now() - 1 * 86_400_000).toISOString(),
         }),
       ],
       invoices: [],

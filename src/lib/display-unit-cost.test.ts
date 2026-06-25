@@ -87,7 +87,7 @@ describe("formatDisplayUnitCostForContext", () => {
   it("packaged liquid subtitle complements €/L primary label", () => {
     const unitCostPerMl = 4.59 / 450;
     expect(formatDisplayUnitCostForContext(unitCostPerMl, "ml")).toBe("€10.20/L");
-    expect(formatPackagedLiquidContext({ price: 4.59, ml: 450 })).toBe("450ml · €4.59");
+    expect(formatPackagedLiquidContext({ price: 4.59, ml: 450 })).toBe("450ml pack · €4.59");
   });
 
   it("brioche countable line shows €/un", () => {
