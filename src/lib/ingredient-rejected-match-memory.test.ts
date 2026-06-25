@@ -21,6 +21,57 @@ function ingredient(id: string, name: string): IngredientCanonicalInput {
   return { id, name, normalized_name: name.toLowerCase(), unit: "kg" };
 }
 
+function createIngredientAliasSupabaseMock() {
+  const scopeTerminal = {
+    eq() {
+      return { maybeSingle: async () => ({ data: null, error: null }) };
+    },
+    then(
+      onFulfilled?: (value: { data: unknown[]; error: null }) => unknown,
+      onRejected?: (reason: unknown) => unknown,
+    ) {
+      return Promise.resolve({ data: [], error: null }).then(onFulfilled, onRejected);
+    },
+  };
+  const afterFirstEq = {
+    is() {
+      return scopeTerminal;
+    },
+    eq() {
+      return {
+        eq() {
+          return { maybeSingle: async () => ({ data: null, error: null }) };
+        },
+        then(
+          onFulfilled?: (value: { data: unknown[]; error: null }) => unknown,
+          onRejected?: (reason: unknown) => unknown,
+        ) {
+          return Promise.resolve({ data: [], error: null }).then(onFulfilled, onRejected);
+        },
+      };
+    },
+  };
+
+  return {
+    from(table: string) {
+      if (table !== "ingredient_aliases") throw new Error(`unexpected table ${table}`);
+      return {
+        select() {
+          return {
+            eq() {
+              return afterFirstEq;
+            },
+          };
+        },
+        insert: () => Promise.resolve({ error: null }),
+        update() {
+          return { eq: () => Promise.resolve({ error: null }) };
+        },
+      };
+    },
+  } as unknown as AppSupabaseClient;
+}
+
 const storage = new Map<string, string>();
 
 describe("ingredient rejected match memory", () => {
@@ -117,35 +168,7 @@ describe("ingredient rejected match memory", () => {
     expect(findCanonicalIngredientMatch("óleo", catalog, aliases)).toBeNull();
     expect(isIngredientMatchPairRejected("óleo", "oleo-1")).toBe(true);
 
-    const supabase = {
-      from(table: string) {
-        if (table !== "ingredient_aliases") throw new Error(`unexpected table ${table}`);
-        return {
-          select() {
-            return {
-              eq() {
-                return {
-                  eq() {
-                    return {
-                      is() {
-                        return { maybeSingle: async () => ({ data: null, error: null }) };
-                      },
-                      eq() {
-                        return { maybeSingle: async () => ({ data: null, error: null }) };
-                      },
-                    };
-                  },
-                };
-              },
-            };
-          },
-          insert: () => Promise.resolve({ error: null }),
-          update() {
-            return { eq: () => Promise.resolve({ error: null }) };
-          },
-        };
-      },
-    } as unknown as AppSupabaseClient;
+    const supabase = createIngredientAliasSupabaseMock();
 
     const { applied, error, clearedRejectedPairs } = await persistManualIngredientCorrection({
       itemName: "óleo",

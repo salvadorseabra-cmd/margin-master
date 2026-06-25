@@ -16,6 +16,60 @@ import {
   validateCanonicalIngredientName,
 } from "./canonical-ingredient-create";
 
+function createIngredientAliasSupabaseMock(insertCalls: Record<string, unknown>[]) {
+  const scopeTerminal = {
+    eq() {
+      return { maybeSingle: async () => ({ data: null, error: null }) };
+    },
+    then(
+      onFulfilled?: (value: { data: unknown[]; error: null }) => unknown,
+      onRejected?: (reason: unknown) => unknown,
+    ) {
+      return Promise.resolve({ data: [], error: null }).then(onFulfilled, onRejected);
+    },
+  };
+  const afterFirstEq = {
+    is() {
+      return scopeTerminal;
+    },
+    eq() {
+      return {
+        eq() {
+          return { maybeSingle: async () => ({ data: null, error: null }) };
+        },
+        then(
+          onFulfilled?: (value: { data: unknown[]; error: null }) => unknown,
+          onRejected?: (reason: unknown) => unknown,
+        ) {
+          return Promise.resolve({ data: [], error: null }).then(onFulfilled, onRejected);
+        },
+      };
+    },
+  };
+
+  return {
+    from(table: string) {
+      if (table !== "ingredient_aliases") throw new Error(`unexpected table ${table}`);
+      return {
+        select() {
+          return {
+            eq() {
+              return afterFirstEq;
+            },
+          };
+        },
+        insert(payload: Record<string, unknown>) {
+          insertCalls.push(payload);
+          return Promise.resolve({ error: null });
+        },
+        update() {
+          return { eq: () => Promise.resolve({ error: null }) };
+        },
+      };
+    },
+  } as unknown as AppSupabaseClient;
+}
+
 const item = (
   name: string,
   overrides: Partial<{ quantity: number | null; unit: string | null; unit_price: number | null }> = {},
@@ -405,38 +459,7 @@ describe("canonical create trace helpers", () => {
 describe("Batata Palha Auchan canonical create alias regression", () => {
   it("persists invoice alias and rematch keys after create from shorthand line", async () => {
     const insertCalls: Record<string, unknown>[] = [];
-    const supabase = {
-      from(table: string) {
-        if (table !== "ingredient_aliases") throw new Error(`unexpected table ${table}`);
-        return {
-          select() {
-            return {
-              eq() {
-                return {
-                  eq() {
-                    return {
-                      is() {
-                        return { maybeSingle: async () => ({ data: null, error: null }) };
-                      },
-                      eq() {
-                        return { maybeSingle: async () => ({ data: null, error: null }) };
-                      },
-                    };
-                  },
-                };
-              },
-            };
-          },
-          insert(payload: Record<string, unknown>) {
-            insertCalls.push(payload);
-            return Promise.resolve({ error: null });
-          },
-          update() {
-            return { eq: () => Promise.resolve({ error: null }) };
-          },
-        };
-      },
-    } as unknown as AppSupabaseClient;
+    const supabase = createIngredientAliasSupabaseMock(insertCalls);
 
     const payload = buildExplicitCanonicalInsertPayload({
       canonicalName: "Batata palha",
@@ -476,38 +499,7 @@ describe("Batata Palha Auchan canonical create alias regression", () => {
 describe("CHK BREADED canonical create alias regression", () => {
   it("persists invoice alias and rematch keys after manual link", async () => {
     const insertCalls: Record<string, unknown>[] = [];
-    const supabase = {
-      from(table: string) {
-        if (table !== "ingredient_aliases") throw new Error(`unexpected table ${table}`);
-        return {
-          select() {
-            return {
-              eq() {
-                return {
-                  eq() {
-                    return {
-                      is() {
-                        return { maybeSingle: async () => ({ data: null, error: null }) };
-                      },
-                      eq() {
-                        return { maybeSingle: async () => ({ data: null, error: null }) };
-                      },
-                    };
-                  },
-                };
-              },
-            };
-          },
-          insert(payload: Record<string, unknown>) {
-            insertCalls.push(payload);
-            return Promise.resolve({ error: null });
-          },
-          update() {
-            return { eq: () => Promise.resolve({ error: null }) };
-          },
-        };
-      },
-    } as unknown as AppSupabaseClient;
+    const supabase = createIngredientAliasSupabaseMock(insertCalls);
 
     const inMemory = applyManualIngredientCorrection(
       {

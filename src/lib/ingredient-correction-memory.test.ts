@@ -72,7 +72,7 @@ describe("applyManualIngredientCorrection", () => {
       {},
     );
     expect(result).not.toBeNull();
-    expect(result!.nextConfirmedAliases["Metro::chicken breaded"]).toBe("chk-1");
+    expect(result!.nextConfirmedAliases["metro::chicken breaded"]).toBe("chk-1");
     expect(result!.nextConfirmedAliases["chicken breaded"]).toBe("chk-1");
   });
 });
@@ -131,7 +131,7 @@ describe("persistManualIngredientCorrection", () => {
       normalized_alias: "chicken breaded",
       confirmed_by_user: true,
     });
-    expect(applied!.nextConfirmedAliases["Metro::chicken breaded"]).toBe("chk-new");
+    expect(applied!.nextConfirmedAliases["metro::chicken breaded"]).toBe("chk-new");
     expect(applied!.nextConfirmedAliases["chicken breaded"]).toBe("chk-new");
   });
 });
